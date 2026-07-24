@@ -1,0 +1,702 @@
+[
+  {
+    "id": "water_basic",
+    "name": "Agua",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "unreleased": false
+  },
+  {
+    "id": "water_gold",
+    "name": "Agua Dorada",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "water_candy",
+    "name": "Agua Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "water_galaxy",
+    "name": "Agua Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "water_gem",
+    "name": "Agua Gema",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
+    "id": "water_holofoil",
+    "name": "Agua Holofoil",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "earth_basic",
+    "name": "Tierra",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "unreleased": false
+  },
+  {
+    "id": "earth_gold",
+    "name": "Tierra Dorada",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "earth_candy",
+    "name": "Tierra Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "earth_galaxy",
+    "name": "Tierra Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "earth_gem",
+    "name": "Tierra Gema",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
+    "id": "earth_rift",
+    "name": "Tierra Cubo",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "fire_basic",
+    "name": "Fuego",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "unreleased": false
+  },
+  {
+    "id": "fire_gold",
+    "name": "Fuego Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "fire_candy",
+    "name": "Fuego Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "fire_galaxy",
+    "name": "Fuego Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "fire_holofoil",
+    "name": "Fuego Holofoil",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "fire_rift",
+    "name": "Fuego Cubo",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "duck_basic",
+    "name": "Pato",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false
+  },
+  {
+    "id": "duck_gold",
+    "name": "Pato Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "duck_candy",
+    "name": "Pato Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "duck_galaxy",
+    "name": "Pato Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "duck_gem",
+    "name": "Pato Gema",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
+    "id": "ghost_basic",
+    "name": "Fantasma",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false
+  },
+  {
+    "id": "ghost_gold",
+    "name": "Fantasma Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "ghost_candy",
+    "name": "Fantasma Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "ghost_galaxy",
+    "name": "Fantasma Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "ghost_holofoil",
+    "name": "Fantasma Holofoil",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "dream_basic",
+    "name": "Sueño",
+    "theme": "Basic",
+    "rarity": "Legendary",
+    "unreleased": false
+  },
+  {
+    "id": "dream_gold",
+    "name": "Sueño Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "dream_candy",
+    "name": "Sueño Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "dream_galaxy",
+    "name": "Sueño Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "dream_rift",
+    "name": "Sueño Cubo",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "demon_basic",
+    "name": "Demonio",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false
+  },
+  {
+    "id": "demon_gold",
+    "name": "Demonio Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "demon_candy",
+    "name": "Demonio Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "demon_galaxy",
+    "name": "Demonio Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "demon_gem",
+    "name": "Demonio Gema",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
+    "id": "punk_basic",
+    "name": "Punk",
+    "theme": "Basic",
+    "rarity": "Legendary",
+    "unreleased": false
+  },
+  {
+    "id": "punk_gold",
+    "name": "Punk Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "punk_candy",
+    "name": "Punk Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "punk_galaxy",
+    "name": "Punk Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "punk_gem",
+    "name": "Punk Gema",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
+    "id": "punk_rift",
+    "name": "Punk Cubo",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "king_basic",
+    "name": "Rey",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false
+  },
+  {
+    "id": "king_gold",
+    "name": "Rey Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "king_candy",
+    "name": "Rey Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "king_galaxy",
+    "name": "Rey Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "king_holofoil",
+    "name": "Rey Holofoil",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "zeropoint_basic",
+    "name": "Punto Cero",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false
+  },
+  {
+    "id": "zeropoint_gold",
+    "name": "Punto Cero Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "zeropoint_candy",
+    "name": "Punto Cero Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "zeropoint_galaxy",
+    "name": "Punto Cero Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "zeropoint_gem",
+    "name": "Punto Cero Gema",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
+    "id": "zeropoint_holofoil",
+    "name": "Punto Cero Holofoil",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
+    "id": "theburntpeanut_basic",
+    "name": "Cacahuate Tostado",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false
+  },
+  {
+    "id": "fishy_basic",
+    "name": "Pececillo",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "unreleased": false
+  },
+  {
+    "id": "fishy_gold",
+    "name": "Pececillo Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "fishy_candy",
+    "name": "Pececillo Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "fishy_galaxy",
+    "name": "Pececillo Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "fishy_rift",
+    "name": "Pececillo Cubo",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "striker_basic",
+    "name": "Delantero",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false
+  },
+  {
+    "id": "striker_gold",
+    "name": "Delantero Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "striker_candy",
+    "name": "Delantero Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "striker_galaxy",
+    "name": "Delantero Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "striker_holofoil",
+    "name": "Delantero Holofoil",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "aura_basic",
+    "name": "Aura",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false
+  },
+  {
+    "id": "aura_gold",
+    "name": "Aura Dorada",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "aura_candy",
+    "name": "Aura Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "aura_galaxy",
+    "name": "Aura Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "aura_gem",
+    "name": "Aura Gema",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
+    "id": "boss_basic",
+    "name": "Jefe",
+    "theme": "Basic",
+    "rarity": "Legendary",
+    "unreleased": false
+  },
+  {
+    "id": "boss_gold",
+    "name": "Jefe Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "boss_candy",
+    "name": "Jefe Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "boss_galaxy",
+    "name": "Jefe Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "boss_rift",
+    "name": "Jefe Cubo",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "grim_basic",
+    "name": "Tétrico",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false
+  },
+  {
+    "id": "grim_gold",
+    "name": "Tétrico Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "grim_candy",
+    "name": "Tétrico Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "grim_galaxy",
+    "name": "Tétrico Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "grim_rift",
+    "name": "Tétrico Cubo",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "air_basic",
+    "name": "Aire",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "unreleased": false
+  },
+  {
+    "id": "air_gold",
+    "name": "Aire Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "air_candy",
+    "name": "Aire Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "air_galaxy",
+    "name": "Aire Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "air_holofoil",
+    "name": "Aire Holofoil",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "seven_basic",
+    "name": "Los Siete",
+    "theme": "Basic",
+    "rarity": "Legendary",
+    "unreleased": false
+  },
+  {
+    "id": "seven_gold",
+    "name": "Los Siete Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "seven_candy",
+    "name": "Los Siete Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "seven_galaxy",
+    "name": "Los Siete Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "seven_holofoil",
+    "name": "Los Siete Holofoil",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "batman_basic",
+    "name": "Batman",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false
+  },
+  {
+    "id": "batman_gold",
+    "name": "Batman Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "batman_candy",
+    "name": "Batman Gominola",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "batman_galaxy",
+    "name": "Batman Galaxia",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "batman_holofoil",
+    "name": "Batman Holofoil",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "batman_rift",
+    "name": "Batman Cubo",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "pollo_basic",
+    "name": "Pollo",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false
+  },
+  {
+    "id": "vini_basic",
+    "name": "Vini Jr.",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false
+  },
+  {
+    "id": "wick_basic",
+    "name": "John Wick",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": true
+  }
+]
