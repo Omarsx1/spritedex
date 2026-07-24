@@ -1,266 +1,266 @@
 [
   {
     "id": "water_basic",
-    "name": "Agua",
+    "name": "Water",
     "theme": "Basic",
     "rarity": "Rare",
     "unreleased": false
   },
   {
     "id": "water_gold",
-    "name": "Agua Dorada",
+    "name": "Gold Water",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "water_candy",
-    "name": "Agua Gominola",
+    "name": "Gummy Water",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "water_galaxy",
-    "name": "Agua Galaxia",
+    "name": "Galaxy Water",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "water_gem",
-    "name": "Agua Gema",
+    "name": "Gem Water",
     "theme": "Gem",
     "rarity": "Special",
     "unreleased": true
   },
   {
     "id": "water_holofoil",
-    "name": "Agua Holofoil",
+    "name": "Holofoil Water",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "earth_basic",
-    "name": "Tierra",
+    "name": "Earth",
     "theme": "Basic",
     "rarity": "Rare",
     "unreleased": false
   },
   {
     "id": "earth_gold",
-    "name": "Tierra Dorada",
+    "name": "Gold Earth",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "earth_candy",
-    "name": "Tierra Gominola",
+    "name": "Gummy Earth",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "earth_galaxy",
-    "name": "Tierra Galaxia",
+    "name": "Galaxy Earth",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "earth_gem",
-    "name": "Tierra Gema",
+    "name": "Gem Earth",
     "theme": "Gem",
     "rarity": "Special",
     "unreleased": true
   },
   {
     "id": "earth_rift",
-    "name": "Tierra Cubo",
+    "name": "Cube Earth",
     "theme": "Cube",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "fire_basic",
-    "name": "Fuego",
+    "name": "Fire",
     "theme": "Basic",
     "rarity": "Rare",
     "unreleased": false
   },
   {
     "id": "fire_gold",
-    "name": "Fuego Dorado",
+    "name": "Gold Fire",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "fire_candy",
-    "name": "Fuego Gominola",
+    "name": "Gummy Fire",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "fire_galaxy",
-    "name": "Fuego Galaxia",
+    "name": "Galaxy Fire",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "fire_holofoil",
-    "name": "Fuego Holofoil",
+    "name": "Holofoil Fire",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "fire_rift",
-    "name": "Fuego Cubo",
+    "name": "Cube Fire",
     "theme": "Cube",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "duck_basic",
-    "name": "Pato",
+    "name": "Duck",
     "theme": "Basic",
     "rarity": "Epic",
     "unreleased": false
   },
   {
     "id": "duck_gold",
-    "name": "Pato Dorado",
+    "name": "Gold Duck",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "duck_candy",
-    "name": "Pato Gominola",
+    "name": "Gummy Duck",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "duck_galaxy",
-    "name": "Pato Galaxia",
+    "name": "Galaxy Duck",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "duck_gem",
-    "name": "Pato Gema",
+    "name": "Gem Duck",
     "theme": "Gem",
     "rarity": "Special",
     "unreleased": true
   },
   {
     "id": "ghost_basic",
-    "name": "Fantasma",
+    "name": "Ghost",
     "theme": "Basic",
     "rarity": "Epic",
     "unreleased": false
   },
   {
     "id": "ghost_gold",
-    "name": "Fantasma Dorado",
+    "name": "Gold Ghost",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "ghost_candy",
-    "name": "Fantasma Gominola",
+    "name": "Gummy Ghost",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "ghost_galaxy",
-    "name": "Fantasma Galaxia",
+    "name": "Galaxy Ghost",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "ghost_holofoil",
-    "name": "Fantasma Holofoil",
+    "name": "Holofoil Ghost",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "dream_basic",
-    "name": "Sueño",
+    "name": "Dream",
     "theme": "Basic",
     "rarity": "Legendary",
     "unreleased": false
   },
   {
     "id": "dream_gold",
-    "name": "Sueño Dorado",
+    "name": "Gold Dream",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "dream_candy",
-    "name": "Sueño Gominola",
+    "name": "Gummy Dream",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "dream_galaxy",
-    "name": "Sueño Galaxia",
+    "name": "Galaxy Dream",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "dream_rift",
-    "name": "Sueño Cubo",
+    "name": "Cube Dream",
     "theme": "Cube",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "demon_basic",
-    "name": "Demonio",
+    "name": "Demon",
     "theme": "Basic",
     "rarity": "Epic",
     "unreleased": false
   },
   {
     "id": "demon_gold",
-    "name": "Demonio Dorado",
+    "name": "Gold Demon",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "demon_candy",
-    "name": "Demonio Gominola",
+    "name": "Gummy Demon",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "demon_galaxy",
-    "name": "Demonio Galaxia",
+    "name": "Galaxy Demon",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "demon_gem",
-    "name": "Demonio Gema",
+    "name": "Gem Demon",
     "theme": "Gem",
     "rarity": "Special",
     "unreleased": true
@@ -274,189 +274,189 @@
   },
   {
     "id": "punk_gold",
-    "name": "Punk Dorado",
+    "name": "Gold Punk",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "punk_candy",
-    "name": "Punk Gominola",
+    "name": "Gummy Punk",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "punk_galaxy",
-    "name": "Punk Galaxia",
+    "name": "Galaxy Punk",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "punk_gem",
-    "name": "Punk Gema",
+    "name": "Gem Punk",
     "theme": "Gem",
     "rarity": "Special",
     "unreleased": true
   },
   {
     "id": "punk_rift",
-    "name": "Punk Cubo",
+    "name": "Cube Punk",
     "theme": "Cube",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "king_basic",
-    "name": "Rey",
+    "name": "King",
     "theme": "Basic",
     "rarity": "Epic",
     "unreleased": false
   },
   {
     "id": "king_gold",
-    "name": "Rey Dorado",
+    "name": "Gold King",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "king_candy",
-    "name": "Rey Gominola",
+    "name": "Gummy King",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "king_galaxy",
-    "name": "Rey Galaxia",
+    "name": "Galaxy King",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "king_holofoil",
-    "name": "Rey Holofoil",
+    "name": "Holofoil King",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "zeropoint_basic",
-    "name": "Punto Cero",
+    "name": "Zero Point",
     "theme": "Basic",
     "rarity": "Mythic",
     "unreleased": false
   },
   {
     "id": "zeropoint_gold",
-    "name": "Punto Cero Dorado",
+    "name": "Gold Zero Point",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "zeropoint_candy",
-    "name": "Punto Cero Gominola",
+    "name": "Gummy Zero Point",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "zeropoint_galaxy",
-    "name": "Punto Cero Galaxia",
+    "name": "Galaxy Zero Point",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "zeropoint_gem",
-    "name": "Punto Cero Gema",
+    "name": "Gem Zero Point",
     "theme": "Gem",
     "rarity": "Special",
     "unreleased": true
   },
   {
     "id": "zeropoint_holofoil",
-    "name": "Punto Cero Holofoil",
+    "name": "Quack Zero Point",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": true
   },
   {
     "id": "theburntpeanut_basic",
-    "name": "Cacahuate Tostado",
+    "name": "Burnt Peanut",
     "theme": "Basic",
     "rarity": "Mythic",
     "unreleased": false
   },
   {
     "id": "fishy_basic",
-    "name": "Pececillo",
+    "name": "Fishy",
     "theme": "Basic",
     "rarity": "Rare",
     "unreleased": false
   },
   {
     "id": "fishy_gold",
-    "name": "Pececillo Dorado",
+    "name": "Gold Fishy",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "fishy_candy",
-    "name": "Pececillo Gominola",
+    "name": "Gummy Fishy",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "fishy_galaxy",
-    "name": "Pececillo Galaxia",
+    "name": "Galaxy Fishy",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "fishy_rift",
-    "name": "Pececillo Cubo",
+    "name": "Cube Fishy",
     "theme": "Cube",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "striker_basic",
-    "name": "Delantero",
+    "name": "Striker",
     "theme": "Basic",
     "rarity": "Epic",
     "unreleased": false
   },
   {
     "id": "striker_gold",
-    "name": "Delantero Dorado",
+    "name": "Gold Striker",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "striker_candy",
-    "name": "Delantero Gominola",
+    "name": "Gummy Striker",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "striker_galaxy",
-    "name": "Delantero Galaxia",
+    "name": "Galaxy Striker",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "striker_holofoil",
-    "name": "Delantero Holofoil",
+    "name": "Holofoil Striker",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
@@ -470,168 +470,168 @@
   },
   {
     "id": "aura_gold",
-    "name": "Aura Dorada",
+    "name": "Gold Aura",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "aura_candy",
-    "name": "Aura Gominola",
+    "name": "Gummy Aura",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "aura_galaxy",
-    "name": "Aura Galaxia",
+    "name": "Galaxy Aura",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "aura_gem",
-    "name": "Aura Gema",
+    "name": "Gem Aura",
     "theme": "Gem",
     "rarity": "Special",
     "unreleased": true
   },
   {
     "id": "boss_basic",
-    "name": "Jefe",
+    "name": "Boss",
     "theme": "Basic",
     "rarity": "Legendary",
     "unreleased": false
   },
   {
     "id": "boss_gold",
-    "name": "Jefe Dorado",
+    "name": "Gold Boss",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "boss_candy",
-    "name": "Jefe Gominola",
+    "name": "Gummy Boss",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "boss_galaxy",
-    "name": "Jefe Galaxia",
+    "name": "Galaxy Boss",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "boss_rift",
-    "name": "Jefe Cubo",
+    "name": "Cube Boss",
     "theme": "Cube",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "grim_basic",
-    "name": "Tétrico",
+    "name": "Grim",
     "theme": "Basic",
     "rarity": "Mythic",
     "unreleased": false
   },
   {
     "id": "grim_gold",
-    "name": "Tétrico Dorado",
+    "name": "Gold Grim",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "grim_candy",
-    "name": "Tétrico Gominola",
+    "name": "Gummy Grim",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "grim_galaxy",
-    "name": "Tétrico Galaxia",
+    "name": "Galaxy Grim",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "grim_rift",
-    "name": "Tétrico Cubo",
+    "name": "Cube Grim",
     "theme": "Cube",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "air_basic",
-    "name": "Aire",
+    "name": "Air",
     "theme": "Basic",
     "rarity": "Rare",
     "unreleased": false
   },
   {
     "id": "air_gold",
-    "name": "Aire Dorado",
+    "name": "Gold Air",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "air_candy",
-    "name": "Aire Gominola",
+    "name": "Gummy Air",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "air_galaxy",
-    "name": "Aire Galaxia",
+    "name": "Galaxy Air",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "air_holofoil",
-    "name": "Aire Holofoil",
+    "name": "Holofoil Air",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "seven_basic",
-    "name": "Los Siete",
+    "name": "Seven",
     "theme": "Basic",
     "rarity": "Legendary",
     "unreleased": false
   },
   {
     "id": "seven_gold",
-    "name": "Los Siete Dorado",
+    "name": "Gold Seven",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "seven_candy",
-    "name": "Los Siete Gominola",
+    "name": "Gummy Seven",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "seven_galaxy",
-    "name": "Los Siete Galaxia",
+    "name": "Galaxy Seven",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "seven_holofoil",
-    "name": "Los Siete Holofoil",
+    "name": "Holofoil Seven",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
@@ -645,35 +645,35 @@
   },
   {
     "id": "batman_gold",
-    "name": "Batman Dorado",
+    "name": "Gold Batman",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "batman_candy",
-    "name": "Batman Gominola",
+    "name": "Gummy Batman",
     "theme": "Candy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "batman_galaxy",
-    "name": "Batman Galaxia",
+    "name": "Galaxy Batman",
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "batman_holofoil",
-    "name": "Batman Holofoil",
+    "name": "Holofoil Batman",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
   },
   {
     "id": "batman_rift",
-    "name": "Batman Cubo",
+    "name": "Cube Batman",
     "theme": "Cube",
     "rarity": "Special",
     "unreleased": false

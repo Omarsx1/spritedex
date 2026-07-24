@@ -19,36 +19,36 @@ export const THEME_STYLES = {
 };
 
 export const THEME_NAMES_ES = {
-  Basic: 'Base',
-  Gold: 'Dorado',
-  Candy: 'Gominola',
-  Galaxy: 'Galaxia',
+  Basic: 'Basic',
+  Gold: 'Gold',
+  Candy: 'Gummy',
+  Galaxy: 'Galaxy',
   Holofoil: 'Holofoil',
-  Cube: 'Cubo',
-  Gem: 'Gema'
+  Cube: 'Cube',
+  Gem: 'Gem'
 };
 
 export const THEMES_LIST = ['Basic', 'Gold', 'Candy', 'Galaxy', 'Holofoil', 'Cube', 'Gem'];
 
 const FAMILY_NAMES_MAP = {
-  water: 'Agua',
-  earth: 'Tierra',
-  fire: 'Fuego',
-  duck: 'Pato',
-  ghost: 'Fantasma',
-  dream: 'Sueño',
-  demon: 'Demonio',
+  water: 'Water',
+  earth: 'Earth',
+  fire: 'Fire',
+  duck: 'Duck',
+  ghost: 'Ghost',
+  dream: 'Dream',
+  demon: 'Demon',
   punk: 'Punk',
-  king: 'Rey',
-  zeropoint: 'Punto Cero',
-  theburntpeanut: 'Cacahuate Tostado',
-  fishy: 'Pececillo',
-  striker: 'Delantero',
+  king: 'King',
+  zeropoint: 'Zero Point',
+  theburntpeanut: 'Burnt Peanut',
+  fishy: 'Fishy',
+  striker: 'Striker',
   aura: 'Aura',
-  boss: 'Jefe',
-  grim: 'Tétrico',
-  air: 'Aire',
-  seven: 'Los Siete',
+  boss: 'Boss',
+  grim: 'Grim',
+  air: 'Air',
+  seven: 'Seven',
   batman: 'Batman',
   pollo: 'Pollo',
   vini: 'Vini Jr.',
@@ -58,16 +58,16 @@ const FAMILY_NAMES_MAP = {
 // All unique sprite families for the SPRITE filter dropdown
 export const SPRITE_FAMILIES_LIST = [...new Set(officialSpritesJson.map(s => {
   const baseKey = s.id.split('_')[0];
-  return FAMILY_NAMES_MAP[baseKey] || baseKey;
+  return FAMILY_NAMES_MAP[baseKey] || (baseKey.charAt(0).toUpperCase() + baseKey.slice(1));
 }))].sort();
 
 // Format and group official sprites
 export const ALL_SPRITES = officialSpritesJson.map((item) => {
   let gen = 1;
   const nameLower = item.name.toLowerCase();
-  if (nameLower.includes('batman') || nameLower.includes('pato') || nameLower.includes('duck') || nameLower.includes('fantasma') || nameLower.includes('ghost') || nameLower.includes('pececillo') || nameLower.includes('fishy') || nameLower.includes('punk') || nameLower.includes('rey') || nameLower.includes('king') || nameLower.includes('delantero') || nameLower.includes('striker')) {
+  if (nameLower.includes('batman') || nameLower.includes('duck') || nameLower.includes('ghost') || nameLower.includes('fishy') || nameLower.includes('punk') || nameLower.includes('king') || nameLower.includes('striker')) {
     gen = 2;
-  } else if (nameLower.includes('punto cero') || nameLower.includes('zeropoint') || nameLower.includes('cacahuate') || nameLower.includes('burnt') || nameLower.includes('jefe') || nameLower.includes('boss') || nameLower.includes('tétrico') || nameLower.includes('grim') || nameLower.includes('siete') || nameLower.includes('seven') || nameLower.includes('pollo') || nameLower.includes('vini') || nameLower.includes('wick')) {
+  } else if (nameLower.includes('zeropoint') || nameLower.includes('burnt') || nameLower.includes('boss') || nameLower.includes('grim') || nameLower.includes('seven') || nameLower.includes('pollo') || nameLower.includes('vini') || nameLower.includes('wick')) {
     gen = 3;
   }
 
@@ -88,7 +88,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     id: item.id,
     fullName: item.name,
     variant: item.theme,
-    variantDisplay: THEME_NAMES_ES[item.theme] || item.theme,
+    variantDisplay: item.theme,
     rarity: item.rarity,
     gen: gen,
     dropChance: item.unreleased ? '0%' : dropChance,
