@@ -1,0 +1,446 @@
+// HTML5 Canvas Exporter for Social Media Pokédex Cards & Grid Checklists
+
+import { GENERATIONS, RARITIES } from '../data/spritesData';
+
+// Helper to pre-load image for canvas drawing
+function loadImage(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+export async function generatePokedexCardImage({
+  spritesList,
+  userState,
+  trainerName = 'Coleccionista Fortnite',
+  format = 'checklist'
+}) {
+  // Pre-load all sprite images for rendering
+  const loadedImagesMap = {};
+  await Promise.all(
+    spritesList.slice(0, 120).map(async (s) => {
+      const img = await loadImage(s.image);
+      if (img) loadedImagesMap[s.id] = img;
+    })
+  );
+
+  if (format === 'checklist') {
+    return generateChecklistTemplate({ spritesList, userState, trainerName, loadedImagesMap });
+  }
+
+  const canvas = document.createElement('canvas');
+  const width = format === 'square' ? 1080 : 1200;
+  const height = format === 'square' ? 1080 : 675;
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext('2d');
+
+  // Background Gradient
+  const bgGradient = ctx.createLinearGradient(0, 0, width, height);
+  bgGradient.addColorStop(0, '#0b0f19');
+  bgGradient.addColorStop(0.5, '#111827');
+  bgGradient.addColorStop(1, '#070a12');
+  ctx.fillStyle = bgGradient;
+  ctx.fillRect(0, 0, width, height);
+
+  // Grid Overlay lines
+  ctx.strokeStyle = 'rgba(59, 130, 246, 0.05)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < width; x += 40) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, height);
+    ctx.stroke();
+  }
+  for (let y = 0; y < height; y += 40) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
+  }
+
+  // Glowing Frame
+  ctx.strokeStyle = '#3b82f6';
+  ctx.shadowColor = '#3b82f6';
+  ctx.shadowBlur = 20;
+  ctx.lineWidth = 4;
+  ctx.strokeRect(20, 20, width - 40, height - 40);
+  ctx.shadowBlur = 0;
+
+  // Header
+  ctx.beginPath();
+  ctx.arc(60, 60, 18, 0, Math.PI * 2);
+  ctx.fillStyle = '#00f0ff';
+  ctx.shadowColor = '#00f0ff';
+  ctx.shadowBlur = 15;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.font = 'bold 32px sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('POKÉDEX DE SPRITES DE FORTNITE', 95, 68);
+
+  ctx.font = '600 18px sans-serif';
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText(`JUGADOR: ${trainerName.toUpperCase()}`, width - 360, 68);
+
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(40, 105);
+  ctx.lineTo(width - 40, 105);
+  ctx.stroke();
+
+  // Stats Calculation
+  const totalCount = spritesList.length;
+  let ownedCount = 0;
+  let masteredCount = 0;
+  const masteredList = [];
+  const missingList = [];
+
+  const genStats = {
+    1: { total: 0, owned: 0 },
+    2: { total: 0, owned: 0 },
+    3: { total: 0, owned: 0 }
+  };
+
+  spritesList.forEach((sprite) => {
+    const state = userState[sprite.id] || { owned: false, level: 1 };
+    if (genStats[sprite.gen]) {
+      genStats[sprite.gen].total++;
+    }
+
+    if (state.owned) {
+      ownedCount++;
+      if (genStats[sprite.gen]) genStats[sprite.gen].owned++;
+      if (state.level === 5) {
+        masteredCount++;
+        masteredList.push(sprite);
+      }
+    } else {
+      missingList.push(sprite);
+    }
+  });
+
+  const percentOwned = Math.round((ownedCount / totalCount) * 100) || 0;
+
+  // Draw Left Card
+  const cardX = 40;
+  const cardY = 130;
+  const cardW = 340;
+  const cardH = height - 170;
+
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+  ctx.strokeStyle = 'rgba(59, 130, 246, 0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.roundRect(cardX, cardY, cardW, cardH, 16);
+  ctx.fill();
+  ctx.stroke();
+
+  // Donut chart
+  const centerX = cardX + cardW / 2;
+  const centerY = cardY + 110;
+  const radius = 65;
+
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+  ctx.lineWidth = 14;
+  ctx.stroke();
+
+  const startAngle = -Math.PI / 2;
+  const endAngle = startAngle + (Math.PI * 2 * (percentOwned / 100));
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+  ctx.strokeStyle = '#ec4899';
+  ctx.shadowColor = '#ec4899';
+  ctx.shadowBlur = 10;
+  ctx.lineWidth = 14;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  ctx.font = 'bold 36px sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${percentOwned}%`, centerX, centerY + 10);
+  ctx.textAlign = 'left';
+
+  ctx.font = 'bold 16px sans-serif';
+  ctx.fillStyle = '#e2e8f0';
+  ctx.fillText(`ATRAPADOS: ${ownedCount} / ${totalCount}`, cardX + 30, cardY + 220);
+  ctx.fillText(`MAESTREADOS (Niv. 5): ${masteredCount} / ${totalCount}`, cardX + 30, cardY + 250);
+
+  ctx.font = 'bold 14px sans-serif';
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText('PROGRESO POR GENERACIÓN:', cardX + 30, cardY + 295);
+
+  GENERATIONS.forEach((gen, idx) => {
+    const gStat = genStats[gen.id] || { total: 1, owned: 0 };
+    const gPct = Math.round((gStat.owned / gStat.total) * 100) || 0;
+    const py = cardY + 325 + idx * 45;
+
+    ctx.fillStyle = '#cbd5e1';
+    ctx.font = '13px sans-serif';
+    ctx.fillText(`${gen.name}: ${gStat.owned}/${gStat.total} (${gPct}%)`, cardX + 30, py);
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.beginPath();
+    ctx.roundRect(cardX + 30, py + 8, cardW - 60, 8, 4);
+    ctx.fill();
+
+    ctx.fillStyle = gen.badgeColor;
+    ctx.beginPath();
+    ctx.roundRect(cardX + 30, py + 8, (cardW - 60) * (gPct / 100), 8, 4);
+    ctx.fill();
+  });
+
+  // Right Side: Mastered & Missing Highlights
+  const rightX = 410;
+  const rightY = 130;
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 20px sans-serif';
+  ctx.fillText('🏆 MAESTRÍAS DESTACADAS (NIVEL 5)', rightX, rightY + 25);
+
+  let rowY = rightY + 45;
+  if (masteredList.length === 0) {
+    ctx.font = 'italic 16px sans-serif';
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('Aún no has llevado ningún Sprite al Nivel 5. ¡A entrenar!', rightX, rowY + 25);
+    rowY += 45;
+  } else {
+    const topMastered = masteredList.slice(0, 6);
+    topMastered.forEach((sprite, idx) => {
+      const mx = rightX + (idx % 3) * 240;
+      const my = rowY + Math.floor(idx / 3) * 60;
+
+      ctx.fillStyle = 'rgba(234, 179, 8, 0.15)';
+      ctx.strokeStyle = '#eab308';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(mx, my, 225, 50, 10);
+      ctx.fill();
+      ctx.stroke();
+
+      const spriteImg = loadedImagesMap[sprite.id];
+      if (spriteImg) {
+        ctx.drawImage(spriteImg, mx + 8, my + 5, 40, 40);
+      }
+
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillStyle = '#fef08a';
+      ctx.fillText(sprite.fullName.substring(0, 18), mx + 52, my + 24);
+
+      ctx.font = '11px sans-serif';
+      ctx.fillStyle = '#eab308';
+      ctx.fillText(`⭐ ⭐ ⭐ ⭐ ⭐ MAX`, mx + 52, my + 40);
+    });
+    rowY += Math.ceil(topMastered.length / 3) * 65 + 15;
+  }
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 20px sans-serif';
+  ctx.fillText('🔍 FALTANTES POR ENCONTRAR', rightX, rowY + 25);
+
+  const missingRowY = rowY + 45;
+  if (missingList.length === 0) {
+    ctx.font = 'bold 18px sans-serif';
+    ctx.fillStyle = '#4ade80';
+    ctx.fillText('🎉 ¡COLECCIÓN COMPLETA! ¡HAS ATRAPADO TODOS LOS SPRITES!', rightX, missingRowY + 25);
+  } else {
+    const topMissing = missingList.slice(0, 8);
+    topMissing.forEach((sprite, idx) => {
+      const mx = rightX + (idx % 4) * 180;
+      const my = missingRowY + Math.floor(idx / 4) * 55;
+
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(mx, my, 170, 45, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      const spriteImg = loadedImagesMap[sprite.id];
+      if (spriteImg) {
+        ctx.save();
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(spriteImg, mx + 6, my + 5, 35, 35);
+        ctx.restore();
+      }
+
+      ctx.font = '600 12px sans-serif';
+      ctx.fillStyle = '#fca5a5';
+      ctx.fillText(sprite.fullName.substring(0, 15), mx + 45, my + 22);
+
+      const rInfo = RARITIES[sprite.rarity] || { name: sprite.rarity, color: '#94a3b8' };
+      ctx.font = '10px sans-serif';
+      ctx.fillStyle = rInfo.color;
+      ctx.fillText(`${rInfo.name} (${sprite.dropChanceDisplay})`, mx + 45, my + 36);
+    });
+  }
+
+  ctx.font = 'bold 14px sans-serif';
+  ctx.fillStyle = '#475569';
+  ctx.fillText('Generado con Fortnite Sprites Pokédex App • fortnite.gg/sprites', rightX, height - 35);
+
+  return canvas.toDataURL('image/png');
+}
+
+// -------------------------------------------------------------
+// Function for "PLANTILLA DE ESPÍRITUS" (Grid Checklist)
+// Draws PNG images directly onto the canvas grid!
+// -------------------------------------------------------------
+function generateChecklistTemplate({ spritesList, userState, trainerName, loadedImagesMap }) {
+  const canvas = document.createElement('canvas');
+
+  const cols = Math.min(Math.max(Math.ceil(Math.sqrt(spritesList.length * 1.5)), 6), 10);
+  const rows = Math.ceil(spritesList.length / cols);
+
+  const cellW = 140;
+  const cellH = 145;
+  const paddingX = 50;
+  const headerH = 170;
+  const footerH = 60;
+
+  const width = paddingX * 2 + cols * cellW;
+  const height = headerH + rows * cellH + footerH;
+
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  // Background Gradient
+  const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+  bgGrad.addColorStop(0, '#111827');
+  bgGrad.addColorStop(0.5, '#1e1b4b');
+  bgGrad.addColorStop(1, '#090d16');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, width, height);
+
+  // Background subtle glow circles
+  ctx.fillStyle = 'rgba(236, 72, 153, 0.08)';
+  ctx.beginPath();
+  ctx.arc(200, 200, 300, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = 'rgba(59, 130, 246, 0.08)';
+  ctx.beginPath();
+  ctx.arc(width - 200, height - 200, 300, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Header Banner: FORTNITE PLANTILLA DE ESPÍRITUS
+  ctx.font = '900 48px sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+  ctx.fillText('FORTNITE', width / 2, 60);
+
+  // Sub-banner box
+  const bannerW = Math.min(640, width - 80);
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(width / 2 - bannerW / 2, 78, bannerW, 50);
+
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(width / 2 - bannerW / 2, 78, bannerW, 50);
+
+  ctx.font = '900 24px sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('PLANTILLA DE ESPÍRITUS / SPRITES', width / 2, 112);
+
+  // Stats in header
+  const ownedCount = spritesList.filter(s => userState[s.id]?.owned).length;
+  const totalCount = spritesList.length;
+  const percent = totalCount > 0 ? Math.round((ownedCount / totalCount) * 100) : 0;
+
+  ctx.font = 'bold 16px sans-serif';
+  ctx.fillStyle = '#a5f3fc';
+  ctx.fillText(`JUGADOR: ${trainerName.toUpperCase()}  •  ATRAPADOS: ${ownedCount} / ${totalCount} (${percent}%)`, width / 2, 155);
+
+  // Render Sprite Grid Cells with actual PNG images
+  spritesList.forEach((sprite, idx) => {
+    const colIdx = idx % cols;
+    const rowIdx = Math.floor(idx / cols);
+
+    const x = paddingX + colIdx * cellW;
+    const y = headerH + rowIdx * cellH;
+
+    const state = userState[sprite.id] || { owned: false, level: 1 };
+    const isOwned = state.owned;
+    const level = state.level || 1;
+
+    // Cell Container Box
+    ctx.fillStyle = isOwned ? 'rgba(30, 41, 59, 0.7)' : 'rgba(15, 23, 42, 0.4)';
+    ctx.strokeStyle = isOwned ? 'rgba(59, 130, 246, 0.5)' : 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(x + 5, y + 5, cellW - 10, cellH - 10, 12);
+    ctx.fill();
+    ctx.stroke();
+
+    // Sprite PNG Image
+    const spriteImg = loadedImagesMap[sprite.id];
+    if (spriteImg) {
+      ctx.save();
+      if (!isOwned) {
+        ctx.globalAlpha = 0.35;
+      }
+      ctx.drawImage(spriteImg, x + cellW / 2 - 28, y + 12, 56, 56);
+      ctx.restore();
+    }
+
+    // Sprite Name
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.fillStyle = isOwned ? '#ffffff' : '#94a3b8';
+    ctx.fillText(sprite.fullName.substring(0, 14), x + cellW / 2, y + 80);
+
+    // Status Box / Marker (Green Checkmark vs Red Cross)
+    const boxSize = 26;
+    const boxX = x + cellW / 2 - boxSize / 2;
+    const boxY = y + 95;
+
+    if (isOwned) {
+      // Green Checkmark or Gold Star level Box
+      ctx.fillStyle = level === 5 ? '#eab308' : '#10b981';
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxSize, boxSize, 6);
+      ctx.fill();
+
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillStyle = '#000000';
+      if (level === 5) {
+        ctx.fillText('★5', boxX + boxSize / 2, boxY + 18);
+      } else {
+        ctx.fillText(`✓${level}`, boxX + boxSize / 2, boxY + 18);
+      }
+    } else {
+      // Translucent Box with RED 'X'
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.2)';
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxSize, boxSize, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillStyle = '#ef4444';
+      ctx.fillText('❌', boxX + boxSize / 2, boxY + 18);
+    }
+  });
+
+  // Footer Watermark
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 14px sans-serif';
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('Plantilla de Espíritus Generada por Fortnite Sprites Pokédex App • fortnite.gg/sprites', width / 2, height - 20);
+
+  return canvas.toDataURL('image/png');
+}
