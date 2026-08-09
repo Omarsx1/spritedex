@@ -361,10 +361,63 @@ body {
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   position: relative;
   overflow: hidden;
-  border: 2px solid transparent;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background-color: #1b1c23;
+}
+
+/* Theme Gradients & Border Colors (Fortnite.gg Exact Design) */
+.sprite-theme-gold {
+  background: linear-gradient(180deg, #9d752a 0%, #1b1c23 100%);
+  border-color: #f5b642;
+}
+
+.sprite-theme-cube {
+  background: linear-gradient(180deg, #730974 0%, #1b1c23 100%);
+  border-color: #8b008b;
+}
+
+.sprite-theme-candy,
+.sprite-theme-gummy {
+  background: linear-gradient(180deg, #9f4540 0%, #1b1c23 100%);
+  border-color: #f16f68;
+}
+
+.sprite-theme-galaxy {
+  background: linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%);
+  border-color: #4a35fa;
+}
+
+.sprite-theme-holofoil {
+  background: linear-gradient(180deg, #cb77be 0%, #1b1c23 100%);
+  border-color: #ec88d8;
+}
+
+.sprite-theme-gem {
+  background: linear-gradient(180deg, #0f6c7d 0%, #1b1c23 100%);
+  border-color: #22d3ee;
+}
+
+.sprite-theme-rare {
+  background: linear-gradient(180deg, #104273 0%, #1b1c23 100%);
+  border-color: #00afff;
+}
+
+.sprite-theme-epic {
+  background: linear-gradient(180deg, #4d1566 0%, #1b1c23 100%);
+  border-color: #ce59ff;
+}
+
+.sprite-theme-legendary {
+  background: linear-gradient(180deg, #743e0a 0%, #1b1c23 100%);
+  border-color: #de6e0e;
+}
+
+.sprite-theme-mythic {
+  background: linear-gradient(180deg, #a89442 0%, #1b1c23 100%);
+  border-color: #f1e198;
 }
 
 .sprite-card::before {

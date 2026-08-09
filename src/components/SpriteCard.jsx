@@ -1,6 +1,6 @@
 import React from 'react';
 import confetti from 'canvas-confetti';
-import { RARITIES } from '../data/spritesData';
+import { RARITIES, getSpriteCardStyle } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 
 export function SpriteCard({ sprite, userState, viewMode, onToggleOwned, onSetLevel, onOpenDetail }) {
@@ -9,7 +9,8 @@ export function SpriteCard({ sprite, userState, viewMode, onToggleOwned, onSetLe
   const level = currentState.level || 1;
   const isMastered = isOwned && level === 5;
 
-  const rarityInfo = RARITIES[sprite.rarity] || { name: sprite.rarity, color: '#94a3b8', bg: '#1e293b', cardGradient: '#1e293b' };
+  const rarityInfo = RARITIES[sprite.rarity] || { name: sprite.rarity, color: '#94a3b8', bg: '#1e293b' };
+  const styleInfo = getSpriteCardStyle(sprite);
 
   const handleToggleClick = (e) => {
     e.stopPropagation();
@@ -84,7 +85,10 @@ export function SpriteCard({ sprite, userState, viewMode, onToggleOwned, onSetLe
   return (
     <div
       className={`sprite-card ${isOwned ? 'is-owned' : ''} ${isMastered ? 'is-mastered' : ''}`}
-      style={{ background: rarityInfo.cardGradient }}
+      style={{
+        background: styleInfo.background,
+        borderColor: isMastered ? '#facc15' : styleInfo.borderColor
+      }}
       onClick={() => onOpenDetail(sprite)}
     >
       {/* Imagen del Sprite */}

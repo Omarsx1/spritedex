@@ -1,22 +1,87 @@
 import officialSpritesJson from './official_sprites.json';
 
 export const RARITIES = {
-  Mythic: { name: 'MÍTICO', color: '#ffaa00', bg: '#b8860b', cardGradient: 'linear-gradient(180deg, #d4a017 0%, #8b6914 40%, #5c4a0e 100%)' },
-  Legendary: { name: 'LEGENDARIO', color: '#f97316', bg: '#c2410c', cardGradient: 'linear-gradient(180deg, #f97316 0%, #c2410c 40%, #7c2d12 100%)' },
-  Epic: { name: 'ÉPICO', color: '#a855f7', bg: '#7e22ce', cardGradient: 'linear-gradient(180deg, #a855f7 0%, #7e22ce 40%, #581c87 100%)' },
-  Rare: { name: 'RARO', color: '#3b82f6', bg: '#1d4ed8', cardGradient: 'linear-gradient(180deg, #3b82f6 0%, #1d4ed8 40%, #1e3a5f 100%)' },
-  Special: { name: 'ESPECIAL', color: '#ec4899', bg: '#be185d', cardGradient: 'linear-gradient(180deg, #ec4899 0%, #be185d 40%, #831843 100%)' }
+  Mythic: { name: 'MÍTICO', color: '#f1e198', bg: '#746226', border: '#f1e198', cardGradient: 'linear-gradient(180deg, #a89442 0%, #1b1c23 100%)' },
+  Legendary: { name: 'LEGENDARIO', color: '#de6e0e', bg: '#5c3108', border: '#de6e0e', cardGradient: 'linear-gradient(180deg, #743e0a 0%, #1b1c23 100%)' },
+  Epic: { name: 'ÉPICO', color: '#ce59ff', bg: '#4d1566', border: '#ce59ff', cardGradient: 'linear-gradient(180deg, #4d1566 0%, #1b1c23 100%)' },
+  Rare: { name: 'RARO', color: '#00afff', bg: '#104273', border: '#00afff', cardGradient: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)' },
+  Special: { name: 'ESPECIAL', color: '#ec4899', bg: '#be185d', border: '#ec4899', cardGradient: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)' }
 };
 
 export const THEME_STYLES = {
-  Basic: { bg: 'linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)', border: 'rgba(255, 255, 255, 0.12)' },
-  Gold: { bg: 'linear-gradient(180deg, rgba(217, 119, 6, 0.65) 0%, rgba(69, 26, 3, 0.95) 100%)', border: '#facc15' },
-  Candy: { bg: 'linear-gradient(180deg, rgba(220, 38, 38, 0.55) 0%, rgba(22, 163, 74, 0.75) 100%)', border: '#f87171' },
-  Galaxy: { bg: 'linear-gradient(180deg, rgba(88, 28, 135, 0.75) 0%, rgba(15, 23, 42, 0.95) 100%)', border: '#c084fc' },
-  Holofoil: { bg: 'linear-gradient(180deg, rgba(219, 39, 119, 0.55) 0%, rgba(37, 99, 235, 0.7) 100%)', border: '#f472b6' },
-  Cube: { bg: 'linear-gradient(180deg, rgba(126, 34, 206, 0.65) 0%, rgba(46, 16, 101, 0.95) 100%)', border: '#a855f7' },
-  Gem: { bg: 'linear-gradient(180deg, rgba(8, 145, 178, 0.55) 0%, rgba(15, 23, 42, 0.95) 100%)', border: '#22d3ee' }
+  Basic: { bg: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', border: '#00afff' },
+  Gold: { bg: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', border: '#f5b642' },
+  Candy: { bg: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)', border: '#f16f68' },
+  Galaxy: { bg: 'linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%)', border: '#4a35fa' },
+  Holofoil: { bg: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', border: '#ec88d8' },
+  Cube: { bg: 'linear-gradient(180deg, #730974 0%, #1b1c23 100%)', border: '#8b008b' },
+  Gem: { bg: 'linear-gradient(180deg, #0f6c7d 0%, #1b1c23 100%)', border: '#22d3ee' }
 };
+
+export const ELEMENTAL_STYLES = {
+  water: { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' },
+  fishy: { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' },
+  fire: { background: 'linear-gradient(180deg, #84280f 0%, #1b1c23 100%)', borderColor: '#ea580c' },
+  theburntpeanut: { background: 'linear-gradient(180deg, #84280f 0%, #1b1c23 100%)', borderColor: '#ea580c' },
+  earth: { background: 'linear-gradient(180deg, #1b532a 0%, #1b1c23 100%)', borderColor: '#4ade80' },
+  slime: { background: 'linear-gradient(180deg, #1b532a 0%, #1b1c23 100%)', borderColor: '#4ade80' },
+  peely: { background: 'linear-gradient(180deg, #1b532a 0%, #1b1c23 100%)', borderColor: '#4ade80' },
+  air: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#60a5fa' },
+  zeropoint: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#60a5fa' },
+  batman: { background: 'linear-gradient(180deg, #3d3b36 0%, #1b1c23 100%)', borderColor: '#a89442' },
+  wick: { background: 'linear-gradient(180deg, #3d3b36 0%, #1b1c23 100%)', borderColor: '#a89442' }
+};
+
+export function getSpriteCardStyle(sprite) {
+  if (!sprite) {
+    return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };
+  }
+
+  const theme = sprite.variant || sprite.theme;
+  const rarity = sprite.rarity;
+  const familyId = (sprite.familyId || sprite.id.split('_')[0] || '').toLowerCase();
+
+  // 1. Theme-specific variants (Gold, Cube, Candy, Galaxy, Holofoil, Gem)
+  if (theme === 'Gold') {
+    return { background: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', borderColor: '#f5b642' };
+  }
+  if (theme === 'Cube') {
+    return { background: 'linear-gradient(180deg, #730974 0%, #1b1c23 100%)', borderColor: '#8b008b' };
+  }
+  if (theme === 'Candy' || theme === 'Gummy') {
+    return { background: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)', borderColor: '#f16f68' };
+  }
+  if (theme === 'Galaxy') {
+    return { background: 'linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%)', borderColor: '#4a35fa' };
+  }
+  if (theme === 'Holofoil') {
+    return { background: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', borderColor: '#ec88d8' };
+  }
+  if (theme === 'Gem') {
+    return { background: 'linear-gradient(180deg, #0f6c7d 0%, #1b1c23 100%)', borderColor: '#22d3ee' };
+  }
+
+  // 2. Elemental Customization for Basic sprites
+  if (theme === 'Basic' && ELEMENTAL_STYLES[familyId]) {
+    return ELEMENTAL_STYLES[familyId];
+  }
+
+  // 3. Rarity-based defaults
+  if (rarity === 'Mythic') {
+    return { background: 'linear-gradient(180deg, #a89442 0%, #1b1c23 100%)', borderColor: '#f1e198' };
+  }
+  if (rarity === 'Legendary') {
+    return { background: 'linear-gradient(180deg, #743e0a 0%, #1b1c23 100%)', borderColor: '#de6e0e' };
+  }
+  if (rarity === 'Epic') {
+    return { background: 'linear-gradient(180deg, #4d1566 0%, #1b1c23 100%)', borderColor: '#ce59ff' };
+  }
+  if (rarity === 'Rare') {
+    return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };
+  }
+
+  return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };
+}
 
 export const THEME_NAMES_ES = {
   Basic: 'Basic',

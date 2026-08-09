@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Sparkles, MapPin, Zap, Coins } from 'lucide-react';
-import { SPRITE_FAMILIES, RARITIES } from '../data/spritesData';
+import { SPRITE_FAMILIES, RARITIES, getSpriteCardStyle } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 
 export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel, onClose }) {
@@ -10,6 +10,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
   const family = SPRITE_FAMILIES.find(f => f.id === sprite.familyId);
   const familySprites = family ? family.sprites : [sprite];
   const rarityInfo = RARITIES[sprite.rarity] || { name: sprite.rarity, color: '#94a3b8', bg: '#1e293b' };
+  const mainStyle = getSpriteCardStyle(sprite);
   const currentState = userState[sprite.id] || { owned: false, level: 1 };
 
   return (
@@ -25,8 +26,8 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
             width: '100px',
             height: '100px',
             borderRadius: '16px',
-            background: 'rgba(30, 41, 59, 0.6)',
-            border: '2px solid rgba(255, 255, 255, 0.15)',
+            background: mainStyle.background,
+            border: `2px solid ${mainStyle.borderColor}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -137,19 +138,19 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
             const vOwned = vState.owned;
             const vLevel = vState.level || 1;
             const vMastered = vOwned && vLevel === 5;
+            const vStyle = getSpriteCardStyle(v);
 
             return (
               <div
                 key={v.id}
                 style={{
-                  background: vMastered
-                    ? 'rgba(250, 204, 21, 0.12)'
-                    : vOwned ? 'rgba(16, 185, 129, 0.15)' : 'rgba(15, 23, 42, 0.7)',
-                  border: `1px solid ${vMastered ? '#facc15' : vOwned ? '#10b981' : 'rgba(255,255,255,0.1)'}`,
+                  background: vStyle.background,
+                  border: `2px solid ${vMastered ? '#facc15' : vOwned ? '#10b981' : vStyle.borderColor}`,
                   borderRadius: '12px',
                   padding: '10px',
                   textAlign: 'center',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  boxShadow: vOwned ? `0 4px 12px ${vStyle.borderColor}33` : 'none'
                 }}
               >
                 {/* Variant sprite image - click to toggle owned */}
