@@ -28,16 +28,16 @@
     "unreleased": false
   },
   {
-    "id": "water_gem",
-    "name": "Gem Water",
-    "theme": "Gem",
+    "id": "water_holofoil",
+    "name": "Holofoil Water",
+    "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
   },
   {
-    "id": "water_holofoil",
-    "name": "Holofoil Water",
-    "theme": "Holofoil",
+    "id": "water_gem",
+    "name": "Gem Water",
+    "theme": "Gem",
     "rarity": "Special",
     "unreleased": false
   },

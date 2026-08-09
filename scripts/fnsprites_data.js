@@ -4,8 +4,8 @@ const baseSprites = [
     { id: "water_gold", name: "Gold Water", theme: "Gold", rarity: "Special", unreleased: false },
     { id: "water_candy", name: "Gummy Water", theme: "Candy", rarity: "Special", unreleased: false },
     { id: "water_galaxy", name: "Galaxy Water", theme: "Galaxy", rarity: "Special", unreleased: false },
-    { id: "water_gem", name: "Gem Water", theme: "Gem", rarity: "Special", unreleased: false },
     { id: "water_holofoil", name: "Holofoil Water", theme: "Holofoil", rarity: "Special", unreleased: false },
+    { id: "water_gem", name: "Gem Water", theme: "Gem", rarity: "Special", unreleased: false },
     
     { id: "earth_basic", name: "Earth", theme: "Basic", rarity: "Rare", unreleased: false },
     { id: "earth_gold", name: "Gold Earth", theme: "Gold", rarity: "Special", unreleased: false },

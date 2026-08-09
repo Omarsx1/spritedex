@@ -28,7 +28,8 @@ export const THEME_NAMES_ES = {
   Gem: 'Gem'
 };
 
-export const THEMES_LIST = ['Basic', 'Gold', 'Candy', 'Galaxy', 'Holofoil', 'Cube', 'Gem'];
+export const VARIANT_ORDER = ['Basic', 'Gold', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem'];
+export const THEMES_LIST = ['Basic', 'Gold', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem'];
 
 const FAMILY_NAMES_MAP = {
   water: 'Water',
@@ -104,7 +105,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   };
 });
 
-// Group sprites into families for detail view
+// Group sprites into families for detail view (sorted canonically by variant order)
 export const SPRITE_FAMILIES = Object.values(
   ALL_SPRITES.reduce((acc, sprite) => {
     if (!acc[sprite.familyId]) {
@@ -118,7 +119,14 @@ export const SPRITE_FAMILIES = Object.values(
     acc[sprite.familyId].sprites.push(sprite);
     return acc;
   }, {})
-);
+).map((family) => ({
+  ...family,
+  sprites: [...family.sprites].sort((a, b) => {
+    const aIdx = VARIANT_ORDER.indexOf(a.variant);
+    const bIdx = VARIANT_ORDER.indexOf(b.variant);
+    return (aIdx === -1 ? 99 : aIdx) - (bIdx === -1 ? 99 : bIdx);
+  })
+}));
 
 export const GENERATIONS = [
   { id: 1, name: '1ª Generación', title: 'Orígenes Elementales', badgeColor: '#3b82f6' },
