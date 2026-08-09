@@ -90,6 +90,8 @@ Si necesitas actualizar o generar nuevos sprites, utiliza los scripts de la carp
 | **Scraper HTML** | `node scripts/fetch_sprites.cjs` | Extrae y analiza la estructura HTML de ítems de fortnite.gg. | Guarda el resultado de la extracción en `scripts/page.html`. |
 | **Traducción** | `node scripts/translate_sprites.js` | Convierte nombres y descripciones de metadatos al español. | Actualiza los strings en las estructuras JS. |
 
+> 📘 **Guía de Desarrollo:** Para una explicación detallada sobre cómo manejar Sprites anunciados/no lanzados, flujo de trabajo de datos y la bitácora de sugerencias técnicas, consulta [`DEVELOPMENT.md`](file:///Users/omarsalazar/Documents/Astro.nosync/spritedex/DEVELOPMENT.md).
+
 ---
 
 ## 🛠️ Tecnologías Utilizadas
