@@ -47,12 +47,18 @@ async function main() {
   let successCount = 0;
 
   for (const sprite of baseSprites) {
+    const dest = path.join(publicSpritesDir, `${sprite.id}.png`);
+    if (fs.existsSync(dest)) {
+      console.log(`Skipping already downloaded: ${sprite.id}.png`);
+      successCount++;
+      continue;
+    }
+
     const extList = ['.png', '.webp', '.jpg'];
     let downloaded = false;
 
     for (const ext of extList) {
       const url = `https://staticvacant.github.io/fnsprites/sprites/${sprite.id}${ext}`;
-      const dest = path.join(publicSpritesDir, `${sprite.id}.png`);
       const ok = await downloadImage(url, dest);
       if (ok) {
         downloaded = true;
