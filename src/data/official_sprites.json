@@ -32,7 +32,7 @@
     "name": "Gem Water",
     "theme": "Gem",
     "rarity": "Special",
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "water_holofoil",
@@ -74,7 +74,7 @@
     "name": "Gem Earth",
     "theme": "Gem",
     "rarity": "Special",
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "earth_rift",
@@ -158,7 +158,7 @@
     "name": "Gem Duck",
     "theme": "Gem",
     "rarity": "Special",
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "ghost_basic",
@@ -263,7 +263,7 @@
     "name": "Gem Demon",
     "theme": "Gem",
     "rarity": "Special",
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "punk_basic",
@@ -298,7 +298,7 @@
     "name": "Gem Punk",
     "theme": "Gem",
     "rarity": "Special",
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "punk_rift",
@@ -375,7 +375,7 @@
     "name": "Gem Zero Point",
     "theme": "Gem",
     "rarity": "Special",
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "zeropoint_holofoil",
@@ -494,7 +494,7 @@
     "name": "Gem Aura",
     "theme": "Gem",
     "rarity": "Special",
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "boss_basic",
