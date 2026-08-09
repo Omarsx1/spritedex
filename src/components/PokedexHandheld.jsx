@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Check, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { RARITIES } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import confetti from 'canvas-confetti';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ALL_SPRITES, SPRITE_FAMILIES_LIST } from './data/spritesData';
+import { ALL_SPRITES } from './data/spritesData';
 import { Header } from './components/Header';
 import { FilterBar } from './components/FilterBar';
 import { SpriteCard } from './components/SpriteCard';

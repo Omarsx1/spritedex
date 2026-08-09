@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Check, Lock, Sparkles, MapPin, Zap, Coins } from 'lucide-react';
+import { X, Sparkles, MapPin, Zap, Coins } from 'lucide-react';
 import { SPRITE_FAMILIES, RARITIES } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 
