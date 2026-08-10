@@ -73,7 +73,7 @@ export function FilterBar({
         value={sortBy}
         onChange={(e) => setSortBy(e.target.value)}
       >
-        <option value="default">ORDENAR POR ▾</option>
+        <option value="default">ORDEN POR ▾</option>
         <option value="name-asc">Nombre (A-Z)</option>
         <option value="name-desc">Nombre (Z-A)</option>
         <option value="rarity">Rareza</option>

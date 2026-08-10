@@ -200,50 +200,54 @@ export function Header({
         {/* Stats + Actions bar */}
         <div className="hero__bar" ref={statsRef}>
           <div className="hero__stat-ring">
-            <svg viewBox="0 0 88 88" className="hero__ring-svg">
-              <circle cx="44" cy="44" r={ringRadius} className="hero__ring-track" />
-              <circle
-                cx="44" cy="44" r={ringRadius}
-                className="hero__ring-fill hero__ring-fill--caught"
-                strokeDasharray={ringCircumference}
-                strokeDashoffset={ringCircumference - (ringCircumference * ownedPct / 100)}
-              />
-            </svg>
-            <div className="hero__stat-inner">
-              <span className="hero__stat-value">{ownedCount}</span>
-              <span className="hero__stat-of">/ {totalCount}</span>
+            <div className="hero__ring-box">
+              <svg viewBox="0 0 88 88" className="hero__ring-svg">
+                <circle cx="44" cy="44" r={ringRadius} className="hero__ring-track" />
+                <circle
+                  cx="44" cy="44" r={ringRadius}
+                  className="hero__ring-fill hero__ring-fill--caught"
+                  strokeDasharray={ringCircumference}
+                  strokeDashoffset={ringCircumference - (ringCircumference * ownedPct / 100)}
+                />
+              </svg>
+              <div className="hero__stat-inner">
+                <span className="hero__stat-value">{ownedCount}</span>
+                <span className="hero__stat-of">/ {totalCount}</span>
+              </div>
             </div>
             <span className="hero__stat-label">ATRAPADOS</span>
           </div>
 
           <div className="hero__actions" ref={actionsRef}>
-            <button className="hero__btn hero__btn--primary" onClick={onOpenCompareModal}>
-              <Users size={16} />
-              <span>Intercambio</span>
+            <button className="hero__btn hero__btn--primary" onClick={onOpenCompareModal} title="Intercambio Fortnite">
+              <Users size={16} className="hero__btn-icon" />
+              <span className="hero__btn-text">Intercambio</span>
             </button>
-            <button className="hero__btn hero__btn--accent" onClick={onOpenShareModal}>
-              <Share2 size={16} />
-              <span>Compartir</span>
+            <button className="hero__btn hero__btn--accent" onClick={onOpenShareModal} title="Compartir Imagen">
+              <Share2 size={16} className="hero__btn-icon" />
+              <span className="hero__btn-text">Compartir</span>
             </button>
-            <button className="hero__btn hero__btn--ghost" onClick={onOpenBackupModal}>
-              <Download size={16} />
-              <span>Respaldo</span>
+            <button className="hero__btn hero__btn--ghost" onClick={onOpenBackupModal} title="Respaldo">
+              <Download size={16} className="hero__btn-icon" />
+              <span className="hero__btn-text">Respaldo</span>
             </button>
           </div>
 
           <div className="hero__stat-ring">
-            <svg viewBox="0 0 88 88" className="hero__ring-svg">
-              <circle cx="44" cy="44" r={ringRadius} className="hero__ring-track" />
-              <circle
-                cx="44" cy="44" r={ringRadius}
-                className="hero__ring-fill hero__ring-fill--mastered"
-                strokeDasharray={ringCircumference}
-                strokeDashoffset={ringCircumference - (ringCircumference * masteredPct / 100)}
-              />
-            </svg>
-            <div className="hero__stat-inner">
-              <span className="hero__stat-value">{masteredCount}</span>
-              <span className="hero__stat-of">/ {totalCount}</span>
+            <div className="hero__ring-box">
+              <svg viewBox="0 0 88 88" className="hero__ring-svg">
+                <circle cx="44" cy="44" r={ringRadius} className="hero__ring-track" />
+                <circle
+                  cx="44" cy="44" r={ringRadius}
+                  className="hero__ring-fill hero__ring-fill--mastered"
+                  strokeDasharray={ringCircumference}
+                  strokeDashoffset={ringCircumference - (ringCircumference * masteredPct / 100)}
+                />
+              </svg>
+              <div className="hero__stat-inner">
+                <span className="hero__stat-value">{masteredCount}</span>
+                <span className="hero__stat-of">/ {totalCount}</span>
+              </div>
             </div>
             <span className="hero__stat-label">MAESTREADOS</span>
           </div>
