@@ -99,43 +99,20 @@ body {
   }
 }
 
-.header-sprite-ticker {
-  display: inline-flex;
+.header-hero-sprite {
+  display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 16px 6px 12px;
-  border-radius: 9999px;
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(16px);
-  border: 1.5px solid rgba(250, 204, 21, 0.4);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(250, 204, 21, 0.2);
-  user-select: none;
+  justify-content: center;
+  height: 120px;
+  margin-top: 6px;
+  pointer-events: none;
 }
 
-.ticker-sprite-img {
-  width: 28px;
-  height: 28px;
+.hero-sprite-img {
+  width: 120px;
+  height: 120px;
   object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
-}
-
-.ticker-sprite-name {
-  font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: 0.95rem;
-  color: #ffffff;
-  letter-spacing: 0.5px;
-}
-
-.ticker-sprite-variant {
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: #fbbf24;
-  text-transform: uppercase;
-  background: rgba(251, 191, 36, 0.15);
-  padding: 2px 8px;
-  border-radius: 9999px;
-  border: 1px solid rgba(251, 191, 36, 0.3);
+  filter: drop-shadow(0 12px 25px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 25px rgba(139, 92, 246, 0.35));
 }
 
 /* Stats boxes (Modern Floating Glass Style) */

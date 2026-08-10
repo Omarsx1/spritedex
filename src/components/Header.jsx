@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Share2, Download, Users, Sparkles } from 'lucide-react';
+import { Share2, Download, Users } from 'lucide-react';
 import gsap from 'gsap';
 import { allSprites } from '../data/spritesData';
 
@@ -60,17 +60,14 @@ export function Header({
               TODOS LOS SPRITES DE FORTNITE
             </h1>
 
-            {/* GSAP Animated Dynamic Sprite Ticker */}
-            <div className="header-sprite-ticker" ref={activeSpriteRef}>
-              <Sparkles size={16} color="#fbbf24" style={{ flexShrink: 0 }} />
+            {/* GSAP Animated Floating Sprite Character Only (No Container, No Text) */}
+            <div className="header-hero-sprite" ref={activeSpriteRef}>
               <img
                 src={currentSprite.image}
                 alt={currentSprite.fullName}
-                className="ticker-sprite-img"
+                className="hero-sprite-img"
                 onError={(e) => { e.target.style.display = 'none'; }}
               />
-              <span className="ticker-sprite-name">{currentSprite.fullName}</span>
-              <span className="ticker-sprite-variant">{currentSprite.variantDisplay}</span>
             </div>
           </div>
 
