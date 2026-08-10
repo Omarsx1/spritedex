@@ -48,6 +48,11 @@ export function SpriteCard({
     }
   };
 
+  const handleImageClick = (e) => {
+    e.stopPropagation();
+    onOpenDetail(sprite);
+  };
+
   const handleLevelClick = (e, newLevel) => {
     e.stopPropagation();
     if (isFriendView) return; // Only adjust levels in my view
@@ -63,14 +68,15 @@ export function SpriteCard({
     return (
       <div
         className={`sprite-list-item ${isOwned ? 'is-owned' : ''} ${isMastered ? 'is-mastered' : ''}`}
-        onClick={() => onOpenDetail(sprite)}
+        onClick={handleToggleClick}
+        style={{ cursor: 'pointer' }}
       >
-        <div className="list-item-image">
+        <div className="list-item-image" onClick={handleImageClick} title="Haz clic en la imagen para ver detalles y variantes">
           <img
             src={sprite.image}
             alt={sprite.fullName}
             loading="lazy"
-            style={{ filter: !isOwned ? 'grayscale(80%) opacity(0.5)' : 'none' }}
+            style={{ filter: !isOwned ? 'grayscale(80%) opacity(0.5)' : 'none', cursor: 'pointer' }}
             onError={(e) => { e.target.style.display = 'none'; }}
           />
         </div>
@@ -125,9 +131,10 @@ export function SpriteCard({
       style={{
         background: styleInfo.background,
         borderColor: styleInfo.borderColor,
-        position: 'relative'
+        position: 'relative',
+        cursor: 'pointer'
       }}
-      onClick={() => onOpenDetail(sprite)}
+      onClick={handleToggleClick}
     >
       {/* Indicator badge if friend can lend */}
       {friendCanLend && (
@@ -151,14 +158,15 @@ export function SpriteCard({
         </div>
       )}
 
-      {/* Imagen del Sprite */}
-      <div className="card-image">
+      {/* Imagen del Sprite: Clic abre la modal de detalles y variantes */}
+      <div className="card-image" onClick={handleImageClick} title="Haz clic en la imagen para ver detalles y variantes">
         <img
           src={sprite.image}
           alt={sprite.fullName}
           loading="lazy"
           style={{
-            filter: !isOwned ? 'grayscale(80%) opacity(0.5)' : 'drop-shadow(0 6px 12px rgba(0,0,0,0.5))'
+            filter: !isOwned ? 'grayscale(80%) opacity(0.5)' : 'drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
+            cursor: 'pointer'
           }}
           onError={(e) => { e.target.style.display = 'none'; }}
         />
@@ -187,7 +195,7 @@ export function SpriteCard({
               onClick={(e) => handleLevelClick(e, num)}
               style={isFriendView ? { pointerEvents: 'none' } : {}}
             >
-              ★{num}
+              ★
             </button>
           ))}
         </div>
@@ -200,7 +208,7 @@ export function SpriteCard({
         style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800 } : {}}
       >
         {isFriendView
-          ? (friendCanLend ? (myOwned ? '✓ Registrado' : '+ Registrar en mi Dex') : isOwned ? '✓ Tu amigo lo tiene' : 'No lo tiene')
+          ? (friendCanLend ? (myOwned ? '✓ Registrado en mi Dex' : '+ Registrar en mi Dex') : isOwned ? '✓ Tu amigo lo tiene' : 'No lo tiene')
           : (isMastered ? '⭐ Maestreado' : isOwned ? `✓ Atrapado (Niv.${level})` : 'Sin atrapar')}
       </button>
     </div>
