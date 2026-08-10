@@ -62,6 +62,20 @@ export function AuthModal({ user, onClose, onAuthSuccess }) {
     }
   };
 
+  const handleAnonymousAuth = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { error: anonError } = await supabase.auth.signInAnonymously();
+      if (anonError) throw anonError;
+      if (onAuthSuccess) onAuthSuccess();
+      onClose();
+    } catch (err) {
+      setError(err.message || 'Error al iniciar sesión rápida');
+      setLoading(false);
+    }
+  };
+
   const handleGoogleAuth = async () => {
     try {
       setLoading(true);
@@ -74,7 +88,7 @@ export function AuthModal({ user, onClose, onAuthSuccess }) {
       });
       if (googleError) {
         if (googleError.message?.includes('provider is not enabled') || googleError.code === 'validation_failed') {
-          throw new Error('Google Sign-In requiere configuración de Google Cloud. Por favor usa el registro con correo abajo.');
+          throw new Error('Google Sign-In requiere activar Google en Supabase. Puedes usar "Acceso Rápido 1-Clic" arriba sin registrarte.');
         }
         throw googleError;
       }
@@ -104,7 +118,7 @@ export function AuthModal({ user, onClose, onAuthSuccess }) {
             {user ? 'Sincronización en la Nube' : (isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión')}
           </h2>
           <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginTop: '4px' }}>
-            {user ? `Conectado como ${user.email}` : 'Guarda tu Pokédex en la nube y accede desde cualquier dispositivo'}
+            {user ? (user.is_anonymous ? 'Conectado como Invitado (1-Clic)' : `Conectado como ${user.email}`) : 'Guarda tu Pokédex en la nube y accede desde cualquier dispositivo'}
           </p>
         </div>
 
@@ -113,7 +127,9 @@ export function AuthModal({ user, onClose, onAuthSuccess }) {
             <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', padding: '14px', marginBottom: '20px' }}>
               <CheckCircle size={24} color="#10b981" style={{ margin: '0 auto 6px' }} />
               <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#10b981' }}>Tu Pokédex está sincronizado</div>
-              <div style={{ fontSize: '0.76rem', color: '#94a3b8', marginTop: '2px' }}>Cualquier cambio se guarda automáticamente en la nube</div>
+              <div style={{ fontSize: '0.76rem', color: '#94a3b8', marginTop: '2px' }}>
+                {user.is_anonymous ? 'Guardando en la nube como Invitado (1-Clic)' : 'Cualquier cambio se guarda automáticamente en la nube'}
+              </div>
             </div>
 
             <button
@@ -128,6 +144,31 @@ export function AuthModal({ user, onClose, onAuthSuccess }) {
           </div>
         ) : (
           <div>
+            {/* 1-Click Anonymous Quick Access */}
+            <button
+              onClick={handleAnonymousAuth}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #10b981, #059669)',
+                color: '#ffffff',
+                border: 'none',
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 900,
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                marginBottom: '12px',
+                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.4)'
+              }}
+              disabled={loading}
+            >
+              <span>⚡ Acceso Rápido 1-Clic (Sin Registro)</span>
+            </button>
             {/* Google Sign In */}
             <button
               onClick={handleGoogleAuth}
