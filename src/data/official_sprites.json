@@ -655,7 +655,7 @@
     "name": "Holofoil Grim",
     "theme": "Holofoil",
     "rarity": "Special",
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "grim_rift",

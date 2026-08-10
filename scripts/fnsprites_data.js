@@ -108,7 +108,7 @@ const baseSprites = [
     { id: "grim_candy", name: "Gummy Grim", theme: "Candy", rarity: "Special", unreleased: false },
     { id: "grim_galaxy", name: "Galaxy Grim", theme: "Galaxy", rarity: "Special", unreleased: false },
     { id: "grim_gem", name: "Gem Grim", theme: "Gem", rarity: "Special", unreleased: true },
-    { id: "grim_holofoil", name: "Holofoil Grim", theme: "Holofoil", rarity: "Special", unreleased: true },
+    { id: "grim_holofoil", name: "Holofoil Grim", theme: "Holofoil", rarity: "Special", unreleased: false },
     { id: "grim_rift", name: "Cube Grim", theme: "Cube", rarity: "Special", unreleased: false },
 
     { id: "air_basic", name: "Air", theme: "Basic", rarity: "Rare", unreleased: false },
