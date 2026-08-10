@@ -2,13 +2,13 @@
 
 /* ===== Reset & Base ===== */
 :root {
-  --bg-body: #1a1a2e;
-  --bg-card: #2a2a3e;
-  --bg-surface: rgba(42, 42, 62, 0.8);
-  --bg-input: rgba(30, 30, 48, 0.9);
-  --border: rgba(255, 255, 255, 0.1);
-  --text: #e2e8f0;
-  --text-muted: #94a3b8;
+  --bg-body: #0d1117;
+  --bg-card: #161b22;
+  --bg-surface: rgba(22, 27, 34, 0.85);
+  --bg-input: rgba(13, 17, 23, 0.9);
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #e6edf3;
+  --text-muted: #8b949e;
   --text-bright: #ffffff;
   --accent: #a855f7;
   --gold: #facc15;
@@ -622,7 +622,7 @@ body {
   width: 100%;
   padding: 10px 18px 10px 40px;
   border-radius: 9999px;
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(22, 27, 34, 0.75);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: var(--text-bright);
@@ -641,7 +641,7 @@ body {
 }
 
 .search-input:hover {
-  background: rgba(30, 41, 59, 0.75);
+  background: rgba(33, 38, 45, 0.85);
   border-color: rgba(255, 255, 255, 0.25);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
@@ -649,7 +649,7 @@ body {
 
 .search-input:focus {
   outline: none;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(13, 17, 23, 0.9);
   border-color: #8b5cf6;
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25), 0 8px 20px rgba(0, 0, 0, 0.4);
 }
@@ -657,7 +657,7 @@ body {
 .filter-select {
   padding: 10px 38px 10px 18px;
   border-radius: 9999px;
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(22, 27, 34, 0.75);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #e2e8f0;
@@ -676,7 +676,7 @@ body {
 }
 
 .filter-select:hover {
-  background-color: rgba(30, 41, 59, 0.75);
+  background-color: rgba(33, 38, 45, 0.85);
   border-color: rgba(255, 255, 255, 0.25);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
@@ -689,7 +689,7 @@ body {
 }
 
 .filter-select option {
-  background: #1e1e32;
+  background: #161b22;
   color: var(--text);
 }
 
@@ -703,7 +703,7 @@ body {
   cursor: pointer;
   padding: 10px 18px;
   border-radius: 9999px;
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(22, 27, 34, 0.75);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   white-space: nowrap;
@@ -713,7 +713,7 @@ body {
 }
 
 .filter-checkbox:hover {
-  background: rgba(30, 41, 59, 0.75);
+  background: rgba(33, 38, 45, 0.85);
   border-color: rgba(255, 255, 255, 0.25);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
@@ -728,7 +728,7 @@ body {
 
 .view-toggle {
   display: flex;
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(22, 27, 34, 0.75);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
@@ -809,58 +809,58 @@ body {
   position: relative;
   overflow: hidden;
   border: 2px solid rgba(255, 255, 255, 0.1);
-  background-color: #1b1c23;
+  background-color: #161b22;
 }
 
 /* Theme Gradients & Border Colors (Fortnite.gg Exact Design) */
 .sprite-theme-gold {
-  background: linear-gradient(180deg, #9d752a 0%, #1b1c23 100%);
+  background: linear-gradient(180deg, #9d752a 0%, #161b22 100%);
   border-color: #f5b642;
 }
 
 .sprite-theme-cube {
-  background: linear-gradient(180deg, #730974 0%, #1b1c23 100%);
+  background: linear-gradient(180deg, #730974 0%, #161b22 100%);
   border-color: #8b008b;
 }
 
 .sprite-theme-candy,
 .sprite-theme-gummy {
-  background: linear-gradient(180deg, #9f4540 0%, #1b1c23 100%);
+  background: linear-gradient(180deg, #9f4540 0%, #161b22 100%);
   border-color: #f16f68;
 }
 
 .sprite-theme-galaxy {
-  background: linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%);
+  background: linear-gradient(180deg, #4a31bc 0%, #161b22 100%);
   border-color: #4a35fa;
 }
 
 .sprite-theme-holofoil {
-  background: linear-gradient(180deg, #cb77be 0%, #1b1c23 100%);
+  background: linear-gradient(180deg, #cb77be 0%, #161b22 100%);
   border-color: #ec88d8;
 }
 
 .sprite-theme-gem {
-  background: linear-gradient(180deg, #334155 0%, #1b1c23 100%);
+  background: linear-gradient(180deg, #334155 0%, #161b22 100%);
   border-color: #38bdf8;
 }
 
 .sprite-theme-rare {
-  background: linear-gradient(180deg, #104273 0%, #1b1c23 100%);
+  background: linear-gradient(180deg, #104273 0%, #161b22 100%);
   border-color: #00afff;
 }
 
 .sprite-theme-epic {
-  background: linear-gradient(180deg, #4d1566 0%, #1b1c23 100%);
+  background: linear-gradient(180deg, #4d1566 0%, #161b22 100%);
   border-color: #ce59ff;
 }
 
 .sprite-theme-legendary {
-  background: linear-gradient(180deg, #743e0a 0%, #1b1c23 100%);
+  background: linear-gradient(180deg, #743e0a 0%, #161b22 100%);
   border-color: #de6e0e;
 }
 
 .sprite-theme-mythic {
-  background: linear-gradient(180deg, #a89442 0%, #1b1c23 100%);
+  background: linear-gradient(180deg, #a89442 0%, #161b22 100%);
   border-color: #f1e198;
 }
 
@@ -1130,7 +1130,7 @@ body {
   align-items: center;
   gap: 16px;
   padding: 10px 16px;
-  background: var(--bg-surface);
+  background: rgba(22, 27, 34, 0.85);
   border: 1px solid var(--border);
   border-radius: 10px;
   cursor: pointer;
@@ -1138,7 +1138,7 @@ body {
 }
 
 .sprite-list-item:hover {
-  background: rgba(42, 42, 62, 0.95);
+  background: rgba(33, 38, 45, 0.95);
   border-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -1269,7 +1269,7 @@ body {
 
 .modal-content-box,
 .modal-content {
-  background: #1e1e32;
+  background: #161b22;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 18px;
   padding: 28px;
@@ -1282,7 +1282,7 @@ body {
 }
 
 .glass-panel {
-  background: rgba(30, 30, 50, 0.95);
+  background: rgba(22, 27, 34, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -1358,7 +1358,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(26, 26, 46, 0.5);
+  background: rgba(13, 17, 23, 0.5);
 }
 
 ::-webkit-scrollbar-thumb {
