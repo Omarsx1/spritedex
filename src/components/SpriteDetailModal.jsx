@@ -1,166 +1,192 @@
-import React from 'react';
-import { X, Sparkles, MapPin, Zap, Coins } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { X, Zap, MapPin, Coins, Sparkles, ChevronUp } from 'lucide-react';
 import { SPRITE_FAMILIES, RARITIES, getSpriteCardStyle } from '../data/spritesData';
 import { sounds } from '../utils/audio';
+import gsap from 'gsap';
 
 export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel, onClose }) {
+  const modalRef = useRef(null);
+  const headerRef = useRef(null);
+  const infoRef = useRef(null);
+  const variantsRef = useRef(null);
+
+  // Entrance animation
+  useEffect(() => {
+    if (!sprite || !modalRef.current) return;
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+    tl.fromTo(modalRef.current,
+      { scale: 0.92, opacity: 0, y: 30 },
+      { scale: 1, opacity: 1, y: 0, duration: 0.4 }
+    );
+
+    if (headerRef.current) {
+      tl.fromTo(headerRef.current,
+        { x: -20, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.35 },
+        '-=0.2'
+      );
+    }
+
+    if (infoRef.current) {
+      tl.fromTo(infoRef.current.children,
+        { y: 15, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.3, stagger: 0.08 },
+        '-=0.15'
+      );
+    }
+
+    if (variantsRef.current) {
+      const cards = variantsRef.current.querySelectorAll('.sdm__variant');
+      if (cards.length) {
+        tl.fromTo(cards,
+          { scale: 0.85, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.3, stagger: 0.04 },
+          '-=0.1'
+        );
+      }
+    }
+  }, [sprite]);
+
   if (!sprite) return null;
 
-  // Find the family that contains this sprite
   const family = SPRITE_FAMILIES.find(f => f.id === sprite.familyId);
   const familySprites = family ? family.sprites : [sprite];
   const rarityInfo = RARITIES[sprite.rarity] || { name: sprite.rarity, color: '#94a3b8', bg: '#1e293b' };
   const mainStyle = getSpriteCardStyle(sprite);
   const currentState = userState[sprite.id] || { owned: false, level: 1 };
+  const isMastered = currentState.owned && currentState.level === 5;
+
+  const handleImgError = (e) => {
+    if (!e.target.dataset.triedBase) {
+      e.target.dataset.triedBase = 'true';
+      const baseId = sprite.id ? sprite.id.split('_')[0] : 'water';
+      if (baseId === 'peely' || baseId === 'llama' || baseId === 'ironmouse') {
+        e.target.src = `/sprites/${baseId}_basic.webp`;
+      } else {
+        e.target.src = `/sprites/${baseId}_basic.png`;
+      }
+    } else {
+      e.target.onerror = null;
+      e.target.src = '/sprites/water_basic.png';
+    }
+  };
+
+  // Progress bar width
+  const ownedInFamily = familySprites.filter(v => userState[v.id]?.owned).length;
+  const progressPct = (ownedInFamily / familySprites.length) * 100;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content glass-panel" style={{ maxWidth: '700px' }} onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose}>
-          <X size={20} />
+      <div className="sdm" ref={modalRef} onClick={(e) => e.stopPropagation()}>
+
+        {/* Close */}
+        <button className="sdm__close" onClick={onClose}>
+          <X size={18} />
         </button>
 
-        {/* Modal Top Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '24px' }}>
-          <div style={{
-            width: '100px',
-            height: '100px',
-            borderRadius: '16px',
-            background: mainStyle.background,
-            border: `2px solid ${mainStyle.borderColor}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            position: 'relative'
-          }}>
-            {currentState.owned && currentState.level === 5 && (
-              <img
-                src="/img/x/sprites/crown.webp"
-                alt="Crown"
-                style={{
-                  position: 'absolute',
-                  top: '4px',
-                  left: '53%',
-                  transform: 'translateX(-50%)',
-                  width: '31px',
-                  height: '21px',
-                  zIndex: 5,
-                  filter: 'drop-shadow(0 0 3px #000)'
-                }}
-              />
+        {/* ═══ Hero header with themed gradient ═══ */}
+        <div
+          className="sdm__hero"
+          style={{ background: mainStyle.background }}
+          ref={headerRef}
+        >
+          <div className="sdm__hero-glow" style={{ background: `radial-gradient(circle at 30% 50%, ${mainStyle.borderColor}40 0%, transparent 70%)` }} />
+
+          <div className="sdm__hero-img-wrap">
+            {isMastered && (
+              <img src="/img/x/sprites/crown.webp" alt="Crown" className="sdm__crown" />
             )}
             <img
               src={sprite.image}
               alt={sprite.fullName}
-              style={{
-                maxWidth: '90%',
-                maxHeight: '90%',
-                objectFit: 'contain',
-                filter: !currentState.owned ? 'grayscale(80%) opacity(0.5)' : 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
-              }}
-              onError={(e) => {
-                if (!e.target.dataset.triedBase) {
-                  e.target.dataset.triedBase = 'true';
-                  const baseId = sprite.id ? sprite.id.split('_')[0] : 'water';
-                  if (baseId === 'peely' || baseId === 'llama' || baseId === 'ironmouse') {
-                    e.target.src = `/sprites/${baseId}_basic.webp`;
-                  } else {
-                    e.target.src = `/sprites/${baseId}_basic.png`;
-                  }
-                } else {
-                  e.target.onerror = null;
-                  e.target.src = '/sprites/water_basic.png';
-                }
-              }}
+              className={`sdm__hero-img ${!currentState.owned ? 'sdm__hero-img--locked' : ''}`}
+              onError={handleImgError}
             />
           </div>
 
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-              <span
-                className={`sprite-pill rarity-badge ${rarityInfo.classKey ? `sprite-rarity-${rarityInfo.classKey}` : ''}`}
-              >
+          <div className="sdm__hero-info">
+            <div className="sdm__hero-badges">
+              <span className={`sprite-pill rarity-badge ${rarityInfo.classKey ? `sprite-rarity-${rarityInfo.classKey}` : ''}`}>
                 {rarityInfo.name}
               </span>
-              <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: 600 }}>
-                Drop Rate: {sprite.dropChance}
-              </span>
+              <span className="sdm__drop">{sprite.dropChance}</span>
             </div>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: 900 }}>{sprite.fullName}</h2>
-            <div style={{ fontSize: '0.82rem', color: '#94a3b8', marginTop: '4px' }}>
-              Variante: <strong style={{ color: '#cbd5e1' }}>{sprite.variantDisplay || sprite.variant}</strong> · Gen {sprite.gen}
+            <h2 className="sdm__name">{sprite.fullName}</h2>
+            <div className="sdm__meta">
+              {sprite.variantDisplay || sprite.variant} · Gen {sprite.gen}
             </div>
           </div>
         </div>
 
-        {/* Ability & Location Specs */}
-        <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '16px', borderRadius: '14px', marginBottom: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '12px' }}>
-            <Zap size={18} color="#eab308" style={{ marginTop: '2px', flexShrink: 0 }} />
-            <div>
-              <strong style={{ color: '#fde047', fontSize: '0.9rem', display: 'block', marginBottom: '2px' }}>HABILIDAD PASIVA:</strong>
-              <p style={{ fontSize: '0.92rem', color: '#cbd5e1', lineHeight: '1.4' }}>{sprite.ability}</p>
-            </div>
-          </div>
+        {/* ═══ Info panels ═══ */}
+        <div className="sdm__body" ref={infoRef}>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: '#94a3b8' }}>
-              <MapPin size={16} color="#3b82f6" />
-              <span>{sprite.location}</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: '#94a3b8' }}>
-              <Coins size={16} color="#eab308" />
-              <span>Costo: {sprite.summonCost}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Level Control for this sprite */}
-        {currentState.owned && (
-          <div style={{
-            background: 'rgba(16, 185, 129, 0.1)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            borderRadius: '12px',
-            padding: '14px 16px',
-            marginBottom: '24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '12px'
-          }}>
-            <div>
-              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: currentState.level === 5 ? '#facc15' : '#10b981', marginBottom: '2px' }}>
-                {currentState.level === 5 ? '⭐ MAESTREADO — NIVEL MÁXIMO' : `Nivel actual: ${currentState.level}/5`}
+          {/* Ability card */}
+          <div className="sdm__card">
+            <div className="sdm__card-row">
+              <Zap size={16} className="sdm__icon sdm__icon--yellow" />
+              <div>
+                <span className="sdm__card-label">HABILIDAD PASIVA</span>
+                <p className="sdm__card-text">{sprite.ability}</p>
               </div>
-              <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Ajusta el nivel de este Sprite</div>
             </div>
-            <div style={{ display: 'flex', gap: '4px' }}>
-              {[1, 2, 3, 4, 5].map((lvl) => (
-                <button
-                  key={lvl}
-                  className={`star-btn ${currentState.level >= lvl ? 'active' : ''}`}
-                  style={{ padding: '6px 10px', fontSize: '0.78rem' }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSetLevel(sprite.id, lvl);
-                    sounds.playLevelUp(lvl);
-                  }}
-                >
-                  ★{lvl}
-                </button>
-              ))}
+            <div className="sdm__card-footer">
+              <div className="sdm__card-detail">
+                <MapPin size={14} className="sdm__icon sdm__icon--blue" />
+                <span>{sprite.location}</span>
+              </div>
+              <div className="sdm__card-detail">
+                <Coins size={14} className="sdm__icon sdm__icon--yellow" />
+                <span>{sprite.summonCost}</span>
+              </div>
             </div>
           </div>
-        )}
 
-        {/* Variants Section */}
-        <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Sparkles size={18} color="#ec4899" />
-          <span>{sprite.familyId === 'icons_crossovers' ? 'TODOS LOS PERSONAJES Y VARIANTES DE ESTA COLECCIÓN:' : 'TODAS LAS VARIANTES DE ESTA FAMILIA:'}</span>
-        </h3>
+          {/* Level control */}
+          {currentState.owned && (
+            <div className={`sdm__level ${isMastered ? 'sdm__level--max' : ''}`}>
+              <div className="sdm__level-info">
+                <ChevronUp size={16} className="sdm__icon" />
+                <span className="sdm__level-text">
+                  {isMastered ? '⭐ MAESTREADO' : `Nivel ${currentState.level}/5`}
+                </span>
+              </div>
+              <div className="sdm__level-btns">
+                {[1, 2, 3, 4, 5].map((lvl) => (
+                  <button
+                    key={lvl}
+                    className={`sdm__lvl-btn ${currentState.level >= lvl ? 'sdm__lvl-btn--active' : ''} ${isMastered ? 'sdm__lvl-btn--gold' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSetLevel(sprite.id, lvl);
+                      sounds.playLevelUp(lvl);
+                    }}
+                  >
+                    {lvl}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '12px', maxHeight: '340px', overflowY: 'auto', paddingRight: '6px' }}>
+          {/* Family progress bar */}
+          <div className="sdm__progress-wrap">
+            <div className="sdm__progress-header">
+              <Sparkles size={14} className="sdm__icon sdm__icon--pink" />
+              <span className="sdm__progress-title">
+                {sprite.familyId === 'icons_crossovers' ? 'COLECCIÓN' : 'VARIANTES'}
+              </span>
+              <span className="sdm__progress-count">{ownedInFamily}/{familySprites.length}</span>
+            </div>
+            <div className="sdm__progress-track">
+              <div className="sdm__progress-fill" style={{ width: `${progressPct}%` }} />
+            </div>
+          </div>
+        </div>
+
+        {/* ═══ Variants grid ═══ */}
+        <div className="sdm__variants" ref={variantsRef}>
           {familySprites.map((v) => {
             const vState = userState[v.id] || { owned: false, level: 1 };
             const vOwned = vState.owned;
@@ -171,112 +197,58 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
             return (
               <div
                 key={v.id}
+                className={`sdm__variant ${vOwned ? 'sdm__variant--owned' : ''} ${vMastered ? 'sdm__variant--mastered' : ''}`}
                 style={{
                   background: vStyle.background,
-                  border: `2px solid ${vStyle.borderColor}`,
-                  borderRadius: '12px',
-                  padding: '10px',
-                  textAlign: 'center',
-                  transition: 'all 0.2s ease',
-                  boxShadow: vOwned ? `0 4px 12px ${vStyle.borderColor}33` : 'none'
+                  borderColor: vStyle.borderColor
                 }}
               >
-                {/* Variant sprite image - click to toggle owned */}
+                {/* Image + toggle */}
                 <div
-                  style={{
-                    width: '60px',
-                    height: '60px',
-                    margin: '0 auto 6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    position: 'relative'
-                  }}
+                  className="sdm__variant-img-wrap"
                   onClick={() => {
                     onToggleOwned(v.id);
                     sounds.playToggle(!vOwned);
                   }}
                 >
                   {vMastered && (
-                    <img
-                      src="/img/x/sprites/crown.webp"
-                      alt="Crown"
-                      style={{
-                        position: 'absolute',
-                        top: '0px',
-                        left: '53%',
-                        transform: 'translateX(-50%)',
-                        width: '26px',
-                        height: '18px',
-                        zIndex: 5,
-                        filter: 'drop-shadow(0 0 3px #000)'
-                      }}
-                    />
+                    <img src="/img/x/sprites/crown.webp" alt="" className="sdm__variant-crown" />
                   )}
                   <img
                     src={v.image}
                     alt={v.fullName}
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: '100%',
-                      objectFit: 'contain',
-                      filter: !vOwned ? 'grayscale(85%) opacity(0.4)' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.5))'
-                    }}
+                    className={`sdm__variant-img ${!vOwned ? 'sdm__variant-img--locked' : ''}`}
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
                 </div>
-                <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {v.variantDisplay || v.variant}
-                </div>
-                <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '2px' }}>
-                  {v.unreleased ? 'NO LANZADO' : v.dropChance}
-                </div>
 
-                {/* Toggle owned/faltante */}
+                <span className="sdm__variant-name">{v.variantDisplay || v.variant}</span>
+                <span className="sdm__variant-drop">{v.unreleased ? 'NO LANZADO' : v.dropChance}</span>
+
+                {/* Status pill */}
                 <div
-                  style={{ marginTop: '6px', cursor: 'pointer' }}
+                  className="sdm__variant-status"
                   onClick={() => {
                     onToggleOwned(v.id);
                     sounds.playToggle(!vOwned);
                   }}
                 >
-                  <span style={{
-                    fontSize: '0.68rem',
-                    fontWeight: 800,
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    background: vMastered ? 'linear-gradient(135deg, #facc15, #ef4444)' : vOwned ? '#10b981' : 'rgba(255,255,255,0.1)',
-                    color: vMastered ? '#000' : vOwned ? '#fff' : '#94a3b8'
-                  }}>
-                    {vMastered ? '⭐ MAX' : vOwned ? '✔ Atrapado' : '❌ Faltante'}
+                  <span className={`sdm__pill ${vMastered ? 'sdm__pill--gold' : vOwned ? 'sdm__pill--green' : ''}`}>
+                    {vMastered ? '⭐ MAX' : vOwned ? '✔ Atrapado' : 'Faltante'}
                   </span>
                 </div>
 
-                {/* Individual level selector per variant */}
+                {/* Level selectors */}
                 {vOwned && (
-                  <div style={{ display: 'flex', gap: '2px', marginTop: '6px' }}>
+                  <div className="sdm__variant-levels">
                     {[1, 2, 3, 4, 5].map((lvl) => (
                       <button
                         key={lvl}
+                        className={`sdm__vlvl ${vLevel >= lvl ? (vMastered ? 'sdm__vlvl--gold' : 'sdm__vlvl--active') : ''}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           onSetLevel(v.id, lvl);
                           sounds.playLevelUp(lvl);
-                        }}
-                        style={{
-                          flex: 1,
-                          padding: '3px 0',
-                          borderRadius: '3px',
-                          background: vLevel >= lvl
-                            ? (vLevel === 5 ? 'linear-gradient(135deg, #facc15, #f97316)' : '#10b981')
-                            : 'rgba(0,0,0,0.4)',
-                          border: `1px solid ${vLevel >= lvl ? (vLevel === 5 ? '#fef08a' : '#34d399') : 'rgba(255,255,255,0.08)'}`,
-                          color: vLevel >= lvl ? (vLevel === 5 ? '#000' : '#fff') : 'rgba(255,255,255,0.25)',
-                          fontSize: '0.6rem',
-                          fontWeight: 900,
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease'
                         }}
                       >
                         {lvl}
