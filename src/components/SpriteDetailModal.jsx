@@ -59,7 +59,11 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                 objectFit: 'contain',
                 filter: !currentState.owned ? 'grayscale(80%) opacity(0.5)' : 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
               }}
-              onError={(e) => { e.target.style.display = 'none'; }}
+              onError={(e) => {
+                e.target.onerror = null;
+                const baseId = sprite.id ? sprite.id.split('_')[0] : 'water';
+                e.target.src = `/sprites/${baseId}_basic.png`;
+              }}
             />
           </div>
 

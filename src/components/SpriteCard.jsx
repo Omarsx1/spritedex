@@ -92,7 +92,11 @@ export function SpriteCard({
             onClick={handleImageClick}
             title="Haz clic exclusivamente en la figura del espíritu para ver detalles y variantes"
             style={{ filter: !isOwned ? 'grayscale(80%) opacity(0.5)' : 'none', cursor: 'pointer' }}
-            onError={(e) => { e.target.style.display = 'none'; }}
+            onError={(e) => {
+              e.target.onerror = null;
+              const baseId = sprite.id ? sprite.id.split('_')[0] : 'water';
+              e.target.src = `/sprites/${baseId}_basic.png`;
+            }}
           />
         </div>
         <div className="list-item-info">
@@ -185,7 +189,11 @@ export function SpriteCard({
             filter: !isOwned ? 'grayscale(80%) opacity(0.5)' : 'drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
             cursor: 'pointer'
           }}
-          onError={(e) => { e.target.style.display = 'none'; }}
+          onError={(e) => {
+            e.target.onerror = null;
+            const baseId = sprite.id ? sprite.id.split('_')[0] : 'water';
+            e.target.src = `/sprites/${baseId}_basic.png`;
+          }}
         />
       </div>
 

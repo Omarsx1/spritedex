@@ -82,7 +82,11 @@ export function App() {
 
       if (searchQuery.trim() !== '') {
         const query = searchQuery.toLowerCase();
-        if (!sprite.fullName.toLowerCase().includes(query)) return false;
+        const nameMatch = sprite.fullName.toLowerCase().includes(query);
+        const variantMatch = sprite.variant.toLowerCase().includes(query);
+        const quackMatch = query.includes('quack') && sprite.variant === 'Holofoil';
+
+        if (!nameMatch && !variantMatch && !quackMatch) return false;
       }
 
       // BASE filter (variant/theme)
