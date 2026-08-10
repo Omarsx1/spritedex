@@ -98,6 +98,26 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
     }
   };
 
+  const handleLinkEmail = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setMessage(null);
+
+    try {
+      const { error: updateError } = await supabase.auth.updateUser({
+        email,
+        password
+      });
+      if (updateError) throw updateError;
+      setMessage('¡Excelente! Tu cuenta ahora está vinculada a tu correo. Puedes usarla en cualquier dispositivo.');
+    } catch (err) {
+      setError(err.message || 'Error al vincular la cuenta');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSignOut = async () => {
     setLoading(true);
     await supabase.auth.signOut();
@@ -116,16 +136,16 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <ShieldCheck size={44} color="#10b981" style={{ marginBottom: '8px' }} />
           <h2 style={{ fontSize: '1.4rem', fontWeight: 900 }}>
-            {user ? 'Sincronización en la Nube' : (isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión')}
+            {user ? (user.is_anonymous ? 'Conectado como Invitado' : 'Sincronización en la Nube') : (isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión')}
           </h2>
           <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginTop: '4px' }}>
-            {user ? (user.is_anonymous ? 'Conectado como Invitado (1-Clic)' : `Conectado como ${user.email}`) : 'Guarda tu Pokédex en la nube y accede desde cualquier dispositivo'}
+            {user ? (user.is_anonymous ? 'Tu Pokédex está seguro en la nube' : `Conectado como ${user.email}`) : 'Guarda tu Pokédex en la nube y accede desde cualquier dispositivo'}
           </p>
         </div>
 
         {user ? (
-          <div style={{ textAlign: 'center', padding: '10px 0' }}>
-            <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', padding: '14px', marginBottom: '14px' }}>
+          <div style={{ padding: '10px 0' }}>
+            <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', padding: '14px', marginBottom: '14px', textAlign: 'center' }}>
               <CheckCircle size={24} color="#10b981" style={{ margin: '0 auto 6px' }} />
               <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#10b981' }}>Tu Pokédex está sincronizado en la nube</div>
               <div style={{ fontSize: '0.76rem', color: '#94a3b8', marginTop: '2px' }}>
@@ -134,13 +154,111 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
             </div>
 
             {user.is_anonymous && (
-              <div style={{ background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.25)', borderRadius: '12px', padding: '12px', marginBottom: '18px', textAlign: 'left' }}>
-                <div style={{ fontSize: '0.78rem', color: '#c084fc', fontWeight: 700, marginBottom: '4px' }}>
-                  💡 ¿Quieres acceder desde otros dispositivos?
+              <div style={{ background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.25)', borderRadius: '14px', padding: '14px', marginBottom: '18px' }}>
+                <div style={{ fontSize: '0.82rem', color: '#c084fc', fontWeight: 800, marginBottom: '6px' }}>
+                  🔗 Convierte tu cuenta para acceder desde otros celulares
                 </div>
-                <div style={{ fontSize: '0.74rem', color: '#94a3b8', lineHeight: 1.4 }}>
-                  Estás guardando como invitado. Si deseas abrir tu colección en otros celulares o computadoras, puedes vincular tu correo registrándote abajo o usar la herramienta de <strong>Respaldo</strong> para transferir tu código.
-                </div>
+                <p style={{ fontSize: '0.75rem', color: '#94a3b8', lineHeight: 1.4, marginBottom: '12px' }}>
+                  Vincula tu correo o Google a esta colección. Conservarás todos los Sprites que ya has marcado.
+                </p>
+
+                {error && (
+                  <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#fca5a5', padding: '8px 12px', borderRadius: '8px', fontSize: '0.78rem', marginBottom: '12px' }}>
+                    {error}
+                  </div>
+                )}
+
+                {message && (
+                  <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#6ee7b7', padding: '8px 12px', borderRadius: '8px', fontSize: '0.78rem', marginBottom: '12px' }}>
+                    {message}
+                  </div>
+                )}
+
+                {/* Link Google */}
+                <button
+                  onClick={handleGoogleAuth}
+                  style={{
+                    width: '100%',
+                    padding: '9px',
+                    borderRadius: '8px',
+                    background: '#ffffff',
+                    color: '#000000',
+                    border: 'none',
+                    fontFamily: 'var(--font-sans)',
+                    fontWeight: 800,
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    marginBottom: '10px'
+                  }}
+                  disabled={loading}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                  </svg>
+                  <span>Vincular con Google</span>
+                </button>
+
+                {/* Link Email Form */}
+                <form onSubmit={handleLinkEmail} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ position: 'relative' }}>
+                    <Mail size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+                    <input
+                      type="email"
+                      placeholder="Tu correo electrónico"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '8px 10px 8px 32px',
+                        borderRadius: '6px',
+                        background: 'rgba(0,0,0,0.4)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        color: '#fff',
+                        fontSize: '0.78rem',
+                        fontFamily: 'var(--font-sans)'
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ position: 'relative' }}>
+                    <Key size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+                    <input
+                      type="password"
+                      placeholder="Nueva contraseña"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      style={{
+                        width: '100%',
+                        padding: '8px 10px 8px 32px',
+                        borderRadius: '6px',
+                        background: 'rgba(0,0,0,0.4)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        color: '#fff',
+                        fontSize: '0.78rem',
+                        fontFamily: 'var(--font-sans)'
+                      }}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="btn-primary"
+                    style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', padding: '8px', marginTop: '2px', opacity: loading ? 0.6 : 1 }}
+                    disabled={loading}
+                  >
+                    <span>Vincular Correo</span>
+                  </button>
+                </form>
               </div>
             )}
 
