@@ -63,8 +63,8 @@ export function FilterBar({
         onChange={(e) => setStatusFilter(e.target.value)}
       >
         <option value="all">ESTADO ▾</option>
-        <option value="owned">Solo Atrapados</option>
-        <option value="missing">Solo Faltantes</option>
+        <option value="owned">Atrapados</option>
+        <option value="missing">No Atrapados</option>
       </select>
 
       {/* ORDENAR POR */}
