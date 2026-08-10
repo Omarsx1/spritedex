@@ -53,10 +53,12 @@ export function SpriteCard({
 
     // Meticulous hit-test: calculate click position relative to the img bounding box
     const rect = e.currentTarget.getBoundingClientRect();
+    const clickXRatio = (e.clientX - rect.left) / rect.width;
     const clickYRatio = (e.clientY - rect.top) / rect.height;
 
-    // If click occurred in the top 20% region (crown or top card area), treat as card toggle click!
-    if (clickYRatio < 0.20) {
+    // Filter out clicks on outer transparent margins (sides, top, bottom):
+    // Left 22%, Right 22%, Top 20%, Bottom 15% -> treat as card toggle click!
+    if (clickXRatio < 0.22 || clickXRatio > 0.78 || clickYRatio < 0.20 || clickYRatio > 0.85) {
       handleToggleClick(e);
       return;
     }
