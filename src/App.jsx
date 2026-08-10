@@ -68,6 +68,8 @@ export function App() {
       setUser(currentUser);
       if (currentUser) {
         loadUserCollectionFromCloud(currentUser.id);
+      } else if (_event === 'SIGNED_OUT') {
+        handleSignOutCleanup();
       }
     });
 
@@ -88,13 +90,22 @@ export function App() {
       }
 
       if (data?.user_state) {
-        setUserState((prevLocal) => ({
-          ...prevLocal,
-          ...data.user_state
-        }));
+        setUserState(data.user_state);
+      } else {
+        // New account with no saved cloud state -> start with clean empty collection
+        setUserState({});
       }
     } catch (err) {
       console.error('Failed to load collection from cloud:', err);
+    }
+  };
+
+  const handleSignOutCleanup = () => {
+    setUserState({});
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+    } catch (e) {
+      console.error('Failed to clear localStorage on sign out:', e);
     }
   };
 
@@ -425,6 +436,7 @@ export function App() {
           onAuthSuccess={() => {
             setShowAuthModal(false);
           }}
+          onSignOut={handleSignOutCleanup}
         />
       )}
     </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Cloud, LogIn, LogOut, CheckCircle, Mail, Key, ShieldCheck } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../utils/supabase';
 
-export function AuthModal({ user, onClose, onAuthSuccess }) {
+export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
@@ -101,6 +101,7 @@ export function AuthModal({ user, onClose, onAuthSuccess }) {
   const handleSignOut = async () => {
     setLoading(true);
     await supabase.auth.signOut();
+    if (onSignOut) onSignOut();
     setLoading(false);
     onClose();
   };
