@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { Share2, Download, Users } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Share2, Download, Users, Sparkles } from 'lucide-react';
 import gsap from 'gsap';
+import { allSprites } from '../data/spritesData';
 
 export function Header({
   totalCount,
@@ -10,68 +11,71 @@ export function Header({
   onOpenBackupModal,
   onOpenCompareModal
 }) {
-  const titleRef = useRef(null);
-  const statsRef = useRef(null);
-  const actionsRef = useRef(null);
+  const [spriteIndex, setSpriteIndex] = useState(0);
+  const activeSpriteRef = useRef(null);
 
+  const currentSprite = allSprites[spriteIndex] || allSprites[0];
+
+  // Dynamic Sprite Switcher driven by GSAP
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Title entrance animation
-      gsap.fromTo(
-        titleRef.current,
-        { y: -30, opacity: 0, scale: 0.96 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.85, ease: 'power3.out' }
-      );
+    const interval = setInterval(() => {
+      if (!activeSpriteRef.current) return;
 
-      // Stats boxes stagger animation
-      if (statsRef.current) {
-        gsap.fromTo(
-          statsRef.current.children,
-          { y: 25, opacity: 0, scale: 0.9 },
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 0.7,
-            stagger: 0.15,
-            delay: 0.2,
-            ease: 'back.out(1.4)'
-          }
-        );
-      }
+      // GSAP animate out
+      gsap.to(activeSpriteRef.current, {
+        y: -16,
+        opacity: 0,
+        scale: 0.9,
+        duration: 0.35,
+        ease: 'power2.in',
+        onComplete: () => {
+          setSpriteIndex((prev) => (prev + 1) % allSprites.length);
+        }
+      });
+    }, 2400);
 
-      // Actions buttons entrance animation
-      if (actionsRef.current) {
-        gsap.fromTo(
-          actionsRef.current.children,
-          { y: 20, opacity: 0, scale: 0.88 },
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 0.6,
-            stagger: 0.1,
-            delay: 0.4,
-            ease: 'power2.out'
-          }
-        );
-      }
-    });
-
-    return () => ctx.revert();
+    return () => clearInterval(interval);
   }, []);
+
+  // GSAP animate in whenever spriteIndex changes
+  useEffect(() => {
+    if (activeSpriteRef.current) {
+      gsap.fromTo(
+        activeSpriteRef.current,
+        { y: 16, opacity: 0, scale: 1.1 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.45, ease: 'back.out(1.6)' }
+      );
+    }
+  }, [spriteIndex]);
 
   return (
     <header className="site-header">
       <div className="header-banner">
         <div className="header-banner-overlay" />
         <div className="header-content">
-          <h1 className="header-title" ref={titleRef}>
-            TODOS LOS SPRITES DE FORTNITE
-          </h1>
+          
+          {/* Title & Dynamic Sprite Switcher */}
+          <div className="header-title-wrapper">
+            <h1 className="header-title">
+              TODOS LOS SPRITES DE FORTNITE
+            </h1>
+
+            {/* GSAP Animated Dynamic Sprite Ticker */}
+            <div className="header-sprite-ticker" ref={activeSpriteRef}>
+              <Sparkles size={16} color="#fbbf24" style={{ flexShrink: 0 }} />
+              <img
+                src={currentSprite.image}
+                alt={currentSprite.fullName}
+                className="ticker-sprite-img"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+              <span className="ticker-sprite-name">{currentSprite.fullName}</span>
+              <span className="ticker-sprite-variant">{currentSprite.variantDisplay}</span>
+            </div>
+          </div>
 
           {/* Stats counters */}
-          <div className="header-stats" ref={statsRef}>
+          <div className="header-stats">
             <div className="stat-box">
               <span className="stat-number">{ownedCount}</span>
               <span className="stat-separator">/</span>
@@ -87,7 +91,7 @@ export function Header({
           </div>
 
           {/* Action buttons */}
-          <div className="header-actions" ref={actionsRef}>
+          <div className="header-actions">
             <button className="header-btn trade" onClick={onOpenCompareModal}>
               <Users size={18} />
               <span>Intercambio Fortnite</span>

@@ -169,6 +169,8 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   };
 });
 
+export const allSprites = ALL_SPRITES;
+
 // All unique sprite families for the SPRITE filter dropdown
 export const SPRITE_FAMILIES_LIST = [...new Set(ALL_SPRITES.map(s => s.familyName))].sort();
 
