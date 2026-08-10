@@ -1,11 +1,11 @@
 import officialSpritesJson from './official_sprites.json';
 
 export const RARITIES = {
-  Mythic: { name: 'MÍTICO', color: '#f1e198', bg: '#746226', border: '#f1e198', cardGradient: 'linear-gradient(180deg, #a89442 0%, #1b1c23 100%)' },
-  Legendary: { name: 'LEGENDARIO', color: '#de6e0e', bg: '#5c3108', border: '#de6e0e', cardGradient: 'linear-gradient(180deg, #743e0a 0%, #1b1c23 100%)' },
-  Epic: { name: 'ÉPICO', color: '#ce59ff', bg: '#4d1566', border: '#ce59ff', cardGradient: 'linear-gradient(180deg, #4d1566 0%, #1b1c23 100%)' },
-  Rare: { name: 'RARO', color: '#00afff', bg: '#104273', border: '#00afff', cardGradient: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)' },
-  Special: { name: 'ESPECIAL', color: '#ec4899', bg: '#be185d', border: '#ec4899', cardGradient: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)' }
+  Mythic: { name: 'MÍTICO', color: '#fff0a6', bg: '#7c5d26', border: '#7c5d26', classKey: 'mythic', cardGradient: 'linear-gradient(180deg, #7c5d26 0%, #1b1c23 100%)' },
+  Legendary: { name: 'LEGENDARIO', color: '#fbc363', bg: '#8a3c1e', border: '#8a3c1e', classKey: 'legendary', cardGradient: 'linear-gradient(180deg, #8a3c1e 0%, #1b1c23 100%)' },
+  Epic: { name: 'ÉPICO', color: '#ec27ff', bg: '#4c197b', border: '#4c197b', classKey: 'epic', cardGradient: 'linear-gradient(180deg, #4c197b 0%, #1b1c23 100%)' },
+  Rare: { name: 'RARO', color: '#00fffb', bg: '#00458a', border: '#00458a', classKey: 'rare', cardGradient: 'linear-gradient(180deg, #00458a 0%, #1b1c23 100%)' },
+  Special: { name: 'ESPECIAL', color: '#000000', bg: 'transparent', border: '#5dffe4', classKey: 'special', cardGradient: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)' }
 };
 
 export const THEME_STYLES = {

@@ -559,6 +559,54 @@ body {
   100% { background-position: 0% 50%; }
 }
 
+/* ===== Sprite Rarity Pills (Fortnite.gg Specs) ===== */
+.sprite-pill,
+.rarity-badge,
+.rarity-badge-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 4px 6px 1px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cfd5df;
+  border-radius: 6px;
+  font-family: var(--font-sans), sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sprite-rarity-rare,
+.rarity-badge.rare,
+.rarity-badge-sm.rare {
+  background: #00458a !important;
+  color: #00fffb !important;
+}
+
+.sprite-rarity-legendary,
+.rarity-badge.legendary,
+.rarity-badge-sm.legendary {
+  background: #8a3c1e !important;
+  color: #fbc363 !important;
+}
+
+.sprite-rarity-epic,
+.rarity-badge.epic,
+.rarity-badge-sm.epic {
+  background: #4c197b !important;
+  color: #ec27ff !important;
+}
+
+.sprite-rarity-mythic,
+.rarity-badge.mythic,
+.rarity-badge-sm.mythic {
+  background: #7c5d26 !important;
+  color: #fff0a6 !important;
+}
+
 .sprite-rarity-special,
 .rarity-badge.special,
 .rarity-badge-sm.special {
@@ -566,18 +614,6 @@ body {
   color: #000 !important;
   background-size: 430% 100% !important;
   animation: sprite-rarity-special-anim 12s linear infinite !important;
-}
-
-.rarity-badge {
-  font-size: 0.65rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: 5px;
-  color: #fff;
-  letter-spacing: 0.8px;
-  line-height: 1;
-  display: inline-block;
 }
 
 .drop-pct {
