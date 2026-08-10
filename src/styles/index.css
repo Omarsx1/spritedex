@@ -420,15 +420,6 @@ body {
   border-color: #f1e198;
 }
 
-.sprite-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 50%;
-  background: radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
-  pointer-events: none;
-}
-
 .sprite-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
@@ -440,29 +431,7 @@ body {
 
 .sprite-card.is-mastered {
   border-color: var(--gold) !important;
-  box-shadow: 0 0 20px rgba(250, 204, 21, 0.3) !important;
-}
-
-@keyframes shimmerMastered {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.sprite-card.is-mastered::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 14px;
-  background: linear-gradient(
-    90deg, transparent 0%,
-    rgba(250, 204, 21, 0.08) 45%,
-    rgba(250, 204, 21, 0.15) 50%,
-    rgba(250, 204, 21, 0.08) 55%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmerMastered 3s infinite linear;
-  pointer-events: none;
+  box-shadow: 0 0 15px rgba(250, 204, 21, 0.3) !important;
 }
 
 /* Card image */
