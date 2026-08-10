@@ -125,11 +125,6 @@ const FAMILY_NAMES_MAP = {
   ironmouse: 'La niña'
 };
 
-export const allSprites = ALL_SPRITES;
-
-// All unique sprite families for the SPRITE filter dropdown
-export const SPRITE_FAMILIES_LIST = [...new Set(ALL_SPRITES.map(s => s.familyName))].sort();
-
 const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse'];
 
 // Format and group official sprites
@@ -202,6 +197,11 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     ability: 'Concede bonificaciones pasivas de escudo, velocidad y recolección de botín.'
   };
 });
+
+export const allSprites = ALL_SPRITES;
+
+// All unique sprite families for the SPRITE filter dropdown
+export const SPRITE_FAMILIES_LIST = [...new Set(ALL_SPRITES.map(s => s.familyName))].sort();
 
 // Group sprites into families for detail view (sorted canonically by variant order)
 export const SPRITE_FAMILIES = Object.values(
