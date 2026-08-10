@@ -32,8 +32,24 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
-            overflow: 'hidden'
+            position: 'relative'
           }}>
+            {currentState.owned && currentState.level === 5 && (
+              <img
+                src="/sprites/crown.svg"
+                alt="Crown"
+                style={{
+                  position: 'absolute',
+                  top: '-4px',
+                  left: '53%',
+                  transform: 'translateX(-50%)',
+                  width: '32px',
+                  height: '22px',
+                  zIndex: 5,
+                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))'
+                }}
+              />
+            )}
             <img
               src={sprite.image}
               alt={sprite.fullName}
@@ -162,13 +178,30 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    position: 'relative'
                   }}
                   onClick={() => {
                     onToggleOwned(v.id);
                     sounds.playToggle(!vOwned);
                   }}
                 >
+                  {vMastered && (
+                    <img
+                      src="/sprites/crown.svg"
+                      alt="Crown"
+                      style={{
+                        position: 'absolute',
+                        top: '-2px',
+                        left: '53%',
+                        transform: 'translateX(-50%)',
+                        width: '24px',
+                        height: '16px',
+                        zIndex: 5,
+                        filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))'
+                      }}
+                    />
+                  )}
                   <img
                     src={v.image}
                     alt={v.fullName}

@@ -444,8 +444,65 @@ body {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
 }
 
+/* ===== Mastered Metallic Premium Card Styling ===== */
 .sprite-card.is-mastered {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    0 0 18px rgba(250, 204, 21, 0.3) !important;
+}
+
+/* Metallic diagonal sheen overlay */
+.sprite-card.is-mastered::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.08) 38%,
+    rgba(255, 255, 255, 0.22) 43%,
+    rgba(255, 255, 255, 0.1) 48%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Crown over Sprite Head when Mastered */
+.sprite-mastered::before,
+.sprite-card.is-mastered .card-image::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 53%;
+  transform: translateX(-50%);
+  width: 31px;
+  height: 21px;
+  background: url(/sprites/crown.svg) center / contain no-repeat;
+  z-index: 5;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+}
+
+/* List view crown */
+.sprite-list-item.is-mastered .list-item-image {
+  position: relative;
+}
+
+.sprite-list-item.is-mastered .list-item-image::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 16px;
+  background: url(/sprites/crown.svg) center / contain no-repeat;
+  z-index: 5;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
 }
 
 /* Card image */
