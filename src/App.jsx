@@ -34,6 +34,7 @@ export function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [baseFilter, setBaseFilter] = useState('all');      // BASE = variant/theme
   const [spriteFilter, setSpriteFilter] = useState('all');  // SPRITE = family
+  const [statusFilter, setStatusFilter] = useState('all');  // STATUS = all/owned/missing
   const [sortBy, setSortBy] = useState('default');          // SORT BY
   const [showUnreleased, setShowUnreleased] = useState(false);
   const [viewMode, setViewMode] = useState('grid');         // 'grid' or 'list'
@@ -98,6 +99,15 @@ export function App() {
       // SPRITE filter (family)
       if (spriteFilter !== 'all' && sprite.familyName.toLowerCase() !== spriteFilter.toLowerCase()) return false;
 
+      // STATUS filter (all / owned / missing)
+      if (statusFilter === 'owned') {
+        const isOwned = (activeProfile === 'friend' && friendState ? friendState : userState)[sprite.id]?.owned;
+        if (!isOwned) return false;
+      } else if (statusFilter === 'missing') {
+        const isOwned = (activeProfile === 'friend' && friendState ? friendState : userState)[sprite.id]?.owned;
+        if (isOwned) return false;
+      }
+
       return true;
     });
 
@@ -138,7 +148,7 @@ export function App() {
     }
 
     return result;
-  }, [searchQuery, baseFilter, spriteFilter, sortBy, showUnreleased, userState, friendState, activeProfile]);
+  }, [searchQuery, baseFilter, spriteFilter, statusFilter, sortBy, showUnreleased, userState, friendState, activeProfile]);
 
   const activeState = activeProfile === 'friend' && friendState ? friendState : userState;
 
@@ -251,6 +261,8 @@ export function App() {
           setBaseFilter={setBaseFilter}
           spriteFilter={spriteFilter}
           setSpriteFilter={setSpriteFilter}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
           sortBy={sortBy}
           setSortBy={setSortBy}
           showUnreleased={showUnreleased}

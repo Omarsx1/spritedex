@@ -9,6 +9,8 @@ export function FilterBar({
   setBaseFilter,
   spriteFilter,
   setSpriteFilter,
+  statusFilter,
+  setStatusFilter,
   sortBy,
   setSortBy,
   showUnreleased,
@@ -52,6 +54,17 @@ export function FilterBar({
         {SPRITE_FAMILIES_LIST.map(f => (
           <option key={f} value={f}>{f}</option>
         ))}
+      </select>
+
+      {/* Filtro ESTADO (todos / atrapados / faltantes) */}
+      <select
+        className="filter-select"
+        value={statusFilter}
+        onChange={(e) => setStatusFilter(e.target.value)}
+      >
+        <option value="all">ESTADO ▾</option>
+        <option value="owned">Solo Atrapados</option>
+        <option value="missing">Solo Faltantes</option>
       </select>
 
       {/* ORDENAR POR */}
