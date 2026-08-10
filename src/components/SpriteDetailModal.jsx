@@ -66,8 +66,8 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
               <span
-                className="rarity-badge"
-                style={{ background: rarityInfo.bg, color: '#fff' }}
+                className={`rarity-badge ${sprite.rarity === 'Special' ? 'special sprite-rarity-special' : ''}`}
+                style={sprite.rarity === 'Special' ? {} : { background: rarityInfo.bg, color: '#fff' }}
               >
                 {rarityInfo.name}
               </span>

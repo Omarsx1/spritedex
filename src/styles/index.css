@@ -553,6 +553,21 @@ body {
   z-index: 1;
 }
 
+@keyframes sprite-rarity-special-anim {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.sprite-rarity-special,
+.rarity-badge.special,
+.rarity-badge-sm.special {
+  background: linear-gradient(15deg, #5dffe4 0, #8dff9a 8%, #fff36a 16%, #60dfff 24%, #7b7cff 32%, #ff77d8 40%, #ffc45f 48%, #5dffe4 56%, #8dff9a 64%, #fff36a 72%, #60dfff 80%, #7b7cff 88%, #ff77d8 96%, #ffc45f 100%) !important;
+  color: #000 !important;
+  background-size: 430% 100% !important;
+  animation: sprite-rarity-special-anim 12s linear infinite !important;
+}
+
 .rarity-badge {
   font-size: 0.6rem;
   font-weight: 900;

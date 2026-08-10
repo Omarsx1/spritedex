@@ -77,7 +77,10 @@ export function SpriteCard({
         <div className="list-item-info">
           <span className="list-item-name">{sprite.fullName}</span>
           <div className="list-item-meta">
-            <span className="rarity-badge-sm" style={{ background: rarityInfo.bg }}>
+            <span
+              className={`rarity-badge-sm ${sprite.rarity === 'Special' ? 'special sprite-rarity-special' : ''}`}
+              style={sprite.rarity === 'Special' ? {} : { background: rarityInfo.bg }}
+            >
               {rarityInfo.name}
             </span>
             <span className="drop-text">{sprite.dropChanceDisplay}</span>
@@ -167,7 +170,10 @@ export function SpriteCard({
 
       {/* Badge de rareza + drop % */}
       <div className="card-meta">
-        <span className="rarity-badge" style={{ background: rarityInfo.bg }}>
+        <span
+          className={`rarity-badge ${sprite.rarity === 'Special' ? 'special sprite-rarity-special' : ''}`}
+          style={sprite.rarity === 'Special' ? {} : { background: rarityInfo.bg }}
+        >
           {rarityInfo.name}
         </span>
         <span className="drop-pct">{sprite.dropChanceDisplay}</span>
