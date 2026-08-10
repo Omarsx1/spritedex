@@ -817,5 +817,82 @@
     "theme": "Basic",
     "rarity": "Mythic",
     "unreleased": false
+  },
+  {
+    "id": "peely_basic",
+    "name": "Peely",
+    "theme": "Basic",
+    "rarity": "Legendary",
+    "unreleased": false
+  },
+  {
+    "id": "peely_gold",
+    "name": "Gold Peely",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "peely_candy",
+    "name": "Gummy Peely",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "peely_galaxy",
+    "name": "Galaxy Peely",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "peely_holofoil",
+    "name": "Holofoil Peely",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "llama_basic",
+    "name": "Llama",
+    "theme": "Basic",
+    "rarity": "Legendary",
+    "unreleased": false
+  },
+  {
+    "id": "llama_gold",
+    "name": "Gold Llama",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "llama_candy",
+    "name": "Gummy Llama",
+    "theme": "Candy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "llama_galaxy",
+    "name": "Galaxy Llama",
+    "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "llama_gem",
+    "name": "Gem Llama",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "ironmouse_basic",
+    "name": "Ironmouse",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false
   }
 ]

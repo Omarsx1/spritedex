@@ -118,10 +118,13 @@ const FAMILY_NAMES_MAP = {
   batman: 'Batman',
   pollo: 'Pollo',
   vini: 'Vini Jr.',
-  wick: 'John Wick'
+  wick: 'John Wick',
+  peely: 'Peely',
+  llama: 'Llama',
+  ironmouse: 'Ironmouse'
 };
 
-const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut'];
+const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse'];
 
 // Format and group official sprites
 export const ALL_SPRITES = officialSpritesJson.map((item) => {
