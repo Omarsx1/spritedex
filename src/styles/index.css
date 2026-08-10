@@ -1475,60 +1475,19 @@ body {
   font-size: 0.82rem;
   color: rgba(255, 255, 255, 0.45);
   font-weight: 500;
-}
-
-/* Level control inside Hero Header (top-right) */
-.sdm__hero-level {
-  position: relative;
-  z-index: 2;
-  margin-left: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  padding: 8px 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-.sdm__hero-level-title {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.76rem;
-  font-weight: 800;
+}
+
+.sdm__meta-lvl {
   color: #10b981;
-}
-
-.sdm__hero-level--max .sdm__hero-level-title {
-  color: #facc15;
-}
-
-.sdm__hero-level-btns {
-  display: flex;
-  gap: 4px;
-}
-
-.sdm__hero-obtain-btn {
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: #fff;
-  font-family: var(--font-sans);
-  font-size: 0.78rem;
   font-weight: 800;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 14px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  transition: all 0.2s ease;
 }
 
-.sdm__hero-obtain-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+.sdm__meta-lvl--mastered {
+  color: #facc15;
+  font-weight: 900;
 }
 
 /* ── Body panels ── */
@@ -1691,6 +1650,17 @@ body {
   text-align: center;
   transition: all 0.2s ease;
   position: relative;
+  cursor: pointer;
+}
+
+.sdm__variant:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.sdm__variant--selected {
+  border-color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.25), 0 4px 14px rgba(0, 0, 0, 0.5) !important;
 }
 
 .sdm__variant--owned {
