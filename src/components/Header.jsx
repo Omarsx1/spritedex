@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { Share2, Download, Users } from 'lucide-react';
 import gsap from 'gsap';
 import { allSprites } from '../data/spritesData';
@@ -16,25 +16,87 @@ export function Header({
     return allSprites && allSprites.length > 0 ? allSprites : [];
   }, []);
 
-  const [spriteIndex, setSpriteIndex] = useState(() => {
-    return Math.floor(Math.random() * (spritePool.length || 1));
+  // Main hero sprite index
+  const [spriteIndex, setSpriteIndex] = useState(() =>
+    Math.floor(Math.random() * (spritePool.length || 1))
+  );
+
+  // 3 orbiting satellite sprites (different from main)
+  const [orbitIndices, setOrbitIndices] = useState(() => {
+    const indices = [];
+    const used = new Set();
+    while (indices.length < 3 && indices.length < spritePool.length) {
+      const idx = Math.floor(Math.random() * spritePool.length);
+      if (!used.has(idx)) {
+        used.add(idx);
+        indices.push(idx);
+      }
+    }
+    return indices;
   });
 
   const activeSpriteRef = useRef(null);
+  const orbitContainerRef = useRef(null);
+  const titleRef = useRef(null);
+  const statsRef = useRef(null);
+  const actionsRef = useRef(null);
   const currentSprite = spritePool[spriteIndex] || spritePool[0];
 
-  // Dynamic RANDOM Sprite Switcher driven by GSAP
+  // Progress percentages
+  const ownedPct = totalCount > 0 ? (ownedCount / totalCount) * 100 : 0;
+  const masteredPct = totalCount > 0 ? (masteredCount / totalCount) * 100 : 0;
+
+  // SVG ring properties
+  const ringRadius = 38;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+
+  // Entrance animations
+  useEffect(() => {
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+    if (titleRef.current) {
+      tl.fromTo(titleRef.current,
+        { y: -30, opacity: 0, scale: 0.95 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.7 }
+      );
+    }
+
+    if (activeSpriteRef.current) {
+      tl.fromTo(activeSpriteRef.current,
+        { scale: 0, opacity: 0, rotation: -15 },
+        { scale: 1, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.7)' },
+        '-=0.3'
+      );
+    }
+
+    if (statsRef.current) {
+      tl.fromTo(statsRef.current.children,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, stagger: 0.12 },
+        '-=0.2'
+      );
+    }
+
+    if (actionsRef.current) {
+      tl.fromTo(actionsRef.current.children,
+        { y: 15, opacity: 0, scale: 0.9 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.4, stagger: 0.08 },
+        '-=0.2'
+      );
+    }
+  }, []);
+
+  // Rotate hero sprite every 2.8s
   useEffect(() => {
     if (spritePool.length === 0) return;
 
     const interval = setInterval(() => {
       if (!activeSpriteRef.current) return;
 
-      // GSAP animate out
       gsap.to(activeSpriteRef.current, {
-        y: -16,
+        scale: 0.7,
         opacity: 0,
-        scale: 0.85,
+        y: -20,
         duration: 0.35,
         ease: 'power2.in',
         onComplete: () => {
@@ -46,85 +108,149 @@ export function Header({
             } while (next === prev);
             return next;
           });
+
+          // Also shuffle one random orbit sprite
+          setOrbitIndices((prev) => {
+            const copy = [...prev];
+            const slot = Math.floor(Math.random() * copy.length);
+            let next;
+            const allUsed = new Set([...copy, spriteIndex]);
+            do {
+              next = Math.floor(Math.random() * spritePool.length);
+            } while (allUsed.has(next) && spritePool.length > 4);
+            copy[slot] = next;
+            return copy;
+          });
         }
       });
-    }, 2400);
+    }, 2800);
 
     return () => clearInterval(interval);
-  }, [spritePool]);
+  }, [spritePool, spriteIndex]);
 
-  // GSAP animate in whenever spriteIndex changes
+  // GSAP animate in when spriteIndex changes
   useEffect(() => {
     if (activeSpriteRef.current) {
       gsap.fromTo(
         activeSpriteRef.current,
-        { y: 16, opacity: 0, scale: 1.15 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.45, ease: 'back.out(1.6)' }
+        { scale: 1.3, opacity: 0, y: 20 },
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: 'back.out(1.8)' }
       );
     }
   }, [spriteIndex]);
 
+  const handleImgError = useCallback((e) => {
+    e.target.onerror = null;
+    e.target.src = '/sprites/water_basic.png';
+  }, []);
+
   return (
-    <header className="site-header">
-      <div className="header-banner">
-        <div className="header-banner-overlay" />
-        <div className="header-content">
-          
-          {/* Title & Dynamic Random Sprite Showcase */}
-          <div className="header-title-wrapper">
-            <h1 className="header-title">
-              TODOS LOS SPRITES DE FORTNITE
-            </h1>
+    <header className="hero">
+      {/* Animated background layers */}
+      <div className="hero__bg">
+        <div className="hero__grid" />
+        <div className="hero__glow hero__glow--1" />
+        <div className="hero__glow hero__glow--2" />
+        <div className="hero__glow hero__glow--3" />
+        <div className="hero__scanline" />
+        <div className="hero__particles" />
+      </div>
 
-            {/* GSAP Animated Large Floating Random Sprite Character */}
-            <div className="header-hero-sprite" ref={activeSpriteRef}>
-              {currentSprite && (
-                <img
-                  key={currentSprite.id || spriteIndex}
-                  src={currentSprite.image}
-                  alt={currentSprite.fullName}
-                  className="hero-sprite-img"
-                  onError={(e) => {
-                    // Fallback to water_basic.png if image fails, never hide display!
-                    e.target.onerror = null;
-                    e.target.src = '/sprites/water_basic.png';
-                  }}
-                />
-              )}
+      <div className="hero__content">
+        {/* Holographic title */}
+        <div className="hero__title-block" ref={titleRef}>
+          <span className="hero__tag">COLECCIÓN SPRITE</span>
+          <h1 className="hero__title">
+            <span className="hero__title-line">FORTNITE</span>
+            <span className="hero__title-line hero__title-line--accent">SPRITEDEX</span>
+          </h1>
+        </div>
+
+        {/* Central sprite showcase with orbiting satellites */}
+        <div className="hero__showcase">
+          <div className="hero__orbit-ring" ref={orbitContainerRef}>
+            {orbitIndices.map((idx, i) => {
+              const sprite = spritePool[idx];
+              if (!sprite) return null;
+              return (
+                <div key={`orbit-${i}`} className={`hero__satellite hero__satellite--${i}`}>
+                  <img
+                    src={sprite.image}
+                    alt={sprite.fullName}
+                    className="hero__satellite-img"
+                    onError={handleImgError}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <div className="hero__hero-sprite" ref={activeSpriteRef}>
+            {currentSprite && (
+              <img
+                key={currentSprite.id || spriteIndex}
+                src={currentSprite.image}
+                alt={currentSprite.fullName}
+                className="hero__hero-img"
+                onError={handleImgError}
+              />
+            )}
+          </div>
+          <div className="hero__hex-badge">
+            <span>{spritePool.length}</span>
+          </div>
+        </div>
+
+        {/* Stats with radial progress rings */}
+        <div className="hero__stats" ref={statsRef}>
+          <div className="hero__stat-ring">
+            <svg viewBox="0 0 88 88" className="hero__ring-svg">
+              <circle cx="44" cy="44" r={ringRadius} className="hero__ring-track" />
+              <circle
+                cx="44" cy="44" r={ringRadius}
+                className="hero__ring-fill hero__ring-fill--caught"
+                strokeDasharray={ringCircumference}
+                strokeDashoffset={ringCircumference - (ringCircumference * ownedPct / 100)}
+              />
+            </svg>
+            <div className="hero__stat-inner">
+              <span className="hero__stat-value">{ownedCount}</span>
+              <span className="hero__stat-of">/ {totalCount}</span>
             </div>
+            <span className="hero__stat-label">ATRAPADOS</span>
           </div>
 
-          {/* Stats counters */}
-          <div className="header-stats">
-            <div className="stat-box">
-              <span className="stat-number">{ownedCount}</span>
-              <span className="stat-separator">/</span>
-              <span className="stat-total">{totalCount}</span>
-              <span className="stat-label">ATRAPADOS</span>
+          <div className="hero__stat-ring">
+            <svg viewBox="0 0 88 88" className="hero__ring-svg">
+              <circle cx="44" cy="44" r={ringRadius} className="hero__ring-track" />
+              <circle
+                cx="44" cy="44" r={ringRadius}
+                className="hero__ring-fill hero__ring-fill--mastered"
+                strokeDasharray={ringCircumference}
+                strokeDashoffset={ringCircumference - (ringCircumference * masteredPct / 100)}
+              />
+            </svg>
+            <div className="hero__stat-inner">
+              <span className="hero__stat-value">{masteredCount}</span>
+              <span className="hero__stat-of">/ {totalCount}</span>
             </div>
-            <div className="stat-box">
-              <span className="stat-number">{masteredCount}</span>
-              <span className="stat-separator">/</span>
-              <span className="stat-total">{totalCount}</span>
-              <span className="stat-label">MAESTREADOS</span>
-            </div>
+            <span className="hero__stat-label">MAESTREADOS</span>
           </div>
+        </div>
 
-          {/* Action buttons */}
-          <div className="header-actions">
-            <button className="header-btn trade" onClick={onOpenCompareModal}>
-              <Users size={18} />
-              <span>Intercambio Fortnite</span>
-            </button>
-            <button className="header-btn share" onClick={onOpenShareModal}>
-              <Share2 size={18} />
-              <span>Compartir Imagen</span>
-            </button>
-            <button className="header-btn backup" onClick={onOpenBackupModal}>
-              <Download size={18} />
-              <span>Respaldo</span>
-            </button>
-          </div>
+        {/* Action buttons */}
+        <div className="hero__actions" ref={actionsRef}>
+          <button className="hero__btn hero__btn--primary" onClick={onOpenCompareModal}>
+            <Users size={16} />
+            <span>Intercambio</span>
+          </button>
+          <button className="hero__btn hero__btn--accent" onClick={onOpenShareModal}>
+            <Share2 size={16} />
+            <span>Compartir</span>
+          </button>
+          <button className="hero__btn hero__btn--ghost" onClick={onOpenBackupModal}>
+            <Download size={16} />
+            <span>Respaldo</span>
+          </button>
         </div>
       </div>
     </header>
