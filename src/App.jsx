@@ -89,11 +89,33 @@ export function App() {
         return;
       }
 
-      if (data?.user_state) {
-        setUserState(data.user_state);
+      if (data?.user_state && Object.keys(data.user_state).length > 0) {
+        // Merge local guest progress with cloud progress so no marked items are ever lost
+        setUserState((currentLocal) => {
+          const merged = { ...currentLocal, ...data.user_state };
+          supabase
+            .from('user_collections')
+            .upsert({
+              user_id: userId,
+              user_state: merged,
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+          return merged;
+        });
       } else {
-        // New account with no saved cloud state -> start with clean empty collection
-        setUserState({});
+        // New account or new link with empty cloud state -> push current guest progress to cloud
+        setUserState((currentLocal) => {
+          if (Object.keys(currentLocal).length > 0) {
+            supabase
+              .from('user_collections')
+              .upsert({
+                user_id: userId,
+                user_state: currentLocal,
+                updated_at: new Date().toISOString()
+              }, { onConflict: 'user_id' });
+          }
+          return currentLocal;
+        });
       }
     } catch (err) {
       console.error('Failed to load collection from cloud:', err);
