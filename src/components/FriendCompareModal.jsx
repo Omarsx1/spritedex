@@ -4,7 +4,7 @@ import { ALL_SPRITES, getSpriteCardStyle } from '../data/spritesData';
 import { generateShareableLink, decodeCollectionState } from '../utils/shareLink';
 import { sounds } from '../utils/audio';
 
-export function FriendCompareModal({ userState, onToggleOwned, onClose }) {
+export function FriendCompareModal({ userState, onLoadFriendState, onToggleOwned, onClose }) {
   const [activeTab, setActiveTab] = useState('friendToMe'); // 'friendToMe' | 'meToFriend' | 'common'
   const [copied, setCopied] = useState(false);
   const [friendState, setFriendState] = useState({});
@@ -21,9 +21,10 @@ export function FriendCompareModal({ userState, onToggleOwned, onClose }) {
       if (Object.keys(decoded).length > 0) {
         setFriendState(decoded);
         setFriendLoaded(true);
+        if (onLoadFriendState) onLoadFriendState(decoded);
       }
     }
-  }, []);
+  }, [onLoadFriendState]);
 
   const myShareLink = generateShareableLink(userState);
 
@@ -52,6 +53,7 @@ export function FriendCompareModal({ userState, onToggleOwned, onClose }) {
     if (Object.keys(decoded).length > 0) {
       setFriendState(decoded);
       setFriendLoaded(true);
+      if (onLoadFriendState) onLoadFriendState(decoded);
     } else {
       alert('No se pudo leer la colección del amigo. Verifica el código o enlace.');
     }
@@ -69,6 +71,7 @@ export function FriendCompareModal({ userState, onToggleOwned, onClose }) {
           setFriendState(json);
           setFriendLoaded(true);
           sounds.playBeep();
+          if (onLoadFriendState) onLoadFriendState(json);
         }
       } catch (err) {
         alert('El archivo no tiene un formato de colección válido.');

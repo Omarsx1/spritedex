@@ -7,6 +7,7 @@ import { SpriteDetailModal } from './components/SpriteDetailModal';
 import { ShareImageModal } from './components/ShareImageModal';
 import { BackupModal } from './components/BackupModal';
 import { FriendCompareModal } from './components/FriendCompareModal';
+import { decodeCollectionState } from './utils/shareLink';
 
 const LOCAL_STORAGE_KEY = 'fortnite_sprites_pokedex_v3';
 
@@ -18,6 +19,15 @@ export function App() {
     } catch (e) {
       return {};
     }
+  });
+
+  const [friendState, setFriendState] = useState(() => {
+    const friendParam = new URLSearchParams(window.location.search).get('friend');
+    return friendParam ? decodeCollectionState(friendParam) : null;
+  });
+
+  const [activeProfile, setActiveProfile] = useState(() => {
+    return new URLSearchParams(window.location.search).has('friend') ? 'friend' : 'mine';
   });
 
   // Filters matching fortnite.gg
@@ -32,9 +42,7 @@ export function App() {
   const [selectedSprite, setSelectedSprite] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showBackupModal, setShowBackupModal] = useState(false);
-  const [showCompareModal, setShowCompareModal] = useState(() => {
-    return new URLSearchParams(window.location.search).has('friend');
-  });
+  const [showCompareModal, setShowCompareModal] = useState(false);
 
   useEffect(() => {
     try {
@@ -113,8 +121,8 @@ export function App() {
         break;
       case 'missing':
         result = [...result].sort((a, b) => {
-          const aOwned = userState[a.id]?.owned ? 1 : 0;
-          const bOwned = userState[b.id]?.owned ? 1 : 0;
+          const aOwned = (activeProfile === 'friend' && friendState ? friendState : userState)[a.id]?.owned ? 1 : 0;
+          const bOwned = (activeProfile === 'friend' && friendState ? friendState : userState)[b.id]?.owned ? 1 : 0;
           return aOwned - bOwned;
         });
         break;
@@ -123,11 +131,17 @@ export function App() {
     }
 
     return result;
-  }, [searchQuery, baseFilter, spriteFilter, sortBy, showUnreleased, userState]);
+  }, [searchQuery, baseFilter, spriteFilter, sortBy, showUnreleased, userState, friendState, activeProfile]);
+
+  const activeState = activeProfile === 'friend' && friendState ? friendState : userState;
 
   const totalCount = ALL_SPRITES.filter(s => showUnreleased || !s.unreleased).length;
-  const ownedCount = ALL_SPRITES.filter(s => (showUnreleased || !s.unreleased) && userState[s.id]?.owned).length;
-  const masteredCount = ALL_SPRITES.filter(s => (showUnreleased || !s.unreleased) && userState[s.id]?.owned && userState[s.id]?.level === 5).length;
+  const ownedCount = ALL_SPRITES.filter(s => (showUnreleased || !s.unreleased) && activeState[s.id]?.owned).length;
+  const masteredCount = ALL_SPRITES.filter(s => (showUnreleased || !s.unreleased) && activeState[s.id]?.owned && activeState[s.id]?.level === 5).length;
+
+  const friendLendableCount = friendState
+    ? ALL_SPRITES.filter(s => friendState[s.id]?.owned && !userState[s.id]?.owned).length
+    : 0;
 
   return (
     <div className="pokedex-app-root">
@@ -140,6 +154,86 @@ export function App() {
         onOpenBackupModal={() => setShowBackupModal(true)}
         onOpenCompareModal={() => setShowCompareModal(true)}
       />
+
+      {/* Profile View Banner (when friend profile is available) */}
+      {friendState && (
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto 16px',
+          padding: '12px 18px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+          background: activeProfile === 'friend' ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(59, 130, 246, 0.25))' : 'rgba(15, 23, 42, 0.6)',
+          border: `1px solid ${activeProfile === 'friend' ? '#a855f7' : 'rgba(255,255,255,0.1)'}`,
+          borderRadius: '14px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '1.4rem' }}>{activeProfile === 'friend' ? '👥' : '👤'}</span>
+            <div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 900, color: '#fff' }}>
+                {activeProfile === 'friend' ? 'Estás explorando la Colección Completa de tu Amigo' : 'Viendo Tu Colección Personal'}
+              </div>
+              <div style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
+                {activeProfile === 'friend'
+                  ? `🎁 Tu amigo tiene ${friendLendableCount} Sprites que te puede prestar en Fortnite (puedes hacer clic en ellos para registrarlos).`
+                  : 'Colección propia guardada localmente.'}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setActiveProfile('mine')}
+              style={{
+                padding: '8px 14px',
+                borderRadius: '8px',
+                background: activeProfile === 'mine' ? '#3b82f6' : 'rgba(255,255,255,0.08)',
+                color: '#fff',
+                border: 'none',
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                cursor: 'pointer'
+              }}
+            >
+              👤 Mi Colección
+            </button>
+            <button
+              onClick={() => setActiveProfile('friend')}
+              style={{
+                padding: '8px 14px',
+                borderRadius: '8px',
+                background: activeProfile === 'friend' ? '#8b5cf6' : 'rgba(255,255,255,0.08)',
+                color: '#fff',
+                border: 'none',
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                cursor: 'pointer'
+              }}
+            >
+              👥 Colección de mi Amigo
+            </button>
+            <button
+              onClick={() => setShowCompareModal(true)}
+              style={{
+                padding: '8px 14px',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, #10b981, #059669)',
+                color: '#fff',
+                border: 'none',
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                cursor: 'pointer'
+              }}
+            >
+              🔄 Resumen de Intercambio
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Filter Bar (fortnite.gg style) */}
       <div className="controls-container">
@@ -173,6 +267,8 @@ export function App() {
                 key={sprite.id}
                 sprite={sprite}
                 userState={userState}
+                friendState={friendState}
+                isFriendView={activeProfile === 'friend'}
                 viewMode={viewMode}
                 onToggleOwned={handleToggleOwned}
                 onSetLevel={handleSetLevel}
@@ -221,6 +317,10 @@ export function App() {
       {showCompareModal && (
         <FriendCompareModal
           userState={userState}
+          onLoadFriendState={(state) => {
+            setFriendState(state);
+            setActiveProfile('friend');
+          }}
           onToggleOwned={handleToggleOwned}
           onClose={() => setShowCompareModal(false)}
         />

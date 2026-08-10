@@ -3,17 +3,43 @@ import confetti from 'canvas-confetti';
 import { RARITIES, getSpriteCardStyle } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 
-export function SpriteCard({ sprite, userState, viewMode, onToggleOwned, onSetLevel, onOpenDetail }) {
-  const currentState = userState[sprite.id] || { owned: false, level: 1 };
+export function SpriteCard({
+  sprite,
+  userState,
+  friendState,
+  isFriendView,
+  viewMode,
+  onToggleOwned,
+  onSetLevel,
+  onOpenDetail
+}) {
+  const currentState = isFriendView
+    ? (friendState?.[sprite.id] || { owned: false, level: 1 })
+    : (userState[sprite.id] || { owned: false, level: 1 });
+
   const isOwned = currentState.owned;
   const level = currentState.level || 1;
   const isMastered = isOwned && level === 5;
+
+  const myOwned = userState[sprite.id]?.owned;
+  const friendCanLend = isFriendView && isOwned && !myOwned;
 
   const rarityInfo = RARITIES[sprite.rarity] || { name: sprite.rarity, color: '#94a3b8', bg: '#1e293b' };
   const styleInfo = getSpriteCardStyle(sprite);
 
   const handleToggleClick = (e) => {
     e.stopPropagation();
+    if (isFriendView) {
+      // In friend view, clicking action button toggles ownership in MY collection
+      const nextOwned = !myOwned;
+      onToggleOwned(sprite.id);
+      sounds.playToggle(nextOwned);
+      if (nextOwned) {
+        confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+      }
+      return;
+    }
+
     const nextOwned = !isOwned;
     onToggleOwned(sprite.id);
     sounds.playToggle(nextOwned);
@@ -24,6 +50,7 @@ export function SpriteCard({ sprite, userState, viewMode, onToggleOwned, onSetLe
 
   const handleLevelClick = (e, newLevel) => {
     e.stopPropagation();
+    if (isFriendView) return; // Only adjust levels in my view
     onSetLevel(sprite.id, newLevel);
     sounds.playLevelUp(newLevel);
     if (newLevel === 5) {
@@ -54,10 +81,15 @@ export function SpriteCard({ sprite, userState, viewMode, onToggleOwned, onSetLe
               {rarityInfo.name}
             </span>
             <span className="drop-text">{sprite.dropChanceDisplay}</span>
+            {friendCanLend && (
+              <span style={{ fontSize: '0.68rem', background: '#10b981', color: '#fff', padding: '1px 6px', borderRadius: '4px', fontWeight: 800 }}>
+                🎁 Te lo presta
+              </span>
+            )}
           </div>
         </div>
         <div className="list-item-actions">
-          {isOwned && (
+          {isOwned && !isFriendView && (
             <div className="list-level-stars" onClick={(e) => e.stopPropagation()}>
               {[1, 2, 3, 4, 5].map((num) => (
                 <button
@@ -73,8 +105,11 @@ export function SpriteCard({ sprite, userState, viewMode, onToggleOwned, onSetLe
           <button
             className={`owned-btn-sm ${isMastered ? 'mastered' : isOwned ? 'owned' : ''}`}
             onClick={handleToggleClick}
+            style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff' } : {}}
           >
-            {isMastered ? '⭐ Maestreado' : isOwned ? `✓ Atrapado (Niv.${level})` : 'Sin atrapar'}
+            {isFriendView
+              ? (friendCanLend ? (myOwned ? '✓ Registrado' : '+ Registrar en mi Dex') : isOwned ? '✓ Tu amigo lo tiene' : 'No lo tiene')
+              : (isMastered ? '⭐ Maestreado' : isOwned ? `✓ Atrapado (Niv.${level})` : 'Sin atrapar')}
           </button>
         </div>
       </div>
@@ -87,10 +122,33 @@ export function SpriteCard({ sprite, userState, viewMode, onToggleOwned, onSetLe
       className={`sprite-card ${isOwned ? 'is-owned' : ''} ${isMastered ? 'is-mastered' : ''}`}
       style={{
         background: styleInfo.background,
-        borderColor: styleInfo.borderColor
+        borderColor: styleInfo.borderColor,
+        position: 'relative'
       }}
       onClick={() => onOpenDetail(sprite)}
     >
+      {/* Indicator badge if friend can lend */}
+      {friendCanLend && (
+        <div style={{
+          position: 'absolute',
+          top: '8px',
+          right: '8px',
+          background: 'linear-gradient(135deg, #10b981, #059669)',
+          color: '#fff',
+          fontSize: '0.62rem',
+          fontWeight: 900,
+          padding: '3px 8px',
+          borderRadius: '20px',
+          boxShadow: '0 4px 10px rgba(0,0,0,0.4)',
+          zIndex: 2,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '3px'
+        }}>
+          🎁 Te lo presta
+        </div>
+      )}
+
       {/* Imagen del Sprite */}
       <div className="card-image">
         <img
@@ -115,7 +173,7 @@ export function SpriteCard({ sprite, userState, viewMode, onToggleOwned, onSetLe
         <span className="drop-pct">{sprite.dropChanceDisplay}</span>
       </div>
 
-      {/* Estrellas de nivel (solo cuando está atrapado) */}
+      {/* Estrellas de nivel */}
       {isOwned && (
         <div className="card-level-stars" onClick={(e) => e.stopPropagation()}>
           {[1, 2, 3, 4, 5].map((num) => (
@@ -123,6 +181,7 @@ export function SpriteCard({ sprite, userState, viewMode, onToggleOwned, onSetLe
               key={num}
               className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''}`}
               onClick={(e) => handleLevelClick(e, num)}
+              style={isFriendView ? { pointerEvents: 'none' } : {}}
             >
               ★{num}
             </button>
@@ -134,8 +193,11 @@ export function SpriteCard({ sprite, userState, viewMode, onToggleOwned, onSetLe
       <button
         className={`card-owned-btn ${isMastered ? 'mastered' : isOwned ? 'owned' : ''}`}
         onClick={handleToggleClick}
+        style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800 } : {}}
       >
-        {isMastered ? '⭐ Maestreado' : isOwned ? `✓ Atrapado (Niv.${level})` : 'Sin atrapar'}
+        {isFriendView
+          ? (friendCanLend ? (myOwned ? '✓ Registrado' : '+ Registrar en mi Dex') : isOwned ? '✓ Tu amigo lo tiene' : 'No lo tiene')
+          : (isMastered ? '⭐ Maestreado' : isOwned ? `✓ Atrapado (Niv.${level})` : 'Sin atrapar')}
       </button>
     </div>
   );
