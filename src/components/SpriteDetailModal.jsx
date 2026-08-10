@@ -36,17 +36,17 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
           }}>
             {currentState.owned && currentState.level === 5 && (
               <img
-                src="/sprites/crown.svg"
+                src="/img/x/sprites/crown.webp"
                 alt="Crown"
                 style={{
                   position: 'absolute',
-                  top: '-4px',
+                  top: '4px',
                   left: '53%',
                   transform: 'translateX(-50%)',
-                  width: '32px',
-                  height: '22px',
+                  width: '31px',
+                  height: '21px',
                   zIndex: 5,
-                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))'
+                  filter: 'drop-shadow(0 0 3px #000)'
                 }}
               />
             )}
@@ -188,17 +188,17 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                 >
                   {vMastered && (
                     <img
-                      src="/sprites/crown.svg"
+                      src="/img/x/sprites/crown.webp"
                       alt="Crown"
                       style={{
                         position: 'absolute',
-                        top: '-2px',
+                        top: '0px',
                         left: '53%',
                         transform: 'translateX(-50%)',
-                        width: '24px',
-                        height: '16px',
+                        width: '26px',
+                        height: '18px',
                         zIndex: 5,
-                        filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))'
+                        filter: 'drop-shadow(0 0 3px #000)'
                       }}
                     />
                   )}

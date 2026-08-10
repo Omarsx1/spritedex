@@ -444,14 +444,15 @@ body {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* ===== Mastered Metallic Premium Card Styling ===== */
+/* ===== Mastered Premium Metallic Card Styling ===== */
 .sprite-card.is-mastered {
   position: relative;
   overflow: hidden;
+  border-color: #f5b642 !important;
   box-shadow:
     0 10px 25px rgba(0, 0, 0, 0.6),
     inset 0 1px 1px rgba(255, 255, 255, 0.4),
-    0 0 18px rgba(250, 204, 21, 0.3) !important;
+    0 0 18px rgba(245, 182, 66, 0.4) !important;
 }
 
 /* Metallic diagonal sheen overlay */
@@ -469,22 +470,21 @@ body {
     transparent 65%
   );
   pointer-events: none;
-  z-index: 2;
+  z-index: 1;
 }
 
-/* Crown over Sprite Head when Mastered */
+/* Crown over Sprite Head when Mastered (exact user rule) */
 .sprite-mastered::before,
 .sprite-card.is-mastered .card-image::before {
   content: "";
   position: absolute;
-  top: 4px;
+  top: 10%;
   left: 53%;
-  transform: translateX(-50%);
   width: 31px;
   height: 21px;
-  background: url(/sprites/crown.svg) center / contain no-repeat;
-  z-index: 5;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+  background: url(/img/x/sprites/crown.webp) center / contain no-repeat;
+  z-index: 2;
+  filter: drop-shadow(0 0 3px #000);
 }
 
 /* List view crown */
@@ -495,14 +495,13 @@ body {
 .sprite-list-item.is-mastered .list-item-image::before {
   content: "";
   position: absolute;
-  top: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 24px;
-  height: 16px;
-  background: url(/sprites/crown.svg) center / contain no-repeat;
-  z-index: 5;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+  top: 0%;
+  left: 53%;
+  width: 26px;
+  height: 18px;
+  background: url(/img/x/sprites/crown.webp) center / contain no-repeat;
+  z-index: 2;
+  filter: drop-shadow(0 0 3px #000);
 }
 
 /* Card image */
