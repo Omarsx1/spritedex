@@ -125,13 +125,24 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
 
         {user ? (
           <div style={{ textAlign: 'center', padding: '10px 0' }}>
-            <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', padding: '14px', marginBottom: '20px' }}>
+            <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', padding: '14px', marginBottom: '14px' }}>
               <CheckCircle size={24} color="#10b981" style={{ margin: '0 auto 6px' }} />
-              <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#10b981' }}>Tu Pokédex está sincronizado</div>
+              <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#10b981' }}>Tu Pokédex está sincronizado en la nube</div>
               <div style={{ fontSize: '0.76rem', color: '#94a3b8', marginTop: '2px' }}>
-                {user.is_anonymous ? 'Guardando en la nube como Invitado (1-Clic)' : 'Cualquier cambio se guarda automáticamente en la nube'}
+                {user.is_anonymous ? 'Conectado mediante Acceso Rápido 1-Clic' : 'Cualquier cambio se guarda automáticamente'}
               </div>
             </div>
+
+            {user.is_anonymous && (
+              <div style={{ background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.25)', borderRadius: '12px', padding: '12px', marginBottom: '18px', textAlign: 'left' }}>
+                <div style={{ fontSize: '0.78rem', color: '#c084fc', fontWeight: 700, marginBottom: '4px' }}>
+                  💡 ¿Quieres acceder desde otros dispositivos?
+                </div>
+                <div style={{ fontSize: '0.74rem', color: '#94a3b8', lineHeight: 1.4 }}>
+                  Estás guardando como invitado. Si deseas abrir tu colección en otros celulares o computadoras, puedes vincular tu correo registrándote abajo o usar la herramienta de <strong>Respaldo</strong> para transferir tu código.
+                </div>
+              </div>
+            )}
 
             <button
               onClick={handleSignOut}
