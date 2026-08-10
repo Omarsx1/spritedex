@@ -60,13 +60,14 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                 filter: !currentState.owned ? 'grayscale(80%) opacity(0.5)' : 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
               }}
               onError={(e) => {
-                if (!e.target.dataset.triedSvg) {
-                  e.target.dataset.triedSvg = 'true';
-                  e.target.src = `/sprites/${sprite.id}.svg`;
-                } else if (!e.target.dataset.triedBase) {
+                if (!e.target.dataset.triedBase) {
                   e.target.dataset.triedBase = 'true';
                   const baseId = sprite.id ? sprite.id.split('_')[0] : 'water';
-                  e.target.src = `/sprites/${baseId}_basic.png`;
+                  if (baseId === 'peely' || baseId === 'llama' || baseId === 'ironmouse') {
+                    e.target.src = `/sprites/${baseId}_basic.webp`;
+                  } else {
+                    e.target.src = `/sprites/${baseId}_basic.png`;
+                  }
                 } else {
                   e.target.onerror = null;
                   e.target.src = '/sprites/water_basic.png';

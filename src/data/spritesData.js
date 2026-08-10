@@ -152,6 +152,24 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
 
   let dropChanceNum = parseFloat(dropChance);
 
+  // Dynamic image resolution for real webp and png assets
+  let imagePath = `/sprites/${item.id}.png`;
+  const webpMap = {
+    'ironmouse_basic': '/sprites/ironmouse_basic.webp',
+    'llama_basic': '/sprites/llama_basic.webp',
+    'llama_gold': '/sprites/llama_gold.webp',
+    'llama_candy': '/sprites/llama_gummy.webp',
+    'llama_galaxy': '/sprites/llama_galaxy.webp',
+    'llama_gem': '/sprites/llama_gem.webp',
+    'peely_basic': '/sprites/peely_basic.webp',
+    'peely_gold': '/sprites/peely_gold.webp',
+    'peely_galaxy': '/sprites/peely_galaxy.webp',
+    'peely_holofoil': '/sprites/peely_holofoil.webp'
+  };
+  if (webpMap[item.id]) {
+    imagePath = webpMap[item.id];
+  }
+
   return {
     id: item.id,
     fullName: item.name,
@@ -163,7 +181,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     dropChanceDisplay: item.unreleased ? '0%' : dropChance,
     dropChanceNum: item.unreleased ? 0 : dropChanceNum,
     unreleased: item.unreleased || false,
-    image: `/sprites/${item.id}.png`,
+    image: imagePath,
     familyId: familyId,
     familyName: familyName,
     location: 'Cofres de Sprite & Zonas de Extracción',
