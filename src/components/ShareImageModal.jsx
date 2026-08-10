@@ -22,6 +22,10 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         return allSprites.filter(s => userState[s.id]?.owned);
       case 'missing':
         return allSprites.filter(s => !userState[s.id]?.owned);
+      case 'mastered':
+        return allSprites.filter(s => userState[s.id]?.owned && userState[s.id]?.level === 5);
+      case 'not_mastered':
+        return allSprites.filter(s => !userState[s.id]?.owned || userState[s.id]?.level < 5);
       default:
         return filteredSprites;
     }
@@ -32,7 +36,9 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     all: allSprites.length,
     filtered: filteredSprites.length,
     owned: allSprites.filter(s => userState[s.id]?.owned).length,
-    missing: allSprites.filter(s => !userState[s.id]?.owned).length
+    missing: allSprites.filter(s => !userState[s.id]?.owned).length,
+    mastered: allSprites.filter(s => userState[s.id]?.owned && userState[s.id]?.level === 5).length,
+    not_mastered: allSprites.filter(s => !userState[s.id]?.owned || userState[s.id]?.level < 5).length
   }), [allSprites, filteredSprites, userState]);
 
   useEffect(() => {
@@ -130,10 +136,12 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   };
 
   const scopeOptions = [
-    { id: 'filtered', label: 'Filtrados actuales', icon: <Filter size={16} />, count: counts.filtered, desc: activeFiltersLabel },
-    { id: 'all', label: 'Colección completa', icon: <Globe size={16} />, count: counts.all, desc: 'Todos los sprites' },
-    { id: 'owned', label: 'Solo atrapados', icon: <CheckCircle size={16} />, count: counts.owned, desc: 'Los que ya tienes' },
-    { id: 'missing', label: 'Solo faltantes', icon: <XCircle size={16} />, count: counts.missing, desc: 'Los que te faltan' }
+    { id: 'all', label: 'ALL SPRITES', icon: <Globe size={16} />, count: counts.all, desc: 'Todos los 117 sprites' },
+    { id: 'owned', label: 'OWNED', icon: <CheckCircle size={16} />, count: counts.owned, desc: 'Solo atrapados' },
+    { id: 'missing', label: 'MISSING', icon: <XCircle size={16} />, count: counts.missing, desc: 'Solo faltantes' },
+    { id: 'mastered', label: 'MASTERED', icon: <CheckCircle size={16} color="#eab308" />, count: counts.mastered, desc: 'Solo Nivel 5' },
+    { id: 'not_mastered', label: 'NOT MASTERED', icon: <XCircle size={16} color="#a855f7" />, count: counts.not_mastered, desc: 'Sin llegar a Nivel 5' },
+    { id: 'filtered', label: 'Filtro Actual', icon: <Filter size={16} />, count: counts.filtered, desc: activeFiltersLabel }
   ];
 
   return (
@@ -156,7 +164,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#cbd5e1', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>
             ¿QUÉ QUIERES COMPARTIR?
           </label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
             {scopeOptions.map((opt) => (
               <button
                 key={opt.id}

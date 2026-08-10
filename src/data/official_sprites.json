@@ -161,6 +161,13 @@
     "unreleased": false
   },
   {
+    "id": "duck_holofoil",
+    "name": "Holofoil Duck",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
     "id": "ghost_basic",
     "name": "Ghost",
     "theme": "Basic",
@@ -196,6 +203,13 @@
     "unreleased": false
   },
   {
+    "id": "ghost_gem",
+    "name": "Gem Ghost",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
     "id": "dream_basic",
     "name": "Dream",
     "theme": "Basic",
@@ -222,6 +236,13 @@
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
+  },
+  {
+    "id": "dream_gem",
+    "name": "Gem Dream",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
   },
   {
     "id": "dream_rift",
@@ -264,6 +285,13 @@
     "theme": "Gem",
     "rarity": "Special",
     "unreleased": false
+  },
+  {
+    "id": "demon_holofoil",
+    "name": "Holofoil Demon",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": true
   },
   {
     "id": "punk_basic",
@@ -343,6 +371,13 @@
     "unreleased": false
   },
   {
+    "id": "king_gem",
+    "name": "Gem King",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
     "id": "zeropoint_basic",
     "name": "Zero Point",
     "theme": "Basic",
@@ -420,6 +455,20 @@
     "unreleased": false
   },
   {
+    "id": "fishy_gem",
+    "name": "Gem Fishy",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
+    "id": "fishy_holofoil",
+    "name": "Holofoil Fishy",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
     "id": "fishy_rift",
     "name": "Cube Fishy",
     "theme": "Cube",
@@ -455,11 +504,25 @@
     "unreleased": false
   },
   {
+    "id": "striker_gem",
+    "name": "Gem Striker",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
     "id": "striker_holofoil",
     "name": "Holofoil Striker",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
+  },
+  {
+    "id": "striker_rift",
+    "name": "Cube Striker",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": true
   },
   {
     "id": "aura_basic",
@@ -497,6 +560,13 @@
     "unreleased": false
   },
   {
+    "id": "aura_holofoil",
+    "name": "Holofoil Aura",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
     "id": "boss_basic",
     "name": "Boss",
     "theme": "Basic",
@@ -523,6 +593,20 @@
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
+  },
+  {
+    "id": "boss_gem",
+    "name": "Gem Boss",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
+    "id": "boss_holofoil",
+    "name": "Holofoil Boss",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": true
   },
   {
     "id": "boss_rift",
@@ -560,6 +644,20 @@
     "unreleased": false
   },
   {
+    "id": "grim_gem",
+    "name": "Gem Grim",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
+    "id": "grim_holofoil",
+    "name": "Holofoil Grim",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
     "id": "grim_rift",
     "name": "Cube Grim",
     "theme": "Cube",
@@ -593,6 +691,13 @@
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
+  },
+  {
+    "id": "air_gem",
+    "name": "Gem Air",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
   },
   {
     "id": "air_holofoil",
@@ -630,6 +735,13 @@
     "unreleased": false
   },
   {
+    "id": "seven_gem",
+    "name": "Gem Seven",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
+  },
+  {
     "id": "seven_holofoil",
     "name": "Holofoil Seven",
     "theme": "Holofoil",
@@ -663,6 +775,13 @@
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false
+  },
+  {
+    "id": "batman_gem",
+    "name": "Gem Batman",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
   },
   {
     "id": "batman_holofoil",
