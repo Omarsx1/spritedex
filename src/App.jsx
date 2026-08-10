@@ -83,10 +83,13 @@ export function App() {
       if (searchQuery.trim() !== '') {
         const query = searchQuery.toLowerCase();
         const nameMatch = sprite.fullName.toLowerCase().includes(query);
-        const variantMatch = sprite.variant.toLowerCase().includes(query);
-        const quackMatch = query.includes('quack') && sprite.variant === 'Holofoil';
+        const idMatch = sprite.id.toLowerCase().includes(query);
+        const familyMatch = (sprite.familyName || '').toLowerCase().includes(query);
+        const variantMatch = (sprite.variant || '').toLowerCase().includes(query);
+        const variantDisplayMatch = (sprite.variantDisplay || '').toLowerCase().includes(query);
+        const quackMatch = (query.includes('quack') || query.includes('patito')) && (sprite.variant === 'Holofoil' || sprite.variantDisplay === 'Holofoil');
 
-        if (!nameMatch && !variantMatch && !quackMatch) return false;
+        if (!nameMatch && !idMatch && !familyMatch && !variantMatch && !variantDisplayMatch && !quackMatch) return false;
       }
 
       // BASE filter (variant/theme)

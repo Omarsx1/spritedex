@@ -84,45 +84,51 @@ export function getSpriteCardStyle(sprite) {
 }
 
 export const THEME_NAMES_ES = {
-  Basic: 'Basic',
-  Gold: 'Gold',
-  Candy: 'Gummy',
-  Galaxy: 'Galaxy',
+  Basic: 'Básico',
+  Gold: 'Dorado',
+  Candy: 'Gomita',
+  Gummy: 'Gomita',
+  Galaxy: 'Galaxia',
   Holofoil: 'Holofoil',
-  Cube: 'Cube',
-  Gem: 'Gem'
+  Cube: 'Cúbico',
+  Gem: 'Gema'
 };
 
 export const VARIANT_ORDER = ['Basic', 'Gold', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem'];
 export const THEMES_LIST = ['Basic', 'Gold', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem'];
 
 const FAMILY_NAMES_MAP = {
-  water: 'Water',
-  earth: 'Earth',
-  fire: 'Fire',
-  duck: 'Duck',
-  ghost: 'Ghost',
-  dream: 'Dream',
-  demon: 'Demon',
+  water: 'Agua',
+  earth: 'Tierra',
+  fire: 'Fuego',
+  air: 'Aire',
+  duck: 'Pato',
+  ghost: 'Fantasma',
+  dream: 'Dormilón',
+  demon: 'Demonio',
   punk: 'Punk',
-  king: 'King',
-  zeropoint: 'Zero Point',
+  king: 'Monarca',
+  zeropoint: 'Punto Zero',
   theburntpeanut: 'Burnt Peanut',
-  fishy: 'Fishy',
-  striker: 'Striker',
+  fishy: 'Pescado',
+  striker: 'Pelotero',
   aura: 'Aura',
-  boss: 'Boss',
-  grim: 'Grim',
-  air: 'Air',
-  seven: 'Seven',
+  boss: 'Jefe',
+  grim: 'Parca',
+  seven: 'Siete',
   batman: 'Batman',
   pollo: 'Pollo',
   vini: 'Vini Jr.',
   wick: 'John Wick',
-  peely: 'Peely',
+  peely: 'Cacahuate',
   llama: 'Llama',
-  ironmouse: 'Ironmouse'
+  ironmouse: 'La niña'
 };
+
+export const allSprites = ALL_SPRITES;
+
+// All unique sprite families for the SPRITE filter dropdown
+export const SPRITE_FAMILIES_LIST = [...new Set(ALL_SPRITES.map(s => s.familyName))].sort();
 
 const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse'];
 
@@ -148,7 +154,13 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   const isCrossover = CROSSOVER_KEYS.includes(baseKey);
 
   const familyId = isCrossover ? 'icons_crossovers' : baseKey;
-  const familyName = isCrossover ? 'Íconos & Crossovers' : (FAMILY_NAMES_MAP[baseKey] || (baseKey.charAt(0).toUpperCase() + baseKey.slice(1)));
+  const spanishFamilyName = FAMILY_NAMES_MAP[baseKey] || (baseKey.charAt(0).toUpperCase() + baseKey.slice(1));
+  const spanishTheme = THEME_NAMES_ES[item.theme] || item.theme;
+
+  let fullName = spanishFamilyName;
+  if (item.theme !== 'Basic') {
+    fullName = `${spanishFamilyName} ${spanishTheme}`;
+  }
 
   let dropChanceNum = parseFloat(dropChance);
 
@@ -173,9 +185,9 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
 
   return {
     id: item.id,
-    fullName: item.name,
+    fullName: fullName,
     variant: item.theme,
-    variantDisplay: item.theme,
+    variantDisplay: spanishTheme,
     rarity: item.rarity,
     gen: gen,
     dropChance: item.unreleased ? '0%' : dropChance,
@@ -184,17 +196,12 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     unreleased: item.unreleased || false,
     image: imagePath,
     familyId: familyId,
-    familyName: familyName,
+    familyName: spanishFamilyName,
     location: 'Cofres de Sprite & Zonas de Extracción',
     summonCost: '5,000 Polvo Estelar',
     ability: 'Concede bonificaciones pasivas de escudo, velocidad y recolección de botín.'
   };
 });
-
-export const allSprites = ALL_SPRITES;
-
-// All unique sprite families for the SPRITE filter dropdown
-export const SPRITE_FAMILIES_LIST = [...new Set(ALL_SPRITES.map(s => s.familyName))].sort();
 
 // Group sprites into families for detail view (sorted canonically by variant order)
 export const SPRITE_FAMILIES = Object.values(
