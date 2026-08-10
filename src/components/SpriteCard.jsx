@@ -71,11 +71,13 @@ export function SpriteCard({
         onClick={handleToggleClick}
         style={{ cursor: 'pointer' }}
       >
-        <div className="list-item-image" onClick={handleImageClick} title="Haz clic en la imagen para ver detalles y variantes">
+        <div className="list-item-image">
           <img
             src={sprite.image}
             alt={sprite.fullName}
             loading="lazy"
+            onClick={handleImageClick}
+            title="Haz clic exclusivamente en la figura del espíritu para ver detalles y variantes"
             style={{ filter: !isOwned ? 'grayscale(80%) opacity(0.5)' : 'none', cursor: 'pointer' }}
             onError={(e) => { e.target.style.display = 'none'; }}
           />
@@ -158,12 +160,14 @@ export function SpriteCard({
         </div>
       )}
 
-      {/* Imagen del Sprite: Clic abre la modal de detalles y variantes */}
-      <div className="card-image" onClick={handleImageClick} title="Haz clic en la imagen para ver detalles y variantes">
+      {/* Imagen del Sprite: Clic exclusivamente en la figura abre la modal de detalles y variantes */}
+      <div className="card-image">
         <img
           src={sprite.image}
           alt={sprite.fullName}
           loading="lazy"
+          onClick={handleImageClick}
+          title="Haz clic exclusivamente en la figura del espíritu para ver detalles y variantes"
           style={{
             filter: !isOwned ? 'grayscale(80%) opacity(0.5)' : 'drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
             cursor: 'pointer'
