@@ -58,7 +58,7 @@ export function getSpriteCardStyle(sprite) {
     return { background: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', borderColor: '#ec88d8' };
   }
   if (theme === 'Gem') {
-    return { background: 'linear-gradient(180deg, #0f6c7d 0%, #1b1c23 100%)', borderColor: '#22d3ee' };
+    return { background: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)', borderColor: '#38bdf8' };
   }
 
   // 2. Elemental Customization for Basic sprites

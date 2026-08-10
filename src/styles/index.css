@@ -502,8 +502,8 @@ body {
 }
 
 .sprite-theme-gem {
-  background: linear-gradient(180deg, #0f6c7d 0%, #1b1c23 100%);
-  border-color: #22d3ee;
+  background: linear-gradient(180deg, #334155 0%, #1b1c23 100%);
+  border-color: #38bdf8;
 }
 
 .sprite-theme-rare {
