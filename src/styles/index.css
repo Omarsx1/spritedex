@@ -1980,3 +1980,73 @@ body {
     padding: 5px 10px;
   }
 }
+
+/* ===== Responsive List View ===== */
+@media (max-width: 768px) {
+  .sprite-list-item {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    padding: 10px 12px;
+  }
+
+  .list-item-image {
+    width: 42px;
+    height: 42px;
+  }
+
+  .list-item-info {
+    flex: 1 1 calc(100% - 60px);
+  }
+
+  .list-item-actions {
+    flex: 1 1 100%;
+    width: 100%;
+    justify-content: space-between;
+    padding-top: 8px;
+    margin-top: 2px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    gap: 8px;
+  }
+
+  .list-level-stars {
+    flex: 1;
+    display: flex;
+    gap: 3px;
+  }
+
+  .star-btn-sm {
+    flex: 1;
+    padding: 5px 0;
+    font-size: 0.72rem;
+    text-align: center;
+    border-radius: 4px;
+  }
+
+  .owned-btn-sm {
+    padding: 6px 12px;
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .sprite-list-item {
+    padding: 8px 10px;
+    gap: 6px 10px;
+  }
+
+  .list-item-name {
+    font-size: 0.88rem;
+  }
+
+  .star-btn-sm {
+    padding: 4px 0;
+    font-size: 0.68rem;
+  }
+
+  .owned-btn-sm {
+    padding: 5px 10px;
+    font-size: 0.68rem;
+  }
+}
