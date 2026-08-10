@@ -194,9 +194,7 @@ export function Header({
               />
             )}
           </div>
-          <div className="hero__hex-badge">
-            <span>{spritePool.length}</span>
-          </div>
+
         </div>
 
         {/* Stats + Actions bar */}
