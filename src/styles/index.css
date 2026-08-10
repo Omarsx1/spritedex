@@ -50,11 +50,24 @@ body {
 }
 
 .hero__bg {
+  /* Bottom fade blends hero into body seamlessly */
   position: absolute;
   inset: 0;
   background:
     linear-gradient(175deg, #0a0a1a 0%, #0d1117 40%, #161b22 100%);
   z-index: 0;
+}
+
+.hero__bg::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, transparent, var(--bg-body));
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Perspective grid floor */
@@ -174,33 +187,18 @@ body {
 .hero__content {
   position: relative;
   z-index: 2;
-  padding: 56px 24px 44px;
+  padding: 56px 24px 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 28px;
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
 }
 
-/* --- Holographic Title --- */
+/* --- Title --- */
 .hero__title-block {
   text-align: center;
-}
-
-.hero__tag {
-  display: inline-block;
-  font-family: var(--font-sans);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: rgba(99, 102, 241, 0.85);
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  padding: 5px 16px;
-  border-radius: 999px;
-  margin-bottom: 14px;
 }
 
 .hero__title {
@@ -339,11 +337,13 @@ body {
   color: #fff;
 }
 
-/* --- Stat Rings --- */
-.hero__stats {
+/* --- Stats + Actions Bar --- */
+.hero__bar {
   display: flex;
-  gap: 32px;
+  align-items: center;
   justify-content: center;
+  gap: 28px;
+  width: 100%;
   cursor: default;
 }
 
@@ -504,7 +504,7 @@ body {
 /* ===== Hero Responsive ===== */
 @media (max-width: 768px) {
   .hero__content {
-    padding: 40px 16px 32px;
+    padding: 40px 16px 48px;
     gap: 22px;
   }
 
@@ -533,27 +533,32 @@ body {
     height: 30px;
   }
 
-  .hero__stats {
-    gap: 24px;
+  .hero__bar {
+    flex-wrap: wrap;
+    gap: 16px;
   }
 
   .hero__ring-svg {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
   }
 
   .hero__stat-inner {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
   }
 
   .hero__stat-value {
-    font-size: 1.15rem;
+    font-size: 1rem;
+  }
+
+  .hero__stat-of {
+    font-size: 0.6rem;
   }
 
   .hero__btn {
-    padding: 8px 16px;
-    font-size: 0.78rem;
+    padding: 8px 14px;
+    font-size: 0.76rem;
   }
 
   .hero__glow--1 { width: 250px; height: 250px; }
@@ -571,7 +576,13 @@ body {
     letter-spacing: 3px;
   }
 
+  .hero__bar {
+    flex-direction: column;
+    gap: 18px;
+  }
+
   .hero__actions {
+    order: -1;
     gap: 8px;
   }
 

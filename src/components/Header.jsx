@@ -157,9 +157,8 @@ export function Header({
       </div>
 
       <div className="hero__content">
-        {/* Holographic title */}
+        {/* Title */}
         <div className="hero__title-block" ref={titleRef}>
-          <span className="hero__tag">COLECCIÓN SPRITE</span>
           <h1 className="hero__title">
             <span className="hero__title-line">FORTNITE</span>
             <span className="hero__title-line hero__title-line--accent">SPRITEDEX</span>
@@ -200,8 +199,8 @@ export function Header({
           </div>
         </div>
 
-        {/* Stats with radial progress rings */}
-        <div className="hero__stats" ref={statsRef}>
+        {/* Stats + Actions bar */}
+        <div className="hero__bar" ref={statsRef}>
           <div className="hero__stat-ring">
             <svg viewBox="0 0 88 88" className="hero__ring-svg">
               <circle cx="44" cy="44" r={ringRadius} className="hero__ring-track" />
@@ -217,6 +216,21 @@ export function Header({
               <span className="hero__stat-of">/ {totalCount}</span>
             </div>
             <span className="hero__stat-label">ATRAPADOS</span>
+          </div>
+
+          <div className="hero__actions" ref={actionsRef}>
+            <button className="hero__btn hero__btn--primary" onClick={onOpenCompareModal}>
+              <Users size={16} />
+              <span>Intercambio</span>
+            </button>
+            <button className="hero__btn hero__btn--accent" onClick={onOpenShareModal}>
+              <Share2 size={16} />
+              <span>Compartir</span>
+            </button>
+            <button className="hero__btn hero__btn--ghost" onClick={onOpenBackupModal}>
+              <Download size={16} />
+              <span>Respaldo</span>
+            </button>
           </div>
 
           <div className="hero__stat-ring">
@@ -235,22 +249,6 @@ export function Header({
             </div>
             <span className="hero__stat-label">MAESTREADOS</span>
           </div>
-        </div>
-
-        {/* Action buttons */}
-        <div className="hero__actions" ref={actionsRef}>
-          <button className="hero__btn hero__btn--primary" onClick={onOpenCompareModal}>
-            <Users size={16} />
-            <span>Intercambio</span>
-          </button>
-          <button className="hero__btn hero__btn--accent" onClick={onOpenShareModal}>
-            <Share2 size={16} />
-            <span>Compartir</span>
-          </button>
-          <button className="hero__btn hero__btn--ghost" onClick={onOpenBackupModal}>
-            <Download size={16} />
-            <span>Respaldo</span>
-          </button>
         </div>
       </div>
     </header>
