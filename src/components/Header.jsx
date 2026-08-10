@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import { Share2, Download, Users } from 'lucide-react';
+import { Share2, Download, Users, Cloud } from 'lucide-react';
 import gsap from 'gsap';
 import { allSprites } from '../data/spritesData';
 
@@ -7,9 +7,11 @@ export function Header({
   totalCount,
   ownedCount,
   masteredCount,
+  user,
   onOpenShareModal,
   onOpenBackupModal,
-  onOpenCompareModal
+  onOpenCompareModal,
+  onOpenAuthModal
 }) {
   // Pool of sprites for hero rotation
   const spritePool = useMemo(() => {
@@ -230,6 +232,10 @@ export function Header({
             <button className="hero__btn hero__btn--ghost" onClick={onOpenBackupModal} title="Respaldo">
               <Download size={16} className="hero__btn-icon" />
               <span className="hero__btn-text">Respaldo</span>
+            </button>
+            <button className="hero__btn hero__btn--ghost" onClick={onOpenAuthModal} title={user ? `Sincronizado (${user.email})` : "Sincronizar en Nube"}>
+              <Cloud size={16} className="hero__btn-icon" style={{ color: user ? '#10b981' : '#a855f7' }} />
+              <span className="hero__btn-text" style={user ? { color: '#10b981' } : {}}>{user ? 'Nube ✓' : 'Nube'}</span>
             </button>
           </div>
 

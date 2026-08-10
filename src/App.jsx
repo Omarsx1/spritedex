@@ -7,7 +7,9 @@ import { SpriteDetailModal } from './components/SpriteDetailModal';
 import { ShareImageModal } from './components/ShareImageModal';
 import { BackupModal } from './components/BackupModal';
 import { FriendCompareModal } from './components/FriendCompareModal';
+import { AuthModal } from './components/AuthModal';
 import { decodeCollectionState } from './utils/shareLink';
+import { supabase, isSupabaseConfigured } from './utils/supabase';
 
 const LOCAL_STORAGE_KEY = 'fortnite_sprites_pokedex_v3';
 
@@ -30,6 +32,10 @@ export function App() {
     return new URLSearchParams(window.location.search).has('friend') ? 'friend' : 'mine';
   });
 
+  // Supabase Auth & Cloud Sync State
+  const [user, setUser] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
   // Filters matching fortnite.gg
   const [searchQuery, setSearchQuery] = useState('');
   const [baseFilter, setBaseFilter] = useState('all');      // BASE = variant/theme
@@ -45,13 +51,78 @@ export function App() {
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [showCompareModal, setShowCompareModal] = useState(false);
 
+  // Listen to Supabase Auth State & Sync Cloud Data
+  useEffect(() => {
+    if (!isSupabaseConfigured || !supabase) return;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      if (currentUser) {
+        loadUserCollectionFromCloud(currentUser.id);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      if (currentUser) {
+        loadUserCollectionFromCloud(currentUser.id);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const loadUserCollectionFromCloud = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_collections')
+        .select('user_state')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching cloud collection:', error);
+        return;
+      }
+
+      if (data?.user_state) {
+        setUserState((prevLocal) => ({
+          ...prevLocal,
+          ...data.user_state
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to load collection from cloud:', err);
+    }
+  };
+
+  // Sync to localStorage & Supabase Cloud
   useEffect(() => {
     try {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userState));
     } catch (e) {
       console.error('Failed to save to localStorage:', e);
     }
-  }, [userState]);
+
+    if (isSupabaseConfigured && supabase && user) {
+      const timer = setTimeout(async () => {
+        try {
+          await supabase
+            .from('user_collections')
+            .upsert({
+              user_id: user.id,
+              user_state: userState,
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+        } catch (err) {
+          console.error('Failed to sync to Supabase:', err);
+        }
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [userState, user]);
 
   const handleToggleOwned = (spriteId) => {
     setUserState((prev) => {
@@ -167,9 +238,11 @@ export function App() {
         totalCount={totalCount}
         ownedCount={ownedCount}
         masteredCount={masteredCount}
+        user={user}
         onOpenShareModal={() => setShowShareModal(true)}
         onOpenBackupModal={() => setShowBackupModal(true)}
         onOpenCompareModal={() => setShowCompareModal(true)}
+        onOpenAuthModal={() => setShowAuthModal(true)}
       />
 
       {/* Profile View Banner (when friend profile is available) */}
@@ -342,6 +415,16 @@ export function App() {
           }}
           onToggleOwned={handleToggleOwned}
           onClose={() => setShowCompareModal(false)}
+        />
+      )}
+
+      {showAuthModal && (
+        <AuthModal
+          user={user}
+          onClose={() => setShowAuthModal(false)}
+          onAuthSuccess={() => {
+            setShowAuthModal(false);
+          }}
         />
       )}
     </div>
