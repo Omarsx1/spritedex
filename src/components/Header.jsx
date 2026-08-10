@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Share2, Download, Users } from 'lucide-react';
 import gsap from 'gsap';
 import { allSprites } from '../data/spritesData';
@@ -11,13 +11,22 @@ export function Header({
   onOpenBackupModal,
   onOpenCompareModal
 }) {
-  const [spriteIndex, setSpriteIndex] = useState(0);
+  // Pool of sprites for hero rotation
+  const spritePool = useMemo(() => {
+    return allSprites && allSprites.length > 0 ? allSprites : [];
+  }, []);
+
+  const [spriteIndex, setSpriteIndex] = useState(() => {
+    return Math.floor(Math.random() * (spritePool.length || 1));
+  });
+
   const activeSpriteRef = useRef(null);
+  const currentSprite = spritePool[spriteIndex] || spritePool[0];
 
-  const currentSprite = allSprites[spriteIndex] || allSprites[0];
-
-  // Dynamic Sprite Switcher driven by GSAP
+  // Dynamic RANDOM Sprite Switcher driven by GSAP
   useEffect(() => {
+    if (spritePool.length === 0) return;
+
     const interval = setInterval(() => {
       if (!activeSpriteRef.current) return;
 
@@ -25,24 +34,31 @@ export function Header({
       gsap.to(activeSpriteRef.current, {
         y: -16,
         opacity: 0,
-        scale: 0.9,
+        scale: 0.85,
         duration: 0.35,
         ease: 'power2.in',
         onComplete: () => {
-          setSpriteIndex((prev) => (prev + 1) % allSprites.length);
+          setSpriteIndex((prev) => {
+            if (spritePool.length <= 1) return 0;
+            let next;
+            do {
+              next = Math.floor(Math.random() * spritePool.length);
+            } while (next === prev);
+            return next;
+          });
         }
       });
     }, 2400);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [spritePool]);
 
   // GSAP animate in whenever spriteIndex changes
   useEffect(() => {
     if (activeSpriteRef.current) {
       gsap.fromTo(
         activeSpriteRef.current,
-        { y: 16, opacity: 0, scale: 1.1 },
+        { y: 16, opacity: 0, scale: 1.15 },
         { y: 0, opacity: 1, scale: 1, duration: 0.45, ease: 'back.out(1.6)' }
       );
     }
@@ -54,20 +70,27 @@ export function Header({
         <div className="header-banner-overlay" />
         <div className="header-content">
           
-          {/* Title & Dynamic Sprite Switcher */}
+          {/* Title & Dynamic Random Sprite Showcase */}
           <div className="header-title-wrapper">
             <h1 className="header-title">
               TODOS LOS SPRITES DE FORTNITE
             </h1>
 
-            {/* GSAP Animated Floating Sprite Character Only (No Container, No Text) */}
+            {/* GSAP Animated Large Floating Random Sprite Character */}
             <div className="header-hero-sprite" ref={activeSpriteRef}>
-              <img
-                src={currentSprite.image}
-                alt={currentSprite.fullName}
-                className="hero-sprite-img"
-                onError={(e) => { e.target.style.display = 'none'; }}
-              />
+              {currentSprite && (
+                <img
+                  key={currentSprite.id || spriteIndex}
+                  src={currentSprite.image}
+                  alt={currentSprite.fullName}
+                  className="hero-sprite-img"
+                  onError={(e) => {
+                    // Fallback to water_basic.png if image fails, never hide display!
+                    e.target.onerror = null;
+                    e.target.src = '/sprites/water_basic.png';
+                  }}
+                />
+              )}
             </div>
           </div>
 
