@@ -1,12 +1,13 @@
 import React from 'react';
-import { Share2, Download } from 'lucide-react';
+import { Share2, Download, Users } from 'lucide-react';
 
 export function Header({
   totalCount,
   ownedCount,
   masteredCount,
   onOpenShareModal,
-  onOpenBackupModal
+  onOpenBackupModal,
+  onOpenCompareModal
 }) {
   return (
     <header className="site-header">
@@ -33,9 +34,13 @@ export function Header({
 
           {/* Action buttons */}
           <div className="header-actions">
+            <button className="header-btn primary" onClick={onOpenCompareModal} style={{ background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)' }}>
+              <Users size={16} />
+              <span>Intercambio Fortnite</span>
+            </button>
             <button className="header-btn primary" onClick={onOpenShareModal}>
               <Share2 size={16} />
-              <span>Compartir Colección</span>
+              <span>Compartir Imagen</span>
             </button>
             <button className="header-btn secondary" onClick={onOpenBackupModal}>
               <Download size={16} />

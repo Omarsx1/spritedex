@@ -6,6 +6,7 @@ import { SpriteCard } from './components/SpriteCard';
 import { SpriteDetailModal } from './components/SpriteDetailModal';
 import { ShareImageModal } from './components/ShareImageModal';
 import { BackupModal } from './components/BackupModal';
+import { FriendCompareModal } from './components/FriendCompareModal';
 
 const LOCAL_STORAGE_KEY = 'fortnite_sprites_pokedex_v3';
 
@@ -31,6 +32,9 @@ export function App() {
   const [selectedSprite, setSelectedSprite] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showBackupModal, setShowBackupModal] = useState(false);
+  const [showCompareModal, setShowCompareModal] = useState(() => {
+    return new URLSearchParams(window.location.search).has('friend');
+  });
 
   useEffect(() => {
     try {
@@ -134,6 +138,7 @@ export function App() {
         masteredCount={masteredCount}
         onOpenShareModal={() => setShowShareModal(true)}
         onOpenBackupModal={() => setShowBackupModal(true)}
+        onOpenCompareModal={() => setShowCompareModal(true)}
       />
 
       {/* Filter Bar (fortnite.gg style) */}
@@ -210,6 +215,14 @@ export function App() {
           userState={userState}
           setUserState={setUserState}
           onClose={() => setShowBackupModal(false)}
+        />
+      )}
+
+      {showCompareModal && (
+        <FriendCompareModal
+          userState={userState}
+          onToggleOwned={handleToggleOwned}
+          onClose={() => setShowCompareModal(false)}
         />
       )}
     </div>
