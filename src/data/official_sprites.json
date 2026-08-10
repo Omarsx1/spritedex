@@ -417,7 +417,7 @@
     "name": "Quack Zero Point",
     "theme": "Holofoil",
     "rarity": "Special",
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "theburntpeanut_basic",
