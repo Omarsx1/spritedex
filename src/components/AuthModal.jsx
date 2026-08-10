@@ -65,13 +65,19 @@ export function AuthModal({ user, onClose, onAuthSuccess }) {
   const handleGoogleAuth = async () => {
     try {
       setLoading(true);
+      setError(null);
       const { error: googleError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: window.location.origin
         }
       });
-      if (googleError) throw googleError;
+      if (googleError) {
+        if (googleError.message?.includes('provider is not enabled') || googleError.code === 'validation_failed') {
+          throw new Error('Google Sign-In requiere configuración de Google Cloud. Por favor usa el registro con correo abajo.');
+        }
+        throw googleError;
+      }
     } catch (err) {
       setError(err.message || 'Error con Google Sign-In');
       setLoading(false);
