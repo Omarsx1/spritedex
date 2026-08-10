@@ -88,7 +88,7 @@ export const THEME_NAMES_ES = {
   Gold: 'Dorado',
   Candy: 'Gomita',
   Gummy: 'Gomita',
-  Galaxy: 'Galaxia',
+  Galaxy: 'Galáctico',
   Holofoil: 'Holofoil',
   Cube: 'Cúbico',
   Gem: 'Gema'
