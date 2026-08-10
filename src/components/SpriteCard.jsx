@@ -50,6 +50,17 @@ export function SpriteCard({
 
   const handleImageClick = (e) => {
     e.stopPropagation();
+
+    // Meticulous hit-test: calculate click position relative to the img bounding box
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickYRatio = (e.clientY - rect.top) / rect.height;
+
+    // If click occurred in the top 20% region (crown or top card area), treat as card toggle click!
+    if (clickYRatio < 0.20) {
+      handleToggleClick(e);
+      return;
+    }
+
     onOpenDetail(sprite);
   };
 
