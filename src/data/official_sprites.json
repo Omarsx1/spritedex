@@ -697,6 +697,6 @@
     "name": "John Wick",
     "theme": "Basic",
     "rarity": "Mythic",
-    "unreleased": true
+    "unreleased": false
   }
 ]

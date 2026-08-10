@@ -132,6 +132,6 @@ const baseSprites = [
 
 	{ id: "vini_basic", name: "Vini Jr.", theme: "Basic", rarity: "Mythic", unreleased: false },
 	
-	{ id: "wick_basic", name: "John Wick", theme: "Basic", rarity: "Mythic", unreleased: true },
+	{ id: "wick_basic", name: "John Wick", theme: "Basic", rarity: "Mythic", unreleased: false },
 
 ];
