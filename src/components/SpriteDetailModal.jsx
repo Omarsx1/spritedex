@@ -117,6 +117,44 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
               {sprite.variantDisplay || sprite.variant} · Gen {sprite.gen}
             </div>
           </div>
+
+          {/* Level control inside Hero header (top-right) */}
+          <div className={`sdm__hero-level ${isMastered ? 'sdm__hero-level--max' : ''}`}>
+            {currentState.owned ? (
+              <>
+                <div className="sdm__hero-level-title">
+                  <ChevronUp size={14} />
+                  <span>{isMastered ? '⭐ MAESTREADO' : `Nivel ${currentState.level}/5`}</span>
+                </div>
+                <div className="sdm__hero-level-btns">
+                  {[1, 2, 3, 4, 5].map((lvl) => (
+                    <button
+                      key={lvl}
+                      className={`sdm__lvl-btn ${currentState.level >= lvl ? 'sdm__lvl-btn--active' : ''} ${isMastered ? 'sdm__lvl-btn--gold' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSetLevel(sprite.id, lvl);
+                        sounds.playLevelUp(lvl);
+                      }}
+                    >
+                      {lvl}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <button
+                className="sdm__hero-obtain-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleOwned(sprite.id);
+                  sounds.playToggle(true);
+                }}
+              >
+                + Atrapado
+              </button>
+            )}
+          </div>
         </div>
 
         {/* ═══ Info panels ═══ */}
@@ -142,33 +180,6 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
               </div>
             </div>
           </div>
-
-          {/* Level control */}
-          {currentState.owned && (
-            <div className={`sdm__level ${isMastered ? 'sdm__level--max' : ''}`}>
-              <div className="sdm__level-info">
-                <ChevronUp size={16} className="sdm__icon" />
-                <span className="sdm__level-text">
-                  {isMastered ? '⭐ MAESTREADO' : `Nivel ${currentState.level}/5`}
-                </span>
-              </div>
-              <div className="sdm__level-btns">
-                {[1, 2, 3, 4, 5].map((lvl) => (
-                  <button
-                    key={lvl}
-                    className={`sdm__lvl-btn ${currentState.level >= lvl ? 'sdm__lvl-btn--active' : ''} ${isMastered ? 'sdm__lvl-btn--gold' : ''}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSetLevel(sprite.id, lvl);
-                      sounds.playLevelUp(lvl);
-                    }}
-                  >
-                    {lvl}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Family progress bar */}
           <div className="sdm__progress-wrap">
