@@ -35,7 +35,7 @@ export function App() {
   const [baseFilter, setBaseFilter] = useState('all');      // BASE = variant/theme
   const [spriteFilter, setSpriteFilter] = useState('all');  // SPRITE = family
   const [sortBy, setSortBy] = useState('default');          // SORT BY
-  const [showUnreleased, setShowUnreleased] = useState(false);
+  const [showUnreleased, setShowUnreleased] = useState(true);
   const [viewMode, setViewMode] = useState('grid');         // 'grid' or 'list'
 
   // Modals
