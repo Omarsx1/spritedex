@@ -87,7 +87,7 @@ export function SpriteCard({ sprite, userState, viewMode, onToggleOwned, onSetLe
       className={`sprite-card ${isOwned ? 'is-owned' : ''} ${isMastered ? 'is-mastered' : ''}`}
       style={{
         background: styleInfo.background,
-        borderColor: isMastered ? '#facc15' : styleInfo.borderColor
+        borderColor: styleInfo.borderColor
       }}
       onClick={() => onOpenDetail(sprite)}
     >

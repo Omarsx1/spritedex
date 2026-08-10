@@ -145,7 +145,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                 key={v.id}
                 style={{
                   background: vStyle.background,
-                  border: `2px solid ${vMastered ? '#facc15' : vOwned ? '#10b981' : vStyle.borderColor}`,
+                  border: `2px solid ${vStyle.borderColor}`,
                   borderRadius: '12px',
                   padding: '10px',
                   textAlign: 'center',

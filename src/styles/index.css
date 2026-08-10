@@ -425,13 +425,8 @@ body {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
 }
 
-.sprite-card.is-owned {
-  border-color: rgba(16, 185, 129, 0.5);
-}
-
 .sprite-card.is-mastered {
-  border-color: var(--gold) !important;
-  box-shadow: 0 0 15px rgba(250, 204, 21, 0.3) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 /* Card image */
