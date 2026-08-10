@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Search, Grid, List } from 'lucide-react';
+import gsap from 'gsap';
 import { THEMES_LIST, THEME_NAMES_ES, SPRITE_FAMILIES_LIST } from '../data/spritesData';
 
 export function FilterBar({
@@ -16,8 +17,31 @@ export function FilterBar({
   viewMode,
   setViewMode
 }) {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        containerRef.current.children,
+        { opacity: 0, y: 15, scale: 0.94 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.5,
+          stagger: 0.07,
+          delay: 0.45,
+          ease: 'power2.out'
+        }
+      );
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <div className="filter-bar">
+    <div className="filter-bar" ref={containerRef}>
       {/* Búsqueda */}
       <div className="filter-search">
         <Search size={16} className="search-icon" />
