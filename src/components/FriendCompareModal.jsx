@@ -285,7 +285,7 @@ export function FriendCompareModal({ userState, onToggleOwned, onClose }) {
                 }}
               >
                 <ArrowUpRight size={16} />
-                <span>Tú le me prestas ({meToFriendList.length})</span>
+                <span>Tú le prestas ({meToFriendList.length})</span>
               </button>
 
               <button
