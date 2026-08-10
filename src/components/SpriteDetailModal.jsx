@@ -129,7 +129,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
         {/* Variants Section */}
         <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Sparkles size={18} color="#ec4899" />
-          <span>TODAS LAS VARIANTES DE ESTA FAMILIA:</span>
+          <span>{sprite.familyId === 'icons_crossovers' ? 'TODOS LOS PERSONAJES Y VARIANTES DE ESTA COLECCIÓN:' : 'TODAS LAS VARIANTES DE ESTA FAMILIA:'}</span>
         </h3>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '12px', maxHeight: '340px', overflowY: 'auto', paddingRight: '6px' }}>

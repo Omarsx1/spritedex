@@ -121,11 +121,7 @@ const FAMILY_NAMES_MAP = {
   wick: 'John Wick'
 };
 
-// All unique sprite families for the SPRITE filter dropdown
-export const SPRITE_FAMILIES_LIST = [...new Set(officialSpritesJson.map(s => {
-  const baseKey = s.id.split('_')[0];
-  return FAMILY_NAMES_MAP[baseKey] || (baseKey.charAt(0).toUpperCase() + baseKey.slice(1));
-}))].sort();
+const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut'];
 
 // Format and group official sprites
 export const ALL_SPRITES = officialSpritesJson.map((item) => {
@@ -145,8 +141,11 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   else if (item.theme === 'Galaxy') dropChance = '0.04%';
   else if (item.theme === 'Holofoil') dropChance = '0.01%';
 
-  const familyId = item.id.split('_')[0];
-  const familyName = FAMILY_NAMES_MAP[familyId] || (familyId.charAt(0).toUpperCase() + familyId.slice(1));
+  const baseKey = item.id.split('_')[0].toLowerCase();
+  const isCrossover = CROSSOVER_KEYS.includes(baseKey);
+
+  const familyId = isCrossover ? 'icons_crossovers' : baseKey;
+  const familyName = isCrossover ? 'Íconos & Crossovers' : (FAMILY_NAMES_MAP[baseKey] || (baseKey.charAt(0).toUpperCase() + baseKey.slice(1)));
 
   let dropChanceNum = parseFloat(dropChance);
 
@@ -169,6 +168,9 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     ability: 'Concede bonificaciones pasivas de escudo, velocidad y recolección de botín.'
   };
 });
+
+// All unique sprite families for the SPRITE filter dropdown
+export const SPRITE_FAMILIES_LIST = [...new Set(ALL_SPRITES.map(s => s.familyName))].sort();
 
 // Group sprites into families for detail view (sorted canonically by variant order)
 export const SPRITE_FAMILIES = Object.values(
