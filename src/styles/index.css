@@ -1912,19 +1912,23 @@ body {
 /* ===== Responsive Filter Bar ===== */
 @media (max-width: 768px) {
   .controls-container {
-    padding: 12px 16px 20px;
-    max-width: 520px;
+    padding: 10px 16px 18px;
+    max-width: 100%;
     margin: 0 auto;
   }
 
   .filter-bar {
-    gap: 6px 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
+    gap: 8px;
   }
 
   .filter-search {
     flex: 1 1 100%;
     width: 100%;
+    margin-bottom: 2px;
   }
 
   .search-input {
@@ -1933,40 +1937,46 @@ body {
   }
 
   .filter-select {
-    flex: 1 1 calc(50% - 4px);
-    max-width: 240px;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: none;
     min-width: 0;
-    padding: 7px 22px 7px 10px;
-    font-size: 0.73rem;
-    background-position: right 8px center;
+    padding: 6px 22px 6px 10px;
+    font-size: 0.72rem;
+    background-position: right 6px center;
   }
 
   .filter-checkbox {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
+    width: auto;
     justify-content: center;
-    padding: 7px 12px;
-    font-size: 0.71rem;
+    padding: 6px 10px;
+    font-size: 0.70rem;
   }
 
   .view-toggle {
-    margin-left: auto;
+    flex: 0 0 auto;
+    margin-left: 0;
   }
 }
 
 @media (max-width: 480px) {
-  .controls-container {
-    max-width: 420px;
+  .filter-bar {
+    gap: 6px;
   }
 
   .filter-select {
-    flex: 1 1 calc(50% - 4px);
-    max-width: 190px;
-    font-size: 0.71rem;
     padding: 6px 18px 6px 8px;
+    font-size: 0.70rem;
+    background-position: right 5px center;
   }
 
   .filter-checkbox {
     font-size: 0.68rem;
-    padding: 6px 10px;
+    padding: 6px 9px;
+  }
+
+  .view-btn {
+    padding: 5px 10px;
   }
 }
