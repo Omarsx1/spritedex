@@ -537,21 +537,25 @@ body {
   }
 
   .hero__bar {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    justify-items: center;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
     gap: 16px 20px;
     width: 100%;
   }
 
+  .hero__stat-ring {
+    order: 1;
+  }
+
   .hero__actions {
-    grid-column: 1 / -1;
-    order: -1;
+    order: 2;
+    width: 100%;
     display: flex;
     justify-content: center;
     gap: 8px;
-    width: 100%;
+    margin-top: 4px;
   }
 
   .hero__ring-box {
@@ -596,12 +600,16 @@ body {
     letter-spacing: 3px;
   }
 
+  .hero__bar {
+    gap: 12px 16px;
+  }
+
   .hero__actions {
     gap: 8px;
   }
 
   .hero__btn {
-    padding: 10px 12px;
+    padding: 9px 12px;
     border-radius: 10px;
   }
 }
@@ -1905,10 +1913,13 @@ body {
 @media (max-width: 768px) {
   .controls-container {
     padding: 12px 16px 20px;
+    max-width: 520px;
+    margin: 0 auto;
   }
 
   .filter-bar {
-    gap: 8px;
+    gap: 6px 8px;
+    justify-content: center;
   }
 
   .filter-search {
@@ -1916,19 +1927,25 @@ body {
     width: 100%;
   }
 
+  .search-input {
+    padding: 8px 14px 8px 36px;
+    font-size: 0.78rem;
+  }
+
   .filter-select {
     flex: 1 1 calc(50% - 4px);
+    max-width: 240px;
     min-width: 0;
-    padding: 8px 24px 8px 12px;
-    font-size: 0.76rem;
+    padding: 7px 22px 7px 10px;
+    font-size: 0.73rem;
     background-position: right 8px center;
   }
 
   .filter-checkbox {
-    flex: 1 1 calc(50% - 4px);
+    flex: 1 1 auto;
     justify-content: center;
-    padding: 8px 12px;
-    font-size: 0.74rem;
+    padding: 7px 12px;
+    font-size: 0.71rem;
   }
 
   .view-toggle {
@@ -1937,14 +1954,19 @@ body {
 }
 
 @media (max-width: 480px) {
+  .controls-container {
+    max-width: 420px;
+  }
+
   .filter-select {
     flex: 1 1 calc(50% - 4px);
-    font-size: 0.74rem;
-    padding: 8px 20px 8px 10px;
+    max-width: 190px;
+    font-size: 0.71rem;
+    padding: 6px 18px 6px 8px;
   }
 
   .filter-checkbox {
-    font-size: 0.72rem;
-    padding: 8px 10px;
+    font-size: 0.68rem;
+    padding: 6px 10px;
   }
 }
