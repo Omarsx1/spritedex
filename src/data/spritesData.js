@@ -163,6 +163,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     'llama_gem': '/sprites/llama_gem.webp',
     'peely_basic': '/sprites/peely_basic.webp',
     'peely_gold': '/sprites/peely_gold.webp',
+    'peely_candy': '/sprites/peely_gummy.webp',
     'peely_galaxy': '/sprites/peely_galaxy.webp',
     'peely_holofoil': '/sprites/peely_holofoil.webp'
   };
