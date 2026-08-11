@@ -362,24 +362,39 @@ body {
 /* --- Responsive --- */
 @media (max-width: 600px) {
   .app-navbar {
-    width: calc(100% - 20px);
-    height: 42px;
-    padding: 4px 4px 4px 5px;
+    width: calc(100% - 24px);
+    height: auto;
+    padding: 0;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0;
   }
   .app-navbar__item span {
     display: none;
   }
   .app-navbar__item {
     padding: 7px 10px;
+    background: rgba(12, 14, 22, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
   }
   .app-navbar__logo-mark {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     font-size: 1.05rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   }
   .app-navbar__avatar {
-    width: 32px;
-    height: 32px;
+    height: 34px;
+    min-width: 34px;
+    background: rgba(12, 14, 22, 0.65);
+    backdrop-filter: blur(16px);
+  }
+  .app-navbar__username {
+    max-width: 80px;
   }
 }
 
