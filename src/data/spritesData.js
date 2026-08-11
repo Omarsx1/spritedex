@@ -15,7 +15,8 @@ export const THEME_STYLES = {
   Galaxy: { bg: 'linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%)', border: '#4a35fa' },
   Holofoil: { bg: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', border: '#ec88d8' },
   Cube: { bg: 'linear-gradient(180deg, #730974 0%, #1b1c23 100%)', border: '#8b008b' },
-  Gem: { bg: 'linear-gradient(180deg, #0f6c7d 0%, #1b1c23 100%)', border: '#22d3ee' }
+  Gem: { bg: 'linear-gradient(180deg, #0f6c7d 0%, #1b1c23 100%)', border: '#22d3ee' },
+  Quack: { bg: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', border: '#ec88d8' }
 };
 
 export const ELEMENTAL_STYLES = {
@@ -41,7 +42,7 @@ export function getSpriteCardStyle(sprite) {
   const rarity = sprite.rarity;
   const familyId = (sprite.familyId || sprite.id.split('_')[0] || '').toLowerCase();
 
-  // 1. Theme-specific variants (Gold, Cube, Candy, Galaxy, Holofoil, Gem)
+  // 1. Theme-specific variants (Gold, Cube, Candy, Galaxy, Holofoil, Gem, Quack)
   if (theme === 'Gold') {
     return { background: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', borderColor: '#f5b642' };
   }
@@ -54,7 +55,7 @@ export function getSpriteCardStyle(sprite) {
   if (theme === 'Galaxy') {
     return { background: 'linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%)', borderColor: '#4a35fa' };
   }
-  if (theme === 'Holofoil') {
+  if (theme === 'Holofoil' || theme === 'Quack') {
     return { background: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', borderColor: '#ec88d8' };
   }
   if (theme === 'Gem') {
@@ -91,11 +92,12 @@ export const THEME_NAMES_ES = {
   Galaxy: 'Galáctico',
   Holofoil: 'Holofoil',
   Cube: 'Cúbico',
-  Gem: 'Gema'
+  Gem: 'Gema',
+  Quack: 'Patito'
 };
 
-export const VARIANT_ORDER = ['Basic', 'Gold', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem'];
-export const THEMES_LIST = ['Basic', 'Gold', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem'];
+export const VARIANT_ORDER = ['Basic', 'Gold', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
+export const THEMES_LIST = ['Basic', 'Gold', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
 
 const FAMILY_NAMES_MAP = {
   water: 'Agua',
