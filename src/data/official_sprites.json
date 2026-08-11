@@ -28,7 +28,7 @@
     "unreleased": false
   },
   {
-    "id": "water_holofoil",
+    "id": "water_quack",
     "name": "Quack Water",
     "theme": "Quack",
     "rarity": "Special",
@@ -70,7 +70,7 @@
     "unreleased": false
   },
   {
-    "id": "earth_holofoil",
+    "id": "earth_quack",
     "name": "Quack Earth",
     "theme": "Quack",
     "rarity": "Special",
@@ -119,7 +119,7 @@
     "unreleased": false
   },
   {
-    "id": "fire_holofoil",
+    "id": "fire_quack",
     "name": "Quack Fire",
     "theme": "Quack",
     "rarity": "Special",
@@ -420,7 +420,7 @@
     "unreleased": false
   },
   {
-    "id": "zeropoint_holofoil",
+    "id": "zeropoint_quack",
     "name": "Quack Zero Point",
     "theme": "Quack",
     "rarity": "Special",

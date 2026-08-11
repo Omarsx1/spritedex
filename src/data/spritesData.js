@@ -130,10 +130,10 @@ const FAMILY_NAMES_MAP = {
 const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse'];
 
 const SPANISH_NAME_OVERRIDES = {
-  water_holofoil: 'Patito de Agua',
-  earth_holofoil: 'Patito de Tierra',
-  fire_holofoil: 'Patito de Fuego',
-  zeropoint_holofoil: 'Patito del Punto Cero'
+  water_quack: 'Patito de Agua',
+  earth_quack: 'Patito de Tierra',
+  fire_quack: 'Patito de Fuego',
+  zeropoint_quack: 'Patito del Punto Cero'
 };
 
 // Format and group official sprites
@@ -179,10 +179,10 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     'peely_candy': '/sprites/peely_gummy.webp',
     'peely_galaxy': '/sprites/peely_galaxy.webp',
     'peely_holofoil': '/sprites/peely_holofoil.webp',
-    'water_holofoil': '/sprites/water_duck.webp',
-    'earth_holofoil': '/sprites/earth_duck.webp',
-    'fire_holofoil': '/sprites/fire_duck.webp',
-    'zeropoint_holofoil': '/sprites/zeropoint_duck.png'
+    'water_quack': '/sprites/water_duck.webp',
+    'earth_quack': '/sprites/earth_duck.webp',
+    'fire_quack': '/sprites/fire_duck.webp',
+    'zeropoint_quack': '/sprites/zeropoint_duck.png'
   };
   if (webpMap[item.id]) {
     imagePath = webpMap[item.id];
