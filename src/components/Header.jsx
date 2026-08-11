@@ -229,14 +229,6 @@ export function Header({
               <Share2 size={16} className="hero__btn-icon" />
               <span className="hero__btn-text">Compartir</span>
             </button>
-            <button className="hero__btn hero__btn--ghost" onClick={onOpenBackupModal} title="Respaldo">
-              <Download size={16} className="hero__btn-icon" />
-              <span className="hero__btn-text">Respaldo</span>
-            </button>
-            <button className="hero__btn hero__btn--ghost" onClick={onOpenAuthModal} title={user ? `Sincronizado (${user.email})` : "Sincronizar en Nube"}>
-              <Cloud size={16} className="hero__btn-icon" style={{ color: user ? '#10b981' : '#a855f7' }} />
-              <span className="hero__btn-text" style={user ? { color: '#10b981' } : {}}>{user ? 'Nube ✓' : 'Nube'}</span>
-            </button>
           </div>
 
           <div className="hero__stat-ring">

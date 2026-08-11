@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ALL_SPRITES } from './data/spritesData';
 import { Header } from './components/Header';
+import { Navbar } from './components/Navbar';
 import { FilterBar } from './components/FilterBar';
 import { SpriteCard } from './components/SpriteCard';
 import { SpriteDetailModal } from './components/SpriteDetailModal';
@@ -8,6 +9,7 @@ import { ShareImageModal } from './components/ShareImageModal';
 import { BackupModal } from './components/BackupModal';
 import { FriendCompareModal } from './components/FriendCompareModal';
 import { AuthModal } from './components/AuthModal';
+import { PrivacyNotice } from './components/PrivacyNotice';
 import { decodeCollectionState } from './utils/shareLink';
 import { supabase, isSupabaseConfigured } from './utils/supabase';
 
@@ -192,7 +194,7 @@ export function App() {
         const familyMatch = (sprite.familyName || '').toLowerCase().includes(query);
         const variantMatch = (sprite.variant || '').toLowerCase().includes(query);
         const variantDisplayMatch = (sprite.variantDisplay || '').toLowerCase().includes(query);
-        const quackMatch = (query.includes('quack') || query.includes('patito')) && (sprite.variant === 'Quack' || sprite.id.includes('duck'));
+        const quackMatch = (query.includes('quack') || query.includes('patito')) && sprite.variant === 'Quack';
         const holofoilMatch = (query.includes('holofoil') || query.includes('holografico') || query.includes('holográfico')) && sprite.variant === 'Holofoil';
 
         if (!nameMatch && !idMatch && !familyMatch && !variantMatch && !variantDisplayMatch && !quackMatch && !holofoilMatch) return false;
@@ -267,6 +269,13 @@ export function App() {
 
   return (
     <div className="pokedex-app-root">
+      {/* Top Glassmorphic Navbar */}
+      <Navbar
+        user={user}
+        onOpenAuthModal={() => setShowAuthModal(true)}
+        onOpenBackupModal={() => setShowBackupModal(true)}
+      />
+
       {/* Header */}
       <Header
         totalCount={totalCount}
@@ -462,6 +471,8 @@ export function App() {
           onSignOut={handleSignOutCleanup}
         />
       )}
+
+      <PrivacyNotice />
     </div>
   );
 }
