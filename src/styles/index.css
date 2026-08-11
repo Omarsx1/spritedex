@@ -30,7 +30,7 @@
   --gold: #facc15;
   --emerald: #10b981;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-heading: 'Burbank Big Condensed', 'FortniteFont', 'Outfit', sans-serif;
+  --font-heading: 'Outfit', sans-serif;
   --font-fortnite: 'Burbank Big Condensed', 'FortniteFont', 'Outfit', sans-serif;
 }
 
@@ -227,7 +227,7 @@ body {
 }
 
 .hero__title-line {
-  font-family: var(--font-heading);
+  font-family: var(--font-fortnite);
   font-weight: 900;
   font-size: 3.6rem;
   letter-spacing: 3px;
@@ -238,6 +238,7 @@ body {
 }
 
 .hero__title-line--accent {
+  font-family: var(--font-heading);
   font-size: 2.4rem;
   letter-spacing: 8px;
   background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #f97316 100%);
