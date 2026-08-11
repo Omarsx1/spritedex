@@ -193,8 +193,9 @@ export function App() {
         const variantMatch = (sprite.variant || '').toLowerCase().includes(query);
         const variantDisplayMatch = (sprite.variantDisplay || '').toLowerCase().includes(query);
         const quackMatch = (query.includes('quack') || query.includes('patito')) && (sprite.variant === 'Quack' || sprite.id.includes('duck'));
+        const holofoilMatch = (query.includes('holofoil') || query.includes('holografico') || query.includes('holográfico')) && sprite.variant === 'Holofoil';
 
-        if (!nameMatch && !idMatch && !familyMatch && !variantMatch && !variantDisplayMatch && !quackMatch) return false;
+        if (!nameMatch && !idMatch && !familyMatch && !variantMatch && !variantDisplayMatch && !quackMatch && !holofoilMatch) return false;
       }
 
       // BASE filter (variant/theme)

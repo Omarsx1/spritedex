@@ -90,7 +90,7 @@ export const THEME_NAMES_ES = {
   Candy: 'Gomita',
   Gummy: 'Gomita',
   Galaxy: 'Galáctico',
-  Holofoil: 'Holofoil',
+  Holofoil: 'Holográfico',
   Cube: 'Cúbico',
   Gem: 'Gema',
   Quack: 'Patito'
