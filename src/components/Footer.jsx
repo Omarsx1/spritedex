@@ -7,7 +7,7 @@ export function Footer({ onOpenBackup, onOpenPrivacy }) {
       <div className="app-footer-pill__left">
         <div className="app-navbar__logo-mark">F</div>
         <span className="app-footer-pill__copyright">
-          © {new Date().getFullYear()} Fortnite Spritedex. Todos los derechos reservados.
+          © {new Date().getFullYear()} Fortnite Spritedex · Creado para la comunidad
         </span>
       </div>
 

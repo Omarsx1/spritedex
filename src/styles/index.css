@@ -59,7 +59,7 @@ body {
 /* ===== NAVBAR — Full-width Glassmorphic Bar ===== */
 .app-navbar {
   width: calc(100% - 32px);
-  max-width: 1100px;
+  max-width: 1200px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3101,7 +3101,7 @@ body {
 /* ===== APP FOOTER (Glassmorphic Pill Card) ===== */
 .app-footer-pill {
   width: calc(100% - 32px);
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 40px auto 24px;
   padding: 6px 16px 6px 6px;
   display: flex;
