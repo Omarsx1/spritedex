@@ -380,18 +380,26 @@ body {
     background: rgba(12, 14, 22, 0.65);
     border: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(16px);
+    box-shadow: none !important;
   }
   .app-navbar__logo-mark {
     width: 34px;
     height: 34px;
     font-size: 1.05rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: none !important;
   }
   .app-navbar__avatar {
     height: 34px;
     min-width: 34px;
     background: rgba(12, 14, 22, 0.65);
     backdrop-filter: blur(16px);
+    box-shadow: none !important;
+  }
+  .app-navbar__avatar.is-logged:hover {
+    box-shadow: none !important;
+  }
+  .app-navbar__avatar-dot {
+    box-shadow: none !important;
   }
   .app-navbar__username {
     max-width: 80px;
