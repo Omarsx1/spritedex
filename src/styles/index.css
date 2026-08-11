@@ -148,12 +148,14 @@ body {
 /* --- User avatar (inside navbar, right side) --- */
 .app-navbar__avatar {
   position: relative;
-  width: 34px;
   height: 34px;
+  min-width: 34px;
+  padding: 0 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  gap: 6px;
+  border-radius: 9999px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.45);
@@ -166,27 +168,47 @@ body {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.22);
   color: #fff;
-  transform: scale(1.04);
+  transform: scale(1.03);
 }
 
 .app-navbar__avatar:active {
-  transform: scale(0.95);
+  transform: scale(0.96);
 }
 
 .app-navbar__avatar.is-logged {
   border-color: rgba(16, 185, 129, 0.45);
   color: #34d399;
+  background: rgba(16, 185, 129, 0.08);
 }
 
 .app-navbar__avatar.is-logged:hover {
   border-color: rgba(16, 185, 129, 0.7);
+  background: rgba(16, 185, 129, 0.15);
   box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+
+.app-navbar__avatar-img {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.app-navbar__username {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .app-navbar__avatar-dot {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: 1px;
+  right: 1px;
   width: 8px;
   height: 8px;
   border-radius: 50%;
