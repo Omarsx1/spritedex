@@ -1,7 +1,7 @@
 import React from 'react';
-import { Download, ShieldCheck } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 
-export function Footer({ onOpenBackup, onOpenPrivacy }) {
+export function Footer({ onOpenPrivacy }) {
   return (
     <footer className="app-footer-pill">
       <div className="app-footer-pill__left">
@@ -12,12 +12,6 @@ export function Footer({ onOpenBackup, onOpenPrivacy }) {
       </div>
 
       <ul className="app-footer-pill__links">
-        <li>
-          <button onClick={onOpenBackup} className="app-footer-pill__link">
-            <Download size={13} strokeWidth={2.2} />
-            <span>Respaldo</span>
-          </button>
-        </li>
         <li>
           <button onClick={onOpenPrivacy} className="app-footer-pill__link">
             <ShieldCheck size={13} strokeWidth={2.2} />

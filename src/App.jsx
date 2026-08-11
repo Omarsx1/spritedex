@@ -482,7 +482,6 @@ export function App() {
       )}
 
       <Footer
-        onOpenBackup={() => setShowBackupModal(true)}
         onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
       />
 
