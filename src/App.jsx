@@ -192,7 +192,8 @@ export function App() {
         const familyMatch = (sprite.familyName || '').toLowerCase().includes(query);
         const variantMatch = (sprite.variant || '').toLowerCase().includes(query);
         const variantDisplayMatch = (sprite.variantDisplay || '').toLowerCase().includes(query);
-        const quackMatch = (query.includes('quack') || query.includes('patito')) && (sprite.variant === 'Holofoil' || sprite.variantDisplay === 'Holofoil');
+        const QUACK_IDS = ['water_holofoil', 'earth_holofoil', 'fire_holofoil', 'zeropoint_holofoil'];
+        const quackMatch = (query.includes('quack') || query.includes('patito')) && QUACK_IDS.includes(sprite.id);
 
         if (!nameMatch && !idMatch && !familyMatch && !variantMatch && !variantDisplayMatch && !quackMatch) return false;
       }

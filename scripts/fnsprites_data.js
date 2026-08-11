@@ -4,13 +4,14 @@ const baseSprites = [
     { id: "water_gold", name: "Gold Water", theme: "Gold", rarity: "Special", unreleased: false },
     { id: "water_candy", name: "Gummy Water", theme: "Candy", rarity: "Special", unreleased: false },
     { id: "water_galaxy", name: "Galaxy Water", theme: "Galaxy", rarity: "Special", unreleased: false },
-    { id: "water_holofoil", name: "Holofoil Water", theme: "Holofoil", rarity: "Special", unreleased: false },
+    { id: "water_holofoil", name: "Quack Water", theme: "Holofoil", rarity: "Special", unreleased: false },
     { id: "water_gem", name: "Gem Water", theme: "Gem", rarity: "Special", unreleased: false },
     
     { id: "earth_basic", name: "Earth", theme: "Basic", rarity: "Rare", unreleased: false },
     { id: "earth_gold", name: "Gold Earth", theme: "Gold", rarity: "Special", unreleased: false },
     { id: "earth_candy", name: "Gummy Earth", theme: "Candy", rarity: "Special", unreleased: false },
     { id: "earth_galaxy", name: "Galaxy Earth", theme: "Galaxy", rarity: "Special", unreleased: false },
+    { id: "earth_holofoil", name: "Quack Earth", theme: "Holofoil", rarity: "Special", unreleased: false },
     { id: "earth_gem", name: "Gem Earth", theme: "Gem", rarity: "Special", unreleased: false },
     { id: "earth_rift", name: "Cube Earth", theme: "Cube", rarity: "Special", unreleased: false },
 
@@ -18,7 +19,7 @@ const baseSprites = [
     { id: "fire_gold", name: "Gold Fire", theme: "Gold", rarity: "Special", unreleased: false },
     { id: "fire_candy", name: "Gummy Fire", theme: "Candy", rarity: "Special", unreleased: false },
     { id: "fire_galaxy", name: "Galaxy Fire", theme: "Galaxy", rarity: "Special", unreleased: false },
-    { id: "fire_holofoil", name: "Holofoil Fire", theme: "Holofoil", rarity: "Special", unreleased: false },
+    { id: "fire_holofoil", name: "Quack Fire", theme: "Holofoil", rarity: "Special", unreleased: false },
 	{ id: "fire_rift", name: "Cube Fire", theme: "Cube", rarity: "Special", unreleased: false },
 	
     { id: "duck_basic", name: "Duck", theme: "Basic", rarity: "Epic", unreleased: false },

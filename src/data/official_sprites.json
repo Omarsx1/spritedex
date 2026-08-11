@@ -29,7 +29,7 @@
   },
   {
     "id": "water_holofoil",
-    "name": "Holofoil Water",
+    "name": "Quack Water",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
@@ -66,6 +66,13 @@
     "id": "earth_galaxy",
     "name": "Galaxy Earth",
     "theme": "Galaxy",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "earth_holofoil",
+    "name": "Quack Earth",
+    "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
   },
@@ -113,7 +120,7 @@
   },
   {
     "id": "fire_holofoil",
-    "name": "Holofoil Fire",
+    "name": "Quack Fire",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
