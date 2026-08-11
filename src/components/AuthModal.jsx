@@ -13,17 +13,17 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
   if (!isSupabaseConfigured) {
     return (
       <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content glass-panel" style={{ maxWidth: '480px' }} onClick={(e) => e.stopPropagation()}>
+        <div className="modal-content glass-panel auth-modal__content--unconfigured" onClick={(e) => e.stopPropagation()}>
           <button className="modal-close-btn" onClick={onClose}>
             <X size={20} />
           </button>
-          <div style={{ textAlign: 'center', padding: '20px 10px' }}>
-            <Cloud size={48} color="#a855f7" style={{ marginBottom: '12px' }} />
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '8px' }}>Configuración de Nube</h2>
-            <p style={{ fontSize: '0.88rem', color: '#94a3b8', lineHeight: 1.5, marginBottom: '16px' }}>
-              Para activar el guardado automático en la nube con Supabase, agrega tus variables de entorno <code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px' }}>VITE_SUPABASE_URL</code> y <code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px' }}>VITE_SUPABASE_ANON_KEY</code> en Vercel.
+          <div className="auth-modal__header">
+            <Cloud size={48} color="#a855f7" className="auth-modal__header-icon" />
+            <h2 className="auth-modal__title">Configuración de Nube</h2>
+            <p className="auth-modal__subtitle">
+              Para activar el guardado automático en la nube con Supabase, agrega tus variables de entorno <code className="auth-modal__code">VITE_SUPABASE_URL</code> y <code className="auth-modal__code">VITE_SUPABASE_ANON_KEY</code> en Vercel.
             </p>
-            <p style={{ fontSize: '0.82rem', color: '#10b981', fontWeight: 700 }}>
+            <p className="auth-modal__local-notice">
               ✓ Mientras tanto, tus datos están 100% seguros guardados localmente en tu dispositivo.
             </p>
           </div>
@@ -128,48 +128,48 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content glass-panel" style={{ maxWidth: '440px' }} onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content glass-panel auth-modal__content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-btn" onClick={onClose}>
           <X size={20} />
         </button>
 
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <ShieldCheck size={44} color="#10b981" style={{ marginBottom: '8px' }} />
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 900 }}>
+        <div className="auth-modal__header">
+          <ShieldCheck size={44} color="#10b981" className="auth-modal__header-icon" />
+          <h2 className="auth-modal__title">
             {user ? (user.is_anonymous ? 'Conectado como Invitado' : 'Sincronización en la Nube') : (isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión')}
           </h2>
-          <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginTop: '4px' }}>
+          <p className="auth-modal__subtitle">
             {user ? (user.is_anonymous ? 'Tu Pokédex está seguro en la nube' : `Conectado como ${user.email}`) : 'Guarda tu Pokédex en la nube y accede desde cualquier dispositivo'}
           </p>
         </div>
 
         {user ? (
-          <div style={{ padding: '10px 0' }}>
-            <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', padding: '14px', marginBottom: '14px', textAlign: 'center' }}>
-              <CheckCircle size={24} color="#10b981" style={{ margin: '0 auto 6px' }} />
-              <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#10b981' }}>Tu Pokédex está sincronizado en la nube</div>
-              <div style={{ fontSize: '0.76rem', color: '#94a3b8', marginTop: '2px' }}>
+          <div className="auth-modal__body">
+            <div className="auth-modal__status-card">
+              <CheckCircle size={24} color="#10b981" className="auth-modal__status-icon" />
+              <div className="auth-modal__status-title">Tu Pokédex está sincronizado en la nube</div>
+              <div className="auth-modal__status-text">
                 {user.is_anonymous ? 'Conectado mediante Acceso Rápido 1-Clic' : 'Cualquier cambio se guarda automáticamente'}
               </div>
             </div>
 
             {user.is_anonymous && (
-              <div style={{ background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.25)', borderRadius: '14px', padding: '14px', marginBottom: '18px' }}>
-                <div style={{ fontSize: '0.82rem', color: '#c084fc', fontWeight: 800, marginBottom: '6px' }}>
+              <div className="auth-modal__link-section">
+                <div className="auth-modal__link-title">
                   🔗 Convierte tu cuenta para acceder desde otros celulares
                 </div>
-                <p style={{ fontSize: '0.75rem', color: '#94a3b8', lineHeight: 1.4, marginBottom: '12px' }}>
+                <p className="auth-modal__link-desc">
                   Vincula tu correo o Google a esta colección. Conservarás todos los Sprites que ya has marcado.
                 </p>
 
                 {error && (
-                  <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#fca5a5', padding: '8px 12px', borderRadius: '8px', fontSize: '0.78rem', marginBottom: '12px' }}>
+                  <div className="auth-modal__alert--error">
                     {error}
                   </div>
                 )}
 
                 {message && (
-                  <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#6ee7b7', padding: '8px 12px', borderRadius: '8px', fontSize: '0.78rem', marginBottom: '12px' }}>
+                  <div className="auth-modal__alert--success">
                     {message}
                   </div>
                 )}
@@ -177,23 +177,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                 {/* Link Google */}
                 <button
                   onClick={handleGoogleAuth}
-                  style={{
-                    width: '100%',
-                    padding: '9px',
-                    borderRadius: '8px',
-                    background: '#ffffff',
-                    color: '#000000',
-                    border: 'none',
-                    fontFamily: 'var(--font-sans)',
-                    fontWeight: 800,
-                    fontSize: '0.82rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    marginBottom: '10px'
-                  }}
+                  className="auth-modal__btn-google auth-modal__btn-google--sm"
                   disabled={loading}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24">
@@ -206,30 +190,21 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                 </button>
 
                 {/* Link Email Form */}
-                <form onSubmit={handleLinkEmail} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{ position: 'relative' }}>
-                    <Mail size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+                <form onSubmit={handleLinkEmail} className="auth-modal__form auth-modal__form--compact">
+                  <div className="auth-modal__input-group auth-modal__input-group--sm">
+                    <Mail size={14} className="auth-modal__input-icon" />
                     <input
                       type="email"
                       placeholder="Tu correo electrónico"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      style={{
-                        width: '100%',
-                        padding: '8px 10px 8px 32px',
-                        borderRadius: '6px',
-                        background: 'rgba(0,0,0,0.4)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        color: '#fff',
-                        fontSize: '0.78rem',
-                        fontFamily: 'var(--font-sans)'
-                      }}
+                      className="auth-modal__input auth-modal__input--sm"
                     />
                   </div>
 
-                  <div style={{ position: 'relative' }}>
-                    <Key size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+                  <div className="auth-modal__input-group auth-modal__input-group--sm">
+                    <Key size={14} className="auth-modal__input-icon" />
                     <input
                       type="password"
                       placeholder="Nueva contraseña"
@@ -237,23 +212,13 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       minLength={6}
-                      style={{
-                        width: '100%',
-                        padding: '8px 10px 8px 32px',
-                        borderRadius: '6px',
-                        background: 'rgba(0,0,0,0.4)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        color: '#fff',
-                        fontSize: '0.78rem',
-                        fontFamily: 'var(--font-sans)'
-                      }}
+                      className="auth-modal__input auth-modal__input--sm"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="btn-primary"
-                    style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', padding: '8px', marginTop: '2px', opacity: loading ? 0.6 : 1 }}
+                    className="btn-primary auth-modal__btn-submit auth-modal__btn-submit--sm"
                     disabled={loading}
                   >
                     <span>Vincular Correo</span>
@@ -264,8 +229,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
 
             <button
               onClick={handleSignOut}
-              className="btn-secondary"
-              style={{ width: '100%', justifyContent: 'center', gap: '8px', opacity: loading ? 0.6 : 1 }}
+              className="btn-secondary auth-modal__btn-signout"
               disabled={loading}
             >
               <LogOut size={16} />
@@ -277,49 +241,16 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
             {/* 1-Click Anonymous Quick Access */}
             <button
               onClick={handleAnonymousAuth}
-              style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: '10px',
-                background: 'linear-gradient(135deg, #10b981, #059669)',
-                color: '#ffffff',
-                border: 'none',
-                fontFamily: 'var(--font-sans)',
-                fontWeight: 900,
-                fontSize: '0.9rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                marginBottom: '12px',
-                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.4)'
-              }}
+              className="auth-modal__btn-quick"
               disabled={loading}
             >
               <span>⚡ Acceso Rápido 1-Clic (Sin Registro)</span>
             </button>
+
             {/* Google Sign In */}
             <button
               onClick={handleGoogleAuth}
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '10px',
-                background: '#ffffff',
-                color: '#000000',
-                border: 'none',
-                fontFamily: 'var(--font-sans)',
-                fontWeight: 800,
-                fontSize: '0.86rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                marginBottom: '16px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
-              }}
+              className="auth-modal__btn-google"
               disabled={loading}
             >
               <svg width="18" height="18" viewBox="0 0 24 24">
@@ -331,48 +262,37 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
               <span>Continuar con Google</span>
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '16px 0', color: 'rgba(255,255,255,0.3)', fontSize: '0.75rem' }}>
-              <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+            <div className="auth-modal__divider">
               <span>O con Correo</span>
-              <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
             </div>
 
             {error && (
-              <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#fca5a5', padding: '8px 12px', borderRadius: '8px', fontSize: '0.78rem', marginBottom: '12px' }}>
+              <div className="auth-modal__alert--error">
                 {error}
               </div>
             )}
 
             {message && (
-              <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#6ee7b7', padding: '8px 12px', borderRadius: '8px', fontSize: '0.78rem', marginBottom: '12px' }}>
+              <div className="auth-modal__alert--success">
                 {message}
               </div>
             )}
 
-            <form onSubmit={handleEmailAuth} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div style={{ position: 'relative' }}>
-                <Mail size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+            <form onSubmit={handleEmailAuth} className="auth-modal__form">
+              <div className="auth-modal__input-group">
+                <Mail size={16} className="auth-modal__input-icon" />
                 <input
                   type="email"
                   placeholder="Tu correo electrónico"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px 10px 38px',
-                    borderRadius: '8px',
-                    background: 'rgba(0,0,0,0.3)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: '#fff',
-                    fontSize: '0.84rem',
-                    fontFamily: 'var(--font-sans)'
-                  }}
+                  className="auth-modal__input"
                 />
               </div>
 
-              <div style={{ position: 'relative' }}>
-                <Key size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+              <div className="auth-modal__input-group">
+                <Key size={16} className="auth-modal__input-icon" />
                 <input
                   type="password"
                   placeholder="Tu contraseña"
@@ -380,23 +300,13 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px 10px 38px',
-                    borderRadius: '8px',
-                    background: 'rgba(0,0,0,0.3)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: '#fff',
-                    fontSize: '0.84rem',
-                    fontFamily: 'var(--font-sans)'
-                  }}
+                  className="auth-modal__input"
                 />
               </div>
 
               <button
                 type="submit"
-                className="btn-primary"
-                style={{ width: '100%', justifyContent: 'center', marginTop: '6px', opacity: loading ? 0.6 : 1 }}
+                className="btn-primary auth-modal__btn-submit"
                 disabled={loading}
               >
                 <LogIn size={16} />
@@ -404,10 +314,10 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
               </button>
             </form>
 
-            <div style={{ textAlign: 'center', marginTop: '14px' }}>
+            <div className="auth-modal__toggle-container">
               <button
                 onClick={() => { setIsSignUp(!isSignUp); setError(null); setMessage(null); }}
-                style={{ background: 'none', border: 'none', color: '#a855f7', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}
+                className="auth-modal__toggle"
               >
                 {isSignUp ? '¿Ya tienes cuenta? Inicia Sesión' : '¿No tienes cuenta? Regístrate gratis'}
               </button>
