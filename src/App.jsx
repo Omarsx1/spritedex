@@ -10,6 +10,8 @@ import { BackupModal } from './components/BackupModal';
 import { FriendCompareModal } from './components/FriendCompareModal';
 import { AuthModal } from './components/AuthModal';
 import { PrivacyNotice } from './components/PrivacyNotice';
+import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
+import { Footer } from './components/Footer';
 import { decodeCollectionState } from './utils/shareLink';
 import { supabase, isSupabaseConfigured } from './utils/supabase';
 
@@ -52,6 +54,7 @@ export function App() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [showCompareModal, setShowCompareModal] = useState(false);
+  const [showFooterPrivacyModal, setShowFooterPrivacyModal] = useState(false);
 
   // Listen to Supabase Auth State & Sync Cloud Data
   useEffect(() => {
@@ -471,6 +474,17 @@ export function App() {
           onSignOut={handleSignOutCleanup}
         />
       )}
+
+      {showFooterPrivacyModal && (
+        <PrivacyPolicyModal
+          onClose={() => setShowFooterPrivacyModal(false)}
+        />
+      )}
+
+      <Footer
+        onOpenBackup={() => setShowBackupModal(true)}
+        onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
+      />
 
       <PrivacyNotice />
     </div>
