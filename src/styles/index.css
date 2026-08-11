@@ -1,5 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;700;900&display=swap');
 
+@font-face {
+  font-family: 'Burbank Big Condensed';
+  src: url('/Burbank Big Condensed Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FortniteFont';
+  src: url('/fortnite.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ===== Reset & Base ===== */
 :root {
   --bg-body: #0d1117;
@@ -14,7 +30,8 @@
   --gold: #facc15;
   --emerald: #10b981;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-heading: 'Outfit', sans-serif;
+  --font-heading: 'Burbank Big Condensed', 'FortniteFont', 'Outfit', sans-serif;
+  --font-fortnite: 'Burbank Big Condensed', 'FortniteFont', 'Outfit', sans-serif;
 }
 
 * {
