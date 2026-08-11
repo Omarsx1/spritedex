@@ -383,10 +383,13 @@ body {
     box-shadow: none !important;
   }
   .app-navbar__logo-mark {
-    width: 34px;
-    height: 34px;
-    font-size: 1.05rem;
+    width: auto;
+    height: auto;
+    background: transparent !important;
+    border-radius: 0;
+    font-size: 1.45rem;
     box-shadow: none !important;
+    padding: 0 4px;
   }
   .app-navbar__avatar {
     height: 34px;
