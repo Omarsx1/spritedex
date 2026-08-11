@@ -64,6 +64,7 @@ export function App() {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       if (currentUser) {
+        setShowAuthModal(false);
         loadUserCollectionFromCloud(currentUser.id);
       }
     });
@@ -72,6 +73,7 @@ export function App() {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       if (currentUser) {
+        setShowAuthModal(false);
         loadUserCollectionFromCloud(currentUser.id);
       } else if (_event === 'SIGNED_OUT') {
         handleSignOutCleanup();
@@ -464,7 +466,7 @@ export function App() {
         />
       )}
 
-      {showAuthModal && (
+      {showAuthModal && !user && (
         <AuthModal
           user={user}
           onClose={() => setShowAuthModal(false)}
