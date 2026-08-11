@@ -3098,109 +3098,100 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* ===== APP FOOTER (Barra Sutil) ===== */
-.app-footer-subtle {
-  margin-top: 40px;
-  background: rgba(12, 14, 22, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  padding: 12px 20px;
-  position: relative;
-  z-index: 10;
-}
-
-.app-footer-subtle__container {
-  max-width: 1200px;
-  margin: 0 auto;
+/* ===== APP FOOTER (Glassmorphic Pill Card) ===== */
+.app-footer-pill {
+  width: calc(100% - 32px);
+  max-width: 1100px;
+  margin: 40px auto 24px;
+  padding: 6px 16px 6px 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
+  height: 48px;
+  background: rgba(12, 14, 22, 0.65);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  z-index: 10;
+  box-sizing: border-box;
 }
 
-.app-footer-subtle__brand {
+.app-footer-pill__left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
-.app-footer-subtle__logo {
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
-  background: linear-gradient(135deg, #f59e0b, #ec4899);
-  color: #ffffff;
-  font-weight: 900;
-  font-size: 0.7rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.app-footer-subtle__text {
-  font-size: 0.74rem;
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.01em;
-}
-
-.app-footer-subtle__text strong {
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 800;
-}
-
-.app-footer-subtle__links {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.app-footer-subtle__btn {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.5);
+.app-footer-pill__copyright {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
   font-family: var(--font-sans);
-  font-size: 0.74rem;
+  letter-spacing: -0.01em;
+}
+
+.app-footer-pill__links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.app-footer-pill__link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 2px 4px;
-  border-radius: 4px;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.app-footer-subtle__btn:hover {
-  color: #60a5fa;
-  background: rgba(255, 255, 255, 0.05);
+.app-footer-pill__link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.app-footer-subtle__dot {
-  color: rgba(255, 255, 255, 0.2);
-  font-size: 0.7rem;
+@media (max-width: 680px) {
+  .app-footer-pill {
+    height: auto;
+    border-radius: 20px;
+    padding: 12px 14px;
+    flex-direction: column;
+    gap: 10px;
+    margin: 28px auto 20px;
+  }
+
+  .app-footer-pill__left {
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+  }
+
+  .app-footer-pill__copyright {
+    font-size: 0.72rem;
+  }
+
+  .app-footer-pill__link {
+    font-size: 0.74rem;
+    padding: 5px 12px;
+  }
 }
 
-@media (max-width: 600px) {
-  .app-footer-subtle {
-    padding: 10px 14px;
-    margin-top: 28px;
-  }
-
-  .app-footer-subtle__container {
-    justify-content: center;
-    gap: 8px 16px;
-  }
-
-  .app-footer-subtle__text {
-    font-size: 0.7rem;
-  }
-
-  .app-footer-subtle__btn {
-    font-size: 0.7rem;
-  }
-}
 
 
 
