@@ -247,7 +247,7 @@ export function Header({
                 <span className="hero__stat-of">/ {totalCount}</span>
               </div>
             </div>
-            <span className="hero__stat-label">MAESTREADOS</span>
+            <span className="hero__stat-label">MAXEADOS</span>
           </div>
         </div>
       </div>

@@ -62,7 +62,7 @@ export function PrivacyPolicyModal({ onClose, onOpenPreferences }) {
                 <span className="privacy-policy-badge privacy-policy-badge--purple">Propio / Local</span>
               </div>
               <p className="privacy-policy-card__desc">
-                Guarda tus Sprites atrapados, maestreados y tus filtros preferidos localmente para que puedas usar la app aun sin conexión.
+                Guarda tus Sprites atrapados, maxeados y tus filtros preferidos localmente para que puedas usar la app aun sin conexión.
               </p>
             </div>
           </div>

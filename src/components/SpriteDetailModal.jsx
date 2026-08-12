@@ -97,7 +97,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
               <span>{activeSprite.variantDisplay || activeSprite.variant} · Gen {activeSprite.gen}</span>
               {currentState.owned && (
                 <span className={`sdm__meta-lvl ${isMastered ? 'sdm__meta-lvl--mastered' : ''}`}>
-                  {' · '}{isMastered ? '⭐ MAESTREADO' : `Nivel ${currentState.level}/5`}
+                  {' · '}{isMastered ? '⭐ MAXEADO' : `Nivel ${currentState.level}/5`}
                 </span>
               )}
             </div>

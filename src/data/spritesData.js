@@ -183,7 +183,8 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     'fire_quack': '/sprites/fire_duck.webp',
     'zeropoint_quack': '/sprites/zeropoint_duck.png',
     'zeropoint_holofoil': '/sprites/zeropoint_holofoil.webp',
-    'grim_holofoil': '/sprites/grim_holofoil.webp'
+    'grim_holofoil': '/sprites/grim_holofoil.webp',
+    'grim_gem': '/sprites/grim_gem.webp'
   };
   if (webpMap[item.id]) {
     imagePath = webpMap[item.id];

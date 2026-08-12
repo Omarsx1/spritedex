@@ -76,7 +76,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     text += `👤 Entrenador: ${trainerName}\n`;
     text += `📋 Mostrando: ${scopeLabels[scope]}\n`;
     text += `📊 Atrapados: ${owned}/${total} (${total > 0 ? Math.round((owned/total)*100) : 0}%)\n`;
-    text += `⭐ Maestreados (Nivel 5): ${mastered}\n\n`;
+    text += `⭐ Maxeados (Nivel 5): ${mastered}\n\n`;
 
     if (missing.length > 0 && scope !== 'owned') {
       text += `❌ Faltantes:\n`;

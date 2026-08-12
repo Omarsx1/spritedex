@@ -174,7 +174,7 @@ export async function generatePokedexCardImage({
   ctx.font = 'bold 16px sans-serif';
   ctx.fillStyle = '#e2e8f0';
   ctx.fillText(`ATRAPADOS: ${ownedCount} / ${totalCount}`, cardX + 30, cardY + 220);
-  ctx.fillText(`MAESTREADOS (Niv. 5): ${masteredCount} / ${totalCount}`, cardX + 30, cardY + 250);
+  ctx.fillText(`MAXEADOS (Niv. 5): ${masteredCount} / ${totalCount}`, cardX + 30, cardY + 250);
 
   ctx.font = 'bold 14px sans-serif';
   ctx.fillStyle = '#94a3b8';

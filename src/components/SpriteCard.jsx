@@ -145,7 +145,7 @@ export function SpriteCard({
           >
             {isFriendView
               ? (friendCanLend ? (myOwned ? '✓ Registrado' : '+ Registrar en mi Dex') : isOwned ? '✓ Tu amigo lo tiene' : 'No lo tiene')
-              : (isMastered ? '⭐ Maestreado' : isOwned ? `✓ Atrapado (Niv.${level})` : 'Sin atrapar')}
+              : (isMastered ? '⭐ Maxeado' : isOwned ? `✓ Atrapado (Niv.${level})` : 'Sin atrapar')}
           </button>
         </div>
       </div>
@@ -252,7 +252,7 @@ export function SpriteCard({
       >
         {isFriendView
           ? (friendCanLend ? (myOwned ? '✓ Registrado en mi Dex' : '+ Registrar en mi Dex') : isOwned ? '✓ Tu amigo lo tiene' : 'No lo tiene')
-          : (isMastered ? '⭐ Maestreado' : isOwned ? `✓ Atrapado (Niv.${level})` : 'Sin atrapar')}
+          : (isMastered ? '⭐ Maxeado' : isOwned ? `✓ Atrapado (Niv.${level})` : 'Sin atrapar')}
       </button>
     </div>
   );
