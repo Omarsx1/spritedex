@@ -2904,91 +2904,116 @@ body {
   width: 5px;
 }
 
-/* ===== Responsive Filter Bar ===== */
+/* ===== Responsive Filter Bar (Compact & Centered - No Stretching) ===== */
 @media (max-width: 768px) {
   .controls-container {
     padding: 10px 12px 16px;
   }
 
   .filter-bar-container {
-    gap: 10px;
+    gap: 8px;
+    align-items: center;
   }
 
   .status-pill-group {
-    width: 100%;
+    width: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
   }
 
   .status-pill-btn {
-    flex: 1;
-    text-align: center;
-    padding: 6px 8px;
-    font-size: 0.76rem;
+    flex: 0 0 auto;
+    width: auto;
+    padding: 5px 12px;
+    font-size: 0.75rem;
   }
 
   .filter-controls-row {
-    gap: 8px;
+    gap: 6px;
+    justify-content: center;
   }
 
   .filter-search-box {
-    flex: 1 1 100%;
+    flex: 0 0 auto;
+    width: auto;
   }
 
   .search-input-field {
-    width: 100%;
+    width: 130px;
+    padding: 6px 10px 6px 28px;
+    font-size: 0.72rem;
   }
 
   .search-input-field:focus {
-    width: 100%;
+    width: 150px;
   }
 
   .filter-dropdown-wrap {
-    flex: 1 1 calc(50% - 4px);
+    flex: 0 0 auto;
+    width: auto;
   }
 
   .filter-pill-trigger {
-    width: 100%;
-    justify-content: center;
-    padding: 7px 10px;
-    font-size: 0.74rem;
+    width: auto;
+    padding: 6px 12px;
+    font-size: 0.72rem;
   }
 
   .variant-grid-dropdown {
     min-width: 220px;
-    left: 0;
-    transform: none;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   .sprite-grid-dropdown {
     min-width: 240px;
-    left: auto;
-    right: 0;
-    transform: none;
+    left: 50%;
+    transform: translateX(-50%);
     grid-template-columns: 1fr 1fr;
+  }
+
+  .filter-pill-checkbox {
+    padding: 5px 10px;
+    font-size: 0.72rem;
+  }
+
+  .view-toggle-btn {
+    padding: 4px 8px;
   }
 }
 
 @media (max-width: 480px) {
   .controls-container {
-    padding: 8px 8px 12px;
+    padding: 8px 6px 12px;
   }
 
   .status-pill-btn {
-    padding: 5px 6px;
+    padding: 5px 10px;
     font-size: 0.7rem;
   }
 
+  .search-input-field {
+    width: 115px;
+    font-size: 0.7rem;
+  }
+
+  .search-input-field:focus {
+    width: 130px;
+  }
+
   .filter-pill-trigger {
-    padding: 6px 8px;
+    padding: 5px 10px;
     font-size: 0.7rem;
   }
 
   .filter-pill-checkbox {
-    font-size: 0.7rem;
-    padding: 6px 10px;
+    font-size: 0.68rem;
+    padding: 5px 8px;
   }
 
   .view-toggle-btn {
-    padding: 4px 8px;
+    padding: 3px 7px;
   }
 }
 
