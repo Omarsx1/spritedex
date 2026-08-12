@@ -15,6 +15,7 @@ const VARIANT_COLORS = {
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'Todos' },
+  { value: 'new', label: 'Nuevos' },
   { value: 'owned', label: 'Atrapados' },
   { value: 'missing', label: 'Faltantes' },
 ];

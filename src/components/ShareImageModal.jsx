@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, Download, Share2, Copy, Check, Image as ImageIcon, Filter, Globe, CheckCircle, XCircle } from 'lucide-react';
+import { X, Download, Share2, Copy, Check, Image as ImageIcon, Filter, Globe, CheckCircle, XCircle, Sparkles } from 'lucide-react';
 import { generatePokedexCardImage } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 
 export function ShareImageModal({ filteredSprites, allSprites, userState, activeFiltersLabel, onClose }) {
   const [trainerName, setTrainerName] = useState('Coleccionista Fortnite');
   const [format, setFormat] = useState('checklist');
-  const [scope, setScope] = useState('filtered'); // 'all', 'filtered', 'owned', 'missing'
+  const [scope, setScope] = useState('filtered'); // 'all', 'new', 'filtered', 'owned', 'missing'
   const [dataUrl, setDataUrl] = useState('');
   const [isGenerating, setIsGenerating] = useState(true);
   const [copiedText, setCopiedText] = useState(false);
@@ -16,6 +16,8 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     switch (scope) {
       case 'all':
         return allSprites;
+      case 'new':
+        return allSprites.filter(s => s.gen === 3 || s.unreleased);
       case 'filtered':
         return filteredSprites;
       case 'owned':
@@ -34,6 +36,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   // Scope counts for display
   const counts = useMemo(() => ({
     all: allSprites.length,
+    new: allSprites.filter(s => s.gen === 3 || s.unreleased).length,
     filtered: filteredSprites.length,
     owned: allSprites.filter(s => userState[s.id]?.owned).length,
     missing: allSprites.filter(s => !userState[s.id]?.owned).length,
@@ -67,6 +70,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
 
     const scopeLabels = {
       all: 'Colección Completa',
+      new: 'Nuevos Espíritus',
       filtered: `Filtrado (${activeFiltersLabel})`,
       owned: 'Solo Atrapados',
       missing: 'Solo Faltantes'
@@ -137,6 +141,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
 
   const scopeOptions = [
     { id: 'all', label: 'ALL SPRITES', icon: <Globe size={16} />, count: counts.all, desc: 'Todos los 117 sprites' },
+    { id: 'new', label: 'NUEVOS ESPÍRITUS', icon: <Sparkles size={16} color="#38bdf8" />, count: counts.new, desc: 'Espíritus y variantes nuevas' },
     { id: 'owned', label: 'OWNED', icon: <CheckCircle size={16} />, count: counts.owned, desc: 'Solo atrapados' },
     { id: 'missing', label: 'MISSING', icon: <XCircle size={16} />, count: counts.missing, desc: 'Solo faltantes' },
     { id: 'mastered', label: 'MASTERED', icon: <CheckCircle size={16} color="#eab308" />, count: counts.mastered, desc: 'Solo Nivel 5' },

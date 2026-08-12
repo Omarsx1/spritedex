@@ -211,13 +211,15 @@ export function App() {
       // SPRITE filter (family)
       if (spriteFilter !== 'all' && sprite.familyName.toLowerCase() !== spriteFilter.toLowerCase()) return false;
 
-      // STATUS filter (all / owned / missing)
+      // STATUS filter (all / owned / missing / new)
       if (statusFilter === 'owned') {
         const isOwned = (activeProfile === 'friend' && friendState ? friendState : userState)[sprite.id]?.owned;
         if (!isOwned) return false;
       } else if (statusFilter === 'missing') {
         const isOwned = (activeProfile === 'friend' && friendState ? friendState : userState)[sprite.id]?.owned;
         if (isOwned) return false;
+      } else if (statusFilter === 'new') {
+        if (sprite.gen !== 3 && !sprite.unreleased) return false;
       }
 
       return true;
