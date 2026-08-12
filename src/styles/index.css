@@ -1356,7 +1356,7 @@ body {
   content: "";
   position: absolute;
   top: -3px;
-  left: calc(50% + 2px);
+  left: calc(50% + 5px);
   transform: translateX(-35%);
   width: 20px;
   height: 13px;
