@@ -122,7 +122,7 @@ const FAMILY_NAMES_MAP = {
   pollo: 'Pollo',
   vini: 'Vini Jr.',
   wick: 'John Wick',
-  peely: 'Plátano',
+  peely: 'Bananín',
   llama: 'Llama',
   ironmouse: 'La niña'
 };
