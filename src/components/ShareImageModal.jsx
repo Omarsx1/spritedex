@@ -140,80 +140,86 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   };
 
   const scopeOptions = [
-    { id: 'all', label: 'ALL SPRITES', icon: <Globe size={16} />, count: counts.all, desc: 'Todos los 117 sprites' },
-    { id: 'new', label: 'NUEVOS ESPÍRITUS', icon: <Sparkles size={16} color="#38bdf8" />, count: counts.new, desc: 'Espíritus y variantes nuevas' },
-    { id: 'owned', label: 'OWNED', icon: <CheckCircle size={16} />, count: counts.owned, desc: 'Solo atrapados' },
-    { id: 'missing', label: 'MISSING', icon: <XCircle size={16} />, count: counts.missing, desc: 'Solo faltantes' },
-    { id: 'mastered', label: 'MASTERED', icon: <CheckCircle size={16} color="#eab308" />, count: counts.mastered, desc: 'Solo Nivel 5' },
-    { id: 'not_mastered', label: 'NOT MASTERED', icon: <XCircle size={16} color="#a855f7" />, count: counts.not_mastered, desc: 'Sin llegar a Nivel 5' },
-    { id: 'filtered', label: 'Filtro Actual', icon: <Filter size={16} />, count: counts.filtered, desc: activeFiltersLabel }
+    { id: 'all', label: 'TODOS', icon: <Globe size={15} />, count: counts.all, desc: 'Todos los 117 sprites' },
+    { id: 'new', label: 'NUEVOS', icon: <Sparkles size={15} color="#38bdf8" />, count: counts.new, desc: 'Espíritus y variantes nuevas' },
+    { id: 'owned', label: 'ATRAPADOS', icon: <CheckCircle size={15} color="#10b981" />, count: counts.owned, desc: 'Solo atrapados' },
+    { id: 'missing', label: 'FALTANTES', icon: <XCircle size={15} color="#ef4444" />, count: counts.missing, desc: 'Solo faltantes' },
+    { id: 'mastered', label: 'MAXEADOS', icon: <CheckCircle size={15} color="#eab308" />, count: counts.mastered, desc: 'Solo Nivel 5' },
+    { id: 'not_mastered', label: 'NO MAXEADOS', icon: <XCircle size={15} color="#a855f7" />, count: counts.not_mastered, desc: 'Sin llegar a Nivel 5' },
+    { id: 'filtered', label: 'FILTRO ACTUAL', icon: <Filter size={15} />, count: counts.filtered, desc: activeFiltersLabel }
   ];
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content glass-panel" style={{ maxWidth: '900px' }} onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content glass-panel" style={{ maxWidth: '920px', padding: '28px' }} onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-btn" onClick={onClose}>
           <X size={20} />
         </button>
 
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <ImageIcon size={22} color="#ec4899" />
-          <span>Compartir Colección</span>
-        </h2>
-        <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '20px' }}>
-          Elige qué sprites incluir en la imagen y el formato de exportación.
-        </p>
+        <div style={{ marginBottom: '22px' }}>
+          <h2 style={{ fontSize: '1.45rem', fontWeight: 900, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '10px', color: '#fff' }}>
+            <ImageIcon size={22} color="#ec4899" />
+            <span>Compartir Colección</span>
+          </h2>
+          <p style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
+            Elige qué espíritus incluir y el formato de exportación para tu plantilla.
+          </p>
+        </div>
 
         {/* ===== SCOPE SELECTOR ===== */}
-        <div style={{ marginBottom: '18px' }}>
-          <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#cbd5e1', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ fontSize: '0.74rem', fontWeight: 800, color: '#cbd5e1', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>
             ¿QUÉ QUIERES COMPARTIR?
           </label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
-            {scopeOptions.map((opt) => (
-              <button
-                key={opt.id}
-                onClick={() => setScope(opt.id)}
-                style={{
-                  padding: '10px 8px',
-                  borderRadius: '10px',
-                  background: scope === opt.id
-                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(168, 85, 247, 0.3))'
-                    : 'rgba(255,255,255,0.04)',
-                  border: `1.5px solid ${scope === opt.id ? '#3b82f6' : 'rgba(255,255,255,0.1)'}`,
-                  color: scope === opt.id ? '#fff' : '#94a3b8',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  transition: 'all 0.2s ease',
-                  textAlign: 'center'
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  {opt.icon}
-                  <span style={{ fontWeight: 800, fontSize: '0.82rem' }}>{opt.label}</span>
-                </div>
-                <span style={{
-                  fontSize: '0.95rem',
-                  fontWeight: 900,
-                  color: scope === opt.id ? '#60a5fa' : '#64748b'
-                }}>
-                  {opt.count} sprites
-                </span>
-                <span style={{ fontSize: '0.65rem', color: '#64748b', lineHeight: '1.2' }}>
-                  {opt.desc}
-                </span>
-              </button>
-            ))}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(122px, 1fr))', gap: '8px' }}>
+            {scopeOptions.map((opt) => {
+              const isActive = scope === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  onClick={() => setScope(opt.id)}
+                  style={{
+                    padding: '10px 8px',
+                    borderRadius: '12px',
+                    background: isActive
+                      ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(168, 85, 247, 0.25))'
+                      : 'rgba(22, 27, 34, 0.6)',
+                    border: `1.5px solid ${isActive ? '#8b5cf6' : 'rgba(255,255,255,0.08)'}`,
+                    color: isActive ? '#fff' : '#94a3b8',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '4px',
+                    transition: 'all 0.2s ease',
+                    textAlign: 'center',
+                    boxShadow: isActive ? '0 0 14px rgba(139, 92, 246, 0.25)' : 'none'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    {opt.icon}
+                    <span style={{ fontWeight: 900, fontSize: '0.78rem', letterSpacing: '0.3px' }}>{opt.label}</span>
+                  </div>
+                  <span style={{
+                    fontSize: '0.92rem',
+                    fontWeight: 900,
+                    color: isActive ? '#60a5fa' : '#cbd5e1'
+                  }}>
+                    {opt.count} sprites
+                  </span>
+                  <span style={{ fontSize: '0.64rem', color: '#64748b', lineHeight: '1.2' }}>
+                    {opt.desc}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* ===== FORMAT + TRAINER NAME ===== */}
-        <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', marginBottom: '18px' }}>
-          <div style={{ flex: 1, minWidth: '200px' }}>
-            <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#cbd5e1', display: 'block', marginBottom: '6px' }}>
+        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '20px' }}>
+          <div style={{ flex: '1 1 200px' }}>
+            <label style={{ fontSize: '0.74rem', fontWeight: 800, color: '#cbd5e1', display: 'block', marginBottom: '6px', letterSpacing: '0.5px' }}>
               NOMBRE DE JUGADOR:
             </label>
             <input
@@ -222,84 +228,101 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
               onChange={(e) => setTrainerName(e.target.value)}
               style={{
                 width: '100%',
-                padding: '9px 12px',
-                borderRadius: '8px',
+                padding: '9px 14px',
+                borderRadius: '10px',
                 background: 'rgba(15, 23, 42, 0.8)',
                 border: '1px solid rgba(255,255,255,0.12)',
                 color: '#fff',
                 fontWeight: 700,
-                fontSize: '0.88rem',
-                fontFamily: 'inherit'
+                fontSize: '0.86rem',
+                fontFamily: 'inherit',
+                boxSizing: 'border-box'
               }}
             />
           </div>
 
-          <div style={{ minWidth: '300px' }}>
-            <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#cbd5e1', display: 'block', marginBottom: '6px' }}>
+          <div style={{ flex: '2 1 300px' }}>
+            <label style={{ fontSize: '0.74rem', fontWeight: 800, color: '#cbd5e1', display: 'block', marginBottom: '6px', letterSpacing: '0.5px' }}>
               FORMATO DE IMAGEN:
             </label>
-            <div style={{ display: 'flex', gap: '5px' }}>
+            <div style={{ display: 'flex', gap: '6px' }}>
               {[
                 { id: 'checklist', label: '📋 Plantilla Rejilla' },
                 { id: 'landscape', label: '🎴 Resumen 16:9' },
                 { id: 'square', label: '📱 Cuadrado (1:1)' }
-              ].map(f => (
-                <button
-                  key={f.id}
-                  className="btn-secondary"
-                  style={{
-                    flex: 1,
-                    padding: '8px 6px',
-                    borderRadius: '8px',
-                    background: format === f.id ? 'linear-gradient(135deg, #3b82f6, #8b5cf6)' : 'rgba(255,255,255,0.05)',
-                    fontSize: '0.75rem',
-                    fontWeight: 800,
-                    border: format === f.id ? '1px solid #3b82f6' : '1px solid rgba(255,255,255,0.1)'
-                  }}
-                  onClick={() => setFormat(f.id)}
-                >
-                  {f.label}
-                </button>
-              ))}
+              ].map(f => {
+                const isActive = format === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    style={{
+                      flex: 1,
+                      padding: '9px 8px',
+                      borderRadius: '10px',
+                      background: isActive ? 'linear-gradient(135deg, #8b5cf6, #ec4899)' : 'rgba(22, 27, 34, 0.6)',
+                      color: isActive ? '#ffffff' : '#94a3b8',
+                      fontSize: '0.76rem',
+                      fontWeight: 800,
+                      border: isActive ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.08)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onClick={() => setFormat(f.id)}
+                  >
+                    {f.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        {/* ===== PREVIEW ===== */}
+        {/* ===== PREVIEW BOX ===== */}
         <div style={{
-          background: '#0a0d14',
-          borderRadius: '12px',
-          padding: '12px',
+          background: 'rgba(10, 13, 20, 0.95)',
+          borderRadius: '16px',
+          padding: '16px',
           border: '1px solid rgba(255,255,255,0.08)',
-          marginBottom: '20px',
+          marginBottom: '22px',
           textAlign: 'center',
-          minHeight: '200px',
+          minHeight: '220px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          overflowY: 'auto'
+          maxHeight: '400px',
+          overflow: 'auto'
         }}>
           {spritesList.length === 0 ? (
-            <div style={{ color: '#64748b', fontWeight: 700 }}>No hay sprites para mostrar con este filtro.</div>
+            <div style={{ color: '#64748b', fontWeight: 700 }}>No hay espíritus para mostrar con este filtro.</div>
           ) : isGenerating ? (
-            <div style={{ color: '#3b82f6', fontWeight: 700 }}>Generando imagen ({spritesList.length} sprites)...</div>
+            <div style={{ color: '#8b5cf6', fontWeight: 700 }}>Generando plantilla gráfica ({spritesList.length} espíritus)...</div>
           ) : (
             <img
               src={dataUrl}
-              alt="Preview"
-              style={{ maxWidth: '100%', maxHeight: '380px', borderRadius: '8px', boxShadow: '0 8px 20px rgba(0,0,0,0.5)' }}
+              alt="Vista previa de la plantilla"
+              style={{ maxWidth: '100%', maxHeight: '360px', borderRadius: '10px', boxShadow: '0 12px 32px rgba(0,0,0,0.6)' }}
             />
           )}
         </div>
 
         {/* ===== ACTION BUTTONS ===== */}
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          <button className="btn-secondary" onClick={handleCopyText} disabled={spritesList.length === 0}>
+          <button
+            className="btn-secondary"
+            onClick={handleCopyText}
+            disabled={spritesList.length === 0}
+            style={{ borderRadius: '10px', padding: '9px 16px', fontSize: '0.82rem' }}
+          >
             {copiedText ? <Check size={16} color="#4ade80" /> : <Copy size={16} />}
             <span>{copiedText ? '¡Copiado!' : 'Copiar Texto'}</span>
           </button>
 
-          <button className="btn-secondary" onClick={handleDownload} disabled={!dataUrl}>
+          <button
+            className="btn-secondary"
+            onClick={handleDownload}
+            disabled={!dataUrl}
+            style={{ borderRadius: '10px', padding: '9px 16px', fontSize: '0.82rem' }}
+          >
             <Download size={16} />
             <span>Descargar PNG</span>
           </button>
@@ -308,7 +331,13 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
             className="btn-primary"
             onClick={handleNativeShare}
             disabled={!dataUrl}
-            style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}
+            style={{
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              borderRadius: '10px',
+              padding: '9px 18px',
+              fontSize: '0.82rem',
+              fontWeight: 800
+            }}
           >
             <Share2 size={16} />
             <span>Compartir (WhatsApp/Discord)</span>

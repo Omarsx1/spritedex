@@ -10,7 +10,7 @@ export function BackupModal({ userState, setUserState, onClose }) {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userState, null, 2));
     const dlAnchor = document.createElement('a');
     dlAnchor.setAttribute("href", dataStr);
-    dlAnchor.setAttribute("download", `Fortnite_Sprites_Pokedex_Backup_${new Date().toISOString().slice(0,10)}.json`);
+    dlAnchor.setAttribute("download", `Fortnite_Sprites_Backup_${new Date().toISOString().slice(0,10)}.json`);
     dlAnchor.click();
   };
 
