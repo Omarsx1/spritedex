@@ -42,6 +42,13 @@
     "unreleased": false
   },
   {
+    "id": "water_holofoil",
+    "name": "Holofoil Water",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
     "id": "earth_basic",
     "name": "Earth",
     "theme": "Basic",
@@ -91,6 +98,13 @@
     "unreleased": false
   },
   {
+    "id": "earth_holofoil",
+    "name": "Holofoil Earth",
+    "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
     "id": "fire_basic",
     "name": "Fire",
     "theme": "Basic",
@@ -129,6 +143,13 @@
     "id": "fire_rift",
     "name": "Cube Fire",
     "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "fire_holofoil",
+    "name": "Holofoil Fire",
+    "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
   },
@@ -423,6 +444,13 @@
     "id": "zeropoint_quack",
     "name": "Quack Zero Point",
     "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "zeropoint_holofoil",
+    "name": "Holofoil Zero Point",
+    "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
   },
