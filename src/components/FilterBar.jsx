@@ -67,22 +67,6 @@ export function FilterBar({
         <option value="missing">No Atrapados</option>
       </select>
 
-      {/* ORDENAR POR */}
-      <select
-        className="filter-select"
-        value={sortBy}
-        onChange={(e) => setSortBy(e.target.value)}
-      >
-        <option value="default">ORDEN POR ▾</option>
-        <option value="name-asc">Nombre (A-Z)</option>
-        <option value="name-desc">Nombre (Z-A)</option>
-        <option value="rarity">Rareza</option>
-        <option value="drop-desc">Drop % (Mayor → Menor)</option>
-        <option value="drop-asc">Drop % (Menor → Mayor)</option>
-        <option value="owned">Atrapados primero</option>
-        <option value="missing">Faltantes primero</option>
-      </select>
-
       {/* Mostrar no lanzados */}
       <label className="filter-checkbox">
         <span>NO LANZADOS</span>

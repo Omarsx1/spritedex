@@ -2797,15 +2797,10 @@ body {
     flex: 1 1 calc(50% - 3px);
   }
 
-  /* Row 3: ESTADO (order 6) & ORDEN POR (order 7) - 2 equal columns */
+  /* Row 3: ESTADO (order 6) */
   .filter-select:nth-of-type(3) {
     order: 6;
-    flex: 1 1 calc(50% - 3px);
-  }
-
-  .filter-select:nth-of-type(4) {
-    order: 7;
-    flex: 1 1 calc(50% - 3px);
+    flex: 1 1 100%;
   }
 
   .filter-select {
