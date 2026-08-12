@@ -1340,7 +1340,7 @@ body {
   left: 53%;
   width: 31px;
   height: 21px;
-  background: url(/sprites/crown.svg) center / contain no-repeat;
+  background: url(/img/x/sprites/crown.webp) center / contain no-repeat;
   z-index: 2;
   filter: drop-shadow(0 0 3px #000);
   pointer-events: none !important;
@@ -1359,7 +1359,7 @@ body {
   transform: translateX(-35%) rotate(8deg);
   width: 15px;
   height: 11px;
-  background: url(/sprites/crown.svg) center / contain no-repeat;
+  background: url(/img/x/sprites/crown.webp) center / contain no-repeat;
   z-index: 3;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
   pointer-events: none !important;
