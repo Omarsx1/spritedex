@@ -110,8 +110,8 @@ const FAMILY_NAMES_MAP = {
   demon: 'Demonio',
   punk: 'Punk',
   king: 'Monarca',
-  zeropoint: 'Punto Zero',
-  theburntpeanut: 'Burnt Peanut',
+  zeropoint: 'Punto Cero',
+  theburntpeanut: 'Cacahuate',
   fishy: 'Pescado',
   striker: 'Pelotero',
   aura: 'Aura',
@@ -122,7 +122,7 @@ const FAMILY_NAMES_MAP = {
   pollo: 'Pollo',
   vini: 'Vini Jr.',
   wick: 'John Wick',
-  peely: 'Cacahuate',
+  peely: 'Plátano',
   llama: 'Llama',
   ironmouse: 'La niña'
 };
@@ -133,7 +133,8 @@ const SPANISH_NAME_OVERRIDES = {
   water_quack: 'Patito de Agua',
   earth_quack: 'Patito de Tierra',
   fire_quack: 'Patito de Fuego',
-  zeropoint_quack: 'Patito del Punto Cero'
+  zeropoint_quack: 'Patito del Punto Cero',
+  theburntpeanut_basic: 'Cacahuate'
 };
 
 // Format and group official sprites
@@ -155,9 +156,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   else if (item.theme === 'Holofoil') dropChance = '0.01%';
 
   const baseKey = item.id.split('_')[0].toLowerCase();
-  const isCrossover = CROSSOVER_KEYS.includes(baseKey);
-
-  const familyId = isCrossover ? 'icons_crossovers' : baseKey;
+  const familyId = baseKey;
   const spanishFamilyName = FAMILY_NAMES_MAP[baseKey] || (baseKey.charAt(0).toUpperCase() + baseKey.slice(1));
   const spanishTheme = THEME_NAMES_ES[item.theme] || item.theme;
 

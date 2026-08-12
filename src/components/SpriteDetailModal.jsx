@@ -133,7 +133,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
             <div className="sdm__progress-header">
               <Sparkles size={14} className="sdm__icon sdm__icon--pink" />
               <span className="sdm__progress-title">
-                {activeSprite.familyId === 'icons_crossovers' ? 'COLECCIÓN' : 'VARIANTES'}
+                {familySprites.length > 1 ? 'VARIANTES' : 'COLECCIÓN'}
               </span>
               <span className="sdm__progress-count">{ownedInFamily}/{familySprites.length}</span>
             </div>
