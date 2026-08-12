@@ -1355,8 +1355,8 @@ body {
 .sprite-list-item.is-mastered .list-item-image::before {
   content: "";
   position: absolute;
-  top: 3%;
-  left: 50%;
+  top: -3px;
+  left: calc(50% + 2px);
   transform: translateX(-35%);
   width: 20px;
   height: 13px;
