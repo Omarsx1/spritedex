@@ -215,6 +215,19 @@ export const allSprites = ALL_SPRITES;
 // All unique sprite families for the SPRITE filter dropdown
 export const SPRITE_FAMILIES_LIST = [...new Set(ALL_SPRITES.map(s => s.familyName))].sort();
 
+// Sprite families with image paths for the visual dropdown
+export const SPRITE_FAMILIES_WITH_IMAGES = [...new Set(ALL_SPRITES.map(s => s.familyId))]
+  .map(familyId => {
+    const sprite = ALL_SPRITES.find(s => s.familyId === familyId && s.variant === 'Basic');
+    const name = FAMILY_NAMES_MAP[familyId] || (familyId.charAt(0).toUpperCase() + familyId.slice(1));
+    return {
+      name,
+      familyId,
+      image: sprite ? sprite.image : `/sprites/${familyId}_basic.png`
+    };
+  })
+  .sort((a, b) => a.name.localeCompare(b.name));
+
 // Group sprites into families for detail view (sorted canonically by variant order)
 export const SPRITE_FAMILIES = Object.values(
   ALL_SPRITES.reduce((acc, sprite) => {

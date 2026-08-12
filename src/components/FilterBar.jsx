@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import { Search, Grid, List, ChevronDown } from 'lucide-react';
-import { THEMES_LIST, THEME_NAMES_ES, SPRITE_FAMILIES_LIST } from '../data/spritesData';
+import { THEMES_LIST, THEME_NAMES_ES, SPRITE_FAMILIES_LIST, SPRITE_FAMILIES_WITH_IMAGES, THEME_STYLES } from '../data/spritesData';
 
-/* Gradient colors matching the card theme styles from spritesData.js */
+/*
+ * Variant chip gradients — uses the exact same top color from THEME_STYLES
+ * but as a horizontal gradient for the pill button style.
+ * Border colors match the card borders exactly.
+ */
 const VARIANT_COLORS = {
-  Basic:    { gradient: 'linear-gradient(135deg, #104273, #00afff)', border: '#00afff', glow: 'rgba(0, 175, 255, 0.3)' },
-  Gold:     { gradient: 'linear-gradient(135deg, #9d752a, #f5b642)', border: '#f5b642', glow: 'rgba(245, 182, 66, 0.3)' },
-  Candy:    { gradient: 'linear-gradient(135deg, #9f4540, #f16f68)', border: '#f16f68', glow: 'rgba(241, 111, 104, 0.3)' },
-  Galaxy:   { gradient: 'linear-gradient(135deg, #4a31bc, #7c3aed)', border: '#4a35fa', glow: 'rgba(74, 53, 250, 0.3)' },
-  Cube:     { gradient: 'linear-gradient(135deg, #730974, #a855f7)', border: '#8b008b', glow: 'rgba(139, 0, 139, 0.3)' },
-  Holofoil: { gradient: 'linear-gradient(135deg, #cb77be, #ec88d8)', border: '#ec88d8', glow: 'rgba(236, 136, 216, 0.3)' },
-  Gem:      { gradient: 'linear-gradient(135deg, #0f6c7d, #22d3ee)', border: '#22d3ee', glow: 'rgba(34, 211, 238, 0.3)' },
-  Quack:    { gradient: 'linear-gradient(135deg, #cb77be, #f9a825)', border: '#f9a825', glow: 'rgba(249, 168, 37, 0.3)' },
+  Basic:    { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' },
+  Gold:     { gradient: 'linear-gradient(135deg, #9d752a, #d4a23a)', border: '#f5b642' },
+  Candy:    { gradient: 'linear-gradient(135deg, #9f4540, #d4615b)', border: '#f16f68' },
+  Galaxy:   { gradient: 'linear-gradient(135deg, #4a31bc, #6d4fe0)', border: '#4a35fa' },
+  Cube:     { gradient: 'linear-gradient(135deg, #730974, #a040a2)', border: '#8b008b' },
+  Holofoil: { gradient: 'linear-gradient(135deg, #cb77be, #e09dd6)', border: '#ec88d8' },
+  Gem:      { gradient: 'linear-gradient(135deg, #0f6c7d, #1a9cb5)', border: '#22d3ee' },
+  Quack:    { gradient: 'linear-gradient(135deg, #cb77be, #d89a4a)', border: '#ec88d8' },
 };
 
 export function FilterBar({
@@ -31,11 +35,22 @@ export function FilterBar({
   setViewMode
 }) {
   const [variantOpen, setVariantOpen] = useState(false);
+  const [spriteOpen, setSpriteOpen] = useState(false);
 
   const handleVariantSelect = (value) => {
     setBaseFilter(value);
     setVariantOpen(false);
   };
+
+  const handleSpriteSelect = (value) => {
+    setSpriteFilter(value);
+    setSpriteOpen(false);
+  };
+
+  // Find the selected sprite's image for the trigger
+  const selectedSpriteData = spriteFilter !== 'all'
+    ? SPRITE_FAMILIES_WITH_IMAGES.find(f => f.name === spriteFilter)
+    : null;
 
   return (
     <div className="filter-bar">
@@ -55,11 +70,10 @@ export function FilterBar({
       <div className="variant-filter-wrap">
         <button
           className={`variant-filter-trigger ${variantOpen ? 'is-open' : ''} ${baseFilter !== 'all' ? 'has-selection' : ''}`}
-          onClick={() => setVariantOpen(!variantOpen)}
+          onClick={() => { setVariantOpen(!variantOpen); setSpriteOpen(false); }}
           style={baseFilter !== 'all' && VARIANT_COLORS[baseFilter] ? {
             background: VARIANT_COLORS[baseFilter].gradient,
             borderColor: VARIANT_COLORS[baseFilter].border,
-            boxShadow: `0 0 12px ${VARIANT_COLORS[baseFilter].glow}`
           } : {}}
         >
           <span>{baseFilter === 'all' ? 'VARIANTE' : (THEME_NAMES_ES[baseFilter] || baseFilter)}</span>
@@ -70,7 +84,6 @@ export function FilterBar({
           <>
             <div className="variant-filter-backdrop" onClick={() => setVariantOpen(false)} />
             <div className="variant-filter-dropdown">
-              {/* Todas */}
               <button
                 className={`variant-chip variant-chip--all ${baseFilter === 'all' ? 'is-active' : ''}`}
                 onClick={() => handleVariantSelect('all')}
@@ -78,7 +91,6 @@ export function FilterBar({
                 Todas
               </button>
 
-              {/* Variantes con colores */}
               {THEMES_LIST.map(theme => {
                 const colors = VARIANT_COLORS[theme];
                 const isActive = baseFilter === theme;
@@ -90,7 +102,6 @@ export function FilterBar({
                     style={{
                       background: colors.gradient,
                       borderColor: isActive ? '#fff' : colors.border,
-                      boxShadow: isActive ? `0 0 14px ${colors.glow}, inset 0 0 20px rgba(255,255,255,0.1)` : `0 2px 8px rgba(0,0,0,0.3)`
                     }}
                   >
                     {THEME_NAMES_ES[theme] || theme}
@@ -102,17 +113,57 @@ export function FilterBar({
         )}
       </div>
 
-      {/* Filtro SPRITE (familia) */}
-      <select
-        className="filter-select"
-        value={spriteFilter}
-        onChange={(e) => setSpriteFilter(e.target.value)}
-      >
-        <option value="all">SPRITE ▾</option>
-        {SPRITE_FAMILIES_LIST.map(f => (
-          <option key={f} value={f}>{f}</option>
-        ))}
-      </select>
+      {/* Filtro SPRITE — Dropdown con iconos */}
+      <div className="sprite-filter-wrap">
+        <button
+          className={`variant-filter-trigger ${spriteOpen ? 'is-open' : ''} ${spriteFilter !== 'all' ? 'has-selection' : ''}`}
+          onClick={() => { setSpriteOpen(!spriteOpen); setVariantOpen(false); }}
+        >
+          {selectedSpriteData && (
+            <img
+              src={selectedSpriteData.image}
+              alt=""
+              className="sprite-filter-trigger-icon"
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+          )}
+          <span>{spriteFilter === 'all' ? 'SPRITE' : spriteFilter}</span>
+          <ChevronDown size={14} className={`variant-chevron ${spriteOpen ? 'rotated' : ''}`} />
+        </button>
+
+        {spriteOpen && (
+          <>
+            <div className="variant-filter-backdrop" onClick={() => setSpriteOpen(false)} />
+            <div className="sprite-filter-dropdown">
+              <button
+                className={`sprite-chip ${spriteFilter === 'all' ? 'is-active' : ''}`}
+                onClick={() => handleSpriteSelect('all')}
+              >
+                <span className="sprite-chip__name">Todos</span>
+              </button>
+
+              {SPRITE_FAMILIES_WITH_IMAGES.map(family => {
+                const isActive = spriteFilter === family.name;
+                return (
+                  <button
+                    key={family.familyId}
+                    className={`sprite-chip ${isActive ? 'is-active' : ''}`}
+                    onClick={() => handleSpriteSelect(family.name)}
+                  >
+                    <img
+                      src={family.image}
+                      alt=""
+                      className="sprite-chip__icon"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                    <span className="sprite-chip__name">{family.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
 
       {/* Filtro ESTADO (todos / atrapados / faltantes) */}
       <select
