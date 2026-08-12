@@ -1246,10 +1246,10 @@ body {
   z-index: 91;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
+  gap: 5px;
   padding: 10px;
-  min-width: 310px;
-  max-height: 340px;
+  min-width: 460px;
+  max-height: 360px;
   overflow-y: auto;
   background: rgba(15, 20, 28, 0.96);
   backdrop-filter: blur(24px);
@@ -1262,19 +1262,18 @@ body {
 .sprite-grid-chip {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 8px;
+  gap: 6px;
+  padding: 6px 10px;
   border-radius: 8px;
   border: 1px solid transparent;
   background: rgba(255, 255, 255, 0.05);
   color: #e2e8f0;
   font-family: var(--font-sans);
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
-  overflow: hidden;
 }
 
 .sprite-grid-chip:hover {
@@ -1296,8 +1295,7 @@ body {
 }
 
 .sprite-chip-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* No Lanzados Checkbox Pill */
