@@ -80,9 +80,9 @@ export function SpriteCard({
   if (viewMode === 'list') {
     return (
       <div
-        className={`sprite-list-item ${isOwned ? 'is-owned' : ''} ${isMastered ? 'sprite-mastered is-mastered' : ''}`}
+        className={`sprite-list-item ${isOwned ? 'is-owned' : ''} ${isMastered ? 'is-mastered' : ''}`}
         onClick={handleToggleClick}
-        style={{ cursor: 'pointer', position: 'relative' }}
+        style={{ cursor: 'pointer' }}
       >
         <div className="list-item-image">
           <img

@@ -1331,8 +1331,10 @@ body {
   z-index: 1;
 }
 
-/* Crown over Sprite Head when Mastered (Exact User Rules) */
-.sprite-mastered::before {
+/* ===== MASTERED CROWN SYSTEM (Separated Grid & List view rules) ===== */
+
+/* 1. Grid View Crown — Scoped to .card-image */
+.sprite-card.is-mastered .card-image::before {
   content: "";
   position: absolute;
   top: 10%;
@@ -1345,11 +1347,23 @@ body {
   pointer-events: none !important;
 }
 
-.list-view .sprite-mastered::before,
-.sprites-grid.list-view .sprite-mastered::before {
+/* 2. List View Crown — Scoped to .list-item-image */
+.sprite-list-item.is-mastered .list-item-image {
+  position: relative;
+}
+
+.sprite-list-item.is-mastered .list-item-image::before {
+  content: "";
+  position: absolute;
   top: 3%;
+  left: 50%;
+  transform: translateX(-35%);
   width: 20px;
   height: 13px;
+  z-index: 2;
+  filter: drop-shadow(rgb(0, 0, 0) 0px 0px 3px);
+  background: url(/img/x/sprites/crown.webp) center center / contain no-repeat;
+  pointer-events: none !important;
 }
 
 /* Card image container - pass clicks through to parent card */
