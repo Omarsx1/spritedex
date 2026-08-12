@@ -38,8 +38,6 @@ export function FilterBar({
   const [variantOpen, setVariantOpen] = useState(false);
   const [spriteOpen, setSpriteOpen] = useState(false);
 
-  const closeAll = () => { setVariantOpen(false); setSpriteOpen(false); };
-
   const handleVariantSelect = (value) => { setBaseFilter(value); setVariantOpen(false); };
   const handleSpriteSelect = (value) => { setSpriteFilter(value); setSpriteOpen(false); };
 
@@ -48,55 +46,55 @@ export function FilterBar({
     : null;
 
   return (
-    <div className="filter-bar">
-      {/* ── Row 1: Status pill tabs ── */}
-      <div className="fb-row fb-row--status">
-        <div className="status-tabs">
-          {STATUS_OPTIONS.map(opt => (
-            <button
-              key={opt.value}
-              className={`status-tab ${statusFilter === opt.value ? 'is-active' : ''}`}
-              onClick={() => setStatusFilter(opt.value)}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
+    <div className="filter-bar-container">
+      {/* Status Filter Pill Buttons (Top line) */}
+      <div className="status-pill-group">
+        {STATUS_OPTIONS.map(opt => (
+          <button
+            key={opt.value}
+            className={`status-pill-btn ${statusFilter === opt.value ? 'is-active' : ''}`}
+            onClick={() => setStatusFilter(opt.value)}
+          >
+            {opt.label}
+          </button>
+        ))}
       </div>
 
-      {/* ── Row 2: Search + Variante + Sprite ── */}
-      <div className="fb-row fb-row--main">
-        <div className="filter-search">
+      {/* Main Filter Controls (Compact Inline Row) */}
+      <div className="filter-controls-row">
+        {/* Search */}
+        <div className="filter-search-box">
           <Search size={14} className="search-icon" />
           <input
             type="text"
             placeholder="BUSCAR"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
+            className="search-input-field"
           />
         </div>
 
-        {/* Variante dropdown */}
-        <div className="variant-filter-wrap">
+        {/* Variante Dropdown */}
+        <div className="filter-dropdown-wrap">
           <button
-            className={`filter-trigger ${variantOpen ? 'is-open' : ''} ${baseFilter !== 'all' ? 'has-selection' : ''}`}
+            className={`filter-pill-trigger ${variantOpen ? 'is-open' : ''} ${baseFilter !== 'all' ? 'has-selection' : ''}`}
             onClick={() => { setVariantOpen(!variantOpen); setSpriteOpen(false); }}
             style={baseFilter !== 'all' && VARIANT_COLORS[baseFilter] ? {
               background: VARIANT_COLORS[baseFilter].gradient,
               borderColor: VARIANT_COLORS[baseFilter].border,
+              color: '#ffffff'
             } : {}}
           >
             <span>{baseFilter === 'all' ? 'VARIANTE' : (THEME_NAMES_ES[baseFilter] || baseFilter)}</span>
-            <ChevronDown size={13} className={`filter-trigger__chevron ${variantOpen ? 'rotated' : ''}`} />
+            <ChevronDown size={13} className={`trigger-chevron ${variantOpen ? 'rotated' : ''}`} />
           </button>
 
           {variantOpen && (
             <>
-              <div className="filter-dropdown-backdrop" onClick={() => setVariantOpen(false)} />
-              <div className="variant-filter-dropdown">
+              <div className="filter-backdrop-overlay" onClick={() => setVariantOpen(false)} />
+              <div className="variant-grid-dropdown">
                 <button
-                  className={`variant-chip variant-chip--all ${baseFilter === 'all' ? 'is-active' : ''}`}
+                  className={`variant-grid-chip variant-chip--all ${baseFilter === 'all' ? 'is-active' : ''}`}
                   onClick={() => handleVariantSelect('all')}
                 >
                   Todas
@@ -107,7 +105,7 @@ export function FilterBar({
                   return (
                     <button
                       key={theme}
-                      className={`variant-chip ${isActive ? 'is-active' : ''}`}
+                      className={`variant-grid-chip ${isActive ? 'is-active' : ''}`}
                       onClick={() => handleVariantSelect(theme)}
                       style={{ background: colors.gradient, borderColor: isActive ? '#fff' : colors.border }}
                     >
@@ -120,72 +118,71 @@ export function FilterBar({
           )}
         </div>
 
-        {/* Sprite dropdown */}
-        <div className="sprite-filter-wrap">
+        {/* Sprite Dropdown */}
+        <div className="filter-dropdown-wrap">
           <button
-            className={`filter-trigger ${spriteOpen ? 'is-open' : ''} ${spriteFilter !== 'all' ? 'has-selection' : ''}`}
+            className={`filter-pill-trigger ${spriteOpen ? 'is-open' : ''} ${spriteFilter !== 'all' ? 'has-selection' : ''}`}
             onClick={() => { setSpriteOpen(!spriteOpen); setVariantOpen(false); }}
           >
             {selectedSpriteData && (
-              <img src={selectedSpriteData.image} alt="" className="filter-trigger__sprite-icon"
+              <img src={selectedSpriteData.image} alt="" className="trigger-sprite-icon"
                 onError={(e) => { e.target.style.display = 'none'; }} />
             )}
             <span>{spriteFilter === 'all' ? 'SPRITE' : spriteFilter}</span>
-            <ChevronDown size={13} className={`filter-trigger__chevron ${spriteOpen ? 'rotated' : ''}`} />
+            <ChevronDown size={13} className={`trigger-chevron ${spriteOpen ? 'rotated' : ''}`} />
           </button>
 
           {spriteOpen && (
             <>
-              <div className="filter-dropdown-backdrop" onClick={() => setSpriteOpen(false)} />
-              <div className="sprite-filter-dropdown">
+              <div className="filter-backdrop-overlay" onClick={() => setSpriteOpen(false)} />
+              <div className="sprite-grid-dropdown">
                 <button
-                  className={`sprite-chip ${spriteFilter === 'all' ? 'is-active' : ''}`}
+                  className={`sprite-grid-chip ${spriteFilter === 'all' ? 'is-active' : ''}`}
                   onClick={() => handleSpriteSelect('all')}
                 >
-                  <span className="sprite-chip__name">Todos</span>
+                  <span className="sprite-chip-name">Todos</span>
                 </button>
                 {SPRITE_FAMILIES_WITH_IMAGES.map(family => (
                   <button
                     key={family.familyId}
-                    className={`sprite-chip ${spriteFilter === family.name ? 'is-active' : ''}`}
+                    className={`sprite-grid-chip ${spriteFilter === family.name ? 'is-active' : ''}`}
                     onClick={() => handleSpriteSelect(family.name)}
                   >
-                    <img src={family.image} alt="" className="sprite-chip__icon"
+                    <img src={family.image} alt="" className="sprite-chip-icon"
                       onError={(e) => { e.target.style.display = 'none'; }} />
-                    <span className="sprite-chip__name">{family.name}</span>
+                    <span className="sprite-chip-name">{family.name}</span>
                   </button>
                 ))}
               </div>
             </>
           )}
         </div>
-      </div>
 
-      {/* ── Row 3: Secondary controls ── */}
-      <div className="fb-row fb-row--secondary">
-        <label className="filter-checkbox">
+        {/* No Lanzados Checkbox */}
+        <label className="filter-pill-checkbox">
+          <span>NO LANZADOS</span>
           <input
             type="checkbox"
             checked={showUnreleased}
             onChange={(e) => setShowUnreleased(e.target.checked)}
           />
-          <span>NO LANZADOS</span>
         </label>
 
-        <div className="view-toggle">
+        {/* View Mode Toggle (Grid/List) */}
+        <div className="filter-view-toggle">
           <button
-            className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+            className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
             onClick={() => setViewMode('grid')}
             title="Vista cuadrícula"
           >
-            <Grid size={16} />
+            <Grid size={15} />
           </button>
           <button
-            className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+            className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
             onClick={() => setViewMode('list')}
             title="Vista lista"
           >
-            <List size={16} />
+            <List size={15} />
           </button>
         </div>
       </div>
