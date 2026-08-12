@@ -1126,6 +1126,138 @@ body {
   color: var(--text);
 }
 
+/* ===== VARIANT FILTER CHIPS ===== */
+.variant-filter-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.variant-filter-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px 9px 18px;
+  border-radius: 9999px;
+  background: rgba(22, 27, 34, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.4px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.variant-filter-trigger:hover {
+  background: rgba(33, 38, 45, 0.85);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.variant-filter-trigger.has-selection {
+  color: #fff;
+  font-weight: 900;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.variant-chevron {
+  transition: transform 0.2s ease;
+  opacity: 0.7;
+}
+
+.variant-chevron.rotated {
+  transform: rotate(180deg);
+}
+
+.variant-filter-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+}
+
+.variant-filter-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 91;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 12px;
+  min-width: 260px;
+  background: rgba(13, 17, 23, 0.95);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  animation: variantDropIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes variantDropIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.variant-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.variant-chip:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.15);
+}
+
+.variant-chip:active {
+  transform: scale(0.97);
+}
+
+.variant-chip.is-active {
+  border-color: #fff !important;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.12) !important;
+  transform: scale(1.03);
+}
+
+.variant-chip--all {
+  grid-column: 1 / -1;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  text-shadow: none;
+}
+
+.variant-chip--all:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.variant-chip--all.is-active {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: #fff !important;
+}
+
 .filter-checkbox {
   display: flex;
   align-items: center;
@@ -2787,18 +2919,32 @@ body {
   }
 
   /* Row 2: VARIANTE (order 4) & SPRITE (order 5) - 2 equal columns */
-  .filter-select:nth-of-type(1) {
+  .variant-filter-wrap {
     order: 4;
     flex: 1 1 calc(50% - 3px);
   }
 
-  .filter-select:nth-of-type(2) {
+  .variant-filter-trigger {
+    width: 100%;
+    justify-content: center;
+    padding: 7px 10px;
+    font-size: 0.72rem;
+    border-radius: 10px;
+  }
+
+  .variant-filter-dropdown {
+    min-width: 240px;
+    left: 0;
+    right: auto;
+  }
+
+  .filter-select:nth-of-type(1) {
     order: 5;
     flex: 1 1 calc(50% - 3px);
   }
 
   /* Row 3: ESTADO (order 6) */
-  .filter-select:nth-of-type(3) {
+  .filter-select:nth-of-type(2) {
     order: 6;
     flex: 1 1 100%;
   }
@@ -2841,6 +2987,22 @@ body {
     padding: 6px 16px 6px 6px;
     font-size: 0.66rem;
     background-position: right 4px center;
+  }
+
+  .variant-filter-trigger {
+    padding: 6px 8px;
+    font-size: 0.66rem;
+  }
+
+  .variant-filter-dropdown {
+    min-width: 220px;
+    padding: 8px;
+    gap: 5px;
+  }
+
+  .variant-chip {
+    padding: 6px 8px;
+    font-size: 0.7rem;
   }
 
   .view-btn {
