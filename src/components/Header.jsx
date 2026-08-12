@@ -49,7 +49,7 @@ export function Header({
   const masteredPct = totalCount > 0 ? (masteredCount / totalCount) * 100 : 0;
 
   // SVG ring properties
-  const ringRadius = 38;
+  const ringRadius = 48;
   const ringCircumference = 2 * Math.PI * ringRadius;
 
   // Entrance animations
@@ -203,10 +203,10 @@ export function Header({
         <div className="hero__bar" ref={statsRef}>
           <div className="hero__stat-ring">
             <div className="hero__ring-box">
-              <svg viewBox="0 0 88 88" className="hero__ring-svg">
-                <circle cx="44" cy="44" r={ringRadius} className="hero__ring-track" />
+              <svg viewBox="0 0 110 110" className="hero__ring-svg">
+                <circle cx="55" cy="55" r={ringRadius} className="hero__ring-track" />
                 <circle
-                  cx="44" cy="44" r={ringRadius}
+                  cx="55" cy="55" r={ringRadius}
                   className="hero__ring-fill hero__ring-fill--caught"
                   strokeDasharray={ringCircumference}
                   strokeDashoffset={ringCircumference - (ringCircumference * ownedPct / 100)}
@@ -233,10 +233,10 @@ export function Header({
 
           <div className="hero__stat-ring">
             <div className="hero__ring-box">
-              <svg viewBox="0 0 88 88" className="hero__ring-svg">
-                <circle cx="44" cy="44" r={ringRadius} className="hero__ring-track" />
+              <svg viewBox="0 0 110 110" className="hero__ring-svg">
+                <circle cx="55" cy="55" r={ringRadius} className="hero__ring-track" />
                 <circle
-                  cx="44" cy="44" r={ringRadius}
+                  cx="55" cy="55" r={ringRadius}
                   className="hero__ring-fill hero__ring-fill--mastered"
                   strokeDasharray={ringCircumference}
                   strokeDashoffset={ringCircumference - (ringCircumference * masteredPct / 100)}
