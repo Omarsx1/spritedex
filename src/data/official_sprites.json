@@ -98,13 +98,6 @@
     "unreleased": false
   },
   {
-    "id": "earth_holofoil",
-    "name": "Holofoil Earth",
-    "theme": "Holofoil",
-    "rarity": "Special",
-    "unreleased": false
-  },
-  {
     "id": "fire_basic",
     "name": "Fire",
     "theme": "Basic",
