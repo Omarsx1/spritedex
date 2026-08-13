@@ -1,6 +1,5 @@
-// HTML5 Canvas Exporter for Social Media Pokédex Cards & Grid Checklists
-
-import { GENERATIONS, RARITIES } from '../data/spritesData';
+// HTML5 Canvas Exporter for Social Media Pokédex Grid Templates
+// Generates clean visual grids with Scalloped Cyan-Green Gradient Checked Badge & Scalloped Red Outline Badge!
 
 // Helper to pre-load image for canvas drawing
 function loadImage(src) {
@@ -13,458 +12,323 @@ function loadImage(src) {
   });
 }
 
+// Convert Hex color string to RGBA with explicit opacity
+function hexToRgba(hex, alpha = 0.50) {
+  let c = hex.replace('#', '');
+  if (c.length === 3) c = c.split('').map((x) => x + x).join('');
+  const num = parseInt(c, 16);
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// Scalloped Verified Checkmark Starburst Badge with Cyan to Green Gradient SVG (Owned)
+const SCALLOPED_GRADIENT_CHECK_SVG = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="cyanGreenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff" />
+      <stop offset="50%" stop-color="#00e676" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+  <path fill="url(#cyanGreenGrad)" d="M93.75 52.08c0-6.58-3.65-12.29-8.95-15C85.44 35.26 85.79 33.3 85.79 31.25c0-9.21-7.46-16.67-16.67-16.67-2.06 0-4.02.35-5.83.99-2.71-5.3-8.42-8.95-15-8.95s-12.29 3.65-15 8.95c-1.81-.64-3.77-.99-5.83-.99-9.21 0-16.67 7.46-16.67 16.67 0 2.06.35 4.02.99 5.83-5.3 2.71-8.95 8.42-8.95 15s3.65 12.29 8.95 15c-.64 1.81-.99 3.77-.99 5.83 0 9.21 7.46 16.67 16.67 16.67 2.06 0 4.02-.35 5.83-.99 2.71 5.3 8.42 8.95 15 8.95s12.29-3.65 15-8.95c1.81.64 3.77.99 5.83.99 9.21 0 16.67-7.46 16.67-16.67 0-2.06-.35-4.02-.99-5.83 5.3-2.71 8.95-8.42 8.95-15z"/>
+  <path fill="#ffffff" d="M41.67 64.58L27.08 50l5.89-5.89 8.7 8.7 25.36-25.36 5.89 5.89z"/>
+</svg>
+`);
+
+// Scalloped Red Outline Badge SVG for Missing Spirits (matching user reference image)
+const SCALLOPED_RED_OUTLINE_SVG = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <path fill="rgba(239, 68, 68, 0.10)" stroke="#ef4444" stroke-width="4.5" stroke-linejoin="round" d="M93.75 52.08c0-6.58-3.65-12.29-8.95-15C85.44 35.26 85.79 33.3 85.79 31.25c0-9.21-7.46-16.67-16.67-16.67-2.06 0-4.02.35-5.83.99-2.71-5.3-8.42-8.95-15-8.95s-12.29 3.65-15 8.95c-1.81-.64-3.77-.99-5.83-.99-9.21 0-16.67 7.46-16.67 16.67 0 2.06.35 4.02.99 5.83-5.3 2.71-8.95 8.42-8.95 15s3.65 12.29 8.95 15c-.64 1.81-.99 3.77-.99 5.83 0 9.21 7.46 16.67 16.67 16.67 2.06 0 4.02-.35 5.83-.99 2.71 5.3 8.42 8.95 15 8.95s12.29-3.65 15-8.95c1.81.64 3.77.99 5.83.99 9.21 0 16.67-7.46 16.67-16.67 0-2.06-.35-4.02-.99-5.83 5.3-2.71 8.95-8.42 8.95-15z"/>
+</svg>
+`);
+
+// Crop and fill canvas using background_template.webp with cover scaling
+function drawCroppedBackground(ctx, img, canvasW, canvasH) {
+  if (!img || !img.width || !img.height) return;
+  const imgRatio = img.width / img.height;
+  const canvasRatio = canvasW / canvasH;
+  let srcX = 0, srcY = 0, srcW = img.width, srcH = img.height;
+
+  if (imgRatio > canvasRatio) {
+    srcW = img.height * canvasRatio;
+    srcX = (img.width - srcW) / 2;
+  } else {
+    srcH = img.width / canvasRatio;
+    srcY = (img.height - srcH) / 2;
+  }
+
+  ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, canvasW, canvasH);
+}
+
+// Helper to determine the true primary hue color for each spirit
+function getSpiritHue(sprite) {
+  const name = (sprite.fullName || sprite.name || '').toLowerCase();
+  const rarity = (sprite.rarity || '').toLowerCase();
+
+  if (name.includes('dorado') || name.includes('oro') || name.includes('peely')) return '#facc15';
+  if (name.includes('fuego') || name.includes('flama')) return '#ff5722';
+  if (name.includes('gomita') || name.includes('dulce')) return '#ff6b81';
+  if (name.includes('galáctico') || name.includes('galactico') || name.includes('cúbico') || name.includes('cubico')) return '#a855f7';
+  if (name.includes('gema') || name.includes('cristal')) return '#38bdf8';
+  if (name.includes('holográfico') || name.includes('holografico')) return '#ec4899';
+  if (name.includes('patito') || name.includes('tierra')) return '#00f0ff';
+  if (name.includes('oscuridad') || name.includes('parca')) return '#94a3b8';
+  if (name.includes('cacahuate')) return '#eab308';
+  if (name.includes('agua')) return '#00f0ff';
+
+  if (rarity.includes('mitico') || rarity.includes('mítico')) return '#f59e0b';
+  if (rarity.includes('legendario')) return '#f97316';
+  if (rarity.includes('epico') || rarity.includes('épico')) return '#a855f7';
+  if (rarity.includes('raro')) return '#3b82f6';
+  if (rarity.includes('especial')) return '#ec4899';
+
+  return '#38bdf8';
+}
+
 export async function generatePokedexCardImage({
   spritesList,
   userState,
-  trainerName = 'Coleccionista Fortnite',
-  format = 'checklist'
+  format = 'checklist', // 'checklist', 'square' (1:1)
+  useBackgroundTemplate = true
 }) {
-  // Pre-load all sprite images for rendering
   const loadedImagesMap = {};
-  await Promise.all(
-    spritesList.slice(0, 120).map(async (s) => {
+  const bgImgPromise = useBackgroundTemplate ? loadImage('/background_template.webp') : Promise.resolve(null);
+  const badgeGradientPromise = loadImage(SCALLOPED_GRADIENT_CHECK_SVG);
+  const badgeRedOutlinePromise = loadImage(SCALLOPED_RED_OUTLINE_SVG);
+
+  await Promise.all([
+    bgImgPromise.then((img) => {
+      if (img) loadedImagesMap['__bg_template__'] = img;
+    }),
+    badgeGradientPromise.then((img) => {
+      if (img) loadedImagesMap['__scalloped_gradient_check__'] = img;
+    }),
+    badgeRedOutlinePromise.then((img) => {
+      if (img) loadedImagesMap['__scalloped_red_outline__'] = img;
+    }),
+    ...spritesList.slice(0, 150).map(async (s) => {
       const img = await loadImage(s.image);
       if (img) loadedImagesMap[s.id] = img;
     })
-  );
+  ]);
 
-  if (format === 'checklist') {
-    return generateChecklistTemplate({ spritesList, userState, trainerName, loadedImagesMap });
-  }
+  const bgTemplateImg = loadedImagesMap['__bg_template__'];
 
-  const canvas = document.createElement('canvas');
-  const width = format === 'square' ? 1080 : 1200;
-  const height = format === 'square' ? 1080 : 675;
-  canvas.width = width;
-  canvas.height = height;
-
-  const ctx = canvas.getContext('2d');
-
-  // Background Gradient
-  const bgGradient = ctx.createLinearGradient(0, 0, width, height);
-  bgGradient.addColorStop(0, '#0b0f19');
-  bgGradient.addColorStop(0.5, '#111827');
-  bgGradient.addColorStop(1, '#070a12');
-  ctx.fillStyle = bgGradient;
-  ctx.fillRect(0, 0, width, height);
-
-  // Grid Overlay lines
-  ctx.strokeStyle = 'rgba(59, 130, 246, 0.05)';
-  ctx.lineWidth = 1;
-  for (let x = 0; x < width; x += 40) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, height);
-    ctx.stroke();
-  }
-  for (let y = 0; y < height; y += 40) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(width, y);
-    ctx.stroke();
-  }
-
-  // Glowing Frame
-  ctx.strokeStyle = '#3b82f6';
-  ctx.shadowColor = '#3b82f6';
-  ctx.shadowBlur = 20;
-  ctx.lineWidth = 4;
-  ctx.strokeRect(20, 20, width - 40, height - 40);
-  ctx.shadowBlur = 0;
-
-  // Header
-  ctx.beginPath();
-  ctx.arc(60, 60, 18, 0, Math.PI * 2);
-  ctx.fillStyle = '#00f0ff';
-  ctx.shadowColor = '#00f0ff';
-  ctx.shadowBlur = 15;
-  ctx.fill();
-  ctx.shadowBlur = 0;
-
-  ctx.font = 'bold 32px sans-serif';
-  ctx.fillStyle = '#ffffff';
-  ctx.fillText('FORTNITE SPRITEDEX', 95, 68);
-
-  ctx.font = '600 18px sans-serif';
-  ctx.fillStyle = '#94a3b8';
-  ctx.fillText(`JUGADOR: ${trainerName.toUpperCase()}`, width - 360, 68);
-
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(40, 105);
-  ctx.lineTo(width - 40, 105);
-  ctx.stroke();
-
-  // Stats Calculation
-  const totalCount = spritesList.length;
-  let ownedCount = 0;
-  let masteredCount = 0;
-  const masteredList = [];
-  const missingList = [];
-
-  spritesList.forEach((sprite) => {
-    const state = userState[sprite.id] || { owned: false, level: 1 };
-    if (state.owned) {
-      ownedCount++;
-      if (state.level === 5) {
-        masteredCount++;
-        masteredList.push(sprite);
-      }
-    } else {
-      missingList.push(sprite);
-    }
+  return generateGridTemplate({
+    spritesList,
+    userState,
+    format,
+    loadedImagesMap,
+    bgTemplateImg
   });
-
-  // Left Side: Donut Progress Ring + Stats
-  const cx = 200;
-  const cy = 350;
-  const radius = 110;
-  const strokeW = 20;
-
-  // Background Ring
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-  ctx.lineWidth = strokeW;
-  ctx.stroke();
-
-  // Progress Arc
-  const pct = totalCount > 0 ? ownedCount / totalCount : 0;
-  const startAngle = -Math.PI / 2;
-  const endAngle = startAngle + (Math.PI * 2 * pct);
-
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius, startAngle, endAngle);
-  ctx.strokeStyle = '#3b82f6';
-  ctx.shadowColor = '#3b82f6';
-  ctx.shadowBlur = 15;
-  ctx.lineWidth = strokeW;
-  ctx.lineCap = 'round';
-  ctx.stroke();
-  ctx.shadowBlur = 0;
-
-  // Percentage Text
-  ctx.font = '900 44px sans-serif';
-  ctx.fillStyle = '#ffffff';
-  ctx.textAlign = 'center';
-  ctx.fillText(`${Math.round(pct * 100)}%`, cx, cy + 10);
-
-  ctx.font = '600 14px sans-serif';
-  ctx.fillStyle = '#94a3b8';
-  ctx.fillText('COLECCIÓN COMPLETADA', cx, cy + 35);
-
-  // Summary Stat Cards
-  const statsBoxes = [
-    { label: 'ESPRÍTUS ATRAPADOS', val: `${ownedCount} / ${totalCount}`, color: '#3b82f6' },
-    { label: 'MAXEADOS (NIVEL 5)', val: `${masteredCount}`, color: '#eab308' },
-    { label: 'FALTANTES', val: `${missingList.length}`, color: '#ef4444' }
-  ];
-
-  statsBoxes.forEach((b, i) => {
-    const boxY = 490 + i * 55;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.roundRect(50, boxY, 300, 46, 10);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = b.color;
-    ctx.beginPath();
-    ctx.arc(70, boxY + 23, 6, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.font = '600 12px sans-serif';
-    ctx.fillStyle = '#94a3b8';
-    ctx.textAlign = 'left';
-    ctx.fillText(b.label, 90, boxY + 28);
-
-    ctx.font = 'bold 16px sans-serif';
-    ctx.fillStyle = '#ffffff';
-    ctx.textAlign = 'right';
-    ctx.fillText(b.val, 330, boxY + 29);
-  });
-
-  // Right Side: Mastered & Missing Highlights
-  const rightX = 410;
-  const rightY = 130;
-
-  ctx.textAlign = 'left';
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 20px sans-serif';
-  ctx.fillText('🏆 ESPÍRITUS MAXEADOS (NIVEL 5)', rightX, rightY + 25);
-
-  let rowY = rightY + 45;
-  if (masteredList.length === 0) {
-    ctx.font = 'italic 16px sans-serif';
-    ctx.fillStyle = '#64748b';
-    ctx.fillText('Aún no has llevado ningún Sprite al Nivel 5. ¡A entrenar!', rightX, rowY + 25);
-    rowY += 45;
-  } else {
-    const topMastered = masteredList.slice(0, 6);
-    topMastered.forEach((sprite, idx) => {
-      const mx = rightX + (idx % 3) * 240;
-      const my = rowY + Math.floor(idx / 3) * 60;
-
-      ctx.fillStyle = 'rgba(234, 179, 8, 0.15)';
-      ctx.strokeStyle = '#eab308';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.roundRect(mx, my, 225, 50, 10);
-      ctx.fill();
-      ctx.stroke();
-
-      const spriteImg = loadedImagesMap[sprite.id];
-      if (spriteImg) {
-        ctx.drawImage(spriteImg, mx + 8, my + 5, 40, 40);
-      }
-
-      ctx.font = 'bold 13px sans-serif';
-      ctx.fillStyle = '#fef08a';
-      ctx.fillText(sprite.fullName.substring(0, 18), mx + 52, my + 24);
-
-      ctx.font = '11px sans-serif';
-      ctx.fillStyle = '#eab308';
-      ctx.fillText(`⭐ ⭐ ⭐ ⭐ ⭐ MAX`, mx + 52, my + 40);
-    });
-    rowY += Math.ceil(topMastered.length / 3) * 65 + 15;
-  }
-
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 20px sans-serif';
-  ctx.fillText('🔍 FALTANTES POR ENCONTRAR', rightX, rowY + 25);
-
-  const missingRowY = rowY + 45;
-  if (missingList.length === 0) {
-    ctx.font = 'bold 18px sans-serif';
-    ctx.fillStyle = '#4ade80';
-    ctx.fillText('🎉 ¡COLECCIÓN COMPLETA! ¡HAS ATRAPADO TODOS LOS SPRITES!', rightX, missingRowY + 25);
-  } else {
-    const topMissing = missingList.slice(0, 8);
-    topMissing.forEach((sprite, idx) => {
-      const mx = rightX + (idx % 4) * 180;
-      const my = missingRowY + Math.floor(idx / 4) * 55;
-
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.roundRect(mx, my, 170, 45, 8);
-      ctx.fill();
-      ctx.stroke();
-
-      const spriteImg = loadedImagesMap[sprite.id];
-      if (spriteImg) {
-        ctx.save();
-        ctx.globalAlpha = 0.5;
-        ctx.drawImage(spriteImg, mx + 6, my + 5, 35, 35);
-        ctx.restore();
-      }
-
-      ctx.font = '600 12px sans-serif';
-      ctx.fillStyle = '#fca5a5';
-      ctx.fillText(sprite.fullName.substring(0, 15), mx + 45, my + 22);
-
-      const rInfo = RARITIES[sprite.rarity] || { name: sprite.rarity, color: '#94a3b8' };
-      ctx.font = '10px sans-serif';
-      ctx.fillStyle = rInfo.color;
-      ctx.fillText(`${rInfo.name} (${sprite.dropChanceDisplay})`, mx + 45, my + 36);
-    });
-  }
-
-  ctx.font = 'bold 14px sans-serif';
-  ctx.fillStyle = '#475569';
-  ctx.fillText('Generado con Fortnite Sprites App • fortnite.gg/sprites', rightX, height - 35);
-
-  return canvas.toDataURL('image/png');
 }
 
 // -------------------------------------------------------------
-// Function for "PLANTILLA DE ESPÍRITUS" (Grid Checklist)
-// Draws PNG images directly onto the canvas grid!
+// Renders spirits with translucent silhouette glow auras & scalloped status badges
 // -------------------------------------------------------------
-function generateChecklistTemplate({ spritesList, userState, trainerName, loadedImagesMap }) {
+function generateGridTemplate({
+  spritesList,
+  userState,
+  format,
+  loadedImagesMap,
+  bgTemplateImg
+}) {
   const canvas = document.createElement('canvas');
+  const totalSprites = spritesList.length;
 
-  const cols = Math.min(Math.max(Math.ceil(Math.sqrt(spritesList.length * 1.4)), 5), 8);
-  const rows = Math.ceil(spritesList.length / cols);
+  const isLightTemplate = Boolean(bgTemplateImg);
 
-  const cellW = 160;
-  const cellH = 180;
-  const paddingX = 40;
-  const headerH = 185;
-  const footerH = 50;
+  // Soft, translucent & extra diffused aura blur settings
+  const shadowBlurAmount = isLightTemplate ? 32 : 44;
 
-  const width = Math.max(920, paddingX * 2 + cols * cellW);
-  const height = headerH + rows * cellH + footerH;
+  let width = 1200;
+  let height = 800;
+  let cols = 5;
+  const paddingX = 60;
+  let headerH = 115;
+  const footerH = 45;
+
+  if (format === 'square') {
+    width = 1200;
+    height = 1200;
+    headerH = 140;
+
+    if (totalSprites <= 6) cols = 3;
+    else if (totalSprites <= 12) cols = 3;
+    else if (totalSprites <= 20) cols = 4;
+    else if (totalSprites <= 30) cols = 5;
+    else if (totalSprites <= 42) cols = 6;
+    else cols = 7;
+
+  } else {
+    if (totalSprites <= 8) cols = 4;
+    else if (totalSprites <= 15) cols = 5;
+    else if (totalSprites <= 28) cols = 6;
+    else if (totalSprites <= 48) cols = 7;
+    else cols = 8;
+  }
+
+  const rows = Math.max(1, Math.ceil(totalSprites / cols));
+  const availW = width - paddingX * 2;
+
+  if (format === 'checklist') {
+    const desiredCellH = 230;
+    height = headerH + rows * desiredCellH + footerH;
+  }
+
+  const availH = height - headerH - footerH;
+  const cellW = Math.floor(availW / cols);
+  const cellH = Math.floor(availH / rows);
 
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
 
-  // Background Dark Gradient
-  const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-  bgGrad.addColorStop(0, '#090d16');
-  bgGrad.addColorStop(0.4, '#131b2e');
-  bgGrad.addColorStop(1, '#060911');
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, width, height);
-
-  // Futuristic Background Grid Lines
-  ctx.strokeStyle = 'rgba(139, 92, 246, 0.07)';
-  ctx.lineWidth = 1;
-  for (let gx = 0; gx < width; gx += 40) {
-    ctx.beginPath();
-    ctx.moveTo(gx, 0);
-    ctx.lineTo(gx, height);
-    ctx.stroke();
-  }
-  for (let gy = 0; gy < height; gy += 40) {
-    ctx.beginPath();
-    ctx.moveTo(0, gy);
-    ctx.lineTo(width, gy);
-    ctx.stroke();
+  if (bgTemplateImg) {
+    drawCroppedBackground(ctx, bgTemplateImg, width, height);
+  } else {
+    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+    bgGrad.addColorStop(0, '#090d16');
+    bgGrad.addColorStop(0.5, '#131b2e');
+    bgGrad.addColorStop(1, '#060911');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
   }
 
-  // Ambient Glow Orbs
-  ctx.fillStyle = 'rgba(168, 85, 247, 0.12)';
-  ctx.beginPath();
-  ctx.arc(width * 0.2, 120, 240, 0, Math.PI * 2);
-  ctx.fill();
+  // Header Title: Centered "FORTNITE SPRITEDEX"
+  ctx.save();
+  const fontSizeFortnite = format === 'square' ? 52 : 46;
+  const fontSizeSpritedex = format === 'square' ? 42 : 36;
+  const fontFortnite = `normal 900 ${fontSizeFortnite}px Impact, "Arial Black", sans-serif`;
+  const fontSpritedex = `bold 900 ${fontSizeSpritedex}px sans-serif`;
 
-  ctx.fillStyle = 'rgba(59, 130, 246, 0.1)';
-  ctx.beginPath();
-  ctx.arc(width * 0.8, height - 150, 280, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.font = fontFortnite;
+  const wFortnite = ctx.measureText('FORTNITE').width;
+  ctx.font = fontSpritedex;
+  const wSpritedex = ctx.measureText('SPRITEDEX').width;
 
-  // Header Title
-  ctx.textAlign = 'center';
-  ctx.font = '900 48px sans-serif';
-  ctx.fillStyle = '#ffffff';
-  ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
-  ctx.shadowBlur = 15;
-  ctx.fillText('FORTNITE', width / 2, 55);
-  ctx.shadowBlur = 0;
+  const gap = 16;
+  const totalHeaderW = wFortnite + gap + wSpritedex;
+  const startHeaderX = (width - totalHeaderW) / 2;
+  const headerY = format === 'square' ? 72 : 62;
 
-  // Sub-banner Pill Box
-  const bannerW = Math.min(580, width - 60);
-  ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
-  ctx.beginPath();
-  ctx.roundRect(width / 2 - bannerW / 2, 72, bannerW, 46, 12);
-  ctx.fill();
+  // 1. Draw "FORTNITE" with Fortnite font at startHeaderX
+  ctx.font = fontFortnite;
+  ctx.textAlign = 'left';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetY = 3;
 
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 2.5;
-  ctx.stroke();
+  ctx.strokeStyle = isLightTemplate ? '#ffffff' : '#000000';
+  ctx.lineWidth = 7;
+  ctx.strokeText('FORTNITE', startHeaderX, headerY);
 
-  ctx.font = '900 22px sans-serif';
-  ctx.fillStyle = '#ffffff';
-  ctx.fillText('PLANTILLA DE ESPÍRITUS / SPRITES', width / 2, 103);
+  ctx.fillStyle = isLightTemplate ? '#000000' : '#ffffff';
+  ctx.fillText('FORTNITE', startHeaderX, headerY);
 
-  // Stats Tagline Pill Badge
-  const ownedCount = spritesList.filter(s => userState[s.id]?.owned).length;
-  const masteredCount = spritesList.filter(s => userState[s.id]?.owned && userState[s.id]?.level === 5).length;
-  const totalCount = spritesList.length;
-  const percent = totalCount > 0 ? Math.round((ownedCount / totalCount) * 100) : 0;
+  // 2. Draw "SPRITEDEX" right after FORTNITE
+  ctx.font = fontSpritedex;
+  ctx.shadowColor = isLightTemplate ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.85)';
+  ctx.shadowBlur = 5;
+  ctx.fillStyle = isLightTemplate ? '#0f172a' : '#ffffff';
+  ctx.fillText('SPRITEDEX', startHeaderX + wFortnite + gap, headerY - 2);
 
-  ctx.font = 'bold 14px sans-serif';
-  ctx.fillStyle = '#38bdf8';
-  ctx.fillText(`🎮 JUGADOR: ${trainerName.toUpperCase()}   •   ATRAPADOS: ${ownedCount} / ${totalCount} (${percent}%)   •   MAXEADOS: ${masteredCount}`, width / 2, 150);
+  ctx.restore();
 
-  // Grid Origin Offset to Center Grid
+  // Grid Origin Offset
   const gridW = cols * cellW;
+  const gridH = rows * cellH;
   const startX = (width - gridW) / 2;
+  const startY = headerH + Math.max(0, (availH - gridH) / 2);
 
-  // Render Sprite Cards
+  const scallopedGradientImg = loadedImagesMap['__scalloped_gradient_check__'];
+  const scallopedRedOutlineImg = loadedImagesMap['__scalloped_red_outline__'];
+
+  // Render Spirit Icons & Scalloped Status SVG Badges
   spritesList.forEach((sprite, idx) => {
     const colIdx = idx % cols;
     const rowIdx = Math.floor(idx / cols);
 
     const x = startX + colIdx * cellW;
-    const y = headerH + rowIdx * cellH;
+    const y = startY + rowIdx * cellH;
 
     const state = userState[sprite.id] || { owned: false, level: 1 };
     const isOwned = state.owned;
-    const level = state.level || 1;
 
-    const cardW = cellW - 12;
-    const cardH = cellH - 12;
-    const cardX = x + 6;
-    const cardY = y + 6;
+    const cardW = cellW;
+    const cardH = cellH;
+    const cardX = x;
+    const cardY = y;
 
-    // Card Container (Dark Glass Panel)
-    ctx.fillStyle = isOwned ? 'rgba(22, 32, 50, 0.85)' : 'rgba(15, 23, 42, 0.5)';
-    ctx.strokeStyle = isOwned
-      ? (level === 5 ? '#eab308' : '#10b981')
-      : 'rgba(255, 255, 255, 0.12)';
-    ctx.lineWidth = isOwned ? 2 : 1;
-    ctx.beginPath();
-    ctx.roundRect(cardX, cardY, cardW, cardH, 14);
-    ctx.fill();
-    ctx.stroke();
+    const maxImgSize = format === 'square' ? 155 : 125;
+    const imgSize = Math.max(68, Math.min(maxImgSize, cardH - 65));
+    const badgeSize = Math.max(38, Math.min(48, Math.floor(imgSize * 0.38)));
 
-    // Sprite PNG Image
+    // 1. Spirit PNG Image with TRANSLUCENT & HIGHLY DIFFUSED silhouette aura glow
     const spriteImg = loadedImagesMap[sprite.id];
     if (spriteImg) {
       ctx.save();
+      const spiritHue = getSpiritHue(sprite);
+
       if (!isOwned) {
         ctx.globalAlpha = 0.38;
       } else {
-        ctx.shadowColor = level === 5 ? 'rgba(234, 179, 8, 0.6)' : 'rgba(16, 185, 129, 0.6)';
-        ctx.shadowBlur = 12;
+        ctx.shadowColor = hexToRgba(spiritHue, isLightTemplate ? 0.48 : 0.65);
+        ctx.shadowBlur = shadowBlurAmount;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
       }
-      ctx.drawImage(spriteImg, cardX + cardW / 2 - 34, cardY + 12, 68, 68);
+      ctx.drawImage(spriteImg, cardX + cardW / 2 - imgSize / 2, cardY + 4, imgSize, imgSize);
       ctx.restore();
     }
 
-    // Sprite Name
-    ctx.textAlign = 'center';
-    ctx.font = 'bold 12px sans-serif';
-    ctx.fillStyle = isOwned ? '#ffffff' : '#94a3b8';
-    const dispName = sprite.fullName.length > 15 ? sprite.fullName.substring(0, 14) + '…' : sprite.fullName;
-    ctx.fillText(dispName, cardX + cardW / 2, cardY + 98);
-
-    // Checklist Box Square (Casilla de verificación para marcar)
-    const boxSize = 32;
-    const boxX = cardX + cardW / 2 - boxSize / 2;
-    const boxY = cardY + 116;
+    // 2. Scalloped Status Badge SVG (Positioned directly underneath spirit)
+    const badgeX = cardX + cardW / 2 - badgeSize / 2;
+    const badgeY = cardY + 4 + imgSize + 10;
 
     if (isOwned) {
-      // Filled vibrant checkbox (Green check or Gold star for Maxeado)
-      ctx.fillStyle = level === 5 ? '#eab308' : '#10b981';
-      ctx.shadowColor = level === 5 ? 'rgba(234, 179, 8, 0.5)' : 'rgba(16, 185, 129, 0.5)';
-      ctx.shadowBlur = 10;
-      ctx.beginPath();
-      ctx.roundRect(boxX, boxY, boxSize, boxSize, 6);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-
-      ctx.font = 'bold 14px sans-serif';
-      ctx.fillStyle = level === 5 ? '#000000' : '#ffffff';
-      if (level === 5) {
-        ctx.fillText('★ MAX', boxX + boxSize / 2, boxY + 21);
+      // Scalloped Cyan-Green Gradient Checked Badge SVG
+      if (scallopedGradientImg) {
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 240, 255, 0.45)';
+        ctx.shadowBlur = 8;
+        ctx.drawImage(scallopedGradientImg, badgeX, badgeY, badgeSize, badgeSize);
+        ctx.restore();
       } else {
-        ctx.fillText(`✓ ${level > 1 ? level : ''}`, boxX + boxSize / 2, boxY + 21);
+        ctx.font = `bold ${Math.floor(badgeSize * 0.7)}px sans-serif`;
+        ctx.fillStyle = '#10b981';
+        ctx.textAlign = 'center';
+        ctx.fillText('✓', cardX + cardW / 2, badgeY + badgeSize / 2 + Math.floor(badgeSize * 0.2));
       }
     } else {
-      // Blank White Checklist Box [  ] (Empty fillable box style for social templates!)
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.roundRect(boxX, boxY, boxSize, boxSize, 6);
-      ctx.fill();
-      ctx.stroke();
+      // Scalloped Red Outline Badge SVG for Missing Spirits (matching user image!)
+      if (scallopedRedOutlineImg) {
+        ctx.save();
+        ctx.shadowColor = 'rgba(239, 68, 68, 0.35)';
+        ctx.shadowBlur = 6;
+        ctx.drawImage(scallopedRedOutlineImg, badgeX, badgeY, badgeSize, badgeSize);
+        ctx.restore();
+      } else {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cardX + cardW / 2, badgeY + badgeSize / 2, badgeSize / 2, 0, Math.PI * 2);
+        ctx.stroke();
+      }
     }
   });
 
-  // Footer Watermark
+  // Footer Watermark: Clean Dark Slate #0f172a
   ctx.textAlign = 'center';
   ctx.font = 'bold 13px sans-serif';
-  ctx.fillStyle = '#64748b';
-  ctx.fillText('⚡ Plantilla de Espíritus Generada por Fortnite Sprites App • fortnite.gg/sprites', width / 2, height - 18);
+  ctx.fillStyle = isLightTemplate ? '#0f172a' : '#ffffff';
+  ctx.shadowColor = isLightTemplate ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.8)';
+  ctx.shadowBlur = 4;
+  ctx.fillText('Plantilla de Espíritus Fortnite', width / 2, height - 16);
+  ctx.shadowBlur = 0;
 
   return canvas.toDataURL('image/png');
 }
