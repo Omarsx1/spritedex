@@ -1,23 +1,41 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { X, Download, Share2, Copy, Check, Image as ImageIcon, Filter, Globe, CheckCircle, XCircle, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import {
+  X, Download, Share2, Copy, Check, Image as ImageIcon, Filter, Globe,
+  CheckCircle, XCircle, Sparkles, Repeat, ShieldCheck, Flame
+} from 'lucide-react';
 import { generatePokedexCardImage } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
+import gsap from 'gsap';
 
 export function ShareImageModal({ filteredSprites, allSprites, userState, activeFiltersLabel, onClose }) {
   const [trainerName, setTrainerName] = useState('Coleccionista Fortnite');
-  const [format, setFormat] = useState('checklist');
-  const [scope, setScope] = useState('filtered'); // 'all', 'new', 'filtered', 'owned', 'missing'
+  const [format, setFormat] = useState('checklist'); // 'checklist', 'landscape', 'square'
+  const [scope, setScope] = useState('new'); // Default to 'new' so trading new spirits is immediate!
+  const [useBgTemplate, setUseBgTemplate] = useState(true);
   const [dataUrl, setDataUrl] = useState('');
   const [isGenerating, setIsGenerating] = useState(true);
   const [copiedText, setCopiedText] = useState(false);
 
+  const modalRef = useRef(null);
+  const headerRef = useRef(null);
+
+  // Entrance animation matching SpriteDetailModal
+  useEffect(() => {
+    if (modalRef.current) {
+      gsap.fromTo(modalRef.current,
+        { opacity: 0, scale: 0.95, y: 15 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: 'power2.out' }
+      );
+    }
+  }, []);
+
   // Determine which sprites to include based on scope
   const spritesList = useMemo(() => {
     switch (scope) {
+      case 'new':
+        return allSprites.filter(s => s.gen === 3 || s.unreleased || s.isNew);
       case 'all':
         return allSprites;
-      case 'new':
-        return allSprites.filter(s => s.gen === 3 || s.unreleased);
       case 'filtered':
         return filteredSprites;
       case 'owned':
@@ -29,14 +47,14 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       case 'not_mastered':
         return allSprites.filter(s => !userState[s.id]?.owned || userState[s.id]?.level < 5);
       default:
-        return filteredSprites;
+        return allSprites;
     }
   }, [scope, filteredSprites, allSprites, userState]);
 
   // Scope counts for display
   const counts = useMemo(() => ({
     all: allSprites.length,
-    new: allSprites.filter(s => s.gen === 3 || s.unreleased).length,
+    new: allSprites.filter(s => s.gen === 3 || s.unreleased || s.isNew).length,
     filtered: filteredSprites.length,
     owned: allSprites.filter(s => userState[s.id]?.owned).length,
     missing: allSprites.filter(s => !userState[s.id]?.owned).length,
@@ -44,6 +62,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     not_mastered: allSprites.filter(s => !userState[s.id]?.owned || userState[s.id]?.level < 5).length
   }), [allSprites, filteredSprites, userState]);
 
+  // Trigger canvas generation on setting changes
   useEffect(() => {
     if (spritesList.length === 0) {
       setDataUrl('');
@@ -55,12 +74,13 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       spritesList,
       userState,
       trainerName,
-      format
+      format,
+      useBackgroundTemplate: useBgTemplate
     }).then((url) => {
       setDataUrl(url);
       setIsGenerating(false);
     });
-  }, [spritesList, userState, trainerName, format]);
+  }, [spritesList, userState, trainerName, format, useBgTemplate]);
 
   const getShareableText = () => {
     const total = spritesList.length;
@@ -69,28 +89,33 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     const missing = spritesList.filter(s => !userState[s.id]?.owned);
 
     const scopeLabels = {
-      all: 'Colección Completa',
-      new: 'Nuevos Espíritus',
-      filtered: `Filtrado (${activeFiltersLabel})`,
-      owned: 'Solo Atrapados',
-      missing: 'Solo Faltantes'
+      new: '✨ Nuevos Espíritus (Intercambio)',
+      all: '🌐 Colección Completa',
+      filtered: `🔍 Filtrado (${activeFiltersLabel})`,
+      owned: '✔️ Solo Atrapados',
+      missing: '❌ Solo Faltantes',
+      mastered: '⭐ Solo Maxeados',
+      not_mastered: '💜 No Maxeados'
     };
 
-    let text = `🏆 ¡MI PLANTILLA DE ESPÍRITUS / SPRITES DE FORTNITE! 🎮\n`;
+    let text = `🎮 ¡MI PLANTILLA DE ESPÍRITUS / SPRITES DE FORTNITE! 🏆\n`;
     text += `👤 Entrenador: ${trainerName}\n`;
-    text += `📋 Mostrando: ${scopeLabels[scope]}\n`;
-    text += `📊 Atrapados: ${owned}/${total} (${total > 0 ? Math.round((owned/total)*100) : 0}%)\n`;
-    text += `⭐ Maxeados (Nivel 5): ${mastered}\n\n`;
+    text += `📋 Vista: ${scopeLabels[scope] || 'Plantilla'}\n`;
+    text += `📊 Atrapados: ${owned}/${total} (${total > 0 ? Math.round((owned / total) * 100) : 0}%)\n`;
+    text += `⭐ Maxeados: ${mastered}\n\n`;
 
-    if (missing.length > 0 && scope !== 'owned') {
-      text += `❌ Faltantes:\n`;
-      missing.slice(0, 8).forEach(m => {
-        text += `- ${m.fullName} (${m.dropChanceDisplay})\n`;
+    if (missing.length > 0) {
+      text += `❌ BUSCO PARA INTERCAMBIAR (${missing.length} faltantes):\n`;
+      missing.slice(0, 10).forEach(m => {
+        text += `- ${m.fullName} (${m.dropChanceDisplay || m.dropChance})\n`;
       });
-      if (missing.length > 8) text += `... y ${missing.length - 8} más.\n`;
-    } else if (scope === 'owned') {
-      text += `✅ Mostrando ${owned} Sprites atrapados.\n`;
+      if (missing.length > 10) text += `... y ${missing.length - 10} más.\n`;
+      text += `\n📩 ¿Tienes alguno disponible para cambiar? ¡Escríbeme!\n`;
+    } else {
+      text += `🎉 ¡Tengo todos los espíritus de esta plantilla atrapados!\n`;
     }
+
+    text += `#FortniteSprites #Fortnite #FortniteGame`;
 
     return text;
   };
@@ -110,24 +135,24 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     try {
       const res = await fetch(dataUrl);
       const blob = await res.blob();
-      const file = new File([blob], 'Fortnite_Sprites.png', { type: 'image/png' });
+      const file = new File([blob], 'Fortnite_Sprites_Plantilla.png', { type: 'image/png' });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
-          title: 'Sprites de Fortnite',
+          title: 'Plantilla de Espíritus Fortnite',
           text: getShareableText(),
           files: [file]
         });
       } else if (navigator.share) {
         await navigator.share({
-          title: 'Sprites de Fortnite',
+          title: 'Plantilla de Espíritus Fortnite',
           text: getShareableText()
         });
       } else {
         handleDownload();
       }
     } catch (err) {
-      console.log('Share canceled:', err);
+      console.log('Share canceled or failed:', err);
       handleDownload();
     }
   };
@@ -140,71 +165,115 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   };
 
   const scopeOptions = [
-    { id: 'all', label: 'TODOS', icon: <Globe size={15} />, count: counts.all, desc: 'Todos los 117 sprites' },
-    { id: 'new', label: 'NUEVOS', icon: <Sparkles size={15} color="#38bdf8" />, count: counts.new, desc: 'Espíritus y variantes nuevas' },
-    { id: 'owned', label: 'ATRAPADOS', icon: <CheckCircle size={15} color="#10b981" />, count: counts.owned, desc: 'Solo atrapados' },
-    { id: 'missing', label: 'FALTANTES', icon: <XCircle size={15} color="#ef4444" />, count: counts.missing, desc: 'Solo faltantes' },
-    { id: 'mastered', label: 'MAXEADOS', icon: <CheckCircle size={15} color="#eab308" />, count: counts.mastered, desc: 'Solo Nivel 5' },
-    { id: 'not_mastered', label: 'NO MAXEADOS', icon: <XCircle size={15} color="#a855f7" />, count: counts.not_mastered, desc: 'Sin llegar a Nivel 5' },
-    { id: 'filtered', label: 'FILTRO ACTUAL', icon: <Filter size={15} />, count: counts.filtered, desc: activeFiltersLabel }
+    {
+      id: 'new',
+      label: 'NUEVOS',
+      icon: <Sparkles size={16} color="#ec4899" />,
+      count: counts.new,
+      desc: 'Espíritus recién agregados',
+      isPopular: true
+    },
+    {
+      id: 'all',
+      label: 'TODOS',
+      icon: <Globe size={16} color="#38bdf8" />,
+      count: counts.all,
+      desc: 'Todos los 117 sprites'
+    },
+    {
+      id: 'owned',
+      label: 'ATRAPADOS',
+      icon: <CheckCircle size={16} color="#10b981" />,
+      count: counts.owned,
+      desc: 'Solo tus atrapados'
+    },
+    {
+      id: 'missing',
+      label: 'FALTANTES',
+      icon: <XCircle size={16} color="#ef4444" />,
+      count: counts.missing,
+      desc: 'Solo los que te faltan'
+    },
+    {
+      id: 'mastered',
+      label: 'MAXEADOS',
+      icon: <ShieldCheck size={16} color="#eab308" />,
+      count: counts.mastered,
+      desc: 'Solo Nivel 5 (⭐)'
+    },
+    {
+      id: 'filtered',
+      label: 'FILTRO ACTUAL',
+      icon: <Filter size={16} color="#a855f7" />,
+      count: counts.filtered,
+      desc: activeFiltersLabel || 'Filtro personalizado'
+    }
   ];
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content glass-panel" style={{ maxWidth: '920px', padding: '28px' }} onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose}>
-          <X size={20} />
+      <div className="sdm sdm-share" ref={modalRef} onClick={(e) => e.stopPropagation()}>
+        {/* Close Button */}
+        <button className="sdm__close" onClick={onClose}>
+          <X size={18} />
         </button>
 
-        <div style={{ marginBottom: '22px' }}>
-          <h2 style={{ fontSize: '1.45rem', fontWeight: 900, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '10px', color: '#fff' }}>
-            <ImageIcon size={22} color="#ec4899" />
-            <span>Compartir Colección</span>
-          </h2>
-          <p style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
-            Elige qué espíritus incluir y el formato de exportación para tu plantilla.
-          </p>
+        {/* ═══ HERO HEADER (SDM Styled) ═══ */}
+        <div className="sdm__hero sdm-share__hero" ref={headerRef}>
+          <div
+            className="sdm__hero-glow"
+            style={{
+              background: 'radial-gradient(circle at 30% 50%, rgba(236, 72, 153, 0.35) 0%, rgba(139, 92, 246, 0.2) 50%, transparent 80%)'
+            }}
+          />
+
+          <div className="sdm-share__hero-icon">
+            <ImageIcon size={34} color="#ec4899" />
+          </div>
+
+          <div className="sdm__hero-info">
+            <div className="sdm__hero-badges">
+              <span className="sprite-pill rarity-badge sprite-rarity-epic" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <Flame size={12} /> HERRAMIENTA DE INTERCAMBIOS
+              </span>
+              <span className="sdm__drop">EXPORTADOR HD</span>
+            </div>
+            <h2 className="sdm__name">COMPARTIR COLECCIÓN</h2>
+            <p className="sdm__meta">
+              Genera tu plantilla gráfica con fondo temático (background_template.webp) y casillas de verificación para redes sociales.
+            </p>
+          </div>
         </div>
 
-        {/* ===== SCOPE SELECTOR ===== */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ fontSize: '0.74rem', fontWeight: 800, color: '#cbd5e1', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>
-            ¿QUÉ QUIERES COMPARTIR?
-          </label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(122px, 1fr))', gap: '8px' }}>
+        {/* ═══ BODY CONTENT ═══ */}
+        <div className="sdm__body" style={{ padding: '20px 24px' }}>
+
+          {/* Scope Selector */}
+          <div className="sdm-share__section-label">
+            <Repeat size={14} color="#a855f7" />
+            <span>¿Qué espíritus quieres incluir en la plantilla?</span>
+          </div>
+
+          <div className="sdm-share__scopes">
             {scopeOptions.map((opt) => {
               const isActive = scope === opt.id;
               return (
                 <button
                   key={opt.id}
-                  onClick={() => setScope(opt.id)}
-                  style={{
-                    padding: '10px 8px',
-                    borderRadius: '12px',
-                    background: isActive
-                      ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(168, 85, 247, 0.25))'
-                      : 'rgba(22, 27, 34, 0.6)',
-                    border: `1.5px solid ${isActive ? '#8b5cf6' : 'rgba(255,255,255,0.08)'}`,
-                    color: isActive ? '#fff' : '#94a3b8',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '4px',
-                    transition: 'all 0.2s ease',
-                    textAlign: 'center',
-                    boxShadow: isActive ? '0 0 14px rgba(139, 92, 246, 0.25)' : 'none'
+                  onClick={() => {
+                    setScope(opt.id);
+                    sounds.playBeep();
                   }}
+                  className={`sdm-share__scope-btn ${isActive ? 'sdm-share__scope-btn--active' : ''}`}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  {opt.isPopular && (
+                    <span className="sdm-share__badge-popular">¡INTERCAMBIO!</span>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: opt.isPopular ? '4px' : '0' }}>
                     {opt.icon}
-                    <span style={{ fontWeight: 900, fontSize: '0.78rem', letterSpacing: '0.3px' }}>{opt.label}</span>
+                    <span style={{ fontWeight: 900, fontSize: '0.8rem', letterSpacing: '0.3px' }}>{opt.label}</span>
                   </div>
-                  <span style={{
-                    fontSize: '0.92rem',
-                    fontWeight: 900,
-                    color: isActive ? '#60a5fa' : '#cbd5e1'
-                  }}>
+                  <span style={{ fontSize: '0.92rem', fontWeight: 900, color: isActive ? '#a855f7' : '#cbd5e1' }}>
                     {opt.count} sprites
                   </span>
                   <span style={{ fontSize: '0.64rem', color: '#64748b', lineHeight: '1.2' }}>
@@ -214,134 +283,142 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
               );
             })}
           </div>
-        </div>
 
-        {/* ===== FORMAT + TRAINER NAME ===== */}
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '20px' }}>
-          <div style={{ flex: '1 1 200px' }}>
-            <label style={{ fontSize: '0.74rem', fontWeight: 800, color: '#cbd5e1', display: 'block', marginBottom: '6px', letterSpacing: '0.5px' }}>
-              NOMBRE DE JUGADOR:
-            </label>
-            <input
-              type="text"
-              value={trainerName}
-              onChange={(e) => setTrainerName(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '9px 14px',
-                borderRadius: '10px',
-                background: 'rgba(15, 23, 42, 0.8)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                color: '#fff',
-                fontWeight: 700,
-                fontSize: '0.86rem',
-                fontFamily: 'inherit',
-                boxSizing: 'border-box'
-              }}
-            />
-          </div>
+          {/* Config Controls Grid */}
+          <div className="sdm-share__grid-config">
+            {/* Player Name */}
+            <div className="sdm-share__input-wrap">
+              <label className="sdm-share__section-label">
+                <span>NOMBRE DE JUGADOR:</span>
+              </label>
+              <input
+                type="text"
+                value={trainerName}
+                onChange={(e) => setTrainerName(e.target.value)}
+                className="sdm-share__input"
+                placeholder="Ej. Coleccionista Fortnite"
+              />
+            </div>
 
-          <div style={{ flex: '2 1 300px' }}>
-            <label style={{ fontSize: '0.74rem', fontWeight: 800, color: '#cbd5e1', display: 'block', marginBottom: '6px', letterSpacing: '0.5px' }}>
-              FORMATO DE IMAGEN:
-            </label>
-            <div style={{ display: 'flex', gap: '6px' }}>
-              {[
-                { id: 'checklist', label: '📋 Plantilla Rejilla' },
-                { id: 'landscape', label: '🎴 Resumen 16:9' },
-                { id: 'square', label: '📱 Cuadrado (1:1)' }
-              ].map(f => {
-                const isActive = format === f.id;
-                return (
+            {/* Format Selector */}
+            <div className="sdm-share__input-wrap">
+              <label className="sdm-share__section-label">
+                <span>FORMATO DE IMAGEN:</span>
+              </label>
+              <div className="sdm-share__pill-selector">
+                {[
+                  { id: 'checklist', label: '📋 Rejilla' },
+                  { id: 'square', label: '🔳 1:1 Cuadrado' }
+                ].map(f => (
                   <button
                     key={f.id}
-                    style={{
-                      flex: 1,
-                      padding: '9px 8px',
-                      borderRadius: '10px',
-                      background: isActive ? 'linear-gradient(135deg, #8b5cf6, #ec4899)' : 'rgba(22, 27, 34, 0.6)',
-                      color: isActive ? '#ffffff' : '#94a3b8',
-                      fontSize: '0.76rem',
-                      fontWeight: 800,
-                      border: isActive ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.08)',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
+                    className={`sdm-share__pill-opt ${format === f.id ? 'sdm-share__pill-opt--active' : ''}`}
+                    onClick={() => {
+                      setFormat(f.id);
+                      sounds.playBeep();
                     }}
-                    onClick={() => setFormat(f.id)}
                   >
                     {f.label}
                   </button>
-                );
-              })}
+                ))}
+              </div>
+            </div>
+
+            {/* Background Template Toggle */}
+            <div className="sdm-share__input-wrap">
+              <label className="sdm-share__section-label">
+                <span>ESTILO DE FONDO:</span>
+              </label>
+              <div className="sdm-share__pill-selector">
+                <button
+                  className={`sdm-share__pill-opt ${useBgTemplate ? 'sdm-share__pill-opt--active' : ''}`}
+                  onClick={() => {
+                    setUseBgTemplate(true);
+                    sounds.playBeep();
+                  }}
+                >
+                  🌌 Fondo Template
+                </button>
+                <button
+                  className={`sdm-share__pill-opt ${!useBgTemplate ? 'sdm-share__pill-opt--active' : ''}`}
+                  onClick={() => {
+                    setUseBgTemplate(false);
+                    sounds.playBeep();
+                  }}
+                >
+                  🔮 Dark Neon
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* ===== PREVIEW BOX ===== */}
-        <div style={{
-          background: 'rgba(10, 13, 20, 0.95)',
-          borderRadius: '16px',
-          padding: '16px',
-          border: '1px solid rgba(255,255,255,0.08)',
-          marginBottom: '22px',
-          textAlign: 'center',
-          minHeight: '220px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          maxHeight: '400px',
-          overflow: 'auto'
-        }}>
-          {spritesList.length === 0 ? (
-            <div style={{ color: '#64748b', fontWeight: 700 }}>No hay espíritus para mostrar con este filtro.</div>
-          ) : isGenerating ? (
-            <div style={{ color: '#8b5cf6', fontWeight: 700 }}>Generando plantilla gráfica ({spritesList.length} espíritus)...</div>
-          ) : (
-            <img
-              src={dataUrl}
-              alt="Vista previa de la plantilla"
-              style={{ maxWidth: '100%', maxHeight: '360px', borderRadius: '10px', boxShadow: '0 12px 32px rgba(0,0,0,0.6)' }}
-            />
-          )}
-        </div>
+          {/* Preview Container */}
+          <div className="sdm-share__preview-container">
+            <div className="sdm-share__preview-header">
+              <span className="sdm-share__section-label" style={{ marginBottom: 0 }}>
+                <Sparkles size={14} color="#ec4899" />
+                <span>Vista Previa de la Plantilla</span>
+              </span>
+              <span className="sdm-share__preview-badge">
+                <CheckCircle size={13} />
+                <span>{spritesList.length} Sprites • {useBgTemplate ? 'Background Template HD' : 'Dark HD'}</span>
+              </span>
+            </div>
 
-        {/* ===== ACTION BUTTONS ===== */}
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          <button
-            className="btn-secondary"
-            onClick={handleCopyText}
-            disabled={spritesList.length === 0}
-            style={{ borderRadius: '10px', padding: '9px 16px', fontSize: '0.82rem' }}
-          >
-            {copiedText ? <Check size={16} color="#4ade80" /> : <Copy size={16} />}
-            <span>{copiedText ? '¡Copiado!' : 'Copiar Texto'}</span>
-          </button>
+            <div className="sdm-share__preview-box">
+              {spritesList.length === 0 ? (
+                <div style={{ color: '#64748b', fontWeight: 700 }}>
+                  No hay espíritus para mostrar en este filtro.
+                </div>
+              ) : isGenerating ? (
+                <div className="sdm-share__loading">
+                  <div className="sdm-share__spinner" />
+                  <span>Generando plantilla gráfica HD...</span>
+                </div>
+              ) : (
+                <img
+                  src={dataUrl}
+                  alt="Vista previa de la plantilla"
+                  className="sdm-share__preview-img"
+                />
+              )}
+            </div>
 
-          <button
-            className="btn-secondary"
-            onClick={handleDownload}
-            disabled={!dataUrl}
-            style={{ borderRadius: '10px', padding: '9px 16px', fontSize: '0.82rem' }}
-          >
-            <Download size={16} />
-            <span>Descargar PNG</span>
-          </button>
+            <p className="sdm-share__trade-tip">
+              💡 <span><strong>Tip de Intercambio:</strong> Publica esta plantilla con las casillas de faltantes (<code>[ ✗ FALTANTE ]</code>) en Twitter/X, Discord o WhatsApp para solicitar cambios con la comunidad.</span>
+            </p>
+          </div>
 
-          <button
-            className="btn-primary"
-            onClick={handleNativeShare}
-            disabled={!dataUrl}
-            style={{
-              background: 'linear-gradient(135deg, #10b981, #059669)',
-              borderRadius: '10px',
-              padding: '9px 18px',
-              fontSize: '0.82rem',
-              fontWeight: 800
-            }}
-          >
-            <Share2 size={16} />
-            <span>Compartir (WhatsApp/Discord)</span>
-          </button>
+          {/* Action Footer */}
+          <div className="sdm-share__actions">
+            <button
+              className="sdm-share__btn sdm-share__btn--secondary"
+              onClick={handleCopyText}
+              disabled={spritesList.length === 0}
+            >
+              {copiedText ? <Check size={16} color="#4ade80" /> : <Copy size={16} />}
+              <span>{copiedText ? '¡Texto Copiado!' : 'Copiar Texto para Post'}</span>
+            </button>
+
+            <button
+              className="sdm-share__btn sdm-share__btn--primary"
+              onClick={handleDownload}
+              disabled={!dataUrl}
+            >
+              <Download size={16} />
+              <span>Descargar PNG</span>
+            </button>
+
+            <button
+              className="sdm-share__btn sdm-share__btn--vibrant"
+              onClick={handleNativeShare}
+              disabled={!dataUrl}
+            >
+              <Share2 size={16} />
+              <span>Compartir (WhatsApp / Discord)</span>
+            </button>
+          </div>
+
         </div>
       </div>
     </div>
