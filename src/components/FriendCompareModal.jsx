@@ -41,11 +41,16 @@ export function FriendCompareModal({ userState, onLoadFriendState, onToggleOwned
 
     let code = friendInput.trim();
     if (code.includes('friend=')) {
-      try {
-        const url = new URL(code);
-        code = url.searchParams.get('friend') || '';
-      } catch (e) {
-        // Not a full URL, treat as raw code
+      const match = code.match(/[?&]friend=([^&#\s]+)/);
+      if (match) {
+        code = decodeURIComponent(match[1]);
+      } else {
+        try {
+          const url = new URL(code.startsWith('http') ? code : `https://${code}`);
+          code = url.searchParams.get('friend') || code;
+        } catch {
+          // fallback
+        }
       }
     }
 
