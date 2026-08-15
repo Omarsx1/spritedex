@@ -347,7 +347,7 @@
     "name": "Gem Punk",
     "theme": "Gem",
     "rarity": "Special",
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "punk_rift",
@@ -444,6 +444,13 @@
     "id": "zeropoint_holofoil",
     "name": "Holofoil Zero Point",
     "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "zeropoint_rift",
+    "name": "Cube Zero Point",
+    "theme": "Cube",
     "rarity": "Special",
     "unreleased": false
   },
