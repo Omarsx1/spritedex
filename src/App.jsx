@@ -14,6 +14,13 @@ import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
 import { Footer } from './components/Footer';
 import { decodeCollectionState } from './utils/shareLink';
 import { supabase, isSupabaseConfigured } from './utils/supabase';
+import {
+  getMyFriendCode,
+  fetchCollectionByFriendCode,
+  subscribeToFriendCollection,
+  saveLastConnectedFriendCode,
+  getLastConnectedFriendCode
+} from './utils/friendCode';
 
 const LOCAL_STORAGE_KEY = 'fortnite_sprites_pokedex_v3';
 
@@ -27,13 +34,22 @@ export function App() {
     }
   });
 
+  // Friend State & Realtime Connection
+  const [myFriendCode, setMyFriendCode] = useState(() => getMyFriendCode());
+  const [connectedFriendCode, setConnectedFriendCode] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('code') || getLastConnectedFriendCode() || '';
+  });
+  const [isLiveConnected, setIsLiveConnected] = useState(false);
+
   const [friendState, setFriendState] = useState(() => {
     const friendParam = new URLSearchParams(window.location.search).get('friend');
     return friendParam ? decodeCollectionState(friendParam) : null;
   });
 
   const [activeProfile, setActiveProfile] = useState(() => {
-    return new URLSearchParams(window.location.search).has('friend') ? 'friend' : 'mine';
+    const params = new URLSearchParams(window.location.search);
+    return params.has('friend') || params.has('code') ? 'friend' : 'mine';
   });
 
   // Supabase Auth & Cloud Sync State
@@ -42,12 +58,12 @@ export function App() {
 
   // Filters matching fortnite.gg
   const [searchQuery, setSearchQuery] = useState('');
-  const [baseFilter, setBaseFilter] = useState('all');      // BASE = variant/theme
-  const [spriteFilter, setSpriteFilter] = useState('all');  // SPRITE = family
-  const [statusFilter, setStatusFilter] = useState('all');  // STATUS = all/owned/missing
-  const [sortBy, setSortBy] = useState('default');          // SORT BY
+  const [baseFilter, setBaseFilter] = useState('all'); // BASE = variant/theme
+  const [spriteFilter, setSpriteFilter] = useState('all'); // SPRITE = family
+  const [statusFilter, setStatusFilter] = useState('all'); // STATUS = all/owned/missing
+  const [sortBy, setSortBy] = useState('default'); // SORT BY
   const [showUnreleased, setShowUnreleased] = useState(false);
-  const [viewMode, setViewMode] = useState('grid');         // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
 
   // Modals
   const [selectedSprite, setSelectedSprite] = useState(null);
@@ -55,6 +71,46 @@ export function App() {
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [showFooterPrivacyModal, setShowFooterPrivacyModal] = useState(false);
+
+  // Update myFriendCode when user logs in
+  useEffect(() => {
+    if (user?.id) {
+      const code = getMyFriendCode(user.id);
+      setMyFriendCode(code);
+    }
+  }, [user]);
+
+  // Real-time Friend Code Connection & Subscriptions
+  useEffect(() => {
+    if (!connectedFriendCode) {
+      setIsLiveConnected(false);
+      return;
+    }
+
+    let unsubscribe = null;
+    let isCancelled = false;
+
+    fetchCollectionByFriendCode(connectedFriendCode).then((data) => {
+      if (isCancelled) return;
+      if (data && data.userState) {
+        setFriendState(data.userState);
+        setIsLiveConnected(true);
+        saveLastConnectedFriendCode(connectedFriendCode);
+
+        // Start realtime WebSocket subscription
+        unsubscribe = subscribeToFriendCollection(data.userId, (liveState) => {
+          if (!isCancelled) {
+            setFriendState(liveState);
+          }
+        });
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+      if (unsubscribe) unsubscribe();
+    };
+  }, [connectedFriendCode]);
 
   // Listen to Supabase Auth State & Sync Cloud Data
   useEffect(() => {
@@ -69,7 +125,9 @@ export function App() {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       if (currentUser) {
@@ -87,7 +145,7 @@ export function App() {
     try {
       const { data, error } = await supabase
         .from('user_collections')
-        .select('user_state')
+        .select('user_state, friend_code')
         .eq('user_id', userId)
         .maybeSingle();
 
@@ -96,30 +154,36 @@ export function App() {
         return;
       }
 
+      if (data?.friend_code) {
+        setMyFriendCode(data.friend_code);
+      }
+
       if (data?.user_state && Object.keys(data.user_state).length > 0) {
-        // Merge local guest progress with cloud progress so no marked items are ever lost
         setUserState((currentLocal) => {
           const merged = { ...currentLocal, ...data.user_state };
-          supabase
-            .from('user_collections')
-            .upsert({
+          supabase.from('user_collections').upsert(
+            {
               user_id: userId,
+              friend_code: data.friend_code || myFriendCode,
               user_state: merged,
               updated_at: new Date().toISOString()
-            }, { onConflict: 'user_id' });
+            },
+            { onConflict: 'user_id' }
+          );
           return merged;
         });
       } else {
-        // New account or new link with empty cloud state -> push current guest progress to cloud
         setUserState((currentLocal) => {
           if (Object.keys(currentLocal).length > 0) {
-            supabase
-              .from('user_collections')
-              .upsert({
+            supabase.from('user_collections').upsert(
+              {
                 user_id: userId,
+                friend_code: myFriendCode,
                 user_state: currentLocal,
                 updated_at: new Date().toISOString()
-              }, { onConflict: 'user_id' });
+              },
+              { onConflict: 'user_id' }
+            );
           }
           return currentLocal;
         });
@@ -149,20 +213,22 @@ export function App() {
     if (isSupabaseConfigured && supabase && user) {
       const timer = setTimeout(async () => {
         try {
-          await supabase
-            .from('user_collections')
-            .upsert({
+          await supabase.from('user_collections').upsert(
+            {
               user_id: user.id,
+              friend_code: myFriendCode,
               user_state: userState,
               updated_at: new Date().toISOString()
-            }, { onConflict: 'user_id' });
+            },
+            { onConflict: 'user_id' }
+          );
         } catch (err) {
           console.error('Failed to sync to Supabase:', err);
         }
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [userState, user]);
+  }, [userState, user, myFriendCode]);
 
   const handleToggleOwned = (spriteId) => {
     setUserState((prev) => {
@@ -172,7 +238,7 @@ export function App() {
         ...prev,
         [spriteId]: {
           owned: nextOwned,
-          level: nextOwned ? (current.level || 1) : 1
+          level: current.level || 1
         }
       };
     });
@@ -186,6 +252,27 @@ export function App() {
         level: Math.min(Math.max(level, 1), 5)
       }
     }));
+  };
+
+  const handleConnectFriendCode = async (code) => {
+    const data = await fetchCollectionByFriendCode(code);
+    if (data && data.userState) {
+      setFriendState(data.userState);
+      setConnectedFriendCode(data.friendCode || code);
+      setIsLiveConnected(true);
+      setActiveProfile('friend');
+      saveLastConnectedFriendCode(data.friendCode || code);
+      return true;
+    }
+    return false;
+  };
+
+  const handleDisconnectFriend = () => {
+    setFriendState(null);
+    setConnectedFriendCode('');
+    setIsLiveConnected(false);
+    setActiveProfile('mine');
+    saveLastConnectedFriendCode(null);
   };
 
   const filteredSprites = useMemo(() => {
@@ -265,28 +352,25 @@ export function App() {
   }, [searchQuery, baseFilter, spriteFilter, statusFilter, sortBy, showUnreleased, userState, friendState, activeProfile]);
 
   const activeState = activeProfile === 'friend' && friendState ? friendState : userState;
+  const totalCount = ALL_SPRITES.filter((s) => showUnreleased || !s.unreleased).length;
+  const ownedCount = ALL_SPRITES.filter((s) => (showUnreleased || !s.unreleased) && activeState[s.id]?.owned).length;
+  const masteredCount = ALL_SPRITES.filter((s) => (showUnreleased || !s.unreleased) && activeState[s.id]?.owned && activeState[s.id]?.level === 5).length;
 
-  const totalCount = ALL_SPRITES.filter(s => showUnreleased || !s.unreleased).length;
-  const ownedCount = ALL_SPRITES.filter(s => (showUnreleased || !s.unreleased) && activeState[s.id]?.owned).length;
-  const masteredCount = ALL_SPRITES.filter(s => (showUnreleased || !s.unreleased) && activeState[s.id]?.owned && activeState[s.id]?.level === 5).length;
-
-  const friendLendableCount = friendState
-    ? ALL_SPRITES.filter(s => friendState[s.id]?.owned && !userState[s.id]?.owned).length
-    : 0;
+  const friendLendableCount = friendState ? ALL_SPRITES.filter((s) => friendState[s.id]?.owned && !userState[s.id]?.owned).length : 0;
 
   return (
-    <div className="pokedex-app-root">
-      {/* Top Glassmorphic Navbar */}
+    <div className="app-container">
+      <PrivacyNotice />
+
       <Navbar
         user={user}
         onOpenAuthModal={() => setShowAuthModal(true)}
-        onOpenBackupModal={() => setShowBackupModal(true)}
+        onSignOut={handleSignOutCleanup}
       />
 
-      {/* Header */}
       <Header
-        totalCount={totalCount}
         ownedCount={ownedCount}
+        totalCount={totalCount}
         masteredCount={masteredCount}
         user={user}
         onOpenShareModal={() => setShowShareModal(true)}
@@ -297,30 +381,37 @@ export function App() {
 
       {/* Profile View Banner (when friend profile is available) */}
       {friendState && (
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto 16px',
-          padding: '12px 18px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px',
-          background: activeProfile === 'friend' ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(59, 130, 246, 0.25))' : 'rgba(15, 23, 42, 0.6)',
-          border: `1px solid ${activeProfile === 'friend' ? '#a855f7' : 'rgba(255,255,255,0.1)'}`,
-          borderRadius: '14px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
-        }}>
+        <div
+          style={{
+            maxWidth: '1200px',
+            margin: '0 auto 16px',
+            padding: '12px 18px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px',
+            background: activeProfile === 'friend' ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(59, 130, 246, 0.25))' : 'rgba(15, 23, 42, 0.6)',
+            border: `1px solid ${activeProfile === 'friend' ? '#a855f7' : 'rgba(255,255,255,0.1)'}`,
+            borderRadius: '14px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '1.4rem' }}>{activeProfile === 'friend' ? '👥' : '👤'}</span>
             <div>
-              <div style={{ fontSize: '0.9rem', fontWeight: 900, color: '#fff' }}>
-                {activeProfile === 'friend' ? 'Estás explorando la Colección Completa de tu Amigo' : 'Viendo Tu Colección Personal'}
+              <div style={{ fontSize: '0.9rem', fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>{activeProfile === 'friend' ? 'Explorando Colección de tu Amigo' : 'Viendo Tu Colección Personal'}</span>
+                {isLiveConnected && (
+                  <span style={{ fontSize: '0.72rem', background: '#10b981', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontWeight: 800 }}>
+                    🟢 En Vivo ({connectedFriendCode})
+                  </span>
+                )}
               </div>
               <div style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
                 {activeProfile === 'friend'
                   ? `🎁 Tu amigo tiene ${friendLendableCount} Sprites que te puede prestar en Fortnite (puedes hacer clic en ellos para registrarlos).`
-                  : 'Colección propia guardada localmente.'}
+                  : 'Colección propia guardada.'}
               </div>
             </div>
           </div>
@@ -354,7 +445,7 @@ export function App() {
                 cursor: 'pointer'
               }}
             >
-              👥 Colección de mi Amigo
+              👥 Colección de Amigo
             </button>
             <button
               onClick={() => setShowCompareModal(true)}
@@ -369,34 +460,31 @@ export function App() {
                 cursor: 'pointer'
               }}
             >
-              🔄 Resumen de Intercambio
+              🔄 Planear Préstamos
             </button>
           </div>
         </div>
       )}
 
-      {/* Filter Bar (fortnite.gg style) */}
-      <div className="controls-container">
+      {/* Main Content with Fortnite.gg matching filters */}
+      <main className="main-content">
         <FilterBar
           searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
+          onSearchChange={setSearchQuery}
           baseFilter={baseFilter}
-          setBaseFilter={setBaseFilter}
+          onBaseChange={setBaseFilter}
           spriteFilter={spriteFilter}
-          setSpriteFilter={setSpriteFilter}
+          onSpriteChange={setSpriteFilter}
           statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
+          onStatusChange={setStatusFilter}
           sortBy={sortBy}
-          setSortBy={setSortBy}
+          onSortChange={setSortBy}
           showUnreleased={showUnreleased}
-          setShowUnreleased={setShowUnreleased}
+          onToggleUnreleased={setShowUnreleased}
           viewMode={viewMode}
-          setViewMode={setViewMode}
+          onViewModeChange={setViewMode}
         />
-      </div>
 
-      {/* Main Grid */}
-      <main className="grid-container">
         {filteredSprites.length === 0 ? (
           <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8', gridColumn: '1 / -1' }}>
             <h2 style={{ fontSize: '1.4rem', marginBottom: '8px' }}>No se encontraron Sprites</h2>
@@ -435,14 +523,16 @@ export function App() {
       {showShareModal && (
         <ShareImageModal
           filteredSprites={filteredSprites}
-          allSprites={ALL_SPRITES.filter(s => showUnreleased || !s.unreleased)}
+          allSprites={ALL_SPRITES.filter((s) => showUnreleased || !s.unreleased)}
           userState={userState}
           activeFiltersLabel={
             [
               baseFilter !== 'all' ? `Base: ${baseFilter}` : '',
               spriteFilter !== 'all' ? `Sprite: ${spriteFilter}` : '',
               searchQuery ? `Search: "${searchQuery}"` : ''
-            ].filter(Boolean).join(' · ') || 'Ningún filtro activo'
+            ]
+              .filter(Boolean)
+              .join(' · ') || 'Ningún filtro activo'
           }
           onClose={() => setShowShareModal(false)}
         />
@@ -459,9 +549,16 @@ export function App() {
       {showCompareModal && (
         <FriendCompareModal
           userState={userState}
-          onLoadFriendState={(state) => {
+          friendState={friendState}
+          isLiveConnected={isLiveConnected}
+          connectedFriendCode={connectedFriendCode}
+          myFriendCode={myFriendCode}
+          onConnectFriendCode={handleConnectFriendCode}
+          onDisconnectFriend={handleDisconnectFriend}
+          onLoadFriendState={(state, sourceLabel) => {
             setFriendState(state);
             setActiveProfile('friend');
+            if (sourceLabel) setConnectedFriendCode(sourceLabel);
           }}
           onToggleOwned={handleToggleOwned}
           onClose={() => setShowCompareModal(false)}
@@ -479,17 +576,14 @@ export function App() {
         />
       )}
 
-      {showFooterPrivacyModal && (
-        <PrivacyPolicyModal
-          onClose={() => setShowFooterPrivacyModal(false)}
-        />
-      )}
-
       <Footer
+        totalSprites={totalCount}
         onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
       />
 
-      <PrivacyNotice />
+      {showFooterPrivacyModal && (
+        <PrivacyPolicyModal onClose={() => setShowFooterPrivacyModal(false)} />
+      )}
     </div>
   );
 }
