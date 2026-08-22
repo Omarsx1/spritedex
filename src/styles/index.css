@@ -168,92 +168,78 @@ body::before {
   transform: scale(0.97);
 }
 
-/* --- Navbar Generation Selector --- */
-.app-navbar__gen-selector {
-  position: relative;
-}
-
-.app-navbar__gen-btn {
+/* --- Navbar Menu Button (Hamburger) --- */
+.app-navbar__menu-btn {
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 6px 14px;
+  justify-content: center;
   border-radius: 9999px;
-  background: rgba(12, 14, 22, 0.7);
+  background: rgba(12, 14, 22, 0.65);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #e2e8f0;
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  white-space: nowrap;
-}
-
-.app-navbar__gen-btn:hover,
-.app-navbar__gen-btn.is-active {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-.app-navbar__gen-btn.is-gen2 {
-  border-color: rgba(0, 240, 255, 0.4);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
-}
-
-.app-navbar__gen-btn.is-gen1 {
-  border-color: rgba(245, 182, 66, 0.4);
-  box-shadow: 0 0 12px rgba(245, 182, 66, 0.15);
-}
-
-.gen-indicator-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+  transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
-.gen-indicator-dot.glitch-dot {
-  background: #00f0ff;
-  box-shadow: 0 0 8px #00f0ff;
-  animation: glitch-dot-blink 2.5s infinite alternate;
+.app-navbar__menu-btn:hover,
+.app-navbar__menu-btn.is-active {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  transform: scale(1.04);
 }
 
-@keyframes glitch-dot-blink {
-  0% { background: #00f0ff; box-shadow: 0 0 8px #00f0ff; }
-  50% { background: #ec4899; box-shadow: 0 0 10px #ec4899; }
-  100% { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+.app-navbar__menu-btn:active {
+  transform: scale(0.96);
 }
 
-.gen-indicator-dot.gold-dot {
-  background: #f5b642;
-  box-shadow: 0 0 6px #f5b642;
-}
-
-.gen-indicator-dot.all-dot {
-  background: #94a3b8;
-}
-
-/* Generation Dropdown Menu */
-.app-navbar__gen-dropdown {
+/* --- Hamburger Menu Dropdown --- */
+.app-navbar__menu-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   right: 0;
-  min-width: 260px;
+  min-width: 250px;
   background: rgba(12, 14, 22, 0.96);
   backdrop-filter: blur(28px) saturate(1.8);
   -webkit-backdrop-filter: blur(28px) saturate(1.8);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  padding: 8px;
+  border-radius: 18px;
+  padding: 12px;
   box-shadow:
     0 16px 40px rgba(0, 0, 0, 0.75),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
   z-index: 100;
   animation: dropdownFadeScale 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.app-navbar__menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.app-navbar__menu-section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #64748b;
+  padding: 2px 8px;
+}
+
+.app-navbar__menu-options {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -264,10 +250,10 @@ body::before {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 10px;
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: left;
@@ -280,32 +266,67 @@ body::before {
 }
 
 .app-navbar__gen-option.selected {
-  background: rgba(0, 240, 255, 0.12);
+  background: rgba(0, 240, 255, 0.1);
   color: #ffffff;
-  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-color: rgba(0, 240, 255, 0.25);
 }
 
 .gen-option-content {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .gen-option-title {
   font-family: var(--font-sans);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 700;
 }
 
 .gen-option-subtitle {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: #94a3b8;
 }
 
 .gen-option-check {
   color: #00f0ff;
   font-weight: 900;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+}
+
+.app-navbar__menu-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.app-navbar__menu-action-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.app-navbar__menu-action-btn .action-btn-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-navbar__menu-action-btn .action-btn-sub {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 /* --- User avatar (inside navbar, right side) --- */

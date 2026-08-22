@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Download, User, LogOut, ShieldCheck, ChevronDown, Sparkles } from 'lucide-react';
+import { Download, User, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles } from 'lucide-react';
 import { supabase } from '../utils/supabase';
 
 export function Navbar({
@@ -10,10 +10,10 @@ export function Navbar({
   onOpenBackupModal,
   onSignOut
 }) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isGenOpen, setIsGenOpen] = useState(false);
-  const dropdownRef = useRef(null);
-  const genDropdownRef = useRef(null);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
+  const userDropdownRef = useRef(null);
+  const navMenuRef = useRef(null);
 
   const fullName = useMemo(() => {
     if (!user) return null;
@@ -43,11 +43,11 @@ export function Navbar({
   // Click outside listener to close dropdowns
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false);
       }
-      if (genDropdownRef.current && !genDropdownRef.current.contains(event.target)) {
-        setIsGenOpen(false);
+      if (navMenuRef.current && !navMenuRef.current.contains(event.target)) {
+        setIsNavMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -58,8 +58,8 @@ export function Navbar({
 
   const handleAvatarClick = () => {
     if (user) {
-      setIsDropdownOpen((prev) => !prev);
-      setIsGenOpen(false);
+      setIsUserMenuOpen((prev) => !prev);
+      setIsNavMenuOpen(false);
     } else {
       onOpenAuthModal();
     }
@@ -67,7 +67,7 @@ export function Navbar({
 
   const handleSignOutClick = async (e) => {
     e.stopPropagation();
-    setIsDropdownOpen(false);
+    setIsUserMenuOpen(false);
     try {
       if (supabase) {
         await supabase.auth.signOut();
@@ -85,79 +85,16 @@ export function Navbar({
         <div className="app-navbar__logo-mark">F</div>
       </div>
 
-      {/* Acciones centrales / derechas */}
+      {/* Acciones derechas: Avatar + Menú Hamburguesa */}
       <div className="app-navbar__right">
-        {/* Selector de Generación Dropdown al costado de Respaldo */}
-        <div className="app-navbar__gen-selector" ref={genDropdownRef}>
-          <button
-            className={`app-navbar__gen-btn ${activeGen === 2 ? 'is-gen2' : activeGen === 1 ? 'is-gen1' : 'is-all'} ${isGenOpen ? 'is-active' : ''}`}
-            onClick={() => { setIsGenOpen((prev) => !prev); setIsDropdownOpen(false); }}
-            title="Seleccionar Generación"
-          >
-            <span className="gen-btn-label">
-              {activeGen === 2 ? '2da Gen' : activeGen === 1 ? '1ra Gen' : 'Todas'}
-            </span>
-            <ChevronDown size={13} className={`app-navbar__chevron ${isGenOpen ? 'open' : ''}`} />
-          </button>
-
-          {isGenOpen && (
-            <div className="app-navbar__gen-dropdown glass-panel">
-              <button
-                className={`app-navbar__gen-option ${activeGen === 2 ? 'selected' : ''}`}
-                onClick={() => { if (onGenChange) onGenChange(2); setIsGenOpen(false); }}
-              >
-                <div className="gen-option-content">
-                  <span className="gen-option-title">2da Gen</span>
-                  <span className="gen-option-subtitle">33 sprites · Actual</span>
-                </div>
-                {activeGen === 2 && <span className="gen-option-check">✓</span>}
-              </button>
-
-              <button
-                className={`app-navbar__gen-option ${activeGen === 1 ? 'selected' : ''}`}
-                onClick={() => { if (onGenChange) onGenChange(1); setIsGenOpen(false); }}
-              >
-                <div className="gen-option-content">
-                  <span className="gen-option-title">1ra Gen</span>
-                  <span className="gen-option-subtitle">117 sprites</span>
-                </div>
-                {activeGen === 1 && <span className="gen-option-check">✓</span>}
-              </button>
-
-              <div className="app-navbar__dropdown-divider" />
-
-              <button
-                className={`app-navbar__gen-option ${activeGen === 0 ? 'selected' : ''}`}
-                onClick={() => { if (onGenChange) onGenChange(0); setIsGenOpen(false); }}
-              >
-                <div className="gen-option-content">
-                  <span className="gen-option-title">Todas</span>
-                  <span className="gen-option-subtitle">150 sprites total</span>
-                </div>
-                {activeGen === 0 && <span className="gen-option-check">✓</span>}
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Botón Respaldo */}
-        <button
-          className="app-navbar__item"
-          onClick={onOpenBackupModal}
-          title="Copia de Seguridad"
-        >
-          <Download size={14} strokeWidth={2.4} />
-          <span>Respaldo</span>
-        </button>
-
         {/* Avatar / Usuario */}
-        <div ref={dropdownRef} style={{ position: 'relative' }}>
+        <div ref={userDropdownRef} style={{ position: 'relative' }}>
           <button
-            className={`app-navbar__avatar ${user ? 'is-logged' : ''} ${isDropdownOpen ? 'is-active' : ''}`}
+            className={`app-navbar__avatar ${user ? 'is-logged' : ''} ${isUserMenuOpen ? 'is-active' : ''}`}
             onClick={handleAvatarClick}
             title={user ? `Conectado como ${user.email || fullName}` : 'Iniciar Sesión'}
             aria-label={user ? 'Cuenta de usuario' : 'Iniciar sesión'}
-            aria-expanded={user ? isDropdownOpen : undefined}
+            aria-expanded={user ? isUserMenuOpen : undefined}
           >
             {avatarUrl ? (
               <img src={avatarUrl} alt="" className="app-navbar__avatar-img" />
@@ -169,12 +106,12 @@ export function Navbar({
               <span className="app-navbar__username">{firstName}</span>
             )}
 
-            {user && <ChevronDown size={13} className={`app-navbar__chevron ${isDropdownOpen ? 'open' : ''}`} />}
+            {user && <ChevronDown size={13} className={`app-navbar__chevron ${isUserMenuOpen ? 'open' : ''}`} />}
             {user && <span className="app-navbar__avatar-dot" />}
           </button>
 
           {/* Dropdown Menu (cuando el usuario está conectado) */}
-          {user && isDropdownOpen && (
+          {user && isUserMenuOpen && (
             <div className="app-navbar__dropdown glass-panel">
               <div className="app-navbar__dropdown-header">
                 <div className="app-navbar__dropdown-user">
@@ -206,6 +143,83 @@ export function Navbar({
                 <LogOut size={15} />
                 <span>Cerrar Sesión</span>
               </button>
+            </div>
+          )}
+        </div>
+
+        {/* Botón Menú Hamburguesa */}
+        <div ref={navMenuRef} style={{ position: 'relative' }}>
+          <button
+            className={`app-navbar__menu-btn ${isNavMenuOpen ? 'is-active' : ''}`}
+            onClick={() => { setIsNavMenuOpen((prev) => !prev); setIsUserMenuOpen(false); }}
+            title="Menú"
+            aria-label="Menú de navegación"
+            aria-expanded={isNavMenuOpen}
+          >
+            {isNavMenuOpen ? <X size={17} strokeWidth={2.4} /> : <Menu size={17} strokeWidth={2.4} />}
+          </button>
+
+          {/* Menú Desplegable Hamburguesa */}
+          {isNavMenuOpen && (
+            <div className="app-navbar__menu-dropdown glass-panel">
+              {/* Sección Generaciones */}
+              <div className="app-navbar__menu-section">
+                <div className="app-navbar__menu-section-label">
+                  <Layers size={13} />
+                  <span>Generaciones</span>
+                </div>
+
+                <div className="app-navbar__menu-options">
+                  <button
+                    className={`app-navbar__gen-option ${activeGen === 2 ? 'selected' : ''}`}
+                    onClick={() => { if (onGenChange) onGenChange(2); setIsNavMenuOpen(false); }}
+                  >
+                    <div className="gen-option-content">
+                      <span className="gen-option-title">2da Gen</span>
+                      <span className="gen-option-subtitle">33 sprites · Actual</span>
+                    </div>
+                    {activeGen === 2 && <span className="gen-option-check">✓</span>}
+                  </button>
+
+                  <button
+                    className={`app-navbar__gen-option ${activeGen === 1 ? 'selected' : ''}`}
+                    onClick={() => { if (onGenChange) onGenChange(1); setIsNavMenuOpen(false); }}
+                  >
+                    <div className="gen-option-content">
+                      <span className="gen-option-title">1ra Gen</span>
+                      <span className="gen-option-subtitle">117 sprites</span>
+                    </div>
+                    {activeGen === 1 && <span className="gen-option-check">✓</span>}
+                  </button>
+
+                  <button
+                    className={`app-navbar__gen-option ${activeGen === 0 ? 'selected' : ''}`}
+                    onClick={() => { if (onGenChange) onGenChange(0); setIsNavMenuOpen(false); }}
+                  >
+                    <div className="gen-option-content">
+                      <span className="gen-option-title">Todas</span>
+                      <span className="gen-option-subtitle">150 sprites total</span>
+                    </div>
+                    {activeGen === 0 && <span className="gen-option-check">✓</span>}
+                  </button>
+                </div>
+              </div>
+
+              <div className="app-navbar__dropdown-divider" />
+
+              {/* Sección Herramientas */}
+              <div className="app-navbar__menu-section">
+                <button
+                  className="app-navbar__menu-action-btn"
+                  onClick={() => { onOpenBackupModal(); setIsNavMenuOpen(false); }}
+                >
+                  <div className="action-btn-left">
+                    <Download size={15} />
+                    <span>Copia de Seguridad</span>
+                  </div>
+                  <span className="action-btn-sub">Respaldo</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
