@@ -42,9 +42,7 @@
 
 body {
   background-color: #060714;
-  background-image:
-    radial-gradient(ellipse at 50% 30%, rgba(6, 7, 20, 0.4) 0%, rgba(6, 7, 20, 0.82) 100%),
-    url('/background.webp');
+  background-image: url('/background.webp');
   background-size: cover;
   background-position: center top;
   background-attachment: fixed;
@@ -568,25 +566,11 @@ body {
   overflow: hidden;
   isolation: isolate;
   padding-top: 66px;
+  background: transparent;
 }
 
 .hero__bg {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(6, 7, 20, 0.2) 0%, rgba(6, 7, 20, 0.65) 100%);
-  z-index: 0;
-}
-
-.hero__bg::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: linear-gradient(to bottom, transparent, rgba(6, 7, 20, 0.5));
-  pointer-events: none;
-  z-index: 1;
+  display: none !important;
 }
 
 /* Perspective grid floor */
