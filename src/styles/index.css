@@ -41,7 +41,14 @@
 }
 
 body {
-  background: var(--bg-body);
+  background-color: #060714;
+  background-image:
+    radial-gradient(ellipse at 50% 30%, rgba(6, 7, 20, 0.4) 0%, rgba(6, 7, 20, 0.82) 100%),
+    url('/background.webp');
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   color: var(--text);
   font-family: var(--font-sans);
   min-height: 100vh;
@@ -564,11 +571,9 @@ body {
 }
 
 .hero__bg {
-  /* Bottom fade blends hero into body seamlessly */
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(175deg, #0a0a1a 0%, #0d1117 40%, #161b22 100%);
+  background: linear-gradient(180deg, rgba(6, 7, 20, 0.2) 0%, rgba(6, 7, 20, 0.65) 100%);
   z-index: 0;
 }
 
@@ -578,8 +583,8 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 80px;
-  background: linear-gradient(to bottom, transparent, var(--bg-body));
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, rgba(6, 7, 20, 0.5));
   pointer-events: none;
   z-index: 1;
 }
