@@ -8,7 +8,8 @@ export function Footer({ onOpenPrivacy }) {
         <div className="app-footer__brand">
           <div className="app-navbar__logo-mark app-footer__logo">F</div>
           <span className="app-footer__copyright">
-            © {new Date().getFullYear()} Fortnite Spritedex · Creado para la comunidad
+            <span className="footer-full-text">© {new Date().getFullYear()} Fortnite Spritedex · Creado para la comunidad</span>
+            <span className="footer-short-text">© {new Date().getFullYear()} Spritedex</span>
           </span>
         </div>
 

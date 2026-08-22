@@ -4608,12 +4608,12 @@ body::before {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* ===== APP FOOTER ===== */
+/* ===== APP FOOTER (Glassmorphic Floating Capsule) ===== */
 .app-footer {
   width: 100%;
   max-width: 1400px;
-  margin: 48px auto 0;
-  padding: 0 24px max(24px, env(safe-area-inset-bottom));
+  margin: 40px auto 24px;
+  padding: 0 24px max(16px, env(safe-area-inset-bottom));
   box-sizing: border-box;
   position: relative;
   z-index: 10;
@@ -4624,12 +4624,16 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
+  height: 48px;
+  padding: 6px 14px 6px 8px;
   border-radius: 9999px;
-  background: rgba(12, 14, 22, 0.45);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(12, 14, 22, 0.65);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   box-sizing: border-box;
 }
 
@@ -4637,25 +4641,35 @@ body::before {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .app-footer__logo {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   font-size: 0.95rem;
+  flex-shrink: 0;
 }
 
 .app-footer__copyright {
-  font-size: 0.76rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
   font-weight: 500;
   font-family: var(--font-sans);
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.footer-short-text {
+  display: none;
 }
 
 .app-footer__actions {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .app-footer__privacy-btn {
@@ -4663,15 +4677,16 @@ body::before {
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: 9999px;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.55);
   font-family: var(--font-sans);
   font-size: 0.76rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .app-footer__privacy-btn:hover {
@@ -4679,45 +4694,42 @@ body::before {
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* En Mobile: Diseño totalmente limpio, transparente y minimalista (sin caja flotante invasiva) */
-@media (max-width: 680px) {
+/* En Mobile: Mantiene la cápsula horizontal en una sola fila sin apilamiento */
+@media (max-width: 600px) {
   .app-footer {
-    margin: 32px auto 0;
-    padding: 0 16px max(24px, env(safe-area-inset-bottom));
+    width: calc(100% - 24px);
+    margin: 28px auto 16px;
+    padding: 0;
   }
 
   .app-footer__content {
-    background: transparent !important;
-    border: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    box-shadow: none !important;
-    padding: 0;
-    flex-direction: column;
-    align-items: center;
+    height: 44px;
+    padding: 4px 10px 4px 6px;
     gap: 8px;
-    text-align: center;
-  }
-
-  .app-footer__brand {
-    flex-direction: column;
-    gap: 4px;
   }
 
   .app-footer__logo {
+    width: 24px;
+    height: 24px;
+    font-size: 0.85rem;
+  }
+
+  .footer-full-text {
     display: none;
+  }
+
+  .footer-short-text {
+    display: inline;
   }
 
   .app-footer__copyright {
     font-size: 0.72rem;
-    color: rgba(255, 255, 255, 0.4);
-    line-height: 1.4;
   }
 
   .app-footer__privacy-btn {
     font-size: 0.72rem;
-    color: rgba(255, 255, 255, 0.45);
-    padding: 4px 8px;
+    padding: 5px 8px;
+    gap: 4px;
   }
 }
 
