@@ -4608,97 +4608,116 @@ body::before {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* ===== APP FOOTER (Glassmorphic Pill Card) ===== */
-.app-footer-pill {
-  width: calc(100% - 48px);
+/* ===== APP FOOTER ===== */
+.app-footer {
+  width: 100%;
   max-width: 1400px;
-  margin: 40px auto 24px;
-  padding: 6px 16px 6px 6px;
+  margin: 48px auto 0;
+  padding: 0 24px max(24px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  position: relative;
+  z-index: 10;
+}
+
+.app-footer__content {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 48px;
-  background: rgba(12, 14, 22, 0.65);
-  backdrop-filter: blur(24px) saturate(1.8);
-  -webkit-backdrop-filter: blur(24px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 12px 20px;
   border-radius: 9999px;
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  position: relative;
-  z-index: 10;
+  background: rgba(12, 14, 22, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   box-sizing: border-box;
 }
 
-.app-footer-pill__left {
+.app-footer__brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-.app-footer-pill__copyright {
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.55);
+.app-footer__logo {
+  width: 26px;
+  height: 26px;
+  font-size: 0.95rem;
+}
+
+.app-footer__copyright {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.5);
   font-weight: 500;
   font-family: var(--font-sans);
   letter-spacing: -0.01em;
 }
 
-.app-footer-pill__links {
+.app-footer__actions {
   display: flex;
   align-items: center;
-  gap: 4px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
 }
 
-.app-footer-pill__link {
-  display: flex;
+.app-footer__privacy-btn {
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
-  border-radius: 9999px;
+  padding: 6px 12px;
+  border-radius: 8px;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.45);
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  white-space: nowrap;
 }
 
-.app-footer-pill__link:hover {
+.app-footer__privacy-btn:hover {
   color: #ffffff;
   background: rgba(255, 255, 255, 0.08);
 }
 
+/* En Mobile: Diseño totalmente limpio, transparente y minimalista (sin caja flotante invasiva) */
 @media (max-width: 680px) {
-  .app-footer-pill {
-    height: auto;
-    border-radius: 20px;
-    padding: 12px 14px;
-    flex-direction: column;
-    gap: 10px;
-    margin: 28px auto 20px;
+  .app-footer {
+    margin: 32px auto 0;
+    padding: 0 16px max(24px, env(safe-area-inset-bottom));
   }
 
-  .app-footer-pill__left {
+  .app-footer__content {
+    background: transparent !important;
+    border: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    padding: 0;
     flex-direction: column;
-    gap: 6px;
+    align-items: center;
+    gap: 8px;
     text-align: center;
   }
 
-  .app-footer-pill__copyright {
-    font-size: 0.72rem;
+  .app-footer__brand {
+    flex-direction: column;
+    gap: 4px;
   }
 
-  .app-footer-pill__link {
-    font-size: 0.74rem;
-    padding: 5px 12px;
+  .app-footer__logo {
+    display: none;
+  }
+
+  .app-footer__copyright {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.4;
+  }
+
+  .app-footer__privacy-btn {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.45);
+    padding: 4px 8px;
   }
 }
 
