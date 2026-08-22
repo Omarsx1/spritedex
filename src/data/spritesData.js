@@ -11,6 +11,8 @@ export const RARITIES = {
 export const THEME_STYLES = {
   Basic: { bg: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', border: '#00afff' },
   Gold: { bg: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', border: '#f5b642' },
+  Cheatmaster: { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
+  'Cheat Master': { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
   Candy: { bg: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)', border: '#f16f68' },
   Galaxy: { bg: 'linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%)', border: '#4a35fa' },
   Holofoil: { bg: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', border: '#ec88d8' },
@@ -30,7 +32,18 @@ export const ELEMENTAL_STYLES = {
   air: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#60a5fa' },
   zeropoint: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#60a5fa' },
   batman: { background: 'linear-gradient(180deg, #3d3b36 0%, #1b1c23 100%)', borderColor: '#a89442' },
-  wick: { background: 'linear-gradient(180deg, #3d3b36 0%, #1b1c23 100%)', borderColor: '#a89442' }
+  wick: { background: 'linear-gradient(180deg, #3d3b36 0%, #1b1c23 100%)', borderColor: '#a89442' },
+  sonic: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#3b82f6' },
+  shadow: { background: 'linear-gradient(180deg, #31103f 0%, #1b1c23 100%)', borderColor: '#a855f7' },
+  tails: { background: 'linear-gradient(180deg, #78350f 0%, #1b1c23 100%)', borderColor: '#f59e0b' },
+  klombo: { background: 'linear-gradient(180deg, #831843 0%, #1b1c23 100%)', borderColor: '#ec4899' },
+  crown: { background: 'linear-gradient(180deg, #713f12 0%, #1b1c23 100%)', borderColor: '#eab308' },
+  bush: { background: 'linear-gradient(180deg, #14532d 0%, #1b1c23 100%)', borderColor: '#22c55e' },
+  adventure: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#0ea5e9' },
+  jonesy: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#0ea5e9' },
+  '8bit': { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#0ea5e9' },
+  jackrabbit: { background: 'linear-gradient(180deg, #713f12 0%, #1b1c23 100%)', borderColor: '#eab308' },
+  killswitch: { background: 'linear-gradient(180deg, #31103f 0%, #1b1c23 100%)', borderColor: '#a855f7' }
 };
 
 export function getSpriteCardStyle(sprite) {
@@ -42,9 +55,12 @@ export function getSpriteCardStyle(sprite) {
   const rarity = sprite.rarity;
   const familyId = (sprite.familyId || sprite.id.split('_')[0] || '').toLowerCase();
 
-  // 1. Theme-specific variants (Gold, Cube, Candy, Galaxy, Holofoil, Gem, Quack)
+  // 1. Theme-specific variants (Gold, Cheatmaster, Cube, Candy, Galaxy, Holofoil, Gem, Quack)
   if (theme === 'Gold') {
     return { background: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', borderColor: '#f5b642' };
+  }
+  if (theme === 'Cheatmaster' || theme === 'Cheat Master') {
+    return { background: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', borderColor: '#22c55e' };
   }
   if (theme === 'Cube') {
     return { background: 'linear-gradient(180deg, #730974 0%, #1b1c23 100%)', borderColor: '#8b008b' };
@@ -87,6 +103,8 @@ export function getSpriteCardStyle(sprite) {
 export const THEME_NAMES_ES = {
   Basic: 'Básico',
   Gold: 'Dorado',
+  Cheatmaster: 'Cheat Master',
+  'Cheat Master': 'Cheat Master',
   Candy: 'Gomita',
   Gummy: 'Gomita',
   Galaxy: 'Galáctico',
@@ -96,10 +114,10 @@ export const THEME_NAMES_ES = {
   Quack: 'Patito'
 };
 
-export const VARIANT_ORDER = ['Basic', 'Gold', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
-export const THEMES_LIST = ['Basic', 'Gold', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
+export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
+export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
 
-const FAMILY_NAMES_MAP = {
+export const FAMILY_NAMES_MAP = {
   water: 'Agua',
   earth: 'Tierra',
   fire: 'Fuego',
@@ -124,10 +142,22 @@ const FAMILY_NAMES_MAP = {
   wick: 'John Wick',
   peely: 'Bananín',
   llama: 'Llama',
-  ironmouse: 'La niña'
+  ironmouse: 'La niña',
+  // Gen 2
+  klombo: 'Klombo',
+  crown: 'Corona',
+  jackrabbit: 'Jackrabbit',
+  sonic: 'Sonic',
+  shadow: 'Shadow',
+  tails: 'Tails',
+  killswitch: 'Killswitch',
+  bush: 'Arbustín',
+  adventure: 'Aventurero',
+  jonesy: 'Jonesy',
+  '8bit': '8-Bit'
 };
 
-const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse'];
+const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails'];
 
 const SPANISH_NAME_OVERRIDES = {
   water_quack: 'Patito de Agua',
@@ -139,13 +169,7 @@ const SPANISH_NAME_OVERRIDES = {
 
 // Format and group official sprites
 export const ALL_SPRITES = officialSpritesJson.map((item) => {
-  let gen = 1;
-  const nameLower = item.name.toLowerCase();
-  if (nameLower.includes('batman') || nameLower.includes('duck') || nameLower.includes('ghost') || nameLower.includes('fishy') || nameLower.includes('punk') || nameLower.includes('king') || nameLower.includes('striker')) {
-    gen = 2;
-  } else if (nameLower.includes('zeropoint') || nameLower.includes('burnt') || nameLower.includes('boss') || nameLower.includes('grim') || nameLower.includes('seven') || nameLower.includes('pollo') || nameLower.includes('vini') || nameLower.includes('wick')) {
-    gen = 3;
-  }
+  let gen = item.gen || 1;
 
   let dropChance = '8.73%';
   if (item.rarity === 'Mythic') dropChance = '0.0003%';
@@ -154,6 +178,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   else if (item.theme === 'Gold') dropChance = '0.75%';
   else if (item.theme === 'Galaxy') dropChance = '0.04%';
   else if (item.theme === 'Holofoil') dropChance = '0.01%';
+  else if (item.theme === 'Cheatmaster') dropChance = '0.08%';
 
   const baseKey = item.id.split('_')[0].toLowerCase();
   const familyId = baseKey;
@@ -165,7 +190,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   let dropChanceNum = parseFloat(dropChance);
 
   // Dynamic image resolution for real webp and png assets
-  let imagePath = `/sprites/${item.id}.png`;
+  let imagePath = item.gen === 2 ? `/sprites/${item.id}.webp` : `/sprites/${item.id}.png`;
   const webpMap = {
     'ironmouse_basic': '/sprites/ironmouse_basic.webp',
     'llama_basic': '/sprites/llama_basic.webp',
@@ -252,7 +277,6 @@ export const SPRITE_FAMILIES = Object.values(
 }));
 
 export const GENERATIONS = [
-  { id: 1, name: '1ª Generación', title: 'Orígenes Elementales', badgeColor: '#3b82f6' },
-  { id: 2, name: '2ª Generación', title: 'Leyendas & Crossovers', badgeColor: '#eab308' },
-  { id: 3, name: '3ª Generación', title: 'Multiverso & Eventos Cósmicos', badgeColor: '#a855f7' }
+  { id: 1, name: '1ª Generación', title: 'Espíritus Clásicos', badgeColor: '#3b82f6' },
+  { id: 2, name: '2ª Generación', title: 'Temporada GLITCH', badgeColor: '#ec4899' }
 ];

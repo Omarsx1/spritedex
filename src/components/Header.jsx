@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { allSprites } from '../data/spritesData';
 
 export function Header({
+  spritesPool,
   totalCount,
   ownedCount,
   masteredCount,
@@ -15,8 +16,8 @@ export function Header({
 }) {
   // Pool of sprites for hero rotation
   const spritePool = useMemo(() => {
-    return allSprites && allSprites.length > 0 ? allSprites : [];
-  }, []);
+    return spritesPool && spritesPool.length > 0 ? spritesPool : (allSprites || []);
+  }, [spritesPool]);
 
   // Main hero sprite index
   const [spriteIndex, setSpriteIndex] = useState(() =>
@@ -162,7 +163,7 @@ export function Header({
         {/* Title */}
         <div className="hero__title-block" ref={titleRef}>
           <h1 className="hero__title">
-            <span className="hero__title-line">FORTNITE</span>
+            <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">FORTNITE</span>
             <span className="hero__title-line hero__title-line--accent">SPRITEDEX</span>
           </h1>
         </div>

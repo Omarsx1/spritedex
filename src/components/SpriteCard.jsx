@@ -33,7 +33,7 @@ export function SpriteCard({
       // In friend view, clicking action button toggles ownership in MY collection
       const nextOwned = !myOwned;
       onToggleOwned(sprite.id);
-      sounds.playToggle(nextOwned);
+      sounds.playToggle(nextOwned, sprite.gen);
       if (nextOwned) {
         confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
       }
@@ -42,7 +42,7 @@ export function SpriteCard({
 
     const nextOwned = !isOwned;
     onToggleOwned(sprite.id);
-    sounds.playToggle(nextOwned);
+    sounds.playToggle(nextOwned, sprite.gen);
     if (nextOwned) {
       confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
     }
@@ -70,7 +70,7 @@ export function SpriteCard({
     e.stopPropagation();
     if (isFriendView) return; // Only adjust levels in my view
     onSetLevel(sprite.id, newLevel);
-    sounds.playLevelUp(newLevel);
+    sounds.playLevelUp(newLevel, sprite.gen);
     if (newLevel === 5) {
       confetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
     }
@@ -80,7 +80,7 @@ export function SpriteCard({
   if (viewMode === 'list') {
     return (
       <div
-        className={`sprite-list-item ${isOwned ? 'is-owned' : ''} ${isMastered ? 'is-mastered' : ''}`}
+        className={`sprite-list-item ${isOwned ? 'is-owned' : ''} ${isMastered ? ('is-mastered ' + (sprite.gen === 2 ? 'is-glitch-mastered' : 'is-classic-mastered')) : ''}`}
         onClick={handleToggleClick}
         style={{ cursor: 'pointer' }}
       >
@@ -155,7 +155,7 @@ export function SpriteCard({
   // Vista cuadrícula (estilo fortnite.gg)
   return (
     <div
-      className={`sprite-card ${isOwned ? 'is-owned' : ''} ${isMastered ? 'is-mastered' : ''}`}
+      className={`sprite-card ${isOwned ? 'is-owned' : ''} ${isMastered ? ('is-mastered ' + (sprite.gen === 2 ? 'is-glitch-mastered' : 'is-classic-mastered')) : ''}`}
       style={{
         background: styleInfo.background,
         borderColor: styleInfo.borderColor,
@@ -164,6 +164,26 @@ export function SpriteCard({
       }}
       onClick={handleToggleClick}
     >
+      {/* Cyber Glitch Visual FX for Gen 2 Mastered cards */}
+      {isMastered && sprite.gen === 2 && (
+        <div className="cyber-fx-overlay" aria-hidden="true">
+          <div className="scan-line" />
+          <div className="cyber-lines">
+            <span /><span /><span /><span />
+          </div>
+          <div className="corner-elements">
+            <span /><span /><span /><span />
+          </div>
+          <div className="glowing-elements">
+            <div className="glow-1" />
+            <div className="glow-2" />
+            <div className="glow-3" />
+          </div>
+          <div className="card-particles">
+            <span /><span /><span /><span /><span /><span />
+          </div>
+        </div>
+      )}
       {/* Indicator badge if friend can lend */}
       {friendCanLend && (
         <div style={{
@@ -245,15 +265,22 @@ export function SpriteCard({
       )}
 
       {/* Botón de estado */}
-      <button
-        className={`card-owned-btn ${isMastered ? 'mastered' : isOwned ? 'owned' : ''}`}
-        onClick={handleToggleClick}
-        style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800 } : {}}
-      >
-        {isFriendView
+      {(() => {
+        const btnText = isFriendView
           ? (friendCanLend ? (myOwned ? '✓ Registrado en mi Dex' : '+ Registrar en mi Dex') : isOwned ? '✓ Tu amigo lo tiene' : 'No lo tiene')
-          : (isMastered ? '⭐ Maxeado' : isOwned ? `✓ Atrapado (Niv.${level})` : 'Sin atrapar')}
-      </button>
+          : (isMastered ? (sprite.gen === 2 ? '⚡ MAXEADO' : '⭐ Maxeado') : isOwned ? (sprite.gen === 2 ? `⚡ CAPTURADO (NIV.${level})` : `✓ Atrapado (Niv.${level})`) : 'Sin atrapar');
+
+        return (
+          <button
+            className={`card-owned-btn ${isMastered ? 'mastered' : isOwned ? 'owned' : ''} ${sprite.gen === 2 && isOwned ? 'is-glitch-btn' : ''}`}
+            data-text={btnText}
+            onClick={handleToggleClick}
+            style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800 } : {}}
+          >
+            <span className="btn-text">{btnText}</span>
+          </button>
+        );
+      })()}
     </div>
   );
 }

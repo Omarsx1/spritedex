@@ -1,9 +1,10 @@
-// Web Audio API Synthesizer for Pokédex Sound Effects
+// Web Audio API Synthesizer & Audio Sample Manager for Spritedex
 
 class SoundManager {
   constructor() {
     this.ctx = null;
     this.enabled = true;
+    this.audioPool = {};
   }
 
   initContext() {
@@ -18,8 +19,53 @@ class SoundManager {
     }
   }
 
-  playToggle(state) {
+  // Helper to play audio samples with zero latency and overlap support
+  playSample(src, volume = 0.7) {
+    if (!this.enabled || typeof window === 'undefined') return;
+    try {
+      const audio = new Audio(src);
+      audio.volume = volume;
+      audio.play().catch(() => {});
+    } catch (e) {
+      console.warn('Audio sample play error:', e);
+    }
+  }
+
+  playGen2Level() {
+    this.playSample('/sound cards/level_spirit.mp3', 0.65);
+  }
+
+  playGen2Maxed() {
+    this.playSample('/sound cards/maxed_8_bit.mp3', 0.8);
+  }
+
+  playToggle(state, gen = 1) {
     if (!this.enabled) return;
+
+    if (gen === 2) {
+      if (state) {
+        this.playGen2Level();
+      } else {
+        // Falling synth beep on un-catch
+        this.initContext();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(300, now + 0.12);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.12);
+      }
+      return;
+    }
+
+    // Classic Gen 1 Synthesizer
     this.initContext();
     if (!this.ctx) return;
 
@@ -48,8 +94,20 @@ class SoundManager {
     osc.stop(now + 0.12);
   }
 
-  playLevelUp(level) {
+  playLevelUp(level, gen = 1) {
     if (!this.enabled) return;
+
+    // 2ª Generación custom sound effects:
+    if (gen === 2) {
+      if (level === 5) {
+        this.playGen2Maxed();
+      } else {
+        this.playGen2Level();
+      }
+      return;
+    }
+
+    // 1ª Generación classic synthesized sounds:
     this.initContext();
     if (!this.ctx) return;
 

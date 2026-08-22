@@ -33,7 +33,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const spritesList = useMemo(() => {
     switch (scope) {
       case 'new':
-        return allSprites.filter(s => s.gen === 3 || s.unreleased || s.isNew);
+        return allSprites.filter(s => s.gen === 2 || s.unreleased || s.isNew);
       case 'all':
         return allSprites;
       case 'filtered':
@@ -54,7 +54,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   // Scope counts for display
   const counts = useMemo(() => ({
     all: allSprites.length,
-    new: allSprites.filter(s => s.gen === 3 || s.unreleased || s.isNew).length,
+    new: allSprites.filter(s => s.gen === 2 || s.unreleased || s.isNew).length,
     filtered: filteredSprites.length,
     owned: allSprites.filter(s => userState[s.id]?.owned).length,
     missing: allSprites.filter(s => !userState[s.id]?.owned).length,

@@ -185,7 +185,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                   onClick={(e) => {
                     e.stopPropagation();
                     onToggleOwned(v.id);
-                    sounds.playToggle(!vOwned);
+                    sounds.playToggle(!vOwned, v.gen);
                   }}
                 >
                   <span className={`sdm__pill ${vMastered ? 'sdm__pill--gold' : vOwned ? 'sdm__pill--green' : ''}`}>
@@ -203,7 +203,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                         onClick={(e) => {
                           e.stopPropagation();
                           onSetLevel(v.id, lvl);
-                          sounds.playLevelUp(lvl);
+                          sounds.playLevelUp(lvl, v.gen);
                         }}
                       >
                         {lvl}

@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Search, Grid, List, ChevronDown } from 'lucide-react';
-import { THEMES_LIST, THEME_NAMES_ES, SPRITE_FAMILIES_WITH_IMAGES } from '../data/spritesData';
+import { THEMES_LIST, THEME_NAMES_ES, ALL_SPRITES, FAMILY_NAMES_MAP } from '../data/spritesData';
 
 const VARIANT_COLORS = {
-  Basic:    { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' },
-  Gold:     { gradient: 'linear-gradient(135deg, #9d752a, #d4a23a)', border: '#f5b642' },
-  Candy:    { gradient: 'linear-gradient(135deg, #9f4540, #d4615b)', border: '#f16f68' },
-  Galaxy:   { gradient: 'linear-gradient(135deg, #4a31bc, #6d4fe0)', border: '#4a35fa' },
-  Cube:     { gradient: 'linear-gradient(135deg, #730974, #a040a2)', border: '#8b008b' },
-  Holofoil: { gradient: 'linear-gradient(135deg, #cb77be, #e09dd6)', border: '#ec88d8' },
-  Gem:      { gradient: 'linear-gradient(135deg, #0f6c7d, #1a9cb5)', border: '#22d3ee' },
-  Quack:    { gradient: 'linear-gradient(135deg, #cb77be, #d89a4a)', border: '#ec88d8' },
+  Basic:       { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' },
+  Gold:        { gradient: 'linear-gradient(135deg, #9d752a, #d4a23a)', border: '#f5b642' },
+  Cheatmaster: { gradient: 'linear-gradient(135deg, #052e16, #166534)', border: '#22c55e' },
+  Candy:       { gradient: 'linear-gradient(135deg, #9f4540, #d4615b)', border: '#f16f68' },
+  Galaxy:      { gradient: 'linear-gradient(135deg, #4a31bc, #6d4fe0)', border: '#4a35fa' },
+  Cube:        { gradient: 'linear-gradient(135deg, #730974, #a040a2)', border: '#8b008b' },
+  Holofoil:    { gradient: 'linear-gradient(135deg, #cb77be, #e09dd6)', border: '#ec88d8' },
+  Gem:         { gradient: 'linear-gradient(135deg, #0f6c7d, #1a9cb5)', border: '#22d3ee' },
+  Quack:       { gradient: 'linear-gradient(135deg, #cb77be, #d89a4a)', border: '#ec88d8' },
 };
 
 const STATUS_OPTIONS = [
@@ -21,6 +22,8 @@ const STATUS_OPTIONS = [
 ];
 
 export function FilterBar({
+  activeGen,
+  setActiveGen,
   searchQuery,
   setSearchQuery,
   baseFilter,
@@ -39,11 +42,40 @@ export function FilterBar({
   const [variantOpen, setVariantOpen] = useState(false);
   const [spriteOpen, setSpriteOpen] = useState(false);
 
+  // Compute available families scoped to activeGen
+  const availableFamiliesWithImages = useMemo(() => {
+    const scopedSprites = ALL_SPRITES.filter(s => activeGen === 0 || s.gen === activeGen);
+    const uniqueFamilyIds = [...new Set(scopedSprites.map(s => s.familyId))];
+    return uniqueFamilyIds.map(familyId => {
+      const sprite = scopedSprites.find(s => s.familyId === familyId && s.variant === 'Basic')
+        || scopedSprites.find(s => s.familyId === familyId);
+      const name = FAMILY_NAMES_MAP[familyId] || (familyId.charAt(0).toUpperCase() + familyId.slice(1));
+      return {
+        name,
+        familyId,
+        image: sprite ? sprite.image : (activeGen === 2 ? `/sprites/${familyId}_basic.webp` : `/sprites/${familyId}_basic.png`)
+      };
+    }).sort((a, b) => a.name.localeCompare(b.name));
+  }, [activeGen]);
+
+  // Compute available variants scoped to activeGen
+  const availableThemes = useMemo(() => {
+    const scopedSprites = ALL_SPRITES.filter(s => activeGen === 0 || s.gen === activeGen);
+    const uniqueThemes = [...new Set(scopedSprites.map(s => s.variant))];
+    return THEMES_LIST.filter(t => uniqueThemes.includes(t));
+  }, [activeGen]);
+
   const handleVariantSelect = (value) => { setBaseFilter(value); setVariantOpen(false); };
   const handleSpriteSelect = (value) => { setSpriteFilter(value); setSpriteOpen(false); };
 
+  const handleGenChange = (newGen) => {
+    setActiveGen(newGen);
+    setBaseFilter('all');
+    setSpriteFilter('all');
+  };
+
   const selectedSpriteData = spriteFilter !== 'all'
-    ? SPRITE_FAMILIES_WITH_IMAGES.find(f => f.name === spriteFilter)
+    ? availableFamiliesWithImages.find(f => f.name === spriteFilter)
     : null;
 
   return (
@@ -100,8 +132,8 @@ export function FilterBar({
                 >
                   Todas
                 </button>
-                {THEMES_LIST.map(theme => {
-                  const colors = VARIANT_COLORS[theme];
+                {availableThemes.map(theme => {
+                  const colors = VARIANT_COLORS[theme] || { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' };
                   const isActive = baseFilter === theme;
                   return (
                     <button
@@ -143,7 +175,7 @@ export function FilterBar({
                 >
                   <span className="sprite-chip-name">Todos</span>
                 </button>
-                {SPRITE_FAMILIES_WITH_IMAGES.map(family => (
+                {availableFamiliesWithImages.map(family => (
                   <button
                     key={family.familyId}
                     className={`sprite-grid-chip ${spriteFilter === family.name ? 'is-active' : ''}`}

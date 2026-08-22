@@ -57,6 +57,7 @@ export function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Filters matching fortnite.gg
+  const [activeGen, setActiveGen] = useState(2); // 2 = 2ª Generación (GLITCH) by default!
   const [searchQuery, setSearchQuery] = useState('');
   const [baseFilter, setBaseFilter] = useState('all'); // BASE = variant/theme
   const [spriteFilter, setSpriteFilter] = useState('all'); // SPRITE = family
@@ -279,6 +280,9 @@ export function App() {
     let result = ALL_SPRITES.filter((sprite) => {
       if (!showUnreleased && sprite.unreleased) return false;
 
+      // Filter by Generation (activeGen: 2 = Gen 2, 1 = Gen 1, 0 = All)
+      if (activeGen !== 0 && sprite.gen !== activeGen) return false;
+
       if (searchQuery.trim() !== '') {
         const query = searchQuery.toLowerCase();
         const nameMatch = sprite.fullName.toLowerCase().includes(query);
@@ -306,7 +310,7 @@ export function App() {
         const isOwned = (activeProfile === 'friend' && friendState ? friendState : userState)[sprite.id]?.owned;
         if (isOwned) return false;
       } else if (statusFilter === 'new') {
-        if (sprite.gen !== 3 && !sprite.unreleased) return false;
+        if (sprite.gen !== 2 && !sprite.unreleased && !sprite.isNew) return false;
       }
 
       return true;
@@ -349,14 +353,22 @@ export function App() {
     }
 
     return result;
-  }, [searchQuery, baseFilter, spriteFilter, statusFilter, sortBy, showUnreleased, userState, friendState, activeProfile]);
+  }, [activeGen, searchQuery, baseFilter, spriteFilter, statusFilter, sortBy, showUnreleased, userState, friendState, activeProfile]);
+
+  const scopedSprites = useMemo(() => {
+    return ALL_SPRITES.filter((s) => {
+      if (!showUnreleased && s.unreleased) return false;
+      if (activeGen !== 0 && s.gen !== activeGen) return false;
+      return true;
+    });
+  }, [activeGen, showUnreleased]);
 
   const activeState = activeProfile === 'friend' && friendState ? friendState : userState;
-  const totalCount = ALL_SPRITES.filter((s) => showUnreleased || !s.unreleased).length;
-  const ownedCount = ALL_SPRITES.filter((s) => (showUnreleased || !s.unreleased) && activeState[s.id]?.owned).length;
-  const masteredCount = ALL_SPRITES.filter((s) => (showUnreleased || !s.unreleased) && activeState[s.id]?.owned && activeState[s.id]?.level === 5).length;
+  const totalCount = scopedSprites.length;
+  const ownedCount = scopedSprites.filter((s) => activeState[s.id]?.owned).length;
+  const masteredCount = scopedSprites.filter((s) => activeState[s.id]?.owned && activeState[s.id]?.level === 5).length;
 
-  const friendLendableCount = friendState ? ALL_SPRITES.filter((s) => friendState[s.id]?.owned && !userState[s.id]?.owned).length : 0;
+  const friendLendableCount = friendState ? scopedSprites.filter((s) => friendState[s.id]?.owned && !userState[s.id]?.owned).length : 0;
 
   return (
     <div className="app-container">
@@ -364,11 +376,19 @@ export function App() {
 
       <Navbar
         user={user}
+        activeGen={activeGen}
+        onGenChange={(newGen) => {
+          setActiveGen(newGen);
+          setBaseFilter('all');
+          setSpriteFilter('all');
+        }}
         onOpenAuthModal={() => setShowAuthModal(true)}
+        onOpenBackupModal={() => setShowBackupModal(true)}
         onSignOut={handleSignOutCleanup}
       />
 
       <Header
+        spritesPool={scopedSprites}
         ownedCount={ownedCount}
         totalCount={totalCount}
         masteredCount={masteredCount}
@@ -469,20 +489,22 @@ export function App() {
       {/* Main Content with Fortnite.gg matching filters */}
       <main className="main-content">
         <FilterBar
+          activeGen={activeGen}
+          setActiveGen={setActiveGen}
           searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
+          setSearchQuery={setSearchQuery}
           baseFilter={baseFilter}
-          onBaseChange={setBaseFilter}
+          setBaseFilter={setBaseFilter}
           spriteFilter={spriteFilter}
-          onSpriteChange={setSpriteFilter}
+          setSpriteFilter={setSpriteFilter}
           statusFilter={statusFilter}
-          onStatusChange={setStatusFilter}
+          setStatusFilter={setStatusFilter}
           sortBy={sortBy}
-          onSortChange={setSortBy}
+          setSortBy={setSortBy}
           showUnreleased={showUnreleased}
-          onToggleUnreleased={setShowUnreleased}
+          setShowUnreleased={setShowUnreleased}
           viewMode={viewMode}
-          onViewModeChange={setViewMode}
+          setViewMode={setViewMode}
         />
 
         {filteredSprites.length === 0 ? (
