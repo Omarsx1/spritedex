@@ -15,13 +15,27 @@ export function Navbar({
   const dropdownRef = useRef(null);
   const genDropdownRef = useRef(null);
 
-  const displayName = useMemo(() => {
+  const fullName = useMemo(() => {
     if (!user) return null;
     if (user.user_metadata?.full_name) return user.user_metadata.full_name;
     if (user.user_metadata?.name) return user.user_metadata.name;
     if (user.email) return user.email.split('@')[0];
     if (user.is_anonymous) return 'Invitado';
     return 'Mi Cuenta';
+  }, [user]);
+
+  const firstName = useMemo(() => {
+    if (!user) return null;
+    const raw = user.user_metadata?.given_name ||
+                user.user_metadata?.full_name ||
+                user.user_metadata?.name ||
+                (user.email ? user.email.split('@')[0] : null);
+    if (raw) {
+      const first = raw.trim().split(/\s+/)[0];
+      return first.charAt(0).toUpperCase() + first.slice(1);
+    }
+    if (user.is_anonymous) return 'Invitado';
+    return 'Cuenta';
   }, [user]);
 
   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
@@ -141,7 +155,7 @@ export function Navbar({
           <button
             className={`app-navbar__avatar ${user ? 'is-logged' : ''} ${isDropdownOpen ? 'is-active' : ''}`}
             onClick={handleAvatarClick}
-            title={user ? `Conectado como ${user.email || displayName}` : 'Iniciar Sesión'}
+            title={user ? `Conectado como ${user.email || fullName}` : 'Iniciar Sesión'}
             aria-label={user ? 'Cuenta de usuario' : 'Iniciar sesión'}
             aria-expanded={user ? isDropdownOpen : undefined}
           >
@@ -152,7 +166,7 @@ export function Navbar({
             )}
 
             {user && (
-              <span className="app-navbar__username">{displayName}</span>
+              <span className="app-navbar__username">{firstName}</span>
             )}
 
             {user && <ChevronDown size={13} className={`app-navbar__chevron ${isDropdownOpen ? 'open' : ''}`} />}
@@ -172,7 +186,7 @@ export function Navbar({
                     </div>
                   )}
                   <div className="app-navbar__dropdown-meta">
-                    <span className="app-navbar__dropdown-name">{displayName}</span>
+                    <span className="app-navbar__dropdown-name">{fullName}</span>
                     <span className="app-navbar__dropdown-email">{user.email || 'Sesión Activa'}</span>
                   </div>
                 </div>
