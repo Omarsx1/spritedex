@@ -398,96 +398,30 @@ export function App() {
         totalCount={totalCount}
         masteredCount={masteredCount}
         user={user}
+        isLiveConnected={isLiveConnected}
+        connectedFriendCode={connectedFriendCode}
         onOpenShareModal={() => setShowShareModal(true)}
         onOpenBackupModal={() => setShowBackupModal(true)}
         onOpenCompareModal={() => setShowCompareModal(true)}
         onOpenAuthModal={() => setShowAuthModal(true)}
       />
 
-      {/* Profile View Banner (when friend profile is available) */}
-      {friendState && (
-        <div
-          style={{
-            maxWidth: '1200px',
-            margin: '0 auto 16px',
-            padding: '12px 18px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '12px',
-            background: activeProfile === 'friend' ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(59, 130, 246, 0.25))' : 'rgba(15, 23, 42, 0.6)',
-            border: `1px solid ${activeProfile === 'friend' ? '#a855f7' : 'rgba(255,255,255,0.1)'}`,
-            borderRadius: '14px',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '1.4rem' }}>{activeProfile === 'friend' ? '👥' : '👤'}</span>
-            <div>
-              <div style={{ fontSize: '0.9rem', fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>{activeProfile === 'friend' ? 'Explorando Colección de tu Amigo' : 'Viendo Tu Colección Personal'}</span>
-                {isLiveConnected && (
-                  <span style={{ fontSize: '0.72rem', background: '#10b981', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontWeight: 800 }}>
-                    🟢 En Vivo ({connectedFriendCode})
-                  </span>
-                )}
-              </div>
-              <div style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
-                {activeProfile === 'friend'
-                  ? `🎁 Tu amigo tiene ${friendLendableCount} Sprites que te puede prestar en Fortnite (puedes hacer clic en ellos para registrarlos).`
-                  : 'Colección propia guardada.'}
-              </div>
-            </div>
+      {/* Barra flotante sutil (Únicamente cuando se está explorando activamente la colección de un amigo) */}
+      {activeProfile === 'friend' && (
+        <div className="sdm-friend-pill">
+          <div className="sdm-friend-pill__info">
+            <span className="sdm-friend-pill__tag">👥 MODO AMIGO</span>
+            <span className="sdm-friend-pill__desc">
+              Explorando colección de <strong>{connectedFriendCode || 'Amigo'}</strong>
+            </span>
           </div>
-
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => setActiveProfile('mine')}
-              style={{
-                padding: '8px 14px',
-                borderRadius: '8px',
-                background: activeProfile === 'mine' ? '#3b82f6' : 'rgba(255,255,255,0.08)',
-                color: '#fff',
-                border: 'none',
-                fontSize: '0.78rem',
-                fontWeight: 800,
-                cursor: 'pointer'
-              }}
-            >
-              👤 Mi Colección
-            </button>
-            <button
-              onClick={() => setActiveProfile('friend')}
-              style={{
-                padding: '8px 14px',
-                borderRadius: '8px',
-                background: activeProfile === 'friend' ? '#8b5cf6' : 'rgba(255,255,255,0.08)',
-                color: '#fff',
-                border: 'none',
-                fontSize: '0.78rem',
-                fontWeight: 800,
-                cursor: 'pointer'
-              }}
-            >
-              👥 Colección de Amigo
-            </button>
-            <button
-              onClick={() => setShowCompareModal(true)}
-              style={{
-                padding: '8px 14px',
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, #10b981, #059669)',
-                color: '#fff',
-                border: 'none',
-                fontSize: '0.78rem',
-                fontWeight: 800,
-                cursor: 'pointer'
-              }}
-            >
-              🔄 Planear Préstamos
-            </button>
-          </div>
+          <button
+            onClick={() => setActiveProfile('mine')}
+            className="sdm-friend-pill__exit"
+            title="Volver a mi colección"
+          >
+            ✕ Salir a mi colección
+          </button>
         </div>
       )}
 
@@ -592,6 +526,8 @@ export function App() {
           isLiveConnected={isLiveConnected}
           connectedFriendCode={connectedFriendCode}
           myFriendCode={myFriendCode}
+          activeProfile={activeProfile}
+          onSetActiveProfile={setActiveProfile}
           onConnectFriendCode={handleConnectFriendCode}
           onDisconnectFriend={handleDisconnectFriend}
           onLoadFriendState={(state, sourceLabel) => {

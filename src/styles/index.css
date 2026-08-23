@@ -4225,6 +4225,100 @@ body::before {
   }
 }
 
+/* Indicador de conexión de amigo en vivo en Hero */
+.hero__live-indicator {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  border: 1.5px solid #060714;
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+/* Barra flotante sutil cuando se explora la colección de un amigo */
+.sdm-friend-pill {
+  max-width: 540px;
+  margin: 0 auto 14px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(168, 85, 247, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-sizing: border-box;
+}
+
+.sdm-friend-pill__info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.80rem;
+  color: #e2e8f0;
+}
+
+.sdm-friend-pill__tag {
+  background: #8b5cf6;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+}
+
+.sdm-friend-pill__desc {
+  font-weight: 600;
+}
+
+.sdm-friend-pill__exit {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.sdm-friend-pill__exit:hover {
+  background: rgba(255, 0, 85, 0.3);
+  border-color: #ff0055;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+}
+
+@media (max-width: 600px) {
+  .sdm-friend-pill {
+    margin: 0 12px 10px 12px;
+    padding: 6px 12px;
+  }
+  .sdm-friend-pill__info {
+    font-size: 0.72rem;
+    gap: 6px;
+  }
+  .sdm-friend-pill__tag {
+    font-size: 0.58rem;
+    padding: 2px 6px;
+  }
+  .sdm-friend-pill__exit {
+    padding: 4px 9px;
+    font-size: 0.68rem;
+  }
+}
+
 /* ===== MODAL DE PLANIFICADOR DE INTERCAMBIOS (CYBER GLITCH) ===== */
 .sdm-compare {
   max-width: 860px;
