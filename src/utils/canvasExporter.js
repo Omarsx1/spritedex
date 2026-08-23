@@ -251,7 +251,7 @@ function renderGlitchOverrideTemplate({
   let cols = 6;
   const paddingX = 36;
   const headerH = 195;
-  const footerH = 110;
+  const footerH = 45;
 
   if (format === 'square') {
     width = 1200;
@@ -270,7 +270,9 @@ function renderGlitchOverrideTemplate({
     else cols = 6; // 6 columns standard for Gen 2 (33 sprites = 6 rows)
   }
 
-  const rows = Math.max(1, Math.ceil(totalSprites / cols));
+  // Reserva espacio para la tarjeta del código QR en el último slot de la cuadrícula
+  const totalSlotsNeeded = totalSprites + 1;
+  const rows = Math.max(1, Math.ceil(totalSlotsNeeded / cols));
   const availW = width - paddingX * 2;
 
   if (format === 'checklist') {
@@ -548,54 +550,81 @@ function renderGlitchOverrideTemplate({
     ctx.restore();
   });
 
-  // 4. FOOTER & MODERN DOT-STYLE QR CODE (BOTTOM-RIGHT)
-  const qrBadgeW = 88;
-  const qrBadgeH = 100;
-  const qrBadgeX = width - paddingX - qrBadgeW;
-  const qrBadgeY = height - qrBadgeH - 8;
+  // 3.B. TARJETA CIBERNÉTICA PROMINENTE DE CÓDIGO QR (ESQUINA INFERIOR DERECHA DE LA CUADRÍCULA)
+  const cardMarginX = 6;
+  const cardMarginY = 6;
+  const qrColIdx = cols - 1;
+  const qrRowIdx = rows - 1;
+  const qrX = startX + qrColIdx * cellW;
+  const qrY = startY + qrRowIdx * cellH;
 
-  // Modern Cyber Glass QR Badge Container
+  const qrCardX = qrX + cardMarginX;
+  const qrCardY = qrY + cardMarginY;
+  const qrCardW = cellW - cardMarginX * 2;
+  const qrCardH = cellH - cardMarginY * 2;
+
   ctx.save();
-  roundRect(ctx, qrBadgeX, qrBadgeY, qrBadgeW, qrBadgeH, 10);
-  ctx.fillStyle = 'rgba(10, 14, 26, 0.88)';
+  // Contenedor de tarjeta idéntico a las tarjetas de espíritus
+  roundRect(ctx, qrCardX, qrCardY, qrCardW, qrCardH, 12);
+  ctx.fillStyle = 'rgba(6, 12, 24, 0.85)';
   ctx.fill();
-  ctx.strokeStyle = 'rgba(0, 240, 232, 0.45)';
-  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = 'rgba(0, 240, 232, 0.55)';
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = 'rgba(0, 240, 232, 0.35)';
+  ctx.shadowBlur = 14;
   ctx.stroke();
+  ctx.shadowBlur = 0;
 
-  // Cyber Corner Brackets on QR Badge
+  // Soportes angulares cibernéticos en las 4 esquinas
   ctx.fillStyle = '#00F0E8';
-  ctx.fillRect(qrBadgeX - 1, qrBadgeY - 1, 6, 2);
-  ctx.fillRect(qrBadgeX - 1, qrBadgeY - 1, 2, 6);
-  ctx.fillRect(qrBadgeX + qrBadgeW - 5, qrBadgeY - 1, 6, 2);
-  ctx.fillRect(qrBadgeX + qrBadgeW - 1, qrBadgeY - 1, 2, 6);
-  ctx.fillRect(qrBadgeX - 1, qrBadgeY + qrBadgeH - 1, 6, 2);
-  ctx.fillRect(qrBadgeX - 1, qrBadgeY + qrBadgeH - 5, 2, 6);
-  ctx.fillRect(qrBadgeX + qrBadgeW - 5, qrBadgeY + qrBadgeH - 1, 6, 2);
-  ctx.fillRect(qrBadgeX + qrBadgeW - 1, qrBadgeY + qrBadgeH - 5, 2, 6);
+  ctx.fillRect(qrCardX - 1, qrCardY - 1, 8, 2.5);
+  ctx.fillRect(qrCardX - 1, qrCardY - 1, 2.5, 8);
+  ctx.fillRect(qrCardX + qrCardW - 7, qrCardY - 1, 8, 2.5);
+  ctx.fillRect(qrCardX + qrCardW - 1.5, qrCardY - 1, 2.5, 8);
+  ctx.fillRect(qrCardX - 1, qrCardY + qrCardH - 1.5, 8, 2.5);
+  ctx.fillRect(qrCardX - 1, qrCardY + qrCardH - 7, 2.5, 8);
+  ctx.fillRect(qrCardX + qrCardW - 7, qrCardY + qrCardH - 1.5, 8, 2.5);
+  ctx.fillRect(qrCardX + qrCardW - 1.5, qrCardY + qrCardH - 7, 2.5, 8);
 
-  // Draw Dot QR Code
-  const qrSize = 70;
-  const qrInnerX = qrBadgeX + (qrBadgeW - qrSize) / 2;
-  const qrInnerY = qrBadgeY + 8;
+  // Código QR de puntos moderno y prominente
+  const qrSize = Math.min(qrCardW - 20, qrCardH - 56, 108);
+  const qrInnerX = qrCardX + (qrCardW - qrSize) / 2;
+  const qrInnerY = qrCardY + 12;
   const currentUrl = typeof window !== 'undefined' ? (window.location.origin || 'https://spritedex.com') : 'https://spritedex.com';
   drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, currentUrl);
 
-  // QR Label below code
-  ctx.font = '800 7.5px "Inter", monospace, sans-serif';
-  ctx.fillStyle = '#00F0E8';
+  // Subtítulo e insignia de acción al pie de la tarjeta
+  const qrTextY = qrInnerY + qrSize + 14;
   ctx.textAlign = 'center';
-  ctx.fillText('ESCANEAR APP', qrBadgeX + qrBadgeW / 2, qrBadgeY + qrBadgeH - 6);
+  ctx.font = '800 10.5px "Inter", sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('¡Únete al Dex!', qrCardX + qrCardW / 2, qrTextY);
+
+  const qrBadgeW = Math.min(qrCardW - 16, 92);
+  const qrBadgeH = 18;
+  const qrBadgeX = qrCardX + (qrCardW - qrBadgeW) / 2;
+  const qrBadgeY = qrTextY + 6;
+
+  roundRect(ctx, qrBadgeX, qrBadgeY, qrBadgeW, qrBadgeH, 4);
+  ctx.fillStyle = '#00F0E8';
+  ctx.shadowColor = 'rgba(0, 240, 232, 0.6)';
+  ctx.shadowBlur = 8;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.font = '900 9px "Inter", sans-serif';
+  ctx.fillStyle = '#060714';
+  ctx.fillText('ESCANEAR APP', qrCardX + qrCardW / 2, qrBadgeY + 12);
   ctx.restore();
 
-  // Watermark text in bottom-left / center
+  // 4. FOOTER WATERMARK (CENTRADO)
   ctx.save();
-  ctx.textAlign = 'left';
+  ctx.textAlign = 'center';
   ctx.font = '700 12px "Inter", monospace, sans-serif';
   ctx.fillStyle = '#38bdf8';
   ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
   ctx.shadowBlur = 6;
-  ctx.fillText('#FNGGOverride  •  spritedex.com', paddingX + 6, height - 20);
+  ctx.fillText('#FNGGOverride  •  spritedex.com', width / 2, height - 16);
   ctx.restore();
 
   return canvas.toDataURL('image/png');
