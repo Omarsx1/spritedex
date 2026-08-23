@@ -5667,9 +5667,8 @@ body::before {
 }
 
 .mobile-swiper__blueprint-layer-3 {
-  background: radial-gradient(circle at 60% 40%, rgba(6,182,212,0.35) 0%, transparent 45%);
+  background: radial-gradient(circle at 60% 40%, rgba(6,182,212,0.28) 0%, rgba(6,182,212,0.08) 35%, transparent 70%);
   mix-blend-mode: screen;
-  filter: blur(175px);
 }
 
 .mobile-swiper__content {
@@ -5686,6 +5685,8 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 360px;
 }
 
 .ms-family-header {
@@ -5707,7 +5708,7 @@ body::before {
   text-transform: uppercase;
   position: relative;
   display: inline-block;
-  animation: glitch-text-anim-sm var(--tg-rgb-duration, 2.8s) steps(100) infinite;
+  text-shadow: 0 0 10px rgba(14, 165, 233, 0.5), 0 0 20px rgba(6, 182, 212, 0.25);
 }
 
 .ms-family-dots {
