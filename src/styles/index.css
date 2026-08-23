@@ -4007,24 +4007,27 @@ body::before {
 }
 
 .sdm-share__preview-box {
-  min-height: 240px;
-  max-height: 420px;
-  overflow: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 12px;
-  border: 1px dashed rgba(0, 240, 255, 0.2);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 14px;
+  border: 1px dashed rgba(0, 240, 255, 0.25);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .sdm-share__preview-img {
+  width: auto;
   max-width: 100%;
-  max-height: 380px;
+  height: auto;
+  max-height: 480px;
+  object-fit: contain;
   border-radius: 10px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
   transition: transform 0.3s ease;
+  display: block;
 }
 
 .sdm-share__preview-img:hover {
@@ -4327,13 +4330,23 @@ body::before {
   }
 
   .sdm-share__preview-box {
-    min-height: 160px;
-    max-height: 240px;
-    padding: 6px;
+    min-height: 180px;
+    max-height: none;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
   }
 
   .sdm-share__preview-img {
-    max-height: 220px;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 380px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
   }
 
   .sdm-share__trade-tip {
