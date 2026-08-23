@@ -2225,13 +2225,13 @@ body::before {
 
 /* ===== MASTERED CROWN SYSTEM ===== */
 
-/* 1. Grid View Crown (Desktop) - A la derecha debajo del badge MAX */
+/* 1. Grid View Crown (Desktop) - Altura exacta sobre la cabeza */
 .card-image__crown {
   position: absolute;
-  top: 8px;
-  right: 30px;
-  left: auto;
-  transform: rotate(14deg);
+  top: 18px;
+  left: 56%;
+  right: auto;
+  transform: rotate(10deg);
   width: 28px;
   height: 19px;
   z-index: 5;
@@ -2242,10 +2242,10 @@ body::before {
 /* 2. List View Crown */
 .list-item-image__crown {
   position: absolute;
-  top: -2px;
-  right: 6px;
-  left: auto;
-  transform: rotate(12deg);
+  top: 0px;
+  left: 54%;
+  right: auto;
+  transform: rotate(10deg);
   width: 18px;
   height: 12px;
   z-index: 5;
@@ -2253,13 +2253,13 @@ body::before {
   pointer-events: none !important;
 }
 
-/* 3. Mobile Swiper Crown - A la derecha debajo de la palabra MAX */
+/* 3. Mobile Swiper Crown - Altura del punto rojo sobre la cresta derecha */
 .ms-card__crown {
   position: absolute;
-  top: 8px;
-  right: 32px;
-  left: auto;
-  transform: rotate(14deg);
+  top: 22px;
+  left: 56%;
+  right: auto;
+  transform: rotate(10deg);
   width: 30px;
   height: 20px;
   z-index: 10;
@@ -2271,10 +2271,10 @@ body::before {
 .sprite-card.is-mastered .card-image:not(:has(.card-image__crown))::before {
   content: "";
   position: absolute;
-  top: 8px;
-  right: 30px;
-  left: auto;
-  transform: rotate(14deg);
+  top: 18px;
+  left: 56%;
+  right: auto;
+  transform: rotate(10deg);
   width: 28px;
   height: 19px;
   z-index: 2;
@@ -2286,10 +2286,10 @@ body::before {
 .sprite-list-item.is-mastered .list-item-image:not(:has(.list-item-image__crown))::before {
   content: "";
   position: absolute;
-  top: -2px;
-  right: 6px;
-  left: auto;
-  transform: rotate(12deg);
+  top: 0px;
+  left: 54%;
+  right: auto;
+  transform: rotate(10deg);
   width: 18px;
   height: 12px;
   z-index: 2;
