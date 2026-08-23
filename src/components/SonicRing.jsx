@@ -1,15 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 /**
  * Sonic Ring en SVG 3D vectorial de alta fidelidad.
  * Se utiliza como indicador de nivel exclusivo para las tarjetas de Gen 2 en lugar de estrellas.
+ * Incluye animación de giro 3D completo (rotateY 720deg) al hacer click o cambiar de nivel.
  */
-export function SonicRing({ active, mastered, size = 18, className = '' }) {
+export function SonicRing({ active, mastered, size = 18, className = '', isSpinning = false }) {
   const gradientId = React.useId();
   const goldId = `sonicRingGold-${gradientId}`;
   const glintId = `sonicRingGlint-${gradientId}`;
   const masteredId = `sonicRingMastered-${gradientId}`;
   const inactiveId = `sonicRingInactive-${gradientId}`;
+
+  const [spinning, setSpinning] = useState(false);
+  const prevActiveRef = useRef(active);
+
+  useEffect(() => {
+    if (active !== prevActiveRef.current) {
+      prevActiveRef.current = active;
+      setSpinning(true);
+      const timer = setTimeout(() => setSpinning(false), 650);
+      return () => clearTimeout(timer);
+    }
+  }, [active]);
+
+  const spinClass = (spinning || isSpinning) ? 'sonic-ring--spinning' : '';
 
   return (
     <svg
@@ -18,12 +33,11 @@ export function SonicRing({ active, mastered, size = 18, className = '' }) {
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={`sonic-ring-svg ${active ? 'is-active' : 'is-inactive'} ${mastered ? 'is-mastered' : ''} ${className}`}
+      className={`sonic-ring-svg ${active ? 'is-active' : 'is-inactive'} ${mastered ? 'is-mastered' : ''} ${spinClass} ${className}`}
       style={{
         display: 'inline-block',
         verticalAlign: 'middle',
         overflow: 'visible',
-        transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
       }}
     >
       <defs>
