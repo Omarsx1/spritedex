@@ -247,7 +247,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         </div>
 
         {/* ═══ BODY CONTENT ═══ */}
-        <div className="sdm__body" style={{ padding: '16px 24px' }}>
+        <div className="sdm__body sdm-share__body">
 
           {/* Scope Selector */}
           <div className="sdm-share__section-label">
@@ -267,12 +267,12 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
                   }}
                   className={`sdm-share__scope-btn ${isActive ? 'sdm-share__scope-btn--active' : ''}`}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <div className="sdm-share__scope-left">
                     {opt.icon}
-                    <span style={{ fontWeight: 900, fontSize: '0.8rem', letterSpacing: '0.4px' }}>{opt.label}</span>
+                    <span className="sdm-share__scope-label">{opt.label}</span>
                   </div>
-                  <span style={{ fontSize: '0.94rem', fontWeight: 900, color: isActive ? '#00f0ff' : '#cbd5e1' }}>
-                    {opt.count} sprites
+                  <span className="sdm-share__scope-count">
+                    {opt.count} <span className="sdm-share__scope-unit">sprites</span>
                   </span>
                 </button>
               );
