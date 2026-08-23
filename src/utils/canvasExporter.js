@@ -566,11 +566,14 @@ function renderGlitchOverrideTemplate({
   ctx.save();
   // Contenedor de tarjeta idéntico a las tarjetas de espíritus
   roundRect(ctx, qrCardX, qrCardY, qrCardW, qrCardH, 12);
-  ctx.fillStyle = 'rgba(6, 12, 24, 0.85)';
+  const cardGrad = ctx.createLinearGradient(qrCardX, qrCardY, qrCardX, qrCardY + qrCardH);
+  cardGrad.addColorStop(0, 'rgba(8, 24, 48, 0.92)');
+  cardGrad.addColorStop(1, 'rgba(4, 9, 20, 0.96)');
+  ctx.fillStyle = cardGrad;
   ctx.fill();
-  ctx.strokeStyle = 'rgba(0, 240, 232, 0.55)';
+  ctx.strokeStyle = '#00F0E8';
   ctx.lineWidth = 1.5;
-  ctx.shadowColor = 'rgba(0, 240, 232, 0.35)';
+  ctx.shadowColor = 'rgba(0, 240, 232, 0.5)';
   ctx.shadowBlur = 14;
   ctx.stroke();
   ctx.shadowBlur = 0;
@@ -586,35 +589,21 @@ function renderGlitchOverrideTemplate({
   ctx.fillRect(qrCardX + qrCardW - 7, qrCardY + qrCardH - 1.5, 8, 2.5);
   ctx.fillRect(qrCardX + qrCardW - 1.5, qrCardY + qrCardH - 7, 2.5, 8);
 
-  // Código QR de puntos moderno y prominente
-  const qrSize = Math.min(qrCardW - 20, qrCardH - 56, 108);
+  // Código QR de puntos moderno y prominente (centrado en toda la tarjeta)
+  const qrSize = Math.min(qrCardW - 24, qrCardH - 24, 136);
   const qrInnerX = qrCardX + (qrCardW - qrSize) / 2;
-  const qrInnerY = qrCardY + 12;
+  const qrInnerY = qrCardY + (qrCardH - qrSize) / 2;
+
+  // Fondo oscuro con microborde detrás del QR para máximo contraste
+  roundRect(ctx, qrInnerX - 6, qrInnerY - 6, qrSize + 12, qrSize + 12, 10);
+  ctx.fillStyle = 'rgba(3, 7, 18, 0.9)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0, 240, 232, 0.35)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
   const currentUrl = typeof window !== 'undefined' ? (window.location.origin || 'https://spritedex.com') : 'https://spritedex.com';
   drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, currentUrl);
-
-  // Subtítulo e insignia de acción al pie de la tarjeta
-  const qrTextY = qrInnerY + qrSize + 14;
-  ctx.textAlign = 'center';
-  ctx.font = '800 10.5px "Inter", sans-serif';
-  ctx.fillStyle = '#ffffff';
-  ctx.fillText('¡Únete al Dex!', qrCardX + qrCardW / 2, qrTextY);
-
-  const qrBadgeW = Math.min(qrCardW - 16, 92);
-  const qrBadgeH = 18;
-  const qrBadgeX = qrCardX + (qrCardW - qrBadgeW) / 2;
-  const qrBadgeY = qrTextY + 6;
-
-  roundRect(ctx, qrBadgeX, qrBadgeY, qrBadgeW, qrBadgeH, 4);
-  ctx.fillStyle = '#00F0E8';
-  ctx.shadowColor = 'rgba(0, 240, 232, 0.6)';
-  ctx.shadowBlur = 8;
-  ctx.fill();
-  ctx.shadowBlur = 0;
-
-  ctx.font = '900 9px "Inter", sans-serif';
-  ctx.fillStyle = '#060714';
-  ctx.fillText('ESCANEAR APP', qrCardX + qrCardW / 2, qrBadgeY + 12);
   ctx.restore();
 
   // 4. FOOTER WATERMARK (CENTRADO)
