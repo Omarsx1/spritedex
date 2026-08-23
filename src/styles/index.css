@@ -4153,9 +4153,11 @@ body::before {
     max-width: 440px;
     margin: auto;
     border-radius: 16px;
-    max-height: 92vh;
-    display: flex;
-    flex-direction: column;
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    display: block;
   }
 
   .sdm-share .sdm__hero {
@@ -4245,7 +4247,7 @@ body::before {
 
   .sdm-share .sdm__body.sdm-share__body {
     padding: 10px 12px 14px 12px;
-    overflow-y: auto;
+    overflow: visible;
   }
 
   .sdm-share .sdm-share__section-label {
@@ -4314,6 +4316,8 @@ body::before {
     padding: 10px;
     border-radius: 12px;
     margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .sdm-share__preview-header {
@@ -4330,23 +4334,28 @@ body::before {
   }
 
   .sdm-share__preview-box {
-    min-height: 180px;
-    max-height: none;
-    padding: 8px;
+    width: 100%;
+    min-height: 320px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    border: 1px dashed rgba(0, 240, 255, 0.3);
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: visible;
+    overflow: hidden;
   }
 
   .sdm-share__preview-img {
-    width: auto;
-    max-width: 100%;
+    width: 100%;
+    max-width: 270px;
     height: auto;
-    max-height: 380px;
     object-fit: contain;
     display: block;
     margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
   }
 
   .sdm-share__trade-tip {
