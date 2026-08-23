@@ -10,7 +10,7 @@ import gsap from 'gsap';
 export function ShareImageModal({ filteredSprites, allSprites, userState, activeFiltersLabel, onClose }) {
   const [trainerName, setTrainerName] = useState('Coleccionista Fortnite');
   const [format, setFormat] = useState('checklist'); // 'checklist', 'square'
-  const [scope, setScope] = useState('new'); // Default to 'new'
+  const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
   const [bgStyle, setBgStyle] = useState('glitch_override'); // 'glitch_override', 'blueprint', 'dark_matrix'
   const [dataUrl, setDataUrl] = useState('');
   const [isGenerating, setIsGenerating] = useState(true);
@@ -32,8 +32,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   // Determine which sprites to include based on scope
   const spritesList = useMemo(() => {
     switch (scope) {
-      case 'new':
-        return allSprites.filter(s => s.gen === 2 || s.unreleased || s.isNew);
       case 'all':
         return allSprites;
       case 'filtered':
@@ -44,8 +42,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         return allSprites.filter(s => !userState[s.id]?.owned);
       case 'mastered':
         return allSprites.filter(s => userState[s.id]?.owned && userState[s.id]?.level === 5);
-      case 'not_mastered':
-        return allSprites.filter(s => !userState[s.id]?.owned || userState[s.id]?.level < 5);
       default:
         return allSprites;
     }
@@ -54,12 +50,10 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   // Scope counts for display
   const counts = useMemo(() => ({
     all: allSprites.length,
-    new: allSprites.filter(s => s.gen === 2 || s.unreleased || s.isNew).length,
     filtered: filteredSprites.length,
     owned: allSprites.filter(s => userState[s.id]?.owned).length,
     missing: allSprites.filter(s => !userState[s.id]?.owned).length,
-    mastered: allSprites.filter(s => userState[s.id]?.owned && userState[s.id]?.level === 5).length,
-    not_mastered: allSprites.filter(s => !userState[s.id]?.owned || userState[s.id]?.level < 5).length
+    mastered: allSprites.filter(s => userState[s.id]?.owned && userState[s.id]?.level === 5).length
   }), [allSprites, filteredSprites, userState]);
 
   const ownedInScope = useMemo(() => {
@@ -97,13 +91,11 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     const missing = spritesList.filter(s => !userState[s.id]?.owned);
 
     const scopeLabels = {
-      new: '⚡ Gen 2 / Glitch (Intercambio)',
       all: '🌐 Colección Completa Override',
       filtered: `🔍 Filtrado (${activeFiltersLabel})`,
       owned: '✔️ Solo Desencriptados',
       missing: '❌ Solo Faltantes / Bloqueados',
-      mastered: '⭐ Solo Maxeados',
-      not_mastered: '💜 No Maxeados'
+      mastered: '⭐ Solo Maxeados'
     };
 
     let text = `🎮 ¡MI COLECCIÓN SPRITEDEX OVERRIDE / GLITCH! 🏆\n`;
@@ -174,47 +166,34 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
 
   const scopeOptions = [
     {
-      id: 'new',
-      label: 'NUEVOS (GEN 2)',
-      icon: <Sparkles size={15} color="#00f0ff" />,
-      count: counts.new,
-      desc: 'Temporada Glitch',
-      isPopular: true
-    },
-    {
       id: 'all',
       label: 'TODOS',
       icon: <Globe size={15} color="#38bdf8" />,
-      count: counts.all,
-      desc: 'Toda la colección'
+      count: counts.all
     },
     {
       id: 'owned',
-      label: 'HACKEADOS',
+      label: 'ATRAPADOS',
       icon: <CheckCircle size={15} color="#10b981" />,
-      count: counts.owned,
-      desc: 'Tus espíritus atrapados'
+      count: counts.owned
     },
     {
       id: 'missing',
       label: 'FALTANTES',
       icon: <XCircle size={15} color="#ef4444" />,
-      count: counts.missing,
-      desc: 'Por desbloquear'
+      count: counts.missing
     },
     {
       id: 'mastered',
       label: 'MAXEADOS',
       icon: <ShieldCheck size={15} color="#eab308" />,
-      count: counts.mastered,
-      desc: 'Solo Nivel 5 (⭐)'
+      count: counts.mastered
     },
     {
       id: 'filtered',
       label: 'FILTRO ACTUAL',
       icon: <Filter size={15} color="#a855f7" />,
-      count: counts.filtered,
-      desc: activeFiltersLabel || 'Personalizado'
+      count: counts.filtered
     }
   ];
 
@@ -242,7 +221,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           <div className="sdm__hero-info">
             <div className="sdm__hero-badges">
               <span className="sdm-share__tag-chapter">FORTNITE | TEMPORADA GLITCH</span>
-              <span className="sdm-share__tag-pill">BREAK THE RULES • CHANGE THE GAME</span>
+              <span className="sdm-share__tag-pill">ROMPE LAS REGLAS • CAMBIA EL JUEGO</span>
             </div>
             <h2 className="sdm__name sdm-share__glitch-title">SPRITEDEX OVERRIDE</h2>
             <p className="sdm__meta">
@@ -276,7 +255,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           {/* Scope Selector */}
           <div className="sdm-share__section-label">
             <Repeat size={14} color="#00f0ff" />
-            <span>CATEGORÍA / BREACH A EXPORTAR</span>
+            <span>CATEGORÍA A EXPORTAR</span>
           </div>
 
           <div className="sdm-share__scopes">
@@ -291,18 +270,12 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
                   }}
                   className={`sdm-share__scope-btn ${isActive ? 'sdm-share__scope-btn--active' : ''}`}
                 >
-                  {opt.isPopular && (
-                    <span className="sdm-share__badge-popular">HOT</span>
-                  )}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: opt.isPopular ? '2px' : '0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                     {opt.icon}
-                    <span style={{ fontWeight: 900, fontSize: '0.78rem', letterSpacing: '0.4px' }}>{opt.label}</span>
+                    <span style={{ fontWeight: 900, fontSize: '0.8rem', letterSpacing: '0.4px' }}>{opt.label}</span>
                   </div>
-                  <span style={{ fontSize: '0.92rem', fontWeight: 900, color: isActive ? '#00f0ff' : '#cbd5e1' }}>
+                  <span style={{ fontSize: '0.94rem', fontWeight: 900, color: isActive ? '#00f0ff' : '#cbd5e1' }}>
                     {opt.count} sprites
-                  </span>
-                  <span style={{ fontSize: '0.64rem', color: '#64748b', lineHeight: '1.2' }}>
-                    {opt.desc}
                   </span>
                 </button>
               );
