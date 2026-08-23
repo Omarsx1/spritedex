@@ -948,7 +948,7 @@
   },
   {
     "id": "klombo_cheatmaster",
-    "name": "Cheat Master Klombo",
+    "name": "Hacker Klombo",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -972,7 +972,7 @@
   },
   {
     "id": "crown_cheatmaster",
-    "name": "Cheat Master Crown",
+    "name": "Hacker Crown",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -996,7 +996,7 @@
   },
   {
     "id": "jackrabbit_cheatmaster",
-    "name": "Cheat Master Jackrabbit",
+    "name": "Hacker Jackrabbit",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1020,7 +1020,7 @@
   },
   {
     "id": "sonic_cheatmaster",
-    "name": "Cheat Master Sonic",
+    "name": "Hacker Sonic",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1044,7 +1044,7 @@
   },
   {
     "id": "shadow_cheatmaster",
-    "name": "Cheat Master Shadow",
+    "name": "Hacker Shadow",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1068,7 +1068,7 @@
   },
   {
     "id": "tails_cheatmaster",
-    "name": "Cheat Master Tails",
+    "name": "Hacker Tails",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1092,7 +1092,7 @@
   },
   {
     "id": "killswitch_cheatmaster",
-    "name": "Cheat Master Killswitch",
+    "name": "Hacker Killswitch",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1116,7 +1116,7 @@
   },
   {
     "id": "bush_cheatmaster",
-    "name": "Cheat Master Bush",
+    "name": "Hacker Bush",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1140,7 +1140,7 @@
   },
   {
     "id": "adventure_cheatmaster",
-    "name": "Cheat Master Adventure",
+    "name": "Hacker Adventure",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1164,7 +1164,7 @@
   },
   {
     "id": "jonesy_cheatmaster",
-    "name": "Cheat Master Jonesy",
+    "name": "Hacker Jonesy",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1188,7 +1188,7 @@
   },
   {
     "id": "8bit_cheatmaster",
-    "name": "Cheat Master 8-Bit",
+    "name": "Hacker 8-Bit",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
