@@ -8,7 +8,6 @@ import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 
 export function ShareImageModal({ filteredSprites, allSprites, userState, activeFiltersLabel, onClose }) {
-  const [trainerName, setTrainerName] = useState('Coleccionista Fortnite');
   const [format, setFormat] = useState('checklist'); // 'checklist', 'square'
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
   const [bgStyle, setBgStyle] = useState('glitch_override'); // 'glitch_override', 'blueprint', 'dark_matrix'
@@ -75,14 +74,13 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     generatePokedexCardImage({
       spritesList,
       userState,
-      trainerName,
       format,
       bgStyle
     }).then((url) => {
       setDataUrl(url);
       setIsGenerating(false);
     });
-  }, [spritesList, userState, trainerName, format, bgStyle]);
+  }, [spritesList, userState, format, bgStyle]);
 
   const getShareableText = () => {
     const total = spritesList.length;
@@ -99,7 +97,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     };
 
     let text = `🎮 ¡MI COLECCIÓN SPRITEDEX OVERRIDE / GLITCH! 🏆\n`;
-    text += `👤 Jugador: ${trainerName}\n`;
     text += `📋 Vista: ${scopeLabels[scope] || 'Plantilla'}\n`;
     text += `📊 Desencriptados: ${owned}/${total} (${total > 0 ? Math.round((owned / total) * 100) : 0}%)\n`;
     text += `⭐ Maxeados: ${mastered}\n\n`;
@@ -125,7 +122,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     sounds.playBeep();
     const a = document.createElement('a');
     a.href = dataUrl;
-    a.download = `Fortnite_Override_${scope}_${trainerName.replace(/\s+/g, '_')}.png`;
+    a.download = `Fortnite_Override_${scope}.png`;
     a.click();
   };
 
@@ -284,20 +281,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
 
           {/* Config Controls Grid */}
           <div className="sdm-share__grid-config">
-            {/* Player Name */}
-            <div className="sdm-share__input-wrap">
-              <label className="sdm-share__section-label">
-                <span>NOMBRE DE ENTRENADOR:</span>
-              </label>
-              <input
-                type="text"
-                value={trainerName}
-                onChange={(e) => setTrainerName(e.target.value)}
-                className="sdm-share__input"
-                placeholder="Ej. Coleccionista Fortnite"
-              />
-            </div>
-
             {/* Format Selector */}
             <div className="sdm-share__input-wrap">
               <label className="sdm-share__section-label">
