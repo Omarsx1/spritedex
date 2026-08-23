@@ -4056,13 +4056,20 @@ body::before {
 
 .sdm-share__trade-tip {
   margin-top: 10px;
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   color: #94a3b8;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 6px;
-  text-align: center;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.sdm-share__trade-tip span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .sdm-share__trade-tip code {
@@ -4070,6 +4077,13 @@ body::before {
   background: rgba(0, 240, 255, 0.1);
   padding: 2px 6px;
   border-radius: 4px;
+  display: inline;
+}
+
+@media (max-width: 600px) {
+  .sdm-share__trade-tip {
+    white-space: normal;
+  }
 }
 
 .sdm-share__actions {
