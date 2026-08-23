@@ -1862,7 +1862,7 @@ body::before {
 /* ===== Sprite Card (fortnite.gg style) ===== */
 .sprite-card {
   border-radius: 14px;
-  padding: 16px 14px 12px;
+  padding: 22px 14px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2225,10 +2225,10 @@ body::before {
 
 /* ===== MASTERED CROWN SYSTEM ===== */
 
-/* 1. Grid View Crown (Desktop) - Altura exacta sobre la cabeza */
+/* 1. Grid View Crown (Desktop) - Flotando con holgura sobre la cresta */
 .card-image__crown {
   position: absolute;
-  top: 18px;
+  top: 8px;
   left: 56%;
   right: auto;
   transform: rotate(10deg);
@@ -2253,7 +2253,7 @@ body::before {
   pointer-events: none !important;
 }
 
-/* 3. Mobile Swiper Crown - Altura del punto rojo sobre la cresta derecha */
+/* 3. Mobile Swiper Crown - Altura sobre la cresta derecha */
 .ms-card__crown {
   position: absolute;
   top: 22px;
@@ -2271,7 +2271,7 @@ body::before {
 .sprite-card.is-mastered .card-image:not(:has(.card-image__crown))::before {
   content: "";
   position: absolute;
-  top: 18px;
+  top: 8px;
   left: 56%;
   right: auto;
   transform: rotate(10deg);
@@ -2301,10 +2301,11 @@ body::before {
 /* Card image container - pass clicks through to parent card */
 .card-image {
   width: 100%;
-  height: 130px;
+  height: 125px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 8px;
   margin-bottom: 10px;
   position: relative;
   z-index: 1;
