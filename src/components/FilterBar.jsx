@@ -22,6 +22,7 @@ const STATUS_OPTIONS = [
 ];
 
 export function FilterBar({
+  isMobile,
   activeGen,
   setActiveGen,
   searchQuery,
@@ -202,22 +203,24 @@ export function FilterBar({
         </label>
 
         {/* View Mode Toggle (Grid/List) */}
-        <div className="filter-view-toggle">
-          <button
-            className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
-            onClick={() => setViewMode('grid')}
-            title="Vista cuadrícula"
-          >
-            <Grid size={15} />
-          </button>
-          <button
-            className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-            onClick={() => setViewMode('list')}
-            title="Vista lista"
-          >
-            <List size={15} />
-          </button>
-        </div>
+        {!isMobile && (
+          <div className="filter-view-toggle">
+            <button
+              className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+              title="Vista cuadrícula"
+            >
+              <Grid size={15} />
+            </button>
+            <button
+              className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+              title="Vista lista"
+            >
+              <List size={15} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

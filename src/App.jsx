@@ -12,6 +12,8 @@ import { AuthModal } from './components/AuthModal';
 import { PrivacyNotice } from './components/PrivacyNotice';
 import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
 import { Footer } from './components/Footer';
+import { MobileSpriteSwiper } from './components/MobileSpriteSwiper';
+import { useIsMobile } from './hooks/useIsMobile';
 import { decodeCollectionState } from './utils/shareLink';
 import { supabase, isSupabaseConfigured } from './utils/supabase';
 import {
@@ -25,6 +27,7 @@ import {
 const LOCAL_STORAGE_KEY = 'fortnite_sprites_pokedex_v3';
 
 export function App() {
+  const isMobile = useIsMobile(600);
   const [userState, setUserState] = useState(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -489,6 +492,7 @@ export function App() {
       {/* Main Content with Fortnite.gg matching filters */}
       <main className="main-content">
         <FilterBar
+          isMobile={isMobile}
           activeGen={activeGen}
           setActiveGen={setActiveGen}
           searchQuery={searchQuery}
@@ -512,6 +516,16 @@ export function App() {
             <h2 style={{ fontSize: '1.4rem', marginBottom: '8px' }}>No se encontraron Sprites</h2>
             <p>Prueba ajustando la búsqueda o los filtros.</p>
           </div>
+        ) : isMobile ? (
+          <MobileSpriteSwiper
+            sprites={filteredSprites}
+            userState={userState}
+            friendState={friendState}
+            isFriendView={activeProfile === 'friend'}
+            onToggleOwned={handleToggleOwned}
+            onSetLevel={handleSetLevel}
+            onOpenDetail={(s) => setSelectedSprite(s)}
+          />
         ) : (
           <div className={`sprites-grid ${viewMode === 'list' ? 'list-view' : ''}`}>
             {filteredSprites.map((sprite) => (

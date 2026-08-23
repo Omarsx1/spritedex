@@ -4608,6 +4608,218 @@ body::before {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* ===== MOBILE SWIPER (Family Rows + Variant Swipe) ===== */
+.mobile-swiper {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding: 0 0 20px;
+}
+
+/* Blueprint Aura Layers */
+.mobile-swiper__blueprint-layer-1,
+.mobile-swiper__blueprint-layer-2,
+.mobile-swiper__blueprint-layer-3 {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  transform: translateZ(0);
+  z-index: 0;
+}
+
+.mobile-swiper__blueprint-layer-1 {
+  background: linear-gradient(rgba(14,165,233,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.12) 1px, transparent 1px);
+  background-size: 50px 50px;
+  mix-blend-mode: normal;
+}
+
+.mobile-swiper__blueprint-layer-2 {
+  background: linear-gradient(rgba(14,165,233,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.06) 1px, transparent 1px);
+  background-size: 10px 10px;
+  mix-blend-mode: normal;
+}
+
+.mobile-swiper__blueprint-layer-3 {
+  background: radial-gradient(circle at 60% 40%, rgba(6,182,212,0.35) 0%, transparent 45%);
+  mix-blend-mode: screen;
+  filter: blur(175px);
+}
+
+.mobile-swiper__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 0 16px;
+}
+
+/* ── Family Row ── */
+.ms-family-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ms-family-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.ms-family-name {
+  font-family: var(--font-display, var(--font-sans));
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.ms-family-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.ms-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.ms-dot--active {
+  background: #0ea5e9;
+  transform: scale(1.3);
+  box-shadow: 0 0 6px rgba(14, 165, 233, 0.6);
+}
+
+/* ── Card Stack Container (per family) ── */
+.ms-family-stack {
+  position: relative;
+  perspective: 1200px;
+  width: 100%;
+  height: 240px;
+  touch-action: pan-y;
+}
+
+/* ── Individual Card ── */
+.ms-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% - 40px);
+  height: 100%;
+  border-radius: 16px;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.ms-card--active {
+  z-index: 10;
+  transform: translateX(0) scale(1);
+  opacity: 1;
+}
+
+.ms-card--next {
+  z-index: 9;
+  transform: translateX(20px) scale(0.96) rotateY(-3deg);
+  opacity: 0.85;
+  filter: brightness(0.85);
+  pointer-events: none;
+}
+
+.ms-card--next-2 {
+  z-index: 8;
+  transform: translateX(35px) scale(0.92) rotateY(-5deg);
+  opacity: 0.55;
+  filter: brightness(0.75);
+  pointer-events: none;
+}
+
+.ms-card--next-3 {
+  z-index: 7;
+  transform: translateX(48px) scale(0.88) rotateY(-7deg);
+  opacity: 0.3;
+  filter: brightness(0.6);
+  pointer-events: none;
+}
+
+.ms-card--hidden {
+  z-index: 1;
+  transform: translateX(60px) scale(0.85);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Variant Tag ── */
+.ms-variant-tag {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  z-index: 3;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ── Card Image ── */
+.ms-card__image {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 2px;
+}
+
+.ms-card__image img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+/* ── Card Info ── */
+.ms-card__info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+/* ── Swipe Hint ── */
+.ms-swipe-hint {
+  text-align: center;
+  font-size: 0.68rem;
+  color: rgba(14, 165, 233, 0.6);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 2px 0;
+  animation: ms-hint-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes ms-hint-pulse {
+  0%, 100% { opacity: 0.5; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(6px); }
+}
+
 /* ===== APP FOOTER (Glassmorphic Floating Capsule) ===== */
 .app-footer {
   width: 100%;
