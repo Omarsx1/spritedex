@@ -356,12 +356,41 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
             <div className="sdm-share__preview-header">
               <span className="sdm-share__section-label" style={{ marginBottom: 0 }}>
                 <Sparkles size={14} color="#00f0ff" />
-                <span>Vista Previa de la Plantilla</span>
+                <span>Vista Previa</span>
               </span>
-              <span className="sdm-share__preview-badge">
-                <CheckCircle size={13} />
-                <span>{spritesList.length} Sprites • {bgStyle === 'glitch_override' ? 'Glitch Override HD' : bgStyle === 'blueprint' ? 'Blueprint Aura HD' : 'Dark Matrix HD'}</span>
-              </span>
+
+              {/* Botones de acción directos en la barra superior */}
+              <div className="sdm-share__header-actions">
+                <button
+                  className="sdm-share__quick-btn sdm-share__quick-btn--copy"
+                  onClick={handleCopyText}
+                  disabled={spritesList.length === 0}
+                  title="Copiar texto para compartir en redes"
+                >
+                  {copiedText ? <Check size={14} color="#4ade80" /> : <Copy size={14} />}
+                  <span>{copiedText ? '¡Copiado!' : 'Copiar Texto'}</span>
+                </button>
+
+                <button
+                  className="sdm-share__quick-btn sdm-share__quick-btn--download"
+                  onClick={handleDownload}
+                  disabled={!dataUrl}
+                  title="Descargar imagen PNG"
+                >
+                  <Download size={14} />
+                  <span>Descargar</span>
+                </button>
+
+                <button
+                  className="sdm-share__quick-btn sdm-share__quick-btn--share"
+                  onClick={handleNativeShare}
+                  disabled={!dataUrl}
+                  title="Compartir plantilla"
+                >
+                  <Share2 size={14} />
+                  <span>Compartir</span>
+                </button>
+              </div>
             </div>
 
             <div className="sdm-share__preview-box">
@@ -386,36 +415,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
             <div className="sdm-share__trade-tip">
               <span>💡 <strong>Tip de Intercambio:</strong> Comparte esta plantilla en tus redes o chats con amigos usando <code>#FNGGOverride</code></span>
             </div>
-          </div>
-
-          {/* Action Footer */}
-          <div className="sdm-share__actions">
-            <button
-              className="sdm-share__btn sdm-share__btn--secondary"
-              onClick={handleCopyText}
-              disabled={spritesList.length === 0}
-            >
-              {copiedText ? <Check size={16} color="#4ade80" /> : <Copy size={16} />}
-              <span>{copiedText ? '¡Texto Copiado!' : 'Copiar Texto para Post'}</span>
-            </button>
-
-            <button
-              className="sdm-share__btn sdm-share__btn--primary"
-              onClick={handleDownload}
-              disabled={!dataUrl}
-            >
-              <Download size={16} />
-              <span>Descargar PNG</span>
-            </button>
-
-            <button
-              className="sdm-share__btn sdm-share__btn--vibrant"
-              onClick={handleNativeShare}
-              disabled={!dataUrl}
-            >
-              <Share2 size={16} />
-              <span>Compartir Imagen</span>
-            </button>
           </div>
 
         </div>
