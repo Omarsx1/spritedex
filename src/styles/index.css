@@ -76,11 +76,21 @@ body::before {
   }
 }
 
-/* En pantallas verticales/móviles, centrar y ajustar para mantener proporciones nítidas */
-@media (max-width: 768px) {
+/* En pantallas verticales/móviles (tablets), centrar y ajustar para mantener proporciones nítidas */
+@media (max-width: 768px) and (min-width: 601px) {
   body::before {
     background-size: auto 100dvh;
     background-position: center top;
+  }
+}
+
+/* En mobile (≤600px), ocultar background.webp — el fondo Blueprint Aura del swiper lo reemplaza */
+@media (max-width: 600px) {
+  body::before {
+    display: none;
+  }
+  body {
+    background-color: #100e0b;
   }
 }
 
@@ -4702,7 +4712,7 @@ body::before {
   position: relative;
   perspective: 1200px;
   width: 220px;
-  height: 280px;
+  height: 340px;
   margin: 0 auto;
   touch-action: pan-y;
 }
