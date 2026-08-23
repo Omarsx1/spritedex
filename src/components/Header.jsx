@@ -89,12 +89,13 @@ export function Header({
     }
   }, []);
 
-  // Rotate hero sprite every 2.8s
+  // Rotate hero sprite with visibility and performance awareness
   useEffect(() => {
     if (spritePool.length === 0) return;
 
+    const intervalTime = window.innerWidth <= 600 ? 5500 : 3500;
     const interval = setInterval(() => {
-      if (!activeSpriteRef.current) return;
+      if (document.hidden || !activeSpriteRef.current) return;
 
       gsap.to(activeSpriteRef.current, {
         scale: 0.7,
@@ -126,7 +127,7 @@ export function Header({
           });
         }
       });
-    }, 2800);
+    }, intervalTime);
 
     return () => clearInterval(interval);
   }, [spritePool, spriteIndex]);
