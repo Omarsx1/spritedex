@@ -117,12 +117,20 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     return text;
   };
 
+  const getCaptureFilename = () => {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    const timeStr = `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+    return `captura_${dateStr}_${timeStr}.png`;
+  };
+
   const handleDownload = () => {
     if (!dataUrl) return;
     sounds.playBeep();
     const a = document.createElement('a');
     a.href = dataUrl;
-    a.download = `Fortnite_Override_${scope}.png`;
+    a.download = getCaptureFilename();
     a.click();
   };
 
@@ -130,9 +138,10 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     if (!dataUrl) return;
     sounds.playBeep();
     try {
+      const filename = getCaptureFilename();
       const res = await fetch(dataUrl);
       const blob = await res.blob();
-      const file = new File([blob], 'Fortnite_Override_Sprites.png', { type: 'image/png' });
+      const file = new File([blob], filename, { type: 'image/png' });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
