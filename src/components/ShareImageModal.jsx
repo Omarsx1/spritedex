@@ -288,7 +288,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
               </label>
               <div className="sdm-share__pill-selector">
                 {[
-                  { id: 'checklist', label: '📋 Rejilla' },
+                  { id: 'checklist', label: '📱 Vertical Móvil' },
                   { id: 'square', label: '🔳 1:1 Cuadrado' }
                 ].map(f => (
                   <button
