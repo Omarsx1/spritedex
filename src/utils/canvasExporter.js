@@ -550,50 +550,17 @@ function renderGlitchOverrideTemplate({
     ctx.restore();
   });
 
-  // 3.B. TARJETA CIBERNÉTICA PROMINENTE DE CÓDIGO QR (ESQUINA INFERIOR DERECHA DE LA CUADRÍCULA)
-  const cardMarginX = 6;
-  const cardMarginY = 6;
+  // 3.B. CÓDIGO QR DE PUNTOS MODERNO (SIN MARCO, FLOTANTE EN LA ESQUINA INFERIOR DERECHA)
   const qrColIdx = cols - 1;
   const qrRowIdx = rows - 1;
   const qrX = startX + qrColIdx * cellW;
   const qrY = startY + qrRowIdx * cellH;
 
-  const qrCardX = qrX + cardMarginX;
-  const qrCardY = qrY + cardMarginY;
-  const qrCardW = cellW - cardMarginX * 2;
-  const qrCardH = cellH - cardMarginY * 2;
+  const qrSize = Math.min(cellW - 16, cellH - 16, 156);
+  const qrInnerX = qrX + (cellW - qrSize) / 2;
+  const qrInnerY = qrY + (cellH - qrSize) / 2;
 
   ctx.save();
-  // Contenedor de tarjeta idéntico a las tarjetas de espíritus
-  roundRect(ctx, qrCardX, qrCardY, qrCardW, qrCardH, 12);
-  const cardGrad = ctx.createLinearGradient(qrCardX, qrCardY, qrCardX, qrCardY + qrCardH);
-  cardGrad.addColorStop(0, 'rgba(8, 24, 48, 0.92)');
-  cardGrad.addColorStop(1, 'rgba(4, 9, 20, 0.96)');
-  ctx.fillStyle = cardGrad;
-  ctx.fill();
-  ctx.strokeStyle = '#00F0E8';
-  ctx.lineWidth = 1.5;
-  ctx.shadowColor = 'rgba(0, 240, 232, 0.5)';
-  ctx.shadowBlur = 14;
-  ctx.stroke();
-  ctx.shadowBlur = 0;
-
-  // Soportes angulares cibernéticos en las 4 esquinas
-  ctx.fillStyle = '#00F0E8';
-  ctx.fillRect(qrCardX - 1, qrCardY - 1, 8, 2.5);
-  ctx.fillRect(qrCardX - 1, qrCardY - 1, 2.5, 8);
-  ctx.fillRect(qrCardX + qrCardW - 7, qrCardY - 1, 8, 2.5);
-  ctx.fillRect(qrCardX + qrCardW - 1.5, qrCardY - 1, 2.5, 8);
-  ctx.fillRect(qrCardX - 1, qrCardY + qrCardH - 1.5, 8, 2.5);
-  ctx.fillRect(qrCardX - 1, qrCardY + qrCardH - 7, 2.5, 8);
-  ctx.fillRect(qrCardX + qrCardW - 7, qrCardY + qrCardH - 1.5, 8, 2.5);
-  ctx.fillRect(qrCardX + qrCardW - 1.5, qrCardY + qrCardH - 7, 2.5, 8);
-
-  // Código QR de puntos moderno y prominente (centrado libremente en toda la tarjeta sin marco interno)
-  const qrSize = Math.min(qrCardW - 16, qrCardH - 16, 144);
-  const qrInnerX = qrCardX + (qrCardW - qrSize) / 2;
-  const qrInnerY = qrCardY + (qrCardH - qrSize) / 2;
-
   const targetUrl = 'https://spritedex-two.vercel.app/';
   drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, targetUrl);
   ctx.restore();
