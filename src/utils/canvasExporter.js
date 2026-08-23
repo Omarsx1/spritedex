@@ -1,5 +1,42 @@
 // HTML5 Canvas Exporter for Social Media - Estilo Oficial GLITCH / OVERRIDE
 // Inspirado en el diseño 'CHAPTER 7 | SEASON 4: OVERRIDE' de Fortnite
+import { generateQRMatrix } from './qrGenerator';
+
+// Renderiza un código QR moderno con estilo de puntos/círculos y acentos cibernéticos
+function drawModernDotQR(ctx, qrX, qrY, qrSize, url = 'https://spritedex.com') {
+  try {
+    const qr = generateQRMatrix(url);
+    const count = qr.getModuleCount();
+    const cellSize = qrSize / count;
+    const dotRadius = cellSize * 0.42;
+
+    for (let r = 0; r < count; r++) {
+      for (let c = 0; c < count; c++) {
+        if (qr.isDark(r, c)) {
+          const isFinder =
+            (r < 7 && c < 7) ||
+            (r < 7 && c >= count - 7) ||
+            (r >= count - 7 && c < 7);
+
+          const centerX = qrX + c * cellSize + cellSize / 2;
+          const centerY = qrY + r * cellSize + cellSize / 2;
+
+          ctx.beginPath();
+          if (isFinder) {
+            ctx.arc(centerX, centerY, cellSize * 0.46, 0, Math.PI * 2);
+            ctx.fillStyle = '#00F0E8';
+          } else {
+            ctx.arc(centerX, centerY, dotRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+          }
+          ctx.fill();
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Error rendering modern dot QR on canvas:', err);
+  }
+}
 
 // Helper to pre-load image for canvas drawing
 function loadImage(src) {
@@ -214,7 +251,7 @@ function renderGlitchOverrideTemplate({
   let cols = 6;
   const paddingX = 36;
   const headerH = 195;
-  const footerH = 55;
+  const footerH = 110;
 
   if (format === 'square') {
     width = 1200;
@@ -511,14 +548,54 @@ function renderGlitchOverrideTemplate({
     ctx.restore();
   });
 
-  // 4. FOOTER WATERMARK
+  // 4. FOOTER & MODERN DOT-STYLE QR CODE (BOTTOM-RIGHT)
+  const qrBadgeW = 88;
+  const qrBadgeH = 100;
+  const qrBadgeX = width - paddingX - qrBadgeW;
+  const qrBadgeY = height - qrBadgeH - 8;
+
+  // Modern Cyber Glass QR Badge Container
   ctx.save();
+  roundRect(ctx, qrBadgeX, qrBadgeY, qrBadgeW, qrBadgeH, 10);
+  ctx.fillStyle = 'rgba(10, 14, 26, 0.88)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0, 240, 232, 0.45)';
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+
+  // Cyber Corner Brackets on QR Badge
+  ctx.fillStyle = '#00F0E8';
+  ctx.fillRect(qrBadgeX - 1, qrBadgeY - 1, 6, 2);
+  ctx.fillRect(qrBadgeX - 1, qrBadgeY - 1, 2, 6);
+  ctx.fillRect(qrBadgeX + qrBadgeW - 5, qrBadgeY - 1, 6, 2);
+  ctx.fillRect(qrBadgeX + qrBadgeW - 1, qrBadgeY - 1, 2, 6);
+  ctx.fillRect(qrBadgeX - 1, qrBadgeY + qrBadgeH - 1, 6, 2);
+  ctx.fillRect(qrBadgeX - 1, qrBadgeY + qrBadgeH - 5, 2, 6);
+  ctx.fillRect(qrBadgeX + qrBadgeW - 5, qrBadgeY + qrBadgeH - 1, 6, 2);
+  ctx.fillRect(qrBadgeX + qrBadgeW - 1, qrBadgeY + qrBadgeH - 5, 2, 6);
+
+  // Draw Dot QR Code
+  const qrSize = 70;
+  const qrInnerX = qrBadgeX + (qrBadgeW - qrSize) / 2;
+  const qrInnerY = qrBadgeY + 8;
+  const currentUrl = typeof window !== 'undefined' ? (window.location.origin || 'https://spritedex.com') : 'https://spritedex.com';
+  drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, currentUrl);
+
+  // QR Label below code
+  ctx.font = '800 7.5px "Inter", monospace, sans-serif';
+  ctx.fillStyle = '#00F0E8';
   ctx.textAlign = 'center';
+  ctx.fillText('ESCANEAR APP', qrBadgeX + qrBadgeW / 2, qrBadgeY + qrBadgeH - 6);
+  ctx.restore();
+
+  // Watermark text in bottom-left / center
+  ctx.save();
+  ctx.textAlign = 'left';
   ctx.font = '700 12px "Inter", monospace, sans-serif';
   ctx.fillStyle = '#38bdf8';
   ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
   ctx.shadowBlur = 6;
-  ctx.fillText('#FNGGOverride  •  spritedex.com', width / 2, height - 16);
+  ctx.fillText('#FNGGOverride  •  spritedex.com', paddingX + 6, height - 20);
   ctx.restore();
 
   return canvas.toDataURL('image/png');
