@@ -403,9 +403,9 @@ function renderGlitchOverrideTemplate({
     ctx.save();
     roundRect(ctx, cardX, cardY, cardW, cardH, 12);
     if (isOwned) {
-      ctx.fillStyle = isMastered ? 'rgba(234, 179, 8, 0.10)' : 'rgba(15, 23, 42, 0.65)';
+      ctx.fillStyle = isMastered ? 'rgba(234, 179, 8, 0.12)' : 'rgba(0, 240, 232, 0.08)';
       ctx.fill();
-      ctx.strokeStyle = isMastered ? 'rgba(234, 179, 8, 0.65)' : 'rgba(0, 240, 255, 0.35)';
+      ctx.strokeStyle = isMastered ? 'rgba(234, 179, 8, 0.65)' : 'rgba(0, 240, 232, 0.45)';
       ctx.lineWidth = isMastered ? 1.5 : 1;
       if (isMastered) {
         ctx.shadowColor = 'rgba(234, 179, 8, 0.4)';
@@ -414,16 +414,16 @@ function renderGlitchOverrideTemplate({
       ctx.stroke();
       ctx.shadowBlur = 0;
     } else {
-      ctx.fillStyle = 'rgba(8, 10, 18, 0.45)';
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
       ctx.fill();
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
       ctx.lineWidth = 1;
       ctx.stroke();
     }
 
     // Corner pixel ticks on active cards
     if (isOwned) {
-      ctx.fillStyle = isMastered ? '#facc15' : '#00f0ff';
+      ctx.fillStyle = isMastered ? '#facc15' : '#00F0E8';
       ctx.fillRect(cardX + 2, cardY + 2, 4, 4);
       ctx.fillRect(cardX + cardW - 6, cardY + 2, 4, 4);
       ctx.fillRect(cardX + 2, cardY + cardH - 6, 4, 4);
@@ -441,7 +441,7 @@ function renderGlitchOverrideTemplate({
       const spiritHue = getSpiritHue(sprite);
 
       if (!isOwned) {
-        ctx.globalAlpha = 0.32;
+        ctx.globalAlpha = 0.68;
         ctx.drawImage(spriteImg, cardX + cardW / 2 - imgSize / 2, cardY + 8, imgSize, imgSize);
       } else {
         ctx.shadowColor = hexToRgba(spiritHue, 0.65);
@@ -457,7 +457,7 @@ function renderGlitchOverrideTemplate({
     ctx.save();
     ctx.textAlign = 'center';
     ctx.font = '800 11px "Inter", sans-serif';
-    ctx.fillStyle = isOwned ? '#ffffff' : 'rgba(255, 255, 255, 0.35)';
+    ctx.fillStyle = isOwned ? '#ffffff' : 'rgba(255, 255, 255, 0.75)';
     const textY = cardY + 8 + imgSize + 14;
 
     let nameText = sprite.fullName || sprite.name;
@@ -470,7 +470,7 @@ function renderGlitchOverrideTemplate({
     }
     ctx.fillText(nameText, cardX + cardW / 2, textY);
 
-    // D. Cyber Badge at Bottom (Image 2 style)
+    // D. Cyber Badge at Bottom
     const badgeW = Math.min(cardW - 16, 76);
     const badgeH = 18;
     const badgeX = cardX + (cardW - badgeW) / 2;
@@ -479,32 +479,32 @@ function renderGlitchOverrideTemplate({
     if (isOwned) {
       roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 4);
       if (isMastered) {
-        ctx.fillStyle = 'rgba(234, 179, 8, 0.9)';
+        ctx.fillStyle = 'rgba(234, 179, 8, 0.95)';
         ctx.shadowColor = 'rgba(234, 179, 8, 0.6)';
         ctx.shadowBlur = 6;
       } else {
-        ctx.fillStyle = '#ff0055';
-        ctx.shadowColor = 'rgba(255, 0, 85, 0.5)';
+        ctx.fillStyle = '#00F0E8';
+        ctx.shadowColor = 'rgba(0, 240, 232, 0.55)';
         ctx.shadowBlur = 6;
       }
       ctx.fill();
       ctx.shadowBlur = 0;
 
       ctx.font = '900 9px "Inter", sans-serif';
-      ctx.fillStyle = '#ffffff';
-      const badgeLabel = isMastered ? '★ MAX' : (level > 1 ? `✓ LVL.${level}` : '✓ HACKED');
+      ctx.fillStyle = '#060714';
+      const badgeLabel = isMastered ? 'MAX' : (level > 1 ? `LVL.${level}` : 'HACKEADO');
       ctx.fillText(badgeLabel, cardX + cardW / 2, badgeY + 12);
     } else {
       roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 4);
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.08)';
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
       ctx.fill();
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.35)';
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
       ctx.lineWidth = 1;
       ctx.stroke();
 
       ctx.font = '800 8.5px "Inter", sans-serif';
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.7)';
-      ctx.fillText('✗ FALTANTE', cardX + cardW / 2, badgeY + 12);
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.95)';
+      ctx.fillText('FALTANTE', cardX + cardW / 2, badgeY + 12);
     }
     ctx.restore();
   });
