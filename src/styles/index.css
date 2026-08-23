@@ -49,6 +49,7 @@ body {
   position: relative;
 }
 
+/* Fondo Blueprint Aura Global (Cuadrícula 50px y 10px + Brillo Radial) */
 body::before {
   content: '';
   position: fixed;
@@ -57,25 +58,31 @@ body::before {
   width: 100vw;
   height: 100vh;
   height: 100dvh;
-  background-image: url('/background.webp');
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
+  background-image:
+    linear-gradient(rgba(14, 165, 233, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.12) 1px, transparent 1px),
+    linear-gradient(rgba(14, 165, 233, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.06) 1px, transparent 1px);
+  background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+  z-index: -2;
+  pointer-events: none;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: radial-gradient(circle at 60% 40%, rgba(6, 182, 212, 0.2) 0%, rgba(6, 182, 212, 0.05) 35%, transparent 70%);
   z-index: -1;
   pointer-events: none;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
-  will-change: transform;
-}
-
-/* En mobile (≤600px), ocultar background.webp — el fondo Blueprint Aura del swiper lo reemplaza */
-@media (max-width: 600px) {
-  body::before {
-    display: none;
-  }
-  body {
-    background-color: #100e0b;
-  }
 }
 
 #root {
