@@ -227,7 +227,7 @@ function FamilyRow({
 
               {/* Info: nombre, rareza, drop */}
               <div className="ms-card__info">
-                <div className="card-name" style={{ fontSize: '0.92rem' }}>{sprite.fullName}</div>
+                <div className="card-name" style={{ fontSize: '1.02rem' }}>{sprite.fullName}</div>
                 <div className="card-meta">
                   <span className={`sprite-pill rarity-badge ${rarityInfo.classKey ? `sprite-rarity-${rarityInfo.classKey}` : ''}`}>
                     {rarityInfo.name}
