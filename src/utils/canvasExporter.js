@@ -165,7 +165,6 @@ function getSpiritHue(sprite) {
 export async function generatePokedexCardImage({
   spritesList,
   userState,
-  trainerName = 'Coleccionista Fortnite',
   format = 'checklist', // 'checklist', 'square'
   bgStyle = 'glitch_override', // 'glitch_override', 'blueprint', 'dark_matrix'
   useBackgroundTemplate = true
@@ -189,7 +188,6 @@ export async function generatePokedexCardImage({
   return renderGlitchOverrideTemplate({
     spritesList,
     userState,
-    trainerName,
     format,
     bgStyle: effectiveBgStyle,
     loadedImagesMap
@@ -202,7 +200,6 @@ export async function generatePokedexCardImage({
 function renderGlitchOverrideTemplate({
   spritesList,
   userState,
-  trainerName,
   format,
   bgStyle,
   loadedImagesMap
@@ -512,14 +509,14 @@ function renderGlitchOverrideTemplate({
     ctx.restore();
   });
 
-  // 4. FOOTER WATERMARK & USERNAME
+  // 4. FOOTER WATERMARK
   ctx.save();
   ctx.textAlign = 'center';
   ctx.font = '700 12px "Inter", monospace, sans-serif';
   ctx.fillStyle = '#38bdf8';
   ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
   ctx.shadowBlur = 6;
-  ctx.fillText(`#FNGGOverride  •  spritedex.com  •  Entrenador: ${trainerName}`, width / 2, height - 16);
+  ctx.fillText('#FNGGOverride  •  spritedex.com', width / 2, height - 16);
   ctx.restore();
 
   return canvas.toDataURL('image/png');
