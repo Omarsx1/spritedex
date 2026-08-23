@@ -2,6 +2,7 @@ import React from 'react';
 import confetti from 'canvas-confetti';
 import { RARITIES, getSpriteCardStyle } from '../data/spritesData';
 import { sounds } from '../utils/audio';
+import { SonicRing } from './SonicRing';
 
 export function SpriteCard({
   sprite,
@@ -140,7 +141,11 @@ export function SpriteCard({
                   className={`star-btn-sm ${level >= num ? 'active' : ''}`}
                   onClick={(e) => handleLevelClick(e, num)}
                 >
-                  ★
+                  {sprite.gen === 2 ? (
+                    <SonicRing active={level >= num} mastered={isMastered && num === 5} size={14} />
+                  ) : (
+                    '★'
+                  )}
                 </button>
               ))}
             </div>
@@ -268,18 +273,22 @@ export function SpriteCard({
         <span className="drop-pct">{sprite.dropChanceDisplay}</span>
       </div>
 
-      {/* Control inferior: Estrellas si está atrapado, botón estándar si no */}
+      {/* Control inferior: Anillos de Sonic para Gen 2 o Estrellas para Gen 1 si está atrapado */}
       {isOwned ? (
         <div className="card-level-stars" onClick={(e) => e.stopPropagation()}>
           {[1, 2, 3, 4, 5].map((num) => (
             <button
               key={num}
-              className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''}`}
+              className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''} ${sprite.gen === 2 ? 'is-sonic-ring-btn' : ''}`}
               onClick={(e) => handleLevelClick(e, num)}
               style={isFriendView ? { pointerEvents: 'none' } : {}}
               title={level === 1 && num === 1 ? 'Toca para desmarcar' : `Nivel ${num}`}
             >
-              ★
+              {sprite.gen === 2 ? (
+                <SonicRing active={level >= num} mastered={isMastered && num === 5} size={19} />
+              ) : (
+                '★'
+              )}
             </button>
           ))}
         </div>

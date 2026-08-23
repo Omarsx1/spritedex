@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import confetti from 'canvas-confetti';
 import { RARITIES, getSpriteCardStyle } from '../data/spritesData';
 import { sounds } from '../utils/audio';
+import { SonicRing } from './SonicRing';
 
 /**
  * Una fila individual por familia de sprites.
@@ -252,12 +253,16 @@ function FamilyRow({
                   {[1, 2, 3, 4, 5].map((num) => (
                     <button
                       key={num}
-                      className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''}`}
+                      className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''} ${sprite.gen === 2 ? 'is-sonic-ring-btn' : ''}`}
                       onClick={(e) => handleLevelClick(e, num)}
                       style={isFriendView ? { pointerEvents: 'none' } : {}}
                       title={level === 1 && num === 1 ? 'Toca para desmarcar' : `Nivel ${num}`}
                     >
-                      ★
+                      {sprite.gen === 2 ? (
+                        <SonicRing active={level >= num} mastered={isMastered && num === 5} size={20} />
+                      ) : (
+                        '★'
+                      )}
                     </button>
                   ))}
                 </div>
