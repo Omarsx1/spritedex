@@ -375,7 +375,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
             </div>
 
             <div className="sdm-share__trade-tip">
-              <span>💡 <strong>Tip de Intercambio:</strong> Comparte esta plantilla en Twitter/X, Discord o WhatsApp para buscar intercambios usando <code>#FNGGOverride</code></span>
+              <span>💡 <strong>Tip de Intercambio:</strong> Comparte esta plantilla en tus redes o chats con amigos usando <code>#FNGGOverride</code></span>
             </div>
           </div>
 
@@ -405,7 +405,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
               disabled={!dataUrl}
             >
               <Share2 size={16} />
-              <span>Compartir (WhatsApp / Discord)</span>
+              <span>Compartir Imagen</span>
             </button>
           </div>
 

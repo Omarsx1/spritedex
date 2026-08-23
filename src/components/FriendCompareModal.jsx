@@ -345,7 +345,7 @@ export function FriendCompareModal({
                   className="sdm-compare__btn-trade-plan"
                 >
                   {copiedTradePlan ? <Check size={14} color="#4ade80" /> : <MessageSquare size={14} />}
-                  <span>{copiedTradePlan ? '¡Plan Copiado!' : 'Copiar Plan para Discord / WhatsApp'}</span>
+                  <span>{copiedTradePlan ? '¡Plan Copiado!' : 'Copiar Plan de Intercambio'}</span>
                 </button>
               </div>
 
