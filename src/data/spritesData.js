@@ -43,7 +43,8 @@ export const ELEMENTAL_STYLES = {
   jonesy: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#0ea5e9' },
   '8bit': { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#0ea5e9' },
   jackrabbit: { background: 'linear-gradient(180deg, #713f12 0%, #1b1c23 100%)', borderColor: '#eab308' },
-  killswitch: { background: 'linear-gradient(180deg, #31103f 0%, #1b1c23 100%)', borderColor: '#a855f7' }
+  killswitch: { background: 'linear-gradient(180deg, #31103f 0%, #1b1c23 100%)', borderColor: '#a855f7' },
+  stormscout: { background: 'linear-gradient(180deg, #1e1b4b 0%, #1b1c23 100%)', borderColor: '#818cf8' }
 };
 
 export function getSpriteCardStyle(sprite) {
@@ -154,7 +155,8 @@ export const FAMILY_NAMES_MAP = {
   bush: 'Arbustín',
   adventure: 'Aventurero',
   jonesy: 'Jonesy',
-  '8bit': '8-Bit'
+  '8bit': '8-Bit',
+  stormscout: 'Storm Scout'
 };
 
 const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails'];

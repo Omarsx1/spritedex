@@ -1193,5 +1193,29 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false
+  },
+  {
+    "id": "stormscout_basic",
+    "name": "Storm Scout",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "stormscout_gold",
+    "name": "Gold Storm Scout",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "stormscout_cheatmaster",
+    "name": "Hacker Storm Scout",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
   }
 ]
