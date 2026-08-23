@@ -172,7 +172,20 @@ export function Header({
         </div>
 
         {/* Central sprite showcase with orbiting satellites */}
-        <div className="hero__showcase">
+        <div
+          className="hero__showcase"
+          style={{
+            width: '180px',
+            height: '180px',
+            maxWidth: '180px',
+            maxHeight: '180px',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto'
+          }}
+        >
           <div className="hero__orbit-ring" ref={orbitContainerRef}>
             {orbitIndices.map((idx, i) => {
               const sprite = spritePool[idx];
@@ -183,19 +196,48 @@ export function Header({
                     src={sprite.image}
                     alt={sprite.fullName}
                     className="hero__satellite-img"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      maxWidth: '40px',
+                      maxHeight: '40px',
+                      objectFit: 'contain'
+                    }}
                     onError={handleImgError}
                   />
                 </div>
               );
             })}
           </div>
-          <div className="hero__hero-sprite" ref={activeSpriteRef}>
+          <div
+            className="hero__hero-sprite"
+            ref={activeSpriteRef}
+            style={{
+              width: '120px',
+              height: '120px',
+              maxWidth: '120px',
+              maxHeight: '120px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+              zIndex: 3
+            }}
+          >
             {currentSprite && (
               <img
                 key={currentSprite.id || spriteIndex}
                 src={currentSprite.image}
                 alt={currentSprite.fullName}
                 className="hero__hero-img"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  maxWidth: '120px',
+                  maxHeight: '120px',
+                  objectFit: 'contain',
+                  display: 'block'
+                }}
                 onError={handleImgError}
               />
             )}
