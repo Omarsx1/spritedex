@@ -122,7 +122,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     const pad = (n) => String(n).padStart(2, '0');
     const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
     const timeStr = `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
-    return `captura_${dateStr}_${timeStr}.png`;
+    return `spritedex_${dateStr}_${timeStr}.png`;
   };
 
   const handleDownload = () => {
