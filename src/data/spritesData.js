@@ -103,8 +103,8 @@ export function getSpriteCardStyle(sprite) {
 export const THEME_NAMES_ES = {
   Basic: 'Básico',
   Gold: 'Dorado',
-  Cheatmaster: 'Cheat Master',
-  'Cheat Master': 'Cheat Master',
+  Cheatmaster: 'Hacker',
+  'Cheat Master': 'Hacker',
   Candy: 'Gomita',
   Gummy: 'Gomita',
   Galaxy: 'Galáctico',
