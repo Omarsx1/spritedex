@@ -9,6 +9,8 @@ export function Header({
   ownedCount,
   masteredCount,
   user,
+  isLiveConnected,
+  connectedFriendCode,
   onOpenShareModal,
   onOpenBackupModal,
   onOpenCompareModal,
@@ -98,50 +100,41 @@ export function Header({
       if (document.hidden || !activeSpriteRef.current) return;
 
       gsap.to(activeSpriteRef.current, {
-        scale: 0.7,
+        scale: 0,
         opacity: 0,
-        y: -20,
+        rotation: 15,
         duration: 0.35,
         ease: 'power2.in',
         onComplete: () => {
-          setSpriteIndex((prev) => {
-            if (spritePool.length <= 1) return 0;
+          setSpriteIndex(prev => {
             let next;
             do {
               next = Math.floor(Math.random() * spritePool.length);
-            } while (next === prev);
+            } while (next === prev && spritePool.length > 1);
             return next;
           });
-
-          // Also shuffle one random orbit sprite
-          setOrbitIndices((prev) => {
-            const copy = [...prev];
-            const slot = Math.floor(Math.random() * copy.length);
-            let next;
-            const allUsed = new Set([...copy, spriteIndex]);
-            do {
-              next = Math.floor(Math.random() * spritePool.length);
-            } while (allUsed.has(next) && spritePool.length > 4);
-            copy[slot] = next;
-            return copy;
+          setOrbitIndices(() => {
+            const indices = [];
+            const used = new Set();
+            while (indices.length < 3 && indices.length < spritePool.length) {
+              const idx = Math.floor(Math.random() * spritePool.length);
+              if (!used.has(idx)) {
+                used.add(idx);
+                indices.push(idx);
+              }
+            }
+            return indices;
           });
+          gsap.fromTo(activeSpriteRef.current,
+            { scale: 0, opacity: 0, rotation: -15 },
+            { scale: 1, opacity: 1, rotation: 0, duration: 0.45, ease: 'back.out(1.7)' }
+          );
         }
       });
     }, intervalTime);
 
     return () => clearInterval(interval);
-  }, [spritePool, spriteIndex]);
-
-  // GSAP animate in when spriteIndex changes
-  useEffect(() => {
-    if (activeSpriteRef.current) {
-      gsap.fromTo(
-        activeSpriteRef.current,
-        { scale: 1.3, opacity: 0, y: 20 },
-        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: 'back.out(1.8)' }
-      );
-    }
-  }, [spriteIndex]);
+  }, [spritePool]);
 
   const handleImgError = useCallback((e) => {
     e.target.onerror = null;
@@ -150,53 +143,47 @@ export function Header({
 
   return (
     <header className="hero">
-      {/* Animated background layers */}
-      <div className="hero__bg">
-        <div className="hero__grid" />
-        <div className="hero__glow hero__glow--1" />
-        <div className="hero__glow hero__glow--2" />
-        <div className="hero__glow hero__glow--3" />
-        <div className="hero__scanline" />
-        <div className="hero__particles" />
-      </div>
+      <div className="hero__glow" />
 
       <div className="hero__content">
         {/* Title */}
-        <div className="hero__title-block" ref={titleRef}>
+        <div className="hero__title-box" ref={titleRef}>
           <h1 className="hero__title">
-            <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">FORTNITE</span>
-            <span className="hero__title-line hero__title-line--accent">SPRITEDEX</span>
+            <span className="hero__title-fortnite">FORTNITE</span>
+            <span className="hero__title-spritedex">SPRITEDEX</span>
           </h1>
         </div>
 
-        {/* Central sprite showcase with orbiting satellites */}
+        {/* Dynamic Sprite Showcase - 1 central + 3 orbiting satellites */}
         <div className="hero__showcase">
-          <div className="hero__orbit-ring" ref={orbitContainerRef}>
+          {/* Central Sprite */}
+          <div className="hero__active-sprite" ref={activeSpriteRef}>
+            <div className="hero__sprite-glow" />
+            <img
+              src={currentSprite.image}
+              alt={currentSprite.fullName}
+              className="hero__sprite-img"
+              loading="eager"
+              onError={handleImgError}
+            />
+          </div>
+
+          {/* 3 Orbiting Satellites */}
+          <div className="hero__satellites" ref={orbitContainerRef}>
             {orbitIndices.map((idx, i) => {
-              const sprite = spritePool[idx];
-              if (!sprite) return null;
+              const sprite = spritePool[idx] || spritePool[0];
               return (
-                <div key={`orbit-${i}`} className={`hero__satellite hero__satellite--${i}`}>
+                <div key={`${sprite.id}-${i}`} className={`hero__satellite hero__satellite--${i + 1}`}>
                   <img
                     src={sprite.image}
                     alt={sprite.fullName}
                     className="hero__satellite-img"
+                    loading="lazy"
                     onError={handleImgError}
                   />
                 </div>
               );
             })}
-          </div>
-          <div className="hero__hero-sprite" ref={activeSpriteRef}>
-            {currentSprite && (
-              <img
-                key={currentSprite.id || spriteIndex}
-                src={currentSprite.image}
-                alt={currentSprite.fullName}
-                className="hero__hero-img"
-                onError={handleImgError}
-              />
-            )}
           </div>
 
         </div>
@@ -223,9 +210,17 @@ export function Header({
           </div>
 
           <div className="hero__actions" ref={actionsRef}>
-            <button className="hero__btn hero__btn--primary" onClick={onOpenCompareModal} title="Intercambio Fortnite">
+            <button
+              className="hero__btn hero__btn--primary"
+              onClick={onOpenCompareModal}
+              title={isLiveConnected ? `Intercambio en vivo conectado (${connectedFriendCode})` : "Intercambio Fortnite"}
+              style={{ position: 'relative' }}
+            >
               <Users size={16} className="hero__btn-icon" />
               <span className="hero__btn-text">Intercambio</span>
+              {isLiveConnected && (
+                <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
+              )}
             </button>
             <button className="hero__btn hero__btn--accent" onClick={onOpenShareModal} title="Compartir Imagen">
               <Share2 size={16} className="hero__btn-icon" />
