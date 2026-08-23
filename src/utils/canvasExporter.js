@@ -2,33 +2,50 @@
 // Inspirado en el diseño 'CHAPTER 7 | SEASON 4: OVERRIDE' de Fortnite
 import { generateQRMatrix } from './qrGenerator';
 
-// Renderiza un código QR moderno con estilo de puntos/círculos y acentos cibernéticos
+// Renderiza un código QR moderno con estilo de puntos/círculos y acentos cibernéticos (100% escaneable)
 function drawModernDotQR(ctx, qrX, qrY, qrSize, url = 'https://spritedex-two.vercel.app/') {
   try {
     const qr = generateQRMatrix(url);
     const count = qr.getModuleCount();
     const cellSize = qrSize / count;
-    const dotRadius = cellSize * 0.42;
+
+    // 1. Dibuja los 3 patrones de detección de posición con geometría ISO estándar para reconocimiento instantáneo de cámara
+    const drawFinderPattern = (startX, startY) => {
+      // Anillo exterior 7x7 en cian neón
+      ctx.fillStyle = '#00F0E8';
+      ctx.fillRect(startX, startY, 7 * cellSize, 7 * cellSize);
+      // Espacio intermedio 5x5 oscuro
+      ctx.fillStyle = '#060a14';
+      ctx.fillRect(startX + cellSize, startY + cellSize, 5 * cellSize, 5 * cellSize);
+      // Núcleo central 3x3 en cian neón
+      ctx.fillStyle = '#00F0E8';
+      ctx.fillRect(startX + 2 * cellSize, startY + 2 * cellSize, 3 * cellSize, 3 * cellSize);
+    };
+
+    drawFinderPattern(qrX, qrY); // Superior izquierdo
+    drawFinderPattern(qrX + (count - 7) * cellSize, qrY); // Superior derecho
+    drawFinderPattern(qrX, qrY + (count - 7) * cellSize); // Inferior izquierdo
+
+    // 2. Dibuja todos los módulos de datos como puntos circulares de alto contraste
+    const dotRadius = cellSize * 0.44;
+    ctx.fillStyle = '#ffffff';
 
     for (let r = 0; r < count; r++) {
       for (let c = 0; c < count; c++) {
-        if (qr.isDark(r, c)) {
-          const isFinder =
-            (r < 7 && c < 7) ||
-            (r < 7 && c >= count - 7) ||
-            (r >= count - 7 && c < 7);
+        // Excluye las 3 áreas de los patrones de posición (7x7 en cada esquina)
+        const isFinder =
+          (r < 7 && c < 7) ||
+          (r < 7 && c >= count - 7) ||
+          (r >= count - 7 && c < 7);
 
+        if (isFinder) continue;
+
+        if (qr.isDark(r, c)) {
           const centerX = qrX + c * cellSize + cellSize / 2;
           const centerY = qrY + r * cellSize + cellSize / 2;
 
           ctx.beginPath();
-          if (isFinder) {
-            ctx.arc(centerX, centerY, cellSize * 0.46, 0, Math.PI * 2);
-            ctx.fillStyle = '#00F0E8';
-          } else {
-            ctx.arc(centerX, centerY, dotRadius, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffffff';
-          }
+          ctx.arc(centerX, centerY, dotRadius, 0, Math.PI * 2);
           ctx.fill();
         }
       }
