@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 
 /**
  * Sonic Ring en SVG 3D vectorial de alta fidelidad.
- * Se utiliza como indicador de nivel exclusivo para las tarjetas de Gen 2 en lugar de estrellas.
- * Incluye animación de giro 3D completo (rotateY 720deg) al hacer click o cambiar de nivel.
+ * 100% geométricamente circular con círculos concéntricos matemáticos perfectos.
+ * Giro de moneda 3D sobre su eje vertical (como una moneda girando en una mesa).
  */
 export function SonicRing({ active, mastered, size = 18, className = '', isSpinning = false }) {
   const gradientId = React.useId();
   const goldId = `sonicRingGold-${gradientId}`;
-  const glintId = `sonicRingGlint-${gradientId}`;
+  const rimId = `sonicRingRim-${gradientId}`;
   const masteredId = `sonicRingMastered-${gradientId}`;
   const inactiveId = `sonicRingInactive-${gradientId}`;
 
@@ -19,7 +19,7 @@ export function SonicRing({ active, mastered, size = 18, className = '', isSpinn
     if (active !== prevActiveRef.current) {
       prevActiveRef.current = active;
       setSpinning(true);
-      const timer = setTimeout(() => setSpinning(false), 650);
+      const timer = setTimeout(() => setSpinning(false), 600);
       return () => clearTimeout(timer);
     }
   }, [active]);
@@ -41,91 +41,114 @@ export function SonicRing({ active, mastered, size = 18, className = '', isSpinn
       }}
     >
       <defs>
-        {/* Gradiente dorado 3D para anillo activo */}
-        <radialGradient id={goldId} cx="32%" cy="28%" r="70%" fx="28%" fy="24%">
-          <stop offset="0%" stopColor="#fffde7" />
-          <stop offset="20%" stopColor="#fef08a" />
-          <stop offset="45%" stopColor="#facc15" />
-          <stop offset="75%" stopColor="#eab308" />
-          <stop offset="92%" stopColor="#ca8a04" />
+        {/* Gradiente dorado 3D simétrico para anillo activo */}
+        <radialGradient id={goldId} cx="36%" cy="32%" r="68%">
+          <stop offset="0%" stopColor="#fff9c4" />
+          <stop offset="22%" stopColor="#fde047" />
+          <stop offset="55%" stopColor="#eab308" />
+          <stop offset="85%" stopColor="#ca8a04" />
           <stop offset="100%" stopColor="#854d0e" />
         </radialGradient>
 
-        {/* Brillo especular y reflejo metálico */}
-        <linearGradient id={glintId} x1="15%" y1="10%" x2="85%" y2="90%">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
-          <stop offset="35%" stopColor="#fef08a" stopOpacity="0.6" />
-          <stop offset="70%" stopColor="#eab308" stopOpacity="0.2" />
-          <stop offset="100%" stopColor="#713f12" stopOpacity="0.85" />
+        {/* Gradiente de bisel metálico concéntrico */}
+        <linearGradient id={rimId} x1="20%" y1="15%" x2="80%" y2="85%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
+          <stop offset="40%" stopColor="#fef08a" stopOpacity="0.5" />
+          <stop offset="75%" stopColor="#eab308" stopOpacity="0.2" />
+          <stop offset="100%" stopColor="#713f12" stopOpacity="0.8" />
         </linearGradient>
 
-        {/* Mastered Super Sonic Gold/Rose Aura Gradient */}
-        <radialGradient id={masteredId} cx="32%" cy="28%" r="70%">
+        {/* Mastered Super Sonic Gold/Rose Gradient */}
+        <radialGradient id={masteredId} cx="36%" cy="32%" r="68%">
           <stop offset="0%" stopColor="#ffffff" />
           <stop offset="25%" stopColor="#fef08a" />
-          <stop offset="55%" stopColor="#f59e0b" />
-          <stop offset="85%" stopColor="#f43f5e" />
-          <stop offset="100%" stopColor="#9f1239" />
+          <stop offset="60%" stopColor="#f59e0b" />
+          <stop offset="90%" stopColor="#e11d48" />
+          <stop offset="100%" stopColor="#881337" />
         </radialGradient>
 
-        {/* Anillo inactivo translúcido */}
+        {/* Anillo inactivo translúcido perfectamente redondo */}
         <linearGradient id={inactiveId} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="rgba(255, 255, 255, 0.22)" />
-          <stop offset="100%" stopColor="rgba(255, 255, 255, 0.05)" />
+          <stop offset="100%" stopColor="rgba(255, 255, 255, 0.06)" />
         </linearGradient>
       </defs>
 
       {active ? (
         <g>
-          {/* Cuerpo del anillo en 3D */}
-          <path
-            d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 15c-2.761 0-5-2.239-5-5s2.239-5 5-5 5 2.239 5 5-2.239 5-5 5z"
-            fill={mastered ? `url(#${masteredId})` : `url(#${goldId})`}
-            filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))"
-          />
-
-          {/* Bisel de luz superior izquierdo */}
-          <path
-            d="M12 2.5C7.2 2.5 3.2 6.1 2.6 10.8c.6-3.8 3.9-6.8 7.9-6.8 4.4 0 8 3.6 8 8 0 1.2-.3 2.3-.7 3.3 2.6-1.5 4.2-4.3 4.2-7.3 0-5-4.3-5.5-10-5.5z"
-            fill="#ffffff"
-            opacity="0.75"
-          />
-
-          {/* Borde exterior e interior para nitidez metálica */}
+          {/* Anillo base 100% perfectamente circular usando stroke concéntrico */}
           <circle
             cx="12"
             cy="12"
-            r="9.5"
-            stroke={`url(#${glintId})`}
-            strokeWidth="0.8"
+            r="8.2"
+            stroke={mastered ? `url(#${masteredId})` : `url(#${goldId})`}
+            strokeWidth="3.8"
+            fill="none"
+          />
+
+          {/* Borde exterior e interior de alta definición para nitidez metálica */}
+          <circle
+            cx="12"
+            cy="12"
+            r="10.1"
+            stroke={`url(#${rimId})`}
+            strokeWidth="0.75"
             fill="none"
           />
           <circle
             cx="12"
             cy="12"
-            r="5"
-            stroke="rgba(0,0,0,0.3)"
-            strokeWidth="0.6"
+            r="6.3"
+            stroke="rgba(0, 0, 0, 0.35)"
+            strokeWidth="0.7"
             fill="none"
           />
 
-          {/* Destello de brillo */}
+          {/* Arco de brillo sutil simétrico en la curvatura superior */}
+          <path
+            d="M 6.8 12 A 5.2 5.2 0 0 1 12 6.8"
+            stroke="#ffffff"
+            strokeWidth="1.1"
+            strokeLinecap="round"
+            fill="none"
+            opacity="0.8"
+          />
+
+          {/* Micro destello especular */}
           <circle
-            cx="7.2"
-            cy="6.8"
-            r="1.2"
+            cx="7.6"
+            cy="7.6"
+            r="0.9"
             fill="#ffffff"
-            opacity="0.95"
+            opacity="0.9"
           />
         </g>
       ) : (
-        /* Anillo inactivo */
+        /* Anillo inactivo 100% concéntrico */
         <g>
-          <path
-            d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 15c-2.761 0-5-2.239-5-5s2.239-5 5-5 5 2.239 5 5-2.239 5-5 5z"
-            fill={`url(#${inactiveId})`}
-            stroke="rgba(255, 255, 255, 0.16)"
-            strokeWidth="0.8"
+          <circle
+            cx="12"
+            cy="12"
+            r="8.2"
+            stroke={`url(#${inactiveId})`}
+            strokeWidth="3.8"
+            fill="none"
+          />
+          <circle
+            cx="12"
+            cy="12"
+            r="10.1"
+            stroke="rgba(255, 255, 255, 0.18)"
+            strokeWidth="0.75"
+            fill="none"
+          />
+          <circle
+            cx="12"
+            cy="12"
+            r="6.3"
+            stroke="rgba(255, 255, 255, 0.12)"
+            strokeWidth="0.7"
+            fill="none"
           />
         </g>
       )}
