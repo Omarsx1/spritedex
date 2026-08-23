@@ -12,6 +12,8 @@ export function FriendCompareModal({
   isLiveConnected,
   connectedFriendCode,
   myFriendCode,
+  activeProfile,
+  onSetActiveProfile,
   onConnectFriendCode,
   onDisconnectFriend,
   onLoadFriendState,
@@ -322,6 +324,41 @@ export function FriendCompareModal({
             </div>
           ) : (
             <div className="sdm-compare__results">
+
+              {/* Botón para ver la colección del amigo en el Dex Principal */}
+              {onSetActiveProfile && (
+                <div style={{ marginBottom: '14px', display: 'flex', justifyContent: 'center' }}>
+                  <button
+                    onClick={() => {
+                      sounds.playBeep();
+                      onSetActiveProfile(activeProfile === 'friend' ? 'mine' : 'friend');
+                      onClose();
+                    }}
+                    style={{
+                      background: activeProfile === 'friend' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(168, 85, 247, 0.2)',
+                      border: `1.5px solid ${activeProfile === 'friend' ? '#3b82f6' : '#a855f7'}`,
+                      color: '#ffffff',
+                      padding: '8px 16px',
+                      borderRadius: '10px',
+                      fontSize: '0.82rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Users size={16} color={activeProfile === 'friend' ? '#3b82f6' : '#a855f7'} />
+                    <span>
+                      {activeProfile === 'friend'
+                        ? '👤 Salir y Ver Mi Colección Personal en la Dex'
+                        : '👥 Explorar Colección de Amigo en la Pantalla Principal'}
+                    </span>
+                  </button>
+                </div>
+              )}
 
               {/* Season Filter Switcher + Share Plan Header */}
               <div className="sdm-compare__toolbar">
