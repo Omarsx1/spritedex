@@ -102,13 +102,15 @@ function FamilyRow({
           const rarityInfo = RARITIES[sprite.rarity] || { name: sprite.rarity, bg: '#1e293b' };
           const styleInfo = getSpriteCardStyle(sprite);
 
-          const handleToggleClick = (e) => {
+          const handleToggleBadgeClick = (e) => {
             e.stopPropagation();
             if (isFriendView) {
-              const nextOwned = !myOwned;
-              onToggleOwned(sprite.id);
-              sounds.playToggle(nextOwned, sprite.gen);
-              if (nextOwned) confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+              if (friendCanLend) {
+                const nextOwned = !myOwned;
+                onToggleOwned(sprite.id);
+                sounds.playToggle(nextOwned, sprite.gen);
+                if (nextOwned) confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+              }
               return;
             }
             const nextOwned = !isOwned;
@@ -125,19 +127,27 @@ function FamilyRow({
           const handleLevelClick = (e, newLevel) => {
             e.stopPropagation();
             if (isFriendView) return;
-            onSetLevel(sprite.id, newLevel);
-            sounds.playLevelUp(newLevel, sprite.gen);
-            if (newLevel === 5) confetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
+            if (!isOwned) {
+              onToggleOwned(sprite.id);
+              onSetLevel(sprite.id, newLevel);
+              sounds.playToggle(true, sprite.gen);
+              sounds.playLevelUp(newLevel, sprite.gen);
+              if (newLevel === 5) confetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
+              else confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+            } else if (level === 1 && newLevel === 1) {
+              onToggleOwned(sprite.id);
+              sounds.playToggle(false, sprite.gen);
+            } else {
+              onSetLevel(sprite.id, newLevel);
+              sounds.playLevelUp(newLevel, sprite.gen);
+              if (newLevel === 5) confetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
+            }
           };
 
           const dragStyle = isCurrent && dragOffset !== 0 ? {
             transform: `translateX(${dragOffset}px) rotateZ(${dragOffset * 0.05}deg) scale(1)`,
             transition: 'none'
           } : {};
-
-          const btnText = isFriendView
-            ? (friendCanLend ? (myOwned ? '✓ Registrado' : '+ Registrar') : isOwned ? '✓ Lo tiene' : 'No lo tiene')
-            : (isMastered ? '⭐ Maxeado' : isOwned ? `Niv.${level}` : 'Sin atrapar');
 
           return (
             <div
@@ -160,26 +170,35 @@ function FamilyRow({
                 </div>
               )}
 
-              {friendCanLend && (
-                <div style={{
-                  position: 'absolute', top: '6px', right: '6px',
-                  background: 'linear-gradient(135deg, #10b981, #059669)',
-                  color: '#fff', fontSize: '0.58rem', fontWeight: 900,
-                  padding: '2px 6px', borderRadius: '20px',
-                  boxShadow: '0 4px 10px rgba(0,0,0,0.4)', zIndex: 2
-                }}>
-                  🎁 Te lo presta
-                </div>
-              )}
-
-              {/* Etiqueta de variante */}
+              {/* Etiqueta de variante (esquina superior izquierda) */}
               {variants.length > 1 && (
                 <div className="ms-variant-tag">
                   {sprite.variantDisplay || sprite.variant}
                 </div>
               )}
 
-              {/* Imagen del Sprite */}
+              {/* Badge de nivel o amigo (esquina superior derecha) */}
+              {isFriendView ? (
+                friendCanLend ? (
+                  <div className="ms-level-tag ms-level-tag--lend" onClick={handleToggleBadgeClick}>
+                    {myOwned ? '✓ REGISTRADO' : '🎁 PRESTA'}
+                  </div>
+                ) : isOwned ? (
+                  <div className="ms-level-tag ms-level-tag--friend">
+                    ✓ AMIGO
+                  </div>
+                ) : null
+              ) : isOwned ? (
+                <div
+                  className={`ms-level-tag ${isMastered ? 'ms-level-tag--mastered' : ''}`}
+                  onClick={handleToggleBadgeClick}
+                  title="Toca para desmarcar o cambiar"
+                >
+                  {isMastered ? 'MAX' : `LVL.${level}`}
+                </div>
+              ) : null}
+
+              {/* Imagen del Sprite (tamaño controlado) */}
               <div className="ms-card__image" onClick={handleImageClick}>
                 <img
                   src={sprite.image}
@@ -217,34 +236,23 @@ function FamilyRow({
                 </div>
               </div>
 
-              {/* Estrellas de nivel */}
-              {isOwned && (
-                <div className="card-level-stars" onClick={(e) => e.stopPropagation()} style={{ marginTop: '4px' }}>
-                  {[1, 2, 3, 4, 5].map((num) => (
-                    <button
-                      key={num}
-                      className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''}`}
-                      onClick={(e) => handleLevelClick(e, num)}
-                      style={isFriendView ? { pointerEvents: 'none' } : {}}
-                    >
-                      ★
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Botón de estado */}
-              <button
-                className={`card-owned-btn ${isMastered ? 'mastered' : isOwned ? 'owned' : ''} ${sprite.gen === 2 && isOwned ? 'is-glitch-btn' : ''}`}
-                data-text={btnText}
-                onClick={handleToggleClick}
-                style={{
-                  ...(isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800 } : {}),
-                  marginTop: '6px'
-                }}
+              {/* Estrellas de nivel abajo (único control inferior) */}
+              <div
+                className="card-level-stars ms-stars"
+                onClick={(e) => e.stopPropagation()}
               >
-                <span className="btn-text">{btnText}</span>
-              </button>
+                {[1, 2, 3, 4, 5].map((num) => (
+                  <button
+                    key={num}
+                    className={`star-btn ${isOwned && level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''}`}
+                    onClick={(e) => handleLevelClick(e, num)}
+                    style={isFriendView ? { pointerEvents: 'none' } : {}}
+                    title={isOwned ? (level === 1 && num === 1 ? 'Toca para desmarcar' : `Nivel ${num}`) : `Marcar Nivel ${num}`}
+                  >
+                    ★
+                  </button>
+                ))}
+              </div>
             </div>
           );
         })}
