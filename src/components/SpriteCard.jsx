@@ -191,27 +191,33 @@ export function SpriteCard({
           </div>
         </div>
       )}
-      {/* Indicator badge if friend can lend */}
-      {friendCanLend && (
-        <div style={{
-          position: 'absolute',
-          top: '8px',
-          right: '8px',
-          background: 'linear-gradient(135deg, #10b981, #059669)',
-          color: '#fff',
-          fontSize: '0.62rem',
-          fontWeight: 900,
-          padding: '3px 8px',
-          borderRadius: '20px',
-          boxShadow: '0 4px 10px rgba(0,0,0,0.4)',
-          zIndex: 2,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '3px'
-        }}>
-          🎁 Te lo presta
+      {/* Etiqueta de variante (esquina superior izquierda) */}
+      {(sprite.variantDisplay || sprite.variant) && (
+        <div className="ms-variant-tag">
+          {sprite.variantDisplay || sprite.variant}
         </div>
       )}
+
+      {/* Badge de nivel o amigo (esquina superior derecha, solo si está atrapado o vista amigo) */}
+      {isFriendView ? (
+        friendCanLend ? (
+          <div className="ms-level-tag ms-level-tag--lend" onClick={handleToggleClick}>
+            {myOwned ? '✓ REGISTRADO' : '🎁 PRESTA'}
+          </div>
+        ) : isOwned ? (
+          <div className="ms-level-tag ms-level-tag--friend">
+            ✓ AMIGO
+          </div>
+        ) : null
+      ) : isOwned ? (
+        <div
+          className={`ms-level-tag ${isMastered ? 'ms-level-tag--mastered' : ''}`}
+          onClick={handleToggleClick}
+          title="Toca para desmarcar o cambiar"
+        >
+          {isMastered ? 'MAX' : `LVL.${level}`}
+        </div>
+      ) : null}
 
       {/* Imagen del Sprite: Clic exclusivamente en la figura abre la modal de detalles y variantes */}
       <div className="card-image">
@@ -262,8 +268,8 @@ export function SpriteCard({
         <span className="drop-pct">{sprite.dropChanceDisplay}</span>
       </div>
 
-      {/* Estrellas de nivel */}
-      {isOwned && (
+      {/* Control inferior: Estrellas si está atrapado, botón estándar si no */}
+      {isOwned ? (
         <div className="card-level-stars" onClick={(e) => e.stopPropagation()}>
           {[1, 2, 3, 4, 5].map((num) => (
             <button
@@ -271,30 +277,25 @@ export function SpriteCard({
               className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''}`}
               onClick={(e) => handleLevelClick(e, num)}
               style={isFriendView ? { pointerEvents: 'none' } : {}}
+              title={level === 1 && num === 1 ? 'Toca para desmarcar' : `Nivel ${num}`}
             >
               ★
             </button>
           ))}
         </div>
+      ) : (
+        <button
+          className="card-owned-btn"
+          onClick={handleToggleClick}
+          style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800 } : {}}
+        >
+          <span className="btn-text">
+            {isFriendView
+              ? (friendCanLend ? '+ Registrar en mi Dex' : 'No lo tiene')
+              : 'Sin atrapar'}
+          </span>
+        </button>
       )}
-
-      {/* Botón de estado */}
-      {(() => {
-        const btnText = isFriendView
-          ? (friendCanLend ? (myOwned ? '✓ Registrado en mi Dex' : '+ Registrar en mi Dex') : isOwned ? '✓ Tu amigo lo tiene' : 'No lo tiene')
-          : (isMastered ? (sprite.gen === 2 ? '⚡ MAXEADO' : '⭐ Maxeado') : isOwned ? (sprite.gen === 2 ? `⚡ CAPTURADO (NIV.${level})` : `✓ Atrapado (Niv.${level})`) : 'Sin atrapar');
-
-        return (
-          <button
-            className={`card-owned-btn ${isMastered ? 'mastered' : isOwned ? 'owned' : ''} ${sprite.gen === 2 && isOwned ? 'is-glitch-btn' : ''}`}
-            data-text={btnText}
-            onClick={handleToggleClick}
-            style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800 } : {}}
-          >
-            <span className="btn-text">{btnText}</span>
-          </button>
-        );
-      })()}
     </div>
   );
 }
