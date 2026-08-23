@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { X, Users, Copy, Check, ArrowDownLeft, ArrowUpRight, Handshake, Upload, ExternalLink, Radio, Zap, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { X, Users, Copy, Check, ArrowDownLeft, ArrowUpRight, Handshake, Upload, Radio, Zap, RefreshCw, Sparkles, MessageSquare } from 'lucide-react';
 import { ALL_SPRITES, getSpriteCardStyle } from '../data/spritesData';
-import { generateShareableLink, decodeCollectionState } from '../utils/shareLink';
+import { decodeCollectionState } from '../utils/shareLink';
 import { generatePermanentFriendUrl, normalizeFriendCode } from '../utils/friendCode';
 import { sounds } from '../utils/audio';
+import gsap from 'gsap';
 
 export function FriendCompareModal({
   userState,
@@ -18,26 +19,38 @@ export function FriendCompareModal({
   onClose
 }) {
   const [activeTab, setActiveTab] = useState('friendToMe'); // 'friendToMe' | 'meToFriend' | 'common'
+  const [seasonFilter, setSeasonFilter] = useState('active'); // 'active' (Gen 2) | 'all'
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedTradePlan, setCopiedTradePlan] = useState(false);
   const [friendInput, setFriendInput] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
+  const modalRef = useRef(null);
   const fileInputRef = useRef(null);
 
   const permanentFriendUrl = generatePermanentFriendUrl(myFriendCode || 'SDEX-0000');
+
+  useEffect(() => {
+    if (modalRef.current) {
+      gsap.fromTo(modalRef.current,
+        { opacity: 0, scale: 0.95, y: 15 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: 'power2.out' }
+      );
+    }
+  }, []);
 
   const handleCopyCode = () => {
     sounds.playBeep();
     navigator.clipboard.writeText(myFriendCode || '');
     setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2500);
+    setTimeout(() => setCopiedCode(false), 2000);
   };
 
   const handleCopyPermanentLink = () => {
     sounds.playBeep();
     navigator.clipboard.writeText(permanentFriendUrl);
     setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2500);
+    setTimeout(() => setCopiedLink(false), 2000);
   };
 
   const handleConnectFriend = async () => {
@@ -99,168 +112,152 @@ export function FriendCompareModal({
   const currentFriendState = friendState || {};
   const hasFriendData = Object.keys(currentFriendState).length > 0;
 
+  // Base list depending on season filter
+  const baseSpritesList = useMemo(() => {
+    if (seasonFilter === 'active') {
+      return ALL_SPRITES.filter(s => s.gen === 2 || s.isNew);
+    }
+    return ALL_SPRITES;
+  }, [seasonFilter]);
+
   // Sprites friend can lend to me (Friend has it, I don't)
-  const friendToMeList = ALL_SPRITES.filter((s) => {
-    const friendHas = currentFriendState[s.id]?.owned;
-    const iHave = userState[s.id]?.owned;
-    return friendHas && !iHave;
-  });
+  const friendToMeList = useMemo(() => {
+    return baseSpritesList.filter((s) => {
+      const friendHas = currentFriendState[s.id]?.owned;
+      const iHave = userState[s.id]?.owned;
+      return friendHas && !iHave;
+    });
+  }, [baseSpritesList, currentFriendState, userState]);
 
   // Sprites I can lend to friend (I have it, friend doesn't)
-  const meToFriendList = ALL_SPRITES.filter((s) => {
-    const friendHas = currentFriendState[s.id]?.owned;
-    const iHave = userState[s.id]?.owned;
-    return iHave && !friendHas;
-  });
+  const meToFriendList = useMemo(() => {
+    return baseSpritesList.filter((s) => {
+      const friendHas = currentFriendState[s.id]?.owned;
+      const iHave = userState[s.id]?.owned;
+      return iHave && !friendHas;
+    });
+  }, [baseSpritesList, currentFriendState, userState]);
 
   // Sprites both own
-  const commonList = ALL_SPRITES.filter((s) => {
-    const friendHas = currentFriendState[s.id]?.owned;
-    const iHave = userState[s.id]?.owned;
-    return iHave && friendHas;
-  });
+  const commonList = useMemo(() => {
+    return baseSpritesList.filter((s) => {
+      const friendHas = currentFriendState[s.id]?.owned;
+      const iHave = userState[s.id]?.owned;
+      return iHave && friendHas;
+    });
+  }, [baseSpritesList, currentFriendState, userState]);
 
   const activeList = activeTab === 'friendToMe' ? friendToMeList : activeTab === 'meToFriend' ? meToFriendList : commonList;
 
+  const handleCopyTradePlan = () => {
+    sounds.playBeep();
+    let text = `🎮 ¡PLAN DE INTERCAMBIO FORTNITE SPRITEDEX! 🤝\n`;
+    text += `👥 Conexión: Mi Código (${myFriendCode}) ⇄ Amigo (${connectedFriendCode || 'Amigo'})\n\n`;
+
+    if (friendToMeList.length > 0) {
+      text += `📥 TÚ ME PRESTAS (${friendToMeList.length}):\n`;
+      friendToMeList.slice(0, 8).forEach(s => {
+        text += `- ${s.fullName}\n`;
+      });
+      if (friendToMeList.length > 8) text += `... y ${friendToMeList.length - 8} más.\n`;
+      text += `\n`;
+    }
+
+    if (meToFriendList.length > 0) {
+      text += `📤 YO TE PRESTO (${meToFriendList.length}):\n`;
+      meToFriendList.slice(0, 8).forEach(s => {
+        text += `- ${s.fullName}\n`;
+      });
+      if (meToFriendList.length > 8) text += `... y ${meToFriendList.length - 8} más.\n`;
+      text += `\n`;
+    }
+
+    text += `¡Nos vemos en Fortnite para intercambiar! 🏆 #FNGGOverride`;
+
+    navigator.clipboard.writeText(text);
+    setCopiedTradePlan(true);
+    setTimeout(() => setCopiedTradePlan(false), 2500);
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content glass-panel" style={{ maxWidth: '840px' }} onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose}>
-          <X size={20} />
+      <div className="sdm sdm-compare sdm-share--glitch" ref={modalRef} onClick={(e) => e.stopPropagation()}>
+        {/* Close Button */}
+        <button className="sdm__close" onClick={onClose}>
+          <X size={18} />
         </button>
 
-        {/* Modal Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+        {/* ═══ HERO HEADER (GLITCH THEMED) ═══ */}
+        <div className="sdm__hero sdm-share__hero sdm-compare__hero">
           <div
+            className="sdm__hero-glow"
             style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #a855f7, #3b82f6)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff'
+              background: 'radial-gradient(circle at 30% 50%, rgba(168, 85, 247, 0.4) 0%, rgba(0, 240, 232, 0.25) 50%, transparent 80%)'
             }}
-          >
-            <Users size={24} />
+          />
+
+          <div className="sdm-share__hero-icon">
+            <Users size={28} color="#00F0E8" />
           </div>
-          <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#fff', margin: 0 }}>
-              Planificador de Intercambios en Vivo
-            </h2>
-            <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: '2px 0 0' }}>
-              Sincroniza en tiempo real con tu amigo en Fortnite mediante tu Código de Amigo permanente.
+
+          <div className="sdm__hero-info">
+            <div className="sdm__hero-badges">
+              <span className="sdm-share__tag-chapter">FORTNITE | TEMPORADA GLITCH</span>
+              <span className="sdm-share__tag-pill" style={{ background: '#8b5cf6' }}>INTERCAMBIO EN VIVO</span>
+            </div>
+            <h2 className="sdm__name sdm-share__glitch-title">PLANIFICADOR DE INTERCAMBIOS</h2>
+            <p className="sdm__meta">
+              Sincroniza y compara en tiempo real con tu amigo en Fortnite mediante tu Código de Amigo permanente.
             </p>
           </div>
         </div>
 
-        {/* Top Actions: My Friend Code vs Connect to Friend */}
-        <div
-          style={{
-            background: 'rgba(15, 23, 42, 0.75)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            borderRadius: '14px',
-            padding: '16px',
-            marginBottom: '20px'
-          }}
-        >
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+        {/* ═══ BODY CONTENT ═══ */}
+        <div className="sdm__body sdm-compare__body">
+
+          {/* Top Cards: My Friend Code vs Connect to Friend */}
+          <div className="sdm-compare__top-grid">
+
             {/* 1. Tu Código de Amigo Permanente */}
-            <div
-              style={{
-                background: 'rgba(56, 189, 248, 0.08)',
-                border: '1px solid rgba(56, 189, 248, 0.25)',
-                borderRadius: '10px',
-                padding: '12px'
-              }}
-            >
-              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
-                ⭐ Tu Código de Amigo Permanente
+            <div className="sdm-compare__card sdm-compare__card--my-code">
+              <div className="sdm-compare__card-title">
+                <span>⭐ TU CÓDIGO DE AMIGO</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span
-                  style={{
-                    fontFamily: 'monospace',
-                    fontSize: '1.15rem',
-                    fontWeight: 900,
-                    color: '#fff',
-                    background: 'rgba(0,0,0,0.5)',
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(56, 189, 248, 0.4)'
-                  }}
-                >
+              <div className="sdm-compare__code-row">
+                <span className="sdm-compare__code-badge">
                   {myFriendCode || 'SDEX-????'}
                 </span>
                 <button
                   onClick={handleCopyCode}
-                  style={{
-                    padding: '6px 10px',
-                    borderRadius: '6px',
-                    background: copiedCode ? '#10b981' : '#0284c7',
-                    color: '#fff',
-                    border: 'none',
-                    fontSize: '0.75rem',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
+                  className={`sdm-compare__btn-copy ${copiedCode ? 'sdm-compare__btn-copy--done' : ''}`}
                 >
                   {copiedCode ? <Check size={14} /> : <Copy size={14} />}
-                  <span>{copiedCode ? '¡Copiado!' : 'Copiar Código'}</span>
+                  <span>{copiedCode ? '¡Copiado!' : 'Copiar'}</span>
                 </button>
               </div>
               <button
                 onClick={handleCopyPermanentLink}
-                style={{
-                  width: '100%',
-                  padding: '7px 10px',
-                  borderRadius: '6px',
-                  background: copiedLink ? '#10b981' : 'rgba(255,255,255,0.08)',
-                  color: copiedLink ? '#fff' : '#38bdf8',
-                  border: '1px solid rgba(56, 189, 248, 0.3)',
-                  fontSize: '0.74rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
+                className="sdm-compare__btn-link"
               >
-                {copiedLink ? <Check size={13} /> : <Zap size={13} />}
-                <span>{copiedLink ? '¡Enlace Permanente Copiado!' : 'Copiar Enlace Directo'}</span>
+                {copiedLink ? <Check size={13} color="#10b981" /> : <Zap size={13} color="#00F0E8" />}
+                <span>{copiedLink ? '¡Enlace Copiado!' : 'Copiar Enlace Directo'}</span>
               </button>
             </div>
 
             {/* 2. Conectar con Amigo en Tiempo Real */}
-            <div
-              style={{
-                background: isLiveConnected ? 'rgba(16, 185, 129, 0.08)' : 'rgba(168, 85, 247, 0.08)',
-                border: `1px solid ${isLiveConnected ? 'rgba(16, 185, 129, 0.3)' : 'rgba(168, 85, 247, 0.25)'}`,
-                borderRadius: '10px',
-                padding: '12px'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: isLiveConnected ? '#10b981' : '#c084fc', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  {isLiveConnected ? '🟢 Conectado en Tiempo Real' : '🤝 Conectar con un Amigo'}
+            <div className={`sdm-compare__card sdm-compare__card--connect ${isLiveConnected ? 'sdm-compare__card--connected' : ''}`}>
+              <div className="sdm-compare__card-header-row">
+                <div className="sdm-compare__card-title">
+                  {isLiveConnected ? (
+                    <span style={{ color: '#10b981' }}>🟢 CONECTADO EN VIVO</span>
+                  ) : (
+                    <span>🤝 CONECTAR CON UN AMIGO</span>
+                  )}
                 </div>
                 {isLiveConnected && onDisconnectFriend && (
                   <button
                     onClick={onDisconnectFriend}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#ef4444',
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      textDecoration: 'underline'
-                    }}
+                    className="sdm-compare__btn-disconnect"
                   >
                     Desconectar
                   </button>
@@ -268,60 +265,35 @@ export function FriendCompareModal({
               </div>
 
               {isLiveConnected ? (
-                <div style={{ fontSize: '0.8rem', color: '#e2e8f0', margin: '6px 0' }}>
-                  Sincronizado en vivo con: <strong style={{ color: '#10b981' }}>{connectedFriendCode}</strong>
-                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '4px' }}>
-                    ⚡ Las nuevas capturas de tu amigo se reflejan solas al instante.
+                <div className="sdm-compare__connected-info">
+                  <div className="sdm-compare__connected-target">
+                    Amigo: <strong>{connectedFriendCode}</strong>
                   </div>
+                  <span className="sdm-compare__connected-hint">
+                    ⚡ Las nuevas capturas de tu amigo se actualizan al instante.
+                  </span>
                 </div>
               ) : (
-                <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
+                <div className="sdm-compare__input-row">
                   <input
                     type="text"
                     placeholder="Código (ej: SDEX-7K9X) o enlace..."
                     value={friendInput}
                     onChange={(e) => setFriendInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleConnectFriend()}
-                    style={{
-                      flex: 1,
-                      padding: '8px 10px',
-                      borderRadius: '8px',
-                      background: 'rgba(0,0,0,0.4)',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                      color: '#fff',
-                      fontSize: '0.78rem'
-                    }}
+                    className="sdm-compare__input"
                   />
                   <button
                     onClick={handleConnectFriend}
                     disabled={isConnecting}
-                    style={{
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      background: '#8b5cf6',
-                      color: '#fff',
-                      border: 'none',
-                      fontSize: '0.78rem',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
+                    className="sdm-compare__btn-connect"
                   >
-                    {isConnecting ? <RefreshCw size={13} className="animate-spin" /> : 'Conectar'}
+                    {isConnecting ? <RefreshCw size={14} className="animate-spin" /> : 'Conectar'}
                   </button>
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     title="Cargar archivo JSON"
-                    style={{
-                      padding: '8px 10px',
-                      borderRadius: '8px',
-                      background: 'rgba(255,255,255,0.1)',
-                      color: '#94a3b8',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                      cursor: 'pointer'
-                    }}
+                    className="sdm-compare__btn-upload"
                   >
                     <Upload size={14} />
                   </button>
@@ -336,174 +308,129 @@ export function FriendCompareModal({
               )}
             </div>
           </div>
-        </div>
 
-        {/* Trade Comparison Results */}
-        {!hasFriendData ? (
-          <div style={{ padding: '35px 20px', textAlign: 'center', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', color: '#94a3b8' }}>
-            <Radio size={36} style={{ marginBottom: '10px', opacity: 0.6, color: '#38bdf8' }} />
-            <h3 style={{ fontSize: '1rem', color: '#e2e8f0', margin: '0 0 6px' }}>Esperando Conexión de Amigo</h3>
-            <p style={{ fontSize: '0.8rem', margin: 0, maxWidth: '460px', marginInline: 'auto' }}>
-              Ingresa el <strong>Código de Amigo</strong> o pega el enlace que te envió tu amigo arriba para ver las diferencias y planificar préstamos de espíritus en Fortnite en tiempo real.
-            </p>
-          </div>
-        ) : (
-          <div>
-            {/* Tabs */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
-              <button
-                onClick={() => setActiveTab('friendToMe')}
-                style={{
-                  flex: 1,
-                  padding: '10px 12px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  background: activeTab === 'friendToMe' ? 'linear-gradient(135deg, #10b981, #059669)' : 'rgba(255, 255, 255, 0.06)',
-                  color: '#fff',
-                  fontWeight: 800,
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
-                <ArrowDownLeft size={16} />
-                <span>Te Puede Prestar ({friendToMeList.length})</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('meToFriend')}
-                style={{
-                  flex: 1,
-                  padding: '10px 12px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  background: activeTab === 'meToFriend' ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : 'rgba(255, 255, 255, 0.06)',
-                  color: '#fff',
-                  fontWeight: 800,
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
-                <ArrowUpRight size={16} />
-                <span>Le Puedes Prestar ({meToFriendList.length})</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('common')}
-                style={{
-                  flex: 1,
-                  padding: '10px 12px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  background: activeTab === 'common' ? 'linear-gradient(135deg, #8b5cf6, #7c3aed)' : 'rgba(255, 255, 255, 0.06)',
-                  color: '#fff',
-                  fontWeight: 800,
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
-                <Handshake size={16} />
-                <span>Ambos Tienen ({commonList.length})</span>
-              </button>
-            </div>
-
-            {/* Sprites Grid */}
-            {activeList.length === 0 ? (
-              <div style={{ padding: '30px', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>
-                {activeTab === 'friendToMe' && '🎉 ¡Genial! Tu amigo no tiene ningún Sprite que te falte.'}
-                {activeTab === 'meToFriend' && '🤝 No tienes Sprites adicionales para prestarle a tu amigo.'}
-                {activeTab === 'common' && 'Aún no tienen Sprites repetidos en común.'}
+          {/* Trade Comparison Results */}
+          {!hasFriendData ? (
+            <div className="sdm-compare__waiting">
+              <div className="sdm-compare__radar-icon">
+                <Radio size={36} color="#00F0E8" />
               </div>
-            ) : (
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))',
-                  gap: '10px',
-                  maxHeight: '340px',
-                  overflowY: 'auto',
-                  paddingRight: '6px'
-                }}
-              >
-                {activeList.map((sprite) => {
-                  const style = getSpriteCardStyle(sprite);
-                  const isMine = userState[sprite.id]?.owned;
-                  const friendLvl = currentFriendState[sprite.id]?.level || 1;
-                  const myLvl = userState[sprite.id]?.level || 1;
+              <h3 className="sdm-compare__waiting-title">Esperando Conexión de Amigo</h3>
+              <p className="sdm-compare__waiting-text">
+                Ingresa el <strong>Código de Amigo</strong> o pega el enlace arriba para comparar colecciones y planificar préstamos en tiempo real.
+              </p>
+            </div>
+          ) : (
+            <div className="sdm-compare__results">
 
-                  return (
-                    <div
-                      key={sprite.id}
-                      style={{
-                        background: style.background,
-                        border: `1px solid ${style.borderColor}`,
-                        borderRadius: '10px',
-                        padding: '10px 6px',
-                        textAlign: 'center',
-                        position: 'relative'
-                      }}
-                    >
-                      <img
-                        src={sprite.image}
-                        alt={sprite.fullName}
-                        style={{ width: '48px', height: '48px', objectFit: 'contain', margin: '0 auto 4px' }}
-                      />
+              {/* Season Filter Switcher + Share Plan Header */}
+              <div className="sdm-compare__toolbar">
+                <div className="sdm-compare__season-pills">
+                  <button
+                    className={`sdm-compare__season-pill ${seasonFilter === 'active' ? 'sdm-compare__season-pill--active' : ''}`}
+                    onClick={() => setSeasonFilter('active')}
+                  >
+                    ⚡ Gen 2 / Glitch ({ALL_SPRITES.filter(s => s.gen === 2).length})
+                  </button>
+                  <button
+                    className={`sdm-compare__season-pill ${seasonFilter === 'all' ? 'sdm-compare__season-pill--active' : ''}`}
+                    onClick={() => setSeasonFilter('all')}
+                  >
+                    🌐 Toda la Colección ({ALL_SPRITES.length})
+                  </button>
+                </div>
+
+                <button
+                  onClick={handleCopyTradePlan}
+                  className="sdm-compare__btn-trade-plan"
+                >
+                  {copiedTradePlan ? <Check size={14} color="#4ade80" /> : <MessageSquare size={14} />}
+                  <span>{copiedTradePlan ? '¡Plan Copiado!' : 'Copiar Plan para Discord / WhatsApp'}</span>
+                </button>
+              </div>
+
+              {/* Tabs */}
+              <div className="sdm-compare__tabs">
+                <button
+                  onClick={() => setActiveTab('friendToMe')}
+                  className={`sdm-compare__tab ${activeTab === 'friendToMe' ? 'sdm-compare__tab--active-green' : ''}`}
+                >
+                  <ArrowDownLeft size={16} />
+                  <span>Te Puede Prestar ({friendToMeList.length})</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('meToFriend')}
+                  className={`sdm-compare__tab ${activeTab === 'meToFriend' ? 'sdm-compare__tab--active-blue' : ''}`}
+                >
+                  <ArrowUpRight size={16} />
+                  <span>Le Puedes Prestar ({meToFriendList.length})</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('common')}
+                  className={`sdm-compare__tab ${activeTab === 'common' ? 'sdm-compare__tab--active-purple' : ''}`}
+                >
+                  <Handshake size={16} />
+                  <span>Ambos Tienen ({commonList.length})</span>
+                </button>
+              </div>
+
+              {/* Sprites Grid */}
+              {activeList.length === 0 ? (
+                <div className="sdm-compare__empty">
+                  {activeTab === 'friendToMe' && '🎉 ¡Genial! Tu amigo no tiene ningún Sprite que te falte en esta categoría.'}
+                  {activeTab === 'meToFriend' && '🤝 No tienes Sprites adicionales para prestarle a tu amigo en esta categoría.'}
+                  {activeTab === 'common' && 'Aún no tienen Sprites repetidos en común en esta categoría.'}
+                </div>
+              ) : (
+                <div className="sdm-compare__grid">
+                  {activeList.map((sprite) => {
+                    const style = getSpriteCardStyle(sprite);
+                    const isMine = userState[sprite.id]?.owned;
+                    const friendLvl = currentFriendState[sprite.id]?.level || 1;
+                    const myLvl = userState[sprite.id]?.level || 1;
+
+                    return (
                       <div
+                        key={sprite.id}
+                        className="sdm-compare__sprite-card"
                         style={{
-                          fontSize: '0.72rem',
-                          fontWeight: 800,
-                          color: '#fff',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis'
+                          background: style.background,
+                          borderColor: isMine ? '#00F0E8' : style.borderColor
                         }}
                       >
-                        {sprite.fullName}
-                      </div>
+                        <img
+                          src={sprite.image}
+                          alt={sprite.fullName}
+                          className="sdm-compare__sprite-img"
+                        />
+                        <div className="sdm-compare__sprite-name">
+                          {sprite.fullName}
+                        </div>
 
-                      <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.7)', marginTop: '2px' }}>
-                        {activeTab === 'friendToMe' && `Amigo: Niv.${friendLvl}`}
-                        {activeTab === 'meToFriend' && `Tú: Niv.${myLvl}`}
-                        {activeTab === 'common' && `Tú: Niv.${myLvl} · Amigo: Niv.${friendLvl}`}
-                      </div>
+                        <div className="sdm-compare__sprite-levels">
+                          {activeTab === 'friendToMe' && `Amigo: Niv.${friendLvl}`}
+                          {activeTab === 'meToFriend' && `Tú: Niv.${myLvl}`}
+                          {activeTab === 'common' && `Tú: N.${myLvl} · Amigo: N.${friendLvl}`}
+                        </div>
 
-                      {activeTab === 'friendToMe' && onToggleOwned && (
-                        <button
-                          onClick={() => onToggleOwned(sprite.id)}
-                          style={{
-                            marginTop: '6px',
-                            width: '100%',
-                            padding: '4px',
-                            borderRadius: '5px',
-                            background: isMine ? '#10b981' : 'rgba(255,255,255,0.15)',
-                            color: '#fff',
-                            border: 'none',
-                            fontSize: '0.65rem',
-                            fontWeight: 700,
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {isMine ? '✓ Registrado' : '+ Marcar'}
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
+                        {activeTab === 'friendToMe' && onToggleOwned && (
+                          <button
+                            onClick={() => onToggleOwned(sprite.id)}
+                            className={`sdm-compare__sprite-mark-btn ${isMine ? 'sdm-compare__sprite-mark-btn--owned' : ''}`}
+                          >
+                            {isMine ? '✓ Registrado' : '+ Marcar'}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
