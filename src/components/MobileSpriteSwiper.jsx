@@ -187,7 +187,11 @@ function FamilyRow({
                   <div className="ms-level-tag ms-level-tag--friend">
                     ✓ AMIGO
                   </div>
-                ) : null
+                ) : (
+                  <div className="ms-level-tag ms-level-tag--unowned">
+                    FALTA
+                  </div>
+                )
               ) : isOwned ? (
                 <div
                   className={`ms-level-tag ${isMastered ? 'ms-level-tag--mastered' : ''}`}
@@ -196,7 +200,15 @@ function FamilyRow({
                 >
                   {isMastered ? 'MAX' : `LVL.${level}`}
                 </div>
-              ) : null}
+              ) : (
+                <div
+                  className="ms-level-tag ms-level-tag--unowned"
+                  onClick={handleToggleBadgeClick}
+                  title="Toca para registrar como atrapado"
+                >
+                  SIN ATRAPAR
+                </div>
+              )}
 
               {/* Imagen del Sprite (tamaño controlado) */}
               <div className="ms-card__image" onClick={handleImageClick}>
@@ -236,23 +248,35 @@ function FamilyRow({
                 </div>
               </div>
 
-              {/* Estrellas de nivel abajo (único control inferior) */}
-              <div
-                className="card-level-stars ms-stars"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {[1, 2, 3, 4, 5].map((num) => (
-                  <button
-                    key={num}
-                    className={`star-btn ${isOwned && level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''}`}
-                    onClick={(e) => handleLevelClick(e, num)}
-                    style={isFriendView ? { pointerEvents: 'none' } : {}}
-                    title={isOwned ? (level === 1 && num === 1 ? 'Toca para desmarcar' : `Nivel ${num}`) : `Marcar Nivel ${num}`}
-                  >
-                    ★
-                  </button>
-                ))}
-              </div>
+              {/* Control inferior: Estrellas si está atrapado, botón sutil si no */}
+              {isOwned ? (
+                <div
+                  className="card-level-stars ms-stars"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <button
+                      key={num}
+                      className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''}`}
+                      onClick={(e) => handleLevelClick(e, num)}
+                      style={isFriendView ? { pointerEvents: 'none' } : {}}
+                      title={level === 1 && num === 1 ? 'Toca para desmarcar' : `Nivel ${num}`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <button
+                  className="ms-unowned-btn"
+                  onClick={handleToggleBadgeClick}
+                  style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800, borderColor: 'transparent' } : {}}
+                >
+                  {isFriendView
+                    ? (friendCanLend ? '+ Registrar en mi Dex' : 'No lo tiene')
+                    : '+ Sin atrapar'}
+                </button>
+              )}
             </div>
           );
         })}
