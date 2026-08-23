@@ -11,6 +11,7 @@ import { FriendCompareModal } from './components/FriendCompareModal';
 import { AuthModal } from './components/AuthModal';
 import { PrivacyNotice } from './components/PrivacyNotice';
 import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
+import { InstallPrompt } from './components/InstallPrompt';
 import { Footer } from './components/Footer';
 import { MobileSpriteSwiper } from './components/MobileSpriteSwiper';
 import { useIsMobile } from './hooks/useIsMobile';
@@ -376,6 +377,7 @@ export function App() {
   return (
     <div className="app-container">
       <PrivacyNotice />
+      <InstallPrompt />
 
       <Navbar
         user={user}
