@@ -372,16 +372,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
                 </button>
 
                 <button
-                  className="sdm-share__quick-btn sdm-share__quick-btn--download"
-                  onClick={handleDownload}
-                  disabled={!dataUrl}
-                  title="Descargar imagen PNG"
-                >
-                  <Download size={14} />
-                  <span>Descargar</span>
-                </button>
-
-                <button
                   className="sdm-share__quick-btn sdm-share__quick-btn--share"
                   onClick={handleNativeShare}
                   disabled={!dataUrl}
@@ -389,6 +379,17 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
                 >
                   <Share2 size={14} />
                   <span>Compartir</span>
+                </button>
+
+                <button
+                  className="sdm-share__quick-btn sdm-share__quick-btn--download sdm-share__glitch-btn"
+                  onClick={handleDownload}
+                  disabled={!dataUrl}
+                  title="Descargar imagen PNG"
+                  data-text="DESCARGAR"
+                >
+                  <Download size={14} className="sdm-share__btn-icon" />
+                  <span className="sdm-share__btn-text">Descargar</span>
                 </button>
               </div>
             </div>
