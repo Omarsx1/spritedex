@@ -4133,17 +4133,71 @@ body::before {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.sdm-share__preview-badge {
-  font-size: 0.72rem;
-  font-weight: 900;
-  color: #00f0ff;
-  background: rgba(0, 240, 255, 0.12);
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(0, 240, 255, 0.35);
+.sdm-share__header-actions {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sdm-share__quick-btn {
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  font-family: inherit;
+  user-select: none;
+}
+
+.sdm-share__quick-btn--copy {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #e2e8f0;
+}
+
+.sdm-share__quick-btn--copy:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.sdm-share__quick-btn--download {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #ffffff;
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+}
+
+.sdm-share__quick-btn--download:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.55);
+  transform: translateY(-1px);
+}
+
+.sdm-share__quick-btn--share {
+  background: linear-gradient(135deg, #00f0ff, #ec4899);
+  color: #060714;
+  border-color: #00f0ff;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+}
+
+.sdm-share__quick-btn--share:hover:not(:disabled) {
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.65);
+  transform: translateY(-1px);
+}
+
+.sdm-share__quick-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.sdm-share__quick-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .sdm-share__preview-box {
@@ -4464,13 +4518,19 @@ body::before {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
-    padding-bottom: 5px;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
   }
 
-  .sdm-share__preview-badge {
-    font-size: 0.60rem;
-    padding: 2px 6px;
+  .sdm-share__header-actions {
+    gap: 4px;
+  }
+
+  .sdm-share__quick-btn {
+    padding: 5px 9px;
+    font-size: 0.68rem;
+    gap: 4px;
   }
 
   .sdm-share__preview-box {
