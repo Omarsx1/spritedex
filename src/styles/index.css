@@ -1006,27 +1006,37 @@ body::before {
   position: relative;
   width: 180px;
   height: 180px;
+  max-width: 180px;
+  max-height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 auto;
 }
 
 .hero__hero-sprite {
   position: relative;
   z-index: 3;
+  width: 120px;
+  height: 120px;
+  max-width: 120px;
+  max-height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .hero__hero-img {
-  width: 120px;
-  height: 120px;
+  width: 120px !important;
+  height: 120px !important;
+  max-width: 120px !important;
+  max-height: 120px !important;
   object-fit: contain;
   filter:
     drop-shadow(0 0 24px rgba(99, 102, 241, 0.5))
     drop-shadow(0 0 60px rgba(168, 85, 247, 0.25));
   animation: heroFloat 3s ease-in-out infinite;
+  display: block;
 }
 
 @keyframes heroFloat {
@@ -1290,13 +1300,25 @@ body::before {
   }
 
   .hero__showcase {
-    width: 130px;
-    height: 130px;
+    width: 130px !important;
+    height: 130px !important;
+    max-width: 130px !important;
+    max-height: 130px !important;
+    margin: 0 auto;
+  }
+
+  .hero__hero-sprite {
+    width: 85px !important;
+    height: 85px !important;
+    max-width: 85px !important;
+    max-height: 85px !important;
   }
 
   .hero__hero-img {
-    width: 85px;
-    height: 85px;
+    width: 85px !important;
+    height: 85px !important;
+    max-width: 85px !important;
+    max-height: 85px !important;
   }
 
   .hero__satellite {
