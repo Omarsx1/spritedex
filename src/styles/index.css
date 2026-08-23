@@ -5235,6 +5235,29 @@ body::before {
   .view-toggle-btn {
     padding: 3px 7px;
   }
+
+  /* Ultra-low GPU & Battery Optimization for Mobile */
+  .hero-bg-grid,
+  .hero-ambient-glow,
+  .hero-floating-particles,
+  .hero-sprite-orbit-container {
+    animation: none !important;
+  }
+
+  .ms-card:not(.ms-card--active) .cyber-fx-overlay * {
+    animation: none !important;
+    display: none !important;
+  }
+
+  .ms-card .card-particles {
+    display: none !important;
+  }
+
+  .ms-family-stack,
+  .ms-card {
+    will-change: transform;
+    transform: translateZ(0);
+  }
 }
 
 /* ===== Responsive List View ===== */
@@ -5708,8 +5731,7 @@ body::before {
 }
 
 .mobile-swiper__blueprint-layer-3 {
-  background: radial-gradient(circle at 60% 40%, rgba(6,182,212,0.28) 0%, rgba(6,182,212,0.08) 35%, transparent 70%);
-  mix-blend-mode: screen;
+  background: radial-gradient(circle at 60% 40%, rgba(6,182,212,0.2) 0%, rgba(6,182,212,0.05) 35%, transparent 70%);
 }
 
 .mobile-swiper__content {
@@ -5728,6 +5750,7 @@ body::before {
   gap: 6px;
   content-visibility: auto;
   contain-intrinsic-size: 0 360px;
+  contain: layout style paint;
 }
 
 .ms-family-header {
