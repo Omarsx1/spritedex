@@ -78,11 +78,34 @@ export function Navbar({
     if (onSignOut) onSignOut();
   };
 
+  const handleLogoClick = async () => {
+    try {
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((key) => caches.delete(key)));
+      }
+    } catch (err) {
+      console.warn('Error al limpiar caché:', err);
+    }
+    const url = new URL(window.location.href);
+    url.searchParams.set('v', Date.now().toString());
+    window.location.replace(url.toString());
+  };
+
   return (
     <nav className="app-navbar">
-      {/* Logo */}
+      {/* Logo con actualización forzada */}
       <div className="app-navbar__left">
-        <div className="app-navbar__logo-mark">F</div>
+        <button
+          type="button"
+          className="app-navbar__logo-mark"
+          onClick={handleLogoClick}
+          title="Toca para actualizar la aplicación a la última versión"
+          aria-label="Actualizar aplicación"
+          style={{ border: 'none', padding: 0 }}
+        >
+          F
+        </button>
       </div>
 
       {/* Acciones derechas: Avatar + Menú Hamburguesa */}
