@@ -205,219 +205,123 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="sdm sdm-share sdm-share--glitch" ref={modalRef} onClick={(e) => e.stopPropagation()}>
-        {/* Close Button */}
-        <button className="sdm__close" onClick={onClose}>
-          <X size={18} />
-        </button>
-
-        {/* ═══ HERO HEADER (GLITCH / OVERRIDE THEMED) ═══ */}
-        <div className="sdm__hero sdm-share__hero" ref={headerRef}>
-          <div
-            className="sdm__hero-glow"
-            style={{
-              background: 'radial-gradient(circle at 30% 50%, rgba(255, 0, 85, 0.4) 0%, rgba(0, 240, 255, 0.25) 50%, transparent 80%)'
-            }}
-          />
-
-          <div className="sdm-share__hero-icon">
-            <ImageIcon size={32} color="#00f0ff" />
-          </div>
-
-          <div className="sdm__hero-info">
-            <div className="sdm__hero-badges">
-              <span className="sdm-share__tag-chapter">FORTNITE | TEMPORADA GLITCH</span>
-              <span className="sdm-share__tag-pill">ROMPE LAS REGLAS • CAMBIA EL JUEGO</span>
+      <div className="sdm-share-pro" ref={modalRef} onClick={(e) => e.stopPropagation()}>
+        {/* Header Elegante y Minimalista */}
+        <div className="sdm-share-pro__header">
+          <div className="sdm-share-pro__title-wrap">
+            <div className="sdm-share-pro__icon-badge">
+              <Sparkles size={18} color="#00F0E8" />
             </div>
-            <h2 className="sdm__name sdm-share__glitch-title">SPRITEDEX OVERRIDE</h2>
-            <p className="sdm__meta">
-              Exporta tu plantilla de colección en alta resolución con estilo cyber glitch oficial y barra de desencriptación.
-            </p>
+            <div>
+              <h2 className="sdm-share-pro__title">Exportar Colección</h2>
+              <p className="sdm-share-pro__subtitle">
+                {ownedInScope} de {spritesList.length} espíritus atrapados • {pctInScope}% completado
+              </p>
+            </div>
           </div>
+          <button className="sdm-share-pro__close" onClick={onClose} aria-label="Cerrar modal">
+            <X size={18} />
+          </button>
         </div>
 
-        {/* ═══ HUD STATS BAR (Image 2 style) ═══ */}
-        <div className="sdm-share__hud">
-          <div className="sdm-share__hud-header">
-            <div className="sdm-share__hud-left">
-              <span className="sdm-share__hud-highlight">{ownedInScope} / {spritesList.length}</span>
-              <span className="sdm-share__hud-label">espíritus desencriptados</span>
-            </div>
-            <div className="sdm-share__hud-right">
-              <span>PROGRESO <strong>{pctInScope}%</strong></span>
-            </div>
-          </div>
-          <div className="sdm-share__hud-bar-track">
-            <div
-              className="sdm-share__hud-bar-fill"
-              style={{ width: `${Math.max(4, pctInScope)}%` }}
-            />
-          </div>
-        </div>
-
-        {/* ═══ BODY CONTENT ═══ */}
-        <div className="sdm__body sdm-share__body">
-
-          {/* Scope Selector */}
-          <div className="sdm-share__section-label">
-            <Repeat size={14} color="#00f0ff" />
-            <span>CATEGORÍA A EXPORTAR</span>
-          </div>
-
-          <div className="sdm-share__scopes">
-            {scopeOptions.map((opt) => {
-              const isActive = scope === opt.id;
-              return (
+        {/* Toolbar de Configuración Compacta */}
+        <div className="sdm-share-pro__controls">
+          <div className="sdm-share-pro__seg-group">
+            <span className="sdm-share-pro__seg-label">MOSTRAR:</span>
+            <div className="sdm-share-pro__segmented">
+              {[
+                { id: 'all', label: 'Todos' },
+                { id: 'owned', label: 'Atrapados' },
+                { id: 'missing', label: 'Faltantes' }
+              ].map(opt => (
                 <button
                   key={opt.id}
+                  className={`sdm-share-pro__seg-btn ${scope === opt.id ? 'sdm-share-pro__seg-btn--active' : ''}`}
                   onClick={() => {
                     setScope(opt.id);
                     sounds.playBeep();
                   }}
-                  className={`sdm-share__scope-btn ${isActive ? 'sdm-share__scope-btn--active' : ''}`}
                 >
-                  <div className="sdm-share__scope-left">
-                    {opt.icon}
-                    <span className="sdm-share__scope-label">{opt.label}</span>
-                  </div>
-                  <span className="sdm-share__scope-count">
-                    {opt.count} <span className="sdm-share__scope-unit">sprites</span>
-                  </span>
+                  {opt.label}
                 </button>
-              );
-            })}
-          </div>
-
-          {/* Config Controls Grid */}
-          <div className="sdm-share__grid-config">
-            {/* Format Selector */}
-            <div className="sdm-share__input-wrap">
-              <label className="sdm-share__section-label">
-                <span>FORMATO:</span>
-              </label>
-              <div className="sdm-share__pill-selector">
-                {[
-                  { id: 'checklist', label: '📱 Vertical Móvil' },
-                  { id: 'square', label: '🔳 1:1 Cuadrado' }
-                ].map(f => (
-                  <button
-                    key={f.id}
-                    className={`sdm-share__pill-opt ${format === f.id ? 'sdm-share__pill-opt--active' : ''}`}
-                    onClick={() => {
-                      setFormat(f.id);
-                      sounds.playBeep();
-                    }}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Background Template Toggle */}
-            <div className="sdm-share__input-wrap">
-              <label className="sdm-share__section-label">
-                <span>ESTILO DE FONDO:</span>
-              </label>
-              <div className="sdm-share__pill-selector">
-                <button
-                  className={`sdm-share__pill-opt ${bgStyle === 'glitch_override' ? 'sdm-share__pill-opt--active' : ''}`}
-                  onClick={() => {
-                    setBgStyle('glitch_override');
-                    sounds.playBeep();
-                  }}
-                >
-                  🌌 Glitch HD
-                </button>
-                <button
-                  className={`sdm-share__pill-opt ${bgStyle === 'blueprint' ? 'sdm-share__pill-opt--active' : ''}`}
-                  onClick={() => {
-                    setBgStyle('blueprint');
-                    sounds.playBeep();
-                  }}
-                >
-                  💠 Blueprint
-                </button>
-                <button
-                  className={`sdm-share__pill-opt ${bgStyle === 'dark_matrix' ? 'sdm-share__pill-opt--active' : ''}`}
-                  onClick={() => {
-                    setBgStyle('dark_matrix');
-                    sounds.playBeep();
-                  }}
-                >
-                  🔮 Dark
-                </button>
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Preview Container */}
-          <div className="sdm-share__preview-container">
-            <div className="sdm-share__preview-header">
-              <span className="sdm-share__section-label" style={{ marginBottom: 0 }}>
-                <Sparkles size={14} color="#00f0ff" />
-                <span>Vista Previa</span>
-              </span>
-
-              {/* Botones de acción directos en la barra superior */}
-              <div className="sdm-share__header-actions">
+          <div className="sdm-share-pro__seg-group">
+            <span className="sdm-share-pro__seg-label">FORMATO:</span>
+            <div className="sdm-share-pro__segmented">
+              {[
+                { id: 'checklist', label: '📱 Vertical' },
+                { id: 'square', label: '🔳 1:1' }
+              ].map(f => (
                 <button
-                  className="sdm-share__quick-btn sdm-share__quick-btn--copy"
-                  onClick={handleCopyText}
-                  disabled={spritesList.length === 0}
-                  title="Copiar texto para compartir en redes"
+                  key={f.id}
+                  className={`sdm-share-pro__seg-btn ${format === f.id ? 'sdm-share-pro__seg-btn--active' : ''}`}
+                  onClick={() => {
+                    setFormat(f.id);
+                    sounds.playBeep();
+                  }}
                 >
-                  {copiedText ? <Check size={14} color="#4ade80" /> : <Copy size={14} />}
-                  <span>{copiedText ? '¡Copiado!' : 'Copiar Texto'}</span>
+                  {f.label}
                 </button>
-
-                <button
-                  className="sdm-share__quick-btn sdm-share__quick-btn--share"
-                  onClick={handleNativeShare}
-                  disabled={!dataUrl}
-                  title="Compartir plantilla"
-                >
-                  <Share2 size={14} />
-                  <span>Compartir</span>
-                </button>
-
-                <button
-                  className="sdm-share__quick-btn sdm-share__quick-btn--download sdm-share__glitch-btn"
-                  onClick={handleDownload}
-                  disabled={!dataUrl}
-                  title="Descargar imagen PNG"
-                  data-text="DESCARGAR"
-                >
-                  <Download size={14} className="sdm-share__btn-icon" />
-                  <span className="sdm-share__btn-text">Descargar</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="sdm-share__preview-box">
-              {spritesList.length === 0 ? (
-                <div style={{ color: '#64748b', fontWeight: 700 }}>
-                  No hay espíritus para mostrar en este filtro.
-                </div>
-              ) : isGenerating ? (
-                <div className="sdm-share__loading">
-                  <div className="sdm-share__spinner" />
-                  <span>Generando plantilla gráfica HD...</span>
-                </div>
-              ) : (
-                <img
-                  src={dataUrl}
-                  alt="Vista previa de la plantilla"
-                  className="sdm-share__preview-img"
-                />
-              )}
-            </div>
-
-            <div className="sdm-share__trade-tip">
-              <span>💡 <strong>Tip de Intercambio:</strong> Comparte esta plantilla en tus redes o chats con amigos usando <code>#FNGGOverride</code></span>
+              ))}
             </div>
           </div>
+        </div>
 
+        {/* Vista Previa Central HD */}
+        <div className="sdm-share-pro__preview-wrap">
+          {spritesList.length === 0 ? (
+            <div className="sdm-share-pro__empty">
+              No hay espíritus para mostrar en esta categoría.
+            </div>
+          ) : isGenerating ? (
+            <div className="sdm-share-pro__loading">
+              <div className="sdm-share-pro__spinner" />
+              <span>Generando captura HD...</span>
+            </div>
+          ) : (
+            <img
+              src={dataUrl}
+              alt="Vista previa de la colección"
+              className="sdm-share-pro__preview-img"
+            />
+          )}
+        </div>
+
+        {/* Barra de Acciones Principal */}
+        <div className="sdm-share-pro__actions">
+          <button
+            className="sdm-share-pro__btn sdm-share-pro__btn--copy"
+            onClick={handleCopyText}
+            disabled={spritesList.length === 0}
+            title="Copiar resumen de texto para redes"
+          >
+            {copiedText ? <Check size={15} color="#4ade80" /> : <Copy size={15} />}
+            <span>{copiedText ? '¡Texto Copiado!' : 'Copiar Texto'}</span>
+          </button>
+
+          <button
+            className="sdm-share-pro__btn sdm-share-pro__btn--share"
+            onClick={handleNativeShare}
+            disabled={!dataUrl}
+            title="Compartir captura"
+          >
+            <Share2 size={15} />
+            <span>Compartir</span>
+          </button>
+
+          <button
+            className="sdm-share-pro__btn sdm-share-pro__btn--download sdm-share__glitch-btn"
+            onClick={handleDownload}
+            disabled={!dataUrl}
+            title="Descargar imagen en alta resolución"
+            data-text="DESCARGAR"
+          >
+            <Download size={15} className="sdm-share__btn-icon" />
+            <span className="sdm-share__btn-text">Descargar</span>
+          </button>
         </div>
       </div>
     </div>
