@@ -177,7 +177,7 @@ function FamilyRow({
                 </div>
               )}
 
-              {/* Badge de nivel o amigo (esquina superior derecha) */}
+              {/* Badge de nivel o amigo (esquina superior derecha, solo si está atrapado o vista amigo) */}
               {isFriendView ? (
                 friendCanLend ? (
                   <div className="ms-level-tag ms-level-tag--lend" onClick={handleToggleBadgeClick}>
@@ -187,11 +187,7 @@ function FamilyRow({
                   <div className="ms-level-tag ms-level-tag--friend">
                     ✓ AMIGO
                   </div>
-                ) : (
-                  <div className="ms-level-tag ms-level-tag--unowned">
-                    FALTA
-                  </div>
-                )
+                ) : null
               ) : isOwned ? (
                 <div
                   className={`ms-level-tag ${isMastered ? 'ms-level-tag--mastered' : ''}`}
@@ -200,17 +196,9 @@ function FamilyRow({
                 >
                   {isMastered ? 'MAX' : `LVL.${level}`}
                 </div>
-              ) : (
-                <div
-                  className="ms-level-tag ms-level-tag--unowned"
-                  onClick={handleToggleBadgeClick}
-                  title="Toca para registrar como atrapado"
-                >
-                  SIN ATRAPAR
-                </div>
-              )}
+              ) : null}
 
-              {/* Imagen del Sprite (tamaño controlado) */}
+              {/* Imagen del Sprite (proporciones esbeltas) */}
               <div className="ms-card__image" onClick={handleImageClick}>
                 <img
                   src={sprite.image}
@@ -239,7 +227,7 @@ function FamilyRow({
 
               {/* Info: nombre, rareza, drop */}
               <div className="ms-card__info">
-                <div className="card-name" style={{ fontSize: '0.85rem' }}>{sprite.fullName}</div>
+                <div className="card-name" style={{ fontSize: '0.92rem' }}>{sprite.fullName}</div>
                 <div className="card-meta">
                   <span className={`sprite-pill rarity-badge ${rarityInfo.classKey ? `sprite-rarity-${rarityInfo.classKey}` : ''}`}>
                     {rarityInfo.name}
@@ -248,7 +236,7 @@ function FamilyRow({
                 </div>
               </div>
 
-              {/* Control inferior: Estrellas si está atrapado, botón sutil si no */}
+              {/* Control inferior: Estrellas si está atrapado, botón estándar si no */}
               {isOwned ? (
                 <div
                   className="card-level-stars ms-stars"
@@ -268,13 +256,15 @@ function FamilyRow({
                 </div>
               ) : (
                 <button
-                  className="ms-unowned-btn"
+                  className="card-owned-btn"
                   onClick={handleToggleBadgeClick}
-                  style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800, borderColor: 'transparent' } : {}}
+                  style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800 } : {}}
                 >
-                  {isFriendView
-                    ? (friendCanLend ? '+ Registrar en mi Dex' : 'No lo tiene')
-                    : '+ Sin atrapar'}
+                  <span className="btn-text">
+                    {isFriendView
+                      ? (friendCanLend ? '+ Registrar en mi Dex' : 'No lo tiene')
+                      : 'Sin atrapar'}
+                  </span>
                 </button>
               )}
             </div>
