@@ -1055,9 +1055,11 @@ body::before {
 .hero__bar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 28px;
+  justify-content: space-between;
+  max-width: 620px;
   width: 100%;
+  margin: 0 auto;
+  gap: 28px;
   cursor: default;
 }
 
@@ -1071,8 +1073,8 @@ body::before {
 
 .hero__ring-box {
   position: relative;
-  width: 110px;
-  height: 110px;
+  width: 120px;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1123,14 +1125,14 @@ body::before {
 
 .hero__stat-value {
   font-family: var(--font-heading);
-  font-size: 1.75rem;
+  font-size: 1.95rem;
   font-weight: 900;
   color: #fff;
   line-height: 1;
 }
 
 .hero__stat-of {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.5);
   line-height: 1;
@@ -1138,10 +1140,10 @@ body::before {
 }
 
 .hero__stat-label {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.65);
   text-transform: uppercase;
 }
 
@@ -1272,9 +1274,13 @@ body::before {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    justify-content: center;
-    gap: 26px;
+    justify-content: space-between;
+    max-width: 440px;
     width: 100%;
+    margin: 0 auto;
+    gap: 16px;
+    padding: 0 8px;
+    box-sizing: border-box;
   }
 
   .hero__stat-ring {
@@ -1286,26 +1292,27 @@ body::before {
     width: auto;
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     margin-top: 0;
   }
 
   .hero__ring-box {
-    width: 68px;
-    height: 68px;
+    width: 86px;
+    height: 86px;
   }
 
   .hero__stat-label {
-    font-size: 0.58rem;
+    font-size: 0.62rem;
     letter-spacing: 1px;
+    font-weight: 800;
   }
 
   .hero__stat-value {
-    font-size: 1.1rem;
+    font-size: 1.45rem;
   }
 
   .hero__stat-of {
-    font-size: 0.62rem;
+    font-size: 0.74rem;
   }
 
   /* Mobile: ONLY icon (hide text) */
@@ -1339,29 +1346,31 @@ body::before {
   }
 
   .hero__bar {
-    gap: 20px;
+    max-width: 360px;
+    gap: 10px;
+    padding: 0 4px;
   }
 
   .hero__actions {
-    gap: 8px;
+    gap: 6px;
   }
 
   .hero__ring-box {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
   }
 
   .hero__stat-label {
-    font-size: 0.52rem;
-    letter-spacing: 0.5px;
+    font-size: 0.58rem;
+    letter-spacing: 0.8px;
   }
 
   .hero__stat-value {
-    font-size: 1rem;
+    font-size: 1.35rem;
   }
 
   .hero__stat-of {
-    font-size: 0.58rem;
+    font-size: 0.68rem;
   }
 
   .hero__btn {
