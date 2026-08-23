@@ -1259,14 +1259,14 @@ body::before {
   }
 
   .hero__title-line {
-    font-size: 3.7rem;
+    font-size: 4.2rem;
     letter-spacing: 2px;
   }
 
   .hero__title-line--accent {
-    font-size: 1.5rem;
-    letter-spacing: 3px;
-    margin-top: -10px;
+    font-size: 1.75rem;
+    letter-spacing: 4px;
+    margin-top: -12px;
   }
 
   .hero__showcase {
@@ -1345,13 +1345,13 @@ body::before {
 
 @media (max-width: 480px) {
   .hero__title-line {
-    font-size: 2.7rem;
+    font-size: 3.4rem;
   }
 
   .hero__title-line--accent {
-    font-size: 1.15rem;
-    letter-spacing: 2px;
-    margin-top: -6px;
+    font-size: 1.35rem;
+    letter-spacing: 3px;
+    margin-top: -9px;
   }
 
   .hero__bar {
