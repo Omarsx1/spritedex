@@ -200,6 +200,13 @@ function FamilyRow({
 
               {/* Imagen del Sprite (proporciones esbeltas) */}
               <div className="ms-card__image" onClick={handleImageClick}>
+                {isMastered && (
+                  <img
+                    src="/img/x/sprites/crown.webp"
+                    alt="Corona"
+                    className="ms-card__crown"
+                  />
+                )}
                 <img
                   src={sprite.image}
                   alt={sprite.fullName}

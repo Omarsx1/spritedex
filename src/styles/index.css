@@ -2210,10 +2210,49 @@ body::before {
 .card-particles span:nth-child(5) { --x: 1; --y: 0.5; top: 30%; left: 60%; animation-delay: 1.6s; }
 .card-particles span:nth-child(6) { --x: -1; --y: 0.5; top: 70%; right: 60%; animation-delay: 2s; }
 
-/* ===== MASTERED CROWN SYSTEM (Separated Grid & List view rules) ===== */
+/* ===== MASTERED CROWN SYSTEM ===== */
 
-/* 1. Grid View Crown — Scoped to .card-image */
-.sprite-card.is-mastered .card-image::before {
+/* 1. Grid View Crown */
+.card-image__crown {
+  position: absolute;
+  top: 8px;
+  left: 54%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 22px;
+  z-index: 5;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+  pointer-events: none !important;
+}
+
+/* 2. List View Crown */
+.list-item-image__crown {
+  position: absolute;
+  top: -2px;
+  left: 54%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 14px;
+  z-index: 5;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+  pointer-events: none !important;
+}
+
+/* 3. Mobile Swiper Crown */
+.ms-card__crown {
+  position: absolute;
+  top: -2px;
+  left: 54%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 24px;
+  z-index: 10;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.95));
+  pointer-events: none !important;
+}
+
+/* Fallback CSS ::before pseudo elements */
+.sprite-card.is-mastered .card-image:not(:has(.card-image__crown))::before {
   content: "";
   position: absolute;
   top: 10%;
@@ -2226,12 +2265,7 @@ body::before {
   pointer-events: none !important;
 }
 
-/* 2. List View Crown — Scoped to .list-item-image */
-.sprite-list-item.is-mastered .list-item-image {
-  position: relative;
-}
-
-.sprite-list-item.is-mastered .list-item-image::before {
+.sprite-list-item.is-mastered .list-item-image:not(:has(.list-item-image__crown))::before {
   content: "";
   position: absolute;
   top: 0px;

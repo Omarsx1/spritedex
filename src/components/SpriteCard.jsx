@@ -85,6 +85,13 @@ export function SpriteCard({
         style={{ cursor: 'pointer' }}
       >
         <div className="list-item-image">
+          {isMastered && (
+            <img
+              src="/img/x/sprites/crown.webp"
+              alt="Corona"
+              className="list-item-image__crown"
+            />
+          )}
           <img
             src={sprite.image}
             alt={sprite.fullName}
@@ -208,6 +215,13 @@ export function SpriteCard({
 
       {/* Imagen del Sprite: Clic exclusivamente en la figura abre la modal de detalles y variantes */}
       <div className="card-image">
+        {isMastered && (
+          <img
+            src="/img/x/sprites/crown.webp"
+            alt="Corona"
+            className="card-image__crown"
+          />
+        )}
         <img
           src={sprite.image}
           alt={sprite.fullName}
