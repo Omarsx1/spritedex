@@ -288,8 +288,8 @@ function renderGlitchOverrideTemplate({
   ctx.fillText(titleText, width / 2, 86);
   ctx.shadowBlur = 0;
 
-  // Tagline Pill Capsule: "HACK THE SPRITEDEX • OVERRIDE THE GAME" (Magenta Capsule)
-  const capsuleText = 'HACK THE SPRITEDEX • OVERRIDE THE GAME';
+  // Tagline Pill Capsule: "ROMPE LAS REGLAS • CAMBIA EL JUEGO" (Magenta Capsule)
+  const capsuleText = 'ROMPE LAS REGLAS • CAMBIA EL JUEGO';
   ctx.font = '900 11px "Inter", "Arial Black", sans-serif';
   ctx.letterSpacing = '1px';
   const capsuleW = ctx.measureText(capsuleText).width + 32;
