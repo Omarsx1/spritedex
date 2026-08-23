@@ -2225,13 +2225,13 @@ body::before {
 
 /* ===== MASTERED CROWN SYSTEM ===== */
 
-/* 1. Grid View Crown (Desktop) - Flotando con holgura sobre la cresta */
+/* 1. Grid View Crown (Desktop) */
 .card-image__crown {
   position: absolute;
-  top: 8px;
-  left: 56%;
+  top: 4px;
+  left: 49%;
   right: auto;
-  transform: rotate(10deg);
+  transform: rotate(0deg);
   width: 28px;
   height: 19px;
   z-index: 5;
@@ -2271,10 +2271,10 @@ body::before {
 .sprite-card.is-mastered .card-image:not(:has(.card-image__crown))::before {
   content: "";
   position: absolute;
-  top: 8px;
-  left: 56%;
+  top: 4px;
+  left: 49%;
   right: auto;
-  transform: rotate(10deg);
+  transform: rotate(0deg);
   width: 28px;
   height: 19px;
   z-index: 2;
