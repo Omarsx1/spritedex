@@ -1659,12 +1659,18 @@ body::before {
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 16px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-  animation: popIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top center;
+  animation: popInCenter 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes popIn {
+@keyframes popInCenter {
   from { opacity: 0; transform: translate(-50%, -6px) scale(0.96); }
   to   { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+@keyframes popInRight {
+  from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .variant-grid-chip {
@@ -1719,7 +1725,8 @@ body::before {
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 16px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-  animation: popIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top center;
+  animation: popInCenter 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .sprite-grid-chip {
@@ -5146,6 +5153,8 @@ body::before {
     right: 0;
     left: auto;
     transform: none;
+    transform-origin: top right;
+    animation: popInRight 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 100;
   }
 
@@ -5155,6 +5164,8 @@ body::before {
     right: 0;
     left: auto;
     transform: none;
+    transform-origin: top right;
+    animation: popInRight 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     grid-template-columns: 1fr 1fr;
     z-index: 100;
   }
