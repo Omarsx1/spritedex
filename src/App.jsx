@@ -559,13 +559,14 @@ export function App() {
       {showShareModal && (
         <ShareImageModal
           filteredSprites={filteredSprites}
-          allSprites={ALL_SPRITES.filter((s) => showUnreleased || !s.unreleased)}
+          allSprites={ALL_SPRITES.filter((s) => (activeGen === 0 || s.gen === activeGen) && (showUnreleased || !s.unreleased))}
           userState={userState}
+          activeGen={activeGen}
           activeFiltersLabel={
             [
               baseFilter !== 'all' ? `Base: ${baseFilter}` : '',
               spriteFilter !== 'all' ? `Sprite: ${spriteFilter}` : '',
-              searchQuery ? `Search: "${searchQuery}"` : ''
+              searchQuery ? `Búsqueda: "${searchQuery}"` : ''
             ]
               .filter(Boolean)
               .join(' · ') || 'Ningún filtro activo'
