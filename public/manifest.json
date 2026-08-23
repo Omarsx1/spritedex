@@ -1,0 +1,19 @@
+{
+  "name": "Spritedex Fortnite",
+  "short_name": "Spritedex",
+  "description": "Rastreador de Espíritus de Fortnite. Registra capturas, variantes, niveles 1 al 5 y planifica intercambios en vivo.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#060714",
+  "theme_color": "#060714",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
