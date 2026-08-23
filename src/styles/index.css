@@ -2212,16 +2212,17 @@ body::before {
 
 /* ===== MASTERED CROWN SYSTEM ===== */
 
-/* 1. Grid View Crown */
+/* 1. Grid View Crown (Desktop) - A la derecha debajo del badge MAX */
 .card-image__crown {
   position: absolute;
   top: 8px;
-  left: 54%;
-  transform: translateX(-50%);
-  width: 32px;
-  height: 22px;
+  right: 30px;
+  left: auto;
+  transform: rotate(14deg);
+  width: 28px;
+  height: 19px;
   z-index: 5;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.95));
   pointer-events: none !important;
 }
 
@@ -2229,25 +2230,27 @@ body::before {
 .list-item-image__crown {
   position: absolute;
   top: -2px;
-  left: 54%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 14px;
+  right: 6px;
+  left: auto;
+  transform: rotate(12deg);
+  width: 18px;
+  height: 12px;
   z-index: 5;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
   pointer-events: none !important;
 }
 
-/* 3. Mobile Swiper Crown */
+/* 3. Mobile Swiper Crown - A la derecha debajo de la palabra MAX */
 .ms-card__crown {
   position: absolute;
-  top: -2px;
-  left: 54%;
-  transform: translateX(-50%);
-  width: 36px;
-  height: 24px;
+  top: 8px;
+  right: 32px;
+  left: auto;
+  transform: rotate(14deg);
+  width: 30px;
+  height: 20px;
   z-index: 10;
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.95));
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.95));
   pointer-events: none !important;
 }
 
@@ -2255,10 +2258,12 @@ body::before {
 .sprite-card.is-mastered .card-image:not(:has(.card-image__crown))::before {
   content: "";
   position: absolute;
-  top: 10%;
-  left: 53%;
-  width: 31px;
-  height: 21px;
+  top: 8px;
+  right: 30px;
+  left: auto;
+  transform: rotate(14deg);
+  width: 28px;
+  height: 19px;
   z-index: 2;
   filter: drop-shadow(rgb(0, 0, 0) 0px 0px 3px);
   background: url(/img/x/sprites/crown.webp) center center / contain no-repeat;
@@ -2268,10 +2273,11 @@ body::before {
 .sprite-list-item.is-mastered .list-item-image:not(:has(.list-item-image__crown))::before {
   content: "";
   position: absolute;
-  top: 0px;
-  left: calc(50% + 5px);
-  transform: translateX(-35%);
-  width: 18.5px;
+  top: -2px;
+  right: 6px;
+  left: auto;
+  transform: rotate(12deg);
+  width: 18px;
   height: 12px;
   z-index: 2;
   filter: drop-shadow(rgb(0, 0, 0) 0px 0px 3px);
