@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import { Share2, Download, Users, Cloud } from 'lucide-react';
+import { Share2, Users } from 'lucide-react';
 import gsap from 'gsap';
 import { allSprites } from '../data/spritesData';
 
@@ -100,41 +100,50 @@ export function Header({
       if (document.hidden || !activeSpriteRef.current) return;
 
       gsap.to(activeSpriteRef.current, {
-        scale: 0,
+        scale: 0.7,
         opacity: 0,
-        rotation: 15,
+        y: -20,
         duration: 0.35,
         ease: 'power2.in',
         onComplete: () => {
-          setSpriteIndex(prev => {
+          setSpriteIndex((prev) => {
+            if (spritePool.length <= 1) return 0;
             let next;
             do {
               next = Math.floor(Math.random() * spritePool.length);
-            } while (next === prev && spritePool.length > 1);
+            } while (next === prev);
             return next;
           });
-          setOrbitIndices(() => {
-            const indices = [];
-            const used = new Set();
-            while (indices.length < 3 && indices.length < spritePool.length) {
-              const idx = Math.floor(Math.random() * spritePool.length);
-              if (!used.has(idx)) {
-                used.add(idx);
-                indices.push(idx);
-              }
-            }
-            return indices;
+
+          // Also shuffle one random orbit sprite
+          setOrbitIndices((prev) => {
+            const copy = [...prev];
+            const slot = Math.floor(Math.random() * copy.length);
+            let next;
+            const allUsed = new Set([...copy, spriteIndex]);
+            do {
+              next = Math.floor(Math.random() * spritePool.length);
+            } while (allUsed.has(next) && spritePool.length > 4);
+            copy[slot] = next;
+            return copy;
           });
-          gsap.fromTo(activeSpriteRef.current,
-            { scale: 0, opacity: 0, rotation: -15 },
-            { scale: 1, opacity: 1, rotation: 0, duration: 0.45, ease: 'back.out(1.7)' }
-          );
         }
       });
     }, intervalTime);
 
     return () => clearInterval(interval);
-  }, [spritePool]);
+  }, [spritePool, spriteIndex]);
+
+  // GSAP animate in when spriteIndex changes
+  useEffect(() => {
+    if (activeSpriteRef.current) {
+      gsap.fromTo(
+        activeSpriteRef.current,
+        { scale: 1.3, opacity: 0, y: 20 },
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: 'back.out(1.8)' }
+      );
+    }
+  }, [spriteIndex]);
 
   const handleImgError = useCallback((e) => {
     e.target.onerror = null;
@@ -143,49 +152,54 @@ export function Header({
 
   return (
     <header className="hero">
-      <div className="hero__glow" />
+      {/* Animated background layers */}
+      <div className="hero__bg">
+        <div className="hero__grid" />
+        <div className="hero__glow hero__glow--1" />
+        <div className="hero__glow hero__glow--2" />
+        <div className="hero__glow hero__glow--3" />
+        <div className="hero__scanline" />
+        <div className="hero__particles" />
+      </div>
 
       <div className="hero__content">
         {/* Title */}
-        <div className="hero__title-box" ref={titleRef}>
+        <div className="hero__title-block" ref={titleRef}>
           <h1 className="hero__title">
-            <span className="hero__title-fortnite">FORTNITE</span>
-            <span className="hero__title-spritedex">SPRITEDEX</span>
+            <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">FORTNITE</span>
+            <span className="hero__title-line hero__title-line--accent">SPRITEDEX</span>
           </h1>
         </div>
 
-        {/* Dynamic Sprite Showcase - 1 central + 3 orbiting satellites */}
+        {/* Central sprite showcase with orbiting satellites */}
         <div className="hero__showcase">
-          {/* Central Sprite */}
-          <div className="hero__active-sprite" ref={activeSpriteRef}>
-            <div className="hero__sprite-glow" />
-            <img
-              src={currentSprite.image}
-              alt={currentSprite.fullName}
-              className="hero__sprite-img"
-              loading="eager"
-              onError={handleImgError}
-            />
-          </div>
-
-          {/* 3 Orbiting Satellites */}
-          <div className="hero__satellites" ref={orbitContainerRef}>
+          <div className="hero__orbit-ring" ref={orbitContainerRef}>
             {orbitIndices.map((idx, i) => {
-              const sprite = spritePool[idx] || spritePool[0];
+              const sprite = spritePool[idx];
+              if (!sprite) return null;
               return (
-                <div key={`${sprite.id}-${i}`} className={`hero__satellite hero__satellite--${i + 1}`}>
+                <div key={`orbit-${i}`} className={`hero__satellite hero__satellite--${i}`}>
                   <img
                     src={sprite.image}
                     alt={sprite.fullName}
                     className="hero__satellite-img"
-                    loading="lazy"
                     onError={handleImgError}
                   />
                 </div>
               );
             })}
           </div>
-
+          <div className="hero__hero-sprite" ref={activeSpriteRef}>
+            {currentSprite && (
+              <img
+                key={currentSprite.id || spriteIndex}
+                src={currentSprite.image}
+                alt={currentSprite.fullName}
+                className="hero__hero-img"
+                onError={handleImgError}
+              />
+            )}
+          </div>
         </div>
 
         {/* Stats + Actions bar */}
