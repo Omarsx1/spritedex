@@ -2256,7 +2256,7 @@ body::before {
 /* 3. Mobile Swiper Crown - Altura sobre la cresta derecha */
 .ms-card__crown {
   position: absolute;
-  top: 22px;
+  top: 6px;
   left: 56%;
   right: auto;
   transform: rotate(10deg);
@@ -5862,25 +5862,26 @@ body::before {
 
 /* ── Card Image (Generous, prominent proportions) ── */
 .ms-card__image {
-  height: 125px;
-  max-height: 125px;
+  position: relative;
+  height: 120px;
+  max-height: 120px;
   flex: none;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  margin-top: 10px;
-  margin-bottom: 2px;
+  margin-top: 22px;
+  margin-bottom: 4px;
   padding: 0;
 }
 
-.ms-card__image img {
-  max-height: 118px;
+.ms-card__image img:not(.ms-card__crown) {
+  max-height: 116px;
   max-width: 118px;
   object-fit: contain;
   transition: transform 0.2s ease;
 }
 
-.ms-card__image img:active {
+.ms-card__image img:not(.ms-card__crown):active {
   transform: scale(0.95);
 }
 
