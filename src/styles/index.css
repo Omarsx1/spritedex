@@ -4137,62 +4137,161 @@ body::before {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .sdm-share__quick-btn {
-  padding: 6px 14px;
-  border-radius: 9999px;
+  padding: 7px 14px;
+  border-radius: 8px;
   font-size: 0.76rem;
-  font-weight: 900;
+  font-weight: 800;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   font-family: inherit;
   user-select: none;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
+/* 1. Copiar Texto: Cyber Dark Slate & Neon Accent */
 .sdm-share__quick-btn--copy {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   color: #e2e8f0;
 }
 
 .sdm-share__quick-btn--copy:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(168, 85, 247, 0.18);
+  border-color: #a855f7;
   color: #ffffff;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
 }
 
-.sdm-share__quick-btn--download {
-  background: linear-gradient(135deg, #0284c7, #0369a1);
-  color: #ffffff;
-  border-color: #38bdf8;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
-}
-
-.sdm-share__quick-btn--download:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0ea5e9, #0284c7);
-  box-shadow: 0 0 14px rgba(56, 189, 248, 0.55);
-  transform: translateY(-1px);
-}
-
+/* 2. Compartir: Cyber Magenta Glass */
 .sdm-share__quick-btn--share {
-  background: linear-gradient(135deg, #00f0ff, #ec4899);
-  color: #060714;
-  border-color: #00f0ff;
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+  background: rgba(255, 0, 85, 0.12);
+  border: 1px solid rgba(255, 0, 85, 0.45);
+  color: #ff0055;
 }
 
 .sdm-share__quick-btn--share:hover:not(:disabled) {
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.65);
+  background: rgba(255, 0, 85, 0.25);
+  border-color: #ff0055;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(255, 0, 85, 0.5);
   transform: translateY(-1px);
 }
 
-.sdm-share__quick-btn:active:not(:disabled) {
-  transform: scale(0.96);
+/* 3. Descargar con Efecto Glitch Oficial Cyberpunk */
+.sdm-share__glitch-btn {
+  position: relative;
+  background: rgba(0, 240, 232, 0.12);
+  border: 1.5px solid #00F0E8;
+  color: #00F0E8;
+  box-shadow: 0 0 12px rgba(0, 240, 232, 0.25);
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sdm-share__glitch-btn:hover:not(:disabled),
+.sdm-share__glitch-btn:focus:not(:disabled) {
+  background-color: #00F0E8;
+  color: #060714;
+  border-color: #00F0E8;
+  box-shadow: 0 0 25px rgba(0, 240, 232, 0.7);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.sdm-share__glitch-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.sdm-share__glitch-btn .sdm-share__btn-text,
+.sdm-share__glitch-btn .sdm-share__btn-icon {
+  position: relative;
+  z-index: 1;
+  transition: opacity 0.2s ease;
+}
+
+.sdm-share__glitch-btn:hover:not(:disabled) .sdm-share__btn-text,
+.sdm-share__glitch-btn:hover:not(:disabled) .sdm-share__btn-icon {
+  opacity: 0;
+}
+
+.sdm-share__glitch-btn::before,
+.sdm-share__glitch-btn::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  background-color: #00F0E8;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.sdm-share__glitch-btn:hover:not(:disabled)::before,
+.sdm-share__glitch-btn:focus:not(:disabled)::before {
+  opacity: 1;
+  color: #ff0055;
+  animation: sdm-glitch-anim 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+}
+
+.sdm-share__glitch-btn:hover:not(:disabled)::after,
+.sdm-share__glitch-btn:focus:not(:disabled)::after {
+  opacity: 1;
+  color: #060714;
+  animation: sdm-glitch-anim 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both infinite;
+}
+
+@keyframes sdm-glitch-anim {
+  0% {
+    transform: translate(0);
+    clip-path: inset(0 0 0 0);
+  }
+  20% {
+    transform: translate(-3px, 2px);
+    clip-path: inset(50% 0 20% 0);
+  }
+  40% {
+    transform: translate(2px, -2px);
+    clip-path: inset(20% 0 60% 0);
+  }
+  60% {
+    transform: translate(-3px, 1px);
+    clip-path: inset(80% 0 5% 0);
+  }
+  80% {
+    transform: translate(3px, -2px);
+    clip-path: inset(30% 0 45% 0);
+  }
+  100% {
+    transform: translate(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sdm-share__glitch-btn:hover::before,
+  .sdm-share__glitch-btn:hover::after {
+    animation: none;
+    opacity: 0;
+  }
+  .sdm-share__glitch-btn:hover .sdm-share__btn-text,
+  .sdm-share__glitch-btn:hover .sdm-share__btn-icon {
+    opacity: 1;
+  }
 }
 
 .sdm-share__quick-btn:disabled {
@@ -4515,22 +4614,27 @@ body::before {
   }
 
   .sdm-share__preview-header {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     gap: 8px;
     margin-bottom: 8px;
-    padding-bottom: 6px;
+    padding-bottom: 8px;
   }
 
   .sdm-share__header-actions {
-    gap: 4px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.15fr;
+    gap: 6px;
+    width: 100%;
   }
 
   .sdm-share__quick-btn {
-    padding: 5px 9px;
+    padding: 7px 4px;
     font-size: 0.68rem;
     gap: 4px;
+    justify-content: center;
+    text-align: center;
+    border-radius: 6px;
   }
 
   .sdm-share__preview-box {
