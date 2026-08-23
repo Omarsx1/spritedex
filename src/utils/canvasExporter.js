@@ -209,12 +209,12 @@ function renderGlitchOverrideTemplate({
   const ownedCount = spritesList.filter(s => userState[s.id]?.owned).length;
   const pctOwned = totalSprites > 0 ? Math.round((ownedCount / totalSprites) * 100) : 0;
 
-  let width = 1280;
-  let height = 900;
+  let width = 1080;
+  let height = 1520;
   let cols = 6;
-  const paddingX = 48;
-  const headerH = 190;
-  const footerH = 50;
+  const paddingX = 36;
+  const headerH = 195;
+  const footerH = 55;
 
   if (format === 'square') {
     width = 1200;
@@ -226,18 +226,18 @@ function renderGlitchOverrideTemplate({
     else if (totalSprites <= 42) cols = 6;
     else cols = 7;
   } else {
+    // Vertical Mobile / Story Poster Format (Matching Reference Image)
+    width = 1080;
     if (totalSprites <= 8) cols = 4;
     else if (totalSprites <= 15) cols = 5;
-    else if (totalSprites <= 28) cols = 6;
-    else if (totalSprites <= 48) cols = 7;
-    else cols = 8;
+    else cols = 6; // 6 columns standard for Gen 2 (33 sprites = 6 rows)
   }
 
   const rows = Math.max(1, Math.ceil(totalSprites / cols));
   const availW = width - paddingX * 2;
 
   if (format === 'checklist') {
-    const desiredCellH = 195;
+    const desiredCellH = 190;
     height = headerH + rows * desiredCellH + footerH;
   }
 
@@ -256,46 +256,48 @@ function renderGlitchOverrideTemplate({
   // 2. HEADER SECTION (GLITCH OVERRIDE STYLE)
   ctx.save();
 
-  // Top Small Header: "FORTNITE • TEMPORADA GLITCH"
-  ctx.font = '900 13px "Inter", "Arial Black", sans-serif';
-  ctx.fillStyle = '#00f0ff';
+  // Top Small Header: "FORTNITE , NUEVOS"
+  ctx.font = '900 14px "Inter", "Arial Black", sans-serif';
+  ctx.fillStyle = '#00F0E8';
   ctx.textAlign = 'center';
   ctx.letterSpacing = '3px';
-  ctx.shadowColor = 'rgba(0, 240, 255, 0.7)';
+  ctx.shadowColor = 'rgba(0, 240, 232, 0.7)';
   ctx.shadowBlur = 8;
-  ctx.fillText('FORTNITE  |  TEMPORADA GLITCH', width / 2, 36);
+  ctx.fillText('FORTNITE , NUEVOS', width / 2, 34);
 
-  // Main Glitch Title: "SPRITEDEX OVERRIDE"
-  const titleText = 'SPRITEDEX OVERRIDE';
-  ctx.font = '900 48px "Burbank Big Condensed", "Impact", "Arial Black", sans-serif';
+  // Main Big Title: "ESPÍRITUS" (or "SPRITEDEX")
+  const titleText = format === 'checklist' ? 'ESPÍRITUS' : 'SPRITEDEX OVERRIDE';
+  ctx.font = format === 'checklist'
+    ? '900 64px "Burbank Big Condensed", "Impact", "Arial Black", sans-serif'
+    : '900 48px "Burbank Big Condensed", "Impact", "Arial Black", sans-serif';
 
   // Chromatic Aberration Shadows
   // Cyan shadow right
-  ctx.fillStyle = '#00f0ff';
-  ctx.fillText(titleText, width / 2 + 3, 86);
+  ctx.fillStyle = '#00F0E8';
+  ctx.fillText(titleText, width / 2 + 3, format === 'checklist' ? 90 : 86);
 
   // Magenta shadow left
   ctx.fillStyle = '#ff0055';
-  ctx.fillText(titleText, width / 2 - 3, 86);
+  ctx.fillText(titleText, width / 2 - 3, format === 'checklist' ? 90 : 86);
 
   // Main white text
   ctx.fillStyle = '#ffffff';
-  ctx.shadowColor = 'rgba(255, 255, 255, 0.85)';
-  ctx.shadowBlur = 12;
-  ctx.fillText(titleText, width / 2, 86);
+  ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
+  ctx.shadowBlur = 14;
+  ctx.fillText(titleText, width / 2, format === 'checklist' ? 90 : 86);
   ctx.shadowBlur = 0;
 
   // Tagline Pill Capsule: "ROMPE LAS REGLAS • CAMBIA EL JUEGO" (Magenta Capsule)
   const capsuleText = 'ROMPE LAS REGLAS • CAMBIA EL JUEGO';
-  ctx.font = '900 11px "Inter", "Arial Black", sans-serif';
+  ctx.font = '900 10.5px "Inter", "Arial Black", sans-serif';
   ctx.letterSpacing = '1px';
-  const capsuleW = ctx.measureText(capsuleText).width + 32;
-  const capsuleH = 22;
+  const capsuleW = ctx.measureText(capsuleText).width + 28;
+  const capsuleH = 20;
   const capsuleX = (width - capsuleW) / 2;
-  const capsuleY = 100;
+  const capsuleY = format === 'checklist' ? 104 : 100;
 
   // Draw magenta capsule
-  roundRect(ctx, capsuleX, capsuleY, capsuleW, capsuleH, 11);
+  roundRect(ctx, capsuleX, capsuleY, capsuleW, capsuleH, 10);
   ctx.fillStyle = '#ff0055';
   ctx.shadowColor = 'rgba(255, 0, 85, 0.6)';
   ctx.shadowBlur = 10;
@@ -304,24 +306,24 @@ function renderGlitchOverrideTemplate({
 
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'center';
-  ctx.fillText(capsuleText, width / 2, capsuleY + 15);
+  ctx.fillText(capsuleText, width / 2, capsuleY + 14);
 
   // Stats / HUD Progress Box (Image 2 style)
-  const hudW = Math.min(width - 96, 680);
-  const hudH = 46;
+  const hudW = Math.min(width - 72, 600);
+  const hudH = 44;
   const hudX = (width - hudW) / 2;
-  const hudY = 130;
+  const hudY = format === 'checklist' ? 132 : 130;
 
   // Dark cyber panel with glowing border
   roundRect(ctx, hudX, hudY, hudW, hudH, 10);
   ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
   ctx.fill();
-  ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+  ctx.strokeStyle = 'rgba(0, 240, 232, 0.4)';
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
   // Corner brackets on HUD
-  ctx.fillStyle = '#00f0ff';
+  ctx.fillStyle = '#00F0E8';
   ctx.fillRect(hudX - 1, hudY - 1, 6, 2);
   ctx.fillRect(hudX - 1, hudY - 1, 2, 6);
   ctx.fillRect(hudX + hudW - 5, hudY - 1, 6, 2);
@@ -331,25 +333,25 @@ function renderGlitchOverrideTemplate({
   ctx.fillRect(hudX + hudW - 5, hudY + hudH - 1, 6, 2);
   ctx.fillRect(hudX + hudW - 1, hudY + hudH - 5, 2, 6);
 
-  // HUD Text Left: "X / Y ESPÍRITUS HACKEADOS"
+  // HUD Text Left: "X / Y ESPÍRITUS DESENCRIPTADOS"
   ctx.textAlign = 'left';
   ctx.font = '900 12px "Inter", sans-serif';
   ctx.fillStyle = '#ff0055';
-  ctx.fillText(`${ownedCount} / ${totalSprites}`, hudX + 16, hudY + 20);
+  ctx.fillText(`${ownedCount} / ${totalSprites}`, hudX + 14, hudY + 19);
   ctx.font = '700 10px "Inter", sans-serif';
   ctx.fillStyle = '#94a3b8';
-  ctx.fillText(' espíritus hackeados', hudX + 16 + ctx.measureText(`${ownedCount} / ${totalSprites} `).width + 6, hudY + 20);
+  ctx.fillText(' espíritus atrapados', hudX + 14 + ctx.measureText(`${ownedCount} / ${totalSprites} `).width + 4, hudY + 19);
 
   // HUD Text Right: "PROGRESO: X%"
   ctx.textAlign = 'right';
   ctx.font = '900 11px "Inter", sans-serif';
-  ctx.fillStyle = '#00f0ff';
-  ctx.fillText(`PROGRESO ${pctOwned}%`, hudX + hudW - 16, hudY + 20);
+  ctx.fillStyle = '#00F0E8';
+  ctx.fillText(`PROGRESO ${pctOwned}%`, hudX + hudW - 14, hudY + 19);
 
   // Neon Progress Bar inside HUD
-  const barX = hudX + 16;
-  const barY = hudY + 28;
-  const barW = hudW - 32;
+  const barX = hudX + 14;
+  const barY = hudY + 26;
+  const barW = hudW - 28;
   const barH = 7;
 
   // Background track
@@ -364,7 +366,7 @@ function renderGlitchOverrideTemplate({
     const grad = ctx.createLinearGradient(barX, barY, barX + fillW, barY);
     grad.addColorStop(0, '#ff0055');
     grad.addColorStop(0.7, '#ec4899');
-    grad.addColorStop(1, '#00f0ff');
+    grad.addColorStop(1, '#00F0E8');
     ctx.fillStyle = grad;
     ctx.shadowColor = 'rgba(255, 0, 85, 0.65)';
     ctx.shadowBlur = 8;
