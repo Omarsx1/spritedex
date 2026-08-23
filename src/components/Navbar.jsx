@@ -102,7 +102,6 @@ export function Navbar({
           onClick={handleLogoClick}
           title="Toca para actualizar la aplicación a la última versión"
           aria-label="Actualizar aplicación"
-          style={{ border: 'none', padding: 0 }}
         >
           F
         </button>

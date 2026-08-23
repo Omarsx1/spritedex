@@ -575,7 +575,7 @@ body::before {
 /* --- Responsive --- */
 @media (max-width: 600px) {
   .app-navbar {
-    width: calc(100% - 24px);
+    width: calc(100% - 32px);
     height: auto;
     top: calc(max(env(safe-area-inset-top, 0px), 12px) + 6px);
     padding: 0;
@@ -597,13 +597,27 @@ body::before {
     box-shadow: none !important;
   }
   .app-navbar__logo-mark {
-    width: auto;
-    height: auto;
-    background: transparent !important;
-    border-radius: 0;
-    font-size: 1.45rem;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(12, 14, 22, 0.65) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     box-shadow: none !important;
-    padding: 0 4px;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .app-navbar__logo-mark:active {
+    transform: scale(0.92) rotate(-12deg);
+    background: rgba(14, 165, 233, 0.35) !important;
   }
   .app-navbar__avatar {
     height: 34px;
