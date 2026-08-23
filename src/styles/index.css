@@ -116,7 +116,7 @@ body::before {
   box-shadow: none;
   z-index: 50;
   position: absolute;
-  top: calc(14px + env(safe-area-inset-top, 0px));
+  top: calc(max(env(safe-area-inset-top, 0px), 14px) + 4px);
   left: 50%;
   transform: translateX(-50%);
 }
@@ -570,6 +570,7 @@ body::before {
   .app-navbar {
     width: calc(100% - 24px);
     height: auto;
+    top: calc(max(env(safe-area-inset-top, 0px), 12px) + 6px);
     padding: 0;
     background: transparent !important;
     backdrop-filter: none !important;
