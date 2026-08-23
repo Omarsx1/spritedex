@@ -1274,12 +1274,11 @@ body::before {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    justify-content: space-between;
-    max-width: 440px;
+    justify-content: center;
     width: 100%;
     margin: 0 auto;
-    gap: 16px;
-    padding: 0 8px;
+    gap: 18px;
+    padding: 0 4px;
     box-sizing: border-box;
   }
 
@@ -1297,8 +1296,8 @@ body::before {
   }
 
   .hero__ring-box {
-    width: 86px;
-    height: 86px;
+    width: 84px;
+    height: 84px;
   }
 
   .hero__stat-label {
@@ -1308,11 +1307,11 @@ body::before {
   }
 
   .hero__stat-value {
-    font-size: 1.45rem;
+    font-size: 1.42rem;
   }
 
   .hero__stat-of {
-    font-size: 0.74rem;
+    font-size: 0.72rem;
   }
 
   /* Mobile: ONLY icon (hide text) */
@@ -1346,9 +1345,9 @@ body::before {
   }
 
   .hero__bar {
-    max-width: 360px;
-    gap: 10px;
-    padding: 0 4px;
+    justify-content: center;
+    gap: 14px;
+    padding: 0;
   }
 
   .hero__actions {
@@ -1356,8 +1355,8 @@ body::before {
   }
 
   .hero__ring-box {
-    width: 80px;
-    height: 80px;
+    width: 82px;
+    height: 82px;
   }
 
   .hero__stat-label {
@@ -1366,11 +1365,11 @@ body::before {
   }
 
   .hero__stat-value {
-    font-size: 1.35rem;
+    font-size: 1.38rem;
   }
 
   .hero__stat-of {
-    font-size: 0.68rem;
+    font-size: 0.70rem;
   }
 
   .hero__btn {
