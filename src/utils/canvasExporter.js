@@ -3,7 +3,7 @@
 import { generateQRMatrix } from './qrGenerator';
 
 // Renderiza un código QR moderno con estilo de puntos/círculos y acentos cibernéticos
-function drawModernDotQR(ctx, qrX, qrY, qrSize, url = 'https://spritedex.com') {
+function drawModernDotQR(ctx, qrX, qrY, qrSize, url = 'https://spritedex-two.vercel.app/') {
   try {
     const qr = generateQRMatrix(url);
     const count = qr.getModuleCount();
@@ -589,21 +589,13 @@ function renderGlitchOverrideTemplate({
   ctx.fillRect(qrCardX + qrCardW - 7, qrCardY + qrCardH - 1.5, 8, 2.5);
   ctx.fillRect(qrCardX + qrCardW - 1.5, qrCardY + qrCardH - 7, 2.5, 8);
 
-  // Código QR de puntos moderno y prominente (centrado en toda la tarjeta)
-  const qrSize = Math.min(qrCardW - 24, qrCardH - 24, 136);
+  // Código QR de puntos moderno y prominente (centrado libremente en toda la tarjeta sin marco interno)
+  const qrSize = Math.min(qrCardW - 16, qrCardH - 16, 144);
   const qrInnerX = qrCardX + (qrCardW - qrSize) / 2;
   const qrInnerY = qrCardY + (qrCardH - qrSize) / 2;
 
-  // Fondo oscuro con microborde detrás del QR para máximo contraste
-  roundRect(ctx, qrInnerX - 6, qrInnerY - 6, qrSize + 12, qrSize + 12, 10);
-  ctx.fillStyle = 'rgba(3, 7, 18, 0.9)';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(0, 240, 232, 0.35)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-
-  const currentUrl = typeof window !== 'undefined' ? (window.location.origin || 'https://spritedex.com') : 'https://spritedex.com';
-  drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, currentUrl);
+  const targetUrl = 'https://spritedex-two.vercel.app/';
+  drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, targetUrl);
   ctx.restore();
 
   // 4. FOOTER WATERMARK (CENTRADO)
