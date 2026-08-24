@@ -259,30 +259,59 @@ export function AnalyticsDashboard() {
           border: '1px solid #E2E8F0',
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
         }}>
-          <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: '#1E293B', margin: '0 0 16px' }}>
-            Top Canales & Fuentes
-          </h3>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: '#1E293B', margin: 0 }}>
+              Top Canales & Fuentes
+            </h3>
+            <span style={{ fontSize: '0.72rem', color: '#10B981', fontWeight: 700, background: '#ECFDF5', padding: '2px 6px', borderRadius: '4px' }}>
+              En Vivo
+            </span>
+          </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {(data.topChannels && data.topChannels.length > 0 ? data.topChannels.slice(0, 4) : [
-              { source: 'Tráfico Directo / App', count: data.totalVisits || 1, color: '#3C50E0' }
-            ]).map((ch, idx) => {
-              const colors = ['#3C50E0', '#00F0E8', '#10B981', '#F59E0B', '#8B5CF6'];
-              const chColor = ch.color || colors[idx % colors.length];
-              const pct = data.totalVisits > 0 ? Math.round((ch.count / data.totalVisits) * 100) : 100;
-              return (
-                <div key={ch.source} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #F8FAFC' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: chColor }} />
-                    <span style={{ fontSize: '0.84rem', fontWeight: 600, color: '#334155' }}>{ch.source}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {(() => {
+              const defaultChannels = [
+                { source: 'Tráfico Directo / App', count: data.totalVisits || 0, color: '#3C50E0' },
+                { source: 'Twitter / X', count: 0, color: '#0284C7' },
+                { source: 'TikTok & Reels', count: 0, color: '#DB2777' },
+                { source: 'Google Búsquedas', count: 0, color: '#D97706' }
+              ];
+
+              const mergedMap = new Map();
+              defaultChannels.forEach(c => mergedMap.set(c.source, c));
+              (data.topChannels || []).forEach(c => {
+                mergedMap.set(c.source, {
+                  ...mergedMap.get(c.source),
+                  source: c.source,
+                  count: c.count,
+                  color: mergedMap.get(c.source)?.color || '#8B5CF6'
+                });
+              });
+
+              const list = Array.from(mergedMap.values()).slice(0, 4);
+
+              return list.map((ch) => {
+                const pct = data.totalVisits > 0 ? Math.round((ch.count / data.totalVisits) * 100) : (ch.count > 0 ? 100 : 0);
+                return (
+                  <div key={ch.source} style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '4px 0', borderBottom: '1px solid #F8FAFC' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: ch.color }} />
+                        <span style={{ fontSize: '0.84rem', fontWeight: 600, color: '#334155' }}>{ch.source}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '0.74rem', color: '#94A3B8' }}>{pct}%</span>
+                        <strong style={{ fontSize: '0.84rem', color: '#1E293B' }}>{ch.count}</strong>
+                      </div>
+                    </div>
+                    {/* Visual Progress Bar */}
+                    <div style={{ width: '100%', height: '4px', background: '#F1F5F9', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div style={{ width: `${Math.max(pct, ch.count > 0 ? 4 : 0)}%`, height: '100%', background: ch.color, borderRadius: '2px', transition: 'width 0.4s ease' }} />
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '0.74rem', color: '#94A3B8' }}>{pct}%</span>
-                    <strong style={{ fontSize: '0.84rem', color: '#1E293B' }}>{ch.count}</strong>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              });
+            })()}
           </div>
         </div>
 

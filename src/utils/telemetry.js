@@ -72,7 +72,14 @@ export async function trackEvent(eventType = 'pageview', meta = {}) {
 
     const env = getClientEnvironment();
     const sessionId = getOrCreateSessionId();
-    const referrer = typeof document !== 'undefined' ? document.referrer : '';
+    let referrer = typeof document !== 'undefined' ? document.referrer : '';
+    if (!referrer && typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const refParam = urlParams.get('ref') || urlParams.get('utm_source') || urlParams.get('source');
+      if (refParam) {
+        referrer = 'campaign:' + refParam;
+      }
+    }
 
     // Cache locally
     try {
@@ -173,6 +180,12 @@ export async function fetchAnalyticsOverview() {
           else if (ref.includes('discord')) ch = 'Discord';
           else if (ref.includes('instagram')) ch = 'Instagram';
           else if (ref.includes('youtube')) ch = 'YouTube';
+          else if (ref.includes('reddit')) ch = 'Reddit';
+          else if (ref.includes('facebook') || ref.includes('fb')) ch = 'Facebook';
+          else if (ref.includes('campaign:')) {
+            const raw = ref.replace('campaign:', '').trim();
+            ch = raw.charAt(0).toUpperCase() + raw.slice(1);
+          }
 
           channelCounts[ch] = (channelCounts[ch] || 0) + 1;
 
