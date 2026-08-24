@@ -6,9 +6,9 @@ export function Footer({ onOpenPrivacy }) {
     <footer className="app-footer">
       <div className="app-footer__content">
         <div className="app-footer__brand">
-          <div className="app-navbar__logo-mark app-footer__logo">F</div>
+          <div className="app-navbar__logo-mark app-footer__logo">S</div>
           <span className="app-footer__copyright">
-            <span className="footer-full-text">© {new Date().getFullYear()} Fortnite Spritedex · Creado para la comunidad</span>
+            <span className="footer-full-text">© {new Date().getFullYear()} Spritedex · Colección de Espíritus · Creado para la comunidad</span>
             <span className="footer-short-text">© {new Date().getFullYear()} Spritedex</span>
           </span>
         </div>
@@ -16,7 +16,7 @@ export function Footer({ onOpenPrivacy }) {
         <div className="app-footer__actions">
           <button onClick={onOpenPrivacy} className="app-footer__privacy-btn">
             <ShieldCheck size={13} strokeWidth={2.2} />
-            <span>Privacidad</span>
+            <span>Cookies & Privacidad</span>
           </button>
         </div>
       </div>
