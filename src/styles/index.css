@@ -5551,36 +5551,8 @@ body::after {
 /* ===== MOBILE SWIPER (Family Rows + Variant Swipe) ===== */
 .mobile-swiper {
   position: relative;
-  overflow: hidden;
   width: 100%;
   padding: 0 0 20px;
-}
-
-/* Blueprint Aura Layers */
-.mobile-swiper__blueprint-layer-1,
-.mobile-swiper__blueprint-layer-2,
-.mobile-swiper__blueprint-layer-3 {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  transform: translateZ(0);
-  z-index: 0;
-}
-
-.mobile-swiper__blueprint-layer-1 {
-  background: linear-gradient(rgba(14,165,233,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.12) 1px, transparent 1px);
-  background-size: 50px 50px;
-  mix-blend-mode: normal;
-}
-
-.mobile-swiper__blueprint-layer-2 {
-  background: linear-gradient(rgba(14,165,233,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.06) 1px, transparent 1px);
-  background-size: 10px 10px;
-  mix-blend-mode: normal;
-}
-
-.mobile-swiper__blueprint-layer-3 {
-  background: radial-gradient(circle at 60% 40%, rgba(6,182,212,0.2) 0%, rgba(6,182,212,0.05) 35%, transparent 70%);
 }
 
 .mobile-swiper__content {
@@ -6316,15 +6288,7 @@ body::after {
     display: none !important;
   }
 
-  /* 3. Aislamiento de capas fijas para evitar compositing de Safari en cada scroll */
-  .mobile-swiper__blueprint-layer-1,
-  .mobile-swiper__blueprint-layer-2,
-  .mobile-swiper__blueprint-layer-3 {
-    position: absolute !important;
-    will-change: auto !important;
-  }
-
-  /* 4. Optimización de renderizado por tarjeta */
+  /* 3. Optimización de renderizado por tarjeta */
   .sprite-card,
   .ms-card {
     contain: layout style paint;

@@ -328,11 +328,6 @@ export function MobileSpriteSwiper({
 
   return (
     <div className="mobile-swiper">
-      {/* Blueprint Aura Gradient Layers */}
-      <div className="mobile-swiper__blueprint-layer-1" aria-hidden="true" />
-      <div className="mobile-swiper__blueprint-layer-2" aria-hidden="true" />
-      <div className="mobile-swiper__blueprint-layer-3" aria-hidden="true" />
-
       <div className="mobile-swiper__content">
         {families.map((family) => (
           <FamilyRow
