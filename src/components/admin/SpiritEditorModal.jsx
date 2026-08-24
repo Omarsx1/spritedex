@@ -49,7 +49,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
     variant: spirit?.variant || 'Base',
     variantDisplay: spirit?.variantDisplay || THEME_NAMES_ES[spirit?.variant] || 'Básico',
     gen: spirit?.gen || 2,
-    image: spirit?.image || '',
+    image: spirit?.image || (spirit?.id ? `/sprites/${spirit.id}.png` : ''),
     ability: spirit?.ability || 'Concede bonificaciones pasivas de combate y velocidad.',
     specialPerk: spirit?.specialPerk || '',
     summonCost: spirit?.summonCost || '2,000 Polvo Estelar',
@@ -689,18 +689,23 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 justifyContent: 'center',
                 position: 'relative'
               }}>
-                {formData.image ? (
-                  <img
-                    src={formData.image}
-                    alt={formData.fullName}
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                  />
-                ) : (
-                  <div style={{ color: '#707EAE', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <ImageIcon size={42} />
-                    <span style={{ fontSize: '0.68rem', marginTop: '6px' }}>Sin imagen cargada</span>
-                  </div>
-                )}
+                <img
+                  src={formData.image || (formData.id ? `/sprites/${formData.id}.png` : '/sprites/water_basic.png')}
+                  alt={formData.fullName}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  onError={(e) => {
+                    const src = e.target.src;
+                    if (src.endsWith('.webp')) {
+                      e.target.src = src.replace('.webp', '.png');
+                    } else if (!e.target.dataset.triedBase) {
+                      e.target.dataset.triedBase = 'true';
+                      const fam = (formData.familyId || formData.id?.split('_')[0] || 'water').toLowerCase();
+                      e.target.src = `/sprites/${fam}_basic.png`;
+                    } else {
+                      e.target.src = '/sprites/water_basic.png';
+                    }
+                  }}
+                />
               </div>
 
               <h4 style={{ margin: '0 0 4px', fontSize: '0.92rem', fontWeight: 800, color: '#FFFFFF' }}>
