@@ -461,9 +461,22 @@ export function AnalyticsDashboard() {
                   data.recentEvents.slice(0, 5).map((ev, i) => (
                     <tr key={ev.id || i} style={{ borderBottom: '1px solid #F8FAFC' }}>
                       <td style={{ padding: '8px 10px' }}>
-                        <span style={{ padding: '2px 6px', borderRadius: '4px', background: '#EFF6FF', color: '#3C50E0', fontWeight: 700, fontSize: '0.72rem' }}>
-                          {ev.event_type || 'pageview'}
-                        </span>
+                        {(() => {
+                          const ref = (ev.referrer || '').toLowerCase();
+                          let label = 'Directo / App';
+                          let bg = '#EFF6FF';
+                          let textCol = '#3C50E0';
+                          if (ref.includes('twitter') || ref.includes('t.co') || ref.includes('x.com')) { label = 'Twitter / X'; bg = '#E0F2FE'; textCol = '#0284C7'; }
+                          else if (ref.includes('tiktok')) { label = 'TikTok'; bg = '#FDF2F8'; textCol = '#DB2777'; }
+                          else if (ref.includes('google')) { label = 'Google'; bg = '#FEF3C7'; textCol = '#D97706'; }
+                          else if (ref.includes('discord')) { label = 'Discord'; bg = '#EEF2FF'; textCol = '#6366F1'; }
+                          else if (ev.path && ev.path !== '/') { label = ev.path; }
+                          return (
+                            <span style={{ padding: '3px 8px', borderRadius: '6px', background: bg, color: textCol, fontWeight: 700, fontSize: '0.72rem' }}>
+                              {label}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td style={{ padding: '8px 10px', color: '#334155', fontWeight: 600 }}>
                         {ev.os || (ev.is_iphone ? 'iOS (iPhone)' : ev.device_type)}

@@ -54,12 +54,24 @@ export function getClientEnvironment() {
   };
 }
 
+let lastTrackedTimestamp = 0;
+let lastTrackedPath = '';
+
 // Record a pageview or custom telemetry event (Non-blocking)
 export async function trackEvent(eventType = 'pageview', meta = {}) {
   try {
+    const now = Date.now();
+    const path = typeof window !== 'undefined' ? window.location.pathname : '/';
+
+    // Evita duplicados inmediatos en renderizados consecutivos (3 segundos)
+    if (eventType === 'pageview' && path === lastTrackedPath && (now - lastTrackedTimestamp < 3000)) {
+      return;
+    }
+    lastTrackedTimestamp = now;
+    lastTrackedPath = path;
+
     const env = getClientEnvironment();
     const sessionId = getOrCreateSessionId();
-    const path = typeof window !== 'undefined' ? window.location.pathname : '/';
     const referrer = typeof document !== 'undefined' ? document.referrer : '';
 
     // Cache locally

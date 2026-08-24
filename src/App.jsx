@@ -50,9 +50,13 @@ export function App() {
 
   const [isAdminAuth, setIsAdminAuth] = useState(() => isUserAdminAuthenticated());
 
-  // Registro de telemetría y precarga asíncrona en segundo plano
+  // Registro de telemetría de visita al cargar la web
   useEffect(() => {
     trackEvent('pageview');
+  }, []);
+
+  // Precarga asíncrona de sprites en segundo plano
+  useEffect(() => {
     preloadCanvasAssets(dynamicSprites);
   }, [dynamicSprites]);
   const [userState, setUserState] = useState(() => {
