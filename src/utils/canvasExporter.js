@@ -331,26 +331,25 @@ function renderGlitchOverrideTemplate({
   ctx.shadowBlur = 8;
   ctx.fillText('FORTNITE , NUEVOS', width / 2, 34);
 
-  // Main Big Title: "ESPÍRITUS" (or "SPRITEDEX")
-  const titleText = format === 'checklist' ? 'ESPÍRITUS' : 'SPRITEDEX OVERRIDE';
-  ctx.font = format === 'checklist'
-    ? '900 64px "Burbank Big Condensed", "Impact", "Arial Black", sans-serif'
-    : '900 48px "Burbank Big Condensed", "Impact", "Arial Black", sans-serif';
+  // Main Big Title: "SPRITEDEX OVERRIDE"
+  const titleText = 'SPRITEDEX OVERRIDE';
+  const titleFontSize = format === 'checklist' ? 52 : 48;
+  ctx.font = `900 ${titleFontSize}px "Burbank Big Condensed", "Impact", "Arial Black", sans-serif`;
 
   // Chromatic Aberration Shadows
   // Cyan shadow right
   ctx.fillStyle = '#00F0E8';
-  ctx.fillText(titleText, width / 2 + 3, format === 'checklist' ? 90 : 86);
+  ctx.fillText(titleText, width / 2 + 3, 86);
 
   // Magenta shadow left
   ctx.fillStyle = '#ff0055';
-  ctx.fillText(titleText, width / 2 - 3, format === 'checklist' ? 90 : 86);
+  ctx.fillText(titleText, width / 2 - 3, 86);
 
   // Main white text
   ctx.fillStyle = '#ffffff';
   ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
   ctx.shadowBlur = 14;
-  ctx.fillText(titleText, width / 2, format === 'checklist' ? 90 : 86);
+  ctx.fillText(titleText, width / 2, 86);
   ctx.shadowBlur = 0;
 
   // Tagline Pill Capsule: "ROMPE LAS REGLAS • CAMBIA EL JUEGO" (Magenta Capsule)
@@ -360,7 +359,7 @@ function renderGlitchOverrideTemplate({
   const capsuleW = ctx.measureText(capsuleText).width + 28;
   const capsuleH = 22;
   const capsuleX = (width - capsuleW) / 2;
-  const capsuleY = format === 'checklist' ? 104 : 100;
+  const capsuleY = 100;
 
   // Capsule Background (Gradient Magenta)
   roundRect(ctx, capsuleX, capsuleY, capsuleW, capsuleH, 5);
