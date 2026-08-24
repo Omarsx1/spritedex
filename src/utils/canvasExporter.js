@@ -500,19 +500,25 @@ function renderGlitchOverrideTemplate({
     }
     ctx.restore();
 
-    // B. Proporciones y Centrado Vertical de Elementos
-    const maxImgSize = format === 'square'
-      ? (totalSprites <= 6 ? 140 : totalSprites <= 12 ? 120 : 100)
-      : 100;
-    const imgSize = Math.max(50, Math.min(maxImgSize, Math.floor(cardW * 0.65), Math.floor(cardH * 0.56)));
+    // B. Proporciones y Centrado Vertical Dinámico
+    const maxImgCap = format === 'square'
+      ? (totalSprites <= 6 ? 240 : totalSprites <= 12 ? 180 : totalSprites <= 20 ? 140 : 110)
+      : (totalSprites <= 8 ? 140 : 105);
 
-    const nameFontSize = format === 'square' && totalSprites <= 6 ? 13 : totalSprites <= 12 ? 12 : 11;
-    const badgeW = Math.min(cardW - 16, format === 'square' && totalSprites <= 6 ? 96 : 76);
-    const badgeH = format === 'square' && totalSprites <= 6 ? 20 : 18;
+    const imgSize = Math.max(50, Math.min(maxImgCap, Math.floor(cardW * 0.68), Math.floor(cardH * 0.58)));
+
+    const nameFontSize = Math.max(10, Math.min(
+      format === 'square' && totalSprites <= 6 ? 18 : totalSprites <= 12 ? 15 : totalSprites <= 20 ? 13 : 11,
+      Math.floor(cardW * 0.08)
+    ));
+
+    const badgeW = Math.max(70, Math.min(cardW - 24, format === 'square' && totalSprites <= 6 ? 130 : totalSprites <= 12 ? 105 : 84));
+    const badgeH = format === 'square' && totalSprites <= 6 ? 26 : totalSprites <= 12 ? 22 : 18;
+    const badgeFontSize = format === 'square' && totalSprites <= 6 ? 11 : totalSprites <= 12 ? 10 : 8.5;
 
     // Altura total del contenido: Imagen + Espacio + Texto + Espacio + Badge
-    const totalContentH = imgSize + 10 + nameFontSize + 6 + badgeH;
-    const contentStartY = cardY + Math.max(6, Math.floor((cardH - totalContentH) / 2));
+    const totalContentH = imgSize + 14 + nameFontSize + 8 + badgeH;
+    const contentStartY = cardY + Math.max(8, Math.floor((cardH - totalContentH) / 2));
 
     const spriteImg = loadedImagesMap[sprite.id];
 
@@ -540,7 +546,7 @@ function renderGlitchOverrideTemplate({
     ctx.textAlign = 'center';
     ctx.font = `800 ${nameFontSize}px "Inter", sans-serif`;
     ctx.fillStyle = isOwned ? '#ffffff' : 'rgba(255, 255, 255, 0.75)';
-    const textY = contentStartY + imgSize + 12 + Math.floor(nameFontSize * 0.8);
+    const textY = contentStartY + imgSize + 14 + Math.floor(nameFontSize * 0.8);
 
     let nameText = sprite.fullName || sprite.name;
     const maxTextW = cardW - 12;
@@ -554,7 +560,7 @@ function renderGlitchOverrideTemplate({
 
     // D. Cyber Badge at Bottom
     const badgeX = cardX + (cardW - badgeW) / 2;
-    const badgeY = textY + 6;
+    const badgeY = textY + 8;
 
     if (isOwned) {
       roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 4);
@@ -570,10 +576,10 @@ function renderGlitchOverrideTemplate({
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      ctx.font = '900 9px "Inter", sans-serif';
+      ctx.font = `900 ${badgeFontSize}px "Inter", sans-serif`;
       ctx.fillStyle = '#060714';
       const badgeLabel = isMastered ? 'MAX' : (level > 1 ? `LVL.${level}` : 'HACKEADO');
-      ctx.fillText(badgeLabel, cardX + cardW / 2, badgeY + badgeH / 2 + 3);
+      ctx.fillText(badgeLabel, cardX + cardW / 2, badgeY + badgeH / 2 + Math.floor(badgeFontSize * 0.35));
     } else {
       roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 4);
       ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
@@ -582,9 +588,9 @@ function renderGlitchOverrideTemplate({
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      ctx.font = '800 8.5px "Inter", sans-serif';
+      ctx.font = `800 ${badgeFontSize}px "Inter", sans-serif`;
       ctx.fillStyle = 'rgba(239, 68, 68, 0.95)';
-      ctx.fillText('FALTANTE', cardX + cardW / 2, badgeY + badgeH / 2 + 3);
+      ctx.fillText('FALTANTE', cardX + cardW / 2, badgeY + badgeH / 2 + Math.floor(badgeFontSize * 0.35));
     }
     ctx.restore();
   });
@@ -597,7 +603,7 @@ function renderGlitchOverrideTemplate({
   const qrCardW = cellW - 12;
   const qrCardH = cellH - 12;
 
-  const qrSize = Math.min(qrCardW - 20, qrCardH - 20, 160);
+  const qrSize = Math.min(qrCardW - 24, qrCardH - 24, format === 'square' && totalSprites <= 6 ? 240 : 170);
   const qrInnerX = qrCardX + (qrCardW - qrSize) / 2;
   const qrInnerY = qrCardY + (qrCardH - qrSize) / 2;
 
