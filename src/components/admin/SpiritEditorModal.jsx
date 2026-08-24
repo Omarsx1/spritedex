@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { 
   X, 
   Upload, 
@@ -7,40 +7,47 @@ import {
   Clock, 
   Image as ImageIcon, 
   AlertCircle,
-  HelpCircle
+  PlusCircle,
+  Layers,
+  ChevronDown
 } from 'lucide-react';
-import { RARITIES, THEME_NAMES_ES } from '../../data/spritesData';
+import { RARITIES, THEME_NAMES_ES, FAMILY_NAMES_MAP } from '../../data/spritesData';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 
-const RARITY_KEYS = Object.keys(RARITIES);
-const COMMON_FAMILIES = [
-  { id: 'klombo', name: 'Klombo' },
-  { id: 'crown', name: 'Victorioso' },
-  { id: 'sonic', name: 'Sonic' },
-  { id: 'shadow', name: 'Shadow' },
-  { id: 'tails', name: 'Tails' },
-  { id: 'jackrabbit', name: 'Jackrabbit' },
-  { id: 'killswitch', name: 'Killswitch' },
-  { id: 'arbustin', name: 'Arbustín' },
-  { id: 'adventurer', name: 'Aventurero' },
-  { id: 'jonesy', name: 'Jonesy' },
-  { id: 'eightbit', name: '8-Bit' },
-  { id: 'peely', name: 'Peely' },
-  { id: 'llama', name: 'Llama' }
-];
-
-export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClose }) {
+export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClose }) {
   const isEditing = Boolean(spirit?.id);
+
+  // Extract all distinct families from map + existing spirits
+  const allFamilies = useMemo(() => {
+    const map = new Map();
+    // Default system families
+    Object.entries(FAMILY_NAMES_MAP).forEach(([key, name]) => {
+      map.set(key.toLowerCase(), { id: key.toLowerCase(), name });
+    });
+    // Dynamically added families from spirits dataset
+    existingSprites.forEach(s => {
+      if (s.familyId && s.familyName) {
+        map.set(s.familyId.toLowerCase(), { id: s.familyId.toLowerCase(), name: s.familyName });
+      }
+    });
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [existingSprites]);
+
+  // Initial family resolution
+  const initialFamilyId = (spirit?.familyId || spirit?.id?.split('_')[0] || 'klombo').toLowerCase();
+  const matchedFamily = allFamilies.find(f => f.id === initialFamilyId);
+  const initialFamilyName = spirit?.familyName || matchedFamily?.name || (initialFamilyId.charAt(0).toUpperCase() + initialFamilyId.slice(1));
 
   const [formData, setFormData] = useState({
     id: spirit?.id || '',
     name: spirit?.name || '',
-    fullName: spirit?.fullName || '',
-    familyId: spirit?.familyId || 'klombo',
-    familyName: spirit?.familyName || 'Klombo',
+    fullName: spirit?.fullName || spirit?.name || '',
+    familyId: initialFamilyId,
+    familyName: initialFamilyName,
+    customFamily: !matchedFamily ? initialFamilyName : '',
     rarity: spirit?.rarity || 'Epic',
     variant: spirit?.variant || 'Base',
-    variantDisplay: spirit?.variantDisplay || 'Básico',
+    variantDisplay: spirit?.variantDisplay || THEME_NAMES_ES[spirit?.variant] || 'Básico',
     gen: spirit?.gen || 2,
     image: spirit?.image || '',
     ability: spirit?.ability || 'Concede bonificaciones pasivas de combate y velocidad.',
@@ -51,22 +58,45 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
     releaseDate: spirit?.release_date ? new Date(spirit.release_date).toISOString().slice(0, 16) : ''
   });
 
+  const [isCustomFamily, setIsCustomFamily] = useState(!matchedFamily && Boolean(spirit?.familyName));
   const [uploadingImage, setUploadingImage] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Auto-generate ID from family and variant
-  const handleFamilyChange = (famId, famName) => {
+  // When family is changed
+  const handleSelectFamily = (famId) => {
+    if (famId === '__new__') {
+      setIsCustomFamily(true);
+      return;
+    }
+    setIsCustomFamily(false);
+    const fam = allFamilies.find(f => f.id === famId);
+    if (!fam) return;
+
     const varKey = formData.variant.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const newId = `${famId}_${varKey}`;
+    const newId = `${fam.id}_${varKey}`;
     setFormData(prev => ({
       ...prev,
-      familyId: famId,
-      familyName: famName,
+      familyId: fam.id,
+      familyName: fam.name,
       id: isEditing ? prev.id : newId,
-      fullName: prev.variant === 'Base' ? famName : `${famName} ${prev.variantDisplay}`
+      fullName: prev.variant === 'Base' ? fam.name : `${fam.name} ${prev.variantDisplay}`
+    }));
+  };
+
+  const handleCustomFamilyInput = (customName) => {
+    const safeKey = customName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'custom';
+    const varKey = formData.variant.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const newId = `${safeKey}_${varKey}`;
+    setFormData(prev => ({
+      ...prev,
+      familyId: safeKey,
+      familyName: customName,
+      customFamily: customName,
+      id: isEditing ? prev.id : newId,
+      fullName: prev.variant === 'Base' ? customName : `${customName} ${prev.variantDisplay}`
     }));
   };
 
@@ -82,12 +112,12 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
     }));
   };
 
-  // Upload image file to Supabase Storage
+  // Upload image to Supabase Storage
   const handleFileUpload = async (file) => {
     if (!file) return;
 
     if (!file.type.includes('image/')) {
-      setErrorMsg('El archivo debe ser una imagen (.webp o .png).');
+      setErrorMsg('El archivo debe ser una imagen válida (.webp o .png).');
       return;
     }
 
@@ -97,7 +127,8 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
 
       if (isSupabaseConfigured && supabase) {
         const fileExt = file.name.split('.').pop() || 'webp';
-        const fileName = `${formData.id || 'sprite'}_${Date.now()}.${fileExt}`;
+        const cleanName = (formData.id || 'sprite').replace(/[^a-z0-9_-]/gi, '');
+        const fileName = `${cleanName}_${Date.now()}.${fileExt}`;
         const filePath = `sprites/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
@@ -115,7 +146,6 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
 
         setFormData(prev => ({ ...prev, image: publicUrl }));
       } else {
-        // Local FileReader preview fallback
         const reader = new FileReader();
         reader.onload = (e) => {
           setFormData(prev => ({ ...prev, image: e.target.result }));
@@ -124,17 +154,9 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
       }
     } catch (err) {
       console.error('Error subiendo imagen:', err);
-      setErrorMsg('No se pudo subir la imagen a la nube. Intenta de nuevo.');
+      setErrorMsg('Error al subir imagen. Verifique la conexión a Supabase Storage.');
     } finally {
       setUploadingImage(false);
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileUpload(e.dataTransfer.files[0]);
     }
   };
 
@@ -149,8 +171,9 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
       setSaving(true);
       setErrorMsg('');
 
+      const cleanId = formData.id || `${formData.familyId}_${formData.variant.toLowerCase()}`;
       const payload = {
-        id: formData.id || `${formData.familyId}_${formData.variant.toLowerCase()}`,
+        id: cleanId,
         name: formData.name || formData.fullName,
         full_name: formData.fullName,
         family_id: formData.familyId,
@@ -170,10 +193,7 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
       };
 
       if (isSupabaseConfigured && supabase) {
-        const { error } = await supabase
-          .from('sprites')
-          .upsert(payload);
-
+        const { error } = await supabase.from('sprites').upsert(payload);
         if (error) throw error;
       }
 
@@ -193,96 +213,89 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
       position: 'fixed',
       inset: 0,
       zIndex: 9999,
-      background: 'rgba(2, 6, 23, 0.88)',
-      backdropFilter: 'blur(14px)',
+      background: 'rgba(10, 15, 30, 0.85)',
+      backdropFilter: 'blur(16px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '16px',
+      padding: '20px',
       overflowY: 'auto'
     }}>
       <div style={{
-        maxWidth: '860px',
+        maxWidth: '960px',
         width: '100%',
-        background: 'rgba(15, 23, 42, 0.95)',
-        border: '1px solid rgba(0, 240, 255, 0.35)',
-        borderRadius: '22px',
-        boxShadow: '0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 240, 255, 0.12)',
+        background: '#0B1437',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
+        borderRadius: '24px',
+        boxShadow: '0 30px 80px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(67, 24, 255, 0.2)',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        maxHeight: '90vh'
+        maxHeight: '92vh'
       }}>
-        {/* Header */}
+        {/* Silicon Valley Header */}
         <div style={{
-          padding: '18px 24px',
+          padding: '20px 28px',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: 'rgba(2, 6, 23, 0.5)'
+          background: '#111C44'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(168, 85, 247, 0.2))',
-              border: '1px solid rgba(0, 240, 255, 0.4)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#00F0E8'
-            }}>
-              <Sparkles size={20} />
-            </div>
-            <div>
-              <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#f8fafc' }}>
-                {isEditing ? 'Editar Espíritu' : 'Catalogar Nuevo Espíritu'}
-              </h2>
-              <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-                Publicación directa y programada a Spritedex
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#4318FF', background: 'rgba(67, 24, 255, 0.15)', padding: '2px 8px', borderRadius: '6px', textTransform: 'uppercase' }}>
+                Catalog Studio
               </span>
+              <span style={{ fontSize: '0.75rem', color: '#707EAE' }}>•</span>
+              <span style={{ fontSize: '0.75rem', color: '#707EAE' }}>{isEditing ? `ID: ${formData.id}` : 'Nuevo Registro'}</span>
             </div>
+            <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
+              {isEditing ? `Editar: ${formData.fullName}` : 'Crear & Publicar Espíritu'}
+            </h2>
           </div>
 
           <button
             type="button"
             onClick={onClose}
             style={{
-              background: 'none',
-              border: 'none',
-              color: '#94a3b8',
+              background: 'rgba(255, 255, 255, 0.06)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              color: '#A3AED0',
               cursor: 'pointer',
-              padding: '6px',
-              borderRadius: '8px'
+              padding: '8px',
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease'
             }}
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
-        {/* Modal Body: Split in Form (Left) and Live Preview (Right) */}
+        {/* Modal Body */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: '24px',
-          padding: '24px',
+          gridTemplateColumns: '1fr 340px',
+          gap: '28px',
+          padding: '28px',
           overflowY: 'auto'
         }}>
-          {/* LEFT: Form Inputs */}
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* LEFT: Enterprise Form Fields */}
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             {errorMsg && (
               <div style={{
-                padding: '10px 14px',
-                borderRadius: '10px',
-                background: 'rgba(239, 68, 68, 0.15)',
-                border: '1px solid rgba(239, 68, 68, 0.35)',
-                color: '#f87171',
-                fontSize: '0.8rem',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                background: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                color: '#EE5D50',
+                fontSize: '0.82rem',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '10px'
               }}>
                 <AlertCircle size={16} />
                 <span>{errorMsg}</span>
@@ -291,19 +304,19 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
 
             {/* Drag & Drop Upload Zone */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', marginBottom: '6px' }}>
-                IMAGEN DEL ESPÍRITU (.WEBP / .PNG)
+              <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Asset Digital (.webp / .png)
               </label>
               <div
                 onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
                 onDragLeave={() => setIsDragOver(false)}
-                onDrop={handleDrop}
+                onDrop={(e) => { e.preventDefault(); setIsDragOver(false); if (e.dataTransfer.files[0]) handleFileUpload(e.dataTransfer.files[0]); }}
                 onClick={() => fileInputRef.current?.click()}
                 style={{
-                  border: isDragOver ? '2px dashed #00F0E8' : '2px dashed rgba(0, 240, 255, 0.3)',
-                  borderRadius: '14px',
-                  background: isDragOver ? 'rgba(0, 240, 255, 0.08)' : 'rgba(2, 6, 23, 0.6)',
-                  padding: '20px',
+                  border: isDragOver ? '2px dashed #4318FF' : '2px dashed rgba(255, 255, 255, 0.15)',
+                  borderRadius: '16px',
+                  background: isDragOver ? 'rgba(67, 24, 255, 0.08)' : '#111C44',
+                  padding: '24px 16px',
                   textAlign: 'center',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease'
@@ -316,102 +329,147 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
                   accept="image/webp,image/png,image/jpeg"
                   style={{ display: 'none' }}
                 />
-                <Upload size={24} style={{ color: '#00F0E8', marginBottom: '8px' }} />
-                <p style={{ margin: '0 0 4px', fontSize: '0.84rem', fontWeight: 700, color: '#f8fafc' }}>
-                  {uploadingImage ? 'Subiendo imagen a la nube...' : 'Arrastra o haz clic para subir imagen'}
+                <Upload size={26} style={{ color: '#4318FF', marginBottom: '8px' }} />
+                <p style={{ margin: '0 0 4px', fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF' }}>
+                  {uploadingImage ? 'Subiendo imagen a Supabase Storage...' : 'Arrastra o haz clic para subir imagen'}
                 </p>
-                <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
-                  Soporta .webp y .png transparentes
+                <span style={{ fontSize: '0.74rem', color: '#707EAE' }}>
+                  Soporta formatos .webp y .png transparentes
                 </span>
               </div>
             </div>
 
-            {/* Names */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            {/* Names & Family Row */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#94a3b8', marginBottom: '6px' }}>
-                  NOMBRE EN ESPAÑOL
+                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Nombre en Español
                 </label>
                 <input
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                  placeholder="Ej. Klombo Dorado"
+                  placeholder="Ej. Storm Scout Dorado"
                   required
                   style={{
                     width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    background: 'rgba(2, 6, 23, 0.8)',
-                    border: '1px solid rgba(0, 240, 255, 0.25)',
-                    color: '#fff',
-                    fontSize: '0.84rem',
+                    padding: '12px 14px',
+                    borderRadius: '12px',
+                    background: '#111C44',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    color: '#FFFFFF',
+                    fontSize: '0.88rem',
+                    fontWeight: 600,
+                    outline: 'none',
                     boxSizing: 'border-box'
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#94a3b8', marginBottom: '6px' }}>
-                  FAMILIA DEL ESPÍRITU
+                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Familia del Espíritu
                 </label>
-                <select
-                  value={formData.familyId}
-                  onChange={(e) => {
-                    const fam = COMMON_FAMILIES.find(f => f.id === e.target.value) || { id: e.target.value, name: e.target.value };
-                    handleFamilyChange(fam.id, fam.name);
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    background: 'rgba(2, 6, 23, 0.8)',
-                    border: '1px solid rgba(0, 240, 255, 0.25)',
-                    color: '#fff',
-                    fontSize: '0.84rem',
-                    boxSizing: 'border-box'
-                  }}
-                >
-                  {COMMON_FAMILIES.map(fam => (
-                    <option key={fam.id} value={fam.id} style={{ background: '#0f172a' }}>
-                      {fam.name}
+                {!isCustomFamily ? (
+                  <select
+                    value={formData.familyId}
+                    onChange={(e) => handleSelectFamily(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px',
+                      borderRadius: '12px',
+                      background: '#111C44',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      color: '#FFFFFF',
+                      fontSize: '0.88rem',
+                      fontWeight: 600,
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    {allFamilies.map(fam => (
+                      <option key={fam.id} value={fam.id} style={{ background: '#111C44', color: '#fff' }}>
+                        {fam.name} ({fam.id})
+                      </option>
+                    ))}
+                    <option value="__new__" style={{ background: '#4318FF', color: '#fff', fontWeight: 800 }}>
+                      + Escribir Nueva Familia...
                     </option>
-                  ))}
-                </select>
+                  </select>
+                ) : (
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <input
+                      type="text"
+                      value={formData.customFamily}
+                      onChange={(e) => handleCustomFamilyInput(e.target.value)}
+                      placeholder="Nombre de nueva familia..."
+                      autoFocus
+                      style={{
+                        flex: 1,
+                        padding: '12px 14px',
+                        borderRadius: '12px',
+                        background: '#111C44',
+                        border: '1px solid #4318FF',
+                        color: '#FFFFFF',
+                        fontSize: '0.88rem',
+                        fontWeight: 600,
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setIsCustomFamily(false)}
+                      style={{
+                        padding: '0 12px',
+                        borderRadius: '12px',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: 'none',
+                        color: '#A3AED0',
+                        fontSize: '0.75rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Lista
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Rarity & Variant */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            {/* Rarity & Variant Row */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#94a3b8', marginBottom: '6px' }}>
-                  RAREZA
+                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Rareza
                 </label>
                 <select
                   value={formData.rarity}
                   onChange={(e) => setFormData(prev => ({ ...prev, rarity: e.target.value }))}
                   style={{
                     width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    background: 'rgba(2, 6, 23, 0.8)',
-                    border: '1px solid rgba(0, 240, 255, 0.25)',
-                    color: '#fff',
-                    fontSize: '0.84rem',
+                    padding: '12px 14px',
+                    borderRadius: '12px',
+                    background: '#111C44',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    color: '#FFFFFF',
+                    fontSize: '0.88rem',
+                    fontWeight: 600,
+                    outline: 'none',
                     boxSizing: 'border-box'
                   }}
                 >
-                  {RARITY_KEYS.map(r => (
-                    <option key={r} value={r} style={{ background: '#0f172a' }}>
-                      {RARITIES[r].label}
+                  {Object.entries(RARITIES).map(([rKey, rObj]) => (
+                    <option key={rKey} value={rKey} style={{ background: '#111C44', color: '#fff' }}>
+                      {rObj.label || rObj.name || rKey}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#94a3b8', marginBottom: '6px' }}>
-                  VARIANTE DE TEMPORADA
+                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Variante de Temporada
                 </label>
                 <select
                   value={formData.variant}
@@ -422,17 +480,19 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
                   }}
                   style={{
                     width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    background: 'rgba(2, 6, 23, 0.8)',
-                    border: '1px solid rgba(0, 240, 255, 0.25)',
-                    color: '#fff',
-                    fontSize: '0.84rem',
+                    padding: '12px 14px',
+                    borderRadius: '12px',
+                    background: '#111C44',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    color: '#FFFFFF',
+                    fontSize: '0.88rem',
+                    fontWeight: 600,
+                    outline: 'none',
                     boxSizing: 'border-box'
                   }}
                 >
                   {Object.entries(THEME_NAMES_ES).map(([themeKey, nameEs]) => (
-                    <option key={themeKey} value={themeKey} style={{ background: '#0f172a' }}>
+                    <option key={themeKey} value={themeKey} style={{ background: '#111C44', color: '#fff' }}>
                       {nameEs} ({themeKey})
                     </option>
                   ))}
@@ -441,10 +501,10 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
             </div>
 
             {/* Cost & Drop Chance */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#94a3b8', marginBottom: '6px' }}>
-                  COSTO POLVO ESTELAR
+                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Costo Polvo Estelar
                 </label>
                 <input
                   type="text"
@@ -453,20 +513,20 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
                   placeholder="2,000 Polvo Estelar"
                   style={{
                     width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    background: 'rgba(2, 6, 23, 0.8)',
-                    border: '1px solid rgba(0, 240, 255, 0.25)',
-                    color: '#fff',
-                    fontSize: '0.84rem',
+                    padding: '12px 14px',
+                    borderRadius: '12px',
+                    background: '#111C44',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    color: '#FFFFFF',
+                    fontSize: '0.88rem',
                     boxSizing: 'border-box'
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#94a3b8', marginBottom: '6px' }}>
-                  PROBABILIDAD (%)
+                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Probabilidad (%)
                 </label>
                 <input
                   type="text"
@@ -475,40 +535,40 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
                   placeholder="1.50%"
                   style={{
                     width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    background: 'rgba(2, 6, 23, 0.8)',
-                    border: '1px solid rgba(0, 240, 255, 0.25)',
-                    color: '#fff',
-                    fontSize: '0.84rem',
+                    padding: '12px 14px',
+                    borderRadius: '12px',
+                    background: '#111C44',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    color: '#FFFFFF',
+                    fontSize: '0.88rem',
                     boxSizing: 'border-box'
                   }}
                 />
               </div>
             </div>
 
-            {/* Scheduler & Unreleased */}
+            {/* Scheduled Release Card */}
             <div style={{
-              padding: '14px',
-              borderRadius: '12px',
-              background: 'rgba(2, 6, 23, 0.7)',
-              border: '1px solid rgba(168, 85, 247, 0.3)'
+              padding: '18px',
+              borderRadius: '16px',
+              background: '#111C44',
+              border: '1px solid rgba(67, 24, 255, 0.3)'
             }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '10px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginBottom: formData.unreleased ? '12px' : '0' }}>
                 <input
                   type="checkbox"
                   checked={formData.unreleased}
                   onChange={(e) => setFormData(prev => ({ ...prev, unreleased: e.target.checked }))}
-                  style={{ width: '16px', height: '16px', accentColor: '#a855f7' }}
+                  style={{ width: '18px', height: '18px', accentColor: '#4318FF' }}
                 />
-                <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#f8fafc' }}>
-                  Marcar como "Espíritu No Lanzado" (Próximamente)
+                <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#FFFFFF' }}>
+                  Marcar como "Espíritu No Lanzado" (Programado)
                 </span>
               </label>
 
               {formData.unreleased && (
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#c084fc', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: '#A3AED0', marginBottom: '6px' }}>
                     FECHA & HORA DE ESTRENO AUTOMÁTICO
                   </label>
                   <input
@@ -517,36 +577,36 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
                     onChange={(e) => setFormData(prev => ({ ...prev, releaseDate: e.target.value }))}
                     style={{
                       width: '100%',
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      background: 'rgba(15, 23, 42, 0.9)',
-                      border: '1px solid rgba(168, 85, 247, 0.4)',
-                      color: '#fff',
-                      fontSize: '0.82rem',
+                      padding: '10px 14px',
+                      borderRadius: '10px',
+                      background: '#0B1437',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      color: '#FFFFFF',
+                      fontSize: '0.84rem',
                       boxSizing: 'border-box'
                     }}
                   />
-                  <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block', marginTop: '4px' }}>
-                    Al llegar la fecha, el espíritu pasará automáticamente a estar activo en toda la Pokédex.
+                  <span style={{ fontSize: '0.72rem', color: '#707EAE', display: 'block', marginTop: '6px' }}>
+                    Al llegar este momento exacto, el espíritu se desbloqueará y activará automáticamente en toda la web.
                   </span>
                 </div>
               )}
             </div>
 
-            {/* Action buttons */}
+            {/* Form Footer */}
             <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
               <button
                 type="button"
                 onClick={onClose}
                 style={{
                   flex: 1,
-                  padding: '12px',
-                  borderRadius: '10px',
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  color: '#94a3b8',
+                  padding: '14px',
+                  borderRadius: '14px',
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  color: '#A3AED0',
                   border: 'none',
-                  fontSize: '0.84rem',
-                  fontWeight: 800,
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
                   cursor: 'pointer'
                 }}
               >
@@ -558,49 +618,49 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
                 disabled={saving}
                 style={{
                   flex: 2,
-                  padding: '12px',
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #00F0E8, #0284c7)',
-                  color: '#060714',
+                  padding: '14px',
+                  borderRadius: '14px',
+                  background: 'linear-gradient(135deg, #4318FF, #00F0E8)',
+                  color: '#FFFFFF',
                   border: 'none',
-                  fontSize: '0.88rem',
-                  fontWeight: 900,
+                  fontSize: '0.9rem',
+                  fontWeight: 800,
                   cursor: saving ? 'wait' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  boxShadow: '0 4px 18px rgba(0, 240, 255, 0.4)'
+                  boxShadow: '0 10px 25px rgba(67, 24, 255, 0.4)'
                 }}
               >
-                <Check size={16} />
-                <span>{saving ? 'Guardando en la nube...' : 'Publicar Espíritu'}</span>
+                <Check size={18} />
+                <span>{saving ? 'Guardando...' : 'Publicar Espíritu'}</span>
               </button>
             </div>
           </form>
 
-          {/* RIGHT: Live Interactive Card Preview */}
+          {/* RIGHT: Live Interactive Preview */}
           <div style={{
-            background: 'rgba(2, 6, 23, 0.6)',
-            borderRadius: '16px',
+            background: '#111C44',
+            borderRadius: '20px',
             border: '1px solid rgba(255, 255, 255, 0.08)',
-            padding: '20px',
+            padding: '24px 20px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#00F0E8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '14px' }}>
-              VISTA PREVIA EN VIVO
+            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#4318FF', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '18px' }}>
+              Vista Previa en Vivo
             </span>
 
             <div style={{
-              width: '210px',
-              borderRadius: '16px',
-              padding: '18px 14px',
-              background: 'rgba(15, 23, 42, 0.9)',
-              border: `1px solid ${rarityObj.color || '#00F0E8'}`,
-              boxShadow: `0 10px 25px rgba(0,0,0,0.6), 0 0 15px ${rarityObj.glow || 'rgba(0,240,255,0.2)'}`,
+              width: '220px',
+              borderRadius: '18px',
+              padding: '20px 16px',
+              background: '#0B1437',
+              border: `1px solid ${rarityObj.color || '#4318FF'}`,
+              boxShadow: `0 15px 35px rgba(0,0,0,0.7), 0 0 20px ${rarityObj.color || 'rgba(67,24,255,0.3)'}33`,
               textAlign: 'center',
               position: 'relative'
             }}>
@@ -611,18 +671,18 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
                 right: '10px',
                 padding: '2px 8px',
                 borderRadius: '6px',
-                background: rarityObj.color || '#00F0E8',
+                background: rarityObj.color || '#4318FF',
                 color: '#060714',
                 fontSize: '0.65rem',
                 fontWeight: 900
               }}>
-                {rarityObj.label}
+                {rarityObj.label || rarityObj.name}
               </div>
 
               {/* Image */}
               <div style={{
-                width: '110px',
-                height: '110px',
+                width: '120px',
+                height: '120px',
                 margin: '12px auto 8px',
                 display: 'flex',
                 alignItems: 'center',
@@ -636,39 +696,39 @@ export function SpiritEditorModal({ spirit, existingFamilies = [], onSave, onClo
                     style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                   />
                 ) : (
-                  <div style={{ color: '#475569', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <ImageIcon size={38} />
-                    <span style={{ fontSize: '0.65rem', marginTop: '4px' }}>Sin imagen</span>
+                  <div style={{ color: '#707EAE', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <ImageIcon size={42} />
+                    <span style={{ fontSize: '0.68rem', marginTop: '6px' }}>Sin imagen cargada</span>
                   </div>
                 )}
               </div>
 
-              <h4 style={{ margin: '0 0 4px', fontSize: '0.88rem', fontWeight: 900, color: '#fff' }}>
+              <h4 style={{ margin: '0 0 4px', fontSize: '0.92rem', fontWeight: 800, color: '#FFFFFF' }}>
                 {formData.fullName || 'Nombre del Espíritu'}
               </h4>
 
-              <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginBottom: '8px' }}>
+              <div style={{ fontSize: '0.74rem', color: '#A3AED0', marginBottom: '10px' }}>
                 {formData.summonCost}
               </div>
 
               {formData.unreleased ? (
                 <div style={{
-                  padding: '4px 8px',
-                  borderRadius: '6px',
+                  padding: '5px 10px',
+                  borderRadius: '8px',
                   background: 'rgba(168, 85, 247, 0.2)',
-                  color: '#c084fc',
-                  fontSize: '0.68rem',
+                  color: '#C084FC',
+                  fontSize: '0.7rem',
                   fontWeight: 900
                 }}>
                   NO LANZADO
                 </div>
               ) : (
                 <div style={{
-                  padding: '4px 8px',
-                  borderRadius: '6px',
+                  padding: '5px 10px',
+                  borderRadius: '8px',
                   background: 'rgba(0, 240, 232, 0.15)',
                   color: '#00F0E8',
-                  fontSize: '0.68rem',
+                  fontSize: '0.7rem',
                   fontWeight: 900
                 }}>
                   ACTIVO

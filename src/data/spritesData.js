@@ -14,11 +14,13 @@ if (Array.isArray(fortniteGgJson)) {
 }
 
 export const RARITIES = {
-  Mythic: { name: 'MÍTICO', color: '#fff0a6', bg: '#7c5d26', border: '#7c5d26', classKey: 'mythic', cardGradient: 'linear-gradient(180deg, #7c5d26 0%, #1b1c23 100%)' },
-  Legendary: { name: 'LEGENDARIO', color: '#fbc363', bg: '#8a3c1e', border: '#8a3c1e', classKey: 'legendary', cardGradient: 'linear-gradient(180deg, #8a3c1e 0%, #1b1c23 100%)' },
-  Epic: { name: 'ÉPICO', color: '#ec27ff', bg: '#4c197b', border: '#4c197b', classKey: 'epic', cardGradient: 'linear-gradient(180deg, #4c197b 0%, #1b1c23 100%)' },
-  Rare: { name: 'RARO', color: '#00fffb', bg: '#00458a', border: '#00458a', classKey: 'rare', cardGradient: 'linear-gradient(180deg, #00458a 0%, #1b1c23 100%)' },
-  Special: { name: 'ESPECIAL', color: '#000000', bg: 'transparent', border: '#5dffe4', classKey: 'special', cardGradient: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)' }
+  Mythic: { name: 'MÍTICO', label: 'Mítico', color: '#fff0a6', bg: '#7c5d26', border: '#7c5d26', classKey: 'mythic', cardGradient: 'linear-gradient(180deg, #7c5d26 0%, #1b1c23 100%)' },
+  Legendary: { name: 'LEGENDARIO', label: 'Legendario', color: '#fbc363', bg: '#8a3c1e', border: '#8a3c1e', classKey: 'legendary', cardGradient: 'linear-gradient(180deg, #8a3c1e 0%, #1b1c23 100%)' },
+  Epic: { name: 'ÉPICO', label: 'Épico', color: '#ec27ff', bg: '#4c197b', border: '#4c197b', classKey: 'epic', cardGradient: 'linear-gradient(180deg, #4c197b 0%, #1b1c23 100%)' },
+  Rare: { name: 'RARO', label: 'Raro', color: '#00fffb', bg: '#00458a', border: '#00458a', classKey: 'rare', cardGradient: 'linear-gradient(180deg, #00458a 0%, #1b1c23 100%)' },
+  Uncommon: { name: 'POCO COMÚN', label: 'Poco Común', color: '#4ade80', bg: '#14532d', border: '#4ade80', classKey: 'uncommon', cardGradient: 'linear-gradient(180deg, #14532d 0%, #1b1c23 100%)' },
+  Common: { name: 'COMÚN', label: 'Común', color: '#94a3b8', bg: '#334155', border: '#94a3b8', classKey: 'common', cardGradient: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)' },
+  Special: { name: 'ESPECIAL', label: 'Especial', color: '#5dffe4', bg: '#134e4a', border: '#5dffe4', classKey: 'special', cardGradient: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)' }
 };
 
 export const THEME_STYLES = {
