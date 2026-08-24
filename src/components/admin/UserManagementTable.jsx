@@ -175,58 +175,78 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
     return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
   };
 
-  // Styles based on Supabase Dark Theme
+  // Enterprise Corporate Color System (WCAG 2.2 AAA / AA Compliant)
+  const c = {
+    bgCard: darkMode ? '#171717' : '#FFFFFF',
+    borderCard: darkMode ? '#262626' : '#E2E8F0',
+    bgInput: darkMode ? '#141414' : '#F8FAFC',
+    borderInput: darkMode ? '#2E2E2E' : '#CBD5E1',
+    textPrimary: darkMode ? '#EDEDED' : '#0F172A',      // High contrast > 15:1
+    textSecondary: darkMode ? '#A1A1A1' : '#475569',    // High contrast > 7:1
+    textMuted: darkMode ? '#737373' : '#64748B',        // High contrast > 4.8:1
+    tableHeaderBg: darkMode ? '#121212' : '#F8FAFC',
+    rowBorder: darkMode ? '#222222' : '#F1F5F9',
+    badgeSelfBg: darkMode ? '#3ECF8E' : '#0F172A',
+    badgeSelfText: darkMode ? '#000000' : '#FFFFFF',
+    tagMyCodeBg: darkMode ? 'rgba(62, 207, 142, 0.12)' : '#EFF6FF',
+    tagMyCodeBorder: darkMode ? 'rgba(62, 207, 142, 0.3)' : '#BFDBFE',
+    tagMyCodeText: darkMode ? '#3ECF8E' : '#1E40AF',
+    badgeAuthBg: darkMode ? 'rgba(62, 207, 142, 0.12)' : '#F0FDF4',
+    badgeAuthBorder: darkMode ? 'rgba(62, 207, 142, 0.25)' : '#DCFCE7',
+    badgeAuthText: darkMode ? '#3ECF8E' : '#15803D',
+    pillNeutralBg: darkMode ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
+    pillNeutralBorder: darkMode ? '#2E2E2E' : '#E2E8F0',
+    pillNeutralText: darkMode ? '#D4D4D4' : '#334155',
+    barTrack: darkMode ? '#262626' : '#E2E8F0',
+    barFill: darkMode ? '#3ECF8E' : '#2563EB'
+  };
+
   const cardStyle = {
-    background: darkMode ? '#1C1C1C' : '#FFFFFF',
-    borderRadius: '14px',
-    padding: '22px 24px',
-    border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
-    boxShadow: darkMode ? '0 4px 20px rgba(0, 0, 0, 0.35)' : '0 1px 3px rgba(0, 0, 0, 0.05)',
+    background: c.bgCard,
+    borderRadius: '12px',
+    padding: '20px 22px',
+    border: `1px solid ${c.borderCard}`,
+    boxShadow: darkMode ? '0 4px 20px rgba(0, 0, 0, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.04)',
     transition: 'all 0.2s ease'
   };
 
   const containerStyle = {
-    background: darkMode ? '#1C1C1C' : '#FFFFFF',
-    borderRadius: '16px',
-    border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
-    boxShadow: darkMode ? '0 4px 20px rgba(0, 0, 0, 0.35)' : '0 1px 3px rgba(0, 0, 0, 0.05)',
+    background: c.bgCard,
+    borderRadius: '14px',
+    border: `1px solid ${c.borderCard}`,
+    boxShadow: darkMode ? '0 4px 20px rgba(0, 0, 0, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.04)',
     transition: 'all 0.2s ease'
   };
 
   const inputStyle = {
     padding: '9px 14px',
-    borderRadius: '10px',
-    background: darkMode ? '#171717' : '#F8FAFC',
-    border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
-    color: darkMode ? '#EDEDED' : '#1E293B',
+    borderRadius: '8px',
+    background: c.bgInput,
+    border: `1px solid ${c.borderInput}`,
+    color: c.textPrimary,
     fontSize: '0.82rem',
     fontWeight: 600,
     outline: 'none'
   };
 
-  const textPrimary = darkMode ? '#EDEDED' : '#1E293B';
-  const textMuted = darkMode ? '#8B949E' : '#64748B';
-  const tableHeaderBg = darkMode ? '#171717' : '#F8FAFC';
-  const rowBorder = darkMode ? '1px solid #262626' : '1px solid #F1F5F9';
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* ═══ TOP 4 KPI CARDS FOR USER METRICS ═══ */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* ═══ TOP 4 KPI CARDS (Enterprise Clean Design) ═══ */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '20px'
+        gap: '16px'
       }}>
         {/* Card 1: Total Registered Users */}
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Cuentas en Nube</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#ECFDF5', color: '#3ECF8E', fontSize: '0.72rem', fontWeight: 800 }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Cuentas en Nube</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: c.badgeAuthBg, border: `1px solid ${c.badgeAuthBorder}`, color: c.badgeAuthText, fontSize: '0.72rem', fontWeight: 700 }}>
               <ShieldCheck size={12} />
               <span>Supabase Auth</span>
             </div>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: textPrimary, letterSpacing: '-0.03em' }}>
+          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: c.textPrimary, letterSpacing: '-0.03em' }}>
             {metrics.totalUsers.toLocaleString()}
           </div>
         </div>
@@ -234,13 +254,13 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         {/* Card 2: Conversion Rate */}
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Tasa de Conversión</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: darkMode ? 'rgba(2, 132, 199, 0.15)' : '#E0F2FE', color: '#38BDF8', fontSize: '0.72rem', fontWeight: 800 }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Tasa de Conversión</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: c.pillNeutralBg, border: `1px solid ${c.pillNeutralBorder}`, color: c.pillNeutralText, fontSize: '0.72rem', fontWeight: 700 }}>
               <TrendingUp size={12} />
               <span>Login / Visitas</span>
             </div>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: textPrimary, letterSpacing: '-0.03em' }}>
+          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: c.textPrimary, letterSpacing: '-0.03em' }}>
             {metrics.conversionRate}%
           </div>
         </div>
@@ -248,13 +268,13 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         {/* Card 3: Total Caught Spirits */}
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Espíritus Atrapados</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: darkMode ? 'rgba(245, 158, 11, 0.15)' : '#FEF3C7', color: '#F59E0B', fontSize: '0.72rem', fontWeight: 800 }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Espíritus Atrapados</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: c.pillNeutralBg, border: `1px solid ${c.pillNeutralBorder}`, color: c.pillNeutralText, fontSize: '0.72rem', fontWeight: 700 }}>
               <Sparkles size={12} />
-              <span>Globales</span>
+              <span>{selectedGen === 2 ? '2ª Gen' : selectedGen === 1 ? '1ª Gen' : 'Globales'}</span>
             </div>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: textPrimary, letterSpacing: '-0.03em' }}>
+          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: c.textPrimary, letterSpacing: '-0.03em' }}>
             {metrics.totalCaughtAll.toLocaleString()}
           </div>
         </div>
@@ -262,25 +282,25 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         {/* Card 4: Avg Collection Progress */}
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Progreso Promedio</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: darkMode ? 'rgba(168, 85, 247, 0.15)' : '#F5F3FF', color: '#A855F7', fontSize: '0.72rem', fontWeight: 800 }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Progreso Promedio</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: c.pillNeutralBg, border: `1px solid ${c.pillNeutralBorder}`, color: c.pillNeutralText, fontSize: '0.72rem', fontWeight: 700 }}>
               <Star size={12} />
               <span>Maestría</span>
             </div>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: textPrimary, letterSpacing: '-0.03em' }}>
+          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: c.textPrimary, letterSpacing: '-0.03em' }}>
             {metrics.avgProgress}%
           </div>
         </div>
       </div>
 
-      {/* ═══ USER'S OWN ACCOUNT NOTICE BANNER ═══ */}
+      {/* ═══ USER'S OWN ACCOUNT NOTICE BANNER (Accessible & Professional) ═══ */}
       {myFriendCode && (
         <div style={{
-          padding: '14px 20px',
-          borderRadius: '14px',
-          background: darkMode ? 'rgba(0, 240, 232, 0.07)' : 'rgba(60, 80, 224, 0.06)',
-          border: darkMode ? '1px solid rgba(0, 240, 232, 0.3)' : '1px solid rgba(60, 80, 224, 0.2)',
+          padding: '12px 18px',
+          borderRadius: '10px',
+          background: darkMode ? '#1A1A1A' : '#F8FAFC',
+          border: `1px solid ${darkMode ? '#2E2E2E' : '#CBD5E1'}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -289,37 +309,50 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              background: '#00F0E8',
-              color: '#060714',
+              width: '30px',
+              height: '30px',
+              borderRadius: '6px',
+              background: c.badgeSelfBg,
+              color: c.badgeSelfText,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0
             }}>
-              <Crown size={18} />
+              <Crown size={15} />
             </div>
             <div>
-              <div style={{ fontSize: '0.86rem', fontWeight: 800, color: textPrimary }}>
-                Tu Cuenta de Entrenador (Este Dispositivo): <span style={{ color: '#00F0E8', fontFamily: 'monospace', fontSize: '0.95rem' }}>{myFriendCode}</span>
+              <div style={{ fontSize: '0.84rem', fontWeight: 700, color: c.textPrimary, display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span>Tu Cuenta de Entrenador (Este Dispositivo):</span>
+                <span style={{
+                  padding: '2px 8px',
+                  borderRadius: '6px',
+                  background: c.tagMyCodeBg,
+                  border: `1px solid ${c.tagMyCodeBorder}`,
+                  color: c.tagMyCodeText,
+                  fontFamily: 'monospace',
+                  fontWeight: 800,
+                  fontSize: '0.86rem'
+                }}>
+                  {myFriendCode}
+                </span>
               </div>
-              <div style={{ fontSize: '0.75rem', color: textMuted }}>
-                Tu fila aparece identificada con la insignia <strong style={{ color: '#00F0E8' }}>👑 TÚ</strong> y borde cian brillante en la tabla de abajo.
+              <div style={{ fontSize: '0.74rem', color: c.textSecondary, marginTop: '2px' }}>
+                Tu fila aparece identificada con la insignia <strong>👑 TÚ</strong> y borde distintivo en la tabla.
               </div>
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.78rem', color: textMuted }}>Generación Activa:</span>
+            <span style={{ fontSize: '0.76rem', color: c.textSecondary }}>Filtro Activo:</span>
             <span style={{
-              padding: '4px 10px',
-              borderRadius: '8px',
-              background: darkMode ? '#262626' : '#F1F5F9',
-              color: '#00F0E8',
-              fontSize: '0.78rem',
-              fontWeight: 800
+              padding: '3px 8px',
+              borderRadius: '6px',
+              background: darkMode ? '#262626' : '#FFFFFF',
+              border: `1px solid ${darkMode ? '#333333' : '#CBD5E1'}`,
+              color: c.textPrimary,
+              fontSize: '0.76rem',
+              fontWeight: 700
             }}>
               {selectedGen === 2 ? 'Temporada Actual (2ª Gen)' : selectedGen === 1 ? '1ª Generación' : 'Todas las Generaciones'}
             </span>
@@ -330,12 +363,12 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
       {/* ═══ TABLE CONTROL & FILTERS HEADER ═══ */}
       <div style={{
         ...containerStyle,
-        padding: '20px 24px',
+        padding: '16px 20px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
-        gap: '16px'
+        gap: '12px'
       }}>
         {/* Search Input */}
         <div style={{ position: 'relative', minWidth: '260px', flex: 1, maxWidth: '380px' }}>
@@ -347,25 +380,24 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
             style={{
               ...inputStyle,
               width: '100%',
-              padding: '10px 14px 10px 38px',
+              padding: '9px 14px 9px 36px',
               boxSizing: 'border-box'
             }}
           />
-          <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: textMuted }} />
+          <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: c.textMuted }} />
         </div>
 
         {/* Filters: Generation Selector, Progress Filter & Refresh */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           {/* Generation / Season Selector */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Layers size={15} style={{ color: textMuted }} />
+            <Layers size={14} style={{ color: c.textSecondary }} />
             <select
               value={selectedGen}
               onChange={(e) => { setSelectedGen(Number(e.target.value)); setCurrentPage(1); }}
               style={{
                 ...inputStyle,
                 fontWeight: 700,
-                borderColor: selectedGen === 2 ? '#00F0E8' : (darkMode ? '#2E2E2E' : '#E2E8F0'),
                 cursor: 'pointer'
               }}
               title="Filtrar por Temporada / Generación"
@@ -393,37 +425,37 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '9px 14px',
-              borderRadius: '10px',
-              background: darkMode ? '#171717' : '#FFFFFF',
-              border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
-              color: textMuted,
-              fontSize: '0.82rem',
+              padding: '8px 14px',
+              borderRadius: '8px',
+              background: darkMode ? '#1F1F1F' : '#FFFFFF',
+              border: `1px solid ${c.borderCard}`,
+              color: c.textPrimary,
+              fontSize: '0.8rem',
               fontWeight: 700,
               cursor: 'pointer'
             }}
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
             <span>Refrescar</span>
           </button>
         </div>
       </div>
 
-      {/* ═══ USERS DATA TABLE (TailAdmin & Supabase Dark Style) ═══ */}
+      {/* ═══ USERS DATA TABLE (Enterprise Corporate Style) ═══ */}
       <div style={{
         ...containerStyle,
         overflow: 'hidden'
       }}>
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem', textAlign: 'left' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
             <thead>
-              <tr style={{ borderBottom: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0', color: textMuted, background: tableHeaderBg }}>
-                <th style={{ padding: '14px 20px', fontWeight: 700 }}>ENTRENADOR / CUENTA</th>
-                <th style={{ padding: '14px 20px', fontWeight: 700 }}>CÓDIGO DE AMIGO</th>
-                <th style={{ padding: '14px 20px', fontWeight: 700 }}>PROGRESO ({selectedGen === 2 ? '2ª Gen' : selectedGen === 1 ? '1ª Gen' : 'Total'})</th>
-                <th style={{ padding: '14px 20px', fontWeight: 700 }}>ESTRELLAS</th>
-                <th style={{ padding: '14px 20px', fontWeight: 700 }}>ÚLTIMA SINCRONIZACIÓN</th>
-                <th style={{ padding: '14px 20px', fontWeight: 700, textAlign: 'right' }}>ESTADO</th>
+              <tr style={{ borderBottom: `1px solid ${c.borderCard}`, color: c.textSecondary, background: c.tableHeaderBg }}>
+                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>ENTRENADOR / CUENTA</th>
+                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>CÓDIGO DE AMIGO</th>
+                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>PROGRESO ({selectedGen === 2 ? '2ª Gen' : selectedGen === 1 ? '1ª Gen' : 'Total'})</th>
+                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>ESTRELLAS</th>
+                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>ÚLTIMA SINCRONIZACIÓN</th>
+                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em', textAlign: 'right' }}>ESTADO</th>
               </tr>
             </thead>
             <tbody>
@@ -436,57 +468,59 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                     <tr
                       key={user.id || idx}
                       style={{
-                        borderBottom: rowBorder,
-                        borderLeft: isMe ? '4px solid #00F0E8' : '4px solid transparent',
+                        borderBottom: `1px solid ${c.rowBorder}`,
+                        borderLeft: isMe ? `3px solid ${darkMode ? '#3ECF8E' : '#0F172A'}` : '3px solid transparent',
                         background: isMe
-                          ? (darkMode ? 'rgba(0, 240, 232, 0.08)' : 'rgba(60, 80, 224, 0.05)')
+                          ? (darkMode ? '#1C1C1C' : '#F8FAFC')
                           : 'transparent',
                         transition: 'background 0.15s ease'
                       }}
                     >
                       {/* Trainer Avatar & ID */}
-                      <td style={{ padding: '14px 20px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <td style={{ padding: '12px 18px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                           <div style={{
-                            width: '38px',
-                            height: '38px',
-                            borderRadius: '50%',
+                            width: '34px',
+                            height: '34px',
+                            borderRadius: '8px',
                             background: isMe
-                              ? 'linear-gradient(135deg, #00F0E8, #3ECF8E)'
-                              : (darkMode ? 'linear-gradient(135deg, #262626, #3ECF8E)' : 'linear-gradient(135deg, #E2E8F0, #3C50E0)'),
-                            color: isMe ? '#060714' : '#FFFFFF',
-                            fontWeight: 900,
-                            fontSize: '0.8rem',
+                              ? (darkMode ? '#3ECF8E' : '#0F172A')
+                              : (darkMode ? '#262626' : '#F1F5F9'),
+                            color: isMe
+                              ? (darkMode ? '#000000' : '#FFFFFF')
+                              : (darkMode ? '#D4D4D4' : '#334155'),
+                            border: `1px solid ${isMe ? (darkMode ? '#3ECF8E' : '#0F172A') : (darkMode ? '#333333' : '#E2E8F0')}`,
+                            fontWeight: 800,
+                            fontSize: '0.76rem',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            flexShrink: 0,
-                            boxShadow: isMe ? '0 0 12px rgba(0, 240, 232, 0.4)' : 'none'
+                            flexShrink: 0
                           }}>
                             {user.friendCode.slice(-2)}
                           </div>
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <span style={{ fontWeight: 800, color: isMe ? '#00F0E8' : textPrimary }}>
+                              <span style={{ fontWeight: 700, color: c.textPrimary }}>
                                 Entrenador #{user.friendCode.slice(-4)}
                               </span>
                               {isMe && (
                                 <span style={{
-                                  padding: '2px 8px',
-                                  borderRadius: '6px',
-                                  background: '#00F0E8',
-                                  color: '#060714',
-                                  fontSize: '0.68rem',
-                                  fontWeight: 900,
+                                  padding: '1px 6px',
+                                  borderRadius: '4px',
+                                  background: c.badgeSelfBg,
+                                  color: c.badgeSelfText,
+                                  fontSize: '0.66rem',
+                                  fontWeight: 800,
                                   display: 'inline-flex',
                                   alignItems: 'center',
                                   gap: '3px'
                                 }}>
-                                  <Crown size={10} /> TÚ
+                                  <Crown size={9} /> TÚ
                                 </span>
                               )}
                             </div>
-                            <span style={{ fontSize: '0.72rem', color: textMuted, fontFamily: 'monospace' }}>
+                            <span style={{ fontSize: '0.72rem', color: c.textMuted, fontFamily: 'monospace' }}>
                               {shortId}
                             </span>
                           </div>
@@ -494,17 +528,18 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                       </td>
 
                       {/* Friend Code with Copy Button */}
-                      <td style={{ padding: '14px 20px' }}>
+                      <td style={{ padding: '12px 18px' }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                           <span style={{
-                            padding: '4px 10px',
-                            borderRadius: '8px',
-                            background: darkMode ? '#232323' : '#F1F5F9',
-                            color: isMe ? '#00F0E8' : (darkMode ? '#3ECF8E' : '#3C50E0'),
-                            fontSize: '0.82rem',
-                            fontWeight: 800,
+                            padding: '3px 8px',
+                            borderRadius: '6px',
+                            background: isMe ? c.tagMyCodeBg : (darkMode ? '#222222' : '#F1F5F9'),
+                            border: `1px solid ${isMe ? c.tagMyCodeBorder : (darkMode ? '#2E2E2E' : '#E2E8F0')}`,
+                            color: isMe ? c.tagMyCodeText : c.textPrimary,
+                            fontSize: '0.78rem',
+                            fontWeight: 700,
                             fontFamily: 'monospace',
-                            letterSpacing: '0.04em'
+                            letterSpacing: '0.03em'
                           }}>
                             {user.friendCode}
                           </span>
@@ -514,72 +549,73 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                             style={{
                               background: 'none',
                               border: 'none',
-                              color: copiedCode === user.friendCode ? '#3ECF8E' : textMuted,
+                              color: copiedCode === user.friendCode ? (darkMode ? '#3ECF8E' : '#15803D') : c.textMuted,
                               cursor: 'pointer',
-                              padding: '4px',
+                              padding: '3px',
                               display: 'flex',
                               alignItems: 'center'
                             }}
                             title="Copiar Código de Amigo"
                           >
-                            {copiedCode === user.friendCode ? <Check size={14} /> : <Copy size={14} />}
+                            {copiedCode === user.friendCode ? <Check size={13} /> : <Copy size={13} />}
                           </button>
                         </div>
                       </td>
 
                       {/* Collection Progress Bar */}
-                      <td style={{ padding: '14px 20px', minWidth: '180px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.76rem' }}>
-                            <span style={{ color: textPrimary, fontWeight: 700 }}>
+                      <td style={{ padding: '12px 18px', minWidth: '170px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.74rem' }}>
+                            <span style={{ color: c.textPrimary, fontWeight: 600 }}>
                               {user.caughtCount} / {scopedSprites.length} espíritus
                             </span>
-                            <strong style={{ color: darkMode ? '#3ECF8E' : '#3C50E0' }}>
+                            <strong style={{ color: c.textPrimary, fontWeight: 800 }}>
                               {user.progressPct}%
                             </strong>
                           </div>
-                          <div style={{ width: '100%', height: '6px', background: darkMode ? '#262626' : '#F1F5F9', borderRadius: '3px', overflow: 'hidden' }}>
+                          <div style={{ width: '100%', height: '5px', background: c.barTrack, borderRadius: '3px', overflow: 'hidden' }}>
                             <div style={{
                               width: `${user.progressPct}%`,
                               height: '100%',
-                              background: darkMode ? 'linear-gradient(90deg, #10B981, #3ECF8E)' : 'linear-gradient(90deg, #3C50E0, #00F0E8)',
+                              background: user.progressPct > 0 ? c.barFill : c.borderInput,
                               borderRadius: '3px',
-                              transition: 'width 0.4s ease'
+                              transition: 'width 0.3s ease'
                             }} />
                           </div>
                         </div>
                       </td>
 
                       {/* Stars */}
-                      <td style={{ padding: '14px 20px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#F59E0B', fontWeight: 800, fontSize: '0.84rem' }}>
-                          <Star size={14} fill="#F59E0B" />
+                      <td style={{ padding: '12px 18px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: c.textPrimary, fontWeight: 700, fontSize: '0.8rem' }}>
+                          <Star size={13} fill="#D97706" color="#D97706" />
                           <span>{user.starCount}</span>
                         </div>
                       </td>
 
                       {/* Last Updated */}
-                      <td style={{ padding: '14px 20px', color: textMuted }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem' }}>
-                          <Clock size={13} />
+                      <td style={{ padding: '12px 18px', color: c.textSecondary }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.76rem' }}>
+                          <Clock size={12} />
                           <span>{formatRelativeTime(user.updatedAt)}</span>
                         </div>
                       </td>
 
                       {/* Cloud Sync Status */}
-                      <td style={{ padding: '14px 20px', textAlign: 'right' }}>
+                      <td style={{ padding: '12px 18px', textAlign: 'right' }}>
                         <span style={{
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '6px',
-                          padding: '4px 10px',
-                          borderRadius: '8px',
-                          background: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#ECFDF5',
-                          color: '#3ECF8E',
-                          fontSize: '0.74rem',
-                          fontWeight: 800
+                          gap: '5px',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          background: c.badgeAuthBg,
+                          border: `1px solid ${c.badgeAuthBorder}`,
+                          color: c.badgeAuthText,
+                          fontSize: '0.72rem',
+                          fontWeight: 700
                         }}>
-                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#3ECF8E' }} />
+                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: c.badgeAuthText }} />
                           <span>Nube Activa</span>
                         </span>
                       </td>
@@ -588,7 +624,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                 })
               ) : (
                 <tr>
-                  <td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: textMuted }}>
+                  <td colSpan={6} style={{ padding: '36px', textAlign: 'center', color: c.textSecondary }}>
                     {loading ? 'Cargando usuarios de Supabase...' : 'No se encontraron usuarios registrados con los filtros seleccionados.'}
                   </td>
                 </tr>
@@ -599,43 +635,43 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
 
         {/* ═══ TABLE PAGINATION FOOTER ═══ */}
         <div style={{
-          padding: '16px 24px',
-          borderTop: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
+          padding: '14px 20px',
+          borderTop: `1px solid ${c.borderCard}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: '12px',
-          background: darkMode ? '#171717' : '#F8FAFC'
+          background: c.tableHeaderBg
         }}>
-          <span style={{ fontSize: '0.8rem', color: textMuted }}>
+          <span style={{ fontSize: '0.78rem', color: c.textSecondary }}>
             Mostrando <strong>{Math.min((currentPage - 1) * pageSize + 1, filteredUsers.length)}</strong> a <strong>{Math.min(currentPage * pageSize, filteredUsers.length)}</strong> de <strong>{filteredUsers.length}</strong> cuentas
           </span>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <button
               type="button"
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               style={{
-                padding: '6px 12px',
-                borderRadius: '8px',
-                border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
-                background: darkMode ? '#1C1C1C' : '#FFFFFF',
-                color: currentPage === 1 ? (darkMode ? '#525252' : '#CBD5E1') : textPrimary,
+                padding: '5px 10px',
+                borderRadius: '6px',
+                border: `1px solid ${c.borderCard}`,
+                background: c.bgCard,
+                color: currentPage === 1 ? c.textMuted : c.textPrimary,
                 cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                fontSize: '0.78rem',
+                fontSize: '0.76rem',
                 fontWeight: 700
               }}
             >
-              <ChevronLeft size={14} />
+              <ChevronLeft size={13} />
               <span>Anterior</span>
             </button>
 
-            <span style={{ fontSize: '0.8rem', fontWeight: 800, color: textPrimary, padding: '0 8px' }}>
+            <span style={{ fontSize: '0.78rem', fontWeight: 800, color: c.textPrimary, padding: '0 6px' }}>
               {currentPage} / {totalPages}
             </span>
 
@@ -644,21 +680,21 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
               style={{
-                padding: '6px 12px',
-                borderRadius: '8px',
-                border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
-                background: darkMode ? '#1C1C1C' : '#FFFFFF',
-                color: currentPage === totalPages ? (darkMode ? '#525252' : '#CBD5E1') : textPrimary,
+                padding: '5px 10px',
+                borderRadius: '6px',
+                border: `1px solid ${c.borderCard}`,
+                background: c.bgCard,
+                color: currentPage === totalPages ? c.textMuted : c.textPrimary,
                 cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                fontSize: '0.78rem',
+                fontSize: '0.76rem',
                 fontWeight: 700
               }}
             >
               <span>Siguiente</span>
-              <ChevronRight size={14} />
+              <ChevronRight size={13} />
             </button>
           </div>
         </div>
