@@ -182,6 +182,13 @@ const SPANISH_NAME_OVERRIDES = {
   theburntpeanut_basic: 'Cacahuate'
 };
 
+const SUMMON_COST_OVERRIDES = {
+  'klombo_basic': '2,000 Polvo Estelar',
+  'klombo_gold': '2,400 Polvo Estelar',
+  'crown_basic': '2,000 Polvo Estelar',
+  'crown_gold': '2,400 Polvo Estelar'
+};
+
 // Format and group official sprites
 export const ALL_SPRITES = officialSpritesJson.map((item) => {
   let gen = item.gen || 1;
@@ -234,6 +241,10 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   const normTheme = (item.theme || '').toLowerCase().replace(/[^a-z0-9]/g, '');
   const official = fortniteGgMap.get(`${normName}_${normTheme}`) || fortniteGgMap.get(normName);
 
+  const officialCost = official?.summonCost && official.summonCost !== '0'
+    ? (official.summonCost.includes('Polvo') ? official.summonCost : `${official.summonCost} Polvo Estelar`)
+    : null;
+
   return {
     id: item.id,
     fullName: fullName,
@@ -249,7 +260,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     familyId: familyId,
     familyName: spanishFamilyName,
     location: official?.location || 'Cofres de Sprite & Zonas de Extracción',
-    summonCost: official?.summonCost && official.summonCost !== '0' ? `${official.summonCost} Polvo Estelar` : '5,000 Polvo Estelar',
+    summonCost: SUMMON_COST_OVERRIDES[item.id] || officialCost || '5,000 Polvo Estelar',
     ability: official?.ability || 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.',
     specialPerk: official?.specialPerk || ''
   };
