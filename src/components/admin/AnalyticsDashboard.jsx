@@ -264,39 +264,26 @@ export function AnalyticsDashboard() {
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {[
-              { source: 'Tráfico Directo / App', visitors: '4.7K', color: '#3C50E0' },
-              { source: 'Twitter / X & Discord', visitors: '3.4K', color: '#00F0E8' },
-              { source: 'TikTok & Reels', visitors: '2.9K', color: '#10B981' },
-              { source: 'Google Búsquedas', visitors: '1.5K', color: '#F59E0B' }
-            ].map((ch) => (
-              <div key={ch.source} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #F8FAFC' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: ch.color }} />
-                  <span style={{ fontSize: '0.84rem', fontWeight: 600, color: '#334155' }}>{ch.source}</span>
+            {(data.topChannels && data.topChannels.length > 0 ? data.topChannels.slice(0, 4) : [
+              { source: 'Tráfico Directo / App', count: data.totalVisits || 1, color: '#3C50E0' }
+            ]).map((ch, idx) => {
+              const colors = ['#3C50E0', '#00F0E8', '#10B981', '#F59E0B', '#8B5CF6'];
+              const chColor = ch.color || colors[idx % colors.length];
+              const pct = data.totalVisits > 0 ? Math.round((ch.count / data.totalVisits) * 100) : 100;
+              return (
+                <div key={ch.source} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #F8FAFC' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: chColor }} />
+                    <span style={{ fontSize: '0.84rem', fontWeight: 600, color: '#334155' }}>{ch.source}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '0.74rem', color: '#94A3B8' }}>{pct}%</span>
+                    <strong style={{ fontSize: '0.84rem', color: '#1E293B' }}>{ch.count}</strong>
+                  </div>
                 </div>
-                <strong style={{ fontSize: '0.84rem', color: '#1E293B' }}>{ch.visitors}</strong>
-              </div>
-            ))}
+              );
+            })}
           </div>
-
-          <button
-            type="button"
-            style={{
-              width: '100%',
-              marginTop: '16px',
-              padding: '10px',
-              borderRadius: '8px',
-              border: '1px solid #E2E8F0',
-              background: '#FFFFFF',
-              color: '#64748B',
-              fontSize: '0.78rem',
-              fontWeight: 700,
-              cursor: 'pointer'
-            }}
-          >
-            Channels Report →
-          </button>
         </div>
 
         {/* Widget 2: Top Espíritus Más Atrapados */}
@@ -312,12 +299,12 @@ export function AnalyticsDashboard() {
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {[
-              { name: 'Klombo', category: 'Mítico (Gen 2)', rate: '88%' },
-              { name: 'Victorioso', category: 'Mítico (Gen 2)', rate: '84%' },
-              { name: 'Sonic', category: 'Especial (Crossover)', rate: '79%' },
-              { name: 'Shadow', category: 'Especial (Crossover)', rate: '72%' }
-            ].map((sp) => (
+            {(data.popularSpirits && data.popularSpirits.length > 0 ? data.popularSpirits : [
+              { name: 'Victorioso', category: 'Mítico (Gen 2)', rate: '100%' },
+              { name: 'Klombo', category: 'Mítico (Gen 2)', rate: '95%' },
+              { name: 'Sonic', category: 'Especial (Crossover)', rate: '88%' },
+              { name: 'Shadow', category: 'Especial (Crossover)', rate: '80%' }
+            ]).map((sp) => (
               <div key={sp.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #F8FAFC' }}>
                 <div>
                   <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#1E293B' }}>{sp.name}</div>
@@ -329,24 +316,6 @@ export function AnalyticsDashboard() {
               </div>
             ))}
           </div>
-
-          <button
-            type="button"
-            style={{
-              width: '100%',
-              marginTop: '16px',
-              padding: '10px',
-              borderRadius: '8px',
-              border: '1px solid #E2E8F0',
-              background: '#FFFFFF',
-              color: '#64748B',
-              fontSize: '0.78rem',
-              fontWeight: 700,
-              cursor: 'pointer'
-            }}
-          >
-            Catalog Report →
-          </button>
         </div>
 
         {/* Widget 3: Active Users (Live Sparkline) */}

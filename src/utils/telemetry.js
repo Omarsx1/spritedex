@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { allSprites } from '../data/spritesData';
 
 const SESSION_STORAGE_KEY = 'spritedex_session_id';
 const LOCAL_ANALYTICS_KEY = 'spritedex_telemetry_cache';
@@ -206,6 +207,54 @@ export async function fetchAnalyticsOverview() {
         });
 
         result.activeSessionsCount = Math.max(liveSessions.size, 1);
+      }
+
+      // 5. Fetch most popular spirits from real user collections
+      try {
+        const { data: collections } = await supabase
+          .from('user_collections')
+          .select('user_state')
+          .limit(100);
+
+        if (collections && collections.length > 0) {
+          const spriteCounts = {};
+          let totalUsersWithCaught = 0;
+
+          collections.forEach((col) => {
+            const st = col.user_state;
+            if (st && typeof st === 'object') {
+              totalUsersWithCaught++;
+              Object.entries(st).forEach(([sId, val]) => {
+                if (val && (val.caught || val.stars > 0)) {
+                  spriteCounts[sId] = (spriteCounts[sId] || 0) + 1;
+                }
+              });
+            }
+          });
+
+          if (totalUsersWithCaught > 0 && Object.keys(spriteCounts).length > 0) {
+            const sorted = Object.entries(spriteCounts)
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 4);
+
+            result.popularSpirits = sorted.map(([sId, count]) => {
+              const sp = (allSprites || []).find((s) => s.id === sId) || {
+                fullName: sId,
+                family: 'Especial',
+                rarity: 'Legendary'
+              };
+              const pct = Math.min(100, Math.round((count / totalUsersWithCaught) * 100));
+              return {
+                name: sp.fullName || sp.name || sId,
+                category: `${sp.rarity || 'Mítico'} (${sp.family || 'Gen 2'})`,
+                rate: `${pct}%`,
+                count
+              };
+            });
+          }
+        }
+      } catch (err) {
+        console.debug('Error fetching popular spirits:', err);
       }
     } else {
       // Offline fallback: Use local storage telemetry cache
