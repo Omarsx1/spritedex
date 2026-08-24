@@ -194,26 +194,49 @@ function drawCyberMatrixBackground(ctx, width, height, style = 'glitch_override'
 function getSpiritHue(sprite) {
   const name = (sprite.fullName || sprite.name || '').toLowerCase();
   const rarity = (sprite.rarity || '').toLowerCase();
+  const theme = (sprite.variant || sprite.theme || '').toLowerCase();
+  const family = (sprite.familyId || sprite.id || '').toLowerCase();
 
-  if (name.includes('dorado') || name.includes('oro') || name.includes('peely')) return '#facc15';
-  if (name.includes('fuego') || name.includes('flama')) return '#ff5722';
-  if (name.includes('gomita') || name.includes('dulce')) return '#ff6b81';
-  if (name.includes('galáctico') || name.includes('galactico') || name.includes('cúbico') || name.includes('cubico')) return '#a855f7';
-  if (name.includes('gema') || name.includes('cristal')) return '#38bdf8';
-  if (name.includes('holográfico') || name.includes('holografico')) return '#ec4899';
-  if (name.includes('patito') || name.includes('tierra')) return '#00f0ff';
-  if (name.includes('oscuridad') || name.includes('parca')) return '#94a3b8';
-  if (name.includes('cacahuate')) return '#eab308';
-  if (name.includes('agua')) return '#00f0ff';
-  if (name.includes('hacker') || name.includes('cheatmaster')) return '#22c55e';
+  // 1. Variantes de tema
+  if (theme.includes('gold') || theme.includes('dorado') || name.includes('dorado')) return '#facc15';
+  if (theme.includes('cheat') || theme.includes('hacker') || name.includes('hacker')) return '#22c55e';
+  if (theme.includes('candy') || theme.includes('gomita') || name.includes('gomita')) return '#ff6b81';
+  if (theme.includes('galaxy') || theme.includes('galáctico') || theme.includes('galactico')) return '#a855f7';
+  if (theme.includes('cube') || theme.includes('cúbico') || theme.includes('cubico')) return '#8b008b';
+  if (theme.includes('holofoil') || theme.includes('holográfico') || theme.includes('holografico')) return '#ec4899';
+  if (theme.includes('gem') || theme.includes('gema')) return '#38bdf8';
+  if (theme.includes('quack') || theme.includes('patito')) return '#00f0ff';
 
+  // 2. Familias Básicas por color característico
+  if (family.includes('klombo')) return '#ec4899';
+  if (family.includes('sonic')) return '#38bdf8';
+  if (family.includes('shadow')) return '#a855f7';
+  if (family.includes('tails')) return '#f97316';
+  if (family.includes('corona') || family.includes('crown')) return '#f59e0b';
+  if (family.includes('jackrabbit')) return '#a3e635';
+  if (family.includes('bush') || family.includes('arbust')) return '#22c55e';
+  if (family.includes('killswitch')) return '#06b6d4';
+  if (family.includes('jonesy')) return '#fb923c';
+  if (family.includes('8bit')) return '#ef4444';
+  if (family.includes('adventure') || family.includes('aventurero')) return '#0ea5e9';
+  if (family.includes('stormscout')) return '#818cf8';
+  if (family.includes('batman')) return '#3b82f6';
+  if (family.includes('wick')) return '#f59e0b';
+  if (family.includes('water') || family.includes('agua')) return '#00f0ff';
+  if (family.includes('fire') || family.includes('fuego')) return '#ff5722';
+  if (family.includes('earth') || family.includes('tierra')) return '#10b981';
+  if (family.includes('air') || family.includes('aire')) return '#38bdf8';
+  if (family.includes('ghost') || family.includes('fantasma')) return '#94a3b8';
+  if (family.includes('demon') || family.includes('demonio')) return '#dc2626';
+
+  // 3. Rareza por defecto
   if (rarity.includes('mitico') || rarity.includes('mítico')) return '#f59e0b';
   if (rarity.includes('legendario')) return '#f97316';
   if (rarity.includes('epico') || rarity.includes('épico')) return '#a855f7';
   if (rarity.includes('raro')) return '#3b82f6';
   if (rarity.includes('especial')) return '#ec4899';
 
-  return '#00f0ff';
+  return '#00F0E8';
 }
 
 export async function generatePokedexCardImage({
@@ -467,46 +490,39 @@ function renderGlitchOverrideTemplate({
     const cardW = cellW - cardMarginX * 2;
     const cardH = cellH - cardMarginY * 2;
 
-    // A. Cyber Tile Container
-    const spiritHue = getSpiritHue(sprite);
-    const isGreenTheme = spiritHue === '#22c55e' ||
-      (sprite.fullName || '').toLowerCase().includes('hacker') ||
-      (sprite.fullName || '').toLowerCase().includes('arbust') ||
-      (sprite.variant || '').toLowerCase().includes('cheat');
-
+    // A. Cyber Tile Container (Homogéneo y Elegante para TODAS las tarjetas)
     ctx.save();
     roundRect(ctx, cardX, cardY, cardW, cardH, 12);
     if (isOwned) {
       ctx.fillStyle = isMastered
-        ? 'rgba(234, 179, 8, 0.12)'
-        : (isGreenTheme ? 'rgba(34, 197, 94, 0.12)' : 'rgba(0, 240, 232, 0.08)');
+        ? 'rgba(234, 179, 8, 0.14)'
+        : hexToRgba(spiritHue, 0.10);
       ctx.fill();
       ctx.strokeStyle = isMastered
-        ? 'rgba(234, 179, 8, 0.65)'
-        : (isGreenTheme ? 'rgba(74, 222, 128, 0.65)' : 'rgba(0, 240, 232, 0.45)');
-      ctx.lineWidth = isMastered || isGreenTheme ? 1.5 : 1;
-      if (isMastered || isGreenTheme) {
-        ctx.shadowColor = isMastered ? 'rgba(234, 179, 8, 0.4)' : 'rgba(34, 197, 94, 0.4)';
+        ? 'rgba(234, 179, 8, 0.75)'
+        : hexToRgba(spiritHue, 0.55);
+      ctx.lineWidth = isMastered ? 1.5 : 1;
+      if (isMastered) {
+        ctx.shadowColor = 'rgba(234, 179, 8, 0.4)';
         ctx.shadowBlur = 8;
       }
       ctx.stroke();
       ctx.shadowBlur = 0;
     } else {
-      ctx.fillStyle = isGreenTheme ? 'rgba(6, 42, 24, 0.72)' : 'rgba(15, 23, 42, 0.65)';
+      // Contenedor oscuro homogéneo tipo Cyber Glass para todas las tarjetas sin atrapar
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
       ctx.fill();
-      ctx.strokeStyle = isGreenTheme ? 'rgba(74, 222, 128, 0.35)' : 'rgba(255, 255, 255, 0.15)';
+      ctx.strokeStyle = hexToRgba(spiritHue, 0.28);
       ctx.lineWidth = 1;
       ctx.stroke();
     }
 
-    // Corner pixel ticks on active cards
-    if (isOwned) {
-      ctx.fillStyle = isMastered ? '#facc15' : (isGreenTheme ? '#4ade80' : '#00F0E8');
-      ctx.fillRect(cardX + 2, cardY + 2, 4, 4);
-      ctx.fillRect(cardX + cardW - 6, cardY + 2, 4, 4);
-      ctx.fillRect(cardX + 2, cardY + cardH - 6, 4, 4);
-      ctx.fillRect(cardX + cardW - 6, cardY + cardH - 6, 4, 4);
-    }
+    // Corner pixel ticks con el color del espíritu
+    ctx.fillStyle = isOwned ? (isMastered ? '#facc15' : spiritHue) : hexToRgba(spiritHue, 0.50);
+    ctx.fillRect(cardX + 2, cardY + 2, 4, 4);
+    ctx.fillRect(cardX + cardW - 6, cardY + 2, 4, 4);
+    ctx.fillRect(cardX + 2, cardY + cardH - 6, 4, 4);
+    ctx.fillRect(cardX + cardW - 6, cardY + cardH - 6, 4, 4);
     ctx.restore();
 
     // B. Proporciones y Centrado Vertical Dinámico
@@ -536,22 +552,15 @@ function renderGlitchOverrideTemplate({
       const imgX = cardX + (cardW - imgSize) / 2;
       const imgY = contentStartY;
 
-      // Halo Luminoso de Fondo (WCAG 2.2 Perceivable Accessibility)
-      // Otorga una iluminación trasera suave para separar el espíritu del fondo oscuro
+      // Halo Luminoso de Fondo Universal (Iluminación trasera armónica para TODOS los espíritus)
       const centerX = imgX + imgSize / 2;
       const centerY = imgY + imgSize / 2;
       const auraRadius = Math.round(imgSize * 0.58);
-      const auraGrad = ctx.createRadialGradient(centerX, centerY, 5, centerX, centerY, auraRadius);
+      const auraGrad = ctx.createRadialGradient(centerX, centerY, 4, centerX, centerY, auraRadius);
 
-      if (isGreenTheme) {
-        auraGrad.addColorStop(0, isOwned ? 'rgba(74, 222, 128, 0.45)' : 'rgba(34, 197, 94, 0.32)');
-        auraGrad.addColorStop(0.6, isOwned ? 'rgba(34, 197, 94, 0.20)' : 'rgba(16, 185, 129, 0.14)');
-        auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      } else {
-        auraGrad.addColorStop(0, isOwned ? hexToRgba(spiritHue, 0.35) : hexToRgba(spiritHue, 0.18));
-        auraGrad.addColorStop(0.7, isOwned ? hexToRgba(spiritHue, 0.12) : hexToRgba(spiritHue, 0.06));
-        auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      }
+      auraGrad.addColorStop(0, isOwned ? hexToRgba(spiritHue, 0.40) : hexToRgba(spiritHue, 0.26));
+      auraGrad.addColorStop(0.65, isOwned ? hexToRgba(spiritHue, 0.18) : hexToRgba(spiritHue, 0.10));
+      auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       ctx.fillStyle = auraGrad;
       ctx.beginPath();
@@ -559,13 +568,13 @@ function renderGlitchOverrideTemplate({
       ctx.fill();
 
       if (!isOwned) {
-        ctx.globalAlpha = isGreenTheme ? 0.92 : 0.82;
-        ctx.shadowColor = isGreenTheme ? 'rgba(74, 222, 128, 0.4)' : hexToRgba(spiritHue, 0.3);
-        ctx.shadowBlur = 12;
+        ctx.globalAlpha = 0.88;
+        ctx.shadowColor = hexToRgba(spiritHue, 0.35);
+        ctx.shadowBlur = 14;
         ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
       } else {
-        ctx.shadowColor = isGreenTheme ? 'rgba(74, 222, 128, 0.85)' : hexToRgba(spiritHue, 0.75);
-        ctx.shadowBlur = 26;
+        ctx.shadowColor = hexToRgba(spiritHue, 0.80);
+        ctx.shadowBlur = 24;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
         ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
