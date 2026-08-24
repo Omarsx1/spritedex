@@ -656,14 +656,14 @@ function renderGlitchOverrideTemplate({
       ctx.fillText('HACKEADO', cardX + cardW / 2, badgeY + badgeH / 2 + Math.floor(badgeFontSize * 0.35));
     } else {
       roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 4);
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
+      ctx.fillStyle = '#EF4444';
+      ctx.shadowColor = 'rgba(239, 68, 68, 0.65)';
+      ctx.shadowBlur = 6;
       ctx.fill();
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
+      ctx.shadowBlur = 0;
 
-      ctx.font = `800 ${badgeFontSize}px "Inter", sans-serif`;
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.95)';
+      ctx.font = `900 ${badgeFontSize}px "Inter", sans-serif`;
+      ctx.fillStyle = '#FFFFFF';
       ctx.fillText('FALTANTE', cardX + cardW / 2, badgeY + badgeH / 2 + Math.floor(badgeFontSize * 0.35));
     }
     ctx.restore();
