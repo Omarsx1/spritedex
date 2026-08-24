@@ -270,36 +270,46 @@ function renderGlitchOverrideTemplate({
   const headerH = 195;
   const footerH = 45;
 
+  // -------------------------------------------------------------
+  // Configuración de cuadrícula y dimensiones adaptativas
+  // -------------------------------------------------------------
   if (format === 'square') {
     width = 1200;
     height = 1200;
-    if (totalSprites <= 6) cols = 3;
-    else if (totalSprites <= 12) cols = 3;
-    else if (totalSprites <= 20) cols = 4;
-    else if (totalSprites <= 30) cols = 5;
-    else if (totalSprites <= 42) cols = 6;
+    if (totalSprites <= 5) cols = 3;
+    else if (totalSprites <= 11) cols = 3;
+    else if (totalSprites <= 19) cols = 4;
+    else if (totalSprites <= 29) cols = 5;
+    else if (totalSprites <= 41) cols = 6;
     else cols = 7;
   } else {
     // Vertical Mobile / Story Poster Format (Matching Reference Image)
     width = 1080;
     if (totalSprites <= 8) cols = 4;
     else if (totalSprites <= 15) cols = 5;
-    else cols = 6; // 6 columns standard for Gen 2 (33 sprites = 6 rows)
+    else cols = 6; // 6 columns standard for Gen 2
   }
 
   // Reserva espacio para la tarjeta del código QR en el último slot de la cuadrícula
   const totalSlotsNeeded = totalSprites + 1;
   const rows = Math.max(1, Math.ceil(totalSlotsNeeded / cols));
   const availW = width - paddingX * 2;
+  const cellW = Math.floor(availW / cols);
 
+  let cellH;
   if (format === 'checklist') {
     const desiredCellH = 190;
     height = headerH + rows * desiredCellH + footerH;
+    cellH = desiredCellH;
+  } else {
+    // En formato cuadrado 1:1, limitamos cellH para mantener una proporción armónica
+    // y centramos verticalmente toda la cuadrícula en el lienzo
+    const maxCellHByRatio = Math.round(cellW * 1.15);
+    const maxCellHBySpace = Math.floor((1200 - headerH - footerH) / rows);
+    cellH = Math.min(maxCellHBySpace, Math.max(170, maxCellHByRatio));
   }
 
   const availH = height - headerH - footerH;
-  const cellW = Math.floor(availW / cols);
-  const cellH = Math.floor(availH / rows);
 
   canvas.width = width;
   canvas.height = height;
@@ -348,34 +358,35 @@ function renderGlitchOverrideTemplate({
   ctx.font = '900 10.5px "Inter", "Arial Black", sans-serif';
   ctx.letterSpacing = '1px';
   const capsuleW = ctx.measureText(capsuleText).width + 28;
-  const capsuleH = 20;
+  const capsuleH = 22;
   const capsuleX = (width - capsuleW) / 2;
   const capsuleY = format === 'checklist' ? 104 : 100;
 
-  // Draw magenta capsule
-  roundRect(ctx, capsuleX, capsuleY, capsuleW, capsuleH, 10);
-  ctx.fillStyle = '#ff0055';
-  ctx.shadowColor = 'rgba(255, 0, 85, 0.6)';
-  ctx.shadowBlur = 10;
+  // Capsule Background (Gradient Magenta)
+  roundRect(ctx, capsuleX, capsuleY, capsuleW, capsuleH, 5);
+  const capsuleGrad = ctx.createLinearGradient(capsuleX, capsuleY, capsuleX + capsuleW, capsuleY);
+  capsuleGrad.addColorStop(0, '#ff0055');
+  capsuleGrad.addColorStop(1, '#d90429');
+  ctx.fillStyle = capsuleGrad;
   ctx.fill();
-  ctx.shadowBlur = 0;
 
+  // Capsule Text (White)
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'center';
-  ctx.fillText(capsuleText, width / 2, capsuleY + 14);
+  ctx.fillText(capsuleText, width / 2, capsuleY + 15);
 
-  // Stats / HUD Progress Box (Image 2 style)
-  const hudW = Math.min(width - 72, 600);
-  const hudH = 44;
+  // -------------------------------------------------------------
+  // HUD Status Bar: "X/Y Espíritus atrapados" | "PROGRESO: X%"
+  // -------------------------------------------------------------
+  const hudW = Math.min(availW, 580);
+  const hudH = 38;
   const hudX = (width - hudW) / 2;
-  const hudY = format === 'checklist' ? 132 : 130;
+  const hudY = capsuleY + 30;
 
-  // Dark cyber panel with glowing border
-  roundRect(ctx, hudX, hudY, hudW, hudH, 10);
-  ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(0, 240, 232, 0.4)';
-  ctx.lineWidth = 1.5;
+  // HUD Frame Border
+  ctx.strokeStyle = 'rgba(0, 240, 232, 0.55)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, hudX, hudY, hudW, hudH, 4);
   ctx.stroke();
 
   // Corner brackets on HUD
@@ -432,11 +443,11 @@ function renderGlitchOverrideTemplate({
 
   ctx.restore();
 
-  // 3. SPRITE GRID SECTION
+  // 3. SPRITE GRID SECTION (Centrada Vertical y Horizontalmente)
   const gridW = cols * cellW;
   const gridH = rows * cellH;
   const startX = (width - gridW) / 2;
-  const startY = headerH + Math.max(0, (availH - gridH) / 2);
+  const startY = headerH + Math.max(10, Math.floor((availH - gridH) / 2));
 
   spritesList.forEach((sprite, idx) => {
     const colIdx = idx % cols;
@@ -489,24 +500,37 @@ function renderGlitchOverrideTemplate({
     }
     ctx.restore();
 
-    // B. Sprite Image
-    const maxImgSize = format === 'square' ? 120 : 100;
-    const imgSize = Math.max(60, Math.min(maxImgSize, cardH - 60));
+    // B. Proporciones y Centrado Vertical de Elementos
+    const maxImgSize = format === 'square'
+      ? (totalSprites <= 6 ? 140 : totalSprites <= 12 ? 120 : 100)
+      : 100;
+    const imgSize = Math.max(50, Math.min(maxImgSize, Math.floor(cardW * 0.65), Math.floor(cardH * 0.56)));
+
+    const nameFontSize = format === 'square' && totalSprites <= 6 ? 13 : totalSprites <= 12 ? 12 : 11;
+    const badgeW = Math.min(cardW - 16, format === 'square' && totalSprites <= 6 ? 96 : 76);
+    const badgeH = format === 'square' && totalSprites <= 6 ? 20 : 18;
+
+    // Altura total del contenido: Imagen + Espacio + Texto + Espacio + Badge
+    const totalContentH = imgSize + 10 + nameFontSize + 6 + badgeH;
+    const contentStartY = cardY + Math.max(6, Math.floor((cardH - totalContentH) / 2));
+
     const spriteImg = loadedImagesMap[sprite.id];
 
     if (spriteImg) {
       ctx.save();
       const spiritHue = getSpiritHue(sprite);
+      const imgX = cardX + (cardW - imgSize) / 2;
+      const imgY = contentStartY;
 
       if (!isOwned) {
         ctx.globalAlpha = 0.68;
-        ctx.drawImage(spriteImg, cardX + cardW / 2 - imgSize / 2, cardY + 8, imgSize, imgSize);
+        ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
       } else {
         ctx.shadowColor = hexToRgba(spiritHue, 0.65);
         ctx.shadowBlur = 24;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
-        ctx.drawImage(spriteImg, cardX + cardW / 2 - imgSize / 2, cardY + 8, imgSize, imgSize);
+        ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
       }
       ctx.restore();
     }
@@ -514,9 +538,9 @@ function renderGlitchOverrideTemplate({
     // C. Sprite Name
     ctx.save();
     ctx.textAlign = 'center';
-    ctx.font = '800 11px "Inter", sans-serif';
+    ctx.font = `800 ${nameFontSize}px "Inter", sans-serif`;
     ctx.fillStyle = isOwned ? '#ffffff' : 'rgba(255, 255, 255, 0.75)';
-    const textY = cardY + 8 + imgSize + 14;
+    const textY = contentStartY + imgSize + 12 + Math.floor(nameFontSize * 0.8);
 
     let nameText = sprite.fullName || sprite.name;
     const maxTextW = cardW - 12;
@@ -529,8 +553,6 @@ function renderGlitchOverrideTemplate({
     ctx.fillText(nameText, cardX + cardW / 2, textY);
 
     // D. Cyber Badge at Bottom
-    const badgeW = Math.min(cardW - 16, 76);
-    const badgeH = 18;
     const badgeX = cardX + (cardW - badgeW) / 2;
     const badgeY = textY + 6;
 
@@ -551,7 +573,7 @@ function renderGlitchOverrideTemplate({
       ctx.font = '900 9px "Inter", sans-serif';
       ctx.fillStyle = '#060714';
       const badgeLabel = isMastered ? 'MAX' : (level > 1 ? `LVL.${level}` : 'HACKEADO');
-      ctx.fillText(badgeLabel, cardX + cardW / 2, badgeY + 12);
+      ctx.fillText(badgeLabel, cardX + cardW / 2, badgeY + badgeH / 2 + 3);
     } else {
       roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 4);
       ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
@@ -562,20 +584,22 @@ function renderGlitchOverrideTemplate({
 
       ctx.font = '800 8.5px "Inter", sans-serif';
       ctx.fillStyle = 'rgba(239, 68, 68, 0.95)';
-      ctx.fillText('FALTANTE', cardX + cardW / 2, badgeY + 12);
+      ctx.fillText('FALTANTE', cardX + cardW / 2, badgeY + badgeH / 2 + 3);
     }
     ctx.restore();
   });
 
-  // 3.B. CÓDIGO QR DE PUNTOS MODERNO (SIN MARCO, FLOTANTE EN LA ESQUINA INFERIOR DERECHA)
+  // 3.B. CÓDIGO QR DE PUNTOS MODERNO (Centrado perfectamente en el último slot)
   const qrColIdx = cols - 1;
   const qrRowIdx = rows - 1;
-  const qrX = startX + qrColIdx * cellW;
-  const qrY = startY + qrRowIdx * cellH;
+  const qrCardX = startX + qrColIdx * cellW + 6;
+  const qrCardY = startY + qrRowIdx * cellH + 6;
+  const qrCardW = cellW - 12;
+  const qrCardH = cellH - 12;
 
-  const qrSize = Math.min(cellW - 16, cellH - 16, 156);
-  const qrInnerX = qrX + (cellW - qrSize) / 2;
-  const qrInnerY = qrY + (cellH - qrSize) / 2;
+  const qrSize = Math.min(qrCardW - 20, qrCardH - 20, 160);
+  const qrInnerX = qrCardX + (qrCardW - qrSize) / 2;
+  const qrInnerY = qrCardY + (qrCardH - qrSize) / 2;
 
   ctx.save();
   const targetUrl = 'https://spritedex-two.vercel.app/';
