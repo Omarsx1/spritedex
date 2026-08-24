@@ -16,12 +16,12 @@ import {
 } from 'lucide-react';
 import { fetchAnalyticsOverview } from '../../utils/telemetry';
 
-export function AnalyticsDashboard() {
+export function AnalyticsDashboard({ darkMode = false }) {
   const [data, setData] = useState({
     totalVisits: 0,
     todayVisits: 0,
     activeSessionsCount: 1,
-    deviceBreakdown: { mobile: 0, desktop: 0, tablet: 0, iphone: 0 },
+    deviceBreakdown: { mobile: 0, desktop: 0, tablet: 0, iphone: 0, android: 0 },
     browserBreakdown: {},
     recentEvents: []
   });
@@ -56,6 +56,29 @@ export function AnalyticsDashboard() {
   const buckets = data.dailyBuckets && data.dailyBuckets.length === 30 ? data.dailyBuckets : Array(30).fill(0);
   const maxBucket = Math.max(...buckets, 5);
 
+  const cardStyle = {
+    background: darkMode ? '#111C44' : '#FFFFFF',
+    borderRadius: '14px',
+    padding: '24px',
+    border: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
+    boxShadow: darkMode ? '0 4px 20px rgba(0, 0, 0, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.05)',
+    transition: 'all 0.2s ease'
+  };
+
+  const widgetCardStyle = {
+    background: darkMode ? '#111C44' : '#FFFFFF',
+    borderRadius: '16px',
+    padding: '24px',
+    border: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
+    boxShadow: darkMode ? '0 4px 20px rgba(0, 0, 0, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.05)',
+    transition: 'all 0.2s ease'
+  };
+
+  const textPrimary = darkMode ? '#FFFFFF' : '#1E293B';
+  const textMuted = darkMode ? '#A3AED0' : '#64748B';
+  const dividerBorder = darkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #F1F5F9';
+  const rowDividerBorder = darkMode ? '1px solid rgba(255, 255, 255, 0.04)' : '1px solid #F8FAFC';
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* ═══ TOP 4 KPI CARDS (Real Supabase Metrics) ═══ */}
@@ -65,96 +88,66 @@ export function AnalyticsDashboard() {
         gap: '20px'
       }}>
         {/* Card 1: Visitantes Únicos */}
-        <div style={{
-          background: '#FFFFFF',
-          borderRadius: '14px',
-          padding: '24px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-        }}>
+        <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748B' }}>Visitantes Totales</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: '#ECFDF5', color: '#10B981', fontSize: '0.72rem', fontWeight: 800 }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Visitantes Totales</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: darkMode ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5', color: '#10B981', fontSize: '0.72rem', fontWeight: 800 }}>
               <ArrowUpRight size={12} />
               <span>{data.todayVisits} hoy</span>
             </div>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#1E293B', letterSpacing: '-0.03em' }}>
+          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: textPrimary, letterSpacing: '-0.03em' }}>
             {data.totalVisits > 0 ? data.totalVisits.toLocaleString() : '0'}
           </div>
         </div>
 
         {/* Card 2: Total Pageviews */}
-        <div style={{
-          background: '#FFFFFF',
-          borderRadius: '14px',
-          padding: '24px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-        }}>
+        <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748B' }}>Total Pageviews</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: '#EFF6FF', color: '#3C50E0', fontSize: '0.72rem', fontWeight: 800 }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Total Pageviews</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: darkMode ? 'rgba(60, 80, 224, 0.15)' : '#EFF6FF', color: '#3C50E0', fontSize: '0.72rem', fontWeight: 800 }}>
               <TrendingUp size={12} />
               <span>En Tiempo Real</span>
             </div>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#1E293B', letterSpacing: '-0.03em' }}>
+          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: textPrimary, letterSpacing: '-0.03em' }}>
             {data.totalVisits > 0 ? Math.round(data.totalVisits * 1.8).toLocaleString() : '0'}
           </div>
         </div>
 
         {/* Card 3: Tráfico iPhone & Android */}
-        <div style={{
-          background: '#FFFFFF',
-          borderRadius: '14px',
-          padding: '24px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-        }}>
+        <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748B' }}>Móviles (iOS & Android)</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '20px', background: '#EFF6FF', color: '#3C50E0', fontSize: '0.72rem', fontWeight: 800 }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Móviles (iOS & Android)</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '20px', background: darkMode ? 'rgba(60, 80, 224, 0.15)' : '#EFF6FF', color: '#3C50E0', fontSize: '0.72rem', fontWeight: 800 }}>
               <span>{iphoneCount} iOS • {androidCount} Android</span>
             </div>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#1E293B', letterSpacing: '-0.03em', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: textPrimary, letterSpacing: '-0.03em', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
             <span>{mobilePct}%</span>
-            <span style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 600 }}>
+            <span style={{ fontSize: '0.78rem', color: textMuted, fontWeight: 600 }}>
               ({iphonePct}% iOS • {androidPct}% Android)
             </span>
           </div>
         </div>
 
         {/* Card 4: Sesiones Activas */}
-        <div style={{
-          background: '#FFFFFF',
-          borderRadius: '14px',
-          padding: '24px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-        }}>
+        <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748B' }}>Sesiones Activas</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '20px', background: '#FEF2F2', color: '#EF4444', fontSize: '0.72rem', fontWeight: 800 }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Sesiones Activas</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '20px', background: darkMode ? 'rgba(239, 68, 68, 0.15)' : '#FEF2F2', color: '#EF4444', fontSize: '0.72rem', fontWeight: 800 }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#EF4444' }} />
               <span>En Vivo</span>
             </div>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#1E293B', letterSpacing: '-0.03em' }}>
+          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: textPrimary, letterSpacing: '-0.03em' }}>
             {data.activeSessionsCount}
           </div>
         </div>
       </div>
 
       {/* ═══ MAIN BIG CHART: ANALYTICS VISITOR BARS (Real 30 Days) ═══ */}
-      <div style={{
-        background: '#FFFFFF',
-        borderRadius: '16px',
-        padding: '28px',
-        border: '1px solid #E2E8F0',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-      }}>
+      <div style={widgetCardStyle}>
         {/* Header */}
         <div style={{
           display: 'flex',
@@ -165,10 +158,10 @@ export function AnalyticsDashboard() {
           marginBottom: '28px'
         }}>
           <div>
-            <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1E293B', margin: '0 0 4px' }}>
+            <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: textPrimary, margin: '0 0 4px' }}>
               Analytics
             </h2>
-            <span style={{ fontSize: '0.8rem', color: '#64748B' }}>
+            <span style={{ fontSize: '0.8rem', color: textMuted }}>
               Distribución de visitas de los últimos 30 días
             </span>
           </div>
@@ -184,9 +177,9 @@ export function AnalyticsDashboard() {
                 gap: '6px',
                 padding: '6px 12px',
                 borderRadius: '8px',
-                border: '1px solid #E2E8F0',
-                background: '#FFFFFF',
-                color: '#64748B',
+                border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid #E2E8F0',
+                background: darkMode ? '#0B1437' : '#FFFFFF',
+                color: textMuted,
                 fontSize: '0.76rem',
                 fontWeight: 700,
                 cursor: 'pointer'
@@ -202,17 +195,17 @@ export function AnalyticsDashboard() {
         <div style={{ width: '100%', height: '220px', position: 'relative' }}>
           <svg viewBox="0 0 900 220" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
             {/* Horizontal Grid lines */}
-            <line x1="30" y1="20" x2="890" y2="20" stroke="#F1F5F9" strokeWidth="1" />
-            <line x1="30" y1="70" x2="890" y2="70" stroke="#F1F5F9" strokeWidth="1" />
-            <line x1="30" y1="120" x2="890" y2="120" stroke="#F1F5F9" strokeWidth="1" />
-            <line x1="30" y1="170" x2="890" y2="170" stroke="#F1F5F9" strokeWidth="1" />
+            <line x1="30" y1="20" x2="890" y2="20" stroke={darkMode ? 'rgba(255, 255, 255, 0.06)' : '#F1F5F9'} strokeWidth="1" />
+            <line x1="30" y1="70" x2="890" y2="70" stroke={darkMode ? 'rgba(255, 255, 255, 0.06)' : '#F1F5F9'} strokeWidth="1" />
+            <line x1="30" y1="120" x2="890" y2="120" stroke={darkMode ? 'rgba(255, 255, 255, 0.06)' : '#F1F5F9'} strokeWidth="1" />
+            <line x1="30" y1="170" x2="890" y2="170" stroke={darkMode ? 'rgba(255, 255, 255, 0.06)' : '#F1F5F9'} strokeWidth="1" />
 
             {/* Y-Axis Labels */}
-            <text x="5" y="24" fill="#94A3B8" fontSize="10" fontWeight="600">{maxBucket}</text>
-            <text x="5" y="74" fill="#94A3B8" fontSize="10" fontWeight="600">{Math.round(maxBucket * 0.75)}</text>
-            <text x="5" y="124" fill="#94A3B8" fontSize="10" fontWeight="600">{Math.round(maxBucket * 0.5)}</text>
-            <text x="5" y="174" fill="#94A3B8" fontSize="10" fontWeight="600">{Math.round(maxBucket * 0.25)}</text>
-            <text x="15" y="210" fill="#94A3B8" fontSize="10" fontWeight="600">0</text>
+            <text x="5" y="24" fill={textMuted} fontSize="10" fontWeight="600">{maxBucket}</text>
+            <text x="5" y="74" fill={textMuted} fontSize="10" fontWeight="600">{Math.round(maxBucket * 0.75)}</text>
+            <text x="5" y="124" fill={textMuted} fontSize="10" fontWeight="600">{Math.round(maxBucket * 0.5)}</text>
+            <text x="5" y="174" fill={textMuted} fontSize="10" fontWeight="600">{Math.round(maxBucket * 0.25)}</text>
+            <text x="15" y="210" fill={textMuted} fontSize="10" fontWeight="600">0</text>
 
             {/* 30 Cobalt Blue Real Bars */}
             {buckets.map((val, i) => {
@@ -228,7 +221,7 @@ export function AnalyticsDashboard() {
                     width="14"
                     height={actualH}
                     rx="4"
-                    fill={val > 0 ? '#3C50E0' : '#E2E8F0'}
+                    fill={val > 0 ? '#3C50E0' : (darkMode ? 'rgba(255, 255, 255, 0.08)' : '#E2E8F0')}
                     style={{ transition: 'all 0.3s ease' }}
                   >
                     <title>Día {i + 1}: {val} visitas</title>
@@ -236,7 +229,7 @@ export function AnalyticsDashboard() {
                   <text
                     x={x + 7}
                     y="216"
-                    fill="#94A3B8"
+                    fill={textMuted}
                     fontSize="9"
                     fontWeight="600"
                     textAnchor="middle"
@@ -257,18 +250,12 @@ export function AnalyticsDashboard() {
         gap: '20px'
       }}>
         {/* Widget 1: Top Channels */}
-        <div style={{
-          background: '#FFFFFF',
-          borderRadius: '16px',
-          padding: '24px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-        }}>
+        <div style={widgetCardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: '#1E293B', margin: 0 }}>
+            <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: textPrimary, margin: 0 }}>
               Top Canales & Fuentes
             </h3>
-            <span style={{ fontSize: '0.72rem', color: '#10B981', fontWeight: 700, background: '#ECFDF5', padding: '2px 6px', borderRadius: '4px' }}>
+            <span style={{ fontSize: '0.72rem', color: '#10B981', fontWeight: 700, background: darkMode ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5', padding: '2px 6px', borderRadius: '4px' }}>
               En Vivo
             </span>
           </div>
@@ -301,19 +288,19 @@ export function AnalyticsDashboard() {
                 const barWidth = ch.count > 0 ? Math.max(rawPct, 6) : 0;
 
                 return (
-                  <div key={ch.source} style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '4px 0', borderBottom: '1px solid #F8FAFC' }}>
+                  <div key={ch.source} style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '4px 0', borderBottom: rowDividerBorder }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: ch.color }} />
-                        <span style={{ fontSize: '0.84rem', fontWeight: 600, color: '#334155' }}>{ch.source}</span>
+                        <span style={{ fontSize: '0.84rem', fontWeight: 600, color: darkMode ? '#E2E8F0' : '#334155' }}>{ch.source}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '0.74rem', color: '#94A3B8' }}>{pctDisplay}</span>
-                        <strong style={{ fontSize: '0.84rem', color: '#1E293B' }}>{ch.count}</strong>
+                        <span style={{ fontSize: '0.74rem', color: textMuted }}>{pctDisplay}</span>
+                        <strong style={{ fontSize: '0.84rem', color: textPrimary }}>{ch.count}</strong>
                       </div>
                     </div>
                     {/* Visual Progress Bar */}
-                    <div style={{ width: '100%', height: '4px', background: '#F1F5F9', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ width: '100%', height: '4px', background: darkMode ? 'rgba(255, 255, 255, 0.08)' : '#F1F5F9', borderRadius: '2px', overflow: 'hidden' }}>
                       <div style={{ width: `${barWidth}%`, height: '100%', background: ch.color, borderRadius: '2px', transition: 'width 0.4s ease' }} />
                     </div>
                   </div>
@@ -324,14 +311,8 @@ export function AnalyticsDashboard() {
         </div>
 
         {/* Widget 2: Top Espíritus Más Atrapados */}
-        <div style={{
-          background: '#FFFFFF',
-          borderRadius: '16px',
-          padding: '24px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-        }}>
-          <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: '#1E293B', margin: '0 0 16px' }}>
+        <div style={widgetCardStyle}>
+          <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: textPrimary, margin: '0 0 16px' }}>
             Espíritus Más Populares
           </h3>
 
@@ -342,12 +323,12 @@ export function AnalyticsDashboard() {
               { name: 'Sonic', category: 'Especial (Crossover)', rate: '88%' },
               { name: 'Shadow', category: 'Especial (Crossover)', rate: '80%' }
             ]).map((sp) => (
-              <div key={sp.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #F8FAFC' }}>
+              <div key={sp.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: rowDividerBorder }}>
                 <div>
-                  <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#1E293B' }}>{sp.name}</div>
-                  <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>{sp.category}</span>
+                  <div style={{ fontSize: '0.84rem', fontWeight: 700, color: textPrimary }}>{sp.name}</div>
+                  <span style={{ fontSize: '0.72rem', color: textMuted }}>{sp.category}</span>
                 </div>
-                <span style={{ padding: '3px 8px', borderRadius: '6px', background: '#ECFDF5', color: '#10B981', fontSize: '0.76rem', fontWeight: 800 }}>
+                <span style={{ padding: '3px 8px', borderRadius: '6px', background: darkMode ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5', color: '#10B981', fontSize: '0.76rem', fontWeight: 800 }}>
                   {sp.rate}
                 </span>
               </div>
@@ -357,26 +338,22 @@ export function AnalyticsDashboard() {
 
         {/* Widget 3: Active Users (Live Sparkline) */}
         <div style={{
-          background: '#FFFFFF',
-          borderRadius: '16px',
-          padding: '24px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+          ...widgetCardStyle,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between'
         }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748B' }}>Usuarios Activos</span>
+              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Usuarios Activos</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.74rem', color: '#EF4444', fontWeight: 800 }}>
                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#EF4444', boxShadow: '0 0 8px #EF4444' }} />
                 <span>En Vivo</span>
               </div>
             </div>
 
-            <div style={{ fontSize: '1.9rem', fontWeight: 800, color: '#1E293B', letterSpacing: '-0.03em', margin: '4px 0 16px' }}>
-              {data.activeSessionsCount > 1 ? data.activeSessionsCount : 364} <span style={{ fontSize: '0.84rem', fontWeight: 600, color: '#64748B' }}>Live visitors</span>
+            <div style={{ fontSize: '1.9rem', fontWeight: 800, color: textPrimary, letterSpacing: '-0.03em', margin: '4px 0 16px' }}>
+              {data.activeSessionsCount > 1 ? data.activeSessionsCount : 364} <span style={{ fontSize: '0.84rem', fontWeight: 600, color: textMuted }}>Live visitors</span>
             </div>
 
             {/* Sparkline Area Chart */}
@@ -384,7 +361,7 @@ export function AnalyticsDashboard() {
               <svg viewBox="0 0 300 70" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                 <defs>
                   <linearGradient id="liveSparkGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3C50E0" stopOpacity="0.3" />
+                    <stop offset="0%" stopColor="#3C50E0" stopOpacity="0.4" />
                     <stop offset="100%" stopColor="#3C50E0" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
@@ -403,18 +380,18 @@ export function AnalyticsDashboard() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', paddingTop: '16px', borderTop: '1px solid #F1F5F9', textAlign: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', paddingTop: '16px', borderTop: dividerBorder, textAlign: 'center' }}>
             <div>
-              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#1E293B' }}>224</div>
-              <span style={{ fontSize: '0.68rem', color: '#94A3B8' }}>Avg. Daily</span>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: textPrimary }}>224</div>
+              <span style={{ fontSize: '0.68rem', color: textMuted }}>Avg. Daily</span>
             </div>
             <div>
-              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#1E293B' }}>1.4K</div>
-              <span style={{ fontSize: '0.68rem', color: '#94A3B8' }}>Avg. Weekly</span>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: textPrimary }}>1.4K</div>
+              <span style={{ fontSize: '0.68rem', color: textMuted }}>Avg. Weekly</span>
             </div>
             <div>
-              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#1E293B' }}>22.1K</div>
-              <span style={{ fontSize: '0.68rem', color: '#94A3B8' }}>Avg. Monthly</span>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: textPrimary }}>22.1K</div>
+              <span style={{ fontSize: '0.68rem', color: textMuted }}>Avg. Monthly</span>
             </div>
           </div>
         </div>
@@ -427,14 +404,8 @@ export function AnalyticsDashboard() {
         gap: '20px'
       }}>
         {/* Device Breakdown Donut */}
-        <div style={{
-          background: '#FFFFFF',
-          borderRadius: '16px',
-          padding: '24px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-        }}>
-          <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: '#1E293B', margin: '0 0 16px' }}>
+        <div style={widgetCardStyle}>
+          <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: textPrimary, margin: '0 0 16px' }}>
             Sessions By Device
           </h3>
 
@@ -443,7 +414,7 @@ export function AnalyticsDashboard() {
             <div style={{ width: '130px', height: '130px', position: 'relative' }}>
               <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
                 {/* Background Track (Desktop) */}
-                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#E2E8F0" strokeWidth="14" />
+                <circle cx="50" cy="50" r="38" fill="transparent" stroke={darkMode ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'} strokeWidth="14" />
                 {/* Segment 1: iPhone (Blue) */}
                 <circle
                   cx="50"
@@ -473,42 +444,36 @@ export function AnalyticsDashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem' }}>
                 <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: '#3C50E0' }} />
-                <span style={{ color: '#64748B' }}>iPhone / iOS:</span>
-                <strong style={{ color: '#1E293B' }}>{iphonePct}%</strong>
-                <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>({iphoneCount})</span>
+                <span style={{ color: textMuted }}>iPhone / iOS:</span>
+                <strong style={{ color: textPrimary }}>{iphonePct}%</strong>
+                <span style={{ fontSize: '0.72rem', color: textMuted }}>({iphoneCount})</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem' }}>
                 <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: '#10B981' }} />
-                <span style={{ color: '#64748B' }}>Android:</span>
-                <strong style={{ color: '#1E293B' }}>{androidPct}%</strong>
-                <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>({androidCount})</span>
+                <span style={{ color: textMuted }}>Android:</span>
+                <strong style={{ color: textPrimary }}>{androidPct}%</strong>
+                <span style={{ fontSize: '0.72rem', color: textMuted }}>({androidCount})</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem' }}>
-                <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: '#94A3B8' }} />
-                <span style={{ color: '#64748B' }}>Desktop (Mac/PC):</span>
-                <strong style={{ color: '#1E293B' }}>{desktopPct}%</strong>
-                <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>({desktopCount})</span>
+                <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: darkMode ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8' }} />
+                <span style={{ color: textMuted }}>Desktop (Mac/PC):</span>
+                <strong style={{ color: textPrimary }}>{desktopPct}%</strong>
+                <span style={{ fontSize: '0.72rem', color: textMuted }}>({desktopCount})</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Live Stream Table */}
-        <div style={{
-          background: '#FFFFFF',
-          borderRadius: '16px',
-          padding: '24px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-        }}>
-          <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: '#1E293B', margin: '0 0 16px' }}>
+        <div style={widgetCardStyle}>
+          <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: textPrimary, margin: '0 0 16px' }}>
             Live Stream de Visitas
           </h3>
 
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #F1F5F9', color: '#8A99AD' }}>
+                <tr style={{ borderBottom: dividerBorder, color: textMuted }}>
                   <th style={{ padding: '8px 10px' }}>CANAL</th>
                   <th style={{ padding: '8px 10px' }}>DISPOSITIVO</th>
                   <th style={{ padding: '8px 10px' }}>HORA</th>
@@ -517,18 +482,32 @@ export function AnalyticsDashboard() {
               <tbody>
                 {data.recentEvents && data.recentEvents.length > 0 ? (
                   data.recentEvents.slice(0, 5).map((ev, i) => (
-                    <tr key={ev.id || i} style={{ borderBottom: '1px solid #F8FAFC' }}>
+                    <tr key={ev.id || i} style={{ borderBottom: rowDividerBorder }}>
                       <td style={{ padding: '8px 10px' }}>
                         {(() => {
                           const ref = (ev.referrer || '').toLowerCase();
                           let label = 'Directo / App';
-                          let bg = '#EFF6FF';
-                          let textCol = '#3C50E0';
-                          if (ref.includes('twitter') || ref.includes('t.co') || ref.includes('x.com')) { label = 'Twitter / X'; bg = '#E0F2FE'; textCol = '#0284C7'; }
-                          else if (ref.includes('tiktok')) { label = 'TikTok'; bg = '#FDF2F8'; textCol = '#DB2777'; }
-                          else if (ref.includes('google')) { label = 'Google'; bg = '#FEF3C7'; textCol = '#D97706'; }
-                          else if (ref.includes('discord')) { label = 'Discord'; bg = '#EEF2FF'; textCol = '#6366F1'; }
-                          else if (ev.path && ev.path !== '/') { label = ev.path; }
+                          let bg = darkMode ? 'rgba(60, 80, 224, 0.2)' : '#EFF6FF';
+                          let textCol = darkMode ? '#93C5FD' : '#3C50E0';
+                          if (ref.includes('twitter') || ref.includes('t.co') || ref.includes('x.com')) {
+                            label = 'Twitter / X';
+                            bg = darkMode ? 'rgba(2, 132, 199, 0.2)' : '#E0F2FE';
+                            textCol = '#38BDF8';
+                          } else if (ref.includes('tiktok')) {
+                            label = 'TikTok';
+                            bg = darkMode ? 'rgba(219, 39, 119, 0.2)' : '#FDF2F8';
+                            textCol = '#F472B6';
+                          } else if (ref.includes('google')) {
+                            label = 'Google';
+                            bg = darkMode ? 'rgba(217, 119, 6, 0.2)' : '#FEF3C7';
+                            textCol = '#FBBF24';
+                          } else if (ref.includes('discord')) {
+                            label = 'Discord';
+                            bg = darkMode ? 'rgba(99, 102, 241, 0.2)' : '#EEF2FF';
+                            textCol = '#A5B4FC';
+                          } else if (ev.path && ev.path !== '/') {
+                            label = ev.path;
+                          }
                           return (
                             <span style={{ padding: '3px 8px', borderRadius: '6px', background: bg, color: textCol, fontWeight: 700, fontSize: '0.72rem' }}>
                               {label}
@@ -536,17 +515,17 @@ export function AnalyticsDashboard() {
                           );
                         })()}
                       </td>
-                      <td style={{ padding: '8px 10px', color: '#334155', fontWeight: 600 }}>
+                      <td style={{ padding: '8px 10px', color: darkMode ? '#E2E8F0' : '#334155', fontWeight: 600 }}>
                         {ev.os || (ev.is_iphone ? 'iOS (iPhone)' : ev.device_type)}
                       </td>
-                      <td style={{ padding: '8px 10px', color: '#94A3B8', fontSize: '0.74rem' }}>
+                      <td style={{ padding: '8px 10px', color: textMuted, fontSize: '0.74rem' }}>
                         {new Date(ev.created_at).toLocaleTimeString()}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={3} style={{ padding: '16px', textAlign: 'center', color: '#94A3B8' }}>
+                    <td colSpan={3} style={{ padding: '16px', textAlign: 'center', color: textMuted }}>
                       Esperando nuevas conexiones...
                     </td>
                   </tr>
