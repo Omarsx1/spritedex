@@ -238,10 +238,15 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
                         <span
                           className={`sprite-pill rarity-badge-sm sprite-rarity-${rarityObj.classKey || 'common'}`}
                           style={{
-                            padding: '3px 8px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            height: '22px',
+                            padding: '0 10px',
                             borderRadius: '6px',
                             fontSize: '0.72rem',
                             fontWeight: 800,
+                            lineHeight: 1,
                             letterSpacing: '0.04em',
                             boxShadow: '0 1px 2px rgba(0, 0, 0, 0.15)'
                           }}
