@@ -159,7 +159,7 @@ export const FAMILY_NAMES_MAP = {
   ironmouse: 'La niña',
   // Gen 2
   klombo: 'Klombo',
-  crown: 'Corona',
+  crown: 'Victorioso',
   jackrabbit: 'Jackrabbit',
   sonic: 'Sonic',
   shadow: 'Shadow',

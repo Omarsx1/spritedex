@@ -250,7 +250,7 @@ function getSpiritHue(sprite) {
   if (family.includes('sonic')) return '#38bdf8';
   if (family.includes('shadow')) return '#a855f7';
   if (family.includes('tails')) return '#f97316';
-  if (family.includes('corona') || family.includes('crown')) return '#f59e0b';
+  if (family.includes('victorioso') || family.includes('corona') || family.includes('crown')) return '#f59e0b';
   if (family.includes('jackrabbit')) return '#a3e635';
   if (family.includes('bush') || family.includes('arbust')) return '#22c55e';
   if (family.includes('killswitch')) return '#06b6d4';
