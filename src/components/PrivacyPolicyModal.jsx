@@ -71,15 +71,71 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content glass-panel privacy-policy-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '580px', width: '100%' }}>
-        <button className="modal-close-btn" onClick={onClose}>
-          <X size={20} />
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(6, 7, 20, 0.85)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        zIndex: 99999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        boxSizing: 'border-box'
+      }}
+    >
+      <div
+        className="modal-content glass-panel"
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: '#0e1322',
+          border: '1px solid rgba(0, 240, 232, 0.35)',
+          borderRadius: '20px',
+          padding: '26px 24px',
+          maxWidth: '560px',
+          width: '100%',
+          position: 'relative',
+          boxShadow: '0 24px 70px rgba(0, 0, 0, 0.95), 0 0 35px rgba(0, 240, 232, 0.2)',
+          maxHeight: '90vh',
+          display: 'flex',
+          flexDirection: 'column',
+          boxSizing: 'border-box',
+          color: '#EDEDED'
+        }}
+      >
+        <button
+          className="modal-close-btn"
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: 'none',
+            color: '#FFFFFF',
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10
+          }}
+        >
+          <X size={18} />
         </button>
 
         <div className="privacy-policy-modal__header" style={{ textAlign: 'center', paddingBottom: '12px' }}>
-          <ShieldCheck size={42} color="#00F0E8" className="privacy-policy-modal__icon" />
-          <h2 className="privacy-policy-modal__title" style={{ margin: '8px 0 4px', fontSize: '1.25rem', fontWeight: 800 }}>
+          <ShieldCheck size={40} color="#00F0E8" className="privacy-policy-modal__icon" />
+          <h2 className="privacy-policy-modal__title" style={{ margin: '8px 0 4px', fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF' }}>
             Centro de Privacidad & Cookies
           </h2>
           <p className="privacy-policy-modal__subtitle" style={{ margin: 0, fontSize: '0.82rem', color: '#94A3B8' }}>
