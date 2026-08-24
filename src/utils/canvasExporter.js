@@ -55,15 +55,53 @@ function drawModernDotQR(ctx, qrX, qrY, qrSize, url = 'https://spritedex-two.ver
   }
 }
 
-// Helper to pre-load image for canvas drawing
-function loadImage(src) {
+// Caché global en memoria para acelerar la generación instantánea de imágenes
+const globalImageCache = new Map();
+
+// Helper to pre-load image for canvas drawing with instantaneous in-memory caching
+export function loadImage(src) {
+  if (!src) return Promise.resolve(null);
+
+  if (globalImageCache.has(src)) {
+    const cached = globalImageCache.get(src);
+    if (cached && cached.complete && cached.naturalWidth > 0) {
+      return Promise.resolve(cached);
+    }
+  }
+
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = 'Anonymous';
-    img.onload = () => resolve(img);
+    img.onload = () => {
+      globalImageCache.set(src, img);
+      resolve(img);
+    };
     img.onerror = () => resolve(null);
     img.src = src;
+
+    if (img.complete && img.naturalWidth > 0) {
+      globalImageCache.set(src, img);
+      resolve(img);
+    }
   });
+}
+
+// Precarga anticipada de recursos para generación instantánea
+export function preloadCanvasAssets(spritesList = []) {
+  if (typeof window === 'undefined') return;
+  loadImage('/background.webp');
+  if (Array.isArray(spritesList)) {
+    spritesList.slice(0, 50).forEach(s => {
+      if (s && s.image) loadImage(s.image);
+    });
+  }
+}
+
+// Precarga de fondo al inicializar el módulo
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    loadImage('/background.webp');
+  }, 100);
 }
 
 // Convert Hex color string to RGBA with explicit opacity

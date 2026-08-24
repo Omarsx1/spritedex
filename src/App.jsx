@@ -17,6 +17,7 @@ import { MobileSpriteSwiper } from './components/MobileSpriteSwiper';
 import { useIsMobile } from './hooks/useIsMobile';
 import { decodeCollectionState } from './utils/shareLink';
 import { supabase, isSupabaseConfigured } from './utils/supabase';
+import { preloadCanvasAssets } from './utils/canvasExporter';
 import {
   getMyFriendCode,
   fetchCollectionByFriendCode,
@@ -29,6 +30,11 @@ const LOCAL_STORAGE_KEY = 'fortnite_sprites_pokedex_v3';
 
 export function App() {
   const isMobile = useIsMobile(600);
+
+  // Precarga asíncrona de recursos del canvas en segundo plano para exportación instantánea
+  useEffect(() => {
+    preloadCanvasAssets(ALL_SPRITES);
+  }, []);
   const [userState, setUserState] = useState(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);

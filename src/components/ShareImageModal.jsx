@@ -63,27 +63,48 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     return spritesList.length > 0 ? Math.round((ownedInScope / spritesList.length) * 100) : 0;
   }, [spritesList, ownedInScope]);
 
-  // Trigger canvas generation on setting changes
+  const previewCacheRef = React.useRef(new Map());
+
+  // Trigger canvas generation on setting changes with instant in-memory preview cache
   useEffect(() => {
     if (spritesList.length === 0) {
       setDataUrl('');
       setIsGenerating(false);
       return;
     }
+
+    const cacheKey = `${format}_${scope}_${spritesList.length}_${ownedInScope}`;
+    if (previewCacheRef.current.has(cacheKey)) {
+      setDataUrl(previewCacheRef.current.get(cacheKey));
+      setIsGenerating(false);
+      return;
+    }
+
     setIsGenerating(true);
+    let isCancelled = false;
+
     generatePokedexCardImage({
       spritesList,
       userState,
       format,
       bgStyle
     }).then((url) => {
-      setDataUrl(url);
-      setIsGenerating(false);
+      if (!isCancelled) {
+        previewCacheRef.current.set(cacheKey, url);
+        setDataUrl(url);
+        setIsGenerating(false);
+      }
     }).catch((err) => {
-      console.error('Error generando imagen de plantilla:', err);
-      setIsGenerating(false);
+      if (!isCancelled) {
+        console.error('Error generando imagen de plantilla:', err);
+        setIsGenerating(false);
+      }
     });
-  }, [spritesList, userState, format, bgStyle]);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [spritesList, userState, format, bgStyle, scope, ownedInScope]);
 
   const getShareableText = () => {
     const total = spritesList.length;
