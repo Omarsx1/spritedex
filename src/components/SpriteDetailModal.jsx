@@ -135,14 +135,21 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
               </div>
             </div>
             <div className="sdm__card-footer">
-              <div className="sdm__card-detail" title="Coste de invocación">
+              <div className="sdm__card-detail" title="Coste de invocación" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <img
                   src="/img/stelar.webp"
                   alt="Polvo Estelar"
                   className="sdm__stelar-img"
-                  style={{ width: '18px', height: '18px', objectFit: 'contain', display: 'inline-block' }}
+                  style={{
+                    width: '26px',
+                    height: '26px',
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 0 6px rgba(168, 85, 247, 0.55))'
+                  }}
                 />
-                <span>{activeSprite.summonCost || '5,000 Polvo Estelar'}</span>
+                <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)' }}>
+                  {activeSprite.summonCost || '5,000 Polvo Estelar'}
+                </span>
               </div>
             </div>
           </div>
