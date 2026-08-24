@@ -607,22 +607,15 @@ function renderGlitchOverrideTemplate({
 
     if (isOwned) {
       roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 4);
-      if (isMastered) {
-        ctx.fillStyle = 'rgba(234, 179, 8, 0.95)';
-        ctx.shadowColor = 'rgba(234, 179, 8, 0.6)';
-        ctx.shadowBlur = 6;
-      } else {
-        ctx.fillStyle = '#00F0E8';
-        ctx.shadowColor = 'rgba(0, 240, 232, 0.55)';
-        ctx.shadowBlur = 6;
-      }
+      ctx.fillStyle = '#00F0E8';
+      ctx.shadowColor = 'rgba(0, 240, 232, 0.55)';
+      ctx.shadowBlur = 6;
       ctx.fill();
       ctx.shadowBlur = 0;
 
       ctx.font = `900 ${badgeFontSize}px "Inter", sans-serif`;
       ctx.fillStyle = '#060714';
-      const badgeLabel = isMastered ? 'MAX' : (level > 1 ? `LVL.${level}` : 'HACKEADO');
-      ctx.fillText(badgeLabel, cardX + cardW / 2, badgeY + badgeH / 2 + Math.floor(badgeFontSize * 0.35));
+      ctx.fillText('HACKEADO', cardX + cardW / 2, badgeY + badgeH / 2 + Math.floor(badgeFontSize * 0.35));
     } else {
       roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 4);
       ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
