@@ -51,7 +51,7 @@ export const ELEMENTAL_STYLES = {
   tails: { background: 'linear-gradient(180deg, #78350f 0%, #1b1c23 100%)', borderColor: '#f59e0b' },
   klombo: { background: 'linear-gradient(180deg, #831843 0%, #1b1c23 100%)', borderColor: '#ec4899' },
   crown: { background: 'linear-gradient(180deg, #713f12 0%, #1b1c23 100%)', borderColor: '#eab308' },
-  bush: { background: 'linear-gradient(180deg, #14532d 0%, #1b1c23 100%)', borderColor: '#22c55e' },
+  bush: { background: 'linear-gradient(180deg, #166534 0%, #052e16 100%)', borderColor: '#4ade80' },
   adventure: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#0ea5e9' },
   jonesy: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#0ea5e9' },
   '8bit': { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#0ea5e9' },
@@ -74,7 +74,7 @@ export function getSpriteCardStyle(sprite) {
     return { background: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', borderColor: '#f5b642' };
   }
   if (theme === 'Cheatmaster' || theme === 'Cheat Master') {
-    return { background: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', borderColor: '#22c55e' };
+    return { background: 'linear-gradient(180deg, #094726 0%, #0d281a 100%)', borderColor: '#4ade80' };
   }
   if (theme === 'Cube') {
     return { background: 'linear-gradient(180deg, #730974 0%, #1b1c23 100%)', borderColor: '#8b008b' };

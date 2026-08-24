@@ -469,30 +469,40 @@ function renderGlitchOverrideTemplate({
     const cardH = cellH - cardMarginY * 2;
 
     // A. Cyber Tile Container
+    const spiritHue = getSpiritHue(sprite);
+    const isGreenTheme = spiritHue === '#22c55e' ||
+      (sprite.fullName || '').toLowerCase().includes('hacker') ||
+      (sprite.fullName || '').toLowerCase().includes('arbust') ||
+      (sprite.variant || '').toLowerCase().includes('cheat');
+
     ctx.save();
     roundRect(ctx, cardX, cardY, cardW, cardH, 12);
     if (isOwned) {
-      ctx.fillStyle = isMastered ? 'rgba(234, 179, 8, 0.12)' : 'rgba(0, 240, 232, 0.08)';
+      ctx.fillStyle = isMastered
+        ? 'rgba(234, 179, 8, 0.12)'
+        : (isGreenTheme ? 'rgba(34, 197, 94, 0.12)' : 'rgba(0, 240, 232, 0.08)');
       ctx.fill();
-      ctx.strokeStyle = isMastered ? 'rgba(234, 179, 8, 0.65)' : 'rgba(0, 240, 232, 0.45)';
-      ctx.lineWidth = isMastered ? 1.5 : 1;
-      if (isMastered) {
-        ctx.shadowColor = 'rgba(234, 179, 8, 0.4)';
+      ctx.strokeStyle = isMastered
+        ? 'rgba(234, 179, 8, 0.65)'
+        : (isGreenTheme ? 'rgba(74, 222, 128, 0.65)' : 'rgba(0, 240, 232, 0.45)');
+      ctx.lineWidth = isMastered || isGreenTheme ? 1.5 : 1;
+      if (isMastered || isGreenTheme) {
+        ctx.shadowColor = isMastered ? 'rgba(234, 179, 8, 0.4)' : 'rgba(34, 197, 94, 0.4)';
         ctx.shadowBlur = 8;
       }
       ctx.stroke();
       ctx.shadowBlur = 0;
     } else {
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+      ctx.fillStyle = isGreenTheme ? 'rgba(6, 42, 24, 0.72)' : 'rgba(15, 23, 42, 0.65)';
       ctx.fill();
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.strokeStyle = isGreenTheme ? 'rgba(74, 222, 128, 0.35)' : 'rgba(255, 255, 255, 0.15)';
       ctx.lineWidth = 1;
       ctx.stroke();
     }
 
     // Corner pixel ticks on active cards
     if (isOwned) {
-      ctx.fillStyle = isMastered ? '#facc15' : '#00F0E8';
+      ctx.fillStyle = isMastered ? '#facc15' : (isGreenTheme ? '#4ade80' : '#00F0E8');
       ctx.fillRect(cardX + 2, cardY + 2, 4, 4);
       ctx.fillRect(cardX + cardW - 6, cardY + 2, 4, 4);
       ctx.fillRect(cardX + 2, cardY + cardH - 6, 4, 4);
@@ -524,16 +534,39 @@ function renderGlitchOverrideTemplate({
 
     if (spriteImg) {
       ctx.save();
-      const spiritHue = getSpiritHue(sprite);
       const imgX = cardX + (cardW - imgSize) / 2;
       const imgY = contentStartY;
 
+      // Halo Luminoso de Fondo (WCAG 2.2 Perceivable Accessibility)
+      // Otorga una iluminación trasera suave para separar el espíritu del fondo oscuro
+      const centerX = imgX + imgSize / 2;
+      const centerY = imgY + imgSize / 2;
+      const auraRadius = Math.round(imgSize * 0.58);
+      const auraGrad = ctx.createRadialGradient(centerX, centerY, 5, centerX, centerY, auraRadius);
+
+      if (isGreenTheme) {
+        auraGrad.addColorStop(0, isOwned ? 'rgba(74, 222, 128, 0.45)' : 'rgba(34, 197, 94, 0.32)');
+        auraGrad.addColorStop(0.6, isOwned ? 'rgba(34, 197, 94, 0.20)' : 'rgba(16, 185, 129, 0.14)');
+        auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      } else {
+        auraGrad.addColorStop(0, isOwned ? hexToRgba(spiritHue, 0.35) : hexToRgba(spiritHue, 0.18));
+        auraGrad.addColorStop(0.7, isOwned ? hexToRgba(spiritHue, 0.12) : hexToRgba(spiritHue, 0.06));
+        auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      }
+
+      ctx.fillStyle = auraGrad;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
+      ctx.fill();
+
       if (!isOwned) {
-        ctx.globalAlpha = 0.68;
+        ctx.globalAlpha = isGreenTheme ? 0.92 : 0.82;
+        ctx.shadowColor = isGreenTheme ? 'rgba(74, 222, 128, 0.4)' : hexToRgba(spiritHue, 0.3);
+        ctx.shadowBlur = 12;
         ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
       } else {
-        ctx.shadowColor = hexToRgba(spiritHue, 0.65);
-        ctx.shadowBlur = 24;
+        ctx.shadowColor = isGreenTheme ? 'rgba(74, 222, 128, 0.85)' : hexToRgba(spiritHue, 0.75);
+        ctx.shadowBlur = 26;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
         ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
