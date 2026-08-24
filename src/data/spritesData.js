@@ -1,4 +1,17 @@
 import officialSpritesJson from './official_sprites.json';
+import fortniteGgJson from './fortnite_gg_sprites_complete.json';
+
+// Mapa de búsqueda rápida por nombre normalizado de Fortnite.gg
+const fortniteGgMap = new Map();
+if (Array.isArray(fortniteGgJson)) {
+  fortniteGgJson.forEach((item) => {
+    const normName = (item.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const normVariant = (item.variant || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const key = `${normName}_${normVariant}`;
+    fortniteGgMap.set(key, item);
+    fortniteGgMap.set(normName, item);
+  });
+}
 
 export const RARITIES = {
   Mythic: { name: 'MÍTICO', color: '#fff0a6', bg: '#7c5d26', border: '#7c5d26', classKey: 'mythic', cardGradient: 'linear-gradient(180deg, #7c5d26 0%, #1b1c23 100%)' },
@@ -217,6 +230,10 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     imagePath = webpMap[item.id];
   }
 
+  const normName = (item.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const normTheme = (item.theme || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const official = fortniteGgMap.get(`${normName}_${normTheme}`) || fortniteGgMap.get(normName);
+
   return {
     id: item.id,
     fullName: fullName,
@@ -224,16 +241,17 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     variantDisplay: spanishTheme,
     rarity: item.rarity,
     gen: gen,
-    dropChance: item.unreleased ? '0%' : dropChance,
-    dropChanceDisplay: item.unreleased ? '0%' : dropChance,
+    dropChance: item.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
+    dropChanceDisplay: item.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
     dropChanceNum: item.unreleased ? 0 : dropChanceNum,
     unreleased: item.unreleased || false,
     image: imagePath,
     familyId: familyId,
     familyName: spanishFamilyName,
-    location: 'Cofres de Sprite & Zonas de Extracción',
-    summonCost: '5,000 Polvo Estelar',
-    ability: 'Concede bonificaciones pasivas de escudo, velocidad y recolección de botín.'
+    location: official?.location || 'Cofres de Sprite & Zonas de Extracción',
+    summonCost: official?.summonCost && official.summonCost !== '0' ? `${official.summonCost} Polvo Estelar` : '0',
+    ability: official?.ability || 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.',
+    specialPerk: official?.specialPerk || ''
   };
 });
 
