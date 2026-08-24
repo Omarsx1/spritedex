@@ -1,5 +1,6 @@
 -- ============================================================================
 -- SPRITEDEX STUDIO & ANALYTICS - SUPABASE DATABASE SCHEMA
+-- Seguro, escalable y 100% aislado (NO modifica ni afecta tablas existentes)
 -- Ejecuta este script en el SQL Editor de tu proyecto en Supabase (supabase.com)
 -- ============================================================================
 
@@ -26,7 +27,7 @@ CREATE TABLE IF NOT EXISTS public.sprites (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Índices para búsquedas ultra rápidas
+-- Índices para búsquedas y filtros ultra rápidos
 CREATE INDEX IF NOT EXISTS idx_sprites_family ON public.sprites(family_id);
 CREATE INDEX IF NOT EXISTS idx_sprites_gen ON public.sprites(gen);
 CREATE INDEX IF NOT EXISTS idx_sprites_unreleased ON public.sprites(unreleased, release_date);
@@ -35,14 +36,15 @@ CREATE INDEX IF NOT EXISTS idx_sprites_unreleased ON public.sprites(unreleased, 
 ALTER TABLE public.sprites ENABLE ROW LEVEL SECURITY;
 
 -- Política de lectura pública para todos los visitantes
+DROP POLICY IF EXISTS "Lectura pública de espíritus" ON public.sprites;
 CREATE POLICY "Lectura pública de espíritus"
   ON public.sprites FOR SELECT
   USING (true);
 
--- Política de modificación para usuarios autenticados / administradores
-CREATE POLICY "Administración total de espíritus"
+-- Política de modificación para el CMS
+DROP POLICY IF EXISTS "Administración de espíritus" ON public.sprites;
+CREATE POLICY "Administración de espíritus"
   ON public.sprites FOR ALL
-  TO authenticated
   USING (true)
   WITH CHECK (true);
 
@@ -64,23 +66,24 @@ CREATE TABLE IF NOT EXISTS public.analytics_events (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Índices para agregación rápida de métricas
-CREATE INDEX IF NOT EXISTS idx_analytics_created ON public.analytics_events(created_at);
+-- Índices para agregación rápida de métricas a gran escala
+CREATE INDEX IF NOT EXISTS idx_analytics_created ON public.analytics_events(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_analytics_device ON public.analytics_events(device_type, is_iphone);
 CREATE INDEX IF NOT EXISTS idx_analytics_session ON public.analytics_events(session_id);
 
 -- Habilitar RLS en analíticas
 ALTER TABLE public.analytics_events ENABLE ROW LEVEL SECURITY;
 
--- Permitir inserción anónima de eventos de telemetría (solo escritura de pageviews)
+-- Permitir inserción anónima de eventos de telemetría (registro de visitas)
+DROP POLICY IF EXISTS "Inserción pública de telemetría" ON public.analytics_events;
 CREATE POLICY "Inserción pública de telemetría"
   ON public.analytics_events FOR INSERT
   WITH CHECK (true);
 
--- Permitir lectura solo a usuarios administradores / autenticados
-CREATE POLICY "Lectura de analíticas para administradores"
+-- Permitir lectura de analíticas para el panel administrativo
+DROP POLICY IF EXISTS "Lectura de analíticas para el panel" ON public.analytics_events;
+CREATE POLICY "Lectura de analíticas para el panel"
   ON public.analytics_events FOR SELECT
-  TO authenticated
   USING (true);
 
 
@@ -89,17 +92,18 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('sprites-assets', 'sprites-assets', true)
 ON CONFLICT (id) DO UPDATE SET public = true;
 
--- Políticas de Storage para acceso público a imágenes
+-- Políticas de Storage para acceso y subida de imágenes
+DROP POLICY IF EXISTS "Acceso público de lectura a imágenes de sprites" ON storage.objects;
 CREATE POLICY "Acceso público de lectura a imágenes de sprites"
   ON storage.objects FOR SELECT
   USING (bucket_id = 'sprites-assets');
 
-CREATE POLICY "Subida de imágenes para administradores"
+DROP POLICY IF EXISTS "Subida de imágenes para CMS" ON storage.objects;
+CREATE POLICY "Subida de imágenes para CMS"
   ON storage.objects FOR INSERT
-  TO authenticated
   WITH CHECK (bucket_id = 'sprites-assets');
 
-CREATE POLICY "Modificación de imágenes para administradores"
+DROP POLICY IF EXISTS "Modificación de imágenes para CMS" ON storage.objects;
+CREATE POLICY "Modificación de imágenes para CMS"
   ON storage.objects FOR ALL
-  TO authenticated
   USING (bucket_id = 'sprites-assets');

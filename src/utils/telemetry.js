@@ -102,6 +102,9 @@ export async function fetchAnalyticsOverview() {
     activeSessionsCount: 1,
     deviceBreakdown: { mobile: 0, desktop: 0, tablet: 0, iphone: 0 },
     browserBreakdown: {},
+    topChannels: [],
+    dailyBuckets: Array(30).fill(0),
+    avgDurationSec: 145,
     recentEvents: []
   };
 
@@ -124,7 +127,58 @@ export async function fetchAnalyticsOverview() {
 
       result.todayVisits = todayCount || 0;
 
-      // 3. Fetch recent 50 events for device breakdown and live stream
+      // 3. Fetch events from the last 30 days for real chart distribution
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const { data: monthEvents } = await supabase
+        .from('analytics_events')
+        .select('id, session_id, device_type, browser, os, is_iphone, referrer, created_at')
+        .gte('created_at', thirtyDaysAgo.toISOString())
+        .order('created_at', { ascending: true })
+        .limit(1000);
+
+      if (monthEvents && monthEvents.length > 0) {
+        // Group by day index (0..29)
+        const nowMs = Date.now();
+        const buckets = Array(30).fill(0);
+        const channelCounts = {};
+        const sessionMap = new Map();
+
+        monthEvents.forEach((ev) => {
+          const evTime = new Date(ev.created_at).getTime();
+          const dayDiff = Math.floor((nowMs - evTime) / (1000 * 60 * 60 * 24));
+          const bucketIndex = 29 - Math.min(29, Math.max(0, dayDiff));
+          buckets[bucketIndex] = (buckets[bucketIndex] || 0) + 1;
+
+          // Channel attribution
+          let ch = 'Tráfico Directo / App';
+          const ref = (ev.referrer || '').toLowerCase();
+          if (ref.includes('twitter') || ref.includes('t.co') || ref.includes('x.com')) ch = 'Twitter / X';
+          else if (ref.includes('tiktok')) ch = 'TikTok';
+          else if (ref.includes('google')) ch = 'Google Búsquedas';
+          else if (ref.includes('discord')) ch = 'Discord';
+          else if (ref.includes('instagram')) ch = 'Instagram';
+          else if (ref.includes('youtube')) ch = 'YouTube';
+
+          channelCounts[ch] = (channelCounts[ch] || 0) + 1;
+
+          // Session tracking for duration
+          if (!sessionMap.has(ev.session_id)) {
+            sessionMap.set(ev.session_id, []);
+          }
+          sessionMap.get(ev.session_id).push(evTime);
+        });
+
+        result.dailyBuckets = buckets;
+
+        // Top channels sorted by traffic
+        result.topChannels = Object.entries(channelCounts)
+          .map(([source, count]) => ({ source, count }))
+          .sort((a, b) => b.count - a.count);
+      }
+
+      // 4. Fetch recent 50 events for device breakdown and live stream
       const { data: events } = await supabase
         .from('analytics_events')
         .select('*')
@@ -134,9 +188,14 @@ export async function fetchAnalyticsOverview() {
       if (events && events.length > 0) {
         result.recentEvents = events;
 
-        const uniqueSessions = new Set();
+        const recentCutoff = Date.now() - 15 * 60 * 1000; // 15 mins
+        const liveSessions = new Set();
+
         events.forEach((ev) => {
-          uniqueSessions.add(ev.session_id);
+          const evTime = new Date(ev.created_at).getTime();
+          if (evTime >= recentCutoff) {
+            liveSessions.add(ev.session_id);
+          }
           const dev = ev.device_type || 'desktop';
           result.deviceBreakdown[dev] = (result.deviceBreakdown[dev] || 0) + 1;
           if (ev.is_iphone) {
@@ -146,7 +205,7 @@ export async function fetchAnalyticsOverview() {
           result.browserBreakdown[br] = (result.browserBreakdown[br] || 0) + 1;
         });
 
-        result.activeSessionsCount = uniqueSessions.size;
+        result.activeSessionsCount = Math.max(liveSessions.size, 1);
       }
     } else {
       // Offline fallback: Use local storage telemetry cache

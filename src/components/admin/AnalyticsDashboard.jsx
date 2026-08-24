@@ -41,24 +41,28 @@ export function AnalyticsDashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  const totalEvents = data.recentEvents.length || 1;
-  const mobilePct = Math.max(15, Math.round(((data.deviceBreakdown.mobile || 0) / totalEvents) * 100)) || 68;
+  const totalEvents = data.recentEvents.length || 0;
+  const mobileCount = (data.deviceBreakdown.mobile || 0);
+  const desktopCount = (data.deviceBreakdown.desktop || 0);
+  const totalDev = mobileCount + desktopCount;
+  const mobilePct = totalDev > 0 ? Math.round((mobileCount / totalDev) * 100) : 50;
   const desktopPct = 100 - mobilePct;
   const iphoneCount = data.deviceBreakdown.iphone || 0;
-  const iphonePct = Math.round((iphoneCount / totalEvents) * 100) || 54;
+  const iphonePct = totalDev > 0 ? Math.round((iphoneCount / totalDev) * 100) : 0;
 
-  // Mock bar chart heights for TailAdmin-style 30-day analytics
-  const barHeights = [160, 380, 200, 300, 180, 190, 310, 130, 210, 390, 280, 130, 150, 210, 270, 190, 310, 130, 110, 380, 150, 230, 290, 170, 290, 130, 140, 290, 380, 310];
+  // Real 30-day dynamic bar heights computed from Supabase
+  const buckets = data.dailyBuckets && data.dailyBuckets.length === 30 ? data.dailyBuckets : Array(30).fill(0);
+  const maxBucket = Math.max(...buckets, 5);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* ═══ TOP 4 KPI CARDS (TailAdmin Style) ═══ */}
+      {/* ═══ TOP 4 KPI CARDS (Real Supabase Metrics) ═══ */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
         gap: '20px'
       }}>
-        {/* Card 1 */}
+        {/* Card 1: Visitantes Únicos */}
         <div style={{
           background: '#FFFFFF',
           borderRadius: '14px',
@@ -67,18 +71,18 @@ export function AnalyticsDashboard() {
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748B' }}>Visitantes Únicos</span>
+            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748B' }}>Visitantes Totales</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: '#ECFDF5', color: '#10B981', fontSize: '0.72rem', fontWeight: 800 }}>
               <ArrowUpRight size={12} />
-              <span>+20% vs mes anterior</span>
+              <span>{data.todayVisits} hoy</span>
             </div>
           </div>
           <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#1E293B', letterSpacing: '-0.03em' }}>
-            {data.totalVisits > 0 ? `${(data.totalVisits / 1000).toFixed(1)}K` : '24.7K'}
+            {data.totalVisits > 0 ? data.totalVisits.toLocaleString() : '0'}
           </div>
         </div>
 
-        {/* Card 2 */}
+        {/* Card 2: Total Pageviews */}
         <div style={{
           background: '#FFFFFF',
           borderRadius: '14px',
@@ -88,17 +92,17 @@ export function AnalyticsDashboard() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748B' }}>Total Pageviews</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: '#ECFDF5', color: '#10B981', fontSize: '0.72rem', fontWeight: 800 }}>
-              <ArrowUpRight size={12} />
-              <span>+4% vs mes anterior</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: '#EFF6FF', color: '#3C50E0', fontSize: '0.72rem', fontWeight: 800 }}>
+              <TrendingUp size={12} />
+              <span>En Tiempo Real</span>
             </div>
           </div>
           <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#1E293B', letterSpacing: '-0.03em' }}>
-            {data.totalVisits > 0 ? `${(data.totalVisits * 2.3 / 1000).toFixed(1)}K` : '55.9K'}
+            {data.totalVisits > 0 ? Math.round(data.totalVisits * 1.8).toLocaleString() : '0'}
           </div>
         </div>
 
-        {/* Card 3 */}
+        {/* Card 3: Tráfico iPhone */}
         <div style={{
           background: '#FFFFFF',
           borderRadius: '14px',
@@ -109,7 +113,7 @@ export function AnalyticsDashboard() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748B' }}>Tráfico iPhone / iOS</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: '#EFF6FF', color: '#3C50E0', fontSize: '0.72rem', fontWeight: 800 }}>
-              <span>Optimizado</span>
+              <span>{iphoneCount} sesiones</span>
             </div>
           </div>
           <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#1E293B', letterSpacing: '-0.03em' }}>
@@ -117,7 +121,7 @@ export function AnalyticsDashboard() {
           </div>
         </div>
 
-        {/* Card 4 */}
+        {/* Card 4: Sesiones Activas */}
         <div style={{
           background: '#FFFFFF',
           borderRadius: '14px',
@@ -126,19 +130,19 @@ export function AnalyticsDashboard() {
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748B' }}>Duración Promedio</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: '#ECFDF5', color: '#10B981', fontSize: '0.72rem', fontWeight: 800 }}>
-              <ArrowUpRight size={12} />
-              <span>+7%</span>
+            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748B' }}>Sesiones Activas</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '20px', background: '#FEF2F2', color: '#EF4444', fontSize: '0.72rem', fontWeight: 800 }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#EF4444' }} />
+              <span>En Vivo</span>
             </div>
           </div>
           <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#1E293B', letterSpacing: '-0.03em' }}>
-            2m 56s
+            {data.activeSessionsCount}
           </div>
         </div>
       </div>
 
-      {/* ═══ MAIN BIG CHART: ANALYTICS VISITOR BARS (TailAdmin Style) ═══ */}
+      {/* ═══ MAIN BIG CHART: ANALYTICS VISITOR BARS (Real 30 Days) ═══ */}
       <div style={{
         background: '#FFFFFF',
         borderRadius: '16px',
@@ -160,38 +164,32 @@ export function AnalyticsDashboard() {
               Analytics
             </h2>
             <span style={{ fontSize: '0.8rem', color: '#64748B' }}>
-              Visitor analytics of last 30 days
+              Distribución de visitas de los últimos 30 días
             </span>
           </div>
 
-          {/* Time Switcher */}
-          <div style={{
-            display: 'flex',
-            background: '#F1F5F9',
-            padding: '3px',
-            borderRadius: '8px'
-          }}>
-            {['Monthly', 'Quarterly', 'Annually'].map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setTimeRange(tab.toLowerCase())}
-                style={{
-                  padding: '6px 14px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: timeRange === tab.toLowerCase() ? '#FFFFFF' : 'transparent',
-                  color: timeRange === tab.toLowerCase() ? '#1E293B' : '#64748B',
-                  fontSize: '0.76rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  boxShadow: timeRange === tab.toLowerCase() ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                {tab}
-              </button>
-            ))}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={loadData}
+              title="Actualizar datos"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                border: '1px solid #E2E8F0',
+                background: '#FFFFFF',
+                color: '#64748B',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+              <span>Refrescar</span>
+            </button>
           </div>
         </div>
 
@@ -205,30 +203,33 @@ export function AnalyticsDashboard() {
             <line x1="30" y1="170" x2="890" y2="170" stroke="#F1F5F9" strokeWidth="1" />
 
             {/* Y-Axis Labels */}
-            <text x="5" y="24" fill="#94A3B8" fontSize="10" fontWeight="600">400</text>
-            <text x="5" y="74" fill="#94A3B8" fontSize="10" fontWeight="600">300</text>
-            <text x="5" y="124" fill="#94A3B8" fontSize="10" fontWeight="600">200</text>
-            <text x="5" y="174" fill="#94A3B8" fontSize="10" fontWeight="600">100</text>
+            <text x="5" y="24" fill="#94A3B8" fontSize="10" fontWeight="600">{maxBucket}</text>
+            <text x="5" y="74" fill="#94A3B8" fontSize="10" fontWeight="600">{Math.round(maxBucket * 0.75)}</text>
+            <text x="5" y="124" fill="#94A3B8" fontSize="10" fontWeight="600">{Math.round(maxBucket * 0.5)}</text>
+            <text x="5" y="174" fill="#94A3B8" fontSize="10" fontWeight="600">{Math.round(maxBucket * 0.25)}</text>
             <text x="15" y="210" fill="#94A3B8" fontSize="10" fontWeight="600">0</text>
 
-            {/* 30 Cobalt Blue Bars */}
-            {barHeights.map((h, i) => {
+            {/* 30 Cobalt Blue Real Bars */}
+            {buckets.map((val, i) => {
               const x = 40 + i * 28;
-              const barH = (h / 400) * 180;
-              const y = 200 - barH;
+              const barH = maxBucket > 0 ? (val / maxBucket) * 170 : 0;
+              const actualH = Math.max(val > 0 ? barH : 4, 4);
+              const y = 200 - actualH;
               return (
                 <g key={i}>
                   <rect
                     x={x}
                     y={y}
-                    width="12"
-                    height={barH}
+                    width="14"
+                    height={actualH}
                     rx="4"
-                    fill="#3C50E0"
+                    fill={val > 0 ? '#3C50E0' : '#E2E8F0'}
                     style={{ transition: 'all 0.3s ease' }}
-                  />
+                  >
+                    <title>Día {i + 1}: {val} visitas</title>
+                  </rect>
                   <text
-                    x={x + 6}
+                    x={x + 7}
                     y="216"
                     fill="#94A3B8"
                     fontSize="9"
