@@ -40,6 +40,7 @@ export function Header({
     return indices;
   });
 
+  const headerRef = useRef(null);
   const activeSpriteRef = useRef(null);
   const orbitContainerRef = useRef(null);
   const titleRef = useRef(null);
@@ -165,7 +166,7 @@ export function Header({
   }, []);
 
   return (
-    <header className="hero">
+    <header className="hero" ref={headerRef}>
       {/* Animated background layers */}
       <div className="hero__bg">
         <div className="hero__grid" />
