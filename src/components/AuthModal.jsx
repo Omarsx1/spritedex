@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Cloud, LogIn, LogOut, CheckCircle, Mail, Key, ShieldCheck } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../utils/supabase';
+import { trackEvent } from '../utils/telemetry';
 
 export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
   const [email, setEmail] = useState('');
@@ -45,6 +46,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
           password
         });
         if (signUpError) throw signUpError;
+        trackEvent('signup', { method: 'email' });
         setMessage('¡Cuenta creada! Revisa tu correo o inicia sesión.');
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -52,6 +54,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
           password
         });
         if (signInError) throw signInError;
+        trackEvent('login', { method: 'email' });
         if (onAuthSuccess) onAuthSuccess();
         onClose();
       }
@@ -68,6 +71,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
       setError(null);
       const { error: anonError } = await supabase.auth.signInAnonymously();
       if (anonError) throw anonError;
+      trackEvent('login', { method: 'anonymous' });
       if (onAuthSuccess) onAuthSuccess();
       onClose();
     } catch (err) {
@@ -80,6 +84,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
     try {
       setLoading(true);
       setError(null);
+      trackEvent('login', { method: 'google' });
       const { error: googleError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {

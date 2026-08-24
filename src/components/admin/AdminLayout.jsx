@@ -22,12 +22,14 @@ import {
 import { AnalyticsDashboard } from './AnalyticsDashboard';
 import { SpiritCatalogTable } from './SpiritCatalogTable';
 import { SpiritEditorModal } from './SpiritEditorModal';
+import { UserManagementTable } from './UserManagementTable';
 import { clearAdminSession } from './AdminAuthGate';
-import { isSupabaseConfigured } from '../../utils/supabase';
+import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 
 export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
-  const [activeTab, setActiveTab] = useState('analytics'); // 'analytics' | 'catalog'
+  const [activeTab, setActiveTab] = useState('analytics'); // 'analytics' | 'catalog' | 'users'
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [usersCount, setUsersCount] = useState(0);
   const [editingSpirit, setEditingSpirit] = useState(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
@@ -38,6 +40,19 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
       return false;
     }
   });
+
+  useEffect(() => {
+    if (isSupabaseConfigured && supabase) {
+      supabase
+        .from('user_collections')
+        .select('*', { count: 'exact', head: true })
+        .then(({ count }) => {
+          if (count !== null && count !== undefined) {
+            setUsersCount(count);
+          }
+        });
+    }
+  }, []);
 
   const toggleDarkMode = () => {
     setDarkMode(prev => {
@@ -202,6 +217,47 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                   flexShrink: 0
                 }}>
                   {sprites.length}
+                </span>
+              )}
+            </button>
+
+            {/* Registered Users & Cloud Collections */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('users')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: sidebarOpen ? 'space-between' : 'center',
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: '10px',
+                border: 'none',
+                background: activeTab === 'users' ? (darkMode ? '#232323' : 'rgba(60, 80, 224, 0.08)') : 'transparent',
+                color: activeTab === 'users' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'),
+                fontSize: '0.86rem',
+                fontWeight: activeTab === 'users' ? 800 : 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                whiteSpace: 'nowrap'
+              }}
+              title="Usuarios & Cuentas Registradas"
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                <Users size={18} style={{ color: activeTab === 'users' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'), flexShrink: 0 }} />
+                {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>Usuarios & Cuentas</span>}
+              </div>
+              {sidebarOpen && (
+                <span style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 800,
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  background: activeTab === 'users' ? (darkMode ? 'rgba(62, 207, 142, 0.15)' : '#3C50E0') : (darkMode ? '#262626' : '#E2E8F0'),
+                  color: activeTab === 'users' ? (darkMode ? '#3ECF8E' : '#FFFFFF') : (darkMode ? '#A1A1A1' : '#475569'),
+                  flexShrink: 0
+                }}>
+                  {usersCount || 0}
                 </span>
               )}
             </button>
@@ -478,15 +534,22 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
 
         {/* Page Content */}
         <main style={{ padding: '28px', flex: 1, maxWidth: '1440px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
-          {activeTab === 'analytics' ? (
+          {activeTab === 'analytics' && (
             <AnalyticsDashboard darkMode={darkMode} />
-          ) : (
+          )}
+          {activeTab === 'catalog' && (
             <SpiritCatalogTable
               sprites={sprites}
               globalSearch={searchFilter}
               onAddNew={handleOpenNew}
               onEdit={handleOpenEdit}
               onRefresh={onRefreshSprites}
+              darkMode={darkMode}
+            />
+          )}
+          {activeTab === 'users' && (
+            <UserManagementTable
+              sprites={sprites}
               darkMode={darkMode}
             />
           )}
