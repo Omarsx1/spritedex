@@ -5082,15 +5082,9 @@ body::after {
     padding: 3px 7px;
   }
 
-  /* Ultra-low GPU & Battery Optimization for Mobile */
-  .hero-bg-grid,
-  .hero-ambient-glow,
-  .hero-floating-particles,
-  .hero-sprite-orbit-container,
-  .hero__orbit,
-  .hero__satellite,
-  .hero__satellite-img {
-    animation: none !important;
+  /* Mobile Optimization */
+  .hero-floating-particles {
+    display: none !important;
   }
 
   .ms-card:not(.ms-card--active) .cyber-fx-overlay * {

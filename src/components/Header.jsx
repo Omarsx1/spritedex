@@ -95,8 +95,6 @@ export function Header({
   // Rotate hero sprite with visibility, viewport and performance awareness (Battery & Thermal saver)
   useEffect(() => {
     if (spritePool.length === 0) return;
-    // En móviles (<= 600px) no ejecutamos bucles continuos de rotación para evitar calentar la GPU/CPU
-    if (typeof window !== 'undefined' && window.innerWidth <= 600) return;
 
     let isHeaderVisible = true;
     let observer = null;
@@ -107,6 +105,8 @@ export function Header({
       }, { threshold: 0.1 });
       observer.observe(headerRef.current);
     }
+
+    const intervalTime = typeof window !== 'undefined' && window.innerWidth <= 600 ? 5000 : 4500;
 
     const interval = setInterval(() => {
       if (document.hidden || !isHeaderVisible || !activeSpriteRef.current) return;
@@ -141,7 +141,7 @@ export function Header({
           });
         }
       });
-    }, 4500);
+    }, intervalTime);
 
     return () => {
       clearInterval(interval);
