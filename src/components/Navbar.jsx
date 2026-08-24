@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Download, User, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff } from 'lucide-react';
+import { Download, User, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone } from 'lucide-react';
 import { supabase } from '../utils/supabase';
 
 export function Navbar({
@@ -279,6 +279,20 @@ export function Navbar({
 
               {/* Sección Herramientas */}
               <div className="app-navbar__menu-section">
+                <button
+                  className="app-navbar__menu-action-btn"
+                  onClick={() => {
+                    setIsNavMenuOpen(false);
+                    window.dispatchEvent(new CustomEvent('spritedex:open-install-prompt'));
+                  }}
+                >
+                  <div className="action-btn-left">
+                    <Smartphone size={15} color="#00F0E8" />
+                    <span>Instalar Aplicación</span>
+                  </div>
+                  <span className="action-btn-sub" style={{ color: '#00F0E8', fontWeight: 700 }}>App PWA</span>
+                </button>
+
                 <button
                   className="app-navbar__menu-action-btn"
                   onClick={() => { onOpenBackupModal(); setIsNavMenuOpen(false); }}

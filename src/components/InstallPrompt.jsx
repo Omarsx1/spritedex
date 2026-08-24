@@ -8,6 +8,7 @@ export function InstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [manualChromeGuide, setManualChromeGuide] = useState(false);
 
   useEffect(() => {
     // 1. Check if already running in standalone mode (installed PWA)
@@ -20,40 +21,53 @@ export function InstallPrompt() {
       return;
     }
 
-    // 2. Check if user previously dismissed prompt
-    try {
-      if (localStorage.getItem(STORAGE_KEY)) {
-        return;
-      }
-    } catch (e) {
-      console.error(e);
-    }
-
-    // 3. Detect iOS Safari
+    // 2. Detect iOS Safari
     const ua = window.navigator.userAgent || '';
     const isIOSDevice = /iPhone|iPad|iPod/i.test(ua) && !/CriOS|FxiOS|OPiOS/i.test(ua);
     setIsIOS(isIOSDevice);
 
-    if (isIOSDevice) {
-      // Delay showing prompt slightly for smoother initial render
-      const timer = setTimeout(() => setShowPrompt(true), 1500);
-      return () => clearTimeout(timer);
+    // 3. Check if user previously dismissed automatic prompt
+    try {
+      if (!localStorage.getItem(STORAGE_KEY)) {
+        if (isIOSDevice) {
+          const timer = setTimeout(() => setShowPrompt(true), 1500);
+          return () => clearTimeout(timer);
+        }
+      }
+    } catch (e) {
+      console.error(e);
     }
 
     // 4. Android / Chrome / Desktop PWA prompt listener
     const handleBeforeInstall = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      setShowPrompt(true);
+      if (!localStorage.getItem(STORAGE_KEY)) {
+        setShowPrompt(true);
+      }
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
     return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
   }, []);
 
+  // 5. Escuchar evento manual para abrir la guía desde el menú en cualquier momento
+  useEffect(() => {
+    const handleManualOpen = () => {
+      const ua = window.navigator.userAgent || '';
+      const isIOSDevice = /iPhone|iPad|iPod/i.test(ua) && !/CriOS|FxiOS|OPiOS/i.test(ua);
+      setIsIOS(isIOSDevice);
+      setShowPrompt(true);
+    };
+
+    window.addEventListener('spritedex:open-install-prompt', handleManualOpen);
+    return () => window.removeEventListener('spritedex:open-install-prompt', handleManualOpen);
+  }, []);
+
   const handleDismiss = () => {
     sounds.playBeep?.();
     setShowPrompt(false);
+    setManualChromeGuide(false);
     try {
       localStorage.setItem(STORAGE_KEY, 'true');
     } catch (e) {
@@ -73,6 +87,9 @@ export function InstallPrompt() {
         } catch (e) {}
       }
       setDeferredPrompt(null);
+    } else {
+      // Si el navegador ya consumió el prompt nativo, mostrar guía manual de Chrome
+      setManualChromeGuide(true);
     }
   };
 
@@ -95,7 +112,7 @@ export function InstallPrompt() {
           </div>
           <div>
             <div className="install-prompt-badge">⚡ APP OFICIAL SPRITEDEX</div>
-            <h3 className="install-prompt-title">Instalar como Acceso Directo</h3>
+            <h3 className="install-prompt-title">Instalar como Aplicación</h3>
           </div>
         </div>
 
@@ -122,6 +139,21 @@ export function InstallPrompt() {
               <span>¡Listo! Ábrelo desde tu pantalla de inicio como una App.</span>
             </div>
 
+            <button className="install-prompt-btn-done" onClick={handleDismiss}>
+              <Check size={16} />
+              <span>¡Entendido!</span>
+            </button>
+          </div>
+        ) : manualChromeGuide ? (
+          <div className="install-prompt-ios-guide">
+            <div className="install-prompt-step">
+              <span className="install-prompt-step-num">1</span>
+              <span>Toca el menú de opciones <strong>(tres puntos ⋮)</strong> de tu navegador.</span>
+            </div>
+            <div className="install-prompt-step">
+              <span className="install-prompt-step-num">2</span>
+              <span>Selecciona <strong>"Instalar aplicación"</strong> o <strong>"Agregar a pantalla principal"</strong>.</span>
+            </div>
             <button className="install-prompt-btn-done" onClick={handleDismiss}>
               <Check size={16} />
               <span>¡Entendido!</span>
