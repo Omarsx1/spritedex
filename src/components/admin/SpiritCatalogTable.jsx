@@ -235,19 +235,18 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
 
                       {/* Rarity */}
                       <td style={{ padding: '12px 20px' }}>
-                        <span style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '4px 10px',
-                          borderRadius: '8px',
-                          background: `${rarityColor}18`,
-                          color: rarityColor,
-                          fontWeight: 800,
-                          fontSize: '0.76rem'
-                        }}>
-                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: rarityColor }} />
-                          <span>{rarityLabel}</span>
+                        <span
+                          className={`sprite-pill rarity-badge-sm sprite-rarity-${rarityObj.classKey || 'common'}`}
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: '6px',
+                            fontSize: '0.72rem',
+                            fontWeight: 800,
+                            letterSpacing: '0.04em',
+                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.15)'
+                          }}
+                        >
+                          {rarityObj.name || sprite.rarity}
                         </span>
                       </td>
 
