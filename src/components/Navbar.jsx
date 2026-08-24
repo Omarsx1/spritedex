@@ -24,18 +24,14 @@ export function Navbar({
     return 'Mi Cuenta';
   }, [user]);
 
-  const firstName = useMemo(() => {
-    if (!user) return null;
+  const initialLetter = useMemo(() => {
+    if (!user) return '';
     const raw = user.user_metadata?.given_name ||
                 user.user_metadata?.full_name ||
                 user.user_metadata?.name ||
-                (user.email ? user.email.split('@')[0] : null);
-    if (raw) {
-      const first = raw.trim().split(/\s+/)[0];
-      return first.charAt(0).toUpperCase() + first.slice(1);
-    }
-    if (user.is_anonymous) return 'Invitado';
-    return 'Cuenta';
+                user.email ||
+                'U';
+    return raw.trim().charAt(0).toUpperCase();
   }, [user]);
 
   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
@@ -109,7 +105,7 @@ export function Navbar({
 
       {/* Acciones derechas: Avatar + Menú Hamburguesa */}
       <div className="app-navbar__right">
-        {/* Avatar / Usuario */}
+        {/* Avatar / Usuario (Solo Foto o Inicial Circular) */}
         <div ref={userDropdownRef} style={{ position: 'relative' }}>
           <button
             className={`app-navbar__avatar ${user ? 'is-logged' : ''} ${isUserMenuOpen ? 'is-active' : ''}`}
@@ -118,17 +114,16 @@ export function Navbar({
             aria-label={user ? 'Cuenta de usuario' : 'Iniciar sesión'}
             aria-expanded={user ? isUserMenuOpen : undefined}
           >
-            {avatarUrl ? (
-              <img src={avatarUrl} alt="" className="app-navbar__avatar-img" />
+            {user ? (
+              avatarUrl ? (
+                <img src={avatarUrl} alt="" className="app-navbar__avatar-img" />
+              ) : (
+                <span className="app-navbar__avatar-initial">{initialLetter}</span>
+              )
             ) : (
-              <User size={15} strokeWidth={2.2} />
+              <User size={16} strokeWidth={2.2} />
             )}
 
-            {user && (
-              <span className="app-navbar__username">{firstName}</span>
-            )}
-
-            {user && <ChevronDown size={13} className={`app-navbar__chevron ${isUserMenuOpen ? 'open' : ''}`} />}
             {user && <span className="app-navbar__avatar-dot" />}
           </button>
 

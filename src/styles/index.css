@@ -368,17 +368,16 @@ body::after {
 /* --- User avatar (inside navbar, right side) --- */
 .app-navbar__avatar {
   position: relative;
-  height: 34px;
-  min-width: 34px;
-  padding: 0 10px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  border-radius: 9999px;
+  border-radius: 50%;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
@@ -386,61 +385,52 @@ body::after {
 
 .app-navbar__avatar:hover {
   background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.25);
   color: #fff;
-  transform: scale(1.03);
+  transform: scale(1.05);
 }
 
 .app-navbar__avatar:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 
 .app-navbar__avatar.is-logged {
-  border-color: rgba(16, 185, 129, 0.45);
-  color: #34d399;
-  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.5);
+  background: rgba(16, 185, 129, 0.12);
 }
 
 .app-navbar__avatar.is-logged:hover {
-  border-color: rgba(16, 185, 129, 0.7);
-  background: rgba(16, 185, 129, 0.15);
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.8);
+  background: rgba(16, 185, 129, 0.2);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
 }
 
 .app-navbar__avatar-img {
-  width: 20px;
-  height: 20px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
 }
 
-.app-navbar__username {
+.app-navbar__avatar-initial {
   font-family: var(--font-sans);
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #e2e8f0;
-  max-width: 130px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-transform: uppercase;
+  line-height: 1;
 }
 
 .app-navbar__avatar-dot {
   position: absolute;
-  bottom: 1px;
-  right: 1px;
-  width: 8px;
-  height: 8px;
+  bottom: 0px;
+  right: 0px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: #10b981;
-  border: 2px solid rgba(12, 14, 22, 0.9);
-  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
-}
-
-.app-navbar__chevron {
-  color: rgba(255, 255, 255, 0.5);
-  transition: transform 0.2s ease;
-  margin-left: 2px;
+  border: 2px solid #060714;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
 }
 
 .app-navbar__chevron.open {
