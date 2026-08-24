@@ -57,27 +57,27 @@ export function AnalyticsDashboard({ darkMode = false }) {
   const maxBucket = Math.max(...buckets, 5);
 
   const cardStyle = {
-    background: darkMode ? '#111C44' : '#FFFFFF',
+    background: darkMode ? '#1C1C1C' : '#FFFFFF',
     borderRadius: '14px',
     padding: '24px',
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
-    boxShadow: darkMode ? '0 4px 20px rgba(0, 0, 0, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.05)',
+    border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
+    boxShadow: darkMode ? '0 4px 20px rgba(0, 0, 0, 0.35)' : '0 1px 3px rgba(0, 0, 0, 0.05)',
     transition: 'all 0.2s ease'
   };
 
   const widgetCardStyle = {
-    background: darkMode ? '#111C44' : '#FFFFFF',
+    background: darkMode ? '#1C1C1C' : '#FFFFFF',
     borderRadius: '16px',
     padding: '24px',
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
-    boxShadow: darkMode ? '0 4px 20px rgba(0, 0, 0, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.05)',
+    border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
+    boxShadow: darkMode ? '0 4px 20px rgba(0, 0, 0, 0.35)' : '0 1px 3px rgba(0, 0, 0, 0.05)',
     transition: 'all 0.2s ease'
   };
 
-  const textPrimary = darkMode ? '#FFFFFF' : '#1E293B';
-  const textMuted = darkMode ? '#A3AED0' : '#64748B';
-  const dividerBorder = darkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #F1F5F9';
-  const rowDividerBorder = darkMode ? '1px solid rgba(255, 255, 255, 0.04)' : '1px solid #F8FAFC';
+  const textPrimary = darkMode ? '#EDEDED' : '#1E293B';
+  const textMuted = darkMode ? '#8B949E' : '#64748B';
+  const dividerBorder = darkMode ? '1px solid #262626' : '1px solid #F1F5F9';
+  const rowDividerBorder = darkMode ? '1px solid #232323' : '1px solid #F8FAFC';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -177,8 +177,8 @@ export function AnalyticsDashboard({ darkMode = false }) {
                 gap: '6px',
                 padding: '6px 12px',
                 borderRadius: '8px',
-                border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid #E2E8F0',
-                background: darkMode ? '#0B1437' : '#FFFFFF',
+                border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
+                background: darkMode ? '#171717' : '#FFFFFF',
                 color: textMuted,
                 fontSize: '0.76rem',
                 fontWeight: 700,
@@ -195,10 +195,10 @@ export function AnalyticsDashboard({ darkMode = false }) {
         <div style={{ width: '100%', height: '220px', position: 'relative' }}>
           <svg viewBox="0 0 900 220" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
             {/* Horizontal Grid lines */}
-            <line x1="30" y1="20" x2="890" y2="20" stroke={darkMode ? 'rgba(255, 255, 255, 0.06)' : '#F1F5F9'} strokeWidth="1" />
-            <line x1="30" y1="70" x2="890" y2="70" stroke={darkMode ? 'rgba(255, 255, 255, 0.06)' : '#F1F5F9'} strokeWidth="1" />
-            <line x1="30" y1="120" x2="890" y2="120" stroke={darkMode ? 'rgba(255, 255, 255, 0.06)' : '#F1F5F9'} strokeWidth="1" />
-            <line x1="30" y1="170" x2="890" y2="170" stroke={darkMode ? 'rgba(255, 255, 255, 0.06)' : '#F1F5F9'} strokeWidth="1" />
+            <line x1="30" y1="20" x2="890" y2="20" stroke={darkMode ? '#262626' : '#F1F5F9'} strokeWidth="1" />
+            <line x1="30" y1="70" x2="890" y2="70" stroke={darkMode ? '#262626' : '#F1F5F9'} strokeWidth="1" />
+            <line x1="30" y1="120" x2="890" y2="120" stroke={darkMode ? '#262626' : '#F1F5F9'} strokeWidth="1" />
+            <line x1="30" y1="170" x2="890" y2="170" stroke={darkMode ? '#262626' : '#F1F5F9'} strokeWidth="1" />
 
             {/* Y-Axis Labels */}
             <text x="5" y="24" fill={textMuted} fontSize="10" fontWeight="600">{maxBucket}</text>
@@ -207,7 +207,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
             <text x="5" y="174" fill={textMuted} fontSize="10" fontWeight="600">{Math.round(maxBucket * 0.25)}</text>
             <text x="15" y="210" fill={textMuted} fontSize="10" fontWeight="600">0</text>
 
-            {/* 30 Cobalt Blue Real Bars */}
+            {/* 30 Supabase Emerald Real Bars */}
             {buckets.map((val, i) => {
               const x = 40 + i * 28;
               const barH = maxBucket > 0 ? (val / maxBucket) * 170 : 0;
@@ -221,7 +221,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
                     width="14"
                     height={actualH}
                     rx="4"
-                    fill={val > 0 ? '#3C50E0' : (darkMode ? 'rgba(255, 255, 255, 0.08)' : '#E2E8F0')}
+                    fill={val > 0 ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#262626' : '#E2E8F0')}
                     style={{ transition: 'all 0.3s ease' }}
                   >
                     <title>Día {i + 1}: {val} visitas</title>
@@ -255,7 +255,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
             <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: textPrimary, margin: 0 }}>
               Top Canales & Fuentes
             </h3>
-            <span style={{ fontSize: '0.72rem', color: '#10B981', fontWeight: 700, background: darkMode ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5', padding: '2px 6px', borderRadius: '4px' }}>
+            <span style={{ fontSize: '0.72rem', color: '#3ECF8E', fontWeight: 700, background: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#ECFDF5', padding: '2px 6px', borderRadius: '4px' }}>
               En Vivo
             </span>
           </div>
@@ -263,7 +263,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {(() => {
               const defaultChannels = [
-                { source: 'Tráfico Directo / App', count: data.totalVisits || 0, color: '#3C50E0' },
+                { source: 'Tráfico Directo / App', count: data.totalVisits || 0, color: darkMode ? '#3ECF8E' : '#3C50E0' },
                 { source: 'Twitter / X', count: 0, color: '#0284C7' },
                 { source: 'TikTok & Reels', count: 0, color: '#DB2777' },
                 { source: 'Google Búsquedas', count: 0, color: '#D97706' }
@@ -292,7 +292,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: ch.color }} />
-                        <span style={{ fontSize: '0.84rem', fontWeight: 600, color: darkMode ? '#E2E8F0' : '#334155' }}>{ch.source}</span>
+                        <span style={{ fontSize: '0.84rem', fontWeight: 600, color: darkMode ? '#EDEDED' : '#334155' }}>{ch.source}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{ fontSize: '0.74rem', color: textMuted }}>{pctDisplay}</span>
@@ -300,7 +300,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
                       </div>
                     </div>
                     {/* Visual Progress Bar */}
-                    <div style={{ width: '100%', height: '4px', background: darkMode ? 'rgba(255, 255, 255, 0.08)' : '#F1F5F9', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ width: '100%', height: '4px', background: darkMode ? '#262626' : '#F1F5F9', borderRadius: '2px', overflow: 'hidden' }}>
                       <div style={{ width: `${barWidth}%`, height: '100%', background: ch.color, borderRadius: '2px', transition: 'width 0.4s ease' }} />
                     </div>
                   </div>
@@ -328,7 +328,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
                   <div style={{ fontSize: '0.84rem', fontWeight: 700, color: textPrimary }}>{sp.name}</div>
                   <span style={{ fontSize: '0.72rem', color: textMuted }}>{sp.category}</span>
                 </div>
-                <span style={{ padding: '3px 8px', borderRadius: '6px', background: darkMode ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5', color: '#10B981', fontSize: '0.76rem', fontWeight: 800 }}>
+                <span style={{ padding: '3px 8px', borderRadius: '6px', background: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#ECFDF5', color: '#3ECF8E', fontSize: '0.76rem', fontWeight: 800 }}>
                   {sp.rate}
                 </span>
               </div>
@@ -361,8 +361,8 @@ export function AnalyticsDashboard({ darkMode = false }) {
               <svg viewBox="0 0 300 70" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                 <defs>
                   <linearGradient id="liveSparkGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3C50E0" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="#3C50E0" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor={darkMode ? '#3ECF8E' : '#3C50E0'} stopOpacity="0.4" />
+                    <stop offset="100%" stopColor={darkMode ? '#3ECF8E' : '#3C50E0'} stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
                 <path
@@ -372,7 +372,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
                 <path
                   d="M 0,55 Q 50,45 100,50 T 200,30 T 280,20 T 300,35"
                   fill="none"
-                  stroke="#3C50E0"
+                  stroke={darkMode ? '#3ECF8E' : '#3C50E0'}
                   strokeWidth="2.5"
                   strokeLinecap="round"
                 />
@@ -414,25 +414,25 @@ export function AnalyticsDashboard({ darkMode = false }) {
             <div style={{ width: '130px', height: '130px', position: 'relative' }}>
               <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
                 {/* Background Track (Desktop) */}
-                <circle cx="50" cy="50" r="38" fill="transparent" stroke={darkMode ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'} strokeWidth="14" />
-                {/* Segment 1: iPhone (Blue) */}
+                <circle cx="50" cy="50" r="38" fill="transparent" stroke={darkMode ? '#262626' : '#E2E8F0'} strokeWidth="14" />
+                {/* Segment 1: iPhone (Supabase Green) */}
                 <circle
                   cx="50"
                   cy="50"
                   r="38"
                   fill="transparent"
-                  stroke="#3C50E0"
+                  stroke={darkMode ? '#3ECF8E' : '#3C50E0'}
                   strokeWidth="14"
                   strokeDasharray={`${(iphonePct / 100) * 238} 238`}
                   strokeDashoffset="0"
                 />
-                {/* Segment 2: Android (Emerald) */}
+                {/* Segment 2: Android (Sky Blue) */}
                 <circle
                   cx="50"
                   cy="50"
                   r="38"
                   fill="transparent"
-                  stroke="#10B981"
+                  stroke={darkMode ? '#0284C7' : '#10B981'}
                   strokeWidth="14"
                   strokeDasharray={`${(androidPct / 100) * 238} 238`}
                   strokeDashoffset={`-${(iphonePct / 100) * 238}`}
@@ -443,19 +443,19 @@ export function AnalyticsDashboard({ darkMode = false }) {
             {/* Legend (3 Channels) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem' }}>
-                <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: '#3C50E0' }} />
+                <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: darkMode ? '#3ECF8E' : '#3C50E0' }} />
                 <span style={{ color: textMuted }}>iPhone / iOS:</span>
                 <strong style={{ color: textPrimary }}>{iphonePct}%</strong>
                 <span style={{ fontSize: '0.72rem', color: textMuted }}>({iphoneCount})</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem' }}>
-                <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: '#10B981' }} />
+                <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: darkMode ? '#0284C7' : '#10B981' }} />
                 <span style={{ color: textMuted }}>Android:</span>
                 <strong style={{ color: textPrimary }}>{androidPct}%</strong>
                 <span style={{ fontSize: '0.72rem', color: textMuted }}>({androidCount})</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem' }}>
-                <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: darkMode ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8' }} />
+                <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: darkMode ? '#383838' : '#94A3B8' }} />
                 <span style={{ color: textMuted }}>Desktop (Mac/PC):</span>
                 <strong style={{ color: textPrimary }}>{desktopPct}%</strong>
                 <span style={{ fontSize: '0.72rem', color: textMuted }}>({desktopCount})</span>
@@ -487,8 +487,8 @@ export function AnalyticsDashboard({ darkMode = false }) {
                         {(() => {
                           const ref = (ev.referrer || '').toLowerCase();
                           let label = 'Directo / App';
-                          let bg = darkMode ? 'rgba(60, 80, 224, 0.2)' : '#EFF6FF';
-                          let textCol = darkMode ? '#93C5FD' : '#3C50E0';
+                          let bg = darkMode ? 'rgba(62, 207, 142, 0.15)' : '#EFF6FF';
+                          let textCol = darkMode ? '#3ECF8E' : '#3C50E0';
                           if (ref.includes('twitter') || ref.includes('t.co') || ref.includes('x.com')) {
                             label = 'Twitter / X';
                             bg = darkMode ? 'rgba(2, 132, 199, 0.2)' : '#E0F2FE';

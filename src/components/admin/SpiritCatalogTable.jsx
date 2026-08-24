@@ -67,28 +67,28 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
   };
 
   const containerStyle = {
-    background: darkMode ? '#111C44' : '#FFFFFF',
+    background: darkMode ? '#1C1C1C' : '#FFFFFF',
     borderRadius: '16px',
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
-    boxShadow: darkMode ? '0 4px 20px rgba(0, 0, 0, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.05)',
+    border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
+    boxShadow: darkMode ? '0 4px 20px rgba(0, 0, 0, 0.35)' : '0 1px 3px rgba(0, 0, 0, 0.05)',
     transition: 'all 0.2s ease'
   };
 
   const inputStyle = {
     padding: '9px 14px',
     borderRadius: '10px',
-    background: darkMode ? '#0B1437' : '#F8FAFC',
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid #E2E8F0',
-    color: darkMode ? '#FFFFFF' : '#1E293B',
+    background: darkMode ? '#171717' : '#F8FAFC',
+    border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
+    color: darkMode ? '#EDEDED' : '#1E293B',
     fontSize: '0.82rem',
     fontWeight: 600,
     outline: 'none'
   };
 
-  const textPrimary = darkMode ? '#FFFFFF' : '#1E293B';
-  const textMuted = darkMode ? '#A3AED0' : '#64748B';
-  const tableHeaderBg = darkMode ? '#0D173D' : '#F8FAFC';
-  const rowBorder = darkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #F1F5F9';
+  const textPrimary = darkMode ? '#EDEDED' : '#1E293B';
+  const textMuted = darkMode ? '#8B949E' : '#64748B';
+  const tableHeaderBg = darkMode ? '#171717' : '#F8FAFC';
+  const rowBorder = darkMode ? '1px solid #262626' : '1px solid #F1F5F9';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -153,13 +153,13 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
               gap: '8px',
               padding: '10px 18px',
               borderRadius: '10px',
-              background: '#3C50E0',
-              color: '#FFFFFF',
+              background: darkMode ? '#3ECF8E' : '#3C50E0',
+              color: darkMode ? '#121212' : '#FFFFFF',
               border: 'none',
               fontSize: '0.84rem',
               fontWeight: 800,
               cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(60, 80, 224, 0.25)'
+              boxShadow: darkMode ? '0 4px 12px rgba(62, 207, 142, 0.25)' : '0 4px 12px rgba(60, 80, 224, 0.25)'
             }}
           >
             <Plus size={16} />
@@ -176,7 +176,7 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem', textAlign: 'left' }}>
             <thead>
-              <tr style={{ borderBottom: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0', color: textMuted, background: tableHeaderBg }}>
+              <tr style={{ borderBottom: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0', color: textMuted, background: tableHeaderBg }}>
                 <th style={{ padding: '14px 20px', fontWeight: 700 }}>ESPÍRITU</th>
                 <th style={{ padding: '14px 20px', fontWeight: 700 }}>FAMILIA</th>
                 <th style={{ padding: '14px 20px', fontWeight: 700 }}>RAREZA</th>
@@ -206,8 +206,8 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
                               height: '42px',
                               objectFit: 'contain',
                               borderRadius: '10px',
-                              background: darkMode ? '#0B1437' : '#F8FAFC',
-                              border: darkMode ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #E2E8F0',
+                              background: darkMode ? '#171717' : '#F8FAFC',
+                              border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
                               padding: '2px'
                             }}
                             onError={(e) => { e.target.src = '/sprites/water_basic.png'; }}
@@ -223,7 +223,7 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
 
                       {/* Family */}
                       <td style={{ padding: '12px 20px' }}>
-                        <span style={{ padding: '4px 10px', borderRadius: '8px', background: darkMode ? 'rgba(255, 255, 255, 0.08)' : '#F1F5F9', color: darkMode ? '#E2E8F0' : '#475569', fontSize: '0.78rem', fontWeight: 700 }}>
+                        <span style={{ padding: '4px 10px', borderRadius: '8px', background: darkMode ? '#232323' : '#F1F5F9', color: darkMode ? '#E5E7EB' : '#475569', fontSize: '0.78rem', fontWeight: 700 }}>
                           {sprite.familyName}
                         </span>
                       </td>
@@ -268,7 +268,7 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
                             <span>{sprite.release_date ? 'Programado' : 'No Lanzado'}</span>
                           </span>
                         ) : (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '8px', background: darkMode ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5', color: '#10B981', fontSize: '0.76rem', fontWeight: 800 }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '8px', background: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#ECFDF5', color: '#3ECF8E', fontSize: '0.76rem', fontWeight: 800 }}>
                             <CheckCircle2 size={13} />
                             <span>Activo</span>
                           </span>
@@ -284,9 +284,9 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
                             style={{
                               padding: '7px 10px',
                               borderRadius: '8px',
-                              background: darkMode ? 'rgba(60, 80, 224, 0.2)' : '#EFF6FF',
-                              border: darkMode ? '1px solid rgba(60, 80, 224, 0.4)' : '1px solid #DBEAFE',
-                              color: darkMode ? '#93C5FD' : '#3C50E0',
+                              background: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#EFF6FF',
+                              border: darkMode ? '1px solid rgba(62, 207, 142, 0.3)' : '1px solid #DBEAFE',
+                              color: darkMode ? '#3ECF8E' : '#3C50E0',
                               cursor: 'pointer',
                               display: 'flex',
                               alignItems: 'center',
@@ -335,13 +335,13 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
         {/* Table Pagination Footer */}
         <div style={{
           padding: '16px 24px',
-          borderTop: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
+          borderTop: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: '12px',
-          background: darkMode ? '#0D173D' : '#F8FAFC'
+          background: darkMode ? '#171717' : '#F8FAFC'
         }}>
           <span style={{ fontSize: '0.8rem', color: textMuted }}>
             Mostrando <strong>{Math.min((currentPage - 1) * pageSize + 1, filteredSprites.length)}</strong> a <strong>{Math.min(currentPage * pageSize, filteredSprites.length)}</strong> de <strong>{filteredSprites.length}</strong> espíritus
@@ -355,9 +355,9 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
               style={{
                 padding: '6px 12px',
                 borderRadius: '8px',
-                border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid #E2E8F0',
-                background: darkMode ? '#111C44' : '#FFFFFF',
-                color: currentPage === 1 ? (darkMode ? '#475569' : '#CBD5E1') : textPrimary,
+                border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
+                background: darkMode ? '#1C1C1C' : '#FFFFFF',
+                color: currentPage === 1 ? (darkMode ? '#525252' : '#CBD5E1') : textPrimary,
                 cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -381,9 +381,9 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
               style={{
                 padding: '6px 12px',
                 borderRadius: '8px',
-                border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid #E2E8F0',
-                background: darkMode ? '#111C44' : '#FFFFFF',
-                color: currentPage === totalPages ? (darkMode ? '#475569' : '#CBD5E1') : textPrimary,
+                border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
+                background: darkMode ? '#1C1C1C' : '#FFFFFF',
+                color: currentPage === totalPages ? (darkMode ? '#525252' : '#CBD5E1') : textPrimary,
                 cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',

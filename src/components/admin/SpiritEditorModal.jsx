@@ -213,7 +213,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
       position: 'fixed',
       inset: 0,
       zIndex: 9999,
-      background: 'rgba(10, 15, 30, 0.85)',
+      background: 'rgba(0, 0, 0, 0.75)',
       backdropFilter: 'blur(16px)',
       display: 'flex',
       alignItems: 'center',
@@ -224,10 +224,10 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
       <div style={{
         maxWidth: '960px',
         width: '100%',
-        background: '#0B1437',
-        border: '1px solid rgba(255, 255, 255, 0.12)',
+        background: '#121212',
+        border: '1px solid #2E2E2E',
         borderRadius: '24px',
-        boxShadow: '0 30px 80px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(67, 24, 255, 0.2)',
+        boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9), 0 0 1px 1px rgba(62, 207, 142, 0.2)',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
@@ -236,21 +236,21 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
         {/* Silicon Valley Header */}
         <div style={{
           padding: '20px 28px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          borderBottom: '1px solid #2E2E2E',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: '#111C44'
+          background: '#171717'
         }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-              <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#4318FF', background: 'rgba(67, 24, 255, 0.15)', padding: '2px 8px', borderRadius: '6px', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#3ECF8E', background: 'rgba(62, 207, 142, 0.15)', padding: '2px 8px', borderRadius: '6px', textTransform: 'uppercase' }}>
                 Catalog Studio
               </span>
-              <span style={{ fontSize: '0.75rem', color: '#707EAE' }}>•</span>
-              <span style={{ fontSize: '0.75rem', color: '#707EAE' }}>{isEditing ? `ID: ${formData.id}` : 'Nuevo Registro'}</span>
+              <span style={{ fontSize: '0.75rem', color: '#737373' }}>•</span>
+              <span style={{ fontSize: '0.75rem', color: '#737373' }}>{isEditing ? `ID: ${formData.id}` : 'Nuevo Registro'}</span>
             </div>
-            <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
+            <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#EDEDED', letterSpacing: '-0.02em' }}>
               {isEditing ? `Editar: ${formData.fullName}` : 'Crear & Publicar Espíritu'}
             </h2>
           </div>
@@ -260,8 +260,8 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
             onClick={onClose}
             style={{
               background: 'rgba(255, 255, 255, 0.06)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              color: '#A3AED0',
+              border: '1px solid #2E2E2E',
+              color: '#A1A1A1',
               cursor: 'pointer',
               padding: '8px',
               borderRadius: '10px',
@@ -304,7 +304,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
 
             {/* Drag & Drop Upload Zone */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#A1A1A1', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 Asset Digital (.webp / .png)
               </label>
               <div
@@ -313,9 +313,9 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 onDrop={(e) => { e.preventDefault(); setIsDragOver(false); if (e.dataTransfer.files[0]) handleFileUpload(e.dataTransfer.files[0]); }}
                 onClick={() => fileInputRef.current?.click()}
                 style={{
-                  border: isDragOver ? '2px dashed #4318FF' : '2px dashed rgba(255, 255, 255, 0.15)',
+                  border: isDragOver ? '2px dashed #3ECF8E' : '2px dashed #2E2E2E',
                   borderRadius: '16px',
-                  background: isDragOver ? 'rgba(67, 24, 255, 0.08)' : '#111C44',
+                  background: isDragOver ? 'rgba(62, 207, 142, 0.08)' : '#171717',
                   padding: '24px 16px',
                   textAlign: 'center',
                   cursor: 'pointer',
@@ -329,11 +329,11 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   accept="image/webp,image/png,image/jpeg"
                   style={{ display: 'none' }}
                 />
-                <Upload size={26} style={{ color: '#4318FF', marginBottom: '8px' }} />
-                <p style={{ margin: '0 0 4px', fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF' }}>
+                <Upload size={26} style={{ color: '#3ECF8E', marginBottom: '8px' }} />
+                <p style={{ margin: '0 0 4px', fontSize: '0.88rem', fontWeight: 700, color: '#EDEDED' }}>
                   {uploadingImage ? 'Subiendo imagen a Supabase Storage...' : 'Arrastra o haz clic para subir imagen'}
                 </p>
-                <span style={{ fontSize: '0.74rem', color: '#707EAE' }}>
+                <span style={{ fontSize: '0.74rem', color: '#737373' }}>
                   Soporta formatos .webp y .png transparentes
                 </span>
               </div>
@@ -342,7 +342,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
             {/* Names & Family Row */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#A1A1A1', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Nombre en Español
                 </label>
                 <input
@@ -355,9 +355,9 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                     width: '100%',
                     padding: '12px 14px',
                     borderRadius: '12px',
-                    background: '#111C44',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    color: '#FFFFFF',
+                    background: '#1C1C1C',
+                    border: '1px solid #2E2E2E',
+                    color: '#EDEDED',
                     fontSize: '0.88rem',
                     fontWeight: 600,
                     outline: 'none',
@@ -367,7 +367,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#A1A1A1', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Familia del Espíritu
                 </label>
                 {!isCustomFamily ? (
@@ -378,9 +378,9 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                       width: '100%',
                       padding: '12px 14px',
                       borderRadius: '12px',
-                      background: '#111C44',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      color: '#FFFFFF',
+                      background: '#1C1C1C',
+                      border: '1px solid #2E2E2E',
+                      color: '#EDEDED',
                       fontSize: '0.88rem',
                       fontWeight: 600,
                       outline: 'none',
@@ -388,11 +388,11 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                     }}
                   >
                     {allFamilies.map(fam => (
-                      <option key={fam.id} value={fam.id} style={{ background: '#111C44', color: '#fff' }}>
+                      <option key={fam.id} value={fam.id} style={{ background: '#1C1C1C', color: '#fff' }}>
                         {fam.name} ({fam.id})
                       </option>
                     ))}
-                    <option value="__new__" style={{ background: '#4318FF', color: '#fff', fontWeight: 800 }}>
+                    <option value="__new__" style={{ background: '#3ECF8E', color: '#121212', fontWeight: 800 }}>
                       + Escribir Nueva Familia...
                     </option>
                   </select>
@@ -408,9 +408,9 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                         flex: 1,
                         padding: '12px 14px',
                         borderRadius: '12px',
-                        background: '#111C44',
-                        border: '1px solid #4318FF',
-                        color: '#FFFFFF',
+                        background: '#1C1C1C',
+                        border: '1px solid #3ECF8E',
+                        color: '#EDEDED',
                         fontSize: '0.88rem',
                         fontWeight: 600,
                         outline: 'none',
@@ -423,9 +423,9 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                       style={{
                         padding: '0 12px',
                         borderRadius: '12px',
-                        background: 'rgba(255,255,255,0.08)',
+                        background: '#262626',
                         border: 'none',
-                        color: '#A3AED0',
+                        color: '#A1A1A1',
                         fontSize: '0.75rem',
                         cursor: 'pointer'
                       }}
@@ -440,7 +440,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
             {/* Rarity & Variant Row */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#A1A1A1', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Rareza
                 </label>
                 <select
@@ -602,9 +602,9 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   flex: 1,
                   padding: '14px',
                   borderRadius: '14px',
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  color: '#A3AED0',
-                  border: 'none',
+                  background: '#171717',
+                  border: '1px solid #2E2E2E',
+                  color: '#A1A1A1',
                   fontSize: '0.88rem',
                   fontWeight: 700,
                   cursor: 'pointer'
@@ -620,8 +620,8 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   flex: 2,
                   padding: '14px',
                   borderRadius: '14px',
-                  background: 'linear-gradient(135deg, #4318FF, #00F0E8)',
-                  color: '#FFFFFF',
+                  background: '#3ECF8E',
+                  color: '#121212',
                   border: 'none',
                   fontSize: '0.9rem',
                   fontWeight: 800,
@@ -630,7 +630,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  boxShadow: '0 10px 25px rgba(67, 24, 255, 0.4)'
+                  boxShadow: '0 10px 25px rgba(62, 207, 142, 0.35)'
                 }}
               >
                 <Check size={18} />
@@ -641,16 +641,16 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
 
           {/* RIGHT: Live Interactive Preview */}
           <div style={{
-            background: '#111C44',
+            background: '#171717',
             borderRadius: '20px',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            border: '1px solid #2E2E2E',
             padding: '24px 20px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#4318FF', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '18px' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#3ECF8E', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '18px' }}>
               Vista Previa en Vivo
             </span>
 
@@ -658,9 +658,9 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
               width: '220px',
               borderRadius: '18px',
               padding: '20px 16px',
-              background: '#0B1437',
-              border: `1px solid ${rarityObj.color || '#4318FF'}`,
-              boxShadow: `0 15px 35px rgba(0,0,0,0.7), 0 0 20px ${rarityObj.color || 'rgba(67,24,255,0.3)'}33`,
+              background: '#121212',
+              border: `1px solid ${rarityObj.color || '#3ECF8E'}`,
+              boxShadow: `0 15px 35px rgba(0,0,0,0.7), 0 0 20px ${rarityObj.color || 'rgba(62,207,142,0.3)'}33`,
               textAlign: 'center',
               position: 'relative'
             }}>
@@ -671,7 +671,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 right: '10px',
                 padding: '2px 8px',
                 borderRadius: '6px',
-                background: rarityObj.color || '#4318FF',
+                background: rarityObj.color || '#3ECF8E',
                 color: '#060714',
                 fontSize: '0.65rem',
                 fontWeight: 900
@@ -708,11 +708,11 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 />
               </div>
 
-              <h4 style={{ margin: '0 0 4px', fontSize: '0.92rem', fontWeight: 800, color: '#FFFFFF' }}>
+              <h4 style={{ margin: '0 0 4px', fontSize: '0.92rem', fontWeight: 800, color: '#EDEDED' }}>
                 {formData.fullName || 'Nombre del Espíritu'}
               </h4>
 
-              <div style={{ fontSize: '0.74rem', color: '#A3AED0', marginBottom: '10px' }}>
+              <div style={{ fontSize: '0.74rem', color: '#8B949E', marginBottom: '10px' }}>
                 {formData.summonCost}
               </div>
 
@@ -731,8 +731,8 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 <div style={{
                   padding: '5px 10px',
                   borderRadius: '8px',
-                  background: 'rgba(0, 240, 232, 0.15)',
-                  color: '#00F0E8',
+                  background: 'rgba(62, 207, 142, 0.15)',
+                  color: '#3ECF8E',
                   fontSize: '0.7rem',
                   fontWeight: 900
                 }}>
