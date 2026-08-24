@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Zap, MapPin, Coins, Sparkles } from 'lucide-react';
+import { X, Zap, Coins, Sparkles } from 'lucide-react';
 import { SPRITE_FAMILIES, RARITIES, getSpriteCardStyle } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
@@ -134,16 +134,14 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                 <p className="sdm__card-text">{activeSprite.ability}</p>
               </div>
             </div>
-            <div className="sdm__card-footer">
-              <div className="sdm__card-detail" title="Ubicación oficial en Fortnite">
-                <MapPin size={14} className="sdm__icon sdm__icon--blue" />
-                <span>{activeSprite.location}</span>
+            {activeSprite.summonCost && activeSprite.summonCost !== '0' && (
+              <div className="sdm__card-footer">
+                <div className="sdm__card-detail" title="Coste de invocación">
+                  <Coins size={14} className="sdm__icon sdm__icon--yellow" />
+                  <span>{activeSprite.summonCost}</span>
+                </div>
               </div>
-              <div className="sdm__card-detail" title="Coste de invocación">
-                <Coins size={14} className="sdm__icon sdm__icon--yellow" />
-                <span>{activeSprite.summonCost}</span>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Family progress bar */}
