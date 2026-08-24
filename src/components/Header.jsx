@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { Share2, Users } from 'lucide-react';
 import gsap from 'gsap';
 import { allSprites } from '../data/spritesData';
+import { isSafariOrIOS } from '../utils/deviceDetect';
 
 export function Header({
   spritesPool,
@@ -92,9 +93,13 @@ export function Header({
     }
   }, []);
 
-  // Rotate hero sprite with visibility, viewport and performance awareness (Battery & Thermal saver)
+  // Rotate hero sprite with visibility, viewport and device awareness
   useEffect(() => {
     if (spritePool.length === 0) return;
+
+    // Si es Safari en iOS, ralentizamos el ciclo para evitar calentamiento de batería
+    const isApple = isSafariOrIOS();
+    const intervalTime = isApple ? 8000 : 3500; // Rotación rápida y dinámica en Android / Chromium
 
     let isHeaderVisible = true;
     let observer = null;
@@ -102,11 +107,9 @@ export function Header({
     if (typeof window !== 'undefined' && 'IntersectionObserver' in window && headerRef.current) {
       observer = new IntersectionObserver((entries) => {
         isHeaderVisible = Boolean(entries[0]?.isIntersecting);
-      }, { threshold: 0.1 });
+      }, { threshold: 0.05 });
       observer.observe(headerRef.current);
     }
-
-    const intervalTime = typeof window !== 'undefined' && window.innerWidth <= 600 ? 5000 : 4500;
 
     const interval = setInterval(() => {
       if (document.hidden || !isHeaderVisible || !activeSpriteRef.current) return;
@@ -114,8 +117,8 @@ export function Header({
       gsap.to(activeSpriteRef.current, {
         scale: 0.7,
         opacity: 0,
-        y: -20,
-        duration: 0.35,
+        y: -15,
+        duration: 0.3,
         ease: 'power2.in',
         onComplete: () => {
           setSpriteIndex((prev) => {
@@ -127,7 +130,7 @@ export function Header({
             return next;
           });
 
-          // Also shuffle one random orbit sprite
+          // Also shuffle one random orbit satellite
           setOrbitIndices((prev) => {
             const copy = [...prev];
             const slot = Math.floor(Math.random() * copy.length);
@@ -154,8 +157,8 @@ export function Header({
     if (activeSpriteRef.current) {
       gsap.fromTo(
         activeSpriteRef.current,
-        { scale: 1.3, opacity: 0, y: 20 },
-        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: 'back.out(1.8)' }
+        { scale: 1.25, opacity: 0, y: 15 },
+        { scale: 1, opacity: 1, y: 0, duration: 0.45, ease: 'back.out(1.8)' }
       );
     }
   }, [spriteIndex]);
