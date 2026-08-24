@@ -249,7 +249,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     familyId: familyId,
     familyName: spanishFamilyName,
     location: official?.location || 'Cofres de Sprite & Zonas de Extracción',
-    summonCost: official?.summonCost && official.summonCost !== '0' ? `${official.summonCost} Polvo Estelar` : '0',
+    summonCost: official?.summonCost && official.summonCost !== '0' ? `${official.summonCost} Polvo Estelar` : '5,000 Polvo Estelar',
     ability: official?.ability || 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.',
     specialPerk: official?.specialPerk || ''
   };

@@ -134,14 +134,12 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                 <p className="sdm__card-text">{activeSprite.ability}</p>
               </div>
             </div>
-            {activeSprite.summonCost && activeSprite.summonCost !== '0' && (
-              <div className="sdm__card-footer">
-                <div className="sdm__card-detail" title="Coste de invocación">
-                  <Coins size={14} className="sdm__icon sdm__icon--yellow" />
-                  <span>{activeSprite.summonCost}</span>
-                </div>
+            <div className="sdm__card-footer">
+              <div className="sdm__card-detail" title="Coste de invocación">
+                <Coins size={14} className="sdm__icon sdm__icon--yellow" />
+                <span>{activeSprite.summonCost || '5,000 Polvo Estelar'}</span>
               </div>
-            )}
+            </div>
           </div>
 
           {/* Family progress bar */}
