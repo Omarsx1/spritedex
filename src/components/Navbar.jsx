@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Download, User, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone } from 'lucide-react';
 import { supabase } from '../utils/supabase';
+import { getMyFriendCode } from '../utils/friendCode';
 
 export function Navbar({
   user,
@@ -12,6 +13,7 @@ export function Navbar({
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
+  const myFriendCode = useMemo(() => getMyFriendCode(user?.id), [user]);
   const [animationsEnabled, setAnimationsEnabled] = useState(() => {
     if (typeof window === 'undefined') return true;
 
@@ -201,6 +203,23 @@ export function Navbar({
                 <div className="app-navbar__dropdown-status">
                   <ShieldCheck size={13} color="#10b981" />
                   <span>Sincronizado en la nube</span>
+                </div>
+
+                <div style={{
+                  marginTop: '8px',
+                  padding: '6px 10px',
+                  borderRadius: '8px',
+                  background: 'rgba(0, 240, 232, 0.08)',
+                  border: '1px solid rgba(0, 240, 232, 0.25)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '6px'
+                }}>
+                  <span style={{ fontSize: '0.72rem', color: '#94A3B8', fontWeight: 600 }}>Código de Amigo:</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#00F0E8', fontFamily: 'monospace', letterSpacing: '0.04em' }}>
+                    {myFriendCode}
+                  </span>
                 </div>
               </div>
 
