@@ -14,7 +14,23 @@ export function Navbar({
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
   const [animationsEnabled, setAnimationsEnabled] = useState(() => {
     if (typeof window === 'undefined') return true;
-    return localStorage.getItem('spritedex_animations_enabled') !== 'false';
+
+    // 1. Si el usuario ya tiene una preferencia guardada, respetarla
+    const stored = localStorage.getItem('spritedex_animations_enabled');
+    if (stored !== null) {
+      return stored === 'true';
+    }
+
+    // 2. Si es primera visita, desactivar por defecto en iPhone / iPad (iOS) para cuidar batería y temperatura
+    const ua = navigator.userAgent || navigator.vendor || '';
+    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    const isIPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+
+    if (isIOS || isIPadOS) {
+      return false;
+    }
+
+    return true;
   });
   const userDropdownRef = useRef(null);
   const navMenuRef = useRef(null);
