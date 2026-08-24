@@ -91,13 +91,24 @@ export function Header({
     }
   }, []);
 
-  // Rotate hero sprite with visibility and performance awareness
+  // Rotate hero sprite with visibility, viewport and performance awareness (Battery & Thermal saver)
   useEffect(() => {
     if (spritePool.length === 0) return;
+    // En móviles (<= 600px) no ejecutamos bucles continuos de rotación para evitar calentar la GPU/CPU
+    if (typeof window !== 'undefined' && window.innerWidth <= 600) return;
 
-    const intervalTime = window.innerWidth <= 600 ? 5500 : 3500;
+    let isHeaderVisible = true;
+    let observer = null;
+
+    if (typeof window !== 'undefined' && 'IntersectionObserver' in window && headerRef.current) {
+      observer = new IntersectionObserver((entries) => {
+        isHeaderVisible = Boolean(entries[0]?.isIntersecting);
+      }, { threshold: 0.1 });
+      observer.observe(headerRef.current);
+    }
+
     const interval = setInterval(() => {
-      if (document.hidden || !activeSpriteRef.current) return;
+      if (document.hidden || !isHeaderVisible || !activeSpriteRef.current) return;
 
       gsap.to(activeSpriteRef.current, {
         scale: 0.7,
@@ -129,9 +140,12 @@ export function Header({
           });
         }
       });
-    }, intervalTime);
+    }, 4500);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (observer) observer.disconnect();
+    };
   }, [spritePool, spriteIndex]);
 
   // GSAP animate in when spriteIndex changes
