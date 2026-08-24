@@ -330,23 +330,11 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
               <span>Generando captura HD...</span>
             </div>
           ) : (
-            <>
-              <img
-                src={dataUrl}
-                alt="Vista previa de la colección"
-                className="sdm-share-pro__preview-img"
-              />
-              {isIOS && (
-                <p style={{
-                  textAlign: 'center',
-                  fontSize: '0.74rem',
-                  color: 'rgba(255, 255, 255, 0.5)',
-                  marginTop: '8px'
-                }}>
-                  💡 En iPhone: Puedes pulsar <strong>Descargar</strong> (abrirá el menú de guardar) o mantener presionada la imagen para <strong>Guardar en Fotos</strong>.
-                </p>
-              )}
-            </>
+            <img
+              src={dataUrl}
+              alt="Vista previa de la colección"
+              className="sdm-share-pro__preview-img"
+            />
           )}
         </div>
 
