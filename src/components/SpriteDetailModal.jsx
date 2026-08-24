@@ -109,19 +109,37 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
 
           {/* Ability card */}
           <div className="sdm__card">
+            {activeSprite.specialPerk && (
+              <div className="sdm__perk-badge" style={{
+                background: 'linear-gradient(135deg, rgba(245, 182, 66, 0.2), rgba(34, 197, 94, 0.2), rgba(168, 85, 247, 0.2))',
+                border: '1px solid rgba(245, 182, 66, 0.45)',
+                borderRadius: '8px',
+                padding: '8px 12px',
+                marginBottom: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '0.80rem',
+                fontWeight: 700,
+                color: '#fff'
+              }}>
+                <Sparkles size={16} className="sdm__icon--pink" />
+                <span>{activeSprite.specialPerk}</span>
+              </div>
+            )}
             <div className="sdm__card-row">
               <Zap size={16} className="sdm__icon sdm__icon--yellow" />
               <div>
-                <span className="sdm__card-label">HABILIDAD PASIVA</span>
+                <span className="sdm__card-label">HABILIDAD OFICIAL</span>
                 <p className="sdm__card-text">{activeSprite.ability}</p>
               </div>
             </div>
             <div className="sdm__card-footer">
-              <div className="sdm__card-detail">
+              <div className="sdm__card-detail" title="Ubicación oficial en Fortnite">
                 <MapPin size={14} className="sdm__icon sdm__icon--blue" />
                 <span>{activeSprite.location}</span>
               </div>
-              <div className="sdm__card-detail">
+              <div className="sdm__card-detail" title="Coste de invocación">
                 <Coins size={14} className="sdm__icon sdm__icon--yellow" />
                 <span>{activeSprite.summonCost}</span>
               </div>
