@@ -1,0 +1,139 @@
+import { useState, useEffect, useCallback } from 'react';
+import { ALL_SPRITES } from '../data/spritesData';
+import { supabase, isSupabaseConfigured } from '../utils/supabase';
+
+const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache';
+
+// Evaluates whether a scheduled sprite has reached its automatic release time
+export function evaluateReleaseStatus(sprite) {
+  if (!sprite) return sprite;
+
+  if (sprite.release_date) {
+    const releaseTime = new Date(sprite.release_date).getTime();
+    const now = Date.now();
+    const isNowActive = now >= releaseTime;
+
+    return {
+      ...sprite,
+      unreleased: !isNowActive,
+      isAutoScheduled: true,
+      timeUntilRelease: isNowActive ? 0 : Math.max(0, releaseTime - now)
+    };
+  }
+
+  return sprite;
+}
+
+export function useDynamicSprites() {
+  const [sprites, setSprites] = useState(() => {
+    // Initial hybrid startup: static base + cached dynamic items
+    try {
+      const cached = localStorage.getItem(DYNAMIC_SPRITES_CACHE_KEY);
+      if (cached) {
+        const dynamicList = JSON.parse(cached);
+        const map = new Map(ALL_SPRITES.map(s => [s.id, s]));
+        dynamicList.forEach(item => {
+          map.set(item.id, evaluateReleaseStatus(item));
+        });
+        return Array.from(map.values());
+      }
+    } catch {}
+    return ALL_SPRITES.map(evaluateReleaseStatus);
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [customSpiritsCount, setCustomSpiritsCount] = useState(0);
+
+  // Fetch dynamic catalog from Supabase
+  const refreshDynamicSprites = useCallback(async () => {
+    if (!isSupabaseConfigured || !supabase) return;
+
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('sprites')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        setCustomSpiritsCount(data.length);
+        localStorage.setItem(DYNAMIC_SPRITES_CACHE_KEY, JSON.stringify(data));
+
+        setSprites(() => {
+          const map = new Map(ALL_SPRITES.map(s => [s.id, s]));
+          data.forEach(dbItem => {
+            const formatted = {
+              id: dbItem.id,
+              name: dbItem.name,
+              fullName: dbItem.full_name || dbItem.name,
+              familyId: dbItem.family_id,
+              familyName: dbItem.family_name,
+              rarity: dbItem.rarity,
+              variant: dbItem.variant,
+              variantDisplay: dbItem.variant_display || dbItem.variant,
+              gen: dbItem.gen || 2,
+              image: dbItem.image,
+              ability: dbItem.ability || 'Concede bonificaciones pasivas.',
+              specialPerk: dbItem.special_perk || '',
+              location: dbItem.location || 'Zonas de Extracción',
+              summonCost: dbItem.summon_cost || '2,000 Polvo Estelar',
+              dropChance: dbItem.drop_chance || '1.50%',
+              dropChanceDisplay: dbItem.drop_chance || '1.50%',
+              dropChanceNum: parseFloat(dbItem.drop_chance || '1.5'),
+              unreleased: dbItem.unreleased,
+              release_date: dbItem.release_date
+            };
+            map.set(formatted.id, evaluateReleaseStatus(formatted));
+          });
+          return Array.from(map.values());
+        });
+      }
+    } catch (err) {
+      console.warn('Syncing dynamic spirits notice:', err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshDynamicSprites();
+
+    // Setup Supabase Realtime subscription
+    let subscription = null;
+    if (isSupabaseConfigured && supabase) {
+      const channel = supabase
+        .channel('sprites_catalog_changes')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'sprites' },
+          () => {
+            refreshDynamicSprites();
+          }
+        )
+        .subscribe();
+
+      subscription = channel;
+    }
+
+    // Interval to check automatic scheduled releases every 30 seconds
+    const interval = setInterval(() => {
+      setSprites(prev => prev.map(evaluateReleaseStatus));
+    }, 30000);
+
+    return () => {
+      clearInterval(interval);
+      if (subscription && supabase) {
+        supabase.removeChannel(subscription);
+      }
+    };
+  }, [refreshDynamicSprites]);
+
+  return {
+    sprites,
+    isLoading,
+    customSpiritsCount,
+    refreshDynamicSprites
+  };
+}

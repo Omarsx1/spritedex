@@ -15,6 +15,10 @@ import { InstallPrompt } from './components/InstallPrompt';
 import { Footer } from './components/Footer';
 import { MobileSpriteSwiper } from './components/MobileSpriteSwiper';
 import { useIsMobile } from './hooks/useIsMobile';
+import { useDynamicSprites } from './hooks/useDynamicSprites';
+import { trackEvent } from './utils/telemetry';
+import { AdminLayout } from './components/admin/AdminLayout';
+import { AdminAuthGate, isUserAdminAuthenticated } from './components/admin/AdminAuthGate';
 import { decodeCollectionState } from './utils/shareLink';
 import { supabase, isSupabaseConfigured } from './utils/supabase';
 import { preloadCanvasAssets } from './utils/canvasExporter';
@@ -30,11 +34,27 @@ const LOCAL_STORAGE_KEY = 'fortnite_sprites_pokedex_v3';
 
 export function App() {
   const isMobile = useIsMobile(600);
+  const { sprites: dynamicSprites, refreshDynamicSprites } = useDynamicSprites();
 
-  // Precarga asíncrona de recursos del canvas en segundo plano para exportación instantánea
+  // Detección de ruta secreta /portal-override /studio-override o ?studio=true
+  const [isAdminPortal, setIsAdminPortal] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const path = window.location.pathname.toLowerCase();
+    const params = new URLSearchParams(window.location.search);
+    return path.startsWith('/studio-override') ||
+           path.startsWith('/nexus-core') ||
+           path.startsWith('/portal-override') ||
+           params.has('studio') ||
+           params.get('portal') === 'studio';
+  });
+
+  const [isAdminAuth, setIsAdminAuth] = useState(() => isUserAdminAuthenticated());
+
+  // Registro de telemetría y precarga asíncrona en segundo plano
   useEffect(() => {
-    preloadCanvasAssets(ALL_SPRITES);
-  }, []);
+    trackEvent('pageview');
+    preloadCanvasAssets(dynamicSprites);
+  }, [dynamicSprites]);
   const [userState, setUserState] = useState(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -287,7 +307,7 @@ export function App() {
   };
 
   const filteredSprites = useMemo(() => {
-    let result = ALL_SPRITES.filter((sprite) => {
+    let result = dynamicSprites.filter((sprite) => {
       if (!showUnreleased && sprite.unreleased) return false;
 
       // Filter by Generation (activeGen: 2 = Gen 2, 1 = Gen 1, 0 = All)
@@ -363,15 +383,28 @@ export function App() {
     }
 
     return result;
-  }, [activeGen, searchQuery, baseFilter, spriteFilter, statusFilter, sortBy, showUnreleased, userState, friendState, activeProfile]);
+  }, [
+    dynamicSprites,
+    showUnreleased,
+    activeGen,
+    searchQuery,
+    baseFilter,
+    spriteFilter,
+    statusFilter,
+    sortBy,
+    userState,
+    friendState,
+    activeProfile
+  ]);
 
+  // Counts scoped to current generation (excluding unreleased unless enabled)
   const scopedSprites = useMemo(() => {
-    return ALL_SPRITES.filter((s) => {
+    return dynamicSprites.filter((s) => {
       if (!showUnreleased && s.unreleased) return false;
       if (activeGen !== 0 && s.gen !== activeGen) return false;
       return true;
     });
-  }, [activeGen, showUnreleased]);
+  }, [dynamicSprites, activeGen, showUnreleased]);
 
   const activeState = activeProfile === 'friend' && friendState ? friendState : userState;
   const totalCount = scopedSprites.length;
@@ -379,6 +412,40 @@ export function App() {
   const masteredCount = scopedSprites.filter((s) => activeState[s.id]?.owned && activeState[s.id]?.level === 5).length;
 
   const friendLendableCount = friendState ? scopedSprites.filter((s) => friendState[s.id]?.owned && !userState[s.id]?.owned).length : 0;
+
+  // Render Admin Portal if secret path or query parameter is active
+  if (isAdminPortal) {
+    if (!isAdminAuth) {
+      return (
+        <AdminAuthGate
+          onAuthenticated={() => setIsAdminAuth(true)}
+          onExit={() => {
+            setIsAdminPortal(false);
+            const url = new URL(window.location.href);
+            url.searchParams.delete('studio');
+            url.searchParams.delete('portal');
+            const targetPath = url.pathname.includes('override') || url.pathname.includes('nexus') ? '/' : url.toString();
+            window.history.pushState({}, '', targetPath);
+          }}
+        />
+      );
+    }
+
+    return (
+      <AdminLayout
+        sprites={dynamicSprites}
+        onRefreshSprites={refreshDynamicSprites}
+        onExitAdmin={() => {
+          setIsAdminPortal(false);
+          const url = new URL(window.location.href);
+          url.searchParams.delete('studio');
+          url.searchParams.delete('portal');
+          const targetPath = url.pathname.includes('override') || url.pathname.includes('nexus') ? '/' : url.toString();
+          window.history.pushState({}, '', targetPath);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="app-container">
@@ -501,7 +568,7 @@ export function App() {
       {showShareModal && (
         <ShareImageModal
           filteredSprites={filteredSprites}
-          allSprites={ALL_SPRITES.filter((s) => (activeGen === 0 || s.gen === activeGen) && (showUnreleased || !s.unreleased))}
+          allSprites={dynamicSprites.filter((s) => (activeGen === 0 || s.gen === activeGen) && (showUnreleased || !s.unreleased))}
           userState={userState}
           activeGen={activeGen}
           activeFiltersLabel={
