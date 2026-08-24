@@ -291,7 +291,10 @@ export function AnalyticsDashboard() {
               const list = Array.from(mergedMap.values()).slice(0, 4);
 
               return list.map((ch) => {
-                const pct = data.totalVisits > 0 ? Math.round((ch.count / data.totalVisits) * 100) : (ch.count > 0 ? 100 : 0);
+                const rawPct = data.totalVisits > 0 ? (ch.count / data.totalVisits) * 100 : 0;
+                const pctDisplay = ch.count === 0 ? '0%' : (rawPct > 0 && rawPct < 1) ? '< 1%' : `${Math.round(rawPct)}%`;
+                const barWidth = ch.count > 0 ? Math.max(rawPct, 6) : 0;
+
                 return (
                   <div key={ch.source} style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '4px 0', borderBottom: '1px solid #F8FAFC' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -300,13 +303,13 @@ export function AnalyticsDashboard() {
                         <span style={{ fontSize: '0.84rem', fontWeight: 600, color: '#334155' }}>{ch.source}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '0.74rem', color: '#94A3B8' }}>{pct}%</span>
+                        <span style={{ fontSize: '0.74rem', color: '#94A3B8' }}>{pctDisplay}</span>
                         <strong style={{ fontSize: '0.84rem', color: '#1E293B' }}>{ch.count}</strong>
                       </div>
                     </div>
                     {/* Visual Progress Bar */}
                     <div style={{ width: '100%', height: '4px', background: '#F1F5F9', borderRadius: '2px', overflow: 'hidden' }}>
-                      <div style={{ width: `${Math.max(pct, ch.count > 0 ? 4 : 0)}%`, height: '100%', background: ch.color, borderRadius: '2px', transition: 'width 0.4s ease' }} />
+                      <div style={{ width: `${barWidth}%`, height: '100%', background: ch.color, borderRadius: '2px', transition: 'width 0.4s ease' }} />
                     </div>
                   </div>
                 );
