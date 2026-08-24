@@ -786,15 +786,7 @@ body::after {
   display: inline-block;
 }
 
-/* ===== @designbycode/tailwindcss-text-glitch Authentic Plugin Implementation ===== */
-:root {
-  --tg-rgb-r: #ff0055;
-  --tg-rgb-g: #00f0ff;
-  --tg-rgb-b: #8b5cf6;
-  --tg-rgb-blur: 2px;
-  --tg-rgb-duration: 2.8s;
-}
-
+/* ===== Authentic Fortnite High-Impact Glitch Implementation ===== */
 .hero__title-line--glitch {
   font-family: var(--font-fortnite);
   font-weight: 900;
@@ -806,158 +798,50 @@ body::after {
   -webkit-text-fill-color: #ffffff;
   position: relative;
   display: inline-block;
-  animation: glitch-text-anim var(--tg-rgb-duration, 2.8s) steps(100) infinite;
+  text-shadow: 2px 0 #00f0ff, -2px 0 #ff0055;
+  animation: fortniteHeroGlitch 2.8s infinite ease-in-out;
 }
 
-.hero__title-line--glitch::before,
-.hero__title-line--glitch::after {
-  display: none !important;
-}
-
-@keyframes glitch-text-anim {
-  0%, 1%, 2%, 3%, 4% {
-    text-shadow: 0.25rem 0 0 var(--tg-rgb-r), -0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  5%, 6%, 7%, 8%, 9%, 10% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  11%, 12%, 13% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  14%, 15% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  16%, 17%, 18%, 19%, 20% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  21%, 22%, 23%, 24%, 25% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  26%, 27% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  28%, 29%, 30% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  31%, 32%, 33%, 34% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  35%, 36%, 37% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  38%, 39%, 40% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  41% {
-    text-shadow: 0.8rem 0 0 var(--tg-rgb-b), -0.8rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  42% {
-    text-shadow: 0 0 0 var(--tg-rgb-b), 0 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  43%, 44%, 45% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  46% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  47% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  48%, 49%, 50% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  51%, 52%, 53%, 54% {
-    text-shadow: 0.25rem 0 0 var(--tg-rgb-r), -0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  55%, 56%, 57% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  58%, 59%, 60% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  61% {
-    text-shadow: 0.6rem 0 0 var(--tg-rgb-r), -0.6rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
+@keyframes fortniteHeroGlitch {
+  0%, 60%, 100% {
+    transform: translate3d(0, 0, 0) skew(0deg);
+    text-shadow: 2px 0 #00f0ff, -2px 0 #ff0055;
   }
   62% {
-    text-shadow: 0 0 0 var(--tg-rgb-r), 0 0 0 var(--tg-rgb-g);
-    filter: blur(0);
+    transform: translate3d(-3px, 1px, 0) skew(-3deg);
+    text-shadow: -3px 0 #00f0ff, 3px 0 #ff0055;
   }
-  63%, 64%, 65% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
+  65% {
+    transform: translate3d(3px, -2px, 0) skew(2.5deg);
+    text-shadow: 4px 0 #00f0ff, -4px 0 #ff0055;
   }
-  66%, 67% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  68%, 69%, 70% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
+  68% {
+    transform: translate3d(-2px, 0, 0) skew(0deg);
+    text-shadow: -2px 0 #00f0ff, 2px 0 #ff0055;
   }
   71% {
-    text-shadow: 0.8rem 0 0 var(--tg-rgb-r), -0.8rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
+    transform: translate3d(2px, 1px, 0) skew(1.5deg);
+    text-shadow: 3px 0 #00f0ff, -3px 0 #ff0055;
   }
-  72% {
-    text-shadow: 0 0 0 var(--tg-rgb-r), 0 0 0 var(--tg-rgb-b);
-    filter: blur(0);
+  74% {
+    transform: translate3d(0, 0, 0) skew(0deg);
+    text-shadow: 2px 0 #00f0ff, -2px 0 #ff0055;
   }
-  73%, 74%, 75%, 76% {
-    text-shadow: 0.25rem 0 0 var(--tg-rgb-r), -0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
+  88% {
+    transform: translate3d(0, 0, 0) skew(0deg);
+    text-shadow: 2px 0 #00f0ff, -2px 0 #ff0055;
   }
-  77%, 78%, 79%, 80% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
+  90% {
+    transform: translate3d(-4px, 1px, 0) skew(-2deg);
+    text-shadow: -4px 0 #00f0ff, 4px 0 #ff0055;
   }
-  81%, 82% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
+  93% {
+    transform: translate3d(3px, -1px, 0) skew(2deg);
+    text-shadow: 3px 0 #00f0ff, -3px 0 #ff0055;
   }
-  83%, 84%, 85% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  86%, 87% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  88%, 89%, 90% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  91% {
-    text-shadow: 0.6rem 0 0 var(--tg-rgb-g), -0.6rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  92%, 93%, 94%, 95% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  96%, 97%, 98%, 99%, 100% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
+  96% {
+    transform: translate3d(0, 0, 0) skew(0deg);
+    text-shadow: 2px 0 #00f0ff, -2px 0 #ff0055;
   }
 }
 
