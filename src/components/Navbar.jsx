@@ -125,8 +125,23 @@ export function Navbar({
         </button>
       </div>
 
-      {/* Acciones derechas: Avatar + Menú Hamburguesa */}
+      {/* Acciones derechas: Botón de Animaciones (izq) + Avatar (centro) + Menú Hamburguesa (der) */}
       <div className="app-navbar__right">
+        {/* Botón de Alternar Animaciones (Persistente, lado izquierdo del avatar) */}
+        <button
+          type="button"
+          className={`app-navbar__motion-btn ${animationsEnabled ? 'is-active' : 'is-disabled'}`}
+          onClick={handleToggleAnimations}
+          title={animationsEnabled ? 'Animaciones activadas (Toca para pausar)' : 'Animaciones desactivadas (Toca para activar)'}
+          aria-label={animationsEnabled ? 'Desactivar animaciones' : 'Activar animaciones'}
+        >
+          {animationsEnabled ? (
+            <Zap size={15} strokeWidth={2.4} />
+          ) : (
+            <ZapOff size={15} strokeWidth={2.4} />
+          )}
+        </button>
+
         {/* Avatar / Usuario (Solo Foto o Inicial Circular) */}
         <div ref={userDropdownRef} style={{ position: 'relative' }}>
           <button
@@ -143,7 +158,7 @@ export function Navbar({
                 <span className="app-navbar__avatar-initial">{initialLetter}</span>
               )
             ) : (
-              <User size={16} strokeWidth={2.2} />
+              <User size={15} strokeWidth={2.2} />
             )}
 
             {user && <span className="app-navbar__avatar-dot" />}
@@ -185,21 +200,6 @@ export function Navbar({
             </div>
           )}
         </div>
-
-        {/* Botón de Alternar Animaciones (Persistente) */}
-        <button
-          type="button"
-          className={`app-navbar__motion-btn ${animationsEnabled ? 'is-active' : 'is-disabled'}`}
-          onClick={handleToggleAnimations}
-          title={animationsEnabled ? 'Animaciones activadas (Toca para pausar)' : 'Animaciones desactivadas (Toca para activar)'}
-          aria-label={animationsEnabled ? 'Desactivar animaciones' : 'Activar animaciones'}
-        >
-          {animationsEnabled ? (
-            <Zap size={15} strokeWidth={2.4} />
-          ) : (
-            <ZapOff size={15} strokeWidth={2.4} />
-          )}
-        </button>
 
         {/* Botón Menú Hamburguesa */}
         <div ref={navMenuRef} style={{ position: 'relative' }}>

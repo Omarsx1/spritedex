@@ -368,26 +368,28 @@ body::after {
 /* --- User avatar (inside navbar, right side) --- */
 .app-navbar__avatar {
   position: relative;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.6);
+  border-radius: 9999px;
+  background: rgba(12, 14, 22, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.65);
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
 .app-navbar__avatar:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
   border-color: rgba(255, 255, 255, 0.25);
   color: #fff;
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
 .app-navbar__avatar:active {
@@ -415,7 +417,7 @@ body::after {
 
 .app-navbar__avatar-initial {
   font-family: var(--font-sans);
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 800;
   color: #ffffff;
   text-transform: uppercase;
@@ -426,24 +428,27 @@ body::after {
   position: absolute;
   bottom: 0px;
   right: 0px;
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #10b981;
-  border: 2px solid #060714;
+  border: 1.5px solid #060714;
   box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
 }
 
-/* --- Motion Toggle Button --- */
+/* --- Motion Toggle Button (separado y a la izquierda de la foto) --- */
 .app-navbar__motion-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  margin-right: 6px;
+  border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(12, 14, 22, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -454,7 +459,7 @@ body::after {
   background: rgba(0, 240, 232, 0.12);
   border-color: rgba(0, 240, 232, 0.45);
   color: #00F0E8;
-  box-shadow: 0 0 14px rgba(0, 240, 232, 0.35);
+  box-shadow: 0 0 12px rgba(0, 240, 232, 0.3);
 }
 
 .app-navbar__motion-btn.is-disabled {
@@ -464,11 +469,14 @@ body::after {
 }
 
 .app-navbar__motion-btn:hover {
-  transform: scale(1.06);
+  transform: scale(1.04);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
 }
 
 .app-navbar__motion-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.96);
 }
 
 .app-navbar__chevron.open {
