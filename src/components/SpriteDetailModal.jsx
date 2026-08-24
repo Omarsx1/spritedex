@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Zap, Coins, Sparkles } from 'lucide-react';
+import { X, Zap, Sparkles } from 'lucide-react';
 import { SPRITE_FAMILIES, RARITIES, getSpriteCardStyle } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
@@ -136,7 +136,12 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
             </div>
             <div className="sdm__card-footer">
               <div className="sdm__card-detail" title="Coste de invocación">
-                <Coins size={14} className="sdm__icon sdm__icon--yellow" />
+                <img
+                  src="/img/stelar.webp"
+                  alt="Polvo Estelar"
+                  className="sdm__stelar-img"
+                  style={{ width: '18px', height: '18px', objectFit: 'contain', display: 'inline-block' }}
+                />
                 <span>{activeSprite.summonCost || '5,000 Polvo Estelar'}</span>
               </div>
             </div>
