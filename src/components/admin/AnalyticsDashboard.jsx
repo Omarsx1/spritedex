@@ -42,13 +42,15 @@ export function AnalyticsDashboard() {
   }, []);
 
   const totalEvents = data.recentEvents.length || 0;
-  const mobileCount = (data.deviceBreakdown.mobile || 0);
-  const desktopCount = (data.deviceBreakdown.desktop || 0);
-  const totalDev = mobileCount + desktopCount;
-  const mobilePct = totalDev > 0 ? Math.round((mobileCount / totalDev) * 100) : 50;
-  const desktopPct = 100 - mobilePct;
   const iphoneCount = data.deviceBreakdown.iphone || 0;
-  const iphonePct = totalDev > 0 ? Math.round((iphoneCount / totalDev) * 100) : 0;
+  const androidCount = data.deviceBreakdown.android || 0;
+  const desktopCount = data.deviceBreakdown.desktop || 0;
+  const totalDev = iphoneCount + androidCount + desktopCount || 1;
+
+  const iphonePct = Math.round((iphoneCount / totalDev) * 100);
+  const androidPct = Math.round((androidCount / totalDev) * 100);
+  const desktopPct = Math.max(0, 100 - iphonePct - androidPct);
+  const mobilePct = iphonePct + androidPct;
 
   // Real 30-day dynamic bar heights computed from Supabase
   const buckets = data.dailyBuckets && data.dailyBuckets.length === 30 ? data.dailyBuckets : Array(30).fill(0);
@@ -102,7 +104,7 @@ export function AnalyticsDashboard() {
           </div>
         </div>
 
-        {/* Card 3: Tráfico iPhone */}
+        {/* Card 3: Tráfico iPhone & Android */}
         <div style={{
           background: '#FFFFFF',
           borderRadius: '14px',
@@ -111,13 +113,16 @@ export function AnalyticsDashboard() {
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748B' }}>Tráfico iPhone / iOS</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: '#EFF6FF', color: '#3C50E0', fontSize: '0.72rem', fontWeight: 800 }}>
-              <span>{iphoneCount} sesiones</span>
+            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748B' }}>Móviles (iOS & Android)</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '20px', background: '#EFF6FF', color: '#3C50E0', fontSize: '0.72rem', fontWeight: 800 }}>
+              <span>{iphoneCount} iOS • {androidCount} Android</span>
             </div>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#1E293B', letterSpacing: '-0.03em' }}>
-            {iphonePct}%
+          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#1E293B', letterSpacing: '-0.03em', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+            <span>{mobilePct}%</span>
+            <span style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 600 }}>
+              ({iphonePct}% iOS • {androidPct}% Android)
+            </span>
           </div>
         </div>
 
@@ -433,11 +438,13 @@ export function AnalyticsDashboard() {
             Sessions By Device
           </h3>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '16px 0' }}>
-            {/* SVG Donut Chart */}
-            <div style={{ width: '130px', height: '130px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '10px 0', flexWrap: 'wrap', gap: '16px' }}>
+            {/* SVG Donut Chart (3 Segments) */}
+            <div style={{ width: '130px', height: '130px', position: 'relative' }}>
               <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                {/* Background Track (Desktop) */}
                 <circle cx="50" cy="50" r="38" fill="transparent" stroke="#E2E8F0" strokeWidth="14" />
+                {/* Segment 1: iPhone (Blue) */}
                 <circle
                   cx="50"
                   cy="50"
@@ -445,23 +452,42 @@ export function AnalyticsDashboard() {
                   fill="transparent"
                   stroke="#3C50E0"
                   strokeWidth="14"
-                  strokeDasharray={`${mobilePct * 2.38} 238`}
-                  strokeLinecap="round"
+                  strokeDasharray={`${(iphonePct / 100) * 238} 238`}
+                  strokeDashoffset="0"
+                />
+                {/* Segment 2: Android (Emerald) */}
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="38"
+                  fill="transparent"
+                  stroke="#10B981"
+                  strokeWidth="14"
+                  strokeDasharray={`${(androidPct / 100) * 238} 238`}
+                  strokeDashoffset={`-${(iphonePct / 100) * 238}`}
                 />
               </svg>
             </div>
 
-            {/* Legend */}
+            {/* Legend (3 Channels) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem' }}>
                 <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: '#3C50E0' }} />
-                <span style={{ color: '#64748B' }}>Móvil / iPhone:</span>
-                <strong style={{ color: '#1E293B' }}>{mobilePct}%</strong>
+                <span style={{ color: '#64748B' }}>iPhone / iOS:</span>
+                <strong style={{ color: '#1E293B' }}>{iphonePct}%</strong>
+                <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>({iphoneCount})</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem' }}>
-                <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: '#E2E8F0' }} />
-                <span style={{ color: '#64748B' }}>Desktop / PC:</span>
+                <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: '#10B981' }} />
+                <span style={{ color: '#64748B' }}>Android:</span>
+                <strong style={{ color: '#1E293B' }}>{androidPct}%</strong>
+                <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>({androidCount})</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem' }}>
+                <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: '#94A3B8' }} />
+                <span style={{ color: '#64748B' }}>Desktop (Mac/PC):</span>
                 <strong style={{ color: '#1E293B' }}>{desktopPct}%</strong>
+                <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>({desktopCount})</span>
               </div>
             </div>
           </div>

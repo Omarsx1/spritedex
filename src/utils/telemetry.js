@@ -174,15 +174,27 @@ export async function fetchAnalyticsOverview() {
           // Channel attribution
           let ch = 'Tráfico Directo / App';
           const ref = (ev.referrer || '').toLowerCase();
-          if (ref.includes('twitter') || ref.includes('t.co') || ref.includes('x.com')) ch = 'Twitter / X';
-          else if (ref.includes('tiktok')) ch = 'TikTok';
-          else if (ref.includes('google')) ch = 'Google Búsquedas';
-          else if (ref.includes('discord')) ch = 'Discord';
-          else if (ref.includes('instagram')) ch = 'Instagram';
-          else if (ref.includes('youtube')) ch = 'YouTube';
-          else if (ref.includes('reddit')) ch = 'Reddit';
-          else if (ref.includes('facebook') || ref.includes('fb')) ch = 'Facebook';
-          else if (ref.includes('campaign:')) {
+
+          // Detección de App en Pantalla de Inicio (Android PWA / Launcher)
+          if (ref.startsWith('android-app:') || ref.includes('nexuslauncher') || ref.includes('quicksearchbox') || ref.includes('launcher')) {
+            ch = 'Tráfico Directo / App';
+          } else if (ref.includes('twitter') || ref.includes('t.co') || ref.includes('x.com')) {
+            ch = 'Twitter / X';
+          } else if (ref.includes('tiktok')) {
+            ch = 'TikTok & Reels';
+          } else if (ref.includes('google.') || ref.includes('/search') || ref.includes('googlesearch')) {
+            ch = 'Google Búsquedas';
+          } else if (ref.includes('discord')) {
+            ch = 'Discord';
+          } else if (ref.includes('instagram')) {
+            ch = 'Instagram';
+          } else if (ref.includes('youtube')) {
+            ch = 'YouTube';
+          } else if (ref.includes('reddit')) {
+            ch = 'Reddit';
+          } else if (ref.includes('facebook') || ref.includes('fb.')) {
+            ch = 'Facebook';
+          } else if (ref.includes('campaign:')) {
             const raw = ref.replace('campaign:', '').trim();
             ch = raw.charAt(0).toUpperCase() + raw.slice(1);
           }
@@ -222,10 +234,15 @@ export async function fetchAnalyticsOverview() {
           if (evTime >= recentCutoff) {
             liveSessions.add(ev.session_id);
           }
-          const dev = ev.device_type || 'desktop';
-          result.deviceBreakdown[dev] = (result.deviceBreakdown[dev] || 0) + 1;
-          if (ev.is_iphone) {
+          const os = (ev.os || '').toLowerCase();
+          if (ev.is_iphone || os.includes('ios') || os.includes('iphone')) {
             result.deviceBreakdown.iphone = (result.deviceBreakdown.iphone || 0) + 1;
+          } else if (os.includes('android')) {
+            result.deviceBreakdown.android = (result.deviceBreakdown.android || 0) + 1;
+          } else if (os.includes('ipad') || ev.device_type === 'tablet') {
+            result.deviceBreakdown.tablet = (result.deviceBreakdown.tablet || 0) + 1;
+          } else {
+            result.deviceBreakdown.desktop = (result.deviceBreakdown.desktop || 0) + 1;
           }
           const br = ev.browser || 'Other';
           result.browserBreakdown[br] = (result.browserBreakdown[br] || 0) + 1;
