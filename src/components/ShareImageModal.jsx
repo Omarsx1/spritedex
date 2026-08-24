@@ -125,13 +125,56 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     return `spritedex_${dateStr}_${timeStr}.png`;
   };
 
-  const handleDownload = () => {
+  const isIOS = typeof navigator !== 'undefined' && (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  );
+
+  const handleDownload = async () => {
     if (!dataUrl) return;
     sounds.playBeep();
-    const a = document.createElement('a');
-    a.href = dataUrl;
-    a.download = getCaptureFilename();
-    a.click();
+
+    try {
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const filename = getCaptureFilename();
+      const file = new File([blob], filename, { type: 'image/png' });
+
+      // En iOS / iPhone Safari, la descarga sintética de Data URLs falla/parpadea.
+      // Usamos la Web Share API nativa que abre la hoja de iOS para "Guardar imagen" en el Carrete.
+      if (isIOS && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: 'Plantilla de Espíritus Fortnite',
+            text: getShareableText(),
+            files: [file]
+          });
+          return;
+        } catch (shareErr) {
+          if (shareErr.name === 'AbortError') return; // Cancelado por el usuario
+          console.warn('Share falló, usando fallback de blob:', shareErr);
+        }
+      }
+
+      // Método Blob universal para navegadores estándar
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+    } catch (err) {
+      console.error('Error al descargar:', err);
+      // Fallback
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = getCaptureFilename();
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
   };
 
   const handleNativeShare = async () => {
@@ -145,21 +188,23 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
-          title: 'Plantilla de Espíritus Fortnite Override',
+          title: 'Plantilla de Espíritus Fortnite',
           text: getShareableText(),
           files: [file]
         });
       } else if (navigator.share) {
         await navigator.share({
-          title: 'Plantilla de Espíritus Fortnite Override',
+          title: 'Plantilla de Espíritus Fortnite',
           text: getShareableText()
         });
       } else {
         handleDownload();
       }
     } catch (err) {
-      console.log('Share canceled or failed:', err);
-      handleDownload();
+      if (err.name !== 'AbortError') {
+        console.log('Share canceled or failed:', err);
+        handleDownload();
+      }
     }
   };
 
@@ -282,11 +327,23 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
               <span>Generando captura HD...</span>
             </div>
           ) : (
-            <img
-              src={dataUrl}
-              alt="Vista previa de la colección"
-              className="sdm-share-pro__preview-img"
-            />
+            <>
+              <img
+                src={dataUrl}
+                alt="Vista previa de la colección"
+                className="sdm-share-pro__preview-img"
+              />
+              {isIOS && (
+                <p style={{
+                  textAlign: 'center',
+                  fontSize: '0.74rem',
+                  color: 'rgba(255, 255, 255, 0.5)',
+                  marginTop: '8px'
+                }}>
+                  💡 En iPhone: Puedes pulsar <strong>Descargar</strong> (abrirá el menú de guardar) o mantener presionada la imagen para <strong>Guardar en Fotos</strong>.
+                </p>
+              )}
+            </>
           )}
         </div>
 
