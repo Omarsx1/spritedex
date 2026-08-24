@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Download, User, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles } from 'lucide-react';
+import { Download, User, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff } from 'lucide-react';
 import { supabase } from '../utils/supabase';
 
 export function Navbar({
@@ -12,8 +12,30 @@ export function Navbar({
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
+  const [animationsEnabled, setAnimationsEnabled] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return localStorage.getItem('spritedex_animations_enabled') !== 'false';
+  });
   const userDropdownRef = useRef(null);
   const navMenuRef = useRef(null);
+
+  // Sincroniza preferencia persistente de animaciones en DOM y localStorage
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (animationsEnabled) {
+      document.documentElement.classList.remove('motion-disabled');
+      document.body.classList.remove('motion-disabled');
+      localStorage.setItem('spritedex_animations_enabled', 'true');
+    } else {
+      document.documentElement.classList.add('motion-disabled');
+      document.body.classList.add('motion-disabled');
+      localStorage.setItem('spritedex_animations_enabled', 'false');
+    }
+  }, [animationsEnabled]);
+
+  const handleToggleAnimations = () => {
+    setAnimationsEnabled((prev) => !prev);
+  };
 
   const fullName = useMemo(() => {
     if (!user) return null;
@@ -163,6 +185,21 @@ export function Navbar({
             </div>
           )}
         </div>
+
+        {/* Botón de Alternar Animaciones (Persistente) */}
+        <button
+          type="button"
+          className={`app-navbar__motion-btn ${animationsEnabled ? 'is-active' : 'is-disabled'}`}
+          onClick={handleToggleAnimations}
+          title={animationsEnabled ? 'Animaciones activadas (Toca para pausar)' : 'Animaciones desactivadas (Toca para activar)'}
+          aria-label={animationsEnabled ? 'Desactivar animaciones' : 'Activar animaciones'}
+        >
+          {animationsEnabled ? (
+            <Zap size={15} strokeWidth={2.4} />
+          ) : (
+            <ZapOff size={15} strokeWidth={2.4} />
+          )}
+        </button>
 
         {/* Botón Menú Hamburguesa */}
         <div ref={navMenuRef} style={{ position: 'relative' }}>

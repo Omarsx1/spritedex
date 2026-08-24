@@ -433,8 +433,41 @@ body::after {
   box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
 }
 
-.app-navbar__chevron.open {
-  transform: rotate(180deg);
+/* --- Motion Toggle Button --- */
+.app-navbar__motion-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.app-navbar__motion-btn.is-active {
+  background: rgba(0, 240, 232, 0.12);
+  border-color: rgba(0, 240, 232, 0.45);
+  color: #00F0E8;
+  box-shadow: 0 0 14px rgba(0, 240, 232, 0.35);
+}
+
+.app-navbar__motion-btn.is-disabled {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.22);
+}
+
+.app-navbar__motion-btn:hover {
+  transform: scale(1.06);
+}
+
+.app-navbar__motion-btn:active {
+  transform: scale(0.95);
 }
 
 /* --- Dropdown Menu (Logged User) --- */
@@ -3966,13 +3999,25 @@ body::after {
 /* Descargar con Efecto Glitch Oficial Cyberpunk */
 .sdm-share__glitch-btn {
   position: relative;
-  background: rgba(0, 240, 232, 0.12);
+  background: rgba(0, 240, 232, 0.15);
   border: 1.5px solid #00F0E8;
   color: #00F0E8;
-  box-shadow: 0 0 12px rgba(0, 240, 232, 0.25);
+  box-shadow: 0 0 14px rgba(0, 240, 232, 0.35);
   overflow: hidden;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  animation: sdmGlitchBtnPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes sdmGlitchBtnPulse {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(0, 240, 232, 0.3);
+    border-color: #00F0E8;
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(0, 240, 232, 0.7), 0 0 30px rgba(255, 0, 85, 0.3);
+    border-color: #FF0055;
+  }
 }
 
 .sdm-share__glitch-btn:hover:not(:disabled),
@@ -6126,41 +6171,15 @@ body::after {
 }
 
 /* ==========================================================================
-   MOBILE & SAFARI PERFORMANCE & BATTERY OPTIMIZATIONS (THERMAL SHIELD)
-   Elimina recalentamiento y consumo de batería en iPhone / Safari sin perder estilo
+   USER-CONTROLLED MOTION PREFERENCE (.motion-disabled)
+   Guarda y respeta la preferencia del usuario en localStorage
    ========================================================================== */
-@media (max-width: 768px) {
-  /* 1. Fondo de cuadrícula y partículas infinitas pausadas en móvil */
-  .hero__bg-grid {
-    animation: none !important;
-  }
-  .hero__particles {
-    display: none !important;
-  }
-  .hero__scanline {
-    opacity: 0.5;
-  }
-
-  /* 2. Optimización de Mastered Cards: elimina bucles continuos de scanlines y partículas */
-  .scan-line {
-    animation: none !important;
-    display: none !important;
-  }
-  .cyber-lines {
-    display: none !important;
-  }
-  .card-particles {
-    display: none !important;
-  }
-  .glowing-elements {
-    display: none !important;
-  }
-
-  /* 3. Optimización de renderizado por tarjeta */
-  .sprite-card,
-  .ms-card {
-    contain: layout style paint;
-  }
+.motion-disabled *,
+.motion-disabled *::before,
+.motion-disabled *::after {
+  animation-play-state: paused !important;
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
