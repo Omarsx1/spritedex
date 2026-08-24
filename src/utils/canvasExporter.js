@@ -483,6 +483,8 @@ function renderGlitchOverrideTemplate({
     const level = state.level || 1;
     const isMastered = isOwned && level === 5;
 
+    const spiritHue = getSpiritHue(sprite);
+
     const cardMarginX = 6;
     const cardMarginY = 6;
     const cardX = x + cardMarginX;

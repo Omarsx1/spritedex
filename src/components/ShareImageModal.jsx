@@ -79,6 +79,9 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     }).then((url) => {
       setDataUrl(url);
       setIsGenerating(false);
+    }).catch((err) => {
+      console.error('Error generando imagen de plantilla:', err);
+      setIsGenerating(false);
     });
   }, [spritesList, userState, format, bgStyle]);
 
