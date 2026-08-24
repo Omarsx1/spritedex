@@ -796,7 +796,15 @@ body::after {
   display: inline-block;
 }
 
-/* ===== Authentic Fortnite RGB Slice Glitch Implementation ===== */
+/* ===== @designbycode/tailwindcss-text-glitch Authentic Plugin Implementation ===== */
+:root {
+  --tg-rgb-r: #ff0055;
+  --tg-rgb-g: #00f0ff;
+  --tg-rgb-b: #8b5cf6;
+  --tg-rgb-blur: 2px;
+  --tg-rgb-duration: 2.8s;
+}
+
 .hero__title-line--glitch {
   font-family: var(--font-fortnite);
   font-weight: 900;
@@ -808,142 +816,159 @@ body::after {
   -webkit-text-fill-color: #ffffff;
   position: relative;
   display: inline-block;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
-  animation: fortniteGlitchMain 3.5s infinite;
+  animation: glitch-text-anim var(--tg-rgb-duration, 2.8s) steps(100) infinite;
 }
 
 .hero__title-line--glitch::before,
 .hero__title-line--glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
+  display: none !important;
 }
 
-/* Cyan Cyber Layer */
-.hero__title-line--glitch::before {
-  color: #00f0ff;
-  -webkit-text-fill-color: #00f0ff;
-  z-index: -1;
-  text-shadow: -2px 0 #00f0ff;
-  animation: fortniteGlitchCyan 2.8s infinite linear alternate-reverse;
-}
-
-/* Magenta Cyber Layer */
-.hero__title-line--glitch::after {
-  color: #ff0055;
-  -webkit-text-fill-color: #ff0055;
-  z-index: -2;
-  text-shadow: 2px 0 #ff0055;
-  animation: fortniteGlitchMagenta 2.3s infinite linear alternate-reverse;
-}
-
-/* Glitch Main Keyframes */
-@keyframes fortniteGlitchMain {
-  0%, 82%, 100% {
-    transform: translate(0, 0) skew(0deg);
+@keyframes glitch-text-anim {
+  0%, 1%, 2%, 3%, 4% {
+    text-shadow: 0.25rem 0 0 var(--tg-rgb-r), -0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
   }
-  83% {
-    transform: translate(-3px, 1px) skew(-3deg);
+  5%, 6%, 7%, 8%, 9%, 10% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
   }
-  85% {
-    transform: translate(3px, -2px) skew(2deg);
+  11%, 12%, 13% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
   }
-  87% {
-    transform: translate(-2px, 0) skew(0deg);
+  14%, 15% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
   }
-  89% {
-    transform: translate(2px, 1px) skew(1deg);
+  16%, 17%, 18%, 19%, 20% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  21%, 22%, 23%, 24%, 25% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  26%, 27% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  28%, 29%, 30% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  31%, 32%, 33%, 34% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  35%, 36%, 37% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  38%, 39%, 40% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  41% {
+    text-shadow: 0.8rem 0 0 var(--tg-rgb-b), -0.8rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  42% {
+    text-shadow: 0 0 0 var(--tg-rgb-b), 0 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  43%, 44%, 45% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  46% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  47% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  48%, 49%, 50% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  51%, 52%, 53%, 54% {
+    text-shadow: 0.25rem 0 0 var(--tg-rgb-r), -0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
+  }
+  55%, 56%, 57% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  58%, 59%, 60% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
+  }
+  61% {
+    text-shadow: 0.6rem 0 0 var(--tg-rgb-r), -0.6rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  62% {
+    text-shadow: 0 0 0 var(--tg-rgb-r), 0 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  63%, 64%, 65% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
+  }
+  66%, 67% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  68%, 69%, 70% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
+  }
+  71% {
+    text-shadow: 0.8rem 0 0 var(--tg-rgb-r), -0.8rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
+  }
+  72% {
+    text-shadow: 0 0 0 var(--tg-rgb-r), 0 0 0 var(--tg-rgb-b);
+    filter: blur(0);
+  }
+  73%, 74%, 75%, 76% {
+    text-shadow: 0.25rem 0 0 var(--tg-rgb-r), -0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
+  }
+  77%, 78%, 79%, 80% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
+  }
+  81%, 82% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  83%, 84%, 85% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  86%, 87% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  88%, 89%, 90% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
   }
   91% {
-    transform: translate(0, 0) skew(0deg);
+    text-shadow: 0.6rem 0 0 var(--tg-rgb-g), -0.6rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
   }
-}
-
-/* Glitch Cyan Slices */
-@keyframes fortniteGlitchCyan {
-  0% {
-    clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%);
-    transform: translate(-2px, 0);
+  92%, 93%, 94%, 95% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
   }
-  15% {
-    clip-path: polygon(0 15%, 100% 15%, 100% 22%, 0 22%);
-    transform: translate(3px, -1px);
+  96%, 97%, 98%, 99%, 100% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
   }
-  30% {
-    clip-path: polygon(0 40%, 100% 40%, 100% 48%, 0 48%);
-    transform: translate(-3px, 1px);
-  }
-  45% {
-    clip-path: polygon(0 60%, 100% 60%, 100% 68%, 0 68%);
-    transform: translate(2px, 0);
-  }
-  60% {
-    clip-path: polygon(0 80%, 100% 80%, 100% 88%, 0 88%);
-    transform: translate(-2px, -1px);
-  }
-  75% {
-    clip-path: polygon(0 30%, 100% 30%, 100% 36%, 0 36%);
-    transform: translate(3px, 1px);
-  }
-  85% {
-    clip-path: polygon(0 50%, 100% 50%, 100% 58%, 0 58%);
-    transform: translate(-4px, 0);
-  }
-  92% {
-    clip-path: polygon(0 10%, 100% 10%, 100% 90%, 0 90%);
-    transform: translate(4px, -2px);
-  }
-  100% {
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-    transform: translate(-2px, 0);
-  }
-}
-
-/* Glitch Magenta Slices */
-@keyframes fortniteGlitchMagenta {
-  0% {
-    clip-path: polygon(0 85%, 100% 85%, 100% 92%, 0 92%);
-    transform: translate(2px, 0);
-  }
-  18% {
-    clip-path: polygon(0 50%, 100% 50%, 100% 56%, 0 56%);
-    transform: translate(-3px, 1px);
-  }
-  35% {
-    clip-path: polygon(0 25%, 100% 25%, 100% 32%, 0 32%);
-    transform: translate(3px, -1px);
-  }
-  52% {
-    clip-path: polygon(0 70%, 100% 70%, 100% 78%, 0 78%);
-    transform: translate(-2px, 0);
-  }
-  70% {
-    clip-path: polygon(0 10%, 100% 10%, 100% 18%, 0 18%);
-    transform: translate(2px, 1px);
-  }
-  84% {
-    clip-path: polygon(0 45%, 100% 45%, 100% 52%, 0 52%);
-    transform: translate(-3px, -1px);
-  }
-  92% {
-    clip-path: polygon(0 20%, 100% 20%, 100% 80%, 0 80%);
-    transform: translate(-4px, 2px);
-  }
-  100% {
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-    transform: translate(2px, 0);
-  }
-}
-
-/* Optimización térmica suave para Safari / iOS */
-body.is-safari-ios .hero__title-line--glitch::before,
-body.is-safari-ios .hero__title-line--glitch::after {
-  animation-duration: 6s;
-  opacity: 0.5;
 }
 
 .hero__title-line--accent {

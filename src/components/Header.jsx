@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { Share2, Users } from 'lucide-react';
 import gsap from 'gsap';
 import { allSprites } from '../data/spritesData';
-import { isSafariOrIOS } from '../utils/deviceDetect';
 
 export function Header({
   spritesPool,
@@ -41,7 +40,6 @@ export function Header({
     return indices;
   });
 
-  const headerRef = useRef(null);
   const activeSpriteRef = useRef(null);
   const orbitContainerRef = useRef(null);
   const titleRef = useRef(null);
@@ -93,32 +91,19 @@ export function Header({
     }
   }, []);
 
-  // Rotate hero sprite with visibility, viewport and device awareness
+  // Rotate hero sprite with visibility and performance awareness
   useEffect(() => {
     if (spritePool.length === 0) return;
 
-    // Si es Safari en iOS, ralentizamos el ciclo para evitar calentamiento de batería
-    const isApple = isSafariOrIOS();
-    const intervalTime = isApple ? 8000 : 3500; // Rotación rápida y dinámica en Android / Chromium
-
-    let isHeaderVisible = true;
-    let observer = null;
-
-    if (typeof window !== 'undefined' && 'IntersectionObserver' in window && headerRef.current) {
-      observer = new IntersectionObserver((entries) => {
-        isHeaderVisible = Boolean(entries[0]?.isIntersecting);
-      }, { threshold: 0.05 });
-      observer.observe(headerRef.current);
-    }
-
+    const intervalTime = typeof window !== 'undefined' && window.innerWidth <= 600 ? 5500 : 3500;
     const interval = setInterval(() => {
-      if (document.hidden || !isHeaderVisible || !activeSpriteRef.current) return;
+      if (document.hidden || !activeSpriteRef.current) return;
 
       gsap.to(activeSpriteRef.current, {
         scale: 0.7,
         opacity: 0,
-        y: -15,
-        duration: 0.3,
+        y: -20,
+        duration: 0.35,
         ease: 'power2.in',
         onComplete: () => {
           setSpriteIndex((prev) => {
@@ -130,7 +115,7 @@ export function Header({
             return next;
           });
 
-          // Also shuffle one random orbit satellite
+          // Also shuffle one random orbit sprite
           setOrbitIndices((prev) => {
             const copy = [...prev];
             const slot = Math.floor(Math.random() * copy.length);
@@ -146,10 +131,7 @@ export function Header({
       });
     }, intervalTime);
 
-    return () => {
-      clearInterval(interval);
-      if (observer) observer.disconnect();
-    };
+    return () => clearInterval(interval);
   }, [spritePool, spriteIndex]);
 
   // GSAP animate in when spriteIndex changes
@@ -157,8 +139,8 @@ export function Header({
     if (activeSpriteRef.current) {
       gsap.fromTo(
         activeSpriteRef.current,
-        { scale: 1.25, opacity: 0, y: 15 },
-        { scale: 1, opacity: 1, y: 0, duration: 0.45, ease: 'back.out(1.8)' }
+        { scale: 1.3, opacity: 0, y: 20 },
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: 'back.out(1.8)' }
       );
     }
   }, [spriteIndex]);
@@ -169,7 +151,7 @@ export function Header({
   }, []);
 
   return (
-    <header className="hero" ref={headerRef}>
+    <header className="hero">
       {/* Animated background layers */}
       <div className="hero__bg">
         <div className="hero__grid" />
