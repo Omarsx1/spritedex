@@ -13,27 +13,41 @@ import {
   ChevronLeft, 
   ChevronRight,
   ShieldCheck,
-  Star
+  Star,
+  Layers,
+  Crown
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
+import { getMyFriendCode } from '../../utils/friendCode';
 
 export function UserManagementTable({ sprites = [], darkMode = false }) {
-  const [users, setUsers] = useState([]);
+  const [rawCollections, setRawCollections] = useState([]);
   const [totalVisits, setTotalVisits] = useState(0);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState('all'); // 'all' | 'high_progress' | 'recent'
+  const [filterType, setFilterType] = useState('all'); // 'all' | 'high_progress' | 'active_catch'
+  const [selectedGen, setSelectedGen] = useState(2); // 2 = Temporada Actual (2ª Gen), 1 = 1ª Gen, 0 = Todas
   const [currentPage, setCurrentPage] = useState(1);
   const [copiedCode, setCopiedCode] = useState(null);
   const pageSize = 15;
 
-  const totalSpriteCount = sprites.length || 60;
+  const myFriendCode = useMemo(() => getMyFriendCode(), []);
+
+  // Filter pool of sprites according to selected generation
+  const scopedSprites = useMemo(() => {
+    if (selectedGen === 0) return sprites;
+    return sprites.filter((s) => s.gen === selectedGen);
+  }, [sprites, selectedGen]);
+
+  const gen2Count = useMemo(() => sprites.filter(s => s.gen === 2).length || 60, [sprites]);
+  const gen1Count = useMemo(() => sprites.filter(s => s.gen === 1).length || 109, [sprites]);
+  const allCount = useMemo(() => sprites.length || 169, [sprites]);
 
   const loadUserData = async () => {
     try {
       setLoading(true);
       if (isSupabaseConfigured && supabase) {
-        // 1. Fetch user collections (columns: id, user_id, friend_code, user_state, updated_at)
+        // 1. Fetch user collections
         const { data: collections, error: colError } = await supabase
           .from('user_collections')
           .select('id, user_id, friend_code, user_state, updated_at')
@@ -50,39 +64,10 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
 
         setTotalVisits(visitCount || 0);
 
-        if (collections && collections.length > 0) {
-          const parsedUsers = collections.map((col, idx) => {
-            const st = col.user_state || {};
-            let caught = 0;
-            let stars = 0;
-
-            if (typeof st === 'object' && st !== null) {
-              Object.values(st).forEach((val) => {
-                if (val && (val.owned === true || val.caught === true || (val.stars && val.stars > 0) || (val.level && val.level > 0))) {
-                  caught++;
-                }
-                if (val && (val.stars || val.level)) {
-                  stars += Number(val.stars || val.level || 0);
-                }
-              });
-            }
-
-            const pct = Math.min(100, Math.round((caught / totalSpriteCount) * 100));
-
-            return {
-              id: col.id || `usr_${idx}`,
-              userId: col.user_id || 'Anónimo',
-              friendCode: col.friend_code || `SDEX-${(col.user_id || 'USER').slice(0, 4).toUpperCase()}`,
-              caughtCount: caught,
-              starCount: stars,
-              progressPct: pct,
-              updatedAt: col.updated_at || new Date().toISOString()
-            };
-          });
-
-          setUsers(parsedUsers);
+        if (collections) {
+          setRawCollections(collections);
         } else {
-          setUsers([]);
+          setRawCollections([]);
         }
       }
     } catch (err) {
@@ -94,7 +79,44 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
 
   useEffect(() => {
     loadUserData();
-  }, [totalSpriteCount]);
+  }, []);
+
+  // Compute user metrics dynamically according to the selected generation pool
+  const users = useMemo(() => {
+    const totalPool = scopedSprites.length || 1;
+
+    return rawCollections.map((col, idx) => {
+      const st = col.user_state || {};
+      let caught = 0;
+      let stars = 0;
+
+      if (typeof st === 'object' && st !== null) {
+        scopedSprites.forEach((sprite) => {
+          const val = st[sprite.id];
+          if (val && (val.owned === true || val.caught === true || (val.stars && val.stars > 0) || (val.level && val.level > 0))) {
+            caught++;
+          }
+          if (val && (val.stars || val.level)) {
+            stars += Number(val.stars || val.level || 0);
+          }
+        });
+      }
+
+      const pct = Math.min(100, Math.round((caught / totalPool) * 100));
+      const isMe = (col.friend_code && myFriendCode && col.friend_code.trim().toUpperCase() === myFriendCode.trim().toUpperCase());
+
+      return {
+        id: col.id || `usr_${idx}`,
+        userId: col.user_id || 'Anónimo',
+        friendCode: col.friend_code || `SDEX-${(col.user_id || 'USER').slice(0, 4).toUpperCase()}`,
+        caughtCount: caught,
+        starCount: stars,
+        progressPct: pct,
+        isMe: isMe,
+        updatedAt: col.updated_at || new Date().toISOString()
+      };
+    });
+  }, [rawCollections, scopedSprites, myFriendCode]);
 
   // Aggregate Metrics
   const metrics = useMemo(() => {
@@ -252,6 +274,59 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         </div>
       </div>
 
+      {/* ═══ USER'S OWN ACCOUNT NOTICE BANNER ═══ */}
+      {myFriendCode && (
+        <div style={{
+          padding: '14px 20px',
+          borderRadius: '14px',
+          background: darkMode ? 'rgba(0, 240, 232, 0.07)' : 'rgba(60, 80, 224, 0.06)',
+          border: darkMode ? '1px solid rgba(0, 240, 232, 0.3)' : '1px solid rgba(60, 80, 224, 0.2)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              background: '#00F0E8',
+              color: '#060714',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <Crown size={18} />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.86rem', fontWeight: 800, color: textPrimary }}>
+                Tu Cuenta de Entrenador (Este Dispositivo): <span style={{ color: '#00F0E8', fontFamily: 'monospace', fontSize: '0.95rem' }}>{myFriendCode}</span>
+              </div>
+              <div style={{ fontSize: '0.75rem', color: textMuted }}>
+                Tu fila aparece identificada con la insignia <strong style={{ color: '#00F0E8' }}>👑 TÚ</strong> y borde cian brillante en la tabla de abajo.
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '0.78rem', color: textMuted }}>Generación Activa:</span>
+            <span style={{
+              padding: '4px 10px',
+              borderRadius: '8px',
+              background: darkMode ? '#262626' : '#F1F5F9',
+              color: '#00F0E8',
+              fontSize: '0.78rem',
+              fontWeight: 800
+            }}>
+              {selectedGen === 2 ? 'Temporada Actual (2ª Gen)' : selectedGen === 1 ? '1ª Generación' : 'Todas las Generaciones'}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* ═══ TABLE CONTROL & FILTERS HEADER ═══ */}
       <div style={{
         ...containerStyle,
@@ -263,7 +338,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         gap: '16px'
       }}>
         {/* Search Input */}
-        <div style={{ position: 'relative', minWidth: '280px', flex: 1, maxWidth: '420px' }}>
+        <div style={{ position: 'relative', minWidth: '260px', flex: 1, maxWidth: '380px' }}>
           <input
             type="text"
             value={searchQuery}
@@ -279,8 +354,28 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
           <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: textMuted }} />
         </div>
 
-        {/* Filters & Refresh */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+        {/* Filters: Generation Selector, Progress Filter & Refresh */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {/* Generation / Season Selector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Layers size={15} style={{ color: textMuted }} />
+            <select
+              value={selectedGen}
+              onChange={(e) => { setSelectedGen(Number(e.target.value)); setCurrentPage(1); }}
+              style={{
+                ...inputStyle,
+                fontWeight: 700,
+                borderColor: selectedGen === 2 ? '#00F0E8' : (darkMode ? '#2E2E2E' : '#E2E8F0'),
+                cursor: 'pointer'
+              }}
+              title="Filtrar por Temporada / Generación"
+            >
+              <option value={2}>🎮 Temporada Actual (2ª Gen - {gen2Count} Espíritus)</option>
+              <option value={1}>🌟 1ª Generación ({gen1Count} Espíritus)</option>
+              <option value={0}>📦 Todas las Generaciones ({allCount} Espíritus)</option>
+            </select>
+          </div>
+
           <select
             value={filterType}
             onChange={(e) => { setFilterType(e.target.value); setCurrentPage(1); }}
@@ -325,7 +420,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
               <tr style={{ borderBottom: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0', color: textMuted, background: tableHeaderBg }}>
                 <th style={{ padding: '14px 20px', fontWeight: 700 }}>ENTRENADOR / CUENTA</th>
                 <th style={{ padding: '14px 20px', fontWeight: 700 }}>CÓDIGO DE AMIGO</th>
-                <th style={{ padding: '14px 20px', fontWeight: 700 }}>PROGRESO COLECCIÓN</th>
+                <th style={{ padding: '14px 20px', fontWeight: 700 }}>PROGRESO ({selectedGen === 2 ? '2ª Gen' : selectedGen === 1 ? '1ª Gen' : 'Total'})</th>
                 <th style={{ padding: '14px 20px', fontWeight: 700 }}>ESTRELLAS</th>
                 <th style={{ padding: '14px 20px', fontWeight: 700 }}>ÚLTIMA SINCRONIZACIÓN</th>
                 <th style={{ padding: '14px 20px', fontWeight: 700, textAlign: 'right' }}>ESTADO</th>
@@ -335,9 +430,20 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
               {paginatedUsers.length > 0 ? (
                 paginatedUsers.map((user, idx) => {
                   const shortId = user.userId.length > 18 ? `${user.userId.slice(0, 8)}...${user.userId.slice(-6)}` : user.userId;
+                  const isMe = user.isMe;
 
                   return (
-                    <tr key={user.id || idx} style={{ borderBottom: rowBorder, transition: 'background 0.15s ease' }}>
+                    <tr
+                      key={user.id || idx}
+                      style={{
+                        borderBottom: rowBorder,
+                        borderLeft: isMe ? '4px solid #00F0E8' : '4px solid transparent',
+                        background: isMe
+                          ? (darkMode ? 'rgba(0, 240, 232, 0.08)' : 'rgba(60, 80, 224, 0.05)')
+                          : 'transparent',
+                        transition: 'background 0.15s ease'
+                      }}
+                    >
                       {/* Trainer Avatar & ID */}
                       <td style={{ padding: '14px 20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -345,20 +451,40 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                             width: '38px',
                             height: '38px',
                             borderRadius: '50%',
-                            background: darkMode ? 'linear-gradient(135deg, #262626, #3ECF8E)' : 'linear-gradient(135deg, #E2E8F0, #3C50E0)',
-                            color: '#FFFFFF',
-                            fontWeight: 800,
+                            background: isMe
+                              ? 'linear-gradient(135deg, #00F0E8, #3ECF8E)'
+                              : (darkMode ? 'linear-gradient(135deg, #262626, #3ECF8E)' : 'linear-gradient(135deg, #E2E8F0, #3C50E0)'),
+                            color: isMe ? '#060714' : '#FFFFFF',
+                            fontWeight: 900,
                             fontSize: '0.8rem',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            flexShrink: 0
+                            flexShrink: 0,
+                            boxShadow: isMe ? '0 0 12px rgba(0, 240, 232, 0.4)' : 'none'
                           }}>
                             {user.friendCode.slice(-2)}
                           </div>
                           <div>
-                            <div style={{ fontWeight: 800, color: textPrimary }}>
-                              Entrenador #{user.friendCode.slice(-4)}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontWeight: 800, color: isMe ? '#00F0E8' : textPrimary }}>
+                                Entrenador #{user.friendCode.slice(-4)}
+                              </span>
+                              {isMe && (
+                                <span style={{
+                                  padding: '2px 8px',
+                                  borderRadius: '6px',
+                                  background: '#00F0E8',
+                                  color: '#060714',
+                                  fontSize: '0.68rem',
+                                  fontWeight: 900,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '3px'
+                                }}>
+                                  <Crown size={10} /> TÚ
+                                </span>
+                              )}
                             </div>
                             <span style={{ fontSize: '0.72rem', color: textMuted, fontFamily: 'monospace' }}>
                               {shortId}
@@ -374,7 +500,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                             padding: '4px 10px',
                             borderRadius: '8px',
                             background: darkMode ? '#232323' : '#F1F5F9',
-                            color: darkMode ? '#3ECF8E' : '#3C50E0',
+                            color: isMe ? '#00F0E8' : (darkMode ? '#3ECF8E' : '#3C50E0'),
                             fontSize: '0.82rem',
                             fontWeight: 800,
                             fontFamily: 'monospace',
@@ -406,7 +532,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.76rem' }}>
                             <span style={{ color: textPrimary, fontWeight: 700 }}>
-                              {user.caughtCount} / {totalSpriteCount} espíritus
+                              {user.caughtCount} / {scopedSprites.length} espíritus
                             </span>
                             <strong style={{ color: darkMode ? '#3ECF8E' : '#3C50E0' }}>
                               {user.progressPct}%
