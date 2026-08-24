@@ -33,13 +33,15 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
     try {
       setLoading(true);
       if (isSupabaseConfigured && supabase) {
-        // 1. Fetch user collections
+        // 1. Fetch user collections (columns: id, user_id, friend_code, user_state, updated_at)
         const { data: collections, error: colError } = await supabase
           .from('user_collections')
-          .select('id, user_id, friend_code, user_state, created_at, updated_at')
+          .select('id, user_id, friend_code, user_state, updated_at')
           .order('updated_at', { ascending: false });
 
-        if (colError) throw colError;
+        if (colError) {
+          console.error('Error fetching user_collections from Supabase:', colError);
+        }
 
         // 2. Fetch total visits for conversion rate
         const { count: visitCount } = await supabase
@@ -48,7 +50,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
 
         setTotalVisits(visitCount || 0);
 
-        if (collections) {
+        if (collections && collections.length > 0) {
           const parsedUsers = collections.map((col, idx) => {
             const st = col.user_state || {};
             let caught = 0;
@@ -56,11 +58,11 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
 
             if (typeof st === 'object' && st !== null) {
               Object.values(st).forEach((val) => {
-                if (val && (val.caught || val.stars > 0)) {
+                if (val && (val.owned === true || val.caught === true || (val.stars && val.stars > 0) || (val.level && val.level > 0))) {
                   caught++;
                 }
-                if (val && val.stars) {
-                  stars += Number(val.stars) || 0;
+                if (val && (val.stars || val.level)) {
+                  stars += Number(val.stars || val.level || 0);
                 }
               });
             }
@@ -74,25 +76,14 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
               caughtCount: caught,
               starCount: stars,
               progressPct: pct,
-              updatedAt: col.updated_at || col.created_at || new Date().toISOString()
+              updatedAt: col.updated_at || new Date().toISOString()
             };
           });
 
           setUsers(parsedUsers);
+        } else {
+          setUsers([]);
         }
-      } else {
-        // Fallback local sample data
-        setUsers([
-          {
-            id: 'demo_1',
-            userId: 'usr_local_master',
-            friendCode: 'SDEX-A9K2',
-            caughtCount: 42,
-            starCount: 120,
-            progressPct: 70,
-            updatedAt: new Date().toISOString()
-          }
-        ]);
       }
     } catch (err) {
       console.error('Error fetching users:', err);
