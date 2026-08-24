@@ -91,10 +91,11 @@ export function Header({
     }
   }, []);
 
-  // Rotate hero sprite with lively 3s cadence
+  // Rotate hero sprite with visibility and performance awareness
   useEffect(() => {
-    if (spritePool.length <= 1) return;
+    if (spritePool.length === 0) return;
 
+    const intervalTime = window.innerWidth <= 600 ? 5500 : 3500;
     const interval = setInterval(() => {
       if (document.hidden || !activeSpriteRef.current) return;
 
@@ -119,18 +120,19 @@ export function Header({
             const copy = [...prev];
             const slot = Math.floor(Math.random() * copy.length);
             let next;
+            const allUsed = new Set([...copy, spriteIndex]);
             do {
               next = Math.floor(Math.random() * spritePool.length);
-            } while (copy.includes(next) && spritePool.length > 4);
+            } while (allUsed.has(next) && spritePool.length > 4);
             copy[slot] = next;
             return copy;
           });
         }
       });
-    }, 3000);
+    }, intervalTime);
 
     return () => clearInterval(interval);
-  }, [spritePool.length]);
+  }, [spritePool, spriteIndex]);
 
   // GSAP animate in when spriteIndex changes
   useEffect(() => {

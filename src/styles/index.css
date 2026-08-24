@@ -377,7 +377,7 @@ body::after {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
@@ -391,18 +391,19 @@ body::after {
 }
 
 .app-navbar__avatar:active {
-  transform: scale(0.95);
+  transform: scale(0.96);
 }
 
 .app-navbar__avatar.is-logged {
-  border-color: rgba(16, 185, 129, 0.5);
-  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.08);
 }
 
 .app-navbar__avatar.is-logged:hover {
-  border-color: rgba(16, 185, 129, 0.8);
-  background: rgba(16, 185, 129, 0.2);
-  box-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
+  border-color: rgba(16, 185, 129, 0.7);
+  background: rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
 }
 
 .app-navbar__avatar-img {
@@ -468,6 +469,10 @@ body::after {
 
 .app-navbar__motion-btn:active {
   transform: scale(0.95);
+}
+
+.app-navbar__chevron.open {
+  transform: rotate(180deg);
 }
 
 /* --- Dropdown Menu (Logged User) --- */
@@ -701,31 +706,48 @@ body::after {
   100% { background-position: 48px 48px; }
 }
 
-/* Glow blobs - Optimized with native radial gradient falloff (0% GPU blur cost) */
+/* Glow blobs */
 .hero__glow {
   position: absolute;
   border-radius: 50%;
+  filter: blur(80px);
   pointer-events: none;
-  contain: strict;
+  will-change: transform;
 }
 
 .hero__glow--1 {
-  width: 440px; height: 440px;
+  width: 400px; height: 400px;
   top: -120px; left: -100px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.28) 0%, rgba(99, 102, 241, 0.08) 45%, transparent 70%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, transparent 70%);
+  animation: glowFloat1 8s ease-in-out infinite alternate;
 }
 
 .hero__glow--2 {
-  width: 360px; height: 360px;
+  width: 320px; height: 320px;
   bottom: -80px; right: -60px;
-  background: radial-gradient(circle, rgba(236, 72, 153, 0.24) 0%, rgba(236, 72, 153, 0.06) 45%, transparent 70%);
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.3) 0%, transparent 70%);
+  animation: glowFloat2 10s ease-in-out infinite alternate;
 }
 
 .hero__glow--3 {
-  width: 300px; height: 300px;
+  width: 260px; height: 260px;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(34, 211, 238, 0.16) 0%, rgba(34, 211, 238, 0.04) 45%, transparent 70%);
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.18) 0%, transparent 70%);
+  animation: glowPulse 6s ease-in-out infinite;
+}
+
+@keyframes glowFloat1 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(30px, 20px) scale(1.1); }
+}
+@keyframes glowFloat2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-25px, -15px) scale(1.15); }
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+  50%      { opacity: 0.9; transform: translate(-50%, -50%) scale(1.15); }
 }
 
 /* Scanline overlay */
@@ -819,7 +841,15 @@ body::after {
   display: inline-block;
 }
 
-/* ===== Authentic Fortnite High-Impact Glitch Implementation ===== */
+/* ===== @designbycode/tailwindcss-text-glitch Authentic Plugin Implementation ===== */
+:root {
+  --tg-rgb-r: #ff0055;
+  --tg-rgb-g: #00f0ff;
+  --tg-rgb-b: #8b5cf6;
+  --tg-rgb-blur: 2px;
+  --tg-rgb-duration: 2.8s;
+}
+
 .hero__title-line--glitch {
   font-family: var(--font-fortnite);
   font-weight: 900;
@@ -831,50 +861,158 @@ body::after {
   -webkit-text-fill-color: #ffffff;
   position: relative;
   display: inline-block;
-  text-shadow: 2px 0 #00f0ff, -2px 0 #ff0055;
-  animation: fortniteHeroGlitch 2.8s infinite ease-in-out;
+  animation: glitch-text-anim var(--tg-rgb-duration, 2.8s) steps(100) infinite;
 }
 
-@keyframes fortniteHeroGlitch {
-  0%, 60%, 100% {
-    transform: translate3d(0, 0, 0) skew(0deg);
-    text-shadow: 2px 0 #00f0ff, -2px 0 #ff0055;
+.hero__title-line--glitch::before,
+.hero__title-line--glitch::after {
+  display: none !important;
+}
+
+@keyframes glitch-text-anim {
+  0%, 1%, 2%, 3%, 4% {
+    text-shadow: 0.25rem 0 0 var(--tg-rgb-r), -0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
+  }
+  5%, 6%, 7%, 8%, 9%, 10% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
+  }
+  11%, 12%, 13% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  14%, 15% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  16%, 17%, 18%, 19%, 20% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  21%, 22%, 23%, 24%, 25% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  26%, 27% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  28%, 29%, 30% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  31%, 32%, 33%, 34% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  35%, 36%, 37% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  38%, 39%, 40% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  41% {
+    text-shadow: 0.8rem 0 0 var(--tg-rgb-b), -0.8rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  42% {
+    text-shadow: 0 0 0 var(--tg-rgb-b), 0 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  43%, 44%, 45% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  46% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  47% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  48%, 49%, 50% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  51%, 52%, 53%, 54% {
+    text-shadow: 0.25rem 0 0 var(--tg-rgb-r), -0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
+  }
+  55%, 56%, 57% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  58%, 59%, 60% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
+  }
+  61% {
+    text-shadow: 0.6rem 0 0 var(--tg-rgb-r), -0.6rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
   }
   62% {
-    transform: translate3d(-3px, 1px, 0) skew(-3deg);
-    text-shadow: -3px 0 #00f0ff, 3px 0 #ff0055;
+    text-shadow: 0 0 0 var(--tg-rgb-r), 0 0 0 var(--tg-rgb-g);
+    filter: blur(0);
   }
-  65% {
-    transform: translate3d(3px, -2px, 0) skew(2.5deg);
-    text-shadow: 4px 0 #00f0ff, -4px 0 #ff0055;
+  63%, 64%, 65% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
   }
-  68% {
-    transform: translate3d(-2px, 0, 0) skew(0deg);
-    text-shadow: -2px 0 #00f0ff, 2px 0 #ff0055;
+  66%, 67% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  68%, 69%, 70% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
   }
   71% {
-    transform: translate3d(2px, 1px, 0) skew(1.5deg);
-    text-shadow: 3px 0 #00f0ff, -3px 0 #ff0055;
+    text-shadow: 0.8rem 0 0 var(--tg-rgb-r), -0.8rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
   }
-  74% {
-    transform: translate3d(0, 0, 0) skew(0deg);
-    text-shadow: 2px 0 #00f0ff, -2px 0 #ff0055;
+  72% {
+    text-shadow: 0 0 0 var(--tg-rgb-r), 0 0 0 var(--tg-rgb-b);
+    filter: blur(0);
   }
-  88% {
-    transform: translate3d(0, 0, 0) skew(0deg);
-    text-shadow: 2px 0 #00f0ff, -2px 0 #ff0055;
+  73%, 74%, 75%, 76% {
+    text-shadow: 0.25rem 0 0 var(--tg-rgb-r), -0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
   }
-  90% {
-    transform: translate3d(-4px, 1px, 0) skew(-2deg);
-    text-shadow: -4px 0 #00f0ff, 4px 0 #ff0055;
+  77%, 78%, 79%, 80% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
   }
-  93% {
-    transform: translate3d(3px, -1px, 0) skew(2deg);
-    text-shadow: 3px 0 #00f0ff, -3px 0 #ff0055;
+  81%, 82% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
   }
-  96% {
-    transform: translate3d(0, 0, 0) skew(0deg);
-    text-shadow: 2px 0 #00f0ff, -2px 0 #ff0055;
+  83%, 84%, 85% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  86%, 87% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(var(--tg-rgb-blur));
+  }
+  88%, 89%, 90% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  91% {
+    text-shadow: 0.6rem 0 0 var(--tg-rgb-g), -0.6rem 0 0 var(--tg-rgb-b);
+    filter: blur(0);
+  }
+  92%, 93%, 94%, 95% {
+    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
+  }
+  96%, 97%, 98%, 99%, 100% {
+    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
+    filter: blur(0);
   }
 }
 
@@ -3999,25 +4137,13 @@ body::after {
 /* Descargar con Efecto Glitch Oficial Cyberpunk */
 .sdm-share__glitch-btn {
   position: relative;
-  background: rgba(0, 240, 232, 0.15);
+  background: rgba(0, 240, 232, 0.12);
   border: 1.5px solid #00F0E8;
   color: #00F0E8;
-  box-shadow: 0 0 14px rgba(0, 240, 232, 0.35);
+  box-shadow: 0 0 12px rgba(0, 240, 232, 0.25);
   overflow: hidden;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  animation: sdmGlitchBtnPulse 2.5s infinite ease-in-out;
-}
-
-@keyframes sdmGlitchBtnPulse {
-  0%, 100% {
-    box-shadow: 0 0 12px rgba(0, 240, 232, 0.3);
-    border-color: #00F0E8;
-  }
-  50% {
-    box-shadow: 0 0 22px rgba(0, 240, 232, 0.7), 0 0 30px rgba(255, 0, 85, 0.3);
-    border-color: #FF0055;
-  }
 }
 
 .sdm-share__glitch-btn:hover:not(:disabled),
@@ -5001,9 +5127,15 @@ body::after {
     padding: 3px 7px;
   }
 
-  /* Mobile Optimization */
-  .hero-floating-particles {
-    display: none !important;
+  /* Ultra-low GPU & Battery Optimization for Mobile */
+  .hero-bg-grid,
+  .hero-ambient-glow,
+  .hero-floating-particles,
+  .hero-sprite-orbit-container,
+  .hero__orbit,
+  .hero__satellite,
+  .hero__satellite-img {
+    animation: none !important;
   }
 
   .ms-card:not(.ms-card--active) .cyber-fx-overlay * {
@@ -5464,8 +5596,36 @@ body::after {
 /* ===== MOBILE SWIPER (Family Rows + Variant Swipe) ===== */
 .mobile-swiper {
   position: relative;
+  overflow: hidden;
   width: 100%;
   padding: 0 0 20px;
+}
+
+/* Blueprint Aura Layers */
+.mobile-swiper__blueprint-layer-1,
+.mobile-swiper__blueprint-layer-2,
+.mobile-swiper__blueprint-layer-3 {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  transform: translateZ(0);
+  z-index: 0;
+}
+
+.mobile-swiper__blueprint-layer-1 {
+  background: linear-gradient(rgba(14,165,233,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.12) 1px, transparent 1px);
+  background-size: 50px 50px;
+  mix-blend-mode: normal;
+}
+
+.mobile-swiper__blueprint-layer-2 {
+  background: linear-gradient(rgba(14,165,233,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.06) 1px, transparent 1px);
+  background-size: 10px 10px;
+  mix-blend-mode: normal;
+}
+
+.mobile-swiper__blueprint-layer-3 {
+  background: radial-gradient(circle at 60% 40%, rgba(6,182,212,0.2) 0%, rgba(6,182,212,0.05) 35%, transparent 70%);
 }
 
 .mobile-swiper__content {
@@ -6178,17 +6338,6 @@ body::after {
 .motion-disabled *::before,
 .motion-disabled *::after {
   animation-play-state: paused !important;
-  animation-duration: 0.01ms !important;
-  transition-duration: 0.01ms !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
 }
 
 
