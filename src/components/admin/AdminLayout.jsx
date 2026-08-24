@@ -297,25 +297,26 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
               width: '36px',
               height: '36px',
               borderRadius: '50%',
-              background: '#3C50E0',
+              background: 'linear-gradient(135deg, #3C50E0, #7551FF)',
               color: '#FFFFFF',
               fontWeight: 800,
-              fontSize: '0.88rem',
+              fontSize: '0.82rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              flexShrink: 0
+              flexShrink: 0,
+              boxShadow: '0 2px 8px rgba(60, 80, 224, 0.25)'
             }}>
-              OS
+              AD
             </div>
             {sidebarOpen && (
               <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                 <div style={{ fontSize: '0.84rem', fontWeight: 800, color: darkMode ? '#FFFFFF' : '#1E293B', lineHeight: 1.1 }}>
-                  Omar Salazar
+                  Admin
                 </div>
                 <div style={{ fontSize: '0.7rem', color: darkMode ? '#A3AED0' : '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10B981', flexShrink: 0 }} />
-                  <span>Lead Admin</span>
+                  <span>Acceso Maestro</span>
                 </div>
               </div>
             )}
