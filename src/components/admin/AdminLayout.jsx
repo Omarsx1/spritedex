@@ -27,7 +27,35 @@ import { clearAdminSession } from './AdminAuthGate';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 
 export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
-  const [activeTab, setActiveTab] = useState('analytics'); // 'analytics' | 'catalog' | 'users'
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramTab = urlParams.get('tab');
+      if (paramTab && ['analytics', 'catalog', 'users'].includes(paramTab)) {
+        return paramTab;
+      }
+      const hashTab = window.location.hash.replace('#', '');
+      if (hashTab && ['analytics', 'catalog', 'users'].includes(hashTab)) {
+        return hashTab;
+      }
+      const stored = localStorage.getItem('spritedex_studio_active_tab');
+      if (stored && ['analytics', 'catalog', 'users'].includes(stored)) {
+        return stored;
+      }
+    } catch {}
+    return 'analytics';
+  });
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    try {
+      localStorage.setItem('spritedex_studio_active_tab', tabId);
+      const url = new URL(window.location.href);
+      url.searchParams.set('tab', tabId);
+      window.history.replaceState({}, '', url.toString());
+    } catch {}
+  };
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [usersCount, setUsersCount] = useState(0);
   const [editingSpirit, setEditingSpirit] = useState(null);
@@ -40,6 +68,20 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
       return false;
     }
   });
+
+  useEffect(() => {
+    const handlePopState = () => {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramTab = urlParams.get('tab');
+        if (paramTab && ['analytics', 'catalog', 'users'].includes(paramTab)) {
+          setActiveTab(paramTab);
+        }
+      } catch {}
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   useEffect(() => {
     if (isSupabaseConfigured && supabase) {
@@ -156,7 +198,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             {/* Dashboard / Analytics */}
             <button
               type="button"
-              onClick={() => setActiveTab('analytics')}
+              onClick={() => handleTabChange('analytics')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -183,7 +225,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             {/* Spirit Catalog */}
             <button
               type="button"
-              onClick={() => setActiveTab('catalog')}
+              onClick={() => handleTabChange('catalog')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -224,7 +266,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             {/* Registered Users & Cloud Collections */}
             <button
               type="button"
-              onClick={() => setActiveTab('users')}
+              onClick={() => handleTabChange('users')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
