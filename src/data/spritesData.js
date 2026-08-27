@@ -176,12 +176,15 @@ export const FAMILY_NAMES_MAP = {
 
 const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails'];
 
-const SPANISH_NAME_OVERRIDES = {
+export const SPANISH_NAME_OVERRIDES = {
   water_quack: 'Patito de Agua',
   earth_quack: 'Patito de Tierra',
   fire_quack: 'Patito de Fuego',
   zeropoint_quack: 'Patito del Punto Cero',
-  theburntpeanut_basic: 'Cacahuate'
+  theburntpeanut_basic: 'Cacahuate',
+  stormscout_basic: 'Explorador de Tormentas',
+  stormscout_gold: 'Explorador de Tormentas Dorado',
+  stormscout_cheatmaster: 'Explorador de Tormentas Hacker'
 };
 
 const SUMMON_COST_OVERRIDES = {

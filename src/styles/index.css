@@ -2421,14 +2421,19 @@ body::after {
 /* Card name */
 .card-name {
   font-family: var(--font-heading);
-  font-size: 0.95rem;
+  font-size: 0.86rem;
   font-weight: 800;
   color: var(--text-bright);
   text-align: center;
   margin-bottom: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.18;
+  min-height: 2.36em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   position: relative;
   z-index: 1;
@@ -5878,9 +5883,17 @@ body::after {
 }
 
 .ms-card__info .card-name {
-  font-size: 1.02rem;
+  font-size: 0.95rem;
   font-weight: 800;
   margin: 0;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.2;
+  min-height: 2.4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ── Stars & Button Controls ── */
