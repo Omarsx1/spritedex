@@ -69,7 +69,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef(null);
 
-  // ═══ MATERIAL 3 DATE PICKER STATE (Matching Image 2) ═══
+  // ═══ MATERIAL 3 DATE PICKER DROPDOWN STATE ═══
   const [showDatePicker, setShowDatePicker] = useState(false);
   const initialDateObj = useMemo(() => {
     return formData.releaseDate ? new Date(formData.releaseDate) : new Date();
@@ -314,7 +314,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
     const dayName = dayNamesShort[d.getDay()];
     const dayNum = d.getDate();
     const monthName = monthNamesShort[d.getMonth()];
-    return `${dayName}, ${dayNum} ${monthName.toLowerCase()}`;
+    return `${dayName}, ${dayNum} ${monthName}`;
   }, [pickerSelectedDate]);
 
   // Formatted date for input display button
@@ -352,7 +352,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
         border: `1px solid ${c.borderModal}`,
         borderRadius: '24px',
         boxShadow: darkMode ? '0 30px 80px rgba(0, 0, 0, 0.9)' : '0 20px 60px rgba(15, 23, 42, 0.15)',
-        overflow: 'hidden',
+        overflow: 'visible',
         display: 'flex',
         flexDirection: 'column',
         maxHeight: '92vh',
@@ -365,7 +365,8 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: c.headerBg
+          background: c.headerBg,
+          borderRadius: '24px 24px 0 0'
         }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
@@ -689,7 +690,8 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
               padding: '18px',
               borderRadius: '14px',
               background: c.bgScheduled,
-              border: `1px solid ${c.borderScheduled}`
+              border: `1px solid ${c.borderScheduled}`,
+              position: 'relative'
             }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginBottom: formData.unreleased ? '12px' : '0' }}>
                 <input
@@ -710,7 +712,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
               </label>
 
               {formData.unreleased && (
-                <div>
+                <div style={{ position: 'relative' }}>
                   <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '6px' }}>
                     FECHA & HORA DE ESTRENO AUTOMÁTICO
                   </label>
@@ -718,13 +720,13 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   {/* Material 3 Date Trigger Button */}
                   <button
                     type="button"
-                    onClick={() => setShowDatePicker(true)}
+                    onClick={() => setShowDatePicker(v => !v)}
                     style={{
                       width: '100%',
                       padding: '12px 16px',
                       borderRadius: '10px',
                       background: c.bgModal,
-                      border: `1px solid ${c.borderInput}`,
+                      border: `1px solid ${showDatePicker ? (darkMode ? '#3ECF8E' : '#2563EB') : c.borderInput}`,
                       color: formData.releaseDate ? c.textPrimary : c.textMuted,
                       fontSize: '0.86rem',
                       fontWeight: 700,
@@ -743,6 +745,265 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   <span style={{ fontSize: '0.72rem', color: c.textMuted, display: 'block', marginTop: '6px' }}>
                     Al llegar este momento exacto, el espíritu se desbloqueará y activará automáticamente en toda la web.
                   </span>
+
+                  {/* ═══ MATERIAL 3 DATE PICKER DROPDOWN POPOVER (Anchored Desplegable) ═══ */}
+                  {showDatePicker && (
+                    <>
+                      {/* Invisible backdrop click-outside layer */}
+                      <div 
+                        onClick={() => setShowDatePicker(false)}
+                        style={{ position: 'fixed', inset: 0, zIndex: 99990 }}
+                      />
+
+                      <div style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 6px)',
+                        left: 0,
+                        zIndex: 99999,
+                        width: '330px',
+                        maxWidth: '92vw',
+                        background: c.m3Bg,
+                        borderRadius: '24px',
+                        border: darkMode ? '1px solid #333333' : '1px solid #E2E8F0',
+                        boxShadow: darkMode 
+                          ? '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08)' 
+                          : '0 20px 50px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'
+                      }}>
+                        {/* Top M3 Header: Subtitle + Big Headline + Edit Icon */}
+                        <div style={{ padding: '16px 20px 10px' }}>
+                          <div style={{ fontSize: '0.74rem', fontWeight: 600, color: c.m3OnSurfaceVariant, marginBottom: '4px' }}>
+                            Select date
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div style={{ fontSize: '1.65rem', fontWeight: 500, color: c.m3OnSurface, letterSpacing: '-0.02em', textTransform: 'capitalize' }}>
+                              {headerDateStr}
+                            </div>
+                            <div style={{ color: c.m3OnSurfaceVariant }}>
+                              <Edit3 size={16} />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style={{ width: '100%', height: '1px', background: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }} />
+
+                        {/* M3 Month Navigation Bar */}
+                        <div style={{
+                          padding: '10px 16px 6px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.84rem', fontWeight: 700, color: c.m3OnSurface }}>
+                            <span>{monthNames[pickerViewMonth]} {pickerViewYear}</span>
+                            <ChevronDown size={14} style={{ color: c.m3OnSurfaceVariant }} />
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <button
+                              type="button"
+                              onClick={handlePrevMonth}
+                              style={{
+                                border: 'none',
+                                background: 'transparent',
+                                color: c.m3OnSurfaceVariant,
+                                cursor: 'pointer',
+                                padding: '4px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <ChevronLeft size={16} />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={handleNextMonth}
+                              style={{
+                                border: 'none',
+                                background: 'transparent',
+                                color: c.m3OnSurfaceVariant,
+                                cursor: 'pointer',
+                                padding: '4px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <ChevronRight size={16} />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Calendar Grid: Day Headers */}
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(7, 1fr)',
+                          padding: '0 12px',
+                          textAlign: 'center',
+                          fontSize: '0.74rem',
+                          fontWeight: 700,
+                          color: c.m3OnSurfaceVariant,
+                          marginBottom: '4px'
+                        }}>
+                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                            <div key={i} style={{ height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              {d}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Calendar Grid: Days Cells */}
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(7, 1fr)',
+                          gap: '2px',
+                          padding: '0 12px',
+                          textAlign: 'center'
+                        }}>
+                          {Array.from({ length: firstDayOfWeek }).map((_, i) => (
+                            <div key={`empty-${i}`} style={{ height: '32px' }} />
+                          ))}
+
+                          {Array.from({ length: daysInMonth }).map((_, i) => {
+                            const day = i + 1;
+                            const isSelected = 
+                              pickerSelectedDate &&
+                              pickerSelectedDate.getDate() === day &&
+                              pickerSelectedDate.getMonth() === pickerViewMonth &&
+                              pickerSelectedDate.getFullYear() === pickerViewYear;
+
+                            const today = new Date();
+                            const isToday = 
+                              today.getDate() === day &&
+                              today.getMonth() === pickerViewMonth &&
+                              today.getFullYear() === pickerViewYear;
+
+                            return (
+                              <div
+                                key={day}
+                                onClick={() => handleSelectDay(day)}
+                                style={{
+                                  height: '32px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                <div style={{
+                                  width: '30px',
+                                  height: '30px',
+                                  borderRadius: '50%',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '0.8rem',
+                                  fontWeight: isSelected ? 800 : isToday ? 700 : 500,
+                                  background: isSelected 
+                                    ? '#6750A4'
+                                    : 'transparent',
+                                  color: isSelected 
+                                    ? '#FFFFFF' 
+                                    : isToday 
+                                    ? (darkMode ? '#D0BCFF' : '#6750A4') 
+                                    : c.m3OnSurface,
+                                  border: isToday && !isSelected ? `1px solid ${darkMode ? '#D0BCFF' : '#6750A4'}` : 'none',
+                                  transition: 'all 0.15s ease'
+                                }}>
+                                  {day}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Time Selector Section */}
+                        <div style={{
+                          padding: '10px 16px 4px',
+                          borderTop: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
+                          marginTop: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '8px'
+                        }}>
+                          <span style={{ fontSize: '0.74rem', fontWeight: 600, color: c.m3OnSurfaceVariant, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <Clock size={13} /> Hora:
+                          </span>
+
+                          <input
+                            type="time"
+                            value={`${String(pickerHour).padStart(2, '0')}:${String(pickerMinute).padStart(2, '0')}`}
+                            onChange={(e) => {
+                              const [h, m] = e.target.value.split(':');
+                              if (h !== undefined) setPickerHour(Number(h));
+                              if (m !== undefined) setPickerMinute(Number(m));
+                            }}
+                            style={{
+                              padding: '3px 8px',
+                              borderRadius: '8px',
+                              background: c.m3CardBg,
+                              border: `1px solid ${c.borderInput}`,
+                              color: c.m3OnSurface,
+                              fontSize: '0.8rem',
+                              fontWeight: 700,
+                              outline: 'none'
+                            }}
+                          />
+                        </div>
+
+                        {/* Bottom Actions: Cancel & OK */}
+                        <div style={{
+                          padding: '8px 16px 14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'flex-end',
+                          gap: '8px'
+                        }}>
+                          <button
+                            type="button"
+                            onClick={() => setShowDatePicker(false)}
+                            style={{
+                              border: 'none',
+                              background: 'transparent',
+                              color: darkMode ? '#D0BCFF' : '#6750A4',
+                              fontSize: '0.84rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              padding: '6px 12px',
+                              borderRadius: '16px'
+                            }}
+                          >
+                            Cancel
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={handleConfirmDatePicker}
+                            style={{
+                              border: 'none',
+                              background: 'transparent',
+                              color: darkMode ? '#D0BCFF' : '#6750A4',
+                              fontSize: '0.84rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              padding: '6px 12px',
+                              borderRadius: '16px'
+                            }}
+                          >
+                            OK
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -897,279 +1158,6 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
           </div>
         </div>
       </div>
-
-      {/* ═══ MATERIAL 3 DATE PICKER MODAL (Exact design from Image 2) ═══ */}
-      {showDatePicker && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 100000,
-          background: 'rgba(0, 0, 0, 0.65)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '20px'
-        }}>
-          <div style={{
-            maxWidth: '360px',
-            width: '100%',
-            background: c.m3Bg,
-            borderRadius: '28px',
-            boxShadow: '0 25px 60px rgba(0, 0, 0, 0.4)',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'
-          }}>
-            {/* Top M3 Header: Subtitle + Big Headline + Edit Icon */}
-            <div style={{ padding: '20px 24px 14px' }}>
-              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: c.m3OnSurfaceVariant, marginBottom: '6px' }}>
-                Select date
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ fontSize: '1.85rem', fontWeight: 500, color: c.m3OnSurface, letterSpacing: '-0.02em', textTransform: 'capitalize' }}>
-                  {headerDateStr}
-                </div>
-                <button
-                  type="button"
-                  style={{
-                    border: 'none',
-                    background: 'transparent',
-                    color: c.m3OnSurfaceVariant,
-                    cursor: 'pointer',
-                    padding: '6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                  title="Editar fecha"
-                >
-                  <Edit3 size={18} />
-                </button>
-              </div>
-            </div>
-
-            <div style={{ width: '100%', height: '1px', background: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }} />
-
-            {/* M3 Month Navigation Bar */}
-            <div style={{
-              padding: '12px 18px 8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.88rem', fontWeight: 700, color: c.m3OnSurface }}>
-                <span>{monthNames[pickerViewMonth]} {pickerViewYear}</span>
-                <ChevronDown size={14} style={{ color: c.m3OnSurfaceVariant }} />
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <button
-                  type="button"
-                  onClick={handlePrevMonth}
-                  style={{
-                    border: 'none',
-                    background: 'transparent',
-                    color: c.m3OnSurfaceVariant,
-                    cursor: 'pointer',
-                    padding: '6px',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <ChevronLeft size={18} />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleNextMonth}
-                  style={{
-                    border: 'none',
-                    background: 'transparent',
-                    color: c.m3OnSurfaceVariant,
-                    cursor: 'pointer',
-                    padding: '6px',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <ChevronRight size={18} />
-                </button>
-              </div>
-            </div>
-
-            {/* Calendar Grid: Day Headers */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(7, 1fr)',
-              padding: '0 16px',
-              textAlign: 'center',
-              fontSize: '0.78rem',
-              fontWeight: 700,
-              color: c.m3OnSurfaceVariant,
-              marginBottom: '6px'
-            }}>
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-                <div key={i} style={{ height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {d}
-                </div>
-              ))}
-            </div>
-
-            {/* Calendar Grid: Days Cells */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(7, 1fr)',
-              gap: '2px',
-              padding: '0 16px',
-              textAlign: 'center'
-            }}>
-              {/* Empty padding cells for first week */}
-              {Array.from({ length: firstDayOfWeek }).map((_, i) => (
-                <div key={`empty-${i}`} style={{ height: '38px' }} />
-              ))}
-
-              {/* Month Day Cells */}
-              {Array.from({ length: daysInMonth }).map((_, i) => {
-                const day = i + 1;
-                const isSelected = 
-                  pickerSelectedDate &&
-                  pickerSelectedDate.getDate() === day &&
-                  pickerSelectedDate.getMonth() === pickerViewMonth &&
-                  pickerSelectedDate.getFullYear() === pickerViewYear;
-
-                const today = new Date();
-                const isToday = 
-                  today.getDate() === day &&
-                  today.getMonth() === pickerViewMonth &&
-                  today.getFullYear() === pickerViewYear;
-
-                return (
-                  <div
-                    key={day}
-                    onClick={() => handleSelectDay(day)}
-                    style={{
-                      height: '38px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <div style={{
-                      width: '34px',
-                      height: '34px',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.84rem',
-                      fontWeight: isSelected ? 800 : isToday ? 700 : 500,
-                      background: isSelected 
-                        ? (darkMode ? '#6750A4' : '#6750A4')
-                        : 'transparent',
-                      color: isSelected 
-                        ? '#FFFFFF' 
-                        : isToday 
-                        ? (darkMode ? '#D0BCFF' : '#6750A4') 
-                        : c.m3OnSurface,
-                      border: isToday && !isSelected ? `1px solid ${darkMode ? '#D0BCFF' : '#6750A4'}` : 'none',
-                      transition: 'all 0.15s ease'
-                    }}>
-                      {day}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Time Selector Section */}
-            <div style={{
-              padding: '14px 20px 6px',
-              borderTop: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
-              marginTop: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '10px'
-            }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: 600, color: c.m3OnSurfaceVariant, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Clock size={14} /> Hora:
-              </span>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <input
-                  type="time"
-                  value={`${String(pickerHour).padStart(2, '0')}:${String(pickerMinute).padStart(2, '0')}`}
-                  onChange={(e) => {
-                    const [h, m] = e.target.value.split(':');
-                    if (h !== undefined) setPickerHour(Number(h));
-                    if (m !== undefined) setPickerMinute(Number(m));
-                  }}
-                  style={{
-                    padding: '4px 8px',
-                    borderRadius: '8px',
-                    background: c.m3CardBg,
-                    border: `1px solid ${c.borderInput}`,
-                    color: c.m3OnSurface,
-                    fontSize: '0.84rem',
-                    fontWeight: 700,
-                    outline: 'none'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Bottom Actions: Cancel & OK (Matching Image 2) */}
-            <div style={{
-              padding: '12px 20px 20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              gap: '12px'
-            }}>
-              <button
-                type="button"
-                onClick={() => setShowDatePicker(false)}
-                style={{
-                  border: 'none',
-                  background: 'transparent',
-                  color: darkMode ? '#D0BCFF' : '#6750A4',
-                  fontSize: '0.88rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  padding: '8px 14px',
-                  borderRadius: '20px'
-                }}
-              >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                onClick={handleConfirmDatePicker}
-                style={{
-                  border: 'none',
-                  background: 'transparent',
-                  color: darkMode ? '#D0BCFF' : '#6750A4',
-                  fontSize: '0.88rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  padding: '8px 14px',
-                  borderRadius: '20px'
-                }}
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
