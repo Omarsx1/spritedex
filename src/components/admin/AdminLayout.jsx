@@ -398,10 +398,11 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
           )}
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {/* View Live Web */}
-            <button
-              type="button"
-              onClick={onExitAdmin}
+            {/* View Live Web in new tab */}
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -416,13 +417,15 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                 fontWeight: 600,
                 cursor: 'pointer',
                 justifyContent: sidebarOpen ? 'flex-start' : 'center',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                textDecoration: 'none',
+                boxSizing: 'border-box'
               }}
-              title="Ver Sitio Web Público"
+              title="Ver Sitio Web Público en nueva pestaña"
             >
               <ExternalLink size={18} style={{ flexShrink: 0 }} />
               {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>Ver Web Pública</span>}
-            </button>
+            </a>
           </nav>
         </div>
 
