@@ -108,16 +108,20 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
     badgeStudioBg: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#EFF6FF',
     badgeStudioText: darkMode ? '#3ECF8E' : '#2563EB',
 
-    // Material 3 Date Picker Colors
-    m3Bg: darkMode ? '#211F26' : '#ECE6F0',
-    m3CardBg: darkMode ? '#2B2930' : '#F3EDF7',
-    m3Primary: darkMode ? '#D0BCFF' : '#6750A4',
-    m3PrimaryContainer: darkMode ? '#4F378B' : '#EADDFF',
-    m3OnPrimary: darkMode ? '#381E72' : '#FFFFFF',
-    m3OnSurface: darkMode ? '#E6E1E5' : '#1D1B20',
-    m3OnSurfaceVariant: darkMode ? '#CAC4D0' : '#49454F',
-    m3Outline: darkMode ? '#938F99' : '#79747E',
-    m3SurfaceContainer: darkMode ? '#1D1B20' : '#FFFFFF'
+    // CMS Date Picker Theme (Light: Pure White/Slate/Blue #3C50E0, Dark: Clean #1C1C1C/Emerald #3ECF8E)
+    m3Bg: darkMode ? '#1C1C1C' : '#FFFFFF',
+    m3HeaderBg: darkMode ? '#171717' : '#F8FAFC',
+    m3CardBg: darkMode ? '#262626' : '#F8FAFC',
+    m3Primary: darkMode ? '#3ECF8E' : '#3C50E0',
+    m3PrimaryContainer: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#EFF6FF',
+    m3OnPrimary: darkMode ? '#121212' : '#FFFFFF',
+    m3OnSurface: darkMode ? '#EDEDED' : '#0F172A',
+    m3OnSurfaceVariant: darkMode ? '#A1A1A1' : '#64748B',
+    m3Border: darkMode ? '#2E2E2E' : '#E2E8F0',
+    m3Shadow: darkMode 
+      ? '0 20px 50px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08)' 
+      : '0 20px 50px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.06)',
+    m3Divider: darkMode ? 'rgba(255, 255, 255, 0.08)' : '#E2E8F0'
   };
 
   // When family is changed
@@ -763,43 +767,39 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                         width: '290px',
                         maxWidth: '92vw',
                         background: c.m3Bg,
-                        borderRadius: '20px',
-                        border: darkMode ? '1px solid #333333' : '1px solid #E2E8F0',
-                        boxShadow: darkMode 
-                          ? '0 20px 50px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08)' 
-                          : '0 20px 50px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+                        borderRadius: '18px',
+                        border: `1px solid ${c.m3Border}`,
+                        boxShadow: c.m3Shadow,
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column',
-                        fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'
+                        fontFamily: 'inherit'
                       }}>
                         {/* Top M3 Header: Subtitle + Headline + Edit Icon */}
-                        <div style={{ padding: '12px 16px 8px' }}>
-                          <div style={{ fontSize: '0.68rem', fontWeight: 600, color: c.m3OnSurfaceVariant, marginBottom: '2px' }}>
-                            Select date
+                        <div style={{ padding: '14px 16px 10px', background: c.m3HeaderBg, borderBottom: `1px solid ${c.m3Divider}` }}>
+                          <div style={{ fontSize: '0.68rem', fontWeight: 700, color: c.m3OnSurfaceVariant, marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                            Fecha de Estreno
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div style={{ fontSize: '1.25rem', fontWeight: 700, color: c.m3OnSurface, letterSpacing: '-0.02em', textTransform: 'capitalize' }}>
+                            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: c.m3OnSurface, letterSpacing: '-0.02em', textTransform: 'capitalize' }}>
                               {headerDateStr}
                             </div>
-                            <div style={{ color: c.m3OnSurfaceVariant }}>
-                              <Edit3 size={14} />
+                            <div style={{ color: c.m3Primary }}>
+                              <Calendar size={16} />
                             </div>
                           </div>
                         </div>
 
-                        <div style={{ width: '100%', height: '1px', background: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }} />
-
                         {/* M3 Month Navigation Bar */}
                         <div style={{
-                          padding: '8px 14px 4px',
+                          padding: '10px 14px 4px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between'
                         }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', fontWeight: 700, color: c.m3OnSurface }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.82rem', fontWeight: 800, color: c.m3OnSurface }}>
                             <span>{monthNames[pickerViewMonth]} {pickerViewYear}</span>
-                            <ChevronDown size={12} style={{ color: c.m3OnSurfaceVariant }} />
+                            <ChevronDown size={13} style={{ color: c.m3OnSurfaceVariant }} />
                           </div>
 
                           <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
@@ -807,12 +807,12 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                               type="button"
                               onClick={handlePrevMonth}
                               style={{
-                                border: 'none',
-                                background: 'transparent',
-                                color: c.m3OnSurfaceVariant,
+                                border: `1px solid ${c.m3Border}`,
+                                background: c.m3CardBg,
+                                color: c.m3OnSurface,
                                 cursor: 'pointer',
-                                padding: '3px',
-                                borderRadius: '50%',
+                                padding: '4px',
+                                borderRadius: '6px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center'
@@ -825,12 +825,12 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                               type="button"
                               onClick={handleNextMonth}
                               style={{
-                                border: 'none',
-                                background: 'transparent',
-                                color: c.m3OnSurfaceVariant,
+                                border: `1px solid ${c.m3Border}`,
+                                background: c.m3CardBg,
+                                color: c.m3OnSurface,
                                 cursor: 'pointer',
-                                padding: '3px',
-                                borderRadius: '50%',
+                                padding: '4px',
+                                borderRadius: '6px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center'
@@ -852,7 +852,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                           color: c.m3OnSurfaceVariant,
                           marginBottom: '2px'
                         }}>
-                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                          {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((d, i) => (
                             <div key={i} style={{ height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               {d}
                             </div>
@@ -904,17 +904,17 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  fontSize: '0.74rem',
+                                  fontSize: '0.76rem',
                                   fontWeight: isSelected ? 800 : isToday ? 700 : 500,
                                   background: isSelected 
-                                    ? '#6750A4'
+                                    ? c.m3Primary
                                     : 'transparent',
                                   color: isSelected 
-                                    ? '#FFFFFF' 
+                                    ? c.m3OnPrimary 
                                     : isToday 
-                                    ? (darkMode ? '#D0BCFF' : '#6750A4') 
+                                    ? c.m3Primary 
                                     : c.m3OnSurface,
-                                  border: isToday && !isSelected ? `1px solid ${darkMode ? '#D0BCFF' : '#6750A4'}` : 'none',
+                                  border: isToday && !isSelected ? `1.5px solid ${c.m3Primary}` : 'none',
                                   transition: 'all 0.15s ease'
                                 }}>
                                   {day}
@@ -926,16 +926,16 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
 
                         {/* Time Selector Section */}
                         <div style={{
-                          padding: '8px 12px 4px',
-                          borderTop: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
+                          padding: '8px 12px',
+                          borderTop: `1px solid ${c.m3Divider}`,
                           marginTop: '6px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          gap: '6px'
+                          background: c.m3HeaderBg
                         }}>
-                          <span style={{ fontSize: '0.7rem', fontWeight: 600, color: c.m3OnSurfaceVariant, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <Clock size={12} /> Hora:
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: c.m3OnSurfaceVariant, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <Clock size={13} style={{ color: c.m3Primary }} /> Hora:
                           </span>
 
                           <input
@@ -947,12 +947,12 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                               if (m !== undefined) setPickerMinute(Number(m));
                             }}
                             style={{
-                              padding: '2px 6px',
+                              padding: '3px 8px',
                               borderRadius: '6px',
-                              background: c.m3CardBg,
-                              border: `1px solid ${c.borderInput}`,
+                              background: c.bgModal,
+                              border: `1px solid ${c.m3Border}`,
                               color: c.m3OnSurface,
-                              fontSize: '0.76rem',
+                              fontSize: '0.78rem',
                               fontWeight: 700,
                               outline: 'none'
                             }}
@@ -961,27 +961,28 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
 
                         {/* Bottom Actions: Cancel & OK */}
                         <div style={{
-                          padding: '6px 12px 10px',
+                          padding: '8px 12px 10px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'flex-end',
-                          gap: '6px'
+                          gap: '8px',
+                          borderTop: `1px solid ${c.m3Divider}`
                         }}>
                           <button
                             type="button"
                             onClick={() => setShowDatePicker(false)}
                             style={{
-                              border: 'none',
-                              background: 'transparent',
-                              color: darkMode ? '#D0BCFF' : '#6750A4',
+                              border: `1px solid ${c.m3Border}`,
+                              background: c.bgModal,
+                              color: c.m3OnSurfaceVariant,
                               fontSize: '0.78rem',
                               fontWeight: 700,
                               cursor: 'pointer',
-                              padding: '4px 10px',
-                              borderRadius: '12px'
+                              padding: '5px 12px',
+                              borderRadius: '8px'
                             }}
                           >
-                            Cancel
+                            Cancelar
                           </button>
 
                           <button
@@ -989,16 +990,17 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                             onClick={handleConfirmDatePicker}
                             style={{
                               border: 'none',
-                              background: 'transparent',
-                              color: darkMode ? '#D0BCFF' : '#6750A4',
+                              background: c.m3Primary,
+                              color: c.m3OnPrimary,
                               fontSize: '0.78rem',
-                              fontWeight: 700,
+                              fontWeight: 800,
                               cursor: 'pointer',
-                              padding: '4px 10px',
-                              borderRadius: '12px'
+                              padding: '5px 14px',
+                              borderRadius: '8px',
+                              boxShadow: darkMode ? '0 2px 8px rgba(62,207,142,0.3)' : '0 2px 8px rgba(60,80,224,0.3)'
                             }}
                           >
-                            OK
+                            Aceptar
                           </button>
                         </div>
                       </div>
