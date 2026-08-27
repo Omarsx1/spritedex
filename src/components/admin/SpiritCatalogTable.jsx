@@ -18,7 +18,7 @@ import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, onAddNew, onRefresh, darkMode = false }) {
   const [localSearch, setLocalSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'active' | 'unreleased'
-  const [genFilter, setGenFilter] = useState('all'); // 'all' | '1' | '2'
+  const [genFilter, setGenFilter] = useState('2'); // '2' = Temporada Actual (2ª Gen) por defecto!
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 15;
   const [deletingId, setDeletingId] = useState(null);
@@ -138,9 +138,9 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
             onChange={(e) => { setGenFilter(e.target.value); setCurrentPage(1); }}
             style={inputStyle}
           >
-            <option value="all">Todas las Generaciones</option>
-            <option value="2">2ª Generación (GLITCH)</option>
-            <option value="1">1ª Generación (Clásicos)</option>
+            <option value="2">🎮 Temporada Actual (2ª Gen - 60 Espíritus)</option>
+            <option value="1">🌟 1ª Generación (109 Espíritus)</option>
+            <option value="all">📦 Todas las Generaciones (169 Espíritus)</option>
           </select>
 
           {/* Add Spirit Button */}
