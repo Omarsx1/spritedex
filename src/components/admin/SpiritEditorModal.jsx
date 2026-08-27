@@ -746,7 +746,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                     Al llegar este momento exacto, el espíritu se desbloqueará y activará automáticamente en toda la web.
                   </span>
 
-                  {/* ═══ MATERIAL 3 DATE PICKER DROPDOWN POPOVER (Anchored Desplegable) ═══ */}
+                  {/* ═══ MATERIAL 3 DATE PICKER DROPDOWN POPOVER (Compacto & Abierto hacia Arriba) ═══ */}
                   {showDatePicker && (
                     <>
                       {/* Invisible backdrop click-outside layer */}
@@ -757,33 +757,33 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
 
                       <div style={{
                         position: 'absolute',
-                        top: 'calc(100% + 6px)',
+                        bottom: 'calc(100% + 8px)',
                         left: 0,
                         zIndex: 99999,
-                        width: '330px',
+                        width: '290px',
                         maxWidth: '92vw',
                         background: c.m3Bg,
-                        borderRadius: '24px',
+                        borderRadius: '20px',
                         border: darkMode ? '1px solid #333333' : '1px solid #E2E8F0',
                         boxShadow: darkMode 
-                          ? '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08)' 
+                          ? '0 20px 50px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08)' 
                           : '0 20px 50px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05)',
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column',
                         fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'
                       }}>
-                        {/* Top M3 Header: Subtitle + Big Headline + Edit Icon */}
-                        <div style={{ padding: '16px 20px 10px' }}>
-                          <div style={{ fontSize: '0.74rem', fontWeight: 600, color: c.m3OnSurfaceVariant, marginBottom: '4px' }}>
+                        {/* Top M3 Header: Subtitle + Headline + Edit Icon */}
+                        <div style={{ padding: '12px 16px 8px' }}>
+                          <div style={{ fontSize: '0.68rem', fontWeight: 600, color: c.m3OnSurfaceVariant, marginBottom: '2px' }}>
                             Select date
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div style={{ fontSize: '1.65rem', fontWeight: 500, color: c.m3OnSurface, letterSpacing: '-0.02em', textTransform: 'capitalize' }}>
+                            <div style={{ fontSize: '1.25rem', fontWeight: 700, color: c.m3OnSurface, letterSpacing: '-0.02em', textTransform: 'capitalize' }}>
                               {headerDateStr}
                             </div>
                             <div style={{ color: c.m3OnSurfaceVariant }}>
-                              <Edit3 size={16} />
+                              <Edit3 size={14} />
                             </div>
                           </div>
                         </div>
@@ -792,17 +792,17 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
 
                         {/* M3 Month Navigation Bar */}
                         <div style={{
-                          padding: '10px 16px 6px',
+                          padding: '8px 14px 4px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between'
                         }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.84rem', fontWeight: 700, color: c.m3OnSurface }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', fontWeight: 700, color: c.m3OnSurface }}>
                             <span>{monthNames[pickerViewMonth]} {pickerViewYear}</span>
-                            <ChevronDown size={14} style={{ color: c.m3OnSurfaceVariant }} />
+                            <ChevronDown size={12} style={{ color: c.m3OnSurfaceVariant }} />
                           </div>
 
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
                             <button
                               type="button"
                               onClick={handlePrevMonth}
@@ -811,14 +811,14 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                                 background: 'transparent',
                                 color: c.m3OnSurfaceVariant,
                                 cursor: 'pointer',
-                                padding: '4px',
+                                padding: '3px',
                                 borderRadius: '50%',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center'
                               }}
                             >
-                              <ChevronLeft size={16} />
+                              <ChevronLeft size={14} />
                             </button>
 
                             <button
@@ -829,14 +829,14 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                                 background: 'transparent',
                                 color: c.m3OnSurfaceVariant,
                                 cursor: 'pointer',
-                                padding: '4px',
+                                padding: '3px',
                                 borderRadius: '50%',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center'
                               }}
                             >
-                              <ChevronRight size={16} />
+                              <ChevronRight size={14} />
                             </button>
                           </div>
                         </div>
@@ -845,15 +845,15 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                         <div style={{
                           display: 'grid',
                           gridTemplateColumns: 'repeat(7, 1fr)',
-                          padding: '0 12px',
+                          padding: '0 8px',
                           textAlign: 'center',
-                          fontSize: '0.74rem',
+                          fontSize: '0.68rem',
                           fontWeight: 700,
                           color: c.m3OnSurfaceVariant,
-                          marginBottom: '4px'
+                          marginBottom: '2px'
                         }}>
                           {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-                            <div key={i} style={{ height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <div key={i} style={{ height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               {d}
                             </div>
                           ))}
@@ -863,12 +863,12 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                         <div style={{
                           display: 'grid',
                           gridTemplateColumns: 'repeat(7, 1fr)',
-                          gap: '2px',
-                          padding: '0 12px',
+                          gap: '1px',
+                          padding: '0 8px',
                           textAlign: 'center'
                         }}>
                           {Array.from({ length: firstDayOfWeek }).map((_, i) => (
-                            <div key={`empty-${i}`} style={{ height: '32px' }} />
+                            <div key={`empty-${i}`} style={{ height: '28px' }} />
                           ))}
 
                           {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -890,7 +890,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                                 key={day}
                                 onClick={() => handleSelectDay(day)}
                                 style={{
-                                  height: '32px',
+                                  height: '28px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
@@ -898,13 +898,13 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                                 }}
                               >
                                 <div style={{
-                                  width: '30px',
-                                  height: '30px',
+                                  width: '26px',
+                                  height: '26px',
                                   borderRadius: '50%',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  fontSize: '0.8rem',
+                                  fontSize: '0.74rem',
                                   fontWeight: isSelected ? 800 : isToday ? 700 : 500,
                                   background: isSelected 
                                     ? '#6750A4'
@@ -926,16 +926,16 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
 
                         {/* Time Selector Section */}
                         <div style={{
-                          padding: '10px 16px 4px',
+                          padding: '8px 12px 4px',
                           borderTop: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
-                          marginTop: '8px',
+                          marginTop: '6px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          gap: '8px'
+                          gap: '6px'
                         }}>
-                          <span style={{ fontSize: '0.74rem', fontWeight: 600, color: c.m3OnSurfaceVariant, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <Clock size={13} /> Hora:
+                          <span style={{ fontSize: '0.7rem', fontWeight: 600, color: c.m3OnSurfaceVariant, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <Clock size={12} /> Hora:
                           </span>
 
                           <input
@@ -947,12 +947,12 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                               if (m !== undefined) setPickerMinute(Number(m));
                             }}
                             style={{
-                              padding: '3px 8px',
-                              borderRadius: '8px',
+                              padding: '2px 6px',
+                              borderRadius: '6px',
                               background: c.m3CardBg,
                               border: `1px solid ${c.borderInput}`,
                               color: c.m3OnSurface,
-                              fontSize: '0.8rem',
+                              fontSize: '0.76rem',
                               fontWeight: 700,
                               outline: 'none'
                             }}
@@ -961,11 +961,11 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
 
                         {/* Bottom Actions: Cancel & OK */}
                         <div style={{
-                          padding: '8px 16px 14px',
+                          padding: '6px 12px 10px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'flex-end',
-                          gap: '8px'
+                          gap: '6px'
                         }}>
                           <button
                             type="button"
@@ -974,11 +974,11 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                               border: 'none',
                               background: 'transparent',
                               color: darkMode ? '#D0BCFF' : '#6750A4',
-                              fontSize: '0.84rem',
+                              fontSize: '0.78rem',
                               fontWeight: 700,
                               cursor: 'pointer',
-                              padding: '6px 12px',
-                              borderRadius: '16px'
+                              padding: '4px 10px',
+                              borderRadius: '12px'
                             }}
                           >
                             Cancel
@@ -991,11 +991,11 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                               border: 'none',
                               background: 'transparent',
                               color: darkMode ? '#D0BCFF' : '#6750A4',
-                              fontSize: '0.84rem',
+                              fontSize: '0.78rem',
                               fontWeight: 700,
                               cursor: 'pointer',
-                              padding: '6px 12px',
-                              borderRadius: '16px'
+                              padding: '4px 10px',
+                              borderRadius: '12px'
                             }}
                           >
                             OK
