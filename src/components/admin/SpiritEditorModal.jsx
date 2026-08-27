@@ -349,7 +349,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                  placeholder="Ej. Storm Scout Dorado"
+                  placeholder="Ej. Explorador de Tormentas Dorado"
                   required
                   style={{
                     width: '100%',

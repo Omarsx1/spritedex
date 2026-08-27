@@ -171,7 +171,7 @@ export const FAMILY_NAMES_MAP = {
   adventure: 'Aventurero',
   jonesy: 'Jonesy',
   '8bit': '8-Bit',
-  stormscout: 'Storm Scout'
+  stormscout: 'Explorador de Tormentas'
 };
 
 const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails'];
