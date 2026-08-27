@@ -23,6 +23,7 @@ import { getMyFriendCode } from '../../utils/friendCode';
 export function UserManagementTable({ sprites = [], darkMode = false }) {
   const [rawCollections, setRawCollections] = useState([]);
   const [totalVisits, setTotalVisits] = useState(0);
+  const [currentAuthUser, setCurrentAuthUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all' | 'high_progress' | 'active_catch'
@@ -32,6 +33,17 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
   const pageSize = 15;
 
   const myFriendCode = useMemo(() => getMyFriendCode(), []);
+
+  // Fetch current authenticated user to accurately match "TÚ"
+  useEffect(() => {
+    if (isSupabaseConfigured && supabase) {
+      supabase.auth.getUser().then(({ data }) => {
+        if (data?.user) {
+          setCurrentAuthUser(data.user);
+        }
+      });
+    }
+  }, []);
 
   // Filter pool of sprites according to selected generation
   const scopedSprites = useMemo(() => {
@@ -84,6 +96,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
   // Compute user metrics dynamically according to the selected generation pool
   const users = useMemo(() => {
     const totalPool = scopedSprites.length || 1;
+    const currentUserId = currentAuthUser?.id;
 
     return rawCollections.map((col, idx) => {
       const st = col.user_state || {};
@@ -103,12 +116,31 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
       }
 
       const pct = Math.min(100, Math.round((caught / totalPool) * 100));
-      const isMe = (col.friend_code && myFriendCode && col.friend_code.trim().toUpperCase() === myFriendCode.trim().toUpperCase());
+      
+      // Match "isMe" by authenticated user ID or by matching friend code
+      const isMe = (currentUserId && col.user_id === currentUserId) ||
+                   (col.friend_code && myFriendCode && col.friend_code.trim().toUpperCase() === myFriendCode.trim().toUpperCase());
+
+      // Extract user profile metadata if captured (from Google, Discord or state)
+      const profile = st._profile || st.profile || {};
+      let displayName = profile.name;
+      if (!displayName && isMe && currentAuthUser) {
+        displayName = currentAuthUser.user_metadata?.full_name || currentAuthUser.user_metadata?.name || currentAuthUser.email?.split('@')[0];
+      }
+      if (!displayName) {
+        displayName = `Entrenador #${(col.friend_code || col.user_id || 'USER').slice(-4)}`;
+      }
+
+      const email = profile.email || (isMe && currentAuthUser?.email ? currentAuthUser.email : '');
+      const avatarUrl = profile.avatar_url || (isMe && (currentAuthUser?.user_metadata?.avatar_url || currentAuthUser?.user_metadata?.picture) ? (currentAuthUser.user_metadata.avatar_url || currentAuthUser.user_metadata.picture) : '');
 
       return {
         id: col.id || `usr_${idx}`,
         userId: col.user_id || 'Anónimo',
         friendCode: col.friend_code || `SDEX-${(col.user_id || 'USER').slice(0, 4).toUpperCase()}`,
+        name: displayName,
+        email: email,
+        avatarUrl: avatarUrl,
         caughtCount: caught,
         starCount: stars,
         progressPct: pct,
@@ -116,7 +148,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         updatedAt: col.updated_at || new Date().toISOString()
       };
     });
-  }, [rawCollections, scopedSprites, myFriendCode]);
+  }, [rawCollections, scopedSprites, myFriendCode, currentAuthUser]);
 
   // Aggregate Metrics
   const metrics = useMemo(() => {
@@ -221,28 +253,30 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
   const inputStyle = {
     padding: '9px 14px',
     borderRadius: '8px',
-    background: c.bgInput,
-    border: `1px solid ${c.borderInput}`,
-    color: c.textPrimary,
-    fontSize: '0.82rem',
-    fontWeight: 600,
-    outline: 'none'
+    background: c.bgCard,
+    border: `1px solid ${c.borderCard}`,
+    boxShadow: c.shadowCard,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    minHeight: '105px'
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {/* ═══ TOP 4 KPI CARDS (Enterprise Clean Design) ═══ */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', fontFamily: 'inherit' }}>
+      
+      {/* ═══ 4 KPI CARDS ═══ */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
         gap: '16px'
       }}>
-        {/* Card 1: Total Registered Users */}
+        {/* Card 1: Total Users */}
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Cuentas en Nube</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: c.badgeAuthBg, border: `1px solid ${c.badgeAuthBorder}`, color: c.badgeAuthText, fontSize: '0.72rem', fontWeight: 700 }}>
-              <ShieldCheck size={12} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: c.pillNeutralBg, border: `1px solid ${c.pillNeutralBorder}`, color: c.pillNeutralText, fontSize: '0.72rem', fontWeight: 700 }}>
+              <ShieldCheck size={12} style={{ color: '#10B981' }} />
               <span>Supabase Auth</span>
             </div>
           </div>
@@ -295,7 +329,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
       </div>
 
       {/* ═══ USER'S OWN ACCOUNT NOTICE BANNER (Accessible & Professional) ═══ */}
-      {myFriendCode && (
+      {activeFriendCode && (
         <div style={{
           padding: '12px 18px',
           borderRadius: '10px',
@@ -309,9 +343,9 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
-              width: '30px',
-              height: '30px',
-              borderRadius: '6px',
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
               background: c.badgeSelfBg,
               color: c.badgeSelfText,
               display: 'flex',
@@ -319,11 +353,16 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
               justifyContent: 'center',
               flexShrink: 0
             }}>
-              <Crown size={15} />
+              <Crown size={16} />
             </div>
             <div>
               <div style={{ fontSize: '0.84rem', fontWeight: 700, color: c.textPrimary, display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span>Tu Cuenta de Entrenador (Este Dispositivo):</span>
+                <span>Tu Cuenta de Entrenador:</span>
+                {myUserRow?.name && (
+                  <strong style={{ color: darkMode ? '#3ECF8E' : '#2563EB' }}>
+                    {myUserRow.name}
+                  </strong>
+                )}
                 <span style={{
                   padding: '2px 8px',
                   borderRadius: '6px',
@@ -332,75 +371,75 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                   color: c.tagMyCodeText,
                   fontFamily: 'monospace',
                   fontWeight: 800,
-                  fontSize: '0.86rem'
+                  fontSize: '0.8rem'
                 }}>
-                  {myFriendCode}
+                  {activeFriendCode}
                 </span>
               </div>
-              <div style={{ fontSize: '0.74rem', color: c.textSecondary, marginTop: '2px' }}>
-                Tu fila aparece identificada con la insignia <strong>👑 TÚ</strong> y borde distintivo en la tabla.
-              </div>
+              <span style={{ fontSize: '0.72rem', color: c.textMuted }}>
+                Tu fila aparece identificada con la insignia 👑 TÚ y borde distintivo en la tabla.
+              </span>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.76rem', color: c.textSecondary }}>Filtro Activo:</span>
-            <span style={{
-              padding: '3px 8px',
-              borderRadius: '6px',
-              background: darkMode ? '#262626' : '#FFFFFF',
-              border: `1px solid ${darkMode ? '#333333' : '#CBD5E1'}`,
-              color: c.textPrimary,
-              fontSize: '0.76rem',
-              fontWeight: 700
-            }}>
+          <div style={{ fontSize: '0.74rem', color: c.textSecondary, display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>Filtro Activo:</span>
+            <span style={{ fontWeight: 700, color: c.textPrimary }}>
               {selectedGen === 2 ? 'Temporada Actual (2ª Gen)' : selectedGen === 1 ? '1ª Generación' : 'Todas las Generaciones'}
             </span>
           </div>
         </div>
       )}
 
-      {/* ═══ TABLE CONTROL & FILTERS HEADER ═══ */}
+      {/* ═══ FILTER & SEARCH BAR ═══ */}
       <div style={{
-        ...containerStyle,
-        padding: '16px 20px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '12px'
       }}>
-        {/* Search Input */}
-        <div style={{ position: 'relative', minWidth: '260px', flex: 1, maxWidth: '380px' }}>
+        {/* Search Box */}
+        <div style={{ position: 'relative', flex: '1 1 300px', maxWidth: '440px' }}>
+          <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: c.textMuted }} />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-            placeholder="Buscar por Código de Amigo (SDEX-XXXX) o ID..."
+            placeholder="Buscar por Nombre, Código (SDEX-XXXX) o ID..."
             style={{
-              ...inputStyle,
               width: '100%',
-              padding: '9px 14px 9px 36px',
+              padding: '9px 12px 9px 36px',
+              borderRadius: '8px',
+              border: `1px solid ${c.borderInput}`,
+              background: c.bgInput,
+              color: c.textPrimary,
+              fontSize: '0.82rem',
+              outline: 'none',
               boxSizing: 'border-box'
             }}
           />
-          <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: c.textMuted }} />
         </div>
 
-        {/* Filters: Generation Selector, Progress Filter & Refresh */}
+        {/* Action Selects */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          {/* Generation / Season Selector */}
+          {/* Generation Scope Select */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Layers size={14} style={{ color: c.textSecondary }} />
+            <Layers size={15} style={{ color: darkMode ? '#3ECF8E' : '#2563EB' }} />
             <select
               value={selectedGen}
               onChange={(e) => { setSelectedGen(Number(e.target.value)); setCurrentPage(1); }}
               style={{
-                ...inputStyle,
+                padding: '8px 12px',
+                borderRadius: '8px',
+                border: `1px solid ${c.borderInput}`,
+                background: c.bgInput,
+                color: c.textPrimary,
+                fontSize: '0.82rem',
                 fontWeight: 700,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                outline: 'none'
               }}
-              title="Filtrar por Temporada / Generación"
             >
               <option value={2}>🎮 Temporada Actual (2ª Gen - {gen2Count} Espíritus)</option>
               <option value={1}>🌟 1ª Generación ({gen1Count} Espíritus)</option>
@@ -408,30 +447,41 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
             </select>
           </div>
 
+          {/* Activity Filter */}
           <select
             value={filterType}
             onChange={(e) => { setFilterType(e.target.value); setCurrentPage(1); }}
-            style={inputStyle}
+            style={{
+              padding: '8px 12px',
+              borderRadius: '8px',
+              border: `1px solid ${c.borderInput}`,
+              background: c.bgInput,
+              color: c.textPrimary,
+              fontSize: '0.82rem',
+              cursor: 'pointer',
+              outline: 'none'
+            }}
           >
             <option value="all">Todos los Entrenadores</option>
-            <option value="high_progress">Colecciones &gt; 50%</option>
-            <option value="active_catch">Con Espíritus Atrapados</option>
+            <option value="high_progress">Alto Progreso (≥50%)</option>
+            <option value="active_catch">Con Espíritus Atrapados (≥1)</option>
           </select>
 
+          {/* Refresh Button */}
           <button
             type="button"
             onClick={loadUserData}
             style={{
+              padding: '8px 14px',
+              borderRadius: '8px',
+              border: `1px solid ${c.borderInput}`,
+              background: c.bgInput,
+              color: c.textPrimary,
+              fontSize: '0.82rem',
+              fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '8px 14px',
-              borderRadius: '8px',
-              background: darkMode ? '#1F1F1F' : '#FFFFFF',
-              border: `1px solid ${c.borderCard}`,
-              color: c.textPrimary,
-              fontSize: '0.8rem',
-              fontWeight: 700,
               cursor: 'pointer'
             }}
           >
@@ -441,20 +491,23 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         </div>
       </div>
 
-      {/* ═══ USERS DATA TABLE (Enterprise Corporate Style) ═══ */}
+      {/* ═══ TABLE DATA CONTAINER ═══ */}
       <div style={{
-        ...containerStyle,
+        background: c.bgCard,
+        border: `1px solid ${c.borderCard}`,
+        borderRadius: '12px',
+        boxShadow: c.shadowCard,
         overflow: 'hidden'
       }}>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: `1px solid ${c.borderCard}`, color: c.textSecondary, background: c.tableHeaderBg }}>
-                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>ENTRENADOR / CUENTA</th>
-                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>CÓDIGO DE AMIGO</th>
-                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>PROGRESO ({selectedGen === 2 ? '2ª Gen' : selectedGen === 1 ? '1ª Gen' : 'Total'})</th>
+                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>ENTRENADOR</th>
+                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>CÓDIGO</th>
+                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>PROGRESO</th>
                 <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>ESTRELLAS</th>
-                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>ÚLTIMA SINCRONIZACIÓN</th>
+                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>SINCRONIZACIÓN</th>
                 <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em', textAlign: 'right' }}>ESTADO</th>
               </tr>
             </thead>
@@ -469,40 +522,55 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                       key={user.id || idx}
                       style={{
                         borderBottom: `1px solid ${c.rowBorder}`,
-                        borderLeft: isMe ? `3px solid ${darkMode ? '#3ECF8E' : '#0F172A'}` : '3px solid transparent',
+                        borderLeft: isMe ? `3px solid ${darkMode ? '#3ECF8E' : '#2563EB'}` : '3px solid transparent',
                         background: isMe
-                          ? (darkMode ? '#1C1C1C' : '#F8FAFC')
+                          ? (darkMode ? 'rgba(62, 207, 142, 0.06)' : '#EFF6FF')
                           : 'transparent',
                         transition: 'background 0.15s ease'
                       }}
                     >
-                      {/* Trainer Avatar & ID */}
+                      {/* Trainer Avatar, Name & Email */}
                       <td style={{ padding: '12px 18px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div style={{
-                            width: '34px',
-                            height: '34px',
-                            borderRadius: '8px',
-                            background: isMe
-                              ? (darkMode ? '#3ECF8E' : '#0F172A')
-                              : (darkMode ? '#262626' : '#F1F5F9'),
-                            color: isMe
-                              ? (darkMode ? '#000000' : '#FFFFFF')
-                              : (darkMode ? '#D4D4D4' : '#334155'),
-                            border: `1px solid ${isMe ? (darkMode ? '#3ECF8E' : '#0F172A') : (darkMode ? '#333333' : '#E2E8F0')}`,
-                            fontWeight: 800,
-                            fontSize: '0.76rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0
-                          }}>
-                            {user.friendCode.slice(-2)}
-                          </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          {user.avatarUrl ? (
+                            <img
+                              src={user.avatarUrl}
+                              alt={user.name}
+                              style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                objectFit: 'cover',
+                                border: `2px solid ${isMe ? (darkMode ? '#3ECF8E' : '#2563EB') : (darkMode ? '#333333' : '#E2E8F0')}`,
+                                flexShrink: 0
+                              }}
+                            />
+                          ) : (
+                            <div style={{
+                              width: '36px',
+                              height: '36px',
+                              borderRadius: '10px',
+                              background: isMe
+                                ? (darkMode ? '#3ECF8E' : '#2563EB')
+                                : (darkMode ? '#262626' : '#F1F5F9'),
+                              color: isMe
+                                ? (darkMode ? '#000000' : '#FFFFFF')
+                                : (darkMode ? '#D4D4D4' : '#334155'),
+                              border: `1px solid ${isMe ? (darkMode ? '#3ECF8E' : '#2563EB') : (darkMode ? '#333333' : '#E2E8F0')}`,
+                              fontWeight: 800,
+                              fontSize: '0.8rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0
+                            }}>
+                              {user.name && !user.name.startsWith('Entrenador') ? user.name.slice(0, 2).toUpperCase() : user.friendCode.slice(-2)}
+                            </div>
+                          )}
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <span style={{ fontWeight: 700, color: c.textPrimary }}>
-                                Entrenador #{user.friendCode.slice(-4)}
+                              <span style={{ fontWeight: 800, color: c.textPrimary, fontSize: '0.86rem' }}>
+                                {user.name}
                               </span>
                               {isMe && (
                                 <span style={{
@@ -520,8 +588,8 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                                 </span>
                               )}
                             </div>
-                            <span style={{ fontSize: '0.72rem', color: c.textMuted, fontFamily: 'monospace' }}>
-                              {shortId}
+                            <span style={{ fontSize: '0.72rem', color: c.textMuted, fontFamily: user.email ? 'inherit' : 'monospace' }}>
+                              {user.email || shortId}
                             </span>
                           </div>
                         </div>
