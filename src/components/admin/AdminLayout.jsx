@@ -18,7 +18,8 @@ import {
   Users,
   Sun,
   Moon,
-  Globe
+  Globe,
+  ChevronDown
 } from 'lucide-react';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
 import { SpiritCatalogTable } from './SpiritCatalogTable';
@@ -59,6 +60,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
   };
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [usersCount, setUsersCount] = useState(0);
   const [editingSpirit, setEditingSpirit] = useState(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -423,64 +425,6 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             </button>
           </nav>
         </div>
-
-        {/* Sidebar Footer User Profile */}
-        <div style={{
-          padding: '16px',
-          borderTop: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
-          background: darkMode ? '#171717' : '#F8FAFC',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: sidebarOpen ? 'space-between' : 'center'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              background: darkMode ? '#3ECF8E' : 'linear-gradient(135deg, #3C50E0, #7551FF)',
-              color: darkMode ? '#121212' : '#FFFFFF',
-              fontWeight: 800,
-              fontSize: '0.82rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-              boxShadow: darkMode ? '0 2px 8px rgba(62, 207, 142, 0.3)' : '0 2px 8px rgba(60, 80, 224, 0.25)'
-            }}>
-              AD
-            </div>
-            {sidebarOpen && (
-              <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                <div style={{ fontSize: '0.84rem', fontWeight: 800, color: darkMode ? '#EDEDED' : '#1E293B', lineHeight: 1.1 }}>
-                  Admin
-                </div>
-                <div style={{ fontSize: '0.7rem', color: darkMode ? '#A1A1A1' : '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#3ECF8E', flexShrink: 0 }} />
-                  <span>Acceso Maestro</span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {sidebarOpen && (
-            <button
-              type="button"
-              onClick={handleLogout}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: darkMode ? '#737373' : '#94A3B8',
-                cursor: 'pointer',
-                padding: '6px',
-                borderRadius: '6px'
-              }}
-              title="Cerrar Sesión"
-            >
-              <LogOut size={16} />
-            </button>
-          )}
-        </div>
       </aside>
 
       {/* ═══ MAIN CONTENT AREA ═══ */}
@@ -554,7 +498,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             </div>
           </div>
 
-          {/* Right: Cloud Sync Status & Actions */}
+          {/* Right: Cloud Sync Status, Theme Toggle & User Avatar Dropdown */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div style={{
               display: 'flex',
@@ -593,27 +537,214 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
               {darkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            <button
-              type="button"
-              onClick={handleOpenNew}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '9px 16px',
-                borderRadius: '10px',
-                background: darkMode ? '#3ECF8E' : '#3C50E0',
-                color: darkMode ? '#121212' : '#FFFFFF',
-                border: 'none',
-                fontSize: '0.82rem',
-                fontWeight: 800,
-                cursor: 'pointer',
-                boxShadow: darkMode ? '0 4px 12px rgba(62, 207, 142, 0.25)' : '0 4px 12px rgba(60, 80, 224, 0.25)'
-              }}
-            >
-              <PlusCircle size={15} />
-              <span>Crear Espíritu</span>
-            </button>
+            {/* ═══ User Profile Avatar Dropdown ═══ */}
+            <div style={{ position: 'relative' }}>
+              <button
+                type="button"
+                onClick={() => setProfileDropdownOpen(v => !v)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '4px 8px 4px 4px',
+                  borderRadius: '12px',
+                  background: profileDropdownOpen 
+                    ? (darkMode ? '#262626' : '#F1F5F9') 
+                    : 'transparent',
+                  border: `1px solid ${profileDropdownOpen ? (darkMode ? '#3ECF8E' : '#3C50E0') : 'transparent'}`,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+                title="Menú de Usuario Administrador"
+              >
+                <div style={{
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '50%',
+                  background: darkMode ? '#3ECF8E' : 'linear-gradient(135deg, #3C50E0, #7551FF)',
+                  color: darkMode ? '#121212' : '#FFFFFF',
+                  fontWeight: 800,
+                  fontSize: '0.8rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: darkMode ? '0 2px 8px rgba(62, 207, 142, 0.3)' : '0 2px 8px rgba(60, 80, 224, 0.25)',
+                  position: 'relative'
+                }}>
+                  AD
+                  <span style={{
+                    position: 'absolute',
+                    bottom: '-1px',
+                    right: '-1px',
+                    width: '9px',
+                    height: '9px',
+                    borderRadius: '50%',
+                    background: '#3ECF8E',
+                    border: `2px solid ${darkMode ? '#171717' : '#FFFFFF'}`
+                  }} />
+                </div>
+
+                <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 800, color: darkMode ? '#EDEDED' : '#0F172A', lineHeight: 1.1 }}>
+                    Admin
+                  </span>
+                  <span style={{ fontSize: '0.68rem', color: darkMode ? '#3ECF8E' : '#3C50E0', fontWeight: 700 }}>
+                    Acceso Maestro
+                  </span>
+                </div>
+
+                <ChevronDown size={14} style={{ color: darkMode ? '#A1A1A1' : '#64748B', transform: profileDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
+              </button>
+
+              {/* Profile Dropdown Popover */}
+              {profileDropdownOpen && (
+                <>
+                  {/* Invisible click-outside listener */}
+                  <div
+                    onClick={() => setProfileDropdownOpen(false)}
+                    style={{ position: 'fixed', inset: 0, zIndex: 999 }}
+                  />
+
+                  <div style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    right: 0,
+                    width: '230px',
+                    background: darkMode ? '#1C1C1C' : '#FFFFFF',
+                    border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
+                    borderRadius: '16px',
+                    boxShadow: darkMode 
+                      ? '0 15px 35px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.06)' 
+                      : '0 15px 35px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+                    padding: '8px',
+                    zIndex: 1000,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                    fontFamily: 'inherit'
+                  }}>
+                    {/* Header Info */}
+                    <div style={{
+                      padding: '10px 12px',
+                      borderRadius: '10px',
+                      background: darkMode ? '#171717' : '#F8FAFC',
+                      marginBottom: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px'
+                    }}>
+                      <div style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '50%',
+                        background: darkMode ? '#3ECF8E' : 'linear-gradient(135deg, #3C50E0, #7551FF)',
+                        color: darkMode ? '#121212' : '#FFFFFF',
+                        fontWeight: 800,
+                        fontSize: '0.84rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}>
+                        AD
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: '0.86rem', fontWeight: 800, color: darkMode ? '#EDEDED' : '#0F172A', lineHeight: 1.2 }}>
+                          Admin
+                        </div>
+                        <div style={{ fontSize: '0.7rem', color: darkMode ? '#3ECF8E' : '#3C50E0', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#3ECF8E' }} />
+                          <span>Acceso Maestro</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* View Public Web */}
+                    <button
+                      type="button"
+                      onClick={() => { setProfileDropdownOpen(false); onExitAdmin(); }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        width: '100%',
+                        padding: '9px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        background: 'transparent',
+                        color: darkMode ? '#EDEDED' : '#1E293B',
+                        fontSize: '0.82rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'background 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? '#262626' : '#F1F5F9'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <ExternalLink size={15} style={{ color: darkMode ? '#A1A1A1' : '#64748B' }} />
+                      <span>Ver Web Pública</span>
+                    </button>
+
+                    {/* Theme Toggle in Menu */}
+                    <button
+                      type="button"
+                      onClick={() => { toggleDarkMode(); }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        width: '100%',
+                        padding: '9px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        background: 'transparent',
+                        color: darkMode ? '#EDEDED' : '#1E293B',
+                        fontSize: '0.82rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'background 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? '#262626' : '#F1F5F9'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    >
+                      {darkMode ? <Sun size={15} style={{ color: '#F59E0B' }} /> : <Moon size={15} style={{ color: '#6366F1' }} />}
+                      <span>{darkMode ? 'Modo Claro' : 'Modo Oscuro'}</span>
+                    </button>
+
+                    <div style={{ height: '1px', background: darkMode ? '#262626' : '#F1F5F9', margin: '4px 0' }} />
+
+                    {/* Logout Action */}
+                    <button
+                      type="button"
+                      onClick={() => { setProfileDropdownOpen(false); handleLogout(); }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        width: '100%',
+                        padding: '9px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        background: 'transparent',
+                        color: '#EF4444',
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'background 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? 'rgba(239, 68, 68, 0.12)' : '#FEF2F2'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <LogOut size={15} style={{ color: '#EF4444' }} />
+                      <span>Cerrar Sesión</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </header>
 
