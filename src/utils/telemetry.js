@@ -83,7 +83,14 @@ export function getCountryByCode(code = '') {
     'FR': { name: 'Francia', code: 'FR', flag: '🇫🇷' },
     'DE': { name: 'Alemania', code: 'DE', flag: '🇩🇪' },
     'IT': { name: 'Italia', code: 'IT', flag: '🇮🇹' },
+    'PT': { name: 'Portugal', code: 'PT', flag: '🇵🇹' },
     'JP': { name: 'Japón', code: 'JP', flag: '🇯🇵' },
+    'PR': { name: 'Puerto Rico', code: 'PR', flag: '🇵🇷' },
+    'CU': { name: 'Cuba', code: 'CU', flag: '🇨🇺' },
+    'AU': { name: 'Australia', code: 'AU', flag: '🇦🇺' },
+    'NL': { name: 'Países Bajos', code: 'NL', flag: '🇳🇱' },
+    'CH': { name: 'Suiza', code: 'CH', flag: '🇨🇭' },
+    'SE': { name: 'Suecia', code: 'SE', flag: '🇸🇪' }
   };
   return map[c] || null;
 }
@@ -92,18 +99,52 @@ export async function getClientCountry() {
   if (typeof window === 'undefined') return null;
   try {
     const cached = sessionStorage.getItem('spritedex_cached_geo');
-    if (cached) return JSON.parse(cached);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed && parsed.code && parsed.code !== 'GL') return parsed;
+    }
 
-    const res = await fetch('https://api.country.is', { signal: AbortSignal.timeout(1800) });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.country) {
-        const found = getCountryByCode(data.country) || { name: data.country, code: data.country, flag: '🌍' };
-        sessionStorage.setItem('spritedex_cached_geo', JSON.stringify(found));
-        return found;
+    // 1. Primary fast IP Geo API
+    try {
+      const res = await fetch('https://api.country.is', { signal: AbortSignal.timeout(1500) });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.country) {
+          const found = getCountryByCode(data.country) || { name: data.country, code: data.country.toUpperCase(), flag: '🌍' };
+          sessionStorage.setItem('spritedex_cached_geo', JSON.stringify(found));
+          return found;
+        }
+      }
+    } catch {}
+
+    // 2. Secondary IP Geo API
+    try {
+      const res2 = await fetch('https://freeipapi.com/api/json', { signal: AbortSignal.timeout(1500) });
+      if (res2.ok) {
+        const data2 = await res2.json();
+        if (data2 && data2.countryCode) {
+          const found = getCountryByCode(data2.countryCode) || { name: data2.countryName || data2.countryCode, code: data2.countryCode.toUpperCase(), flag: '🌍' };
+          sessionStorage.setItem('spritedex_cached_geo', JSON.stringify(found));
+          return found;
+        }
+      }
+    } catch {}
+
+    // 3. Fallback: Browser Native TimeZone (100% reliable, zero network latency, immune to Brave/AdBlock)
+    let tz = '';
+    try {
+      tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    } catch {}
+
+    if (tz) {
+      const tzGeo = resolveCountry('', tz);
+      if (tzGeo && tzGeo.code !== 'GL') {
+        sessionStorage.setItem('spritedex_cached_geo', JSON.stringify(tzGeo));
+        return tzGeo;
       }
     }
   } catch {}
+
   return null;
 }
 
@@ -128,10 +169,10 @@ export function resolveCountry(countryHint = '', timeZoneHint = '') {
     const tzLower = timeZoneHint.toLowerCase();
 
     if (tzLower.includes('guatemala')) return { name: 'Guatemala', code: 'GT', flag: '🇬🇹' };
-    if (tzLower.includes('mexico') || tzLower.includes('cancun') || tzLower.includes('tijuana') || tzLower.includes('monterrey') || tzLower.includes('merida') || tzLower.includes('chihuahua')) return { name: 'México', code: 'MX', flag: '🇲🇽' };
+    if (tzLower.includes('mexico') || tzLower.includes('cancun') || tzLower.includes('tijuana') || tzLower.includes('monterrey') || tzLower.includes('merida') || tzLower.includes('chihuahua') || tzLower.includes('hermosillo') || tzLower.includes('mazatlan')) return { name: 'México', code: 'MX', flag: '🇲🇽' };
     if (tzLower.includes('bogota')) return { name: 'Colombia', code: 'CO', flag: '🇨🇴' };
-    if (tzLower.includes('santiago') || tzLower.includes('punta_arenas')) return { name: 'Chile', code: 'CL', flag: '🇨🇱' };
-    if (tzLower.includes('buenos_aires') || tzLower.includes('argentina') || tzLower.includes('cordoba') || tzLower.includes('mendoza') || tzLower.includes('rosario') || tzLower.includes('salta')) return { name: 'Argentina', code: 'AR', flag: '🇦🇷' };
+    if (tzLower.includes('santiago') || tzLower.includes('punta_arenas') || tzLower.includes('easter')) return { name: 'Chile', code: 'CL', flag: '🇨🇱' };
+    if (tzLower.includes('buenos_aires') || tzLower.includes('argentina') || tzLower.includes('cordoba') || tzLower.includes('mendoza') || tzLower.includes('rosario') || tzLower.includes('salta') || tzLower.includes('tucuman') || tzLower.includes('jujuy')) return { name: 'Argentina', code: 'AR', flag: '🇦🇷' };
     if (tzLower.includes('madrid') || tzLower.includes('canary') || tzLower.includes('ceuta')) return { name: 'España', code: 'ES', flag: '🇪🇸' };
     if (tzLower.includes('lima')) return { name: 'Perú', code: 'PE', flag: '🇵🇪' };
     if (tzLower.includes('guayaquil') || tzLower.includes('galapagos')) return { name: 'Ecuador', code: 'EC', flag: '🇪🇨' };
@@ -147,13 +188,14 @@ export function resolveCountry(countryHint = '', timeZoneHint = '') {
     if (tzLower.includes('managua')) return { name: 'Nicaragua', code: 'NI', flag: '🇳🇮' };
     if (tzLower.includes('havana')) return { name: 'Cuba', code: 'CU', flag: '🇨🇺' };
     if (tzLower.includes('puerto_rico')) return { name: 'Puerto Rico', code: 'PR', flag: '🇵🇷' };
-    if (tzLower.includes('new_york') || tzLower.includes('chicago') || tzLower.includes('los_angeles') || tzLower.includes('denver') || tzLower.includes('phoenix') || tzLower.includes('detroit') || tzLower.includes('indianapolis')) return { name: 'Estados Unidos', code: 'US', flag: '🇺🇸' };
-    if (tzLower.includes('london')) return { name: 'Reino Unido', code: 'GB', flag: '🇬🇧' };
+    if (tzLower.includes('new_york') || tzLower.includes('chicago') || tzLower.includes('los_angeles') || tzLower.includes('denver') || tzLower.includes('phoenix') || tzLower.includes('detroit') || tzLower.includes('indianapolis') || tzLower.includes('anchorage') || tzLower.includes('honolulu')) return { name: 'Estados Unidos', code: 'US', flag: '🇺🇸' };
+    if (tzLower.includes('london') || tzLower.includes('belfast')) return { name: 'Reino Unido', code: 'GB', flag: '🇬🇧' };
     if (tzLower.includes('paris')) return { name: 'Francia', code: 'FR', flag: '🇫🇷' };
     if (tzLower.includes('berlin')) return { name: 'Alemania', code: 'DE', flag: '🇩🇪' };
     if (tzLower.includes('rome')) return { name: 'Italia', code: 'IT', flag: '🇮🇹' };
-    if (tzLower.includes('sao_paulo') || tzLower.includes('rio') || tzLower.includes('fortaleza')) return { name: 'Brasil', code: 'BR', flag: '🇧🇷' };
-    if (tzLower.includes('toronto') || tzLower.includes('vancouver') || tzLower.includes('montreal')) return { name: 'Canadá', code: 'CA', flag: '🇨🇦' };
+    if (tzLower.includes('lisbon') || tzLower.includes('madeira') || tzLower.includes('azores')) return { name: 'Portugal', code: 'PT', flag: '🇵🇹' };
+    if (tzLower.includes('sao_paulo') || tzLower.includes('rio') || tzLower.includes('fortaleza') || tzLower.includes('manaus') || tzLower.includes('recife')) return { name: 'Brasil', code: 'BR', flag: '🇧🇷' };
+    if (tzLower.includes('toronto') || tzLower.includes('vancouver') || tzLower.includes('montreal') || tzLower.includes('edmonton')) return { name: 'Canadá', code: 'CA', flag: '🇨🇦' };
     if (tzLower.includes('tokyo')) return { name: 'Japón', code: 'JP', flag: '🇯🇵' };
   }
 
@@ -193,11 +235,11 @@ export async function trackEvent(eventType = 'pageview', meta = {}) {
     } catch {}
 
     const geo = await getClientCountry();
-    const country = geo ? geo.name : '';
-    const countryCode = geo ? geo.code : '';
+    const country = geo ? geo.name : (tz ? resolveCountry('', tz).name : 'Global');
+    const countryCode = geo ? geo.code : (tz ? resolveCountry('', tz).code : '');
 
     let storedReferrer = referrer;
-    if (countryCode) {
+    if (countryCode && countryCode !== 'GL') {
       storedReferrer = (referrer ? `${referrer} [geo:${countryCode}]` : `[geo:${countryCode}]`).slice(0, 250);
     }
 
@@ -208,7 +250,7 @@ export async function trackEvent(eventType = 'pageview', meta = {}) {
         event_type: eventType,
         session_id: sessionId,
         ...env,
-        country: country || (tz ? resolveCountry('', tz).name : 'Global'),
+        country: country || 'Global',
         country_code: countryCode,
         timezone: tz,
         path,
