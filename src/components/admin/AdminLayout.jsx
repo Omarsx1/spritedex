@@ -425,6 +425,36 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             </button>
           </nav>
         </div>
+
+        {/* Sidebar Footer with Supabase Cloud Sync Status */}
+        <div style={{
+          padding: '14px 16px',
+          borderTop: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
+          background: darkMode ? '#171717' : '#F8FAFC',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: sidebarOpen ? 'flex-start' : 'center'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: sidebarOpen ? '6px 12px' : '8px',
+            borderRadius: '12px',
+            background: isSupabaseConfigured ? (darkMode ? 'rgba(62, 207, 142, 0.15)' : '#ECFDF5') : (darkMode ? 'rgba(245, 158, 11, 0.15)' : '#FEF3C7'),
+            color: isSupabaseConfigured ? (darkMode ? '#3ECF8E' : '#10B981') : '#F59E0B',
+            fontSize: '0.74rem',
+            fontWeight: 800,
+            width: sidebarOpen ? '100%' : 'auto',
+            justifyContent: sidebarOpen ? 'flex-start' : 'center',
+            boxSizing: 'border-box'
+          }}
+          title={isSupabaseConfigured ? 'Supabase Cloud Sync: Activo' : 'Modo Autónomo'}
+          >
+            <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: isSupabaseConfigured ? '#3ECF8E' : '#F59E0B', flexShrink: 0 }} />
+            {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>{isSupabaseConfigured ? 'Supabase Cloud Sync: Activo' : 'Modo Autónomo'}</span>}
+          </div>
+        </div>
       </aside>
 
       {/* ═══ MAIN CONTENT AREA ═══ */}
@@ -498,23 +528,8 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             </div>
           </div>
 
-          {/* Right: Cloud Sync Status, Theme Toggle & User Avatar Dropdown */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '20px',
-              background: isSupabaseConfigured ? (darkMode ? 'rgba(62, 207, 142, 0.15)' : '#ECFDF5') : (darkMode ? 'rgba(245, 158, 11, 0.15)' : '#FEF3C7'),
-              color: isSupabaseConfigured ? (darkMode ? '#3ECF8E' : '#10B981') : '#F59E0B',
-              fontSize: '0.74rem',
-              fontWeight: 800
-            }}>
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: isSupabaseConfigured ? '#3ECF8E' : '#F59E0B' }} />
-              <span>{isSupabaseConfigured ? 'Supabase Cloud Sync: Activo' : 'Modo Autónomo'}</span>
-            </div>
-
+          {/* Right: Theme Toggle & User Avatar Dropdown */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {/* Dark / Light Theme Toggle Button */}
             <button
               type="button"
@@ -609,7 +624,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                     position: 'absolute',
                     top: 'calc(100% + 8px)',
                     right: 0,
-                    width: '230px',
+                    width: '210px',
                     background: darkMode ? '#1C1C1C' : '#FFFFFF',
                     border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
                     borderRadius: '16px',
@@ -634,13 +649,13 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                       gap: '10px'
                     }}>
                       <div style={{
-                        width: '36px',
-                        height: '36px',
+                        width: '34px',
+                        height: '34px',
                         borderRadius: '50%',
                         background: darkMode ? '#3ECF8E' : 'linear-gradient(135deg, #3C50E0, #7551FF)',
                         color: darkMode ? '#121212' : '#FFFFFF',
                         fontWeight: 800,
-                        fontSize: '0.84rem',
+                        fontSize: '0.82rem',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -649,69 +664,15 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                         AD
                       </div>
                       <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: '0.86rem', fontWeight: 800, color: darkMode ? '#EDEDED' : '#0F172A', lineHeight: 1.2 }}>
+                        <div style={{ fontSize: '0.84rem', fontWeight: 800, color: darkMode ? '#EDEDED' : '#0F172A', lineHeight: 1.2 }}>
                           Admin
                         </div>
-                        <div style={{ fontSize: '0.7rem', color: darkMode ? '#3ECF8E' : '#3C50E0', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <div style={{ fontSize: '0.68rem', color: darkMode ? '#3ECF8E' : '#3C50E0', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#3ECF8E' }} />
                           <span>Acceso Maestro</span>
                         </div>
                       </div>
                     </div>
-
-                    {/* View Public Web */}
-                    <button
-                      type="button"
-                      onClick={() => { setProfileDropdownOpen(false); onExitAdmin(); }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        width: '100%',
-                        padding: '9px 12px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        background: 'transparent',
-                        color: darkMode ? '#EDEDED' : '#1E293B',
-                        fontSize: '0.82rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'background 0.15s ease'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? '#262626' : '#F1F5F9'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <ExternalLink size={15} style={{ color: darkMode ? '#A1A1A1' : '#64748B' }} />
-                      <span>Ver Web Pública</span>
-                    </button>
-
-                    {/* Theme Toggle in Menu */}
-                    <button
-                      type="button"
-                      onClick={() => { toggleDarkMode(); }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        width: '100%',
-                        padding: '9px 12px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        background: 'transparent',
-                        color: darkMode ? '#EDEDED' : '#1E293B',
-                        fontSize: '0.82rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'background 0.15s ease'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? '#262626' : '#F1F5F9'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                    >
-                      {darkMode ? <Sun size={15} style={{ color: '#F59E0B' }} /> : <Moon size={15} style={{ color: '#6366F1' }} />}
-                      <span>{darkMode ? 'Modo Claro' : 'Modo Oscuro'}</span>
-                    </button>
 
                     <div style={{ height: '1px', background: darkMode ? '#262626' : '#F1F5F9', margin: '4px 0' }} />
 
@@ -724,12 +685,12 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                         alignItems: 'center',
                         gap: '10px',
                         width: '100%',
-                        padding: '9px 12px',
+                        padding: '10px 12px',
                         borderRadius: '8px',
                         border: 'none',
                         background: 'transparent',
                         color: '#EF4444',
-                        fontSize: '0.82rem',
+                        fontSize: '0.84rem',
                         fontWeight: 700,
                         cursor: 'pointer',
                         textAlign: 'left',
@@ -738,7 +699,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                       onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? 'rgba(239, 68, 68, 0.12)' : '#FEF2F2'}
                       onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                     >
-                      <LogOut size={15} style={{ color: '#EF4444' }} />
+                      <LogOut size={16} style={{ color: '#EF4444' }} />
                       <span>Cerrar Sesión</span>
                     </button>
                   </div>
