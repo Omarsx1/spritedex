@@ -152,6 +152,13 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
     });
   }, [rawCollections, scopedSprites, myFriendCode, currentAuthUser]);
 
+  // Find active user's matched record
+  const myUserRow = useMemo(() => {
+    return users.find((u) => u.isMe) || null;
+  }, [users]);
+
+  const activeFriendCode = myUserRow ? myUserRow.friendCode : myFriendCode;
+
   // Aggregate Metrics
   const metrics = useMemo(() => {
     const totalUsers = users.length;
