@@ -194,32 +194,13 @@ export function App() {
       }
 
       if (data?.user_state && Object.keys(data.user_state).length > 0) {
+        const { _profile, ...pureState } = data.user_state;
         setUserState((currentLocal) => {
-          const merged = { ...currentLocal, ...data.user_state };
-          supabase.from('user_collections').upsert(
-            {
-              user_id: userId,
-              friend_code: data.friend_code || myFriendCode,
-              user_state: merged,
-              updated_at: new Date().toISOString()
-            },
-            { onConflict: 'user_id' }
-          );
+          const merged = { ...currentLocal, ...pureState };
           return merged;
         });
       } else {
         setUserState((currentLocal) => {
-          if (Object.keys(currentLocal).length > 0) {
-            supabase.from('user_collections').upsert(
-              {
-                user_id: userId,
-                friend_code: myFriendCode,
-                user_state: currentLocal,
-                updated_at: new Date().toISOString()
-              },
-              { onConflict: 'user_id' }
-            );
-          }
           return currentLocal;
         });
       }
@@ -248,11 +229,20 @@ export function App() {
     if (isSupabaseConfigured && supabase && user) {
       const timer = setTimeout(async () => {
         try {
+          const profileMeta = {
+            name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Entrenador',
+            email: user.email || '',
+            avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || '',
+          };
+
           await supabase.from('user_collections').upsert(
             {
               user_id: user.id,
               friend_code: myFriendCode,
-              user_state: userState,
+              user_state: {
+                ...userState,
+                _profile: profileMeta
+              },
               updated_at: new Date().toISOString()
             },
             { onConflict: 'user_id' }
@@ -260,7 +250,7 @@ export function App() {
         } catch (err) {
           console.error('Failed to sync to Supabase:', err);
         }
-      }, 1000);
+      }, 600);
       return () => clearTimeout(timer);
     }
   }, [userState, user, myFriendCode]);
