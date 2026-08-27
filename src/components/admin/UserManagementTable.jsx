@@ -125,15 +125,23 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
 
       // Extract user profile metadata if captured (from Google, Discord or state)
       const profile = st._profile || st.profile || {};
-      let displayName = profile.name;
-      if (!displayName && isMe && currentAuthUser) {
-        displayName = currentAuthUser.user_metadata?.full_name || currentAuthUser.user_metadata?.name || currentAuthUser.email?.split('@')[0];
+      let rawName = profile.name;
+      if (!rawName && isMe && currentAuthUser) {
+        rawName = currentAuthUser.user_metadata?.given_name || 
+                  currentAuthUser.user_metadata?.full_name || 
+                  currentAuthUser.user_metadata?.name || 
+                  currentAuthUser.email?.split('@')[0];
+      }
+
+      // Display strictly the first name (no last names)
+      let displayName = '';
+      if (rawName && !rawName.startsWith('Entrenador #')) {
+        displayName = rawName.trim().split(/\s+/)[0];
       }
       if (!displayName) {
         displayName = `Entrenador #${(col.friend_code || col.user_id || 'USER').slice(-4)}`;
       }
 
-      const email = profile.email || (isMe && currentAuthUser?.email ? currentAuthUser.email : '');
       const avatarUrl = profile.avatar_url || (isMe && (currentAuthUser?.user_metadata?.avatar_url || currentAuthUser?.user_metadata?.picture) ? (currentAuthUser.user_metadata.avatar_url || currentAuthUser.user_metadata.picture) : '');
 
       return {
@@ -141,7 +149,6 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         userId: col.user_id || 'Anónimo',
         friendCode: col.friend_code || `SDEX-${(col.user_id || 'USER').slice(0, 4).toUpperCase()}`,
         name: displayName,
-        email: email,
         avatarUrl: avatarUrl,
         caughtCount: caught,
         starCount: stars,
@@ -597,8 +604,8 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                                 </span>
                               )}
                             </div>
-                            <span style={{ fontSize: '0.72rem', color: c.textMuted, fontFamily: user.email ? 'inherit' : 'monospace' }}>
-                              {user.email || shortId}
+                            <span style={{ fontSize: '0.72rem', color: c.textMuted, fontFamily: 'monospace' }}>
+                              {shortId}
                             </span>
                           </div>
                         </div>
