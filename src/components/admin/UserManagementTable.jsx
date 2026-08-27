@@ -119,9 +119,10 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
 
       const pct = Math.min(100, Math.round((caught / totalPool) * 100));
       
-      // Match "isMe" by authenticated user ID or by matching friend code
-      const isMe = (currentUserId && col.user_id === currentUserId) ||
-                   (col.friend_code && myFriendCode && col.friend_code.trim().toUpperCase() === myFriendCode.trim().toUpperCase());
+      // Match "isMe" strictly by authenticated user ID (or fallback to friend code ONLY if not authenticated)
+      const isMe = currentUserId 
+        ? Boolean(col.user_id && col.user_id === currentUserId)
+        : Boolean(col.friend_code && myFriendCode && col.friend_code.trim().toUpperCase() === myFriendCode.trim().toUpperCase());
 
       // Extract user profile metadata if captured (from Google, Discord or state)
       const profile = st._profile || st.profile || {};
