@@ -651,6 +651,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
           existingSprites={sprites}
           onSave={handleSaveSpirit}
           onClose={() => setIsEditorOpen(false)}
+          darkMode={darkMode}
         />
       )}
     </div>
