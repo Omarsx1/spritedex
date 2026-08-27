@@ -25,21 +25,22 @@ export function getClientEnvironment() {
   }
 
   const ua = navigator.userAgent || '';
-  const isIphone = /iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const isIpad = /iPad/.test(ua);
+  const isIphone = /iPhone|iPod/.test(ua);
+  const isIpad = /iPad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1 && !/Macintosh/.test(ua));
   const isAndroid = /Android/.test(ua);
-  const isMobile = isIphone || isIpad || isAndroid || /Mobi|Tablet/i.test(ua);
+  const isMac = /Macintosh|Mac OS X/.test(ua) && !isIphone;
 
-  let os = 'Other';
+  let os = 'Otros';
   if (isIphone) os = 'iOS (iPhone)';
-  else if (isIpad) os = 'iPadOS';
+  else if (isIpad) os = 'iPadOS / Tablet';
   else if (isAndroid) os = 'Android';
-  else if (/Macintosh|Mac OS X/.test(ua)) os = 'macOS';
+  else if (isMac) os = 'macOS';
   else if (/Windows NT/.test(ua)) os = 'Windows';
   else if (/Linux/.test(ua)) os = 'Linux';
 
-  let browser = 'Other';
-  if (/CriOS|Chrome/.test(ua) && !/Edge|OPR|Edg/.test(ua)) browser = 'Chrome';
+  let browser = 'Otros';
+  if (/Brave/.test(ua) || (navigator.brave && typeof navigator.brave.isBrave === 'function')) browser = 'Brave';
+  else if (/CriOS|Chrome/.test(ua) && !/Edge|OPR|Edg/.test(ua)) browser = 'Chrome';
   else if (/Safari/.test(ua) && !/Chrome|CriOS/.test(ua)) browser = 'Safari';
   else if (/Firefox|FxiOS/.test(ua)) browser = 'Firefox';
   else if (/Edg/.test(ua)) browser = 'Edge';
@@ -54,32 +55,81 @@ export function getClientEnvironment() {
   };
 }
 
-// Helper to resolve Country and Flag from TimeZone and Navigator Language
-export function resolveCountry(timeZoneHint = '', langHint = '') {
-  let tz = timeZoneHint || '';
-  let lang = langHint || '';
+export function getCountryByCode(code = '') {
+  const c = (code || '').toUpperCase().trim();
+  const map = {
+    'MX': { name: 'México', code: 'MX', flag: '🇲🇽' },
+    'ES': { name: 'España', code: 'ES', flag: '🇪🇸' },
+    'CO': { name: 'Colombia', code: 'CO', flag: '🇨🇴' },
+    'CL': { name: 'Chile', code: 'CL', flag: '🇨🇱' },
+    'AR': { name: 'Argentina', code: 'AR', flag: '🇦🇷' },
+    'PE': { name: 'Perú', code: 'PE', flag: '🇵🇪' },
+    'US': { name: 'Estados Unidos', code: 'US', flag: '🇺🇸' },
+    'EC': { name: 'Ecuador', code: 'EC', flag: '🇪🇨' },
+    'GT': { name: 'Guatemala', code: 'GT', flag: '🇬🇹' },
+    'CR': { name: 'Costa Rica', code: 'CR', flag: '🇨🇷' },
+    'PA': { name: 'Panamá', code: 'PA', flag: '🇵🇦' },
+    'UY': { name: 'Uruguay', code: 'UY', flag: '🇺🇾' },
+    'PY': { name: 'Paraguay', code: 'PY', flag: '🇵🇾' },
+    'BO': { name: 'Bolivia', code: 'BO', flag: '🇧🇴' },
+    'SV': { name: 'El Salvador', code: 'SV', flag: '🇸🇻' },
+    'HN': { name: 'Honduras', code: 'HN', flag: '🇭🇳' },
+    'NI': { name: 'Nicaragua', code: 'NI', flag: '🇳🇮' },
+    'DO': { name: 'Rep. Dominicana', code: 'DO', flag: '🇩🇴' },
+    'VE': { name: 'Venezuela', code: 'VE', flag: '🇻🇪' },
+    'BR': { name: 'Brasil', code: 'BR', flag: '🇧🇷' },
+    'CA': { name: 'Canadá', code: 'CA', flag: '🇨🇦' },
+    'GB': { name: 'Reino Unido', code: 'GB', flag: '🇬🇧' },
+    'FR': { name: 'Francia', code: 'FR', flag: '🇫🇷' },
+    'DE': { name: 'Alemania', code: 'DE', flag: '🇩🇪' },
+    'IT': { name: 'Italia', code: 'IT', flag: '🇮🇹' },
+    'JP': { name: 'Japón', code: 'JP', flag: '🇯🇵' },
+  };
+  return map[c] || null;
+}
 
-  if (typeof window !== 'undefined') {
-    if (!tz && typeof Intl !== 'undefined') {
-      try {
-        tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-      } catch {}
+export async function getClientCountry() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const cached = sessionStorage.getItem('spritedex_cached_geo');
+    if (cached) return JSON.parse(cached);
+
+    const res = await fetch('https://api.country.is', { signal: AbortSignal.timeout(1800) });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.country) {
+        const found = getCountryByCode(data.country) || { name: data.country, code: data.country, flag: '🌍' };
+        sessionStorage.setItem('spritedex_cached_geo', JSON.stringify(found));
+        return found;
+      }
     }
-    if (!lang && typeof navigator !== 'undefined') {
-      lang = navigator.language || '';
-    }
+  } catch {}
+  return null;
+}
+
+// Helper to resolve Country and Flag from TimeZone, Country Code, or Environment
+export function resolveCountry(countryHint = '', timeZoneHint = '') {
+  if (countryHint && countryHint.length === 2) {
+    const byCode = getCountryByCode(countryHint);
+    if (byCode) return byCode;
+  }
+
+  let tz = timeZoneHint || '';
+  if (!tz && typeof Intl !== 'undefined') {
+    try {
+      tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    } catch {}
   }
 
   const tzLower = tz.toLowerCase();
-  const langLower = lang.toLowerCase();
 
-  // 1. Precise TimeZone Mapping
-  if (tzLower.includes('lima')) return { name: 'Perú', code: 'PE', flag: '🇵🇪' };
+  // Timezone matching
   if (tzLower.includes('mexico') || tzLower.includes('cancun') || tzLower.includes('tijuana') || tzLower.includes('monterrey') || tzLower.includes('merida') || tzLower.includes('chihuahua')) return { name: 'México', code: 'MX', flag: '🇲🇽' };
   if (tzLower.includes('bogota')) return { name: 'Colombia', code: 'CO', flag: '🇨🇴' };
   if (tzLower.includes('santiago') || tzLower.includes('punta_arenas')) return { name: 'Chile', code: 'CL', flag: '🇨🇱' };
   if (tzLower.includes('buenos_aires') || tzLower.includes('argentina') || tzLower.includes('cordoba') || tzLower.includes('mendoza') || tzLower.includes('rosario') || tzLower.includes('salta')) return { name: 'Argentina', code: 'AR', flag: '🇦🇷' };
   if (tzLower.includes('madrid') || tzLower.includes('canary') || tzLower.includes('ceuta')) return { name: 'España', code: 'ES', flag: '🇪🇸' };
+  if (tzLower.includes('lima')) return { name: 'Perú', code: 'PE', flag: '🇵🇪' };
   if (tzLower.includes('guayaquil') || tzLower.includes('galapagos')) return { name: 'Ecuador', code: 'EC', flag: '🇪🇨' };
   if (tzLower.includes('guatemala')) return { name: 'Guatemala', code: 'GT', flag: '🇬🇹' };
   if (tzLower.includes('caracas')) return { name: 'Venezuela', code: 'VE', flag: '🇻🇪' };
@@ -103,17 +153,7 @@ export function resolveCountry(timeZoneHint = '', langHint = '') {
   if (tzLower.includes('toronto') || tzLower.includes('vancouver') || tzLower.includes('montreal')) return { name: 'Canadá', code: 'CA', flag: '🇨🇦' };
   if (tzLower.includes('tokyo')) return { name: 'Japón', code: 'JP', flag: '🇯🇵' };
 
-  // 2. Language Tag fallback
-  if (langLower.includes('-pe')) return { name: 'Perú', code: 'PE', flag: '🇵🇪' };
-  if (langLower.includes('-mx')) return { name: 'México', code: 'MX', flag: '🇲🇽' };
-  if (langLower.includes('-es')) return { name: 'España', code: 'ES', flag: '🇪🇸' };
-  if (langLower.includes('-co')) return { name: 'Colombia', code: 'CO', flag: '🇨🇴' };
-  if (langLower.includes('-cl')) return { name: 'Chile', code: 'CL', flag: '🇨🇱' };
-  if (langLower.includes('-ar')) return { name: 'Argentina', code: 'AR', flag: '🇦🇷' };
-  if (langLower.includes('-ec')) return { name: 'Ecuador', code: 'EC', flag: '🇪🇨' };
-  if (langLower.includes('-us') || langLower.includes('en-')) return { name: 'Estados Unidos', code: 'US', flag: '🇺🇸' };
-
-  return { name: 'Perú / Latam', code: 'PE', flag: '🇵🇪' };
+  return { name: 'Global / Internacional', code: 'GL', flag: '🌐' };
 }
 
 let lastTrackedTimestamp = 0;
@@ -143,6 +183,15 @@ export async function trackEvent(eventType = 'pageview', meta = {}) {
       }
     }
 
+    let tz = '';
+    try {
+      tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    } catch {}
+
+    const geo = await getClientCountry();
+    const country = geo ? geo.name : resolveCountry('', tz).name;
+    const countryCode = geo ? geo.code : resolveCountry('', tz).code;
+
     // Cache locally
     try {
       const existing = JSON.parse(localStorage.getItem(LOCAL_ANALYTICS_KEY) || '[]');
@@ -150,6 +199,9 @@ export async function trackEvent(eventType = 'pageview', meta = {}) {
         event_type: eventType,
         session_id: sessionId,
         ...env,
+        country,
+        country_code: countryCode,
+        timezone: tz,
         path,
         created_at: new Date().toISOString(),
         ...meta

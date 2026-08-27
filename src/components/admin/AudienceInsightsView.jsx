@@ -124,7 +124,7 @@ export function AudienceInsightsView({ darkMode = false }) {
       browserMap[br] = (browserMap[br] || 0) + 1;
 
       // Country / Location resolution
-      const resolved = resolveCountry(ev.os, ev.browser);
+      const resolved = resolveCountry(ev.country || ev.country_code, ev.timezone);
       const cKey = resolved.name;
       if (!countryMap[cKey]) {
         countryMap[cKey] = {
@@ -638,7 +638,7 @@ export function AudienceInsightsView({ darkMode = false }) {
             <tbody>
               {filteredEvents.length > 0 ? (
                 filteredEvents.slice(0, 15).map((ev, idx) => {
-                  const country = resolveCountry(ev.os, ev.browser);
+                  const country = resolveCountry(ev.country || ev.country_code, ev.timezone);
 
                   const dt = (() => {
                     if (!ev.created_at) return { label: '--', time: '--', isToday: false };
