@@ -17,7 +17,8 @@ import {
   BarChart3,
   Users,
   Sun,
-  Moon
+  Moon,
+  Globe
 } from 'lucide-react';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
 import { SpiritCatalogTable } from './SpiritCatalogTable';
