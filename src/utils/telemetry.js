@@ -107,53 +107,57 @@ export async function getClientCountry() {
   return null;
 }
 
-// Helper to resolve Country and Flag from TimeZone, Country Code, or Environment
+// Helper to resolve Country and Flag from TimeZone, Country Code, or Referrer Geo Tag
 export function resolveCountry(countryHint = '', timeZoneHint = '') {
-  if (countryHint && countryHint.length === 2) {
-    const byCode = getCountryByCode(countryHint);
-    if (byCode) return byCode;
+  if (countryHint && typeof countryHint === 'string') {
+    const cleanHint = countryHint.trim();
+    // Check if referrer contains [geo:XX]
+    const geoMatch = cleanHint.match(/\[geo:([A-Z]{2})\]/i);
+    if (geoMatch && geoMatch[1]) {
+      const byCode = getCountryByCode(geoMatch[1]);
+      if (byCode) return byCode;
+    }
+    if (cleanHint.length === 2) {
+      const byCode = getCountryByCode(cleanHint);
+      if (byCode) return byCode;
+    }
   }
 
-  let tz = timeZoneHint || '';
-  if (!tz && typeof Intl !== 'undefined') {
-    try {
-      tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-    } catch {}
+  // ONLY evaluate timezone if an explicit timeZoneHint string was passed from telemetry
+  if (timeZoneHint && typeof timeZoneHint === 'string' && timeZoneHint.trim()) {
+    const tzLower = timeZoneHint.toLowerCase();
+
+    if (tzLower.includes('guatemala')) return { name: 'Guatemala', code: 'GT', flag: '🇬🇹' };
+    if (tzLower.includes('mexico') || tzLower.includes('cancun') || tzLower.includes('tijuana') || tzLower.includes('monterrey') || tzLower.includes('merida') || tzLower.includes('chihuahua')) return { name: 'México', code: 'MX', flag: '🇲🇽' };
+    if (tzLower.includes('bogota')) return { name: 'Colombia', code: 'CO', flag: '🇨🇴' };
+    if (tzLower.includes('santiago') || tzLower.includes('punta_arenas')) return { name: 'Chile', code: 'CL', flag: '🇨🇱' };
+    if (tzLower.includes('buenos_aires') || tzLower.includes('argentina') || tzLower.includes('cordoba') || tzLower.includes('mendoza') || tzLower.includes('rosario') || tzLower.includes('salta')) return { name: 'Argentina', code: 'AR', flag: '🇦🇷' };
+    if (tzLower.includes('madrid') || tzLower.includes('canary') || tzLower.includes('ceuta')) return { name: 'España', code: 'ES', flag: '🇪🇸' };
+    if (tzLower.includes('lima')) return { name: 'Perú', code: 'PE', flag: '🇵🇪' };
+    if (tzLower.includes('guayaquil') || tzLower.includes('galapagos')) return { name: 'Ecuador', code: 'EC', flag: '🇪🇨' };
+    if (tzLower.includes('caracas')) return { name: 'Venezuela', code: 'VE', flag: '🇻🇪' };
+    if (tzLower.includes('santo_domingo')) return { name: 'Rep. Dominicana', code: 'DO', flag: '🇩🇴' };
+    if (tzLower.includes('costa_rica') || tzLower.includes('san_jose')) return { name: 'Costa Rica', code: 'CR', flag: '🇨🇷' };
+    if (tzLower.includes('panama')) return { name: 'Panamá', code: 'PA', flag: '🇵🇦' };
+    if (tzLower.includes('montevideo')) return { name: 'Uruguay', code: 'UY', flag: '🇺🇾' };
+    if (tzLower.includes('asuncion')) return { name: 'Paraguay', code: 'PY', flag: '🇵🇾' };
+    if (tzLower.includes('la_paz')) return { name: 'Bolivia', code: 'BO', flag: '🇧🇴' };
+    if (tzLower.includes('el_salvador')) return { name: 'El Salvador', code: 'SV', flag: '🇸🇻' };
+    if (tzLower.includes('tegucigalpa')) return { name: 'Honduras', code: 'HN', flag: '🇭🇳' };
+    if (tzLower.includes('managua')) return { name: 'Nicaragua', code: 'NI', flag: '🇳🇮' };
+    if (tzLower.includes('havana')) return { name: 'Cuba', code: 'CU', flag: '🇨🇺' };
+    if (tzLower.includes('puerto_rico')) return { name: 'Puerto Rico', code: 'PR', flag: '🇵🇷' };
+    if (tzLower.includes('new_york') || tzLower.includes('chicago') || tzLower.includes('los_angeles') || tzLower.includes('denver') || tzLower.includes('phoenix') || tzLower.includes('detroit') || tzLower.includes('indianapolis')) return { name: 'Estados Unidos', code: 'US', flag: '🇺🇸' };
+    if (tzLower.includes('london')) return { name: 'Reino Unido', code: 'GB', flag: '🇬🇧' };
+    if (tzLower.includes('paris')) return { name: 'Francia', code: 'FR', flag: '🇫🇷' };
+    if (tzLower.includes('berlin')) return { name: 'Alemania', code: 'DE', flag: '🇩🇪' };
+    if (tzLower.includes('rome')) return { name: 'Italia', code: 'IT', flag: '🇮🇹' };
+    if (tzLower.includes('sao_paulo') || tzLower.includes('rio') || tzLower.includes('fortaleza')) return { name: 'Brasil', code: 'BR', flag: '🇧🇷' };
+    if (tzLower.includes('toronto') || tzLower.includes('vancouver') || tzLower.includes('montreal')) return { name: 'Canadá', code: 'CA', flag: '🇨🇦' };
+    if (tzLower.includes('tokyo')) return { name: 'Japón', code: 'JP', flag: '🇯🇵' };
   }
 
-  const tzLower = tz.toLowerCase();
-
-  // Timezone matching
-  if (tzLower.includes('mexico') || tzLower.includes('cancun') || tzLower.includes('tijuana') || tzLower.includes('monterrey') || tzLower.includes('merida') || tzLower.includes('chihuahua')) return { name: 'México', code: 'MX', flag: '🇲🇽' };
-  if (tzLower.includes('bogota')) return { name: 'Colombia', code: 'CO', flag: '🇨🇴' };
-  if (tzLower.includes('santiago') || tzLower.includes('punta_arenas')) return { name: 'Chile', code: 'CL', flag: '🇨🇱' };
-  if (tzLower.includes('buenos_aires') || tzLower.includes('argentina') || tzLower.includes('cordoba') || tzLower.includes('mendoza') || tzLower.includes('rosario') || tzLower.includes('salta')) return { name: 'Argentina', code: 'AR', flag: '🇦🇷' };
-  if (tzLower.includes('madrid') || tzLower.includes('canary') || tzLower.includes('ceuta')) return { name: 'España', code: 'ES', flag: '🇪🇸' };
-  if (tzLower.includes('lima')) return { name: 'Perú', code: 'PE', flag: '🇵🇪' };
-  if (tzLower.includes('guayaquil') || tzLower.includes('galapagos')) return { name: 'Ecuador', code: 'EC', flag: '🇪🇨' };
-  if (tzLower.includes('guatemala')) return { name: 'Guatemala', code: 'GT', flag: '🇬🇹' };
-  if (tzLower.includes('caracas')) return { name: 'Venezuela', code: 'VE', flag: '🇻🇪' };
-  if (tzLower.includes('santo_domingo')) return { name: 'Rep. Dominicana', code: 'DO', flag: '🇩🇴' };
-  if (tzLower.includes('costa_rica') || tzLower.includes('san_jose')) return { name: 'Costa Rica', code: 'CR', flag: '🇨🇷' };
-  if (tzLower.includes('panama')) return { name: 'Panamá', code: 'PA', flag: '🇵🇦' };
-  if (tzLower.includes('montevideo')) return { name: 'Uruguay', code: 'UY', flag: '🇺🇾' };
-  if (tzLower.includes('asuncion')) return { name: 'Paraguay', code: 'PY', flag: '🇵🇾' };
-  if (tzLower.includes('la_paz')) return { name: 'Bolivia', code: 'BO', flag: '🇧🇴' };
-  if (tzLower.includes('el_salvador')) return { name: 'El Salvador', code: 'SV', flag: '🇸🇻' };
-  if (tzLower.includes('tegucigalpa')) return { name: 'Honduras', code: 'HN', flag: '🇭🇳' };
-  if (tzLower.includes('managua')) return { name: 'Nicaragua', code: 'NI', flag: '🇳🇮' };
-  if (tzLower.includes('havana')) return { name: 'Cuba', code: 'CU', flag: '🇨🇺' };
-  if (tzLower.includes('puerto_rico')) return { name: 'Puerto Rico', code: 'PR', flag: '🇵🇷' };
-  if (tzLower.includes('new_york') || tzLower.includes('chicago') || tzLower.includes('los_angeles') || tzLower.includes('denver') || tzLower.includes('phoenix') || tzLower.includes('detroit') || tzLower.includes('indianapolis')) return { name: 'Estados Unidos', code: 'US', flag: '🇺🇸' };
-  if (tzLower.includes('london')) return { name: 'Reino Unido', code: 'GB', flag: '🇬🇧' };
-  if (tzLower.includes('paris')) return { name: 'Francia', code: 'FR', flag: '🇫🇷' };
-  if (tzLower.includes('berlin')) return { name: 'Alemania', code: 'DE', flag: '🇩🇪' };
-  if (tzLower.includes('rome')) return { name: 'Italia', code: 'IT', flag: '🇮🇹' };
-  if (tzLower.includes('sao_paulo') || tzLower.includes('rio') || tzLower.includes('fortaleza')) return { name: 'Brasil', code: 'BR', flag: '🇧🇷' };
-  if (tzLower.includes('toronto') || tzLower.includes('vancouver') || tzLower.includes('montreal')) return { name: 'Canadá', code: 'CA', flag: '🇨🇦' };
-  if (tzLower.includes('tokyo')) return { name: 'Japón', code: 'JP', flag: '🇯🇵' };
-
-  return { name: 'Global / Internacional', code: 'GL', flag: '🌐' };
+  return { name: 'Sin Geolocalización (Histórico)', code: 'GL', flag: '🌐' };
 }
 
 let lastTrackedTimestamp = 0;
@@ -189,8 +193,13 @@ export async function trackEvent(eventType = 'pageview', meta = {}) {
     } catch {}
 
     const geo = await getClientCountry();
-    const country = geo ? geo.name : resolveCountry('', tz).name;
-    const countryCode = geo ? geo.code : resolveCountry('', tz).code;
+    const country = geo ? geo.name : '';
+    const countryCode = geo ? geo.code : '';
+
+    let storedReferrer = referrer;
+    if (countryCode) {
+      storedReferrer = (referrer ? `${referrer} [geo:${countryCode}]` : `[geo:${countryCode}]`).slice(0, 250);
+    }
 
     // Cache locally
     try {
@@ -199,7 +208,7 @@ export async function trackEvent(eventType = 'pageview', meta = {}) {
         event_type: eventType,
         session_id: sessionId,
         ...env,
-        country,
+        country: country || (tz ? resolveCountry('', tz).name : 'Global'),
         country_code: countryCode,
         timezone: tz,
         path,
@@ -218,7 +227,7 @@ export async function trackEvent(eventType = 'pageview', meta = {}) {
         browser: env.browser,
         os: env.os,
         is_iphone: env.isIphone,
-        referrer: referrer.slice(0, 250),
+        referrer: storedReferrer,
         path: path.slice(0, 100)
       });
     }
