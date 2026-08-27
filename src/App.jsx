@@ -191,6 +191,9 @@ export function App() {
 
       if (data?.friend_code) {
         setMyFriendCode(data.friend_code);
+        try {
+          localStorage.setItem('spritedex_my_friend_code', data.friend_code);
+        } catch {}
       }
 
       if (data?.user_state && Object.keys(data.user_state).length > 0) {

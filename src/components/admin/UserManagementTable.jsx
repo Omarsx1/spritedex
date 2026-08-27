@@ -45,15 +45,18 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
     }
   }, []);
 
-  // Filter pool of sprites according to selected generation
+  // Filter pool of sprites according to selected generation (matching released spirits on home screen)
   const scopedSprites = useMemo(() => {
-    if (selectedGen === 0) return sprites;
-    return sprites.filter((s) => s.gen === selectedGen);
+    return sprites.filter((s) => {
+      if (s.unreleased) return false;
+      if (selectedGen !== 0 && s.gen !== selectedGen) return false;
+      return true;
+    });
   }, [sprites, selectedGen]);
 
-  const gen2Count = useMemo(() => sprites.filter(s => s.gen === 2).length || 60, [sprites]);
-  const gen1Count = useMemo(() => sprites.filter(s => s.gen === 1).length || 109, [sprites]);
-  const allCount = useMemo(() => sprites.length || 169, [sprites]);
+  const gen2Count = useMemo(() => sprites.filter(s => s.gen === 2 && !s.unreleased).length || 33, [sprites]);
+  const gen1Count = useMemo(() => sprites.filter(s => s.gen === 1 && !s.unreleased).length || 109, [sprites]);
+  const allCount = useMemo(() => sprites.filter(s => !s.unreleased).length || 142, [sprites]);
 
   const loadUserData = async () => {
     try {
@@ -106,11 +109,10 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
       if (typeof st === 'object' && st !== null) {
         scopedSprites.forEach((sprite) => {
           const val = st[sprite.id];
-          if (val && (val.owned === true || val.caught === true || (val.stars && val.stars > 0) || (val.level && val.level > 0))) {
+          // A sprite is counted as caught strictly when owned === true
+          if (val && val.owned === true) {
             caught++;
-          }
-          if (val && (val.stars || val.level)) {
-            stars += Number(val.stars || val.level || 0);
+            stars += Number(val.level || val.stars || 1);
           }
         });
       }
