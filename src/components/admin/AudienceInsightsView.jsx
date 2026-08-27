@@ -123,8 +123,8 @@ export function AudienceInsightsView({ darkMode = false }) {
       const br = ev.browser || 'Chrome';
       browserMap[br] = (browserMap[br] || 0) + 1;
 
-      // Country / Location resolution
-      const resolved = resolveCountry(ev.country || ev.country_code, ev.timezone);
+      // Country / Location resolution from embedded geo tag, country column or timezone
+      const resolved = resolveCountry(ev.referrer || ev.country || ev.country_code, ev.timezone);
       const cKey = resolved.name;
       if (!countryMap[cKey]) {
         countryMap[cKey] = {
@@ -638,7 +638,7 @@ export function AudienceInsightsView({ darkMode = false }) {
             <tbody>
               {filteredEvents.length > 0 ? (
                 filteredEvents.slice(0, 15).map((ev, idx) => {
-                  const country = resolveCountry(ev.country || ev.country_code, ev.timezone);
+                  const country = resolveCountry(ev.referrer || ev.country || ev.country_code, ev.timezone);
 
                   const dt = (() => {
                     if (!ev.created_at) return { label: '--', time: '--', isToday: false };
@@ -664,12 +664,13 @@ export function AudienceInsightsView({ darkMode = false }) {
                     return { label: dateLabel, time: timeStr, isToday };
                   })();
 
-                  // Channel attribution
+                  // Channel attribution (strip [geo:XX])
                   let ch = 'Directo / App';
                   let chBg = darkMode ? 'rgba(62, 207, 142, 0.15)' : '#EFF6FF';
                   let chText = darkMode ? '#3ECF8E' : '#2563EB';
 
-                  const ref = (ev.referrer || '').toLowerCase();
+                  const rawRef = ev.referrer || '';
+                  const ref = rawRef.replace(/\[geo:[A-Z]{2}\]/gi, '').trim().toLowerCase();
                   if (ref.includes('twitter') || ref.includes('t.co') || ref.includes('x.com')) {
                     ch = 'Twitter / X';
                     chBg = darkMode ? 'rgba(2, 132, 199, 0.2)' : '#E0F2FE';
