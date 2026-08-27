@@ -23,6 +23,7 @@ import { AnalyticsDashboard } from './AnalyticsDashboard';
 import { SpiritCatalogTable } from './SpiritCatalogTable';
 import { SpiritEditorModal } from './SpiritEditorModal';
 import { UserManagementTable } from './UserManagementTable';
+import { AudienceInsightsView } from './AudienceInsightsView';
 import { clearAdminSession } from './AdminAuthGate';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 
@@ -31,15 +32,15 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
     try {
       const urlParams = new URLSearchParams(window.location.search);
       const paramTab = urlParams.get('tab');
-      if (paramTab && ['analytics', 'catalog', 'users'].includes(paramTab)) {
+      if (paramTab && ['analytics', 'audience', 'catalog', 'users'].includes(paramTab)) {
         return paramTab;
       }
       const hashTab = window.location.hash.replace('#', '');
-      if (hashTab && ['analytics', 'catalog', 'users'].includes(hashTab)) {
+      if (hashTab && ['analytics', 'audience', 'catalog', 'users'].includes(hashTab)) {
         return hashTab;
       }
       const stored = localStorage.getItem('spritedex_studio_active_tab');
-      if (stored && ['analytics', 'catalog', 'users'].includes(stored)) {
+      if (stored && ['analytics', 'audience', 'catalog', 'users'].includes(stored)) {
         return stored;
       }
     } catch {}
@@ -74,7 +75,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const paramTab = urlParams.get('tab');
-        if (paramTab && ['analytics', 'catalog', 'users'].includes(paramTab)) {
+        if (paramTab && ['analytics', 'audience', 'catalog', 'users'].includes(paramTab)) {
           setActiveTab(paramTab);
         }
       } catch {}
@@ -220,6 +221,47 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             >
               <LayoutDashboard size={18} style={{ color: activeTab === 'analytics' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'), flexShrink: 0 }} />
               {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>Dashboard & Métricas</span>}
+            </button>
+
+            {/* Audience, Devices & Geography */}
+            <button
+              type="button"
+              onClick={() => handleTabChange('audience')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: sidebarOpen ? 'space-between' : 'center',
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: '10px',
+                border: 'none',
+                background: activeTab === 'audience' ? (darkMode ? '#232323' : 'rgba(60, 80, 224, 0.08)') : 'transparent',
+                color: activeTab === 'audience' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'),
+                fontSize: '0.86rem',
+                fontWeight: activeTab === 'audience' ? 800 : 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                whiteSpace: 'nowrap'
+              }}
+              title="Dispositivos, Horarios y Países"
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                <Globe size={18} style={{ color: activeTab === 'audience' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'), flexShrink: 0 }} />
+                {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>Dispositivos & Países</span>}
+              </div>
+              {sidebarOpen && (
+                <span style={{
+                  fontSize: '0.64rem',
+                  fontWeight: 800,
+                  padding: '2px 6px',
+                  borderRadius: '10px',
+                  background: darkMode ? 'rgba(56, 189, 248, 0.15)' : '#EFF6FF',
+                  color: darkMode ? '#38BDF8' : '#2563EB',
+                  flexShrink: 0
+                }}>
+                  GEO
+                </span>
+              )}
             </button>
 
             {/* Spirit Catalog */}
@@ -578,6 +620,9 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
         <main style={{ padding: '28px', flex: 1, maxWidth: '1440px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
           {activeTab === 'analytics' && (
             <AnalyticsDashboard darkMode={darkMode} />
+          )}
+          {activeTab === 'audience' && (
+            <AudienceInsightsView darkMode={darkMode} />
           )}
           {activeTab === 'catalog' && (
             <SpiritCatalogTable
