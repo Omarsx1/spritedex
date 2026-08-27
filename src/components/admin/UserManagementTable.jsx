@@ -679,23 +679,65 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                         </div>
                       </td>
 
-                      {/* Cloud Sync Status */}
+                      {/* Dynamic Trainer Status */}
                       <td style={{ padding: '12px 18px', textAlign: 'right' }}>
-                        <span style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                          padding: '3px 8px',
-                          borderRadius: '6px',
-                          background: c.badgeAuthBg,
-                          border: `1px solid ${c.badgeAuthBorder}`,
-                          color: c.badgeAuthText,
-                          fontSize: '0.72rem',
-                          fontWeight: 700
-                        }}>
-                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: c.badgeAuthText }} />
-                          <span>Nube Activa</span>
-                        </span>
+                        {(() => {
+                          const date = new Date(user.updatedAt);
+                          const now = new Date();
+                          const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+                          
+                          let badge = {
+                            label: 'Sin Capturas',
+                            bg: darkMode ? '#1A1A1A' : '#F8FAFC',
+                            color: c.textMuted,
+                            border: darkMode ? '#2E2E2E' : '#E2E8F0',
+                            dot: darkMode ? '#555555' : '#CBD5E1'
+                          };
+
+                          if (user.isMe) {
+                            badge = {
+                              label: 'Activo Ahora',
+                              bg: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#DCFCE7',
+                              color: darkMode ? '#3ECF8E' : '#15803D',
+                              border: darkMode ? 'rgba(62, 207, 142, 0.3)' : '#86EFAC',
+                              dot: darkMode ? '#3ECF8E' : '#16A34A'
+                            };
+                          } else if (diffDays <= 4 && user.caughtCount > 0) {
+                            badge = {
+                              label: 'Activo',
+                              bg: darkMode ? 'rgba(59, 130, 246, 0.12)' : '#EFF6FF',
+                              color: darkMode ? '#60A5FA' : '#2563EB',
+                              border: darkMode ? 'rgba(59, 130, 246, 0.25)' : '#BFDBFE',
+                              dot: darkMode ? '#60A5FA' : '#3B82F6'
+                            };
+                          } else if (user.caughtCount > 0) {
+                            badge = {
+                              label: 'Sincronizado',
+                              bg: darkMode ? '#222222' : '#F1F5F9',
+                              color: c.textSecondary,
+                              border: darkMode ? '#333333' : '#CBD5E1',
+                              dot: darkMode ? '#888888' : '#94A3B8'
+                            };
+                          }
+
+                          return (
+                            <span style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              padding: '3px 8px',
+                              borderRadius: '6px',
+                              background: badge.bg,
+                              border: `1px solid ${badge.border}`,
+                              color: badge.color,
+                              fontSize: '0.72rem',
+                              fontWeight: 700
+                            }}>
+                              <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: badge.dot }} />
+                              <span>{badge.label}</span>
+                            </span>
+                          );
+                        })()}
                       </td>
                     </tr>
                   );
