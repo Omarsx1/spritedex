@@ -1196,7 +1196,7 @@
   },
   {
     "id": "stormscout_basic",
-    "name": "Storm Scout",
+    "name": "Explorador de Tormentas",
     "theme": "Basic",
     "rarity": "Epic",
     "gen": 2,
@@ -1204,7 +1204,7 @@
   },
   {
     "id": "stormscout_gold",
-    "name": "Gold Storm Scout",
+    "name": "Explorador de Tormentas Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -1212,7 +1212,7 @@
   },
   {
     "id": "stormscout_cheatmaster",
-    "name": "Hacker Storm Scout",
+    "name": "Hacker Explorador de Tormentas",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,

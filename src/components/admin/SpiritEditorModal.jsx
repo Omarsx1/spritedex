@@ -9,12 +9,16 @@ import {
   AlertCircle,
   PlusCircle,
   Layers,
-  ChevronDown
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  Edit3
 } from 'lucide-react';
 import { RARITIES, THEME_NAMES_ES, FAMILY_NAMES_MAP } from '../../data/spritesData';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 
-export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClose }) {
+export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClose, darkMode = false }) {
   const isEditing = Boolean(spirit?.id);
 
   // Extract all distinct families from map + existing spirits
@@ -64,6 +68,57 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
   const [errorMsg, setErrorMsg] = useState('');
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef(null);
+
+  // ═══ MATERIAL 3 DATE PICKER STATE (Matching Image 2) ═══
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const initialDateObj = useMemo(() => {
+    return formData.releaseDate ? new Date(formData.releaseDate) : new Date();
+  }, [formData.releaseDate]);
+
+  const [pickerSelectedDate, setPickerSelectedDate] = useState(initialDateObj);
+  const [pickerViewYear, setPickerViewYear] = useState(initialDateObj.getFullYear());
+  const [pickerViewMonth, setPickerViewMonth] = useState(initialDateObj.getMonth());
+  const [pickerHour, setPickerHour] = useState(initialDateObj.getHours());
+  const [pickerMinute, setPickerMinute] = useState(initialDateObj.getMinutes());
+
+  // Palette theme definition (Enterprise High Contrast WCAG 2.2 Compliant)
+  const c = {
+    bgOverlay: darkMode ? 'rgba(0, 0, 0, 0.75)' : 'rgba(15, 23, 42, 0.55)',
+    bgModal: darkMode ? '#171717' : '#FFFFFF',
+    borderModal: darkMode ? '#2E2E2E' : '#E2E8F0',
+    headerBg: darkMode ? '#141414' : '#F8FAFC',
+    headerBorder: darkMode ? '#2E2E2E' : '#E2E8F0',
+    textPrimary: darkMode ? '#EDEDED' : '#0F172A',
+    textSecondary: darkMode ? '#A1A1A1' : '#475569',
+    textMuted: darkMode ? '#737373' : '#64748B',
+    bgInput: darkMode ? '#1F1F1F' : '#F8FAFC',
+    borderInput: darkMode ? '#2E2E2E' : '#CBD5E1',
+    bgScheduled: darkMode ? '#1F1F1F' : '#F8FAFC',
+    borderScheduled: darkMode ? '#2E2E2E' : '#E2E8F0',
+    bgPreview: darkMode ? '#141414' : '#F8FAFC',
+    borderPreview: darkMode ? '#2E2E2E' : '#E2E8F0',
+    bgSpriteCard: darkMode ? '#171717' : '#FFFFFF',
+    btnCancelBg: darkMode ? '#262626' : '#F1F5F9',
+    btnCancelBorder: darkMode ? '#2E2E2E' : '#CBD5E1',
+    btnCancelText: darkMode ? '#EDEDED' : '#475569',
+    btnPrimaryBg: darkMode ? '#3ECF8E' : '#2563EB',
+    btnPrimaryText: darkMode ? '#121212' : '#FFFFFF',
+    dropzoneBg: darkMode ? '#1A1A1A' : '#F8FAFC',
+    dropzoneBorder: darkMode ? '#333333' : '#CBD5E1',
+    badgeStudioBg: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#EFF6FF',
+    badgeStudioText: darkMode ? '#3ECF8E' : '#2563EB',
+
+    // Material 3 Date Picker Colors
+    m3Bg: darkMode ? '#211F26' : '#ECE6F0',
+    m3CardBg: darkMode ? '#2B2930' : '#F3EDF7',
+    m3Primary: darkMode ? '#D0BCFF' : '#6750A4',
+    m3PrimaryContainer: darkMode ? '#4F378B' : '#EADDFF',
+    m3OnPrimary: darkMode ? '#381E72' : '#FFFFFF',
+    m3OnSurface: darkMode ? '#E6E1E5' : '#1D1B20',
+    m3OnSurfaceVariant: darkMode ? '#CAC4D0' : '#49454F',
+    m3Outline: darkMode ? '#938F99' : '#79747E',
+    m3SurfaceContainer: darkMode ? '#1D1B20' : '#FFFFFF'
+  };
 
   // When family is changed
   const handleSelectFamily = (famId) => {
@@ -208,12 +263,81 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
 
   const rarityObj = RARITIES[formData.rarity] || RARITIES.Common;
 
+  // ═══ CALENDAR MATH FOR MATERIAL 3 DATE PICKER ═══
+  const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  const monthNamesShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const dayNamesShort = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+  // Days in selected view month
+  const daysInMonth = new Date(pickerViewYear, pickerViewMonth + 1, 0).getDate();
+  const firstDayOfWeek = new Date(pickerViewYear, pickerViewMonth, 1).getDay(); // 0 = Sun
+
+  const handlePrevMonth = () => {
+    if (pickerViewMonth === 0) {
+      setPickerViewMonth(11);
+      setPickerViewYear(y => y - 1);
+    } else {
+      setPickerViewMonth(m => m - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (pickerViewMonth === 11) {
+      setPickerViewMonth(0);
+      setPickerViewYear(y => y + 1);
+    } else {
+      setPickerViewMonth(m => m + 1);
+    }
+  };
+
+  const handleSelectDay = (day) => {
+    const newDate = new Date(pickerViewYear, pickerViewMonth, day, pickerHour, pickerMinute);
+    setPickerSelectedDate(newDate);
+  };
+
+  const handleConfirmDatePicker = () => {
+    const finalDate = new Date(pickerSelectedDate);
+    finalDate.setHours(pickerHour);
+    finalDate.setMinutes(pickerMinute);
+    
+    // Format YYYY-MM-DDTHH:mm
+    const tzOffset = finalDate.getTimezoneOffset() * 60000;
+    const localIso = new Date(finalDate.getTime() - tzOffset).toISOString().slice(0, 16);
+    
+    setFormData(prev => ({ ...prev, releaseDate: localIso }));
+    setShowDatePicker(false);
+  };
+
+  // Header display string: "Lun, 17 ago" (Matching Image 2)
+  const headerDateStr = useMemo(() => {
+    const d = pickerSelectedDate || new Date();
+    const dayName = dayNamesShort[d.getDay()];
+    const dayNum = d.getDate();
+    const monthName = monthNamesShort[d.getMonth()];
+    return `${dayName}, ${dayNum} ${monthName.toLowerCase()}`;
+  }, [pickerSelectedDate]);
+
+  // Formatted date for input display button
+  const formattedReleaseDateDisplay = useMemo(() => {
+    if (!formData.releaseDate) return 'Seleccionar fecha y hora de estreno...';
+    const d = new Date(formData.releaseDate);
+    if (isNaN(d.getTime())) return 'Seleccionar fecha y hora de estreno...';
+
+    const dayName = dayNamesShort[d.getDay()];
+    const dayNum = d.getDate();
+    const monthName = monthNamesShort[d.getMonth()];
+    const year = d.getFullYear();
+    const timeStr = d.toLocaleTimeString('es-ES', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+    return `📅 ${dayName}, ${dayNum} ${monthName} ${year} · ${timeStr}`;
+  }, [formData.releaseDate]);
+
   return (
     <div style={{
       position: 'fixed',
       inset: 0,
       zIndex: 9999,
-      background: 'rgba(0, 0, 0, 0.75)',
+      background: c.bgOverlay,
       backdropFilter: 'blur(16px)',
       display: 'flex',
       alignItems: 'center',
@@ -224,34 +348,37 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
       <div style={{
         maxWidth: '960px',
         width: '100%',
-        background: '#121212',
-        border: '1px solid #2E2E2E',
+        background: c.bgModal,
+        border: `1px solid ${c.borderModal}`,
         borderRadius: '24px',
-        boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9), 0 0 1px 1px rgba(62, 207, 142, 0.2)',
+        boxShadow: darkMode ? '0 30px 80px rgba(0, 0, 0, 0.9)' : '0 20px 60px rgba(15, 23, 42, 0.15)',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        maxHeight: '92vh'
+        maxHeight: '92vh',
+        transition: 'all 0.2s ease'
       }}>
-        {/* Silicon Valley Header */}
+        {/* Silicon Valley Enterprise Header */}
         <div style={{
           padding: '20px 28px',
-          borderBottom: '1px solid #2E2E2E',
+          borderBottom: `1px solid ${c.headerBorder}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: '#171717'
+          background: c.headerBg
         }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-              <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#3ECF8E', background: 'rgba(62, 207, 142, 0.15)', padding: '2px 8px', borderRadius: '6px', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 800, color: c.badgeStudioText, background: c.badgeStudioBg, padding: '2px 8px', borderRadius: '6px', textTransform: 'uppercase' }}>
                 Catalog Studio
               </span>
-              <span style={{ fontSize: '0.75rem', color: '#737373' }}>•</span>
-              <span style={{ fontSize: '0.75rem', color: '#737373' }}>{isEditing ? `ID: ${formData.id}` : 'Nuevo Registro'}</span>
+              <span style={{ fontSize: '0.75rem', color: c.textMuted }}>•</span>
+              <span style={{ fontSize: '0.78rem', color: c.textSecondary, fontFamily: 'monospace' }}>
+                ID: {formData.id || 'autogenerado'}
+              </span>
             </div>
-            <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#EDEDED', letterSpacing: '-0.02em' }}>
-              {isEditing ? `Editar: ${formData.fullName}` : 'Crear & Publicar Espíritu'}
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: c.textPrimary, margin: 0, letterSpacing: '-0.02em' }}>
+              {isEditing ? `Editar: ${formData.fullName}` : 'Crear Nuevo Espíritu'}
             </h2>
           </div>
 
@@ -259,12 +386,13 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
             type="button"
             onClick={onClose}
             style={{
-              background: 'rgba(255, 255, 255, 0.06)',
-              border: '1px solid #2E2E2E',
-              color: '#A1A1A1',
-              cursor: 'pointer',
-              padding: '8px',
+              width: '36px',
+              height: '36px',
               borderRadius: '10px',
+              border: `1px solid ${c.borderModal}`,
+              background: c.bgModal,
+              color: c.textSecondary,
+              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -275,90 +403,113 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
           </button>
         </div>
 
-        {/* Modal Body */}
+        {/* Modal Body: 2 Columns */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 340px',
+          gridTemplateColumns: '1.25fr 0.75fr',
           gap: '28px',
           padding: '28px',
           overflowY: 'auto'
         }}>
-          {/* LEFT: Enterprise Form Fields */}
+          {/* LEFT: Form Controls */}
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             {errorMsg && (
               <div style={{
                 padding: '12px 16px',
                 borderRadius: '12px',
-                background: 'rgba(239, 68, 68, 0.12)',
+                background: 'rgba(239, 68, 68, 0.1)',
                 border: '1px solid rgba(239, 68, 68, 0.3)',
-                color: '#EE5D50',
+                color: '#EF4444',
                 fontSize: '0.82rem',
+                fontWeight: 600,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '8px'
               }}>
                 <AlertCircle size={16} />
                 <span>{errorMsg}</span>
               </div>
             )}
 
-            {/* Drag & Drop Upload Zone */}
+            {/* Asset Drag & Drop Zone */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#A1A1A1', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 Asset Digital (.webp / .png)
               </label>
+
               <div
                 onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
                 onDragLeave={() => setIsDragOver(false)}
-                onDrop={(e) => { e.preventDefault(); setIsDragOver(false); if (e.dataTransfer.files[0]) handleFileUpload(e.dataTransfer.files[0]); }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragOver(false);
+                  if (e.dataTransfer.files?.[0]) handleFileUpload(e.dataTransfer.files[0]);
+                }}
                 onClick={() => fileInputRef.current?.click()}
                 style={{
-                  border: isDragOver ? '2px dashed #3ECF8E' : '2px dashed #2E2E2E',
+                  padding: '22px',
                   borderRadius: '16px',
-                  background: isDragOver ? 'rgba(62, 207, 142, 0.08)' : '#171717',
-                  padding: '24px 16px',
+                  border: isDragOver ? '2px dashed #3ECF8E' : `2px dashed ${c.dropzoneBorder}`,
+                  background: isDragOver ? (darkMode ? '#1E2B24' : '#F0FDF4') : c.dropzoneBg,
                   textAlign: 'center',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  position: 'relative'
                 }}
               >
                 <input
-                  type="file"
                   ref={fileInputRef}
-                  onChange={(e) => e.target.files && handleFileUpload(e.target.files[0])}
-                  accept="image/webp,image/png,image/jpeg"
+                  type="file"
+                  accept="image/png,image/webp"
                   style={{ display: 'none' }}
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) handleFileUpload(e.target.files[0]);
+                  }}
                 />
-                <Upload size={26} style={{ color: '#3ECF8E', marginBottom: '8px' }} />
-                <p style={{ margin: '0 0 4px', fontSize: '0.88rem', fontWeight: 700, color: '#EDEDED' }}>
-                  {uploadingImage ? 'Subiendo imagen a Supabase Storage...' : 'Arrastra o haz clic para subir imagen'}
-                </p>
-                <span style={{ fontSize: '0.74rem', color: '#737373' }}>
+
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  background: darkMode ? '#262626' : '#FFFFFF',
+                  border: `1px solid ${c.borderModal}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 10px',
+                  color: darkMode ? '#3ECF8E' : '#2563EB'
+                }}>
+                  <Upload size={18} />
+                </div>
+
+                <div style={{ fontSize: '0.86rem', fontWeight: 700, color: c.textPrimary, marginBottom: '2px' }}>
+                  {uploadingImage ? 'Subiendo asset...' : 'Arrastra o haz clic para subir imagen'}
+                </div>
+                <span style={{ fontSize: '0.72rem', color: c.textMuted }}>
                   Soporta formatos .webp y .png transparentes
                 </span>
               </div>
             </div>
 
-            {/* Names & Family Row */}
+            {/* Name & Family Row */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#A1A1A1', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Nombre en Español
                 </label>
                 <input
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                  placeholder="Ej. Storm Scout Dorado"
-                  required
+                  placeholder="Ej: Klombo Dorado"
                   style={{
                     width: '100%',
-                    padding: '12px 14px',
-                    borderRadius: '12px',
-                    background: '#1C1C1C',
-                    border: '1px solid #2E2E2E',
-                    color: '#EDEDED',
-                    fontSize: '0.88rem',
+                    padding: '11px 14px',
+                    borderRadius: '10px',
+                    background: c.bgInput,
+                    border: `1px solid ${c.borderInput}`,
+                    color: c.textPrimary,
+                    fontSize: '0.86rem',
                     fontWeight: 600,
                     outline: 'none',
                     boxSizing: 'border-box'
@@ -367,80 +518,66 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#A1A1A1', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Familia del Espíritu
                 </label>
-                {!isCustomFamily ? (
-                  <select
-                    value={formData.familyId}
-                    onChange={(e) => handleSelectFamily(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '12px 14px',
-                      borderRadius: '12px',
-                      background: '#1C1C1C',
-                      border: '1px solid #2E2E2E',
-                      color: '#EDEDED',
-                      fontSize: '0.88rem',
-                      fontWeight: 600,
-                      outline: 'none',
-                      boxSizing: 'border-box'
-                    }}
-                  >
-                    {allFamilies.map(fam => (
-                      <option key={fam.id} value={fam.id} style={{ background: '#1C1C1C', color: '#fff' }}>
-                        {fam.name} ({fam.id})
-                      </option>
-                    ))}
-                    <option value="__new__" style={{ background: '#3ECF8E', color: '#121212', fontWeight: 800 }}>
-                      + Escribir Nueva Familia...
+                <select
+                  value={isCustomFamily ? '__new__' : formData.familyId}
+                  onChange={(e) => handleSelectFamily(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '11px 14px',
+                    borderRadius: '10px',
+                    background: c.bgInput,
+                    border: `1px solid ${c.borderInput}`,
+                    color: c.textPrimary,
+                    fontSize: '0.86rem',
+                    fontWeight: 600,
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  {allFamilies.map(fam => (
+                    <option key={fam.id} value={fam.id}>
+                      {fam.name} ({fam.id})
                     </option>
-                  </select>
-                ) : (
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <input
-                      type="text"
-                      value={formData.customFamily}
-                      onChange={(e) => handleCustomFamilyInput(e.target.value)}
-                      placeholder="Nombre de nueva familia..."
-                      autoFocus
-                      style={{
-                        flex: 1,
-                        padding: '12px 14px',
-                        borderRadius: '12px',
-                        background: '#1C1C1C',
-                        border: '1px solid #3ECF8E',
-                        color: '#EDEDED',
-                        fontSize: '0.88rem',
-                        fontWeight: 600,
-                        outline: 'none',
-                        boxSizing: 'border-box'
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setIsCustomFamily(false)}
-                      style={{
-                        padding: '0 12px',
-                        borderRadius: '12px',
-                        background: '#262626',
-                        border: 'none',
-                        color: '#A1A1A1',
-                        fontSize: '0.75rem',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Lista
-                    </button>
-                  </div>
-                )}
+                  ))}
+                  <option value="__new__">+ Crear Nueva Familia...</option>
+                </select>
               </div>
             </div>
+
+            {/* Custom Family Input if toggled */}
+            {isCustomFamily && (
+              <div>
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Nombre de la Nueva Familia
+                </label>
+                <input
+                  type="text"
+                  value={formData.customFamily}
+                  onChange={(e) => handleCustomFamilyInput(e.target.value)}
+                  placeholder="Ej: Sombra, Dragón, Fénix..."
+                  style={{
+                    width: '100%',
+                    padding: '11px 14px',
+                    borderRadius: '10px',
+                    background: c.bgInput,
+                    border: `1px solid ${c.borderInput}`,
+                    color: c.textPrimary,
+                    fontSize: '0.86rem',
+                    fontWeight: 600,
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+            )}
 
             {/* Rarity & Variant Row */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#A1A1A1', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Rareza
                 </label>
                 <select
@@ -448,19 +585,19 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   onChange={(e) => setFormData(prev => ({ ...prev, rarity: e.target.value }))}
                   style={{
                     width: '100%',
-                    padding: '12px 14px',
-                    borderRadius: '12px',
-                    background: '#111C44',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    color: '#FFFFFF',
-                    fontSize: '0.88rem',
+                    padding: '11px 14px',
+                    borderRadius: '10px',
+                    background: c.bgInput,
+                    border: `1px solid ${c.borderInput}`,
+                    color: c.textPrimary,
+                    fontSize: '0.86rem',
                     fontWeight: 600,
                     outline: 'none',
                     boxSizing: 'border-box'
                   }}
                 >
                   {Object.entries(RARITIES).map(([rKey, rObj]) => (
-                    <option key={rKey} value={rKey} style={{ background: '#111C44', color: '#fff' }}>
+                    <option key={rKey} value={rKey}>
                       {rObj.label || rObj.name || rKey}
                     </option>
                   ))}
@@ -468,7 +605,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Variante de Temporada
                 </label>
                 <select
@@ -480,19 +617,19 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   }}
                   style={{
                     width: '100%',
-                    padding: '12px 14px',
-                    borderRadius: '12px',
-                    background: '#111C44',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    color: '#FFFFFF',
-                    fontSize: '0.88rem',
+                    padding: '11px 14px',
+                    borderRadius: '10px',
+                    background: c.bgInput,
+                    border: `1px solid ${c.borderInput}`,
+                    color: c.textPrimary,
+                    fontSize: '0.86rem',
                     fontWeight: 600,
                     outline: 'none',
                     boxSizing: 'border-box'
                   }}
                 >
                   {Object.entries(THEME_NAMES_ES).map(([themeKey, nameEs]) => (
-                    <option key={themeKey} value={themeKey} style={{ background: '#111C44', color: '#fff' }}>
+                    <option key={themeKey} value={themeKey}>
                       {nameEs} ({themeKey})
                     </option>
                   ))}
@@ -503,7 +640,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
             {/* Cost & Drop Chance */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Costo Polvo Estelar
                 </label>
                 <input
@@ -513,19 +650,19 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   placeholder="2,000 Polvo Estelar"
                   style={{
                     width: '100%',
-                    padding: '12px 14px',
-                    borderRadius: '12px',
-                    background: '#111C44',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    color: '#FFFFFF',
-                    fontSize: '0.88rem',
+                    padding: '11px 14px',
+                    borderRadius: '10px',
+                    background: c.bgInput,
+                    border: `1px solid ${c.borderInput}`,
+                    color: c.textPrimary,
+                    fontSize: '0.86rem',
                     boxSizing: 'border-box'
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#8F9BBA', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Probabilidad (%)
                 </label>
                 <input
@@ -535,12 +672,12 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   placeholder="1.50%"
                   style={{
                     width: '100%',
-                    padding: '12px 14px',
-                    borderRadius: '12px',
-                    background: '#111C44',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    color: '#FFFFFF',
-                    fontSize: '0.88rem',
+                    padding: '11px 14px',
+                    borderRadius: '10px',
+                    background: c.bgInput,
+                    border: `1px solid ${c.borderInput}`,
+                    color: c.textPrimary,
+                    fontSize: '0.86rem',
                     boxSizing: 'border-box'
                   }}
                 />
@@ -550,62 +687,79 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
             {/* Scheduled Release Card */}
             <div style={{
               padding: '18px',
-              borderRadius: '16px',
-              background: '#111C44',
-              border: '1px solid rgba(67, 24, 255, 0.3)'
+              borderRadius: '14px',
+              background: c.bgScheduled,
+              border: `1px solid ${c.borderScheduled}`
             }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginBottom: formData.unreleased ? '12px' : '0' }}>
                 <input
                   type="checkbox"
                   checked={formData.unreleased}
-                  onChange={(e) => setFormData(prev => ({ ...prev, unreleased: e.target.checked }))}
-                  style={{ width: '18px', height: '18px', accentColor: '#4318FF' }}
+                  onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    setFormData(prev => ({ ...prev, unreleased: isChecked }));
+                    if (isChecked && !formData.releaseDate) {
+                      setShowDatePicker(true);
+                    }
+                  }}
+                  style={{ width: '18px', height: '18px', accentColor: darkMode ? '#3ECF8E' : '#2563EB' }}
                 />
-                <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#FFFFFF' }}>
+                <span style={{ fontSize: '0.88rem', fontWeight: 800, color: c.textPrimary }}>
                   Marcar como "Espíritu No Lanzado" (Programado)
                 </span>
               </label>
 
               {formData.unreleased && (
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: '#A3AED0', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '6px' }}>
                     FECHA & HORA DE ESTRENO AUTOMÁTICO
                   </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.releaseDate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, releaseDate: e.target.value }))}
+
+                  {/* Material 3 Date Trigger Button */}
+                  <button
+                    type="button"
+                    onClick={() => setShowDatePicker(true)}
                     style={{
                       width: '100%',
-                      padding: '10px 14px',
+                      padding: '12px 16px',
                       borderRadius: '10px',
-                      background: '#0B1437',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                      color: '#FFFFFF',
-                      fontSize: '0.84rem',
-                      boxSizing: 'border-box'
+                      background: c.bgModal,
+                      border: `1px solid ${c.borderInput}`,
+                      color: formData.releaseDate ? c.textPrimary : c.textMuted,
+                      fontSize: '0.86rem',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      cursor: 'pointer',
+                      boxSizing: 'border-box',
+                      transition: 'all 0.15s ease'
                     }}
-                  />
-                  <span style={{ fontSize: '0.72rem', color: '#707EAE', display: 'block', marginTop: '6px' }}>
+                  >
+                    <span>{formattedReleaseDateDisplay}</span>
+                    <Calendar size={16} style={{ color: darkMode ? '#3ECF8E' : '#2563EB' }} />
+                  </button>
+
+                  <span style={{ fontSize: '0.72rem', color: c.textMuted, display: 'block', marginTop: '6px' }}>
                     Al llegar este momento exacto, el espíritu se desbloqueará y activará automáticamente en toda la web.
                   </span>
                 </div>
               )}
             </div>
 
-            {/* Form Footer */}
+            {/* Form Action Footer */}
             <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
               <button
                 type="button"
                 onClick={onClose}
                 style={{
                   flex: 1,
-                  padding: '14px',
-                  borderRadius: '14px',
-                  background: '#171717',
-                  border: '1px solid #2E2E2E',
-                  color: '#A1A1A1',
-                  fontSize: '0.88rem',
+                  padding: '13px',
+                  borderRadius: '12px',
+                  background: c.btnCancelBg,
+                  border: `1px solid ${c.btnCancelBorder}`,
+                  color: c.btnCancelText,
+                  fontSize: '0.86rem',
                   fontWeight: 700,
                   cursor: 'pointer'
                 }}
@@ -618,19 +772,19 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 disabled={saving}
                 style={{
                   flex: 2,
-                  padding: '14px',
-                  borderRadius: '14px',
-                  background: '#3ECF8E',
-                  color: '#121212',
+                  padding: '13px',
+                  borderRadius: '12px',
+                  background: c.btnPrimaryBg,
+                  color: c.btnPrimaryText,
                   border: 'none',
-                  fontSize: '0.9rem',
+                  fontSize: '0.88rem',
                   fontWeight: 800,
                   cursor: saving ? 'wait' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  boxShadow: '0 10px 25px rgba(62, 207, 142, 0.35)'
+                  boxShadow: darkMode ? '0 8px 20px rgba(62, 207, 142, 0.25)' : '0 8px 20px rgba(37, 99, 235, 0.25)'
                 }}
               >
                 <Check size={18} />
@@ -641,16 +795,16 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
 
           {/* RIGHT: Live Interactive Preview */}
           <div style={{
-            background: '#171717',
+            background: c.bgPreview,
             borderRadius: '20px',
-            border: '1px solid #2E2E2E',
+            border: `1px solid ${c.borderPreview}`,
             padding: '24px 20px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#3ECF8E', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '18px' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: darkMode ? '#3ECF8E' : '#2563EB', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '18px' }}>
               Vista Previa en Vivo
             </span>
 
@@ -658,9 +812,9 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
               width: '220px',
               borderRadius: '18px',
               padding: '20px 16px',
-              background: '#121212',
-              border: `1px solid ${rarityObj.color || '#3ECF8E'}`,
-              boxShadow: `0 15px 35px rgba(0,0,0,0.7), 0 0 20px ${rarityObj.color || 'rgba(62,207,142,0.3)'}33`,
+              background: c.bgSpriteCard,
+              border: `1px solid ${rarityObj.color || (darkMode ? '#3ECF8E' : '#2563EB')}`,
+              boxShadow: darkMode ? '0 15px 35px rgba(0,0,0,0.7)' : '0 10px 30px rgba(0,0,0,0.08)',
               textAlign: 'center',
               position: 'relative'
             }}>
@@ -708,11 +862,11 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 />
               </div>
 
-              <h4 style={{ margin: '0 0 4px', fontSize: '0.92rem', fontWeight: 800, color: '#EDEDED' }}>
+              <h4 style={{ margin: '0 0 4px', fontSize: '0.92rem', fontWeight: 800, color: c.textPrimary }}>
                 {formData.fullName || 'Nombre del Espíritu'}
               </h4>
 
-              <div style={{ fontSize: '0.74rem', color: '#8B949E', marginBottom: '10px' }}>
+              <div style={{ fontSize: '0.74rem', color: c.textMuted, marginBottom: '10px' }}>
                 {formData.summonCost}
               </div>
 
@@ -720,8 +874,8 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 <div style={{
                   padding: '5px 10px',
                   borderRadius: '8px',
-                  background: 'rgba(168, 85, 247, 0.2)',
-                  color: '#C084FC',
+                  background: darkMode ? 'rgba(168, 85, 247, 0.2)' : '#F3E8FF',
+                  color: darkMode ? '#C084FC' : '#7E22CE',
                   fontSize: '0.7rem',
                   fontWeight: 900
                 }}>
@@ -731,8 +885,8 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 <div style={{
                   padding: '5px 10px',
                   borderRadius: '8px',
-                  background: 'rgba(62, 207, 142, 0.15)',
-                  color: '#3ECF8E',
+                  background: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#DCFCE7',
+                  color: darkMode ? '#3ECF8E' : '#15803D',
                   fontSize: '0.7rem',
                   fontWeight: 900
                 }}>
@@ -743,6 +897,279 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
           </div>
         </div>
       </div>
+
+      {/* ═══ MATERIAL 3 DATE PICKER MODAL (Exact design from Image 2) ═══ */}
+      {showDatePicker && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 100000,
+          background: 'rgba(0, 0, 0, 0.65)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            maxWidth: '360px',
+            width: '100%',
+            background: c.m3Bg,
+            borderRadius: '28px',
+            boxShadow: '0 25px 60px rgba(0, 0, 0, 0.4)',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'
+          }}>
+            {/* Top M3 Header: Subtitle + Big Headline + Edit Icon */}
+            <div style={{ padding: '20px 24px 14px' }}>
+              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: c.m3OnSurfaceVariant, marginBottom: '6px' }}>
+                Select date
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ fontSize: '1.85rem', fontWeight: 500, color: c.m3OnSurface, letterSpacing: '-0.02em', textTransform: 'capitalize' }}>
+                  {headerDateStr}
+                </div>
+                <button
+                  type="button"
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    color: c.m3OnSurfaceVariant,
+                    cursor: 'pointer',
+                    padding: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  title="Editar fecha"
+                >
+                  <Edit3 size={18} />
+                </button>
+              </div>
+            </div>
+
+            <div style={{ width: '100%', height: '1px', background: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }} />
+
+            {/* M3 Month Navigation Bar */}
+            <div style={{
+              padding: '12px 18px 8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.88rem', fontWeight: 700, color: c.m3OnSurface }}>
+                <span>{monthNames[pickerViewMonth]} {pickerViewYear}</span>
+                <ChevronDown size={14} style={{ color: c.m3OnSurfaceVariant }} />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <button
+                  type="button"
+                  onClick={handlePrevMonth}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    color: c.m3OnSurfaceVariant,
+                    cursor: 'pointer',
+                    padding: '6px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <ChevronLeft size={18} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleNextMonth}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    color: c.m3OnSurfaceVariant,
+                    cursor: 'pointer',
+                    padding: '6px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Calendar Grid: Day Headers */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(7, 1fr)',
+              padding: '0 16px',
+              textAlign: 'center',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              color: c.m3OnSurfaceVariant,
+              marginBottom: '6px'
+            }}>
+              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                <div key={i} style={{ height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {d}
+                </div>
+              ))}
+            </div>
+
+            {/* Calendar Grid: Days Cells */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(7, 1fr)',
+              gap: '2px',
+              padding: '0 16px',
+              textAlign: 'center'
+            }}>
+              {/* Empty padding cells for first week */}
+              {Array.from({ length: firstDayOfWeek }).map((_, i) => (
+                <div key={`empty-${i}`} style={{ height: '38px' }} />
+              ))}
+
+              {/* Month Day Cells */}
+              {Array.from({ length: daysInMonth }).map((_, i) => {
+                const day = i + 1;
+                const isSelected = 
+                  pickerSelectedDate &&
+                  pickerSelectedDate.getDate() === day &&
+                  pickerSelectedDate.getMonth() === pickerViewMonth &&
+                  pickerSelectedDate.getFullYear() === pickerViewYear;
+
+                const today = new Date();
+                const isToday = 
+                  today.getDate() === day &&
+                  today.getMonth() === pickerViewMonth &&
+                  today.getFullYear() === pickerViewYear;
+
+                return (
+                  <div
+                    key={day}
+                    onClick={() => handleSelectDay(day)}
+                    style={{
+                      height: '38px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div style={{
+                      width: '34px',
+                      height: '34px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '0.84rem',
+                      fontWeight: isSelected ? 800 : isToday ? 700 : 500,
+                      background: isSelected 
+                        ? (darkMode ? '#6750A4' : '#6750A4')
+                        : 'transparent',
+                      color: isSelected 
+                        ? '#FFFFFF' 
+                        : isToday 
+                        ? (darkMode ? '#D0BCFF' : '#6750A4') 
+                        : c.m3OnSurface,
+                      border: isToday && !isSelected ? `1px solid ${darkMode ? '#D0BCFF' : '#6750A4'}` : 'none',
+                      transition: 'all 0.15s ease'
+                    }}>
+                      {day}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Time Selector Section */}
+            <div style={{
+              padding: '14px 20px 6px',
+              borderTop: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
+              marginTop: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '10px'
+            }}>
+              <span style={{ fontSize: '0.78rem', fontWeight: 600, color: c.m3OnSurfaceVariant, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Clock size={14} /> Hora:
+              </span>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <input
+                  type="time"
+                  value={`${String(pickerHour).padStart(2, '0')}:${String(pickerMinute).padStart(2, '0')}`}
+                  onChange={(e) => {
+                    const [h, m] = e.target.value.split(':');
+                    if (h !== undefined) setPickerHour(Number(h));
+                    if (m !== undefined) setPickerMinute(Number(m));
+                  }}
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: '8px',
+                    background: c.m3CardBg,
+                    border: `1px solid ${c.borderInput}`,
+                    color: c.m3OnSurface,
+                    fontSize: '0.84rem',
+                    fontWeight: 700,
+                    outline: 'none'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Bottom Actions: Cancel & OK (Matching Image 2) */}
+            <div style={{
+              padding: '12px 20px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              gap: '12px'
+            }}>
+              <button
+                type="button"
+                onClick={() => setShowDatePicker(false)}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: darkMode ? '#D0BCFF' : '#6750A4',
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  padding: '8px 14px',
+                  borderRadius: '20px'
+                }}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleConfirmDatePicker}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: darkMode ? '#D0BCFF' : '#6750A4',
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  padding: '8px 14px',
+                  borderRadius: '20px'
+                }}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
