@@ -476,53 +476,97 @@ export function AnalyticsDashboard({ darkMode = false }) {
                 <tr style={{ borderBottom: dividerBorder, color: textMuted }}>
                   <th style={{ padding: '8px 10px' }}>CANAL</th>
                   <th style={{ padding: '8px 10px' }}>DISPOSITIVO</th>
-                  <th style={{ padding: '8px 10px' }}>HORA</th>
+                  <th style={{ padding: '8px 10px' }}>FECHA Y HORA</th>
                 </tr>
               </thead>
               <tbody>
                 {data.recentEvents && data.recentEvents.length > 0 ? (
-                  data.recentEvents.slice(0, 5).map((ev, i) => (
-                    <tr key={ev.id || i} style={{ borderBottom: rowDividerBorder }}>
-                      <td style={{ padding: '8px 10px' }}>
-                        {(() => {
-                          const ref = (ev.referrer || '').toLowerCase();
-                          let label = 'Directo / App';
-                          let bg = darkMode ? 'rgba(62, 207, 142, 0.15)' : '#EFF6FF';
-                          let textCol = darkMode ? '#3ECF8E' : '#3C50E0';
-                          if (ref.includes('twitter') || ref.includes('t.co') || ref.includes('x.com')) {
-                            label = 'Twitter / X';
-                            bg = darkMode ? 'rgba(2, 132, 199, 0.2)' : '#E0F2FE';
-                            textCol = '#38BDF8';
-                          } else if (ref.includes('tiktok')) {
-                            label = 'TikTok';
-                            bg = darkMode ? 'rgba(219, 39, 119, 0.2)' : '#FDF2F8';
-                            textCol = '#F472B6';
-                          } else if (ref.includes('google')) {
-                            label = 'Google';
-                            bg = darkMode ? 'rgba(217, 119, 6, 0.2)' : '#FEF3C7';
-                            textCol = '#FBBF24';
-                          } else if (ref.includes('discord')) {
-                            label = 'Discord';
-                            bg = darkMode ? 'rgba(99, 102, 241, 0.2)' : '#EEF2FF';
-                            textCol = '#A5B4FC';
-                          } else if (ev.path && ev.path !== '/') {
-                            label = ev.path;
-                          }
-                          return (
-                            <span style={{ padding: '3px 8px', borderRadius: '6px', background: bg, color: textCol, fontWeight: 700, fontSize: '0.72rem' }}>
-                              {label}
+                  data.recentEvents.slice(0, 6).map((ev, i) => {
+                    const dt = (() => {
+                      if (!ev.created_at) return { label: '--', time: '--', isToday: false };
+                      const date = new Date(ev.created_at);
+                      const now = new Date();
+                      const isToday = date.toDateString() === now.toDateString();
+                      
+                      const timeStr = date.toLocaleTimeString('es-ES', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                      });
+
+                      const yesterday = new Date(now);
+                      yesterday.setDate(yesterday.getDate() - 1);
+                      const isYesterday = date.toDateString() === yesterday.toDateString();
+
+                      let dateLabel = date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+                      if (isToday) dateLabel = 'Hoy';
+                      else if (isYesterday) dateLabel = 'Ayer';
+
+                      return { label: dateLabel, time: timeStr, isToday };
+                    })();
+
+                    return (
+                      <tr key={ev.id || i} style={{ borderBottom: rowDividerBorder }}>
+                        <td style={{ padding: '8px 10px' }}>
+                          {(() => {
+                            const ref = (ev.referrer || '').toLowerCase();
+                            let label = 'Directo / App';
+                            let bg = darkMode ? 'rgba(62, 207, 142, 0.15)' : '#EFF6FF';
+                            let textCol = darkMode ? '#3ECF8E' : '#3C50E0';
+                            if (ref.includes('twitter') || ref.includes('t.co') || ref.includes('x.com')) {
+                              label = 'Twitter / X';
+                              bg = darkMode ? 'rgba(2, 132, 199, 0.2)' : '#E0F2FE';
+                              textCol = '#38BDF8';
+                            } else if (ref.includes('tiktok')) {
+                              label = 'TikTok';
+                              bg = darkMode ? 'rgba(219, 39, 119, 0.2)' : '#FDF2F8';
+                              textCol = '#F472B6';
+                            } else if (ref.includes('google')) {
+                              label = 'Google';
+                              bg = darkMode ? 'rgba(217, 119, 6, 0.2)' : '#FEF3C7';
+                              textCol = '#FBBF24';
+                            } else if (ref.includes('discord')) {
+                              label = 'Discord';
+                              bg = darkMode ? 'rgba(99, 102, 241, 0.2)' : '#EEF2FF';
+                              textCol = '#A5B4FC';
+                            } else if (ev.path && ev.path !== '/') {
+                              label = ev.path;
+                            }
+                            return (
+                              <span style={{ padding: '3px 8px', borderRadius: '6px', background: bg, color: textCol, fontWeight: 700, fontSize: '0.72rem' }}>
+                                {label}
+                              </span>
+                            );
+                          })()}
+                        </td>
+                        <td style={{ padding: '8px 10px', color: darkMode ? '#E2E8F0' : '#334155', fontWeight: 600 }}>
+                          {ev.os || (ev.is_iphone ? 'iOS (iPhone)' : ev.device_type)}
+                        </td>
+                        <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{
+                              fontSize: '0.7rem',
+                              fontWeight: 700,
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              background: dt.isToday 
+                                ? (darkMode ? 'rgba(62, 207, 142, 0.15)' : '#ECFDF5')
+                                : (darkMode ? '#262626' : '#F1F5F9'),
+                              color: dt.isToday 
+                                ? (darkMode ? '#3ECF8E' : '#15803D')
+                                : (darkMode ? '#D4D4D4' : '#475569')
+                            }}>
+                              {dt.label}
                             </span>
-                          );
-                        })()}
-                      </td>
-                      <td style={{ padding: '8px 10px', color: darkMode ? '#E2E8F0' : '#334155', fontWeight: 600 }}>
-                        {ev.os || (ev.is_iphone ? 'iOS (iPhone)' : ev.device_type)}
-                      </td>
-                      <td style={{ padding: '8px 10px', color: textMuted, fontSize: '0.74rem' }}>
-                        {new Date(ev.created_at).toLocaleTimeString()}
-                      </td>
-                    </tr>
-                  ))
+                            <span style={{ fontSize: '0.73rem', color: textMuted, fontFamily: 'monospace' }}>
+                              {dt.time}
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan={3} style={{ padding: '16px', textAlign: 'center', color: textMuted }}>
