@@ -27,7 +27,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all' | 'high_progress' | 'active_catch'
-  const [selectedGen, setSelectedGen] = useState(2); // 2 = Temporada Actual (2ª Gen), 1 = 1ª Gen, 0 = Todas
+  const [selectedGen, setSelectedGen] = useState(0); // 0 = Todas las Generaciones por defecto para ver todos los usuarios con capturas
   const [currentPage, setCurrentPage] = useState(1);
   const [copiedCode, setCopiedCode] = useState(null);
   const pageSize = 15;
@@ -105,14 +105,20 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
       const st = col.user_state || {};
       let caught = 0;
       let stars = 0;
+      let allGensCaught = 0;
+      let allGensStars = 0;
 
       if (typeof st === 'object' && st !== null) {
-        scopedSprites.forEach((sprite) => {
+        sprites.forEach((sprite) => {
+          if (sprite.unreleased) return;
           const val = st[sprite.id];
-          // A sprite is counted as caught strictly when owned === true
           if (val && val.owned === true) {
-            caught++;
-            stars += Number(val.level || val.stars || 1);
+            allGensCaught++;
+            allGensStars += Number(val.level || val.stars || 1);
+            if (selectedGen === 0 || sprite.gen === selectedGen) {
+              caught++;
+              stars += Number(val.level || val.stars || 1);
+            }
           }
         });
       }
@@ -146,12 +152,14 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         avatarUrl: avatarUrl,
         caughtCount: caught,
         starCount: stars,
+        allGensCount: allGensCaught,
+        allGensStars: allGensStars,
         progressPct: pct,
         isMe: isMe,
         updatedAt: col.updated_at || new Date().toISOString()
       };
     });
-  }, [rawCollections, scopedSprites, myFriendCode, currentAuthUser]);
+  }, [rawCollections, scopedSprites, sprites, selectedGen, myFriendCode, currentAuthUser]);
 
   // Find active user's matched record
   const myUserRow = useMemo(() => {
@@ -660,6 +668,11 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                               transition: 'width 0.3s ease'
                             }} />
                           </div>
+                          {selectedGen !== 0 && user.caughtCount === 0 && user.allGensCount > 0 && (
+                            <span style={{ fontSize: '0.68rem', color: darkMode ? '#3ECF8E' : '#2563EB', fontWeight: 600 }}>
+                              ⭐ {user.allGensCount} capturas en {selectedGen === 2 ? '1ª Gen' : '2ª Gen'}
+                            </span>
+                          )}
                         </div>
                       </td>
 
