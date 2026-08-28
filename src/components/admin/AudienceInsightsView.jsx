@@ -18,10 +18,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
-  Filter
+  Filter,
+  Trash2
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
-import { resolveCountry } from '../../utils/telemetry';
+import { resolveCountry, purgeHistoricalTestEvents } from '../../utils/telemetry';
 
 export function AudienceInsightsView({ darkMode = false }) {
   const [events, setEvents] = useState([]);
@@ -31,6 +32,7 @@ export function AudienceInsightsView({ darkMode = false }) {
   const [tableSearch, setTableSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25); // 15 | 25 | 50 | 100 | 'all'
+  const [purging, setPurging] = useState(false);
 
   const loadAudienceData = async () => {
     try {
@@ -57,6 +59,30 @@ export function AudienceInsightsView({ darkMode = false }) {
       console.error('Audience data load error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePurgeHistorical = async () => {
+    const ungeoCount = events.filter(e => {
+      const c = resolveCountry(e.referrer || e.country || e.country_code, e.timezone);
+      return c.code === 'GL' || (e.referrer && !e.referrer.includes('[geo:'));
+    }).length;
+
+    const confirmMsg = `¿Deseas eliminar las ${ungeoCount} visitas de prueba previas a la implementación de la geolocalización?\n\nEsta acción limpiará el histórico de desarrollo y dejará únicamente las visitas reales con país y fecha registradas.`;
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      setPurging(true);
+      const res = await purgeHistoricalTestEvents();
+      if (res.success) {
+        await loadAudienceData();
+      } else {
+        alert('Nota de Supabase RLS: ' + (res.error || 'Asegúrate de ejecutar la política de eliminación en SQL Editor si está bloqueado.'));
+      }
+    } catch (e) {
+      console.error('Purge error:', e);
+    } finally {
+      setPurging(false);
     }
   };
 
@@ -613,13 +639,38 @@ export function AudienceInsightsView({ darkMode = false }) {
                       <span style={{ fontWeight: 700, color: c.textPrimary, display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{ fontSize: '1.05rem' }}>{country.flag}</span>
                         <span>{country.name}</span>
+                        {country.code === 'GL' && (
+                          <button
+                            type="button"
+                            onClick={handlePurgeHistorical}
+                            disabled={purging}
+                            title="Eliminar registros de prueba de desarrollo"
+                            style={{
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              border: '1px solid rgba(239, 68, 68, 0.4)',
+                              background: darkMode ? 'rgba(239, 68, 68, 0.15)' : '#FEE2E2',
+                              color: '#EF4444',
+                              fontSize: '0.68rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '3px',
+                              marginLeft: '6px'
+                            }}
+                          >
+                            <Trash2 size={10} />
+                            <span>{purging ? 'Purgando...' : 'Limpiar pruebas'}</span>
+                          </button>
+                        )}
                       </span>
                       <span style={{ fontWeight: 800, color: c.textPrimary }}>
                         {country.count} visitas <span style={{ color: c.textMuted, fontWeight: 500 }}>({pct}%)</span>
                       </span>
                     </div>
                     <div style={{ width: '100%', height: '6px', background: c.barTrack, borderRadius: '3px', overflow: 'hidden' }}>
-                      <div style={{ width: `${pct}%`, height: '100%', background: c.barFillBlue, borderRadius: '3px' }} />
+                      <div style={{ width: `${pct}%`, height: '100%', background: country.code === 'GL' ? (darkMode ? '#525252' : '#94A3B8') : c.barFillBlue, borderRadius: '3px' }} />
                     </div>
                   </div>
                 );

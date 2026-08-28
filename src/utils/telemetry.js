@@ -483,3 +483,25 @@ export async function fetchAnalyticsOverview() {
 
   return result;
 }
+
+// Purge historical test visits recorded prior to geolocation implementation
+export async function purgeHistoricalTestEvents() {
+  try {
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('analytics_events')
+        .delete()
+        .not('referrer', 'ilike', '%[geo:%');
+
+      if (error) {
+        console.error('Error purging test analytics:', error);
+        return { success: false, error: error.message };
+      }
+      return { success: true };
+    }
+    return { success: false, error: 'Supabase no configurado' };
+  } catch (err) {
+    console.error('Purge error:', err);
+    return { success: false, error: err.message };
+  }
+}
