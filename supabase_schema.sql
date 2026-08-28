@@ -86,6 +86,12 @@ CREATE POLICY "Lectura de analíticas para el panel"
   ON public.analytics_events FOR SELECT
   USING (true);
 
+-- Permitir eliminación de registros de prueba para el panel administrativo
+DROP POLICY IF EXISTS "Eliminación de analíticas para el panel" ON public.analytics_events;
+CREATE POLICY "Eliminación de analíticas para el panel"
+  ON public.analytics_events FOR DELETE
+  USING (true);
+
 
 -- 3. BUCKET DE ALMACENAMIENTO PARA IMÁGENES (Supabase Storage)
 INSERT INTO storage.buckets (id, name, public)
