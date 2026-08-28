@@ -13,7 +13,12 @@ import {
   Compass, 
   Tablet, 
   Calendar,
-  Zap
+  Zap,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Filter
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 import { resolveCountry } from '../../utils/telemetry';
@@ -21,19 +26,22 @@ import { resolveCountry } from '../../utils/telemetry';
 export function AudienceInsightsView({ darkMode = false }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [timeFilter, setTimeFilter] = useState('all'); // 'all' | 'today' | 'week'
+  const [timeFilter, setTimeFilter] = useState('all'); // 'all' | 'today' | 'yesterday' | 'week' | 'month'
   const [deviceFilter, setDeviceFilter] = useState('all'); // 'all' | 'mobile' | 'desktop'
+  const [tableSearch, setTableSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25); // 15 | 25 | 50 | 100 | 'all'
 
   const loadAudienceData = async () => {
     try {
       setLoading(true);
       if (isSupabaseConfigured && supabase) {
-        // Fetch up to 1000 recent analytics events for comprehensive analysis
+        // Fetch up to 2500 recent analytics events for complete historical date analysis
         const { data: rawEvents, error } = await supabase
           .from('analytics_events')
           .select('id, session_id, device_type, browser, os, is_iphone, referrer, path, created_at')
           .order('created_at', { ascending: false })
-          .limit(1000);
+          .limit(2500);
 
         if (error) {
           console.error('Error loading analytics events for audience:', error);
@@ -58,19 +66,32 @@ export function AudienceInsightsView({ darkMode = false }) {
     return () => clearInterval(interval);
   }, []);
 
+  // Reset pagination on filter change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [timeFilter, deviceFilter, tableSearch, pageSize]);
+
   // Filter events based on time and device filters
   const filteredEvents = useMemo(() => {
-    const now = Date.now();
+    const now = new Date();
+    const nowMs = now.getTime();
+
     return events.filter((ev) => {
-      const evTime = new Date(ev.created_at).getTime();
+      const evDate = new Date(ev.created_at);
+      const evTime = evDate.getTime();
 
       // Time filter
       if (timeFilter === 'today') {
-        const todayStart = new Date();
-        todayStart.setHours(0, 0, 0, 0);
-        if (evTime < todayStart.getTime()) return false;
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        if (evTime < todayStart) return false;
+      } else if (timeFilter === 'yesterday') {
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const yesterdayStart = todayStart - 24 * 60 * 60 * 1000;
+        if (evTime < yesterdayStart || evTime >= todayStart) return false;
       } else if (timeFilter === 'week') {
-        if (now - evTime > 7 * 24 * 60 * 60 * 1000) return false;
+        if (nowMs - evTime > 7 * 24 * 60 * 60 * 1000) return false;
+      } else if (timeFilter === 'month') {
+        if (nowMs - evTime > 30 * 24 * 60 * 60 * 1000) return false;
       }
 
       // Device filter
@@ -79,9 +100,25 @@ export function AudienceInsightsView({ darkMode = false }) {
       if (deviceFilter === 'mobile' && !isMob) return false;
       if (deviceFilter === 'desktop' && isMob) return false;
 
+      // Table text search
+      if (tableSearch.trim()) {
+        const q = tableSearch.toLowerCase().trim();
+        const country = resolveCountry(ev.referrer || ev.country || ev.country_code, ev.timezone);
+        const matchCountry = country.name.toLowerCase().includes(q) || (country.code || '').toLowerCase().includes(q);
+        const matchOS = (ev.os || '').toLowerCase().includes(q);
+        const matchBrowser = (ev.browser || '').toLowerCase().includes(q);
+        const matchRef = (ev.referrer || '').toLowerCase().includes(q);
+        const matchPath = (ev.path || '').toLowerCase().includes(q);
+        const matchDate = evDate.toLocaleDateString('es-ES').toLowerCase().includes(q);
+
+        if (!matchCountry && !matchOS && !matchBrowser && !matchRef && !matchPath && !matchDate) {
+          return false;
+        }
+      }
+
       return true;
     });
-  }, [events, timeFilter, deviceFilter]);
+  }, [events, timeFilter, deviceFilter, tableSearch]);
 
   // Aggregate Metrics & Device Breakdown
   const analytics = useMemo(() => {
@@ -596,34 +633,196 @@ export function AudienceInsightsView({ darkMode = false }) {
         </div>
       </div>
 
-      {/* ═══ LIVE CONNECTIONS STREAM (Real Time Table) ═══ */}
+      {/* ═══ LIVE CONNECTIONS STREAM (Real Time Table & Historical Pagination) ═══ */}
       <div style={{ ...widgetCardStyle, overflow: 'hidden', padding: 0 }}>
-        <div style={{ padding: '18px 22px', borderBottom: `1px solid ${c.borderCard}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <h3 style={{ fontSize: '0.94rem', fontWeight: 800, color: c.textPrimary, margin: 0 }}>
-              Registro de Conexiones en Vivo (Dispositivo, País y Hora)
-            </h3>
-            <p style={{ fontSize: '0.74rem', color: c.textSecondary, margin: '2px 0 0' }}>
-              Últimas sesiones registradas en tiempo real desde Supabase Analytics.
-            </p>
+        {/* Table Header & Controls Bar */}
+        <div style={{
+          padding: '18px 22px',
+          borderBottom: `1px solid ${c.borderCard}`,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 style={{ fontSize: '0.94rem', fontWeight: 800, color: c.textPrimary, margin: 0 }}>
+                  Registro de Conexiones en Vivo y Fechas Históricas
+                </h3>
+                <span style={{
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  background: darkMode ? '#262626' : '#F1F5F9',
+                  color: c.textSecondary,
+                  fontSize: '0.72rem',
+                  fontWeight: 700
+                }}>
+                  {filteredEvents.length} registros
+                </span>
+              </div>
+              <p style={{ fontSize: '0.74rem', color: c.textSecondary, margin: '2px 0 0' }}>
+                Historial completo de sesiones por dispositivo, país, canal de origen y fecha exacta.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '4px 10px',
+                borderRadius: '6px',
+                background: c.badgeGreenBg,
+                border: `1px solid ${c.badgeGreenBorder}`,
+                color: c.badgeGreenText,
+                fontSize: '0.72rem',
+                fontWeight: 700
+              }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: c.badgeGreenText }} />
+                <span>En Tiempo Real</span>
+              </span>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const headers = ['País', 'Código País', 'Dispositivo/SO', 'Navegador', 'Canal de Origen', 'Fecha ISO', 'Fecha Local', 'Hora'];
+                  const rows = filteredEvents.map((ev) => {
+                    const country = resolveCountry(ev.referrer || ev.country || ev.country_code, ev.timezone);
+                    const d = ev.created_at ? new Date(ev.created_at) : new Date();
+                    return [
+                      `"${country.name}"`,
+                      `"${country.code || ''}"`,
+                      `"${ev.os || (ev.is_iphone ? 'iOS' : ev.device_type)}"`,
+                      `"${ev.browser || 'Chrome'}"`,
+                      `"${(ev.referrer || ev.path || 'Directo').replace(/"/g, '""')}"`,
+                      `"${d.toISOString()}"`,
+                      `"${d.toLocaleDateString('es-ES')}"`,
+                      `"${d.toLocaleTimeString('es-ES')}"`
+                    ];
+                  });
+                  const csv = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+                  const encodedUri = encodeURI(csv);
+                  const link = document.createElement('a');
+                  link.setAttribute('href', encodedUri);
+                  link.setAttribute('download', `conexiones_spritedex_${new Date().toISOString().slice(0, 10)}.csv`);
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '5px 12px',
+                  borderRadius: '6px',
+                  border: `1px solid ${c.borderCard}`,
+                  background: darkMode ? '#262626' : '#FFFFFF',
+                  color: c.textPrimary,
+                  fontSize: '0.74rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                <Download size={13} />
+                <span>Exportar CSV</span>
+              </button>
+            </div>
           </div>
-          <span style={{
-            display: 'inline-flex',
+
+          {/* Filter & Search Bar */}
+          <div style={{
+            display: 'flex',
             alignItems: 'center',
-            gap: '5px',
-            padding: '3px 8px',
-            borderRadius: '6px',
-            background: c.badgeGreenBg,
-            border: `1px solid ${c.badgeGreenBorder}`,
-            color: c.badgeGreenText,
-            fontSize: '0.72rem',
-            fontWeight: 700
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '10px',
+            paddingTop: '10px',
+            borderTop: `1px solid ${c.rowBorder}`
           }}>
-            <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: c.badgeGreenText }} />
-            <span>En Tiempo Real</span>
-          </span>
+            {/* Search Input */}
+            <div style={{ position: 'relative', flex: '1 1 240px', maxWidth: '380px' }}>
+              <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: c.textMuted }} />
+              <input
+                type="text"
+                value={tableSearch}
+                onChange={(e) => setTableSearch(e.target.value)}
+                placeholder="Buscar por País, SO, Navegador o Canal..."
+                style={{
+                  width: '100%',
+                  padding: '7px 10px 7px 32px',
+                  borderRadius: '6px',
+                  border: `1px solid ${c.borderCard}`,
+                  background: darkMode ? '#171717' : '#F8FAFC',
+                  color: c.textPrimary,
+                  fontSize: '0.78rem',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+
+            {/* Date Filters Pills */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: c.textSecondary, marginRight: '4px' }}>
+                Filtrar Fecha:
+              </span>
+              {[
+                { id: 'all', label: 'Histórico Completo' },
+                { id: 'today', label: 'Hoy' },
+                { id: 'yesterday', label: 'Ayer' },
+                { id: 'week', label: 'Últimos 7 días' },
+                { id: 'month', label: 'Últimos 30 días' }
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setTimeFilter(f.id)}
+                  style={{
+                    padding: '5px 10px',
+                    borderRadius: '6px',
+                    border: timeFilter === f.id ? `1px solid ${darkMode ? '#3ECF8E' : '#0F172A'}` : `1px solid ${c.borderCard}`,
+                    background: timeFilter === f.id ? (darkMode ? '#3ECF8E' : '#0F172A') : (darkMode ? '#171717' : '#F8FAFC'),
+                    color: timeFilter === f.id ? (darkMode ? '#000000' : '#FFFFFF') : c.textSecondary,
+                    fontSize: '0.72rem',
+                    fontWeight: timeFilter === f.id ? 800 : 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Rows per page selector */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '0.72rem', color: c.textSecondary }}>Filas:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => setPageSize(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                style={{
+                  padding: '4px 8px',
+                  borderRadius: '6px',
+                  border: `1px solid ${c.borderCard}`,
+                  background: darkMode ? '#171717' : '#F8FAFC',
+                  color: c.textPrimary,
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  outline: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value={15}>15</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value="all">Todas</option>
+              </select>
+            </div>
+          </div>
         </div>
 
+        {/* Table Content */}
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
             <thead>
@@ -636,12 +835,27 @@ export function AudienceInsightsView({ darkMode = false }) {
               </tr>
             </thead>
             <tbody>
-              {filteredEvents.length > 0 ? (
-                filteredEvents.slice(0, 15).map((ev, idx) => {
+              {(() => {
+                const totalRows = filteredEvents.length;
+                if (totalRows === 0) {
+                  return (
+                    <tr>
+                      <td colSpan={5} style={{ padding: '36px', textAlign: 'center', color: c.textSecondary }}>
+                        {loading ? 'Cargando sesiones de telemetría...' : 'No se encontraron visitas con los filtros seleccionados.'}
+                      </td>
+                    </tr>
+                  );
+                }
+
+                const rowsToShow = pageSize === 'all'
+                  ? filteredEvents
+                  : filteredEvents.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+                return rowsToShow.map((ev, idx) => {
                   const country = resolveCountry(ev.referrer || ev.country || ev.country_code, ev.timezone);
 
                   const dt = (() => {
-                    if (!ev.created_at) return { label: '--', time: '--', isToday: false };
+                    if (!ev.created_at) return { label: '--', time: '--', isToday: false, isYesterday: false };
                     const date = new Date(ev.created_at);
                     const now = new Date();
                     const isToday = date.toDateString() === now.toDateString();
@@ -657,11 +871,11 @@ export function AudienceInsightsView({ darkMode = false }) {
                     yesterday.setDate(yesterday.getDate() - 1);
                     const isYesterday = date.toDateString() === yesterday.toDateString();
 
-                    let dateLabel = date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+                    let dateLabel = date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
                     if (isToday) dateLabel = 'Hoy';
                     else if (isYesterday) dateLabel = 'Ayer';
 
-                    return { label: dateLabel, time: timeStr, isToday };
+                    return { label: dateLabel, time: timeStr, isToday, isYesterday };
                   })();
 
                   // Channel attribution (strip [geo:XX])
@@ -733,8 +947,8 @@ export function AudienceInsightsView({ darkMode = false }) {
                             fontWeight: 700,
                             padding: '2px 6px',
                             borderRadius: '4px',
-                            background: dt.isToday ? c.badgeGreenBg : (darkMode ? '#262626' : '#F1F5F9'),
-                            color: dt.isToday ? c.badgeGreenText : c.textSecondary
+                            background: dt.isToday ? c.badgeGreenBg : (dt.isYesterday ? (darkMode ? 'rgba(59, 130, 246, 0.15)' : '#EFF6FF') : (darkMode ? '#262626' : '#F1F5F9')),
+                            color: dt.isToday ? c.badgeGreenText : (dt.isYesterday ? (darkMode ? '#60A5FA' : '#2563EB') : c.textSecondary)
                           }}>
                             {dt.label}
                           </span>
@@ -745,17 +959,89 @@ export function AudienceInsightsView({ darkMode = false }) {
                       </td>
                     </tr>
                   );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={5} style={{ padding: '36px', textAlign: 'center', color: c.textSecondary }}>
-                    {loading ? 'Cargando sesiones de telemetría...' : 'No se encontraron visitas con los filtros seleccionados.'}
-                  </td>
-                </tr>
-              )}
+                });
+              })()}
             </tbody>
           </table>
         </div>
+
+        {/* ═══ PAGINATION FOOTER ═══ */}
+        {filteredEvents.length > 0 && pageSize !== 'all' && (
+          <div style={{
+            padding: '14px 22px',
+            borderTop: `1px solid ${c.borderCard}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px',
+            background: darkMode ? '#171717' : '#FAFAFA'
+          }}>
+            {/* Range info */}
+            <div style={{ fontSize: '0.76rem', color: c.textSecondary }}>
+              Mostrando <strong style={{ color: c.textPrimary }}>
+                {Math.min(filteredEvents.length, (currentPage - 1) * pageSize + 1)}
+              </strong> – <strong style={{ color: c.textPrimary }}>
+                {Math.min(filteredEvents.length, currentPage * pageSize)}
+              </strong> de <strong style={{ color: c.textPrimary }}>{filteredEvents.length}</strong> sesiones
+            </div>
+
+            {/* Pagination Controls */}
+            {Math.ceil(filteredEvents.length / pageSize) > 1 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <button
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '5px 10px',
+                    borderRadius: '6px',
+                    border: `1px solid ${c.borderCard}`,
+                    background: currentPage === 1 ? 'transparent' : (darkMode ? '#262626' : '#FFFFFF'),
+                    color: currentPage === 1 ? c.textMuted : c.textPrimary,
+                    fontSize: '0.74rem',
+                    fontWeight: 600,
+                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                    opacity: currentPage === 1 ? 0.5 : 1
+                  }}
+                >
+                  <ChevronLeft size={14} />
+                  <span>Anterior</span>
+                </button>
+
+                <span style={{ fontSize: '0.76rem', fontWeight: 700, color: c.textPrimary, padding: '0 8px' }}>
+                  Página {currentPage} de {Math.ceil(filteredEvents.length / pageSize)}
+                </span>
+
+                <button
+                  type="button"
+                  disabled={currentPage >= Math.ceil(filteredEvents.length / pageSize)}
+                  onClick={() => setCurrentPage(prev => Math.min(Math.ceil(filteredEvents.length / pageSize), prev + 1))}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '5px 10px',
+                    borderRadius: '6px',
+                    border: `1px solid ${c.borderCard}`,
+                    background: currentPage >= Math.ceil(filteredEvents.length / pageSize) ? 'transparent' : (darkMode ? '#262626' : '#FFFFFF'),
+                    color: currentPage >= Math.ceil(filteredEvents.length / pageSize) ? c.textMuted : c.textPrimary,
+                    fontSize: '0.74rem',
+                    fontWeight: 600,
+                    cursor: currentPage >= Math.ceil(filteredEvents.length / pageSize) ? 'not-allowed' : 'pointer',
+                    opacity: currentPage >= Math.ceil(filteredEvents.length / pageSize) ? 0.5 : 1
+                  }}
+                >
+                  <span>Siguiente</span>
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
