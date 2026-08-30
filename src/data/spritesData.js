@@ -9,11 +9,9 @@ if (Array.isArray(fortniteGgJson)) {
     const normVariant = (item.variant || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     const key = `${normName}_${normVariant}`;
     fortniteGgMap.set(key, item);
-    fortniteGgMap.set(normName, item);
     if (item.parent) {
       const normParent = item.parent.toLowerCase().replace(/[^a-z0-9]/g, '');
       fortniteGgMap.set(`${normParent}_${normVariant}`, item);
-      fortniteGgMap.set(normParent, item);
     }
   });
 }
@@ -258,10 +256,12 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
 
   const normName = (item.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
   const normTheme = (item.theme || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const isBaseVariant = item.theme === 'Basic' || item.theme === 'Base';
+  
   const official = fortniteGgMap.get(`${normName}_${normTheme}`) || 
                    fortniteGgMap.get(`${baseKey}_${normTheme}`) || 
-                   fortniteGgMap.get(normName) || 
-                   fortniteGgMap.get(baseKey);
+                   fortniteGgMap.get(`${normName}_basic`) || 
+                   fortniteGgMap.get(`${baseKey}_basic`);
 
   const officialCost = official?.summonCost && official.summonCost !== '0'
     ? (official.summonCost.includes('Polvo') ? official.summonCost : `${official.summonCost} Polvo Estelar`)
@@ -284,7 +284,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     location: official?.location || 'Cofres de Sprite & Zonas de Extracción',
     summonCost: SUMMON_COST_OVERRIDES[item.id] || officialCost || '5,000 Polvo Estelar',
     ability: official?.ability || 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.',
-    specialPerk: official?.specialPerk || ''
+    specialPerk: isBaseVariant ? '' : (official?.specialPerk || '')
   };
 });
 
