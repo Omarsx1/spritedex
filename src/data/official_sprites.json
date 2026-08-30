@@ -940,7 +940,7 @@
   },
   {
     "id": "klombo_gold",
-    "name": "Gold Klombo",
+    "name": "Klombo Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -948,7 +948,7 @@
   },
   {
     "id": "klombo_cheatmaster",
-    "name": "Hacker Klombo",
+    "name": "Klombo Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -956,7 +956,7 @@
   },
   {
     "id": "crown_basic",
-    "name": "Crown",
+    "name": "Victorioso",
     "theme": "Basic",
     "rarity": "Mythic",
     "gen": 2,
@@ -964,7 +964,7 @@
   },
   {
     "id": "crown_gold",
-    "name": "Gold Crown",
+    "name": "Victorioso Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -972,7 +972,7 @@
   },
   {
     "id": "crown_cheatmaster",
-    "name": "Hacker Crown",
+    "name": "Victorioso Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1012,7 +1012,7 @@
   },
   {
     "id": "sonic_gold",
-    "name": "Gold Sonic",
+    "name": "Sonic Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -1020,7 +1020,7 @@
   },
   {
     "id": "sonic_cheatmaster",
-    "name": "Hacker Sonic",
+    "name": "Sonic Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1036,7 +1036,7 @@
   },
   {
     "id": "shadow_gold",
-    "name": "Gold Shadow",
+    "name": "Shadow Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -1044,7 +1044,7 @@
   },
   {
     "id": "shadow_cheatmaster",
-    "name": "Hacker Shadow",
+    "name": "Shadow Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1060,7 +1060,7 @@
   },
   {
     "id": "tails_gold",
-    "name": "Gold Tails",
+    "name": "Tails Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -1068,7 +1068,7 @@
   },
   {
     "id": "tails_cheatmaster",
-    "name": "Hacker Tails",
+    "name": "Tails Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1084,7 +1084,7 @@
   },
   {
     "id": "killswitch_gold",
-    "name": "Gold Killswitch",
+    "name": "Killswitch Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -1092,7 +1092,7 @@
   },
   {
     "id": "killswitch_cheatmaster",
-    "name": "Hacker Killswitch",
+    "name": "Killswitch Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1100,7 +1100,7 @@
   },
   {
     "id": "bush_basic",
-    "name": "Bush",
+    "name": "Arbustín",
     "theme": "Basic",
     "rarity": "Rare",
     "gen": 2,
@@ -1108,7 +1108,7 @@
   },
   {
     "id": "bush_gold",
-    "name": "Gold Bush",
+    "name": "Arbustín Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -1116,7 +1116,7 @@
   },
   {
     "id": "bush_cheatmaster",
-    "name": "Hacker Bush",
+    "name": "Arbustín Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1124,7 +1124,7 @@
   },
   {
     "id": "adventure_basic",
-    "name": "Adventure",
+    "name": "Aventurero",
     "theme": "Basic",
     "rarity": "Rare",
     "gen": 2,
@@ -1132,7 +1132,7 @@
   },
   {
     "id": "adventure_gold",
-    "name": "Gold Adventure",
+    "name": "Aventurero Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -1140,7 +1140,7 @@
   },
   {
     "id": "adventure_cheatmaster",
-    "name": "Hacker Adventure",
+    "name": "Aventurero Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1156,7 +1156,7 @@
   },
   {
     "id": "jonesy_gold",
-    "name": "Gold Jonesy",
+    "name": "Jonesy Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -1164,7 +1164,7 @@
   },
   {
     "id": "jonesy_cheatmaster",
-    "name": "Hacker Jonesy",
+    "name": "Jonesy Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1180,7 +1180,7 @@
   },
   {
     "id": "8bit_gold",
-    "name": "Gold 8-Bit",
+    "name": "8-Bit Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -1188,7 +1188,7 @@
   },
   {
     "id": "8bit_cheatmaster",
-    "name": "Hacker 8-Bit",
+    "name": "8-Bit Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
