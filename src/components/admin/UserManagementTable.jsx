@@ -26,9 +26,34 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
   const [currentAuthUser, setCurrentAuthUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState('all'); // 'all' | 'high_progress' | 'active_catch'
-  const [selectedGen, setSelectedGen] = useState(2); // 2 = Temporada Actual (2ª Gen) por defecto
-  const [currentPage, setCurrentPage] = useState(1);
+  
+  const [filterType, setFilterType] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('spritedex_users_filter');
+      if (saved) return saved;
+    } catch {}
+    return 'all';
+  });
+
+  const [selectedGen, setSelectedGen] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('spritedex_users_gen');
+      if (saved !== null) return Number(saved);
+    } catch {}
+    return 2;
+  });
+
+  const [currentPage, setCurrentPage] = useState(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlPage = parseInt(urlParams.get('page'), 10);
+      if (urlPage && urlPage > 0) return urlPage;
+      const saved = parseInt(sessionStorage.getItem('spritedex_users_page'), 10);
+      if (saved && saved > 0) return saved;
+    } catch {}
+    return 1;
+  });
+
   const [copiedCode, setCopiedCode] = useState(null);
   const pageSize = 15;
 
@@ -199,6 +224,40 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
   }, [users, searchQuery, filterType]);
 
   const totalPages = Math.ceil(filteredUsers.length / pageSize) || 1;
+
+  const handlePageChange = (newPage) => {
+    const clamped = Math.max(1, Math.min(totalPages, newPage));
+    setCurrentPage(clamped);
+    try {
+      sessionStorage.setItem('spritedex_users_page', String(clamped));
+      const url = new URL(window.location.href);
+      url.searchParams.set('page', String(clamped));
+      window.history.replaceState({}, '', url.toString());
+    } catch {}
+  };
+
+  const handleFilterTypeChange = (newType) => {
+    setFilterType(newType);
+    try {
+      sessionStorage.setItem('spritedex_users_filter', newType);
+    } catch {}
+    handlePageChange(1);
+  };
+
+  const handleGenChange = (newGen) => {
+    setSelectedGen(newGen);
+    try {
+      sessionStorage.setItem('spritedex_users_gen', String(newGen));
+    } catch {}
+    handlePageChange(1);
+  };
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      handlePageChange(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handleCopyCode = (code) => {
@@ -777,7 +836,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <button
               type="button"
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
               style={{
                 padding: '5px 10px',
@@ -803,7 +862,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
 
             <button
               type="button"
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
               style={{
                 padding: '5px 10px',
