@@ -1138,7 +1138,9 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 right: '10px',
                 padding: '2px 8px',
                 borderRadius: '6px',
-                background: rarityObj.color || '#3ECF8E',
+                background: formData.rarity === 'Special'
+                  ? 'linear-gradient(15deg, #9effef 0%, #d1ffd6 17%, #fff8ad 34%, #a3edff 51%, #bdbdff 68%, #ffb8eb 85%, #ffdda3 100%)'
+                  : (rarityObj.color || '#3ECF8E'),
                 color: '#060714',
                 fontSize: '0.65rem',
                 fontWeight: 900
@@ -1178,6 +1180,23 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
               <h4 style={{ margin: '0 0 4px', fontSize: '0.92rem', fontWeight: 800, color: c.textPrimary }}>
                 {formData.fullName || 'Nombre del Espíritu'}
               </h4>
+
+              {/* Special Perk Rainbow Badge in Preview (only if variant is not base and has perk) */}
+              {Boolean(formData.specialPerk && formData.specialPerk.trim() && formData.variant !== 'Basic' && formData.variant !== 'Base') && (
+                <div style={{
+                  background: 'linear-gradient(15deg, #9effef 0%, #d1ffd6 17%, #fff8ad 34%, #a3edff 51%, #bdbdff 68%, #ffb8eb 85%, #ffdda3 100%)',
+                  borderRadius: '8px',
+                  padding: '5px 8px',
+                  margin: '6px 0 8px',
+                  fontSize: '0.68rem',
+                  fontWeight: 800,
+                  color: '#0f172a',
+                  boxShadow: '0 2px 8px rgba(158, 255, 239, 0.25)',
+                  lineHeight: 1.3
+                }}>
+                  {formData.specialPerk}
+                </div>
+              )}
 
               <div style={{ fontSize: '0.74rem', color: c.textMuted, marginBottom: '10px' }}>
                 {formData.summonCost}
