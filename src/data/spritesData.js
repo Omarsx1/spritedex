@@ -10,6 +10,11 @@ if (Array.isArray(fortniteGgJson)) {
     const key = `${normName}_${normVariant}`;
     fortniteGgMap.set(key, item);
     fortniteGgMap.set(normName, item);
+    if (item.parent) {
+      const normParent = item.parent.toLowerCase().replace(/[^a-z0-9]/g, '');
+      fortniteGgMap.set(`${normParent}_${normVariant}`, item);
+      fortniteGgMap.set(normParent, item);
+    }
   });
 }
 
@@ -184,7 +189,16 @@ export const SPANISH_NAME_OVERRIDES = {
   theburntpeanut_basic: 'Cacahuate',
   stormscout_basic: 'Exploratormentas',
   stormscout_gold: 'Exploratormentas Dorado',
-  stormscout_cheatmaster: 'Exploratormentas Hacker'
+  stormscout_cheatmaster: 'Exploratormentas Hacker',
+  shadow_basic: 'Shadow',
+  shadow_gold: 'Shadow Dorado',
+  shadow_cheatmaster: 'Shadow Hacker',
+  klombo_basic: 'Klombo',
+  klombo_gold: 'Klombo Dorado',
+  klombo_cheatmaster: 'Klombo Hacker',
+  jonesy_basic: 'Jonesy',
+  jonesy_gold: 'Jonesy Dorado',
+  jonesy_cheatmaster: 'Jonesy Hacker'
 };
 
 const SUMMON_COST_OVERRIDES = {
@@ -244,7 +258,10 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
 
   const normName = (item.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
   const normTheme = (item.theme || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-  const official = fortniteGgMap.get(`${normName}_${normTheme}`) || fortniteGgMap.get(normName);
+  const official = fortniteGgMap.get(`${normName}_${normTheme}`) || 
+                   fortniteGgMap.get(`${baseKey}_${normTheme}`) || 
+                   fortniteGgMap.get(normName) || 
+                   fortniteGgMap.get(baseKey);
 
   const officialCost = official?.summonCost && official.summonCost !== '0'
     ? (official.summonCost.includes('Polvo') ? official.summonCost : `${official.summonCost} Polvo Estelar`)
