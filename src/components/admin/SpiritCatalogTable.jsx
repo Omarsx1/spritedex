@@ -15,7 +15,15 @@ import {
 import { RARITIES } from '../../data/spritesData';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 
-export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, onAddNew, onRefresh, darkMode = false }) {
+export function SpiritCatalogTable({ 
+  sprites = [], 
+  globalSearch = '', 
+  onEdit, 
+  onAddNew, 
+  onManageFamilies,
+  onRefresh, 
+  darkMode = false 
+}) {
   const [localSearch, setLocalSearch] = useState('');
 
   const [statusFilter, setStatusFilter] = useState(() => {
@@ -215,6 +223,28 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
             <option value="1">🌟 1ª Generación (109 Espíritus)</option>
             <option value="all">📦 Todas las Generaciones (169 Espíritus)</option>
           </select>
+
+          {/* Manage Families Button */}
+          <button
+            type="button"
+            onClick={onManageFamilies}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 16px',
+              borderRadius: '10px',
+              background: darkMode ? '#262626' : '#FFFFFF',
+              color: textPrimary,
+              border: darkMode ? '1px solid #333333' : '1px solid #CBD5E1',
+              fontSize: '0.84rem',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            <Layers size={16} style={{ color: darkMode ? '#3ECF8E' : '#3C50E0' }} />
+            <span>Gestionar Familias</span>
+          </button>
 
           {/* Add Spirit Button */}
           <button
