@@ -119,14 +119,12 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                   marginBottom: '12px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
                   fontSize: '0.82rem',
                   fontWeight: 800,
                   color: '#0f172a',
                   boxShadow: '0 3px 12px rgba(158, 255, 239, 0.28)'
                 }}
               >
-                <Sparkles size={15} style={{ color: '#0f172a', flexShrink: 0 }} />
                 <span>{activeSprite.specialPerk}</span>
               </div>
             )}
