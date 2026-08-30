@@ -24,6 +24,7 @@ import {
 import { AnalyticsDashboard } from './AnalyticsDashboard';
 import { SpiritCatalogTable } from './SpiritCatalogTable';
 import { SpiritEditorModal } from './SpiritEditorModal';
+import { FamilyManagerModal } from './FamilyManagerModal';
 import { UserManagementTable } from './UserManagementTable';
 import { AudienceInsightsView } from './AudienceInsightsView';
 import { clearAdminSession } from './AdminAuthGate';
@@ -64,6 +65,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
   const [usersCount, setUsersCount] = useState(0);
   const [editingSpirit, setEditingSpirit] = useState(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isFamilyManagerOpen, setIsFamilyManagerOpen] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
   const [darkMode, setDarkMode] = useState(() => {
     try {
@@ -726,6 +728,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
               globalSearch={searchFilter}
               onAddNew={handleOpenNew}
               onEdit={handleOpenEdit}
+              onManageFamilies={() => setIsFamilyManagerOpen(true)}
               onRefresh={onRefreshSprites}
               darkMode={darkMode}
             />
@@ -746,6 +749,16 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
           existingSprites={sprites}
           onSave={handleSaveSpirit}
           onClose={() => setIsEditorOpen(false)}
+          darkMode={darkMode}
+        />
+      )}
+
+      {/* Family Manager Modal */}
+      {isFamilyManagerOpen && (
+        <FamilyManagerModal
+          sprites={sprites}
+          onRefresh={onRefreshSprites}
+          onClose={() => setIsFamilyManagerOpen(false)}
           darkMode={darkMode}
         />
       )}
