@@ -257,7 +257,7 @@ function getSpiritHue(sprite) {
   if (family.includes('jonesy')) return '#fb923c';
   if (family.includes('8bit')) return '#ef4444';
   if (family.includes('adventure') || family.includes('aventurero')) return '#0ea5e9';
-  if (family.includes('stormscout')) return '#818cf8';
+  if (family.includes('stormscout') || family.includes('exploratormentas')) return '#818cf8';
   if (family.includes('batman')) return '#3b82f6';
   if (family.includes('wick')) return '#f59e0b';
   if (family.includes('water') || family.includes('agua')) return '#00f0ff';
