@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Search, 
   Plus, 
@@ -17,9 +17,40 @@ import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 
 export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, onAddNew, onRefresh, darkMode = false }) {
   const [localSearch, setLocalSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'active' | 'unreleased'
-  const [genFilter, setGenFilter] = useState('2'); // '2' = Temporada Actual (2ª Gen) por defecto!
-  const [currentPage, setCurrentPage] = useState(1);
+
+  const [statusFilter, setStatusFilter] = useState(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlStatus = urlParams.get('status');
+      if (urlStatus && ['all', 'active', 'unreleased'].includes(urlStatus)) return urlStatus;
+      const savedStatus = sessionStorage.getItem('spritedex_catalog_status');
+      if (savedStatus) return savedStatus;
+    } catch {}
+    return 'all';
+  });
+
+  const [genFilter, setGenFilter] = useState(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlGen = urlParams.get('gen');
+      if (urlGen && ['1', '2', 'all'].includes(urlGen)) return urlGen;
+      const savedGen = sessionStorage.getItem('spritedex_catalog_gen');
+      if (savedGen) return savedGen;
+    } catch {}
+    return '2';
+  });
+
+  const [currentPage, setCurrentPage] = useState(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlPage = parseInt(urlParams.get('page'), 10);
+      if (urlPage && urlPage > 0) return urlPage;
+      const savedPage = parseInt(sessionStorage.getItem('spritedex_catalog_page'), 10);
+      if (savedPage && savedPage > 0) return savedPage;
+    } catch {}
+    return 1;
+  });
+
   const pageSize = 15;
   const [deletingId, setDeletingId] = useState(null);
 
@@ -45,6 +76,48 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
   }, [sprites, query, statusFilter, genFilter]);
 
   const totalPages = Math.ceil(filteredSprites.length / pageSize) || 1;
+
+  const handlePageChange = (newPage) => {
+    const clamped = Math.max(1, Math.min(totalPages, newPage));
+    setCurrentPage(clamped);
+    try {
+      sessionStorage.setItem('spritedex_catalog_page', String(clamped));
+      const url = new URL(window.location.href);
+      url.searchParams.set('page', String(clamped));
+      window.history.replaceState({}, '', url.toString());
+    } catch {}
+  };
+
+  const handleGenChange = (newGen) => {
+    setGenFilter(newGen);
+    try {
+      sessionStorage.setItem('spritedex_catalog_gen', newGen);
+      const url = new URL(window.location.href);
+      url.searchParams.set('gen', newGen);
+      url.searchParams.set('page', '1');
+      window.history.replaceState({}, '', url.toString());
+    } catch {}
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (newStatus) => {
+    setStatusFilter(newStatus);
+    try {
+      sessionStorage.setItem('spritedex_catalog_status', newStatus);
+      const url = new URL(window.location.href);
+      url.searchParams.set('status', newStatus);
+      url.searchParams.set('page', '1');
+      window.history.replaceState({}, '', url.toString());
+    } catch {}
+    setCurrentPage(1);
+  };
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      handlePageChange(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
   const paginatedSprites = filteredSprites.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handleDelete = async (sprite) => {
@@ -124,7 +197,7 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
           {/* Status Filter */}
           <select
             value={statusFilter}
-            onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
+            onChange={(e) => handleStatusChange(e.target.value)}
             style={inputStyle}
           >
             <option value="all">Todos los Estados</option>
@@ -135,7 +208,7 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
           {/* Gen Filter */}
           <select
             value={genFilter}
-            onChange={(e) => { setGenFilter(e.target.value); setCurrentPage(1); }}
+            onChange={(e) => handleGenChange(e.target.value)}
             style={inputStyle}
           >
             <option value="2">🎮 Temporada Actual (2ª Gen - 60 Espíritus)</option>
@@ -350,7 +423,7 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
               type="button"
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
               style={{
                 padding: '6px 12px',
@@ -376,7 +449,7 @@ export function SpiritCatalogTable({ sprites = [], globalSearch = '', onEdit, on
 
             <button
               type="button"
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
               style={{
                 padding: '6px 12px',
