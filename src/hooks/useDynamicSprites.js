@@ -6,16 +6,24 @@ const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache';
 
 function sanitizeDynamicItem(item) {
   if (!item) return item;
-  const id = item.id;
-  const isStormScout = id?.startsWith('stormscout') || item.family_id === 'stormscout' || item.familyId === 'stormscout';
   
-  const rawName = item.name || '';
-  const rawFullName = item.full_name || item.fullName || item.name || '';
+  // Dynamic edits saved by the user in Supabase always take top priority
+  const rawFullName = item.full_name || item.fullName || '';
+  const rawName = item.name || rawFullName || '';
   const rawFamilyName = item.family_name || item.familyName || '';
 
-  const cleanName = SPANISH_NAME_OVERRIDES[id] || (isStormScout ? rawName.replace(/Storm\s*Scout/gi, 'Explorador de Tormentas') : rawName);
-  const cleanFullName = SPANISH_NAME_OVERRIDES[id] || (isStormScout ? rawFullName.replace(/Storm\s*Scout/gi, 'Explorador de Tormentas') : rawFullName);
-  const cleanFamilyName = isStormScout ? 'Explorador de Tormentas' : (rawFamilyName.replace(/Storm\s*Scout/gi, 'Explorador de Tormentas') || rawFamilyName);
+  // Clean English placeholders only if no name exists or fallback is needed
+  const cleanName = rawName
+    ? rawName.replace(/Storm\s*Scout/gi, 'Exploratormentas')
+    : (SPANISH_NAME_OVERRIDES[item.id] || '');
+
+  const cleanFullName = rawFullName
+    ? rawFullName.replace(/Storm\s*Scout/gi, 'Exploratormentas')
+    : (cleanName || SPANISH_NAME_OVERRIDES[item.id] || '');
+
+  const cleanFamilyName = rawFamilyName
+    ? rawFamilyName.replace(/Storm\s*Scout/gi, 'Exploratormentas')
+    : (cleanName || 'Espíritu');
 
   return {
     ...item,
