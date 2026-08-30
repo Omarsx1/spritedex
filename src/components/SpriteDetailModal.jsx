@@ -109,21 +109,24 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
 
           {/* Ability card */}
           <div className="sdm__card">
-            {activeSprite.specialPerk && (
-              <div className="sdm__perk-badge" style={{
-                background: 'linear-gradient(135deg, rgba(245, 182, 66, 0.2), rgba(34, 197, 94, 0.2), rgba(168, 85, 247, 0.2))',
-                border: '1px solid rgba(245, 182, 66, 0.45)',
-                borderRadius: '8px',
-                padding: '8px 12px',
-                marginBottom: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontSize: '0.80rem',
-                fontWeight: 700,
-                color: '#fff'
-              }}>
-                <Sparkles size={16} className="sdm__icon--pink" />
+            {Boolean(activeSprite.specialPerk && activeSprite.specialPerk.trim() && activeSprite.variant !== 'Basic' && activeSprite.variant !== 'Base') && (
+              <div 
+                className="sdm__perk-badge" 
+                style={{
+                  background: 'linear-gradient(15deg, #9effef 0%, #d1ffd6 17%, #fff8ad 34%, #a3edff 51%, #bdbdff 68%, #ffb8eb 85%, #ffdda3 100%)',
+                  borderRadius: '10px',
+                  padding: '7px 12px',
+                  marginBottom: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '0.82rem',
+                  fontWeight: 800,
+                  color: '#0f172a',
+                  boxShadow: '0 3px 12px rgba(158, 255, 239, 0.28)'
+                }}
+              >
+                <Sparkles size={15} style={{ color: '#0f172a', flexShrink: 0 }} />
                 <span>{activeSprite.specialPerk}</span>
               </div>
             )}
