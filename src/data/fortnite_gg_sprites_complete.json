@@ -529,8 +529,8 @@
   },
   {
     "id": "194",
-    "name": "Explorador de Tormentas",
-    "fullName": "Explorador de Tormentas",
+    "name": "Exploratormentas",
+    "fullName": "Exploratormentas",
     "parent": "StormScout",
     "rarity": "Rare",
     "variant": "Base",
@@ -545,8 +545,8 @@
   },
   {
     "id": "195",
-    "name": "Hacker Explorador de Tormentas",
-    "fullName": "Hacker Explorador de Tormentas",
+    "name": "Exploratormentas Hacker",
+    "fullName": "Exploratormentas Hacker",
     "parent": "StormScout",
     "rarity": "Special",
     "variant": "Cheatmaster",
@@ -561,8 +561,8 @@
   },
   {
     "id": "196",
-    "name": "Explorador de Tormentas Dorado",
-    "fullName": "Explorador de Tormentas Dorado",
+    "name": "Exploratormentas Dorado",
+    "fullName": "Exploratormentas Dorado",
     "parent": "StormScout",
     "rarity": "Special",
     "variant": "Gold",

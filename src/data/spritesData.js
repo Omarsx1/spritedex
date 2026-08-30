@@ -171,7 +171,7 @@ export const FAMILY_NAMES_MAP = {
   adventure: 'Aventurero',
   jonesy: 'Jonesy',
   '8bit': '8-Bit',
-  stormscout: 'Explorador de Tormentas'
+  stormscout: 'Exploratormentas'
 };
 
 const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails'];
@@ -182,9 +182,9 @@ export const SPANISH_NAME_OVERRIDES = {
   fire_quack: 'Patito de Fuego',
   zeropoint_quack: 'Patito del Punto Cero',
   theburntpeanut_basic: 'Cacahuate',
-  stormscout_basic: 'Explorador de Tormentas',
-  stormscout_gold: 'Explorador de Tormentas Dorado',
-  stormscout_cheatmaster: 'Explorador de Tormentas Hacker'
+  stormscout_basic: 'Exploratormentas',
+  stormscout_gold: 'Exploratormentas Dorado',
+  stormscout_cheatmaster: 'Exploratormentas Hacker'
 };
 
 const SUMMON_COST_OVERRIDES = {
