@@ -7,12 +7,31 @@ if (Array.isArray(fortniteGgJson)) {
   fortniteGgJson.forEach((item) => {
     const normName = (item.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     const normVariant = (item.variant || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    const key = `${normName}_${normVariant}`;
-    fortniteGgMap.set(key, item);
-    if (item.parent) {
-      const normParent = item.parent.toLowerCase().replace(/[^a-z0-9]/g, '');
-      fortniteGgMap.set(`${normParent}_${normVariant}`, item);
+
+    const variantAliases = new Set([normVariant]);
+    if (normVariant === 'base' || normVariant === 'basic') {
+      variantAliases.add('base');
+      variantAliases.add('basic');
     }
+    if (normVariant === 'cheatmaster' || normVariant === 'hacker') {
+      variantAliases.add('cheatmaster');
+      variantAliases.add('hacker');
+    }
+    if (normVariant === 'gold' || normVariant === 'dorado') {
+      variantAliases.add('gold');
+      variantAliases.add('dorado');
+    }
+
+    const nameAliases = new Set([normName]);
+    if (item.parent) {
+      nameAliases.add(item.parent.toLowerCase().replace(/[^a-z0-9]/g, ''));
+    }
+
+    nameAliases.forEach(n => {
+      variantAliases.forEach(v => {
+        fortniteGgMap.set(`${n}_${v}`, item);
+      });
+    });
   });
 }
 
@@ -258,10 +277,42 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   const normTheme = (item.theme || '').toLowerCase().replace(/[^a-z0-9]/g, '');
   const isBaseVariant = item.theme === 'Basic' || item.theme === 'Base';
   
-  const official = fortniteGgMap.get(`${normName}_${normTheme}`) || 
-                   fortniteGgMap.get(`${baseKey}_${normTheme}`) || 
-                   fortniteGgMap.get(`${normName}_basic`) || 
-                   fortniteGgMap.get(`${baseKey}_basic`);
+  const FAMILY_KEY_ALIASES = {
+    '8bit': ['8bit', 'eightbitblaster'],
+    'jackrabbit': ['jackrabbit', 'jazzjackrabbit', 'cosmicthunderdoublejump'],
+    'shadow': ['shadow', 'narrowfleascribe', 'reloadovertime'],
+    'bush': ['bush', 'bushranger'],
+    'tails': ['tails', 'narrowfleamonkey'],
+    'adventure': ['adventure', 'dwarf'],
+    'sonic': ['sonic', 'narrowflea', 'narrowfleaobsidian'],
+    'stormscout': ['stormscout']
+  };
+
+  const keysToTry = [
+    `${normName}_${normTheme}`,
+    `${baseKey}_${normTheme}`
+  ];
+  if (FAMILY_KEY_ALIASES[baseKey]) {
+    FAMILY_KEY_ALIASES[baseKey].forEach(alias => {
+      keysToTry.push(`${alias}_${normTheme}`);
+    });
+  }
+  if (isBaseVariant) {
+    keysToTry.push(`${baseKey}_basic`, `${baseKey}_base`);
+    if (FAMILY_KEY_ALIASES[baseKey]) {
+      FAMILY_KEY_ALIASES[baseKey].forEach(alias => {
+        keysToTry.push(`${alias}_basic`, `${alias}_base`);
+      });
+    }
+  }
+
+  let official = null;
+  for (const k of keysToTry) {
+    if (fortniteGgMap.has(k)) {
+      official = fortniteGgMap.get(k);
+      break;
+    }
+  }
 
   const officialCost = official?.summonCost && official.summonCost !== '0'
     ? (official.summonCost.includes('Polvo') ? official.summonCost : `${official.summonCost} Polvo Estelar`)
