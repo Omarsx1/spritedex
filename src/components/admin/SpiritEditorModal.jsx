@@ -55,9 +55,9 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
     gen: spirit?.gen || 2,
     image: spirit?.image || (spirit?.id ? `/sprites/${spirit.id}.png` : ''),
     ability: spirit?.ability || 'Concede bonificaciones pasivas de combate y velocidad.',
-    specialPerk: spirit?.specialPerk || '',
-    summonCost: spirit?.summonCost || '2,000 Polvo Estelar',
-    dropChance: spirit?.dropChance || '1.50%',
+    specialPerk: spirit?.specialPerk || spirit?.special_perk || '',
+    summonCost: spirit?.summonCost || spirit?.summon_cost || '2,000 Polvo Estelar',
+    dropChance: spirit?.dropChance || spirit?.drop_chance || '1.50%',
     unreleased: spirit?.unreleased || false,
     releaseDate: spirit?.release_date ? new Date(spirit.release_date).toISOString().slice(0, 16) : ''
   });
@@ -687,6 +687,56 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   }}
                 />
               </div>
+            </div>
+
+            {/* In-game Abilities & Special Perks */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Habilidad Oficial (Pasiva)
+              </label>
+              <textarea
+                value={formData.ability}
+                onChange={(e) => setFormData(prev => ({ ...prev, ability: e.target.value }))}
+                placeholder="Ej: Otorga objetos aleatorios en cada nivel y solo sube de nivel al consumir objetos..."
+                rows={2}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  background: c.bgInput,
+                  border: `1px solid ${c.borderInput}`,
+                  color: c.textPrimary,
+                  fontSize: '0.84rem',
+                  lineHeight: '1.4',
+                  resize: 'vertical',
+                  boxSizing: 'border-box',
+                  outline: 'none',
+                  fontFamily: 'inherit'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Ventaja Especial (Barra Arcoíris / Perk)
+              </label>
+              <input
+                type="text"
+                value={formData.specialPerk}
+                onChange={(e) => setFormData(prev => ({ ...prev, specialPerk: e.target.value }))}
+                placeholder="Ej: Obtén PE de bonificación x3 con eliminaciones (o ¡Aprieta los botones!...)"
+                style={{
+                  width: '100%',
+                  padding: '11px 14px',
+                  borderRadius: '10px',
+                  background: c.bgInput,
+                  border: `1px solid ${c.borderInput}`,
+                  color: c.textPrimary,
+                  fontSize: '0.84rem',
+                  boxSizing: 'border-box',
+                  outline: 'none'
+                }}
+              />
             </div>
 
             {/* Scheduled Release Card */}
