@@ -63,7 +63,21 @@ export function useDynamicSprites() {
         const dynamicList = JSON.parse(cached);
         const map = new Map(ALL_SPRITES.map(s => [s.id, s]));
         dynamicList.forEach(item => {
-          map.set(item.id, evaluateReleaseStatus(sanitizeDynamicItem(item)));
+          const sanitized = sanitizeDynamicItem(item);
+          const baseStatic = map.get(sanitized.id);
+          const hasRealCustomAbility = sanitized.ability && 
+            sanitized.ability !== 'Concede bonificaciones pasivas.' && 
+            sanitized.ability !== 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.';
+          
+          const merged = {
+            ...(baseStatic || {}),
+            ...sanitized,
+            ability: hasRealCustomAbility ? sanitized.ability : (baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.'),
+            specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base')
+              ? ''
+              : (sanitized.special_perk || sanitized.specialPerk || baseStatic?.specialPerk || '')
+          };
+          map.set(item.id, evaluateReleaseStatus(merged));
         });
         return Array.from(map.values());
       }
@@ -95,26 +109,33 @@ export function useDynamicSprites() {
           const map = new Map(ALL_SPRITES.map(s => [s.id, s]));
           data.forEach(dbItem => {
             const sanitized = sanitizeDynamicItem(dbItem);
+            const baseStatic = map.get(sanitized.id);
+            const hasRealCustomAbility = sanitized.ability && 
+              sanitized.ability !== 'Concede bonificaciones pasivas.' && 
+              sanitized.ability !== 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.';
+
             const formatted = {
               id: sanitized.id,
               name: sanitized.name,
               fullName: sanitized.fullName || sanitized.name,
-              familyId: sanitized.family_id,
-              familyName: sanitized.familyName || sanitized.family_name,
-              rarity: sanitized.rarity,
-              variant: sanitized.variant,
-              variantDisplay: sanitized.variant_display || sanitized.variant,
-              gen: sanitized.gen || 2,
-              image: sanitized.image,
-              ability: sanitized.ability || 'Concede bonificaciones pasivas.',
-              specialPerk: sanitized.special_perk || '',
-              location: sanitized.location || 'Zonas de Extracción',
-              summonCost: sanitized.summon_cost || '2,000 Polvo Estelar',
-              dropChance: sanitized.drop_chance || '1.50%',
-              dropChanceDisplay: sanitized.drop_chance || '1.50%',
-              dropChanceNum: parseFloat(sanitized.drop_chance || '1.5'),
-              unreleased: sanitized.unreleased,
-              release_date: sanitized.release_date
+              familyId: sanitized.family_id || baseStatic?.familyId,
+              familyName: sanitized.familyName || sanitized.family_name || baseStatic?.familyName,
+              rarity: sanitized.rarity || baseStatic?.rarity,
+              variant: sanitized.variant || baseStatic?.variant,
+              variantDisplay: sanitized.variant_display || sanitized.variant || baseStatic?.variantDisplay,
+              gen: sanitized.gen || baseStatic?.gen || 2,
+              image: sanitized.image || baseStatic?.image,
+              ability: hasRealCustomAbility ? sanitized.ability : (baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.'),
+              specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base') 
+                ? '' 
+                : (sanitized.special_perk || baseStatic?.specialPerk || ''),
+              location: sanitized.location || baseStatic?.location || 'Zonas de Extracción',
+              summonCost: sanitized.summon_cost || baseStatic?.summonCost || '2,000 Polvo Estelar',
+              dropChance: sanitized.drop_chance || baseStatic?.dropChance || '1.50%',
+              dropChanceDisplay: sanitized.drop_chance || baseStatic?.dropChanceDisplay || '1.50%',
+              dropChanceNum: parseFloat(sanitized.drop_chance || baseStatic?.dropChanceNum || '1.5'),
+              unreleased: sanitized.unreleased !== undefined ? sanitized.unreleased : (baseStatic?.unreleased || false),
+              release_date: sanitized.release_date || baseStatic?.release_date
             };
             map.set(formatted.id, evaluateReleaseStatus(formatted));
           });
