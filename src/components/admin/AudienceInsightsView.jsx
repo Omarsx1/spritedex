@@ -38,6 +38,20 @@ const AppleIcon = ({ size = 15, color = 'currentColor', style = {} }) => (
   </svg>
 );
 
+const WindowsIcon = ({ size = 14, color = '#00adef', style = {} }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 88 88"
+    style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0, ...style }}
+  >
+    <rect x="1" y="1" width="41" height="41" fill={color} />
+    <rect x="46" y="1" width="41" height="41" fill={color} />
+    <rect x="1" y="46" width="41" height="41" fill={color} />
+    <rect x="46" y="46" width="41" height="41" fill={color} />
+  </svg>
+);
+
 export function AudienceInsightsView({ darkMode = false }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -598,14 +612,14 @@ export function AudienceInsightsView({ darkMode = false }) {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '5px' }}>
                 <span style={{ fontWeight: 700, color: c.textPrimary, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span>🪟</span> Microsoft Windows PC
+                  <WindowsIcon size={14} color="#00adef" /> Microsoft Windows PC
                 </span>
                 <span style={{ fontWeight: 800, color: c.textPrimary }}>
                   {analytics.windows} <span style={{ color: c.textMuted, fontWeight: 500 }}>({analytics.total > 0 ? Math.round((analytics.windows / analytics.total) * 100) : 0}%)</span>
                 </span>
               </div>
               <div style={{ width: '100%', height: '6px', background: c.barTrack, borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ width: `${analytics.total > 0 ? (analytics.windows / analytics.total) * 100 : 0}%`, height: '100%', background: '#F59E0B', borderRadius: '3px' }} />
+                <div style={{ width: `${analytics.total > 0 ? (analytics.windows / analytics.total) * 100 : 0}%`, height: '100%', background: '#00adef', borderRadius: '3px' }} />
               </div>
             </div>
           </div>
