@@ -430,7 +430,7 @@ export async function fetchAnalyticsOverview() {
       // 4. Fetch recent events for device breakdown and live stream
       result.recentEvents = realEvents.slice(0, 50);
 
-      const recentCutoff = Date.now() - 15 * 60 * 1000; // 15 mins
+      const recentCutoff = Date.now() - 5 * 60 * 1000; // 5 mins (tiempo real ágil)
       const liveSessions = new Set();
 
       realEvents.slice(0, 50).forEach((ev) => {
