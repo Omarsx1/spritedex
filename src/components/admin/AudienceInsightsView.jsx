@@ -105,96 +105,6 @@ export function AudienceInsightsView({ darkMode = false }) {
   const [tableSearch, setTableSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25); // 15 | 25 | 50 | 100 | 'all'
-  const [excludeMyDevice, setExcludeMyDevice] = useState(() => {
-    try {
-      const saved = localStorage.getItem('spritedex_analytics_exclude_my_device');
-      return saved !== null ? saved === 'true' : true;
-    } catch {
-      return true;
-    }
-  });
-  const [isPurging, setIsPurging] = useState(false);
-  const [purgeSuccessMsg, setPurgeSuccessMsg] = useState('');
-
-  const handleToggleExcludeMyDevice = () => {
-    setExcludeMyDevice(prev => {
-      const next = !prev;
-      try {
-        localStorage.setItem('spritedex_analytics_exclude_my_device', String(next));
-      } catch {}
-      return next;
-    });
-  };
-
-  const handlePurgeMyMacRecords = async () => {
-    setIgnoreTelemetry(true);
-    localStorage.setItem('spritedex_ignore_telemetry', 'true');
-    localStorage.setItem('spritedex_analytics_exclude_my_device', 'true');
-    setExcludeMyDevice(true);
-
-    const myMacEvents = events.filter(isMacOrAdminEvent);
-    const count = myMacEvents.length;
-
-    const result = await showConfirmDialog({
-      title: '¿Purgar registros de tu Mac?',
-      text: `¿Confirmas eliminar permanentemente los registros de prueba generados desde tu Mac? Las visitas reales de España, Guatemala y otros países se mantendrán intactas.`,
-      confirmText: 'Sí, purgar registros',
-      cancelText: 'Cancelar',
-      icon: 'warning',
-      isDestructive: true,
-      darkMode
-    });
-
-    if (!result.isConfirmed) {
-      return;
-    }
-
-    try {
-      setIsPurging(true);
-
-      // 1. Guardar permanentemente todos los IDs de la Mac como purgados en localStorage
-      const prevPurged = JSON.parse(localStorage.getItem('spritedex_purged_ids_v2') || '[]');
-      const idsToPurge = myMacEvents.map(e => e.id).filter(Boolean);
-      const newPurgedSet = Array.from(new Set([...prevPurged, ...idsToPurge]));
-      localStorage.setItem('spritedex_purged_ids_v2', JSON.stringify(newPurgedSet));
-
-      // 2. Limpieza inmediata en estado en memoria
-      setEvents(prev => prev.filter(ev => !isMacOrAdminEvent(ev) && !idsToPurge.includes(ev.id)));
-
-      // 3. Intentar borrado en base de datos Supabase
-      if (isSupabaseConfigured && supabase) {
-        try {
-          await supabase.from('analytics_events').delete().eq('os', 'macOS');
-        } catch (e) {}
-        try {
-          await supabase.from('analytics_events').delete().ilike('referrer', '%studio-override%');
-        } catch (e) {}
-
-        for (let i = 0; i < idsToPurge.length; i += 50) {
-          try {
-            await supabase.from('analytics_events').delete().in('id', idsToPurge.slice(i, i + 50));
-          } catch (e) {}
-        }
-      }
-
-      // 4. Limpiar caché local de telemetría
-      localStorage.removeItem('spritedex_local_analytics');
-
-      // 5. Recargar y filtrar datos actualizados
-      await loadAudienceData();
-
-      await showSuccessAlert({
-        title: '¡Purga completada!',
-        text: `Registros de tu Mac eliminados y ocultados. Tus visitas futuras tampoco se registrarán.`,
-        darkMode
-      });
-    } catch (err) {
-      console.error('Error al purgar registros de Mac:', err);
-      alert('Error al purgar registros: ' + err.message);
-    } finally {
-      setIsPurging(false);
-    }
-  };
 
   const loadAudienceData = async () => {
     try {
@@ -212,9 +122,7 @@ export function AudienceInsightsView({ darkMode = false }) {
         }
 
         if (rawEvents && rawEvents.length > 0) {
-          const purgedIds = new Set(JSON.parse(localStorage.getItem('spritedex_purged_ids_v2') || '[]'));
-          const cleanEvents = rawEvents.filter(ev => !purgedIds.has(ev.id));
-          setEvents(cleanEvents);
+          setEvents(rawEvents);
         } else {
           setEvents([]);
         }
@@ -236,7 +144,7 @@ export function AudienceInsightsView({ darkMode = false }) {
   // Reset pagination on filter change
   useEffect(() => {
     setCurrentPage(1);
-  }, [timeFilter, deviceFilter, tableSearch, pageSize, excludeMyDevice]);
+  }, [timeFilter, deviceFilter, tableSearch, pageSize]);
 
   // Filter events based on time and device filters
   const filteredEvents = useMemo(() => {
@@ -247,8 +155,8 @@ export function AudienceInsightsView({ darkMode = false }) {
       const evDate = new Date(ev.created_at);
       const evTime = evDate.getTime();
 
-      // Exclude Admin device / Mac test sessions if toggle is active
-      if (excludeMyDevice && isMacOrAdminEvent(ev)) {
+      // Extra guard: Exclude any admin portal access
+      if (isMacOrAdminEvent(ev)) {
         return false;
       }
 
@@ -855,53 +763,6 @@ export function AudienceInsightsView({ darkMode = false }) {
               </span>
 
               {/* Toggle Exclude My Device */}
-              {/* Toggle Exclude My Device */}
-              <button
-                type="button"
-                onClick={handleToggleExcludeMyDevice}
-                title={excludeMyDevice ? 'Mostrando solo visitantes externos (tu Mac y sesiones de admin están ocultas)' : 'Mostrando todas las sesiones (incluyendo visitas de prueba de tu Mac)'}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '5px 12px',
-                  borderRadius: '6px',
-                  border: excludeMyDevice ? '1px solid #10B981' : `1px solid ${c.borderCard}`,
-                  background: excludeMyDevice ? (darkMode ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5') : (darkMode ? '#262626' : '#FFFFFF'),
-                  color: excludeMyDevice ? (darkMode ? '#34D399' : '#059669') : c.textSecondary,
-                  fontSize: '0.74rem',
-                  fontWeight: 700,
-                  cursor: 'pointer'
-                }}
-              >
-                {excludeMyDevice ? <ShieldCheck size={13} /> : <Eye size={13} />}
-                <span>{excludeMyDevice ? 'Mis Visitas Ocultas' : 'Mostrando Mis Visitas'}</span>
-              </button>
-
-              {/* Purge My Mac Records Button */}
-              <button
-                type="button"
-                onClick={handlePurgeMyMacRecords}
-                disabled={isPurging}
-                title="Eliminar permanentemente todos los registros generados desde tu Mac de las estadísticas"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '5px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid rgba(239, 68, 68, 0.35)',
-                  background: darkMode ? 'rgba(239, 68, 68, 0.12)' : '#FEF2F2',
-                  color: darkMode ? '#F87171' : '#DC2626',
-                  fontSize: '0.74rem',
-                  fontWeight: 700,
-                  cursor: isPurging ? 'wait' : 'pointer'
-                }}
-              >
-                <Trash2 size={13} />
-                <span>{isPurging ? 'Purgando...' : 'Purgar mi Mac'}</span>
-              </button>
-
               <button
                 type="button"
                 onClick={() => {
