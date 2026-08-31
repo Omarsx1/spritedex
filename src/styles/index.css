@@ -5543,32 +5543,21 @@ body::after {
 /* ===== Responsivo Mobile para Modal de Intercambio ===== */
 @media (max-width: 600px) {
   .sdm-compare {
-    width: 95%;
-    max-width: 440px;
-    margin: auto;
-    border-radius: 16px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    border-radius: 14px;
     max-height: 90vh;
     overflow-y: auto;
     overflow-x: hidden;
-    display: block;
-  }
-
-  .sdm-compare__header {
-    padding: 14px 16px;
-    gap: 10px;
-  }
-
-  .sdm-compare__header-title {
-    font-size: 1.12rem;
-    gap: 7px;
-  }
-
-  .sdm-compare__header-subtitle {
-    font-size: 0.74rem;
+    box-sizing: border-box;
   }
 
   .sdm-compare__body {
-    padding: 12px 14px 18px 14px;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   /* Single column cards on mobile to fix clipping */
@@ -5576,11 +5565,15 @@ body::after {
     grid-template-columns: 1fr;
     gap: 10px;
     margin-bottom: 12px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .sdm-compare__card {
-    padding: 10px 12px;
+    padding: 12px;
     gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .sdm-compare__card-title {
