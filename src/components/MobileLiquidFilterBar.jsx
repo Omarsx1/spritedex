@@ -381,7 +381,6 @@ export function MobileLiquidFilterBar({
                 className="mobile-sheet-btn-apply"
                 onClick={() => setIsOpen(false)}
               >
-                <Check size={16} />
                 <span>Aplicar Filtros</span>
               </button>
             </div>
