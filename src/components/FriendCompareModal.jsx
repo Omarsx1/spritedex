@@ -184,34 +184,38 @@ export function FriendCompareModal({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="sdm sdm-compare sdm-share--glitch" ref={modalRef} onClick={(e) => e.stopPropagation()}>
-        {/* Close Button */}
-        <button className="sdm__close" onClick={onClose}>
-          <X size={18} />
-        </button>
-
-        {/* ═══ HERO HEADER (GLITCH THEMED) ═══ */}
-        <div className="sdm__hero sdm-share__hero sdm-compare__hero">
+        
+        {/* ═══ MODERN RADAR HEADER (APPLE / CYBERPUNK GLASS) ═══ */}
+        <div className="sdm-compare__header">
+          {/* Subtle Ambient Radial Glow */}
           <div
-            className="sdm__hero-glow"
+            className="sdm-compare__header-glow"
             style={{
-              background: 'radial-gradient(circle at 30% 50%, rgba(168, 85, 247, 0.35) 0%, rgba(0, 240, 232, 0.2) 50%, transparent 80%)'
+              background: 'radial-gradient(circle at 15% 50%, rgba(0, 240, 232, 0.22) 0%, rgba(139, 92, 246, 0.16) 50%, transparent 80%)'
             }}
           />
 
-          <div className="sdm-share__hero-icon">
-            <Users size={24} color="#00F0E8" />
+          <div className="sdm-compare__header-left">
+            <div className="sdm-compare__header-icon-box">
+              <Users size={20} color="#00F0E8" />
+            </div>
+            <div className="sdm-compare__header-text">
+              <div className="sdm-compare__header-title-row">
+                <h2 className="sdm-compare__header-title">Radar de Amigos</h2>
+                <span className="sdm-compare__header-pill">
+                  <span className="sdm-compare__header-dot" />
+                  {isLiveConnected ? 'En Vivo' : 'Modo Social'}
+                </span>
+              </div>
+              <p className="sdm-compare__header-subtitle">
+                Compara colecciones en tiempo real y sincroniza con tus amigos.
+              </p>
+            </div>
           </div>
 
-          <div className="sdm__hero-info">
-            <div className="sdm__hero-badges">
-              <span className="sdm-share__tag-chapter">FORTNITE</span>
-              <span className="sdm-share__tag-pill" style={{ background: '#8b5cf6' }}>MODO SOCIAL</span>
-            </div>
-            <h2 className="sdm__name sdm-share__glitch-title">RADAR DE AMIGOS</h2>
-            <p className="sdm__meta">
-              Sincroniza y compara en tiempo real tu colección con cualquier amigo de Fortnite.
-            </p>
-          </div>
+          <button className="sdm-compare__close-btn" onClick={onClose} aria-label="Cerrar modal">
+            <X size={18} />
+          </button>
         </div>
 
         {/* ═══ BODY CONTENT ═══ */}
