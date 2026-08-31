@@ -205,9 +205,43 @@ export function resolveCountry(countryHint = '', timeZoneHint = '') {
 let lastTrackedTimestamp = 0;
 let lastTrackedPath = '';
 
+export function setIgnoreTelemetry(ignore = true) {
+  if (typeof localStorage !== 'undefined') {
+    if (ignore) {
+      localStorage.setItem('spritedex_ignore_telemetry', 'true');
+    } else {
+      localStorage.removeItem('spritedex_ignore_telemetry');
+    }
+  }
+}
+
+export function isTelemetryIgnored() {
+  if (typeof localStorage !== 'undefined') {
+    return localStorage.getItem('spritedex_ignore_telemetry') === 'true' || localStorage.getItem('spritedex_admin_override') === 'true';
+  }
+  return false;
+}
+
 // Record a pageview or custom telemetry event (Non-blocking)
 export async function trackEvent(eventType = 'pageview', meta = {}) {
   try {
+    // Evita registrar visitas de administradores, pruebas locales o dispositivos del creador
+    const isExcludedAdmin = typeof window !== 'undefined' && (
+      window.location.search.includes('studio-override') ||
+      window.location.pathname.includes('/studio') ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      localStorage.getItem('spritedex_ignore_telemetry') === 'true' ||
+      localStorage.getItem('spritedex_admin_override') === 'true'
+    );
+
+    if (isExcludedAdmin) {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('spritedex_ignore_telemetry', 'true');
+      }
+      return;
+    }
+
     const now = Date.now();
     const path = typeof window !== 'undefined' ? window.location.pathname : '/';
 
