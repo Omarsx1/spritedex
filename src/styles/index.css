@@ -1353,7 +1353,7 @@ body::after {
 /* ===== Hero Responsive ===== */
 @media (max-width: 768px) {
   .hero__content {
-    padding: 28px 16px 12px;
+    padding: 28px 16px 20px;
     gap: 16px;
   }
 
@@ -1460,8 +1460,8 @@ body::after {
 
 @media (max-width: 480px) {
   .hero__content {
-    padding: 22px 12px 8px;
-    gap: 12px;
+    padding: 24px 14px 18px;
+    gap: 14px;
   }
 
   .hero__title-line {
@@ -1953,7 +1953,7 @@ body::after {
 .mobile-liquid-wrapper {
   width: 100%;
   max-width: 440px;
-  margin: 4px auto 26px auto; /* Espacio limpio y cómodo */
+  margin: 10px auto 26px auto; /* Espacio limpio y cómodo */
   padding: 0 16px;
   display: flex;
   flex-direction: column;
