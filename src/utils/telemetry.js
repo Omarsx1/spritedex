@@ -39,11 +39,13 @@ export function getClientEnvironment() {
   else if (/Linux/.test(ua)) os = 'Linux';
 
   let browser = 'Otros';
-  if (/Brave/.test(ua) || (navigator.brave && typeof navigator.brave.isBrave === 'function')) browser = 'Brave';
-  else if (/CriOS|Chrome/.test(ua) && !/Edge|OPR|Edg/.test(ua)) browser = 'Chrome';
-  else if (/Safari/.test(ua) && !/Chrome|CriOS/.test(ua)) browser = 'Safari';
+  if (/SamsungBrowser/.test(ua)) browser = 'Samsung Internet';
+  else if (/OPR|Opera/.test(ua)) browser = 'Opera';
+  else if (/Brave/.test(ua) || (navigator.brave && typeof navigator.brave.isBrave === 'function')) browser = 'Brave';
+  else if (/Edg|Edge/.test(ua)) browser = 'Edge';
+  else if (/CriOS|Chrome/.test(ua)) browser = 'Chrome';
+  else if (/Safari/.test(ua) && !/Chrome|CriOS|Android/.test(ua)) browser = 'Safari';
   else if (/Firefox|FxiOS/.test(ua)) browser = 'Firefox';
-  else if (/Edg/.test(ua)) browser = 'Edge';
 
   const deviceType = (isIphone || isAndroid) ? 'mobile' : isIpad ? 'tablet' : 'desktop';
 
