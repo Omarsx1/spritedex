@@ -27,15 +27,37 @@ export function FriendCompareModal({
   const [copiedTradePlan, setCopiedTradePlan] = useState(false);
   const [friendInput, setFriendInput] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const modalRef = useRef(null);
 
   const permanentFriendUrl = generatePermanentFriendUrl(myFriendCode || 'SDEX-0000');
 
+  const handleClose = () => {
+    if (isClosing) return;
+    sounds.playBeep();
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 220);
+  };
+
+  // Close on Escape with smooth exit
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && !isClosing) {
+        handleClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isClosing]);
+
+  // Entrance animation matching modern spring physics
   useEffect(() => {
     if (modalRef.current) {
       gsap.fromTo(modalRef.current,
-        { opacity: 0, scale: 0.95, y: 15 },
-        { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: 'power2.out' }
+        { opacity: 0, scale: 0.94, y: 12 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.28, ease: 'power3.out' }
       );
     }
   }, []);
@@ -162,8 +184,8 @@ export function FriendCompareModal({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="sdm-share-pro sdm-compare" ref={modalRef} onClick={(e) => e.stopPropagation()}>
+    <div className={`modal-overlay ${isClosing ? 'is-closing' : ''}`} onClick={handleClose}>
+      <div className={`sdm-share-pro sdm-compare ${isClosing ? 'is-closing' : ''}`} ref={modalRef} onClick={(e) => e.stopPropagation()}>
         
         {/* Header Elegante y Minimalista (Idéntico a Exportar Colección) */}
         <div className="sdm-share-pro__header">
@@ -178,7 +200,7 @@ export function FriendCompareModal({
               </p>
             </div>
           </div>
-          <button className="sdm-share-pro__close" onClick={onClose} aria-label="Cerrar modal">
+          <button className="sdm-share-pro__close" onClick={handleClose} aria-label="Cerrar modal">
             <X size={18} />
           </button>
         </div>
