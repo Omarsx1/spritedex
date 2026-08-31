@@ -1,7 +1,7 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Search, SlidersHorizontal, X, Check, Sparkles, ChevronDown, RotateCcw } from 'lucide-react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { Search, SlidersHorizontal, X, Check, RotateCcw } from 'lucide-react';
 import { THEMES_LIST, THEME_NAMES_ES, ALL_SPRITES, FAMILY_NAMES_MAP } from '../data/spritesData';
-import { Liquid, LiquidItem } from './ui/LiquidGooey';
+import { LiquidGooeyFilter } from './ui/LiquidGooey';
 
 const VARIANT_COLORS = {
   Basic:       { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' },
@@ -37,7 +37,8 @@ export function MobileLiquidFilterBar({
   setShowUnreleased
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef(null);
 
   // Compute active filters count
   const activeFiltersCount = useMemo(() => {
@@ -48,6 +49,10 @@ export function MobileLiquidFilterBar({
     if (showUnreleased) count++;
     return count;
   }, [statusFilter, baseFilter, spriteFilter, showUnreleased]);
+
+  // Is the filter button detached/budded out as a liquid drop?
+  // Always detached when focused, searching, or when active filters exist, or when manually opened
+  const isBudded = isFocused || Boolean(searchQuery) || activeFiltersCount > 0 || isOpen;
 
   // Compute available families scoped to activeGen
   const availableFamiliesWithImages = useMemo(() => {
@@ -103,54 +108,68 @@ export function MobileLiquidFilterBar({
   }, [isOpen]);
 
   return (
-    <div className="mobile-liquid-filter-container">
-      {/* ═══ COMPACT MAIN ROW (Search + Liquid Filter Trigger) ═══ */}
-      <Liquid blur={5} contrast={16} className="mobile-liquid-bar-wrapper">
-        {/* Elastic Search Bar */}
-        <LiquidItem className="mobile-liquid-search-item" style={{ flex: 1 }}>
-          <div className={`mobile-liquid-search-box ${isSearchFocused ? 'is-focused' : ''} ${searchQuery ? 'has-text' : ''}`}>
-            <Search size={15} className="mobile-search-icon" />
+    <div className="mobile-liquid-wrapper">
+      {/* SVG Gooey Filter Engine */}
+      <LiquidGooeyFilter id="spritedex-gooey" blur={6} contrast={18} />
+
+      {/* ═══ LIQUID STAGE (Jakub Antalik Morph Implementation) ═══ */}
+      <div className={`liquid-stage-container ${isBudded ? 'is-budded' : ''}`}>
+        
+        {/* LAYER 1: Silhouette Goo Layer (Passes through SVG Filter) */}
+        <div className="liquid-goo-layer" style={{ filter: 'url(#spritedex-gooey)' }}>
+          {/* Input field blob */}
+          <div className="liquid-blob-field" />
+          {/* Button drop blob that buds out and detaches */}
+          <div className="liquid-blob-btn" />
+        </div>
+
+        {/* LAYER 2: Crisp Content Layer (Text, Icons, Inputs) */}
+        <div className="liquid-crisp-layer">
+          {/* Search Input Box */}
+          <div className="liquid-crisp-field-box">
+            <Search size={15} className="liquid-crisp-search-icon" />
             <input
+              ref={inputRef}
               type="text"
-              placeholder="Buscar por nombre, rareza..."
+              placeholder="Buscar espíritu..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-              className="mobile-search-input"
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              className="liquid-crisp-input"
             />
             {searchQuery && (
               <button
                 type="button"
-                className="mobile-search-clear-btn"
-                onClick={() => setSearchQuery('')}
+                className="liquid-crisp-clear-btn"
+                onClick={() => {
+                  setSearchQuery('');
+                  inputRef.current?.focus();
+                }}
                 aria-label="Borrar búsqueda"
               >
-                <X size={13} />
+                <X size={12} />
               </button>
             )}
           </div>
-        </LiquidItem>
 
-        {/* Liquid Filter Trigger Button */}
-        <LiquidItem delay={30} className="mobile-liquid-btn-item">
+          {/* Liquid Filter Button */}
           <button
             type="button"
-            className={`mobile-liquid-filter-btn ${activeFiltersCount > 0 ? 'has-active-filters' : ''} ${isOpen ? 'is-open' : ''}`}
+            className={`liquid-crisp-btn ${isBudded ? 'is-detached' : ''} ${activeFiltersCount > 0 ? 'has-active-filters' : ''}`}
             onClick={() => setIsOpen(true)}
             aria-expanded={isOpen}
-            aria-label="Abrir panel de filtros"
+            aria-label="Abrir filtros"
           >
-            <SlidersHorizontal size={15} className="mobile-filter-icon" />
-            <span className="mobile-filter-btn-text">Filtros</span>
+            <SlidersHorizontal size={17} className="liquid-crisp-filter-icon" />
             {activeFiltersCount > 0 && (
-              <span className="mobile-filter-badge">
+              <span className="liquid-crisp-badge">
                 {activeFiltersCount}
               </span>
             )}
           </button>
-        </LiquidItem>
-      </Liquid>
+        </div>
+      </div>
 
       {/* ═══ ACTIVE FILTERS CHIPS (Quick dismiss tags) ═══ */}
       {activeFiltersCount > 0 && (
