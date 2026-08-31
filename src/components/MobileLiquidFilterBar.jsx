@@ -23,8 +23,23 @@ export function MobileLiquidFilterBar({
   setShowUnreleased
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
+
+  const handleOpen = () => {
+    setIsClosing(false);
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    if (isClosing) return;
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsOpen(false);
+      setIsClosing(false);
+    }, 240);
+  };
 
   // Smart Single-Touch with Toggle-Off (Apple & Spotify Standard)
   const handleBaseFilterSelect = (theme) => {
@@ -94,13 +109,13 @@ export function MobileLiquidFilterBar({
   // Close sheet on Escape
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false);
+      if (e.key === 'Escape' && isOpen && !isClosing) {
+        handleClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
+  }, [isOpen, isClosing]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -156,7 +171,7 @@ export function MobileLiquidFilterBar({
         <button
           type="button"
           className={`mobile-glass-filter-btn ${activeFiltersCount > 0 ? 'is-active' : ''}`}
-          onClick={() => setIsOpen(true)}
+          onClick={handleOpen}
           aria-expanded={isOpen}
           aria-label="Abrir filtros"
         >
@@ -228,16 +243,19 @@ export function MobileLiquidFilterBar({
 
       {/* ═══ CONSISTENT GLASS FILTER SHEET / MODAL ═══ */}
       {isOpen && (
-        <div className="mobile-liquid-sheet-backdrop" onClick={() => setIsOpen(false)}>
+        <div
+          className={`mobile-liquid-sheet-backdrop ${isClosing ? 'is-closing' : ''}`}
+          onClick={handleClose}
+        >
           <div
-            className="mobile-liquid-sheet"
+            className={`mobile-liquid-sheet ${isClosing ? 'is-closing' : ''}`}
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             aria-label="Filtros de Espíritus"
           >
             {/* Sheet Handle Bar */}
-            <div className="mobile-liquid-sheet-handle-wrap" onClick={() => setIsOpen(false)}>
+            <div className="mobile-liquid-sheet-handle-wrap" onClick={handleClose}>
               <div className="mobile-liquid-sheet-handle" />
             </div>
 
@@ -253,7 +271,7 @@ export function MobileLiquidFilterBar({
               <button
                 type="button"
                 className="mobile-sheet-close-btn"
-                onClick={() => setIsOpen(false)}
+                onClick={handleClose}
                 aria-label="Cerrar filtros"
               >
                 <X size={16} />
@@ -372,7 +390,7 @@ export function MobileLiquidFilterBar({
                 type="button"
                 className="mobile-sheet-btn-apply sdm-share__glitch-btn"
                 data-text="APLICAR FILTROS"
-                onClick={() => setIsOpen(false)}
+                onClick={handleClose}
               >
                 <span className="sdm-share__btn-text">Aplicar Filtros</span>
               </button>
