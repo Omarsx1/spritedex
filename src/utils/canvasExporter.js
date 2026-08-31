@@ -62,6 +62,7 @@ const globalImageCache = new Map();
 export function loadImage(src) {
   if (!src) return Promise.resolve(null);
 
+  // 1. Verificación instantánea en memoria
   if (globalImageCache.has(src)) {
     const cached = globalImageCache.get(src);
     if (cached && cached.complete && cached.naturalWidth > 0) {
@@ -69,12 +70,33 @@ export function loadImage(src) {
     }
   }
 
+  // 2. Reutilización instantánea si la imagen ya está presente en el DOM del navegador
+  if (typeof document !== 'undefined') {
+    const domImg = document.querySelector(`img[src="${src}"]`);
+    if (domImg && domImg.complete && domImg.naturalWidth > 0) {
+      globalImageCache.set(src, domImg);
+      return Promise.resolve(domImg);
+    }
+  }
+
+  // 3. Carga y decodificación asíncrona acelerada por GPU
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = 'Anonymous';
+    img.decoding = 'async';
     img.onload = () => {
-      globalImageCache.set(src, img);
-      resolve(img);
+      if (img.decode) {
+        img.decode().then(() => {
+          globalImageCache.set(src, img);
+          resolve(img);
+        }).catch(() => {
+          globalImageCache.set(src, img);
+          resolve(img);
+        });
+      } else {
+        globalImageCache.set(src, img);
+        resolve(img);
+      }
     };
     img.onerror = () => resolve(null);
     img.src = src;
@@ -91,17 +113,22 @@ export function preloadCanvasAssets(spritesList = []) {
   if (typeof window === 'undefined') return;
   loadImage('/background.webp');
   if (Array.isArray(spritesList)) {
-    spritesList.slice(0, 50).forEach(s => {
-      if (s && s.image) loadImage(s.image);
+    // Precarga todos los sprites en lotes concurrentes rápidos
+    spritesList.forEach(s => {
+      if (s && s.image) {
+        loadImage(s.image);
+      }
     });
   }
 }
 
 // Precarga de fondo al inicializar el módulo
 if (typeof window !== 'undefined') {
-  setTimeout(() => {
-    loadImage('/background.webp');
-  }, 100);
+  if (window.requestIdleCallback) {
+    window.requestIdleCallback(() => loadImage('/background.webp'));
+  } else {
+    setTimeout(() => loadImage('/background.webp'), 50);
+  }
 }
 
 // Convert Hex color string to RGBA with explicit opacity
