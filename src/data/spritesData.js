@@ -318,6 +318,17 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     ? (official.summonCost.includes('Polvo') ? official.summonCost : `${official.summonCost} Polvo Estelar`)
     : null;
 
+  // Calculate isNew based on explicit flag or releaseDate (last 14 days)
+  let isNew = Boolean(item.isNew);
+  if (item.releaseDate) {
+    const relDate = new Date(item.releaseDate);
+    const now = new Date();
+    const daysSince = (now.getTime() - relDate.getTime()) / (1000 * 60 * 60 * 24);
+    if (daysSince >= 0 && daysSince <= 14) {
+      isNew = true;
+    }
+  }
+
   return {
     id: item.id,
     fullName: fullName,
@@ -329,6 +340,8 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     dropChanceDisplay: item.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
     dropChanceNum: item.unreleased ? 0 : dropChanceNum,
     unreleased: item.unreleased || false,
+    isNew: isNew,
+    releaseDate: item.releaseDate || null,
     image: imagePath,
     familyId: familyId,
     familyName: spanishFamilyName,

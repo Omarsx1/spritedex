@@ -365,7 +365,7 @@ export function App() {
         const isOwned = (activeProfile === 'friend' && friendState ? friendState : userState)[sprite.id]?.owned;
         if (isOwned) return false;
       } else if (statusFilter === 'new') {
-        if (sprite.gen !== 2 && !sprite.unreleased && !sprite.isNew) return false;
+        if (!sprite.isNew) return false;
       }
 
       return true;
@@ -598,8 +598,8 @@ export function App() {
           activeGen={activeGen}
           activeFiltersLabel={
             [
-              baseFilter !== 'all' ? `Base: ${baseFilter}` : '',
-              spriteFilter !== 'all' ? `Sprite: ${spriteFilter}` : '',
+              baseFilter !== 'all' ? `Variante: ${baseFilter}` : '',
+              spriteFilter !== 'all' ? `Familia: ${spriteFilter}` : '',
               searchQuery ? `Búsqueda: "${searchQuery}"` : ''
             ]
               .filter(Boolean)

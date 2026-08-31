@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Grid, List, ChevronDown } from 'lucide-react';
 import { THEMES_LIST, THEME_NAMES_ES, ALL_SPRITES, FAMILY_NAMES_MAP } from '../data/spritesData';
+import { MobileLiquidFilterBar } from './MobileLiquidFilterBar';
 
 const VARIANT_COLORS = {
   Basic:       { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' },
@@ -66,8 +67,23 @@ export function FilterBar({
     return THEMES_LIST.filter(t => uniqueThemes.includes(t));
   }, [activeGen]);
 
-  const handleVariantSelect = (value) => { setBaseFilter(value); setVariantOpen(false); };
-  const handleSpriteSelect = (value) => { setSpriteFilter(value); setSpriteOpen(false); };
+  const handleVariantSelect = (value) => {
+    if (value === 'all' || baseFilter === value) {
+      setBaseFilter('all');
+    } else {
+      setBaseFilter(value);
+    }
+    setVariantOpen(false);
+  };
+
+  const handleSpriteSelect = (value) => {
+    if (value === 'all' || spriteFilter === value) {
+      setSpriteFilter('all');
+    } else {
+      setSpriteFilter(value);
+    }
+    setSpriteOpen(false);
+  };
 
   const handleGenChange = (newGen) => {
     setActiveGen(newGen);
@@ -79,15 +95,34 @@ export function FilterBar({
     ? availableFamiliesWithImages.find(f => f.name === spriteFilter)
     : null;
 
+  if (isMobile) {
+    return (
+      <MobileLiquidFilterBar
+        activeGen={activeGen}
+        setActiveGen={setActiveGen}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        baseFilter={baseFilter}
+        setBaseFilter={setBaseFilter}
+        spriteFilter={spriteFilter}
+        setSpriteFilter={setSpriteFilter}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        showUnreleased={showUnreleased}
+        setShowUnreleased={setShowUnreleased}
+      />
+    );
+  }
+
   return (
-    <div className="filter-bar-container">
+    <div className="filter-bar-container desktop-only">
       {/* Status Filter Pill Buttons (Top line) */}
       <div className="status-pill-group">
         {STATUS_OPTIONS.map(opt => (
           <button
             key={opt.value}
             className={`status-pill-btn ${statusFilter === opt.value ? 'is-active' : ''}`}
-            onClick={() => setStatusFilter(opt.value)}
+            onClick={() => setStatusFilter(statusFilter === opt.value ? 'all' : opt.value)}
           >
             {opt.label}
           </button>

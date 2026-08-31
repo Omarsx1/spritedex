@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { X, Users, Copy, Check, ArrowDownLeft, ArrowUpRight, Handshake, Upload, Radio, Zap, RefreshCw, Sparkles, MessageSquare } from 'lucide-react';
+import { X, Users, Copy, Check, ArrowDownLeft, ArrowUpRight, Handshake, Radio, Zap, RefreshCw, Sparkles, MessageSquare } from 'lucide-react';
 import { ALL_SPRITES, getSpriteCardStyle } from '../data/spritesData';
 import { decodeCollectionState } from '../utils/shareLink';
 import { generatePermanentFriendUrl, normalizeFriendCode } from '../utils/friendCode';
@@ -28,7 +28,6 @@ export function FriendCompareModal({
   const [friendInput, setFriendInput] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const modalRef = useRef(null);
-  const fileInputRef = useRef(null);
 
   const permanentFriendUrl = generatePermanentFriendUrl(myFriendCode || 'SDEX-0000');
 
@@ -92,25 +91,6 @@ export function FriendCompareModal({
     }
   };
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const json = JSON.parse(event.target.result);
-        if (typeof json === 'object') {
-          sounds.playBeep();
-          if (onLoadFriendState) onLoadFriendState(json, 'ARCHIVO');
-        }
-      } catch (err) {
-        alert('El archivo no tiene un formato de colección válido.');
-      }
-    };
-    reader.readAsText(file);
-  };
-
   const currentFriendState = friendState || {};
   const hasFriendData = Object.keys(currentFriendState).length > 0;
 
@@ -153,28 +133,28 @@ export function FriendCompareModal({
 
   const handleCopyTradePlan = () => {
     sounds.playBeep();
-    let text = `🎮 ¡PLAN DE INTERCAMBIO FORTNITE SPRITEDEX! 🤝\n`;
-    text += `👥 Conexión: Mi Código (${myFriendCode}) ⇄ Amigo (${connectedFriendCode || 'Amigo'})\n\n`;
+    let text = `🎮 ¡RADAR DE AMIGOS - FORTNITE SPRITEDEX! ⚡\n`;
+    text += `👥 Sincronizados: Mi Código (${myFriendCode}) ⇄ Amigo (${connectedFriendCode || 'Amigo'})\n\n`;
 
     if (friendToMeList.length > 0) {
-      text += `📥 TÚ ME PRESTAS (${friendToMeList.length}):\n`;
+      text += `🟢 TE FALTAN Y TU AMIGO TIENE (${friendToMeList.length}):\n`;
       friendToMeList.slice(0, 8).forEach(s => {
-        text += `- ${s.fullName}\n`;
+        text += `• ${s.fullName}\n`;
       });
       if (friendToMeList.length > 8) text += `... y ${friendToMeList.length - 8} más.\n`;
       text += `\n`;
     }
 
     if (meToFriendList.length > 0) {
-      text += `📤 YO TE PRESTO (${meToFriendList.length}):\n`;
+      text += `🟣 TU AMIGO NECESITA Y TÚ TIENES (${meToFriendList.length}):\n`;
       meToFriendList.slice(0, 8).forEach(s => {
-        text += `- ${s.fullName}\n`;
+        text += `• ${s.fullName}\n`;
       });
       if (meToFriendList.length > 8) text += `... y ${meToFriendList.length - 8} más.\n`;
       text += `\n`;
     }
 
-    text += `¡Nos vemos en Fortnite para intercambiar! 🏆 #FNGGOverride`;
+    text += `¡Juguemos en Fortnite para completar la colección! 🏆\nhttps://spritedex.com/?code=${myFriendCode}`;
 
     navigator.clipboard.writeText(text);
     setCopiedTradePlan(true);
@@ -183,39 +163,28 @@ export function FriendCompareModal({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="sdm sdm-compare sdm-share--glitch" ref={modalRef} onClick={(e) => e.stopPropagation()}>
-        {/* Close Button */}
-        <button className="sdm__close" onClick={onClose}>
-          <X size={18} />
-        </button>
-
-        {/* ═══ HERO HEADER (GLITCH THEMED) ═══ */}
-        <div className="sdm__hero sdm-share__hero sdm-compare__hero">
-          <div
-            className="sdm__hero-glow"
-            style={{
-              background: 'radial-gradient(circle at 30% 50%, rgba(168, 85, 247, 0.4) 0%, rgba(0, 240, 232, 0.25) 50%, transparent 80%)'
-            }}
-          />
-
-          <div className="sdm-share__hero-icon">
-            <Users size={28} color="#00F0E8" />
-          </div>
-
-          <div className="sdm__hero-info">
-            <div className="sdm__hero-badges">
-              <span className="sdm-share__tag-chapter">FORTNITE | TEMPORADA GLITCH</span>
-              <span className="sdm-share__tag-pill" style={{ background: '#8b5cf6' }}>INTERCAMBIO EN VIVO</span>
+      <div className="sdm-share-pro sdm-compare" ref={modalRef} onClick={(e) => e.stopPropagation()}>
+        
+        {/* Header Elegante y Minimalista (Idéntico a Exportar Colección) */}
+        <div className="sdm-share-pro__header">
+          <div className="sdm-share-pro__title-wrap">
+            <div className="sdm-share-pro__icon-badge">
+              <Users size={18} color="#00F0E8" />
             </div>
-            <h2 className="sdm__name sdm-share__glitch-title">PLANIFICADOR DE INTERCAMBIOS</h2>
-            <p className="sdm__meta">
-              Sincroniza y compara en tiempo real con tu amigo en Fortnite mediante tu Código de Amigo permanente.
-            </p>
+            <div>
+              <h2 className="sdm-share-pro__title">Radar de Amigos</h2>
+              <p className="sdm-share-pro__subtitle">
+                {isLiveConnected ? `Conectado en vivo con ${connectedFriendCode}` : 'Sincroniza y compara en tiempo real con amigos'}
+              </p>
+            </div>
           </div>
+          <button className="sdm-share-pro__close" onClick={onClose} aria-label="Cerrar modal">
+            <X size={18} />
+          </button>
         </div>
 
         {/* ═══ BODY CONTENT ═══ */}
-        <div className="sdm__body sdm-compare__body">
+        <div className="sdm-compare__body">
 
           {/* Top Cards: My Friend Code vs Connect to Friend */}
           <div className="sdm-compare__top-grid">
@@ -229,21 +198,25 @@ export function FriendCompareModal({
                 <span className="sdm-compare__code-badge">
                   {myFriendCode || 'SDEX-????'}
                 </span>
-                <button
-                  onClick={handleCopyCode}
-                  className={`sdm-compare__btn-copy ${copiedCode ? 'sdm-compare__btn-copy--done' : ''}`}
-                >
-                  {copiedCode ? <Check size={14} /> : <Copy size={14} />}
-                  <span>{copiedCode ? '¡Copiado!' : 'Copiar'}</span>
-                </button>
+                <div className="sdm-compare__code-actions">
+                  <button
+                    onClick={handleCopyCode}
+                    className={`sdm-compare__btn-copy ${copiedCode ? 'sdm-compare__btn-copy--done' : ''}`}
+                    title="Copiar solo el código"
+                  >
+                    {copiedCode ? <Check size={13} /> : <Copy size={13} />}
+                    <span>{copiedCode ? '¡Copiado!' : 'Código'}</span>
+                  </button>
+                  <button
+                    onClick={handleCopyPermanentLink}
+                    className={`sdm-compare__btn-copy sdm-compare__btn-copy--link ${copiedLink ? 'sdm-compare__btn-copy--done' : ''}`}
+                    title="Copiar enlace directo permanente"
+                  >
+                    {copiedLink ? <Check size={13} color="#10b981" /> : <Zap size={13} color="#00F0E8" />}
+                    <span>{copiedLink ? '¡Enlace!' : 'Enlace'}</span>
+                  </button>
+                </div>
               </div>
-              <button
-                onClick={handleCopyPermanentLink}
-                className="sdm-compare__btn-link"
-              >
-                {copiedLink ? <Check size={13} color="#10b981" /> : <Zap size={13} color="#00F0E8" />}
-                <span>{copiedLink ? '¡Enlace Copiado!' : 'Copiar Enlace Directo'}</span>
-              </button>
             </div>
 
             {/* 2. Conectar con Amigo en Tiempo Real */}
@@ -253,7 +226,7 @@ export function FriendCompareModal({
                   {isLiveConnected ? (
                     <span style={{ color: '#10b981' }}>🟢 CONECTADO EN VIVO</span>
                   ) : (
-                    <span>🤝 CONECTAR CON UN AMIGO</span>
+                    <span>🔗 CONECTAR ENLACE O AMIGO</span>
                   )}
                 </div>
                 {isLiveConnected && onDisconnectFriend && (
@@ -272,7 +245,7 @@ export function FriendCompareModal({
                     Amigo: <strong>{connectedFriendCode}</strong>
                   </div>
                   <span className="sdm-compare__connected-hint">
-                    ⚡ Las nuevas capturas de tu amigo se actualizan al instante.
+                    ⚡ Las capturas de tu amigo se actualizan al instante.
                   </span>
                 </div>
               ) : (
@@ -292,20 +265,6 @@ export function FriendCompareModal({
                   >
                     {isConnecting ? <RefreshCw size={14} className="animate-spin" /> : 'Conectar'}
                   </button>
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    title="Cargar archivo JSON"
-                    className="sdm-compare__btn-upload"
-                  >
-                    <Upload size={14} />
-                  </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".json"
-                    onChange={handleFileUpload}
-                    style={{ display: 'none' }}
-                  />
                 </div>
               )}
             </div>
@@ -315,11 +274,11 @@ export function FriendCompareModal({
           {!hasFriendData ? (
             <div className="sdm-compare__waiting">
               <div className="sdm-compare__radar-icon">
-                <Radio size={36} color="#00F0E8" />
+                <Radio size={32} color="#00F0E8" />
               </div>
-              <h3 className="sdm-compare__waiting-title">Esperando Conexión de Amigo</h3>
+              <h3 className="sdm-compare__waiting-title">Esperando Conexión con un Amigo</h3>
               <p className="sdm-compare__waiting-text">
-                Ingresa el <strong>Código de Amigo</strong> o pega el enlace arriba para comparar colecciones y planificar préstamos en tiempo real.
+                Ingresa el <strong>Código de Amigo</strong> o abre su enlace para sincronizar colecciones en tiempo real.
               </p>
             </div>
           ) : (
@@ -382,7 +341,7 @@ export function FriendCompareModal({
                   className="sdm-compare__btn-trade-plan"
                 >
                   {copiedTradePlan ? <Check size={14} color="#4ade80" /> : <MessageSquare size={14} />}
-                  <span>{copiedTradePlan ? '¡Plan Copiado!' : 'Copiar Plan de Intercambio'}</span>
+                  <span>{copiedTradePlan ? '¡Resumen Copiado!' : 'Copiar Resumen para Amigo'}</span>
                 </button>
               </div>
 
@@ -393,7 +352,7 @@ export function FriendCompareModal({
                   className={`sdm-compare__tab ${activeTab === 'friendToMe' ? 'sdm-compare__tab--active-green' : ''}`}
                 >
                   <ArrowDownLeft size={16} />
-                  <span>Te Puede Prestar ({friendToMeList.length})</span>
+                  <span>Te Faltan ({friendToMeList.length})</span>
                 </button>
 
                 <button
@@ -401,7 +360,7 @@ export function FriendCompareModal({
                   className={`sdm-compare__tab ${activeTab === 'meToFriend' ? 'sdm-compare__tab--active-blue' : ''}`}
                 >
                   <ArrowUpRight size={16} />
-                  <span>Le Puedes Prestar ({meToFriendList.length})</span>
+                  <span>Le Faltan ({meToFriendList.length})</span>
                 </button>
 
                 <button
@@ -409,16 +368,16 @@ export function FriendCompareModal({
                   className={`sdm-compare__tab ${activeTab === 'common' ? 'sdm-compare__tab--active-purple' : ''}`}
                 >
                   <Handshake size={16} />
-                  <span>Ambos Tienen ({commonList.length})</span>
+                  <span>En Común ({commonList.length})</span>
                 </button>
               </div>
 
               {/* Sprites Grid */}
               {activeList.length === 0 ? (
                 <div className="sdm-compare__empty">
-                  {activeTab === 'friendToMe' && '🎉 ¡Genial! Tu amigo no tiene ningún Sprite que te falte en esta categoría.'}
-                  {activeTab === 'meToFriend' && '🤝 No tienes Sprites adicionales para prestarle a tu amigo en esta categoría.'}
-                  {activeTab === 'common' && 'Aún no tienen Sprites repetidos en común en esta categoría.'}
+                  {activeTab === 'friendToMe' && '🎉 ¡Genial! Tu amigo no tiene ningún espíritu que te falte en esta categoría.'}
+                  {activeTab === 'meToFriend' && '🤝 No tienes espíritus adicionales para pasarle a tu amigo en esta categoría.'}
+                  {activeTab === 'common' && 'Aún no tienen espíritus repetidos en común en esta categoría.'}
                 </div>
               ) : (
                 <div className="sdm-compare__grid">

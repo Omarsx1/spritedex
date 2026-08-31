@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { Share2, Users } from 'lucide-react';
 import gsap from 'gsap';
-import { allSprites } from '../data/spritesData';
+import { allSprites as defaultAllSprites } from '../data/spritesData';
 
 export function Header({
   spritesPool,
@@ -18,7 +18,7 @@ export function Header({
 }) {
   // Pool of sprites for hero rotation
   const spritePool = useMemo(() => {
-    return spritesPool && spritesPool.length > 0 ? spritesPool : (allSprites || []);
+    return spritesPool && spritesPool.length > 0 ? spritesPool : (defaultAllSprites || []);
   }, [spritesPool]);
 
   // Main hero sprite index
@@ -164,7 +164,7 @@ export function Header({
 
       <div className="hero__content">
         {/* Title */}
-        <div className="hero__title-block" ref={titleRef}>
+        <div className="hero__title-block" ref={titleRef} style={{ position: 'relative', zIndex: 10 }}>
           <h1 className="hero__title">
             <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">FORTNITE</span>
             <span className="hero__title-line hero__title-line--accent">SPRITEDEX</span>
@@ -180,6 +180,7 @@ export function Header({
             maxWidth: '180px',
             maxHeight: '180px',
             position: 'relative',
+            zIndex: 2,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -269,11 +270,11 @@ export function Header({
             <button
               className="hero__btn hero__btn--primary"
               onClick={onOpenCompareModal}
-              title={isLiveConnected ? `Intercambio en vivo conectado (${connectedFriendCode})` : "Intercambio Fortnite"}
+              title={isLiveConnected ? `Radar de Amigos conectado (${connectedFriendCode})` : "Radar de Amigos"}
               style={{ position: 'relative' }}
             >
               <Users size={16} className="hero__btn-icon" />
-              <span className="hero__btn-text">Intercambio</span>
+              <span className="hero__btn-text">Amigos</span>
               {isLiveConnected && (
                 <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
               )}
