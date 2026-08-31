@@ -1953,7 +1953,7 @@ body::after {
 .mobile-liquid-wrapper {
   width: 100%;
   max-width: 440px;
-  margin: 10px auto 26px auto; /* Espacio limpio y cómodo */
+  margin: 10px auto 38px auto; /* Espacio amplio y comodo debajo de la barra de busqueda */
   padding: 0 16px;
   display: flex;
   flex-direction: column;
@@ -6322,7 +6322,7 @@ body::after {
   position: relative;
   overflow: hidden;
   width: 100%;
-  padding: 0 0 20px;
+  padding: 8px 0 24px;
 }
 
 /* Blueprint Aura Layers */
