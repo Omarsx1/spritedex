@@ -337,28 +337,37 @@ export async function fetchAnalyticsOverview() {
         .from('analytics_events')
         .select('*', { count: 'exact', head: true });
 
-      result.totalVisits = totalCount || 0;
+      // 1. Fetch total count (excluding Mac / admin sessions)
+      const { data: allRawEvents } = await supabase
+        .from('analytics_events')
+        .select('id, session_id, device_type, browser, os, is_iphone, referrer, created_at')
+        .order('created_at', { ascending: false })
+        .limit(2000);
+
+      const isRealEvent = (ev) => {
+        if (!ev) return false;
+        const os = (ev.os || '').toLowerCase();
+        const ref = (ev.referrer || '').toLowerCase();
+        if (ref.includes('studio-override') || ref.includes('nexus') || ref.includes('override')) return false;
+        if (os.includes('mac') || os.includes('darwin')) return false;
+        return true;
+      };
+
+      const realEvents = (allRawEvents || []).filter(isRealEvent);
+      result.totalVisits = realEvents.length;
 
       // 2. Fetch today's count
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
-      const { count: todayCount } = await supabase
-        .from('analytics_events')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', todayStart.toISOString());
-
-      result.todayVisits = todayCount || 0;
+      const todayMs = todayStart.getTime();
+      result.todayVisits = realEvents.filter(e => new Date(e.created_at).getTime() >= todayMs).length;
 
       // 3. Fetch events from the last 30 days for real chart distribution
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const thirtyDaysMs = thirtyDaysAgo.getTime();
 
-      const { data: monthEvents } = await supabase
-        .from('analytics_events')
-        .select('id, session_id, device_type, browser, os, is_iphone, referrer, created_at')
-        .gte('created_at', thirtyDaysAgo.toISOString())
-        .order('created_at', { ascending: true })
-        .limit(1000);
+      const monthEvents = realEvents.filter(e => new Date(e.created_at).getTime() >= thirtyDaysMs);
 
       if (monthEvents && monthEvents.length > 0) {
         // Group by day index (0..29)
@@ -418,40 +427,32 @@ export async function fetchAnalyticsOverview() {
           .sort((a, b) => b.count - a.count);
       }
 
-      // 4. Fetch recent 50 events for device breakdown and live stream
-      const { data: events } = await supabase
-        .from('analytics_events')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50);
+      // 4. Fetch recent events for device breakdown and live stream
+      result.recentEvents = realEvents.slice(0, 50);
 
-      if (events && events.length > 0) {
-        result.recentEvents = events;
+      const recentCutoff = Date.now() - 15 * 60 * 1000; // 15 mins
+      const liveSessions = new Set();
 
-        const recentCutoff = Date.now() - 15 * 60 * 1000; // 15 mins
-        const liveSessions = new Set();
+      realEvents.slice(0, 50).forEach((ev) => {
+        const evTime = new Date(ev.created_at).getTime();
+        if (evTime >= recentCutoff) {
+          liveSessions.add(ev.session_id);
+        }
+        const os = (ev.os || '').toLowerCase();
+        if (ev.is_iphone || os.includes('ios') || os.includes('iphone')) {
+          result.deviceBreakdown.iphone = (result.deviceBreakdown.iphone || 0) + 1;
+        } else if (os.includes('android')) {
+          result.deviceBreakdown.android = (result.deviceBreakdown.android || 0) + 1;
+        } else if (os.includes('ipad') || ev.device_type === 'tablet') {
+          result.deviceBreakdown.tablet = (result.deviceBreakdown.tablet || 0) + 1;
+        } else {
+          result.deviceBreakdown.desktop = (result.deviceBreakdown.desktop || 0) + 1;
+        }
+        const br = ev.browser || 'Other';
+        result.browserBreakdown[br] = (result.browserBreakdown[br] || 0) + 1;
+      });
 
-        events.forEach((ev) => {
-          const evTime = new Date(ev.created_at).getTime();
-          if (evTime >= recentCutoff) {
-            liveSessions.add(ev.session_id);
-          }
-          const os = (ev.os || '').toLowerCase();
-          if (ev.is_iphone || os.includes('ios') || os.includes('iphone')) {
-            result.deviceBreakdown.iphone = (result.deviceBreakdown.iphone || 0) + 1;
-          } else if (os.includes('android')) {
-            result.deviceBreakdown.android = (result.deviceBreakdown.android || 0) + 1;
-          } else if (os.includes('ipad') || ev.device_type === 'tablet') {
-            result.deviceBreakdown.tablet = (result.deviceBreakdown.tablet || 0) + 1;
-          } else {
-            result.deviceBreakdown.desktop = (result.deviceBreakdown.desktop || 0) + 1;
-          }
-          const br = ev.browser || 'Other';
-          result.browserBreakdown[br] = (result.browserBreakdown[br] || 0) + 1;
-        });
-
-        result.activeSessionsCount = Math.max(liveSessions.size, 1);
-      }
+      result.activeSessionsCount = liveSessions.size;
 
       // 5. Fetch most popular spirits from real user collections
       try {
