@@ -1916,7 +1916,7 @@ body::after {
 }
 
 /* ==========================================================================
-   MOBILE UNIFIED SEARCH & FILTER PILL (Official Gooey Aesthetic)
+   MOBILE UNIFIED SEARCH & FILTER PILL (Footer Glassmorphism Aesthetic)
    ========================================================================== */
 
 .mobile-liquid-wrapper {
@@ -1931,7 +1931,7 @@ body::after {
   box-sizing: border-box;
 }
 
-/* Minimalist Dark Capsule (Gooey Style) */
+/* Glassmorphic Floating Capsule (Exact same formula as App Footer) */
 .mobile-glass-search-pill {
   width: 100%;
   max-width: 380px;
@@ -1939,28 +1939,35 @@ body::after {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 8px 0 18px;
-  border-radius: 999px;
-  background: #1e1e1e;
+  padding: 0 8px 0 16px;
+  border-radius: 9999px;
+  background: rgba(12, 14, 22, 0.65);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.55);
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
   box-sizing: border-box;
 }
 
 .mobile-glass-search-pill.is-focused {
-  background: #232323;
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(16, 20, 32, 0.85);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .mobile-glass-search-icon {
-  color: #7f7f7f;
+  color: rgba(255, 255, 255, 0.55);
   flex-shrink: 0;
   transition: color 0.15s ease;
 }
 
 .mobile-glass-search-pill.is-focused .mobile-glass-search-icon {
-  color: #fbfbfb;
+  color: #ffffff;
 }
 
 .mobile-glass-search-input {
@@ -1969,21 +1976,22 @@ body::after {
   background: transparent;
   border: none;
   outline: none;
-  color: #fbfbfb;
+  color: #ffffff;
   font-family: var(--font-sans);
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .mobile-glass-search-input::placeholder {
-  color: #7f7f7f;
-  font-weight: 400;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 500;
 }
 
 .mobile-glass-clear-btn {
   background: rgba(255, 255, 255, 0.08);
   border: none;
-  color: #9a9a9a;
+  color: rgba(255, 255, 255, 0.6);
   width: 22px;
   height: 22px;
   border-radius: 50%;
@@ -1993,12 +2001,12 @@ body::after {
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
-  transition: background-color 0.12s ease, color 0.12s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .mobile-glass-clear-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fbfbfb;
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
 }
 
 .mobile-glass-divider {
@@ -2012,30 +2020,30 @@ body::after {
 /* Integrated Filter Button inside Capsule */
 .mobile-glass-filter-btn {
   position: relative;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   border: none;
   background: transparent;
-  color: #9a9a9a;
+  color: rgba(255, 255, 255, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
-  transition: background-color 0.12s ease, color 0.12s ease;
+  transition: all 0.15s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-glass-filter-btn:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: #fbfbfb;
+  color: #ffffff;
 }
 
 .mobile-glass-filter-btn.is-active {
-  color: #fbfbfb;
-  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .mobile-glass-badge {
@@ -2045,11 +2053,11 @@ body::after {
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
-  border-radius: 999px;
-  background: #fbfbfb;
-  color: #121212;
+  border-radius: 9999px;
+  background: #ffffff;
+  color: #0c0e16;
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
