@@ -2297,13 +2297,21 @@ body::after {
   color: #ffffff;
 }
 
-/* Active Status Pill (White Surface) */
+/* Active Status Pill (Liquid Cyan Glass) */
 .mobile-status-pill.is-active {
-  background: #ffffff !important;
-  color: #0c0e16 !important;
-  border: 1px solid #ffffff !important;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.18) 0%, rgba(0, 180, 216, 0.08) 100%) !important;
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  color: #ffffff !important;
+  border: 1px solid rgba(0, 240, 255, 0.5) !important;
   font-weight: 800;
-  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.35),
+    0 0 12px rgba(0, 240, 255, 0.22),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -1.5px 1px 0 rgba(0, 0, 0, 0.25),
+    inset 0 0 8px rgba(0, 240, 255, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
   transform: translateY(-0.5px);
 }
 
@@ -2332,21 +2340,32 @@ body::after {
   color: #ffffff;
 }
 
-/* Active Variant Chip */
+/* Active Variant Chip (Liquid Cyan Glass) */
 .mobile-variant-chip.is-active {
-  border-color: #ffffff !important;
+  border-color: #00f0ff !important;
   color: #ffffff !important;
   font-weight: 800;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.4),
+    0 0 10px rgba(0, 240, 255, 0.2),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.7),
+    inset 0 -1.5px 1px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   transform: translateY(-0.5px);
 }
 
 .mobile-variant-chip:first-child.is-active {
-  background: #ffffff !important;
-  color: #0c0e16 !important;
-  border: 1px solid #ffffff !important;
-  font-weight: 800;
-  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.25);
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.18) 0%, rgba(0, 180, 216, 0.08) 100%) !important;
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid rgba(0, 240, 255, 0.5) !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.35),
+    0 0 12px rgba(0, 240, 255, 0.22),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -1.5px 1px 0 rgba(0, 0, 0, 0.25),
+    inset 0 0 8px rgba(0, 240, 255, 0.2);
 }
 
 /* Sprites Grid in Sheet */
@@ -2382,13 +2401,20 @@ body::after {
   color: #ffffff;
 }
 
-/* Active Sprite Chip (White Surface) */
+/* Active Sprite Chip (Liquid Cyan Glass) */
 .mobile-sprite-chip.is-active {
-  background: #ffffff !important;
-  color: #0c0e16 !important;
-  border: 1px solid #ffffff !important;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.18) 0%, rgba(0, 180, 216, 0.08) 100%) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: #ffffff !important;
+  border: 1px solid rgba(0, 240, 255, 0.5) !important;
   font-weight: 800;
-  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.35),
+    0 0 10px rgba(0, 240, 255, 0.2),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.7),
+    inset 0 -1.5px 1px rgba(0, 0, 0, 0.2),
+    inset 0 0 6px rgba(0, 240, 255, 0.2);
 }
 
 .mobile-sprite-chip-img {
