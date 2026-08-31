@@ -270,11 +270,11 @@ export function Header({
             <button
               className="hero__btn hero__btn--primary"
               onClick={onOpenCompareModal}
-              title={isLiveConnected ? `Intercambio en vivo conectado (${connectedFriendCode})` : "Intercambio Fortnite"}
+              title={isLiveConnected ? `Radar de Amigos conectado (${connectedFriendCode})` : "Radar de Amigos"}
               style={{ position: 'relative' }}
             >
               <Users size={16} className="hero__btn-icon" />
-              <span className="hero__btn-text">Intercambio</span>
+              <span className="hero__btn-text">Amigos</span>
               {isLiveConnected && (
                 <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
               )}

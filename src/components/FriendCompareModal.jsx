@@ -153,28 +153,28 @@ export function FriendCompareModal({
 
   const handleCopyTradePlan = () => {
     sounds.playBeep();
-    let text = `🎮 ¡PLAN DE INTERCAMBIO FORTNITE SPRITEDEX! 🤝\n`;
-    text += `👥 Conexión: Mi Código (${myFriendCode}) ⇄ Amigo (${connectedFriendCode || 'Amigo'})\n\n`;
+    let text = `🎮 ¡RADAR DE AMIGOS - FORTNITE SPRITEDEX! ⚡\n`;
+    text += `👥 Sincronizados: Mi Código (${myFriendCode}) ⇄ Amigo (${connectedFriendCode || 'Amigo'})\n\n`;
 
     if (friendToMeList.length > 0) {
-      text += `📥 TÚ ME PRESTAS (${friendToMeList.length}):\n`;
+      text += `🟢 TE FALTAN Y TU AMIGO TIENE (${friendToMeList.length}):\n`;
       friendToMeList.slice(0, 8).forEach(s => {
-        text += `- ${s.fullName}\n`;
+        text += `• ${s.fullName}\n`;
       });
       if (friendToMeList.length > 8) text += `... y ${friendToMeList.length - 8} más.\n`;
       text += `\n`;
     }
 
     if (meToFriendList.length > 0) {
-      text += `📤 YO TE PRESTO (${meToFriendList.length}):\n`;
+      text += `🟣 TU AMIGO NECESITA Y TÚ TIENES (${meToFriendList.length}):\n`;
       meToFriendList.slice(0, 8).forEach(s => {
-        text += `- ${s.fullName}\n`;
+        text += `• ${s.fullName}\n`;
       });
       if (meToFriendList.length > 8) text += `... y ${meToFriendList.length - 8} más.\n`;
       text += `\n`;
     }
 
-    text += `¡Nos vemos en Fortnite para intercambiar! 🏆 #FNGGOverride`;
+    text += `¡Juguemos en Fortnite para completar la colección! 🏆\nhttps://spritedex.com/?code=${myFriendCode}`;
 
     navigator.clipboard.writeText(text);
     setCopiedTradePlan(true);
@@ -205,11 +205,11 @@ export function FriendCompareModal({
           <div className="sdm__hero-info">
             <div className="sdm__hero-badges">
               <span className="sdm-share__tag-chapter">FORTNITE</span>
-              <span className="sdm-share__tag-pill" style={{ background: '#8b5cf6' }}>INTERCAMBIO EN VIVO</span>
+              <span className="sdm-share__tag-pill" style={{ background: '#8b5cf6' }}>MODO SOCIAL</span>
             </div>
-            <h2 className="sdm__name sdm-share__glitch-title">PLANIFICADOR DE INTERCAMBIOS</h2>
+            <h2 className="sdm__name sdm-share__glitch-title">RADAR DE AMIGOS</h2>
             <p className="sdm__meta">
-              Sincroniza y compara en tiempo real tu colección con la de un amigo mediante tu Código permanente.
+              Sincroniza y compara en tiempo real tu colección con cualquier amigo de Fortnite.
             </p>
           </div>
         </div>
@@ -257,7 +257,7 @@ export function FriendCompareModal({
                   {isLiveConnected ? (
                     <span style={{ color: '#10b981' }}>🟢 CONECTADO EN VIVO</span>
                   ) : (
-                    <span>🤝 CONECTAR CON AMIGO</span>
+                    <span>🔗 CONECTAR ENLACE O AMIGO</span>
                   )}
                 </div>
                 {isLiveConnected && onDisconnectFriend && (
@@ -323,7 +323,7 @@ export function FriendCompareModal({
               </div>
               <h3 className="sdm-compare__waiting-title">Esperando Conexión con un Amigo</h3>
               <p className="sdm-compare__waiting-text">
-                Ingresa el <strong>Código de Amigo</strong> o pega su enlace arriba para comparar ambas colecciones y ver qué espíritus pueden prestarse en Fortnite.
+                Ingresa el <strong>Código de Amigo</strong> o abre su enlace para sincronizar colecciones en tiempo real.
               </p>
             </div>
           ) : (
@@ -386,7 +386,7 @@ export function FriendCompareModal({
                   className="sdm-compare__btn-trade-plan"
                 >
                   {copiedTradePlan ? <Check size={14} color="#4ade80" /> : <MessageSquare size={14} />}
-                  <span>{copiedTradePlan ? '¡Plan Copiado!' : 'Copiar Plan de Intercambio'}</span>
+                  <span>{copiedTradePlan ? '¡Resumen Copiado!' : 'Copiar Resumen para Amigo'}</span>
                 </button>
               </div>
 
@@ -397,7 +397,7 @@ export function FriendCompareModal({
                   className={`sdm-compare__tab ${activeTab === 'friendToMe' ? 'sdm-compare__tab--active-green' : ''}`}
                 >
                   <ArrowDownLeft size={16} />
-                  <span>Te Puede Prestar ({friendToMeList.length})</span>
+                  <span>Te Faltan ({friendToMeList.length})</span>
                 </button>
 
                 <button
@@ -405,7 +405,7 @@ export function FriendCompareModal({
                   className={`sdm-compare__tab ${activeTab === 'meToFriend' ? 'sdm-compare__tab--active-blue' : ''}`}
                 >
                   <ArrowUpRight size={16} />
-                  <span>Le Puedes Prestar ({meToFriendList.length})</span>
+                  <span>Le Faltan ({meToFriendList.length})</span>
                 </button>
 
                 <button
@@ -413,16 +413,16 @@ export function FriendCompareModal({
                   className={`sdm-compare__tab ${activeTab === 'common' ? 'sdm-compare__tab--active-purple' : ''}`}
                 >
                   <Handshake size={16} />
-                  <span>Ambos Tienen ({commonList.length})</span>
+                  <span>En Común ({commonList.length})</span>
                 </button>
               </div>
 
               {/* Sprites Grid */}
               {activeList.length === 0 ? (
                 <div className="sdm-compare__empty">
-                  {activeTab === 'friendToMe' && '🎉 ¡Genial! Tu amigo no tiene ningún Sprite que te falte en esta categoría.'}
-                  {activeTab === 'meToFriend' && '🤝 No tienes Sprites adicionales para prestarle a tu amigo en esta categoría.'}
-                  {activeTab === 'common' && 'Aún no tienen Sprites repetidos en común en esta categoría.'}
+                  {activeTab === 'friendToMe' && '🎉 ¡Genial! Tu amigo no tiene ningún espíritu que te falte en esta categoría.'}
+                  {activeTab === 'meToFriend' && '🤝 No tienes espíritus adicionales para pasarle a tu amigo en esta categoría.'}
+                  {activeTab === 'common' && 'Aún no tienen espíritus repetidos en común en esta categoría.'}
                 </div>
               ) : (
                 <div className="sdm-compare__grid">
