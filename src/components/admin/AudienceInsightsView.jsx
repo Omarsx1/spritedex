@@ -198,7 +198,7 @@ export function AudienceInsightsView({ darkMode = false }) {
 
       return true;
     });
-  }, [events, timeFilter, deviceFilter, tableSearch, excludeMyDevice]);
+  }, [events, timeFilter, deviceFilter, tableSearch]);
 
   // Aggregate Metrics & Device Breakdown
   const analytics = useMemo(() => {
@@ -809,25 +809,6 @@ export function AudienceInsightsView({ darkMode = false }) {
               </button>
             </div>
           </div>
-
-          {/* Purge Notification Alert */}
-          {purgeSuccessMsg && (
-            <div style={{
-              padding: '10px 14px',
-              borderRadius: '8px',
-              background: darkMode ? 'rgba(16, 185, 129, 0.18)' : '#D1FAE5',
-              border: '1px solid #10B981',
-              color: darkMode ? '#34D399' : '#065F46',
-              fontSize: '0.78rem',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              <CheckCircle size={16} />
-              <span>{purgeSuccessMsg}</span>
-            </div>
-          )}
 
           {/* Filter & Search Bar */}
           <div style={{
