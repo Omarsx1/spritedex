@@ -107,8 +107,6 @@ export function AudienceInsightsView({ darkMode = false }) {
   const [pageSize, setPageSize] = useState(25); // 15 | 25 | 50 | 100 | 'all'
   const [excludeMyDevice, setExcludeMyDevice] = useState(() => {
     try {
-      const isPurged = localStorage.getItem('spritedex_mac_purged_active') === 'true';
-      if (isPurged) return true;
       const saved = localStorage.getItem('spritedex_analytics_exclude_my_device');
       return saved !== null ? saved === 'true' : true;
     } catch {
@@ -118,32 +116,19 @@ export function AudienceInsightsView({ darkMode = false }) {
   const [isPurging, setIsPurging] = useState(false);
   const [purgeSuccessMsg, setPurgeSuccessMsg] = useState('');
 
-  // Bloquea automáticamente telemetría futura mientras el admin usa este panel
-  useEffect(() => {
-    setIgnoreTelemetry(true);
-    loadAudienceData();
-    const interval = setInterval(loadAudienceData, 25000);
-    return () => clearInterval(interval);
-  }, []);
-
   const handleToggleExcludeMyDevice = () => {
     setExcludeMyDevice(prev => {
       const next = !prev;
       try {
         localStorage.setItem('spritedex_analytics_exclude_my_device', String(next));
-        if (!next) {
-          localStorage.removeItem('spritedex_mac_purged_active');
-        }
       } catch {}
       return next;
     });
   };
 
   const handlePurgeMyMacRecords = async () => {
-    // 1. Marcar purga permanente y bloqueo de telemetría
     setIgnoreTelemetry(true);
     localStorage.setItem('spritedex_ignore_telemetry', 'true');
-    localStorage.setItem('spritedex_mac_purged_active', 'true');
     localStorage.setItem('spritedex_analytics_exclude_my_device', 'true');
     setExcludeMyDevice(true);
 
@@ -152,7 +137,7 @@ export function AudienceInsightsView({ darkMode = false }) {
 
     const result = await showConfirmDialog({
       title: '¿Purgar registros de tu Mac?',
-      text: `¿Confirmas eliminar y ocultar permanentemente los registros de prueba generados desde tu Mac? Las visitas reales de España, Guatemala y otros países se mantendrán intactas.`,
+      text: `¿Confirmas eliminar permanentemente los registros de prueba generados desde tu Mac? Las visitas reales de España, Guatemala y otros países se mantendrán intactas.`,
       confirmText: 'Sí, purgar registros',
       cancelText: 'Cancelar',
       icon: 'warning',
@@ -167,10 +152,16 @@ export function AudienceInsightsView({ darkMode = false }) {
     try {
       setIsPurging(true);
 
-      // Limpieza inmediata en memoria para que desaparezcan en el acto
-      setEvents(prev => prev.filter(ev => !isMacOrAdminEvent(ev)));
+      // 1. Guardar permanentemente todos los IDs de la Mac como purgados en localStorage
+      const prevPurged = JSON.parse(localStorage.getItem('spritedex_purged_ids_v2') || '[]');
+      const idsToPurge = myMacEvents.map(e => e.id).filter(Boolean);
+      const newPurgedSet = Array.from(new Set([...prevPurged, ...idsToPurge]));
+      localStorage.setItem('spritedex_purged_ids_v2', JSON.stringify(newPurgedSet));
 
-      // Intentar borrado en base de datos Supabase
+      // 2. Limpieza inmediata en estado en memoria
+      setEvents(prev => prev.filter(ev => !isMacOrAdminEvent(ev) && !idsToPurge.includes(ev.id)));
+
+      // 3. Intentar borrado en base de datos Supabase
       if (isSupabaseConfigured && supabase) {
         try {
           await supabase.from('analytics_events').delete().eq('os', 'macOS');
@@ -179,18 +170,17 @@ export function AudienceInsightsView({ darkMode = false }) {
           await supabase.from('analytics_events').delete().ilike('referrer', '%studio-override%');
         } catch (e) {}
 
-        const ids = myMacEvents.map(e => e.id).filter(Boolean);
-        for (let i = 0; i < ids.length; i += 50) {
+        for (let i = 0; i < idsToPurge.length; i += 50) {
           try {
-            await supabase.from('analytics_events').delete().in('id', ids.slice(i, i + 50));
+            await supabase.from('analytics_events').delete().in('id', idsToPurge.slice(i, i + 50));
           } catch (e) {}
         }
       }
 
-      // Limpiar caché local
+      // 4. Limpiar caché local de telemetría
       localStorage.removeItem('spritedex_local_analytics');
 
-      // Recargar datos actualizados
+      // 5. Recargar y filtrar datos actualizados
       await loadAudienceData();
 
       await showSuccessAlert({
@@ -222,15 +212,9 @@ export function AudienceInsightsView({ darkMode = false }) {
         }
 
         if (rawEvents && rawEvents.length > 0) {
-          const isPurgedActive = localStorage.getItem('spritedex_mac_purged_active') === 'true';
-          const excludeFlag = localStorage.getItem('spritedex_analytics_exclude_my_device');
-          const shouldExcludeMac = isPurgedActive || excludeFlag === null || excludeFlag === 'true';
-
-          if (shouldExcludeMac) {
-            setEvents(rawEvents.filter(ev => !isMacOrAdminEvent(ev)));
-          } else {
-            setEvents(rawEvents);
-          }
+          const purgedIds = new Set(JSON.parse(localStorage.getItem('spritedex_purged_ids_v2') || '[]'));
+          const cleanEvents = rawEvents.filter(ev => !purgedIds.has(ev.id));
+          setEvents(cleanEvents);
         } else {
           setEvents([]);
         }
@@ -243,6 +227,7 @@ export function AudienceInsightsView({ darkMode = false }) {
   };
 
   useEffect(() => {
+    setIgnoreTelemetry(true);
     loadAudienceData();
     const interval = setInterval(loadAudienceData, 25000);
     return () => clearInterval(interval);
