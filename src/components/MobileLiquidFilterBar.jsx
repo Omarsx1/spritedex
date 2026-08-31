@@ -1,19 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Search, SlidersHorizontal, X, Check, RotateCcw } from 'lucide-react';
+import { Search, SlidersHorizontal, X, RotateCcw } from 'lucide-react';
 import { THEMES_LIST, THEME_NAMES_ES, ALL_SPRITES, FAMILY_NAMES_MAP } from '../data/spritesData';
-import { LiquidGlassFilter } from './ui/LiquidGooey';
-
-const VARIANT_COLORS = {
-  Basic:       { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' },
-  Gold:        { gradient: 'linear-gradient(135deg, #9d752a, #d4a23a)', border: '#f5b642' },
-  Cheatmaster: { gradient: 'linear-gradient(135deg, #052e16, #166534)', border: '#22c55e' },
-  Candy:       { gradient: 'linear-gradient(135deg, #9f4540, #d4615b)', border: '#f16f68' },
-  Galaxy:      { gradient: 'linear-gradient(135deg, #4a31bc, #6d4fe0)', border: '#4a35fa' },
-  Cube:        { gradient: 'linear-gradient(135deg, #730974, #a040a2)', border: '#8b008b' },
-  Holofoil:    { gradient: 'linear-gradient(135deg, #cb77be, #e09dd6)', border: '#ec88d8' },
-  Gem:         { gradient: 'linear-gradient(135deg, #0f6c7d, #1a9cb5)', border: '#22d3ee' },
-  Quack:       { gradient: 'linear-gradient(135deg, #cb77be, #d89a4a)', border: '#ec88d8' },
-};
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'Todos' },
@@ -266,14 +253,7 @@ export function MobileLiquidFilterBar({
 
               {/* Section 2: Variantes y Temas */}
               <div className="mobile-sheet-section">
-                <div className="mobile-section-header-flex">
-                  <label className="mobile-section-label">Variante / Tema</label>
-                  {baseFilter !== 'all' && (
-                    <button type="button" className="mobile-section-reset-btn" onClick={() => setBaseFilter('all')}>
-                      Restablecer
-                    </button>
-                  )}
-                </div>
+                <label className="mobile-section-label">Variante / Tema</label>
                 <div className="mobile-variants-chip-grid">
                   <button
                     type="button"
@@ -283,7 +263,6 @@ export function MobileLiquidFilterBar({
                     Todas
                   </button>
                   {availableThemes.map(theme => {
-                    const colors = VARIANT_COLORS[theme] || { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' };
                     const isActive = baseFilter === theme;
                     return (
                       <button
@@ -291,14 +270,6 @@ export function MobileLiquidFilterBar({
                         type="button"
                         className={`mobile-variant-chip ${isActive ? 'is-active' : ''}`}
                         onClick={() => setBaseFilter(isActive ? 'all' : theme)}
-                        style={isActive ? {
-                          background: colors.gradient,
-                          borderColor: '#ffffff',
-                          color: '#ffffff'
-                        } : {
-                          background: 'rgba(255, 255, 255, 0.04)',
-                          borderColor: 'rgba(255, 255, 255, 0.08)'
-                        }}
                       >
                         {THEME_NAMES_ES[theme] || theme}
                       </button>
@@ -309,14 +280,7 @@ export function MobileLiquidFilterBar({
 
               {/* Section 3: Familia / Sprite */}
               <div className="mobile-sheet-section">
-                <div className="mobile-section-header-flex">
-                  <label className="mobile-section-label">Familia de Espíritu</label>
-                  {spriteFilter !== 'all' && (
-                    <button type="button" className="mobile-section-reset-btn" onClick={() => setSpriteFilter('all')}>
-                      Restablecer
-                    </button>
-                  )}
-                </div>
+                <label className="mobile-section-label">Familia de Espíritu</label>
                 <div className="mobile-sprites-chip-grid">
                   <button
                     type="button"
@@ -388,7 +352,6 @@ export function MobileLiquidFilterBar({
           </div>
         </div>
       )}
-      <LiquidGlassFilter id="liquid-glass-refraction" />
     </div>
   );
 }
