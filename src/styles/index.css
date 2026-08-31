@@ -2140,19 +2140,45 @@ body::after {
 .mobile-liquid-sheet-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(2, 4, 10, 0.35); /* Ligero y suave */
-  backdrop-filter: blur(4px); /* Difuminado sutil y ligero */
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(2, 4, 10, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 99999;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  animation: fadeInBackdrop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInFilterBackdrop 0.28s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  will-change: opacity, backdrop-filter;
 }
 
-@keyframes fadeInBackdrop {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.mobile-liquid-sheet-backdrop.is-closing {
+  animation: fadeOutFilterBackdrop 0.24s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+@keyframes fadeInFilterBackdrop {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+}
+
+@keyframes fadeOutFilterBackdrop {
+  from {
+    opacity: 1;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  to {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
 }
 
 .mobile-liquid-sheet {
@@ -2161,26 +2187,47 @@ body::after {
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  background: rgba(12, 14, 22, 0.95);
+  background: rgba(12, 14, 22, 0.96);
   backdrop-filter: blur(28px) saturate(1.8);
   -webkit-backdrop-filter: blur(28px) saturate(1.8);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-bottom: none;
   border-radius: 24px 24px 0 0;
   box-shadow:
-    0 -16px 40px rgba(0, 0, 0, 0.75),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    0 -16px 40px rgba(0, 0, 0, 0.85),
+    0 0 30px rgba(0, 240, 232, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  animation: slideUpFilterSheet 0.34s cubic-bezier(0.2, 0.9, 0.3, 1.05) forwards;
   padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);
   box-sizing: border-box;
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
-@keyframes slideUpSheet {
-  from {
+.mobile-liquid-sheet.is-closing {
+  animation: slideDownFilterSheet 0.24s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+@keyframes slideUpFilterSheet {
+  0% {
     transform: translate3d(0, 100%, 0);
+    opacity: 0.7;
   }
-  to {
+  100% {
     transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDownFilterSheet {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 100%, 0);
+    opacity: 0.7;
   }
 }
 
