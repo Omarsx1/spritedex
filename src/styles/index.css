@@ -2130,16 +2130,16 @@ body::after {
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  background: rgba(12, 14, 22, 0.82);
+  background: rgba(12, 14, 22, 0.95);
   backdrop-filter: blur(28px) saturate(1.8);
   -webkit-backdrop-filter: blur(28px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-bottom: none;
-  border-radius: 28px 28px 0 0;
+  border-radius: 24px 24px 0 0;
   box-shadow:
-    0 -12px 40px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  animation: slideUpSheet 0.3s cubic-bezier(0.34, 1.35, 0.64, 1) forwards;
+    0 -16px 40px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);
   box-sizing: border-box;
 }
@@ -2158,7 +2158,7 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 0 6px;
+  padding: 10px 0 4px;
   cursor: pointer;
 }
 
@@ -2173,23 +2173,23 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 20px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 6px 18px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .mobile-sheet-title-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .mobile-sheet-icon {
-  color: rgba(255, 255, 255, 0.85);
+  color: #00f0ff;
 }
 
 .mobile-sheet-title {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.01em;
@@ -2198,18 +2198,19 @@ body::after {
 .mobile-sheet-count-badge {
   padding: 2px 8px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  font-size: 0.7rem;
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: #00f0ff;
+  font-size: 0.68rem;
   font-weight: 700;
 }
 
 .mobile-sheet-close-btn {
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.6);
-  width: 30px;
-  height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -2219,12 +2220,12 @@ body::after {
 }
 
 .mobile-sheet-close-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   color: #ffffff;
 }
 
 .mobile-liquid-sheet-body {
-  padding: 14px 18px;
+  padding: 12px 18px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -2235,7 +2236,7 @@ body::after {
 .mobile-sheet-section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .mobile-section-header-flex {
@@ -2245,42 +2246,44 @@ body::after {
 }
 
 .mobile-section-label {
-  font-size: 0.72rem;
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  color: #64748b;
+  padding: 0 2px;
 }
 
 .mobile-section-reset-btn {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.72rem;
+  color: #00f0ff;
+  font-size: 0.7rem;
   font-weight: 600;
   cursor: pointer;
   padding: 0;
-  transition: color 0.15s ease;
+  transition: opacity 0.15s ease;
 }
 
 .mobile-section-reset-btn:hover {
-  color: #ffffff;
   text-decoration: underline;
+  opacity: 0.85;
 }
 
 /* Status Grid in Sheet */
 .mobile-status-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 
 .mobile-status-pill {
   padding: 8px 4px;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.55);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.04);
+  color: #94a3b8;
   font-family: var(--font-sans);
   font-size: 0.78rem;
   font-weight: 600;
@@ -2290,24 +2293,17 @@ body::after {
 }
 
 .mobile-status-pill:hover:not(.is-active) {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
 }
 
-/* Authentic Translucent Liquid Glass Active Status Pill */
+/* Active Status Pill (Matching Navbar Menu Option Selected) */
 .mobile-status-pill.is-active {
-  background: rgba(255, 255, 255, 0.18) !important;
-  backdrop-filter: blur(16px) saturate(1.8);
-  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  background: rgba(0, 240, 255, 0.12) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.45) !important;
-  font-weight: 800;
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.35),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.8),
-    inset 0 -1.5px 1px 0 rgba(0, 0, 0, 0.25),
-    inset 0 0 10px rgba(255, 255, 255, 0.1);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 240, 255, 0.35) !important;
+  font-weight: 700;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.18);
   transform: translateY(-0.5px);
 }
 
@@ -2315,15 +2311,15 @@ body::after {
 .mobile-variants-chip-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
+  gap: 6px;
 }
 
 .mobile-variant-chip {
-  padding: 6px 13px;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.55);
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.04);
+  color: #94a3b8;
   font-family: var(--font-sans);
   font-size: 0.76rem;
   font-weight: 600;
@@ -2332,41 +2328,31 @@ body::after {
 }
 
 .mobile-variant-chip:hover:not(.is-active) {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
 }
 
-/* Liquid Glass Active Variant Chip */
+/* Active Variant Chip */
 .mobile-variant-chip.is-active {
-  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  border-color: #00f0ff !important;
   color: #ffffff !important;
-  font-weight: 800;
-  box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.4),
-    inset 0 1.5px 1px rgba(255, 255, 255, 0.8),
-    inset 0 -1.5px 1px rgba(0, 0, 0, 0.3);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  font-weight: 700;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.25);
   transform: translateY(-0.5px);
 }
 
 .mobile-variant-chip:first-child.is-active {
-  background: rgba(255, 255, 255, 0.18) !important;
-  backdrop-filter: blur(16px) saturate(1.8);
-  -webkit-backdrop-filter: blur(16px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  background: rgba(0, 240, 255, 0.12) !important;
+  border: 1px solid rgba(0, 240, 255, 0.35) !important;
   color: #ffffff !important;
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.35),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.8),
-    inset 0 -1.5px 1px 0 rgba(0, 0, 0, 0.25),
-    inset 0 0 10px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.18);
 }
 
 /* Sprites Grid in Sheet */
 .mobile-sprites-chip-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 7px;
+  gap: 6px;
   max-height: 180px;
   overflow-y: auto;
   padding-right: 4px;
@@ -2376,11 +2362,11 @@ body::after {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 9px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.6);
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.04);
+  color: #94a3b8;
   font-family: var(--font-sans);
   font-size: 0.73rem;
   font-weight: 600;
@@ -2391,36 +2377,17 @@ body::after {
 }
 
 .mobile-sprite-chip:hover:not(.is-active) {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
 }
 
-/* Liquid Glass Active Sprite Chip */
+/* Active Sprite Chip */
 .mobile-sprite-chip.is-active {
-  background: rgba(255, 255, 255, 0.16) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(0, 240, 255, 0.12) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.45) !important;
-  font-weight: 800;
-  box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.3),
-    inset 0 1.5px 1px rgba(255, 255, 255, 0.7),
-    inset 0 -1.5px 1px rgba(0, 0, 0, 0.2);
-}
-
-.mobile-sprite-chip:first-child.is-active {
-  background: rgba(255, 255, 255, 0.18) !important;
-  backdrop-filter: blur(16px) saturate(1.8);
-  -webkit-backdrop-filter: blur(16px) saturate(1.8);
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.45) !important;
-  font-weight: 800;
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.35),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.8),
-    inset 0 -1.5px 1px 0 rgba(0, 0, 0, 0.25),
-    inset 0 0 10px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.35) !important;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.18);
 }
 
 .mobile-sprite-chip-img {
@@ -2436,35 +2403,37 @@ body::after {
   white-space: nowrap;
 }
 
-/* ═══ SUBTLE COMPACT NO LANZADOS TOGGLE ROW ═══ */
+/* ═══ NO LANZADOS TOGGLE CARD (Matching Navbar Action Cards) ═══ */
 .mobile-sheet-compact-toggle-row {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 4px 0 0 0;
+  width: 100%;
+  padding-top: 2px;
 }
 
 .mobile-compact-toggle-label-wrap {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
   user-select: none;
-  padding: 6px 12px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .mobile-compact-toggle-label-wrap:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .mobile-compact-toggle-title {
-  font-size: 0.76rem;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.65);
+  color: #f1f5f9;
 }
 
 .mobile-toggle-input {
@@ -2472,8 +2441,8 @@ body::after {
 }
 
 .mobile-toggle-switch {
-  width: 34px;
-  height: 19px;
+  width: 36px;
+  height: 20px;
   border-radius: 9999px;
   background: rgba(255, 255, 255, 0.12);
   position: relative;
@@ -2481,15 +2450,15 @@ body::after {
 }
 
 .mobile-toggle-switch.is-on {
-  background: #ffffff;
-  box-shadow: 0 1px 6px rgba(255, 255, 255, 0.25);
+  background: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
 }
 
 .mobile-toggle-thumb {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.8);
+  background: #ffffff;
   position: absolute;
   top: 3px;
   left: 3px;
@@ -2497,17 +2466,17 @@ body::after {
 }
 
 .mobile-toggle-switch.is-on .mobile-toggle-thumb {
-  transform: translateX(15px);
-  background: #0c0e16;
+  transform: translateX(16px);
+  background: #060714;
 }
 
 /* Sheet Footer */
 .mobile-liquid-sheet-footer {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 10px 18px 4px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .mobile-sheet-btn-clear {
@@ -2515,13 +2484,13 @@ body::after {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 10px 16px;
-  border-radius: 9999px;
+  padding: 10px 14px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.6);
+  color: #94a3b8;
   font-family: var(--font-sans);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -2537,17 +2506,16 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 11px 20px;
-  border-radius: 9999px;
+  padding: 10px 20px;
+  border-radius: 10px;
   border: none;
   background: #ffffff;
-  color: #0c0e16;
+  color: #060714;
   font-family: var(--font-sans);
-  font-size: 0.86rem;
+  font-size: 0.85rem;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
   transition: opacity 0.15s ease;
 }
 

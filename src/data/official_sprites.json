@@ -1200,7 +1200,9 @@
     "theme": "Basic",
     "rarity": "Epic",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-08-30"
   },
   {
     "id": "stormscout_gold",
@@ -1208,7 +1210,9 @@
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-08-30"
   },
   {
     "id": "stormscout_cheatmaster",
@@ -1216,6 +1220,8 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-08-30"
   }
 ]
