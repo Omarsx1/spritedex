@@ -2105,18 +2105,18 @@ body::after {
   color: #9a9a9a;
 }
 
-/* ═══ MINIMALIST GOOEY FILTER SHEET / MODAL ═══ */
+/* ═══ CONSISTENT GLASS FILTER SHEET / MODAL (Spritedex Design System) ═══ */
 .mobile-liquid-sheet-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(4, 7, 16, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   z-index: 99999;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  animation: fadeInBackdrop 0.2s ease forwards;
+  animation: fadeInBackdrop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes fadeInBackdrop {
@@ -2130,12 +2130,16 @@ body::after {
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  background: #181818;
+  background: rgba(12, 14, 22, 0.78);
+  backdrop-filter: blur(28px) saturate(1.8);
+  -webkit-backdrop-filter: blur(28px) saturate(1.8);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: none;
-  border-radius: 24px 24px 0 0;
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
-  animation: slideUpSheet 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  border-radius: 28px 28px 0 0;
+  box-shadow:
+    0 -12px 40px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: slideUpSheet 0.3s cubic-bezier(0.34, 1.35, 0.64, 1) forwards;
   padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);
   box-sizing: border-box;
 }
@@ -2161,7 +2165,7 @@ body::after {
 .mobile-liquid-sheet-handle {
   width: 36px;
   height: 4px;
-  border-radius: 999px;
+  border-radius: 9999px;
   background: rgba(255, 255, 255, 0.2);
 }
 
@@ -2169,7 +2173,7 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 20px 14px;
+  padding: 6px 20px 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -2180,30 +2184,30 @@ body::after {
 }
 
 .mobile-sheet-icon {
-  color: #fbfbfb;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .mobile-sheet-title {
   margin: 0;
   font-size: 1rem;
-  font-weight: 600;
-  color: #fbfbfb;
+  font-weight: 700;
+  color: #ffffff;
   letter-spacing: -0.01em;
 }
 
 .mobile-sheet-count-badge {
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: 9999px;
   background: rgba(255, 255, 255, 0.1);
-  color: #fbfbfb;
+  color: #ffffff;
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .mobile-sheet-close-btn {
   background: rgba(255, 255, 255, 0.06);
-  border: none;
-  color: #9a9a9a;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.6);
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -2211,12 +2215,12 @@ body::after {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.12s ease, color 0.12s ease;
+  transition: all 0.15s ease;
 }
 
 .mobile-sheet-close-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fbfbfb;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
 }
 
 .mobile-liquid-sheet-body {
@@ -2241,9 +2245,9 @@ body::after {
 }
 
 .mobile-section-label {
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: #7f7f7f;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -2251,15 +2255,16 @@ body::after {
 .mobile-section-reset-btn {
   background: transparent;
   border: none;
-  color: #9a9a9a;
+  color: rgba(255, 255, 255, 0.5);
   font-size: 0.72rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   padding: 0;
+  transition: color 0.15s ease;
 }
 
 .mobile-section-reset-btn:hover {
-  color: #fbfbfb;
+  color: #ffffff;
   text-decoration: underline;
 }
 
@@ -2271,70 +2276,30 @@ body::after {
 }
 
 .mobile-status-pill {
-  padding: 9px 6px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.05);
-  color: #9a9a9a;
+  padding: 9px 4px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.65);
   font-family: var(--font-sans);
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: all 0.15s ease;
   text-align: center;
 }
 
-.mobile-status-pill:hover {
+.mobile-status-pill:hover:not(.is-active) {
   background: rgba(255, 255, 255, 0.08);
-  color: #fbfbfb;
+  color: #ffffff;
 }
 
 .mobile-status-pill.is-active {
-  background: #fbfbfb;
-  color: #121212;
-  font-weight: 600;
-}
-
-/* Generation selector */
-.mobile-gen-selector {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.mobile-gen-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 9px 8px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.05);
-  color: #9a9a9a;
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.12s ease;
-}
-
-.mobile-gen-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fbfbfb;
-}
-
-.mobile-gen-btn.is-active {
-  background: #fbfbfb;
-  color: #121212;
-  font-weight: 600;
-}
-
-.mobile-gen2-badge {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #22c55e;
+  background: #ffffff;
+  color: #0c0e16;
+  border-color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
 }
 
 /* Variants Grid in Sheet */
@@ -2346,26 +2311,27 @@ body::after {
 
 .mobile-variant-chip {
   padding: 7px 14px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.04);
-  color: #9a9a9a;
+  color: rgba(255, 255, 255, 0.7);
   font-family: var(--font-sans);
   font-size: 0.78rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: all 0.15s ease;
 }
 
 .mobile-variant-chip:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: #fbfbfb;
+  color: #ffffff;
 }
 
 .mobile-variant-chip.is-active {
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.6);
-  font-weight: 600;
+  border-color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Sprites Grid in Sheet */
@@ -2383,29 +2349,29 @@ body::after {
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.04);
-  color: #9a9a9a;
+  color: rgba(255, 255, 255, 0.75);
   font-family: var(--font-sans);
   font-size: 0.74rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: all 0.15s ease;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .mobile-sprite-chip:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: #fbfbfb;
+  color: #ffffff;
 }
 
 .mobile-sprite-chip.is-active {
-  background: #fbfbfb;
-  color: #121212;
-  border-color: #fbfbfb;
-  font-weight: 600;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+  font-weight: 700;
 }
 
 .mobile-sprite-chip-img {
@@ -2426,8 +2392,8 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
-  border-radius: 10px;
+  padding: 12px 16px;
+  border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.03);
   cursor: pointer;
@@ -2442,13 +2408,13 @@ body::after {
 
 .mobile-toggle-title {
   font-size: 0.84rem;
-  font-weight: 500;
-  color: #fbfbfb;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 .mobile-toggle-desc {
   font-size: 0.72rem;
-  color: #7f7f7f;
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .mobile-toggle-input {
@@ -2458,21 +2424,21 @@ body::after {
 .mobile-toggle-switch {
   width: 40px;
   height: 22px;
-  border-radius: 999px;
+  border-radius: 9999px;
   background: rgba(255, 255, 255, 0.12);
   position: relative;
   transition: background-color 0.2s ease;
 }
 
 .mobile-toggle-switch.is-on {
-  background: #fbfbfb;
+  background: #ffffff;
 }
 
 .mobile-toggle-thumb {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #121212;
+  background: #0c0e16;
   position: absolute;
   top: 3px;
   left: 3px;
@@ -2498,20 +2464,20 @@ body::after {
   justify-content: center;
   gap: 6px;
   padding: 11px 16px;
-  border-radius: 8px;
+  border-radius: 9999px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
-  color: #9a9a9a;
+  color: rgba(255, 255, 255, 0.6);
   font-family: var(--font-sans);
   font-size: 0.82rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.12s ease, color 0.12s ease;
+  transition: all 0.15s ease;
 }
 
 .mobile-sheet-btn-clear:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: #fbfbfb;
+  color: #ffffff;
 }
 
 .mobile-sheet-btn-apply {
@@ -2521,14 +2487,15 @@ body::after {
   justify-content: center;
   gap: 8px;
   padding: 11px 20px;
-  border-radius: 8px;
+  border-radius: 9999px;
   border: none;
-  background: #fbfbfb;
-  color: #121212;
+  background: #ffffff;
+  color: #0c0e16;
   font-family: var(--font-sans);
   font-size: 0.86rem;
-  font-weight: 600;
+  font-weight: 800;
   cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   transition: opacity 0.15s ease;
 }
 

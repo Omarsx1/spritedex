@@ -23,7 +23,6 @@ const STATUS_OPTIONS = [
 
 export function MobileLiquidFilterBar({
   activeGen,
-  setActiveGen,
   searchQuery,
   setSearchQuery,
   baseFilter,
@@ -211,7 +210,7 @@ export function MobileLiquidFilterBar({
         </div>
       )}
 
-      {/* ═══ TRANSLUCENT FROSTED GLASS FILTER SHEET / MODAL ═══ */}
+      {/* ═══ CONSISTENT GLASS FILTER SHEET / MODAL ═══ */}
       {isOpen && (
         <div className="mobile-liquid-sheet-backdrop" onClick={() => setIsOpen(false)}>
           <div
@@ -241,7 +240,7 @@ export function MobileLiquidFilterBar({
                 onClick={() => setIsOpen(false)}
                 aria-label="Cerrar filtros"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
@@ -264,36 +263,7 @@ export function MobileLiquidFilterBar({
                 </div>
               </div>
 
-              {/* Section 2: Generación */}
-              <div className="mobile-sheet-section">
-                <label className="mobile-section-label">Generación</label>
-                <div className="mobile-gen-selector">
-                  <button
-                    type="button"
-                    className={`mobile-gen-btn ${activeGen === 0 ? 'is-active' : ''}`}
-                    onClick={() => { setActiveGen(0); setBaseFilter('all'); setSpriteFilter('all'); }}
-                  >
-                    Todas
-                  </button>
-                  <button
-                    type="button"
-                    className={`mobile-gen-btn is-gen1 ${activeGen === 1 ? 'is-active' : ''}`}
-                    onClick={() => { setActiveGen(1); setBaseFilter('all'); setSpriteFilter('all'); }}
-                  >
-                    Gen 1
-                  </button>
-                  <button
-                    type="button"
-                    className={`mobile-gen-btn is-gen2 ${activeGen === 2 ? 'is-active' : ''}`}
-                    onClick={() => { setActiveGen(2); setBaseFilter('all'); setSpriteFilter('all'); }}
-                  >
-                    <span className="mobile-gen2-badge" />
-                    Gen 2
-                  </button>
-                </div>
-              </div>
-
-              {/* Section 3: Variantes y Temas */}
+              {/* Section 2: Variantes y Temas */}
               <div className="mobile-sheet-section">
                 <div className="mobile-section-header-flex">
                   <label className="mobile-section-label">Variante / Tema</label>
@@ -320,10 +290,13 @@ export function MobileLiquidFilterBar({
                         type="button"
                         className={`mobile-variant-chip ${isActive ? 'is-active' : ''}`}
                         onClick={() => setBaseFilter(isActive ? 'all' : theme)}
-                        style={{
+                        style={isActive ? {
                           background: colors.gradient,
-                          borderColor: isActive ? '#FFFFFF' : colors.border,
-                          boxShadow: isActive ? `0 0 12px ${colors.border}` : 'none'
+                          borderColor: '#ffffff',
+                          color: '#ffffff'
+                        } : {
+                          background: 'rgba(255, 255, 255, 0.04)',
+                          borderColor: 'rgba(255, 255, 255, 0.08)'
                         }}
                       >
                         {THEME_NAMES_ES[theme] || theme}
@@ -333,7 +306,7 @@ export function MobileLiquidFilterBar({
                 </div>
               </div>
 
-              {/* Section 4: Familia / Sprite */}
+              {/* Section 3: Familia / Sprite */}
               <div className="mobile-sheet-section">
                 <div className="mobile-section-header-flex">
                   <label className="mobile-section-label">Familia de Espíritu</label>
@@ -373,7 +346,7 @@ export function MobileLiquidFilterBar({
                 </div>
               </div>
 
-              {/* Section 5: No Lanzados Toggle */}
+              {/* Section 4: No Lanzados Toggle */}
               <div className="mobile-sheet-section">
                 <label className="mobile-toggle-card">
                   <div className="mobile-toggle-info">
