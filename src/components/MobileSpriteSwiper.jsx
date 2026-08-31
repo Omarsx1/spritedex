@@ -64,9 +64,21 @@ function FamilyRow({
         <span className="ms-family-name">{familyName}</span>
         {variants.length > 1 && (
           <span className="ms-family-dots">
-            {variants.map((_, i) => (
-              <span key={i} className={`ms-dot ${i === activeIdx ? 'ms-dot--active' : ''}`} />
-            ))}
+            {variants.map((v, i) => {
+              const isVarOwned = isFriendView ? friendState?.[v.id]?.owned : userState[v.id]?.owned;
+              return (
+                <button
+                  key={v.id || i}
+                  type="button"
+                  className={`ms-dot ${i === activeIdx ? 'ms-dot--active' : ''} ${isVarOwned ? 'ms-dot--owned' : ''}`}
+                  onClick={() => {
+                    setActiveIdx(i);
+                    sounds.playBeep();
+                  }}
+                  aria-label={`Ver ${v.variantDisplay || v.variant}`}
+                />
+              );
+            })}
           </span>
         )}
       </div>
@@ -102,6 +114,15 @@ function FamilyRow({
           const friendCanLend = isFriendView && isOwned && !myOwned;
           const rarityInfo = RARITIES[sprite.rarity] || { name: sprite.rarity, bg: '#1e293b' };
           const styleInfo = getSpriteCardStyle(sprite);
+
+          const rarityGlows = {
+            'Mítico': '0 12px 36px rgba(245, 182, 66, 0.45), 0 0 16px rgba(245, 182, 66, 0.25)',
+            'Legendario': '0 12px 32px rgba(249, 115, 22, 0.4), 0 0 14px rgba(249, 115, 22, 0.22)',
+            'Épico': '0 12px 30px rgba(168, 85, 247, 0.4), 0 0 14px rgba(168, 85, 247, 0.22)',
+            'Raro': '0 12px 28px rgba(0, 240, 232, 0.35), 0 0 12px rgba(0, 240, 232, 0.2)',
+            'Poco Común': '0 12px 26px rgba(34, 197, 94, 0.35), 0 0 12px rgba(34, 197, 94, 0.2)',
+            'Común': '0 8px 24px rgba(0, 0, 0, 0.45)'
+          };
 
           const handleToggleBadgeClick = (e) => {
             e.stopPropagation();
@@ -158,6 +179,7 @@ function FamilyRow({
                 ...dragStyle,
                 background: styleInfo.background,
                 borderColor: styleInfo.borderColor,
+                boxShadow: isCurrent && !isMastered ? (rarityGlows[sprite.rarity] || '0 8px 24px rgba(0, 0, 0, 0.45)') : undefined
               }}
             >
               {/* Cyber FX para Gen 2 Mastered */}
