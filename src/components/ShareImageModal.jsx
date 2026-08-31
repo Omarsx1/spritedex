@@ -7,23 +7,47 @@ import { generatePokedexCardImage } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 
+// Caché persistente global para previews de plantillas generadas (0ms instantáneo entre aperturas y formatos)
+const globalTemplatePreviewCache = new Map();
+
 export function ShareImageModal({ filteredSprites, allSprites, userState, activeFiltersLabel, onClose }) {
   const [format, setFormat] = useState('checklist'); // 'checklist', 'square'
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
   const [bgStyle, setBgStyle] = useState('glitch_override'); // 'glitch_override', 'blueprint', 'dark_matrix'
   const [dataUrl, setDataUrl] = useState('');
   const [isGenerating, setIsGenerating] = useState(true);
+  const [isClosing, setIsClosing] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
 
   const modalRef = useRef(null);
   const headerRef = useRef(null);
 
-  // Entrance animation matching SpriteDetailModal
+  const handleClose = () => {
+    if (isClosing) return;
+    sounds.playBeep();
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 220);
+  };
+
+  // Close on Escape with smooth exit
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && !isClosing) {
+        handleClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isClosing]);
+
+  // Entrance animation matching modern spring physics
   useEffect(() => {
     if (modalRef.current) {
       gsap.fromTo(modalRef.current,
-        { opacity: 0, scale: 0.95, y: 15 },
-        { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: 'power2.out' }
+        { opacity: 0, scale: 0.94, y: 12 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.28, ease: 'power3.out' }
       );
     }
   }, []);
@@ -63,8 +87,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     return spritesList.length > 0 ? Math.round((ownedInScope / spritesList.length) * 100) : 0;
   }, [spritesList, ownedInScope]);
 
-  const previewCacheRef = React.useRef(new Map());
-
   // Trigger canvas generation on setting changes with instant in-memory preview cache
   useEffect(() => {
     if (spritesList.length === 0) {
@@ -73,9 +95,9 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       return;
     }
 
-    const cacheKey = `${format}_${scope}_${spritesList.length}_${ownedInScope}`;
-    if (previewCacheRef.current.has(cacheKey)) {
-      setDataUrl(previewCacheRef.current.get(cacheKey));
+    const cacheKey = `${format}_${scope}_${bgStyle}_${spritesList.length}_${ownedInScope}`;
+    if (globalTemplatePreviewCache.has(cacheKey)) {
+      setDataUrl(globalTemplatePreviewCache.get(cacheKey));
       setIsGenerating(false);
       return;
     }
@@ -83,26 +105,30 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     setIsGenerating(true);
     let isCancelled = false;
 
-    generatePokedexCardImage({
-      spritesList,
-      userState,
-      format,
-      bgStyle
-    }).then((url) => {
-      if (!isCancelled) {
-        previewCacheRef.current.set(cacheKey, url);
-        setDataUrl(url);
-        setIsGenerating(false);
-      }
-    }).catch((err) => {
-      if (!isCancelled) {
-        console.error('Error generando imagen de plantilla:', err);
-        setIsGenerating(false);
-      }
+    // Asynchronous requestAnimationFrame to allow the entrance animation to glide with zero stutter
+    const frameId = requestAnimationFrame(() => {
+      generatePokedexCardImage({
+        spritesList,
+        userState,
+        format,
+        bgStyle
+      }).then((url) => {
+        if (!isCancelled) {
+          globalTemplatePreviewCache.set(cacheKey, url);
+          setDataUrl(url);
+          setIsGenerating(false);
+        }
+      }).catch((err) => {
+        if (!isCancelled) {
+          console.error('Error generando imagen de plantilla:', err);
+          setIsGenerating(false);
+        }
+      });
     });
 
     return () => {
       isCancelled = true;
+      cancelAnimationFrame(frameId);
     };
   }, [spritesList, userState, format, bgStyle, scope, ownedInScope]);
 
@@ -273,8 +299,8 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   ];
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="sdm-share-pro" ref={modalRef} onClick={(e) => e.stopPropagation()}>
+    <div className={`modal-overlay ${isClosing ? 'is-closing' : ''}`} onClick={handleClose}>
+      <div className={`sdm-share-pro ${isClosing ? 'is-closing' : ''}`} ref={modalRef} onClick={(e) => e.stopPropagation()}>
         {/* Header Elegante y Minimalista */}
         <div className="sdm-share-pro__header">
           <div className="sdm-share-pro__title-wrap">
@@ -288,7 +314,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
               </p>
             </div>
           </div>
-          <button className="sdm-share-pro__close" onClick={onClose} aria-label="Cerrar modal">
+          <button className="sdm-share-pro__close" onClick={handleClose} aria-label="Cerrar modal">
             <X size={18} />
           </button>
         </div>
