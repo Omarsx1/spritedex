@@ -26,12 +26,53 @@ export function MobileLiquidFilterBar({
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
 
+  // Helper methods for multi-select
+  const isBaseAll = !baseFilter || baseFilter.length === 0 || baseFilter === 'all';
+  const isBaseSelected = (theme) => Array.isArray(baseFilter) ? baseFilter.includes(theme) : baseFilter === theme;
+
+  const handleToggleBaseFilter = (theme) => {
+    if (theme === 'all') {
+      setBaseFilter([]);
+      return;
+    }
+    const current = Array.isArray(baseFilter) ? baseFilter : (baseFilter && baseFilter !== 'all' ? [baseFilter] : []);
+    if (current.includes(theme)) {
+      setBaseFilter(current.filter(t => t !== theme));
+    } else {
+      setBaseFilter([...current, theme]);
+    }
+  };
+
+  const isSpriteAll = !spriteFilter || spriteFilter.length === 0 || spriteFilter === 'all';
+  const isSpriteSelected = (familyName) => Array.isArray(spriteFilter) ? spriteFilter.includes(familyName) : spriteFilter === familyName;
+
+  const handleToggleSpriteFilter = (familyName) => {
+    if (familyName === 'all') {
+      setSpriteFilter([]);
+      return;
+    }
+    const current = Array.isArray(spriteFilter) ? spriteFilter : (spriteFilter && spriteFilter !== 'all' ? [spriteFilter] : []);
+    if (current.includes(familyName)) {
+      setSpriteFilter(current.filter(f => f !== familyName));
+    } else {
+      setSpriteFilter([...current, familyName]);
+    }
+  };
+
   // Compute active filters count
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (statusFilter !== 'all') count++;
-    if (baseFilter !== 'all') count++;
-    if (spriteFilter !== 'all') count++;
+    if (Array.isArray(baseFilter)) {
+      count += baseFilter.length;
+    } else if (baseFilter && baseFilter !== 'all') {
+      count++;
+    }
+    if (Array.isArray(spriteFilter)) {
+      count += spriteFilter.length;
+    } else if (spriteFilter && spriteFilter !== 'all') {
+      count++;
+    }
     if (showUnreleased) count++;
     return count;
   }, [statusFilter, baseFilter, spriteFilter, showUnreleased]);
@@ -61,8 +102,8 @@ export function MobileLiquidFilterBar({
 
   const handleResetFilters = () => {
     setStatusFilter('all');
-    setBaseFilter('all');
-    setSpriteFilter('all');
+    setBaseFilter([]);
+    setSpriteFilter([]);
     setShowUnreleased(false);
   };
 
@@ -157,26 +198,55 @@ export function MobileLiquidFilterBar({
               <X size={11} />
             </button>
           )}
-          {baseFilter !== 'all' && (
+
+          {/* Multi-select Variant Badges */}
+          {Array.isArray(baseFilter) ? (
+            baseFilter.map(b => (
+              <button
+                key={b}
+                type="button"
+                className="mobile-active-chip"
+                onClick={() => handleToggleBaseFilter(b)}
+              >
+                <span>{THEME_NAMES_ES[b] || b}</span>
+                <X size={11} />
+              </button>
+            ))
+          ) : (baseFilter && baseFilter !== 'all' && (
             <button
               type="button"
               className="mobile-active-chip"
-              onClick={() => setBaseFilter('all')}
+              onClick={() => setBaseFilter([])}
             >
               <span>{THEME_NAMES_ES[baseFilter] || baseFilter}</span>
               <X size={11} />
             </button>
-          )}
-          {spriteFilter !== 'all' && (
+          ))}
+
+          {/* Multi-select Sprite Family Badges */}
+          {Array.isArray(spriteFilter) ? (
+            spriteFilter.map(s => (
+              <button
+                key={s}
+                type="button"
+                className="mobile-active-chip"
+                onClick={() => handleToggleSpriteFilter(s)}
+              >
+                <span>{s}</span>
+                <X size={11} />
+              </button>
+            ))
+          ) : (spriteFilter && spriteFilter !== 'all' && (
             <button
               type="button"
               className="mobile-active-chip"
-              onClick={() => setSpriteFilter('all')}
+              onClick={() => setSpriteFilter([])}
             >
               <span>{spriteFilter}</span>
               <X size={11} />
             </button>
-          )}
+          ))}
+
           {showUnreleased && (
             <button
               type="button"
@@ -251,25 +321,25 @@ export function MobileLiquidFilterBar({
                 </div>
               </div>
 
-              {/* Section 2: Variantes y Temas */}
+              {/* Section 2: Variantes y Temas (Multi-Select) */}
               <div className="mobile-sheet-section">
                 <label className="mobile-section-label">Variante / Tema</label>
                 <div className="mobile-variants-chip-grid">
                   <button
                     type="button"
-                    className={`mobile-variant-chip ${baseFilter === 'all' ? 'is-active' : ''}`}
-                    onClick={() => setBaseFilter('all')}
+                    className={`mobile-variant-chip ${isBaseAll ? 'is-active' : ''}`}
+                    onClick={() => handleToggleBaseFilter('all')}
                   >
                     Todas
                   </button>
                   {availableThemes.map(theme => {
-                    const isActive = baseFilter === theme;
+                    const isActive = isBaseSelected(theme);
                     return (
                       <button
                         key={theme}
                         type="button"
                         className={`mobile-variant-chip ${isActive ? 'is-active' : ''}`}
-                        onClick={() => setBaseFilter(isActive ? 'all' : theme)}
+                        onClick={() => handleToggleBaseFilter(theme)}
                       >
                         {THEME_NAMES_ES[theme] || theme}
                       </button>
@@ -278,25 +348,25 @@ export function MobileLiquidFilterBar({
                 </div>
               </div>
 
-              {/* Section 3: Familia / Sprite */}
+              {/* Section 3: Familia / Sprite (Multi-Select) */}
               <div className="mobile-sheet-section">
                 <label className="mobile-section-label">Familia de Espíritu</label>
                 <div className="mobile-sprites-chip-grid">
                   <button
                     type="button"
-                    className={`mobile-sprite-chip ${spriteFilter === 'all' ? 'is-active' : ''}`}
-                    onClick={() => setSpriteFilter('all')}
+                    className={`mobile-sprite-chip ${isSpriteAll ? 'is-active' : ''}`}
+                    onClick={() => handleToggleSpriteFilter('all')}
                   >
                     <span className="mobile-sprite-chip-text">Todos</span>
                   </button>
                   {availableFamiliesWithImages.map(family => {
-                    const isActive = spriteFilter === family.name;
+                    const isActive = isSpriteSelected(family.name);
                     return (
                       <button
                         key={family.familyId}
                         type="button"
                         className={`mobile-sprite-chip ${isActive ? 'is-active' : ''}`}
-                        onClick={() => setSpriteFilter(isActive ? 'all' : family.name)}
+                        onClick={() => handleToggleSpriteFilter(family.name)}
                       >
                         <img
                           src={family.image}

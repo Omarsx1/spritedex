@@ -67,17 +67,45 @@ export function FilterBar({
     return THEMES_LIST.filter(t => uniqueThemes.includes(t));
   }, [activeGen]);
 
-  const handleVariantSelect = (value) => { setBaseFilter(value); setVariantOpen(false); };
-  const handleSpriteSelect = (value) => { setSpriteFilter(value); setSpriteOpen(false); };
+  const isBaseAll = !baseFilter || baseFilter.length === 0 || baseFilter === 'all';
+  const isBaseSelected = (theme) => Array.isArray(baseFilter) ? baseFilter.includes(theme) : baseFilter === theme;
+  const isSpriteAll = !spriteFilter || spriteFilter.length === 0 || spriteFilter === 'all';
+  const isSpriteSelected = (name) => Array.isArray(spriteFilter) ? spriteFilter.includes(name) : spriteFilter === name;
+
+  const handleVariantSelect = (value) => {
+    if (value === 'all') {
+      setBaseFilter([]);
+    } else {
+      const current = Array.isArray(baseFilter) ? baseFilter : (baseFilter && baseFilter !== 'all' ? [baseFilter] : []);
+      if (current.includes(value)) {
+        setBaseFilter(current.filter(t => t !== value));
+      } else {
+        setBaseFilter([...current, value]);
+      }
+    }
+  };
+
+  const handleSpriteSelect = (value) => {
+    if (value === 'all') {
+      setSpriteFilter([]);
+    } else {
+      const current = Array.isArray(spriteFilter) ? spriteFilter : (spriteFilter && spriteFilter !== 'all' ? [spriteFilter] : []);
+      if (current.includes(value)) {
+        setSpriteFilter(current.filter(f => f !== value));
+      } else {
+        setSpriteFilter([...current, value]);
+      }
+    }
+  };
 
   const handleGenChange = (newGen) => {
     setActiveGen(newGen);
-    setBaseFilter('all');
-    setSpriteFilter('all');
+    setBaseFilter([]);
+    setSpriteFilter([]);
   };
 
-  const selectedSpriteData = spriteFilter !== 'all'
-    ? availableFamiliesWithImages.find(f => f.name === spriteFilter)
+  const selectedSpriteData = !isSpriteAll
+    ? availableFamiliesWithImages.find(f => Array.isArray(spriteFilter) ? spriteFilter.includes(f.name) : f.name === spriteFilter)
     : null;
 
   if (isMobile) {
@@ -131,15 +159,15 @@ export function FilterBar({
         {/* Variante Dropdown */}
         <div className="filter-dropdown-wrap">
           <button
-            className={`filter-pill-trigger ${variantOpen ? 'is-open' : ''} ${baseFilter !== 'all' ? 'has-selection' : ''}`}
+            className={`filter-pill-trigger ${variantOpen ? 'is-open' : ''} ${!isBaseAll ? 'has-selection' : ''}`}
             onClick={() => { setVariantOpen(!variantOpen); setSpriteOpen(false); }}
-            style={baseFilter !== 'all' && VARIANT_COLORS[baseFilter] ? {
-              background: VARIANT_COLORS[baseFilter].gradient,
-              borderColor: VARIANT_COLORS[baseFilter].border,
+            style={!isBaseAll && Array.isArray(baseFilter) && baseFilter.length === 1 && VARIANT_COLORS[baseFilter[0]] ? {
+              background: VARIANT_COLORS[baseFilter[0]].gradient,
+              borderColor: VARIANT_COLORS[baseFilter[0]].border,
               color: '#ffffff'
             } : {}}
           >
-            <span>{baseFilter === 'all' ? 'VARIANTE' : (THEME_NAMES_ES[baseFilter] || baseFilter)}</span>
+            <span>{isBaseAll ? 'VARIANTE' : (Array.isArray(baseFilter) ? (baseFilter.length === 1 ? (THEME_NAMES_ES[baseFilter[0]] || baseFilter[0]) : `${baseFilter.length} VARIANTES`) : (THEME_NAMES_ES[baseFilter] || baseFilter))}</span>
             <ChevronDown size={13} className={`trigger-chevron ${variantOpen ? 'rotated' : ''}`} />
           </button>
 
@@ -148,14 +176,14 @@ export function FilterBar({
               <div className="filter-backdrop-overlay" onClick={() => setVariantOpen(false)} />
               <div className="variant-grid-dropdown">
                 <button
-                  className={`variant-grid-chip variant-chip--all ${baseFilter === 'all' ? 'is-active' : ''}`}
+                  className={`variant-grid-chip variant-chip--all ${isBaseAll ? 'is-active' : ''}`}
                   onClick={() => handleVariantSelect('all')}
                 >
                   Todas
                 </button>
                 {availableThemes.map(theme => {
                   const colors = VARIANT_COLORS[theme] || { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' };
-                  const isActive = baseFilter === theme;
+                  const isActive = isBaseSelected(theme);
                   return (
                     <button
                       key={theme}
@@ -175,14 +203,14 @@ export function FilterBar({
         {/* Sprite Dropdown */}
         <div className="filter-dropdown-wrap">
           <button
-            className={`filter-pill-trigger ${spriteOpen ? 'is-open' : ''} ${spriteFilter !== 'all' ? 'has-selection' : ''}`}
+            className={`filter-pill-trigger ${spriteOpen ? 'is-open' : ''} ${!isSpriteAll ? 'has-selection' : ''}`}
             onClick={() => { setSpriteOpen(!spriteOpen); setVariantOpen(false); }}
           >
             {selectedSpriteData && (
               <img src={selectedSpriteData.image} alt="" className="trigger-sprite-icon"
                 onError={(e) => { e.target.style.display = 'none'; }} />
             )}
-            <span>{spriteFilter === 'all' ? 'SPRITE' : spriteFilter}</span>
+            <span>{isSpriteAll ? 'SPRITE' : (Array.isArray(spriteFilter) ? (spriteFilter.length === 1 ? spriteFilter[0] : `${spriteFilter.length} SPRITES`) : spriteFilter)}</span>
             <ChevronDown size={13} className={`trigger-chevron ${spriteOpen ? 'rotated' : ''}`} />
           </button>
 
@@ -191,7 +219,7 @@ export function FilterBar({
               <div className="filter-backdrop-overlay" onClick={() => setSpriteOpen(false)} />
               <div className="sprite-grid-dropdown">
                 <button
-                  className={`sprite-grid-chip ${spriteFilter === 'all' ? 'is-active' : ''}`}
+                  className={`sprite-grid-chip ${isSpriteAll ? 'is-active' : ''}`}
                   onClick={() => handleSpriteSelect('all')}
                 >
                   <span className="sprite-chip-name">Todos</span>
@@ -199,7 +227,7 @@ export function FilterBar({
                 {availableFamiliesWithImages.map(family => (
                   <button
                     key={family.familyId}
-                    className={`sprite-grid-chip ${spriteFilter === family.name ? 'is-active' : ''}`}
+                    className={`sprite-grid-chip ${isSpriteSelected(family.name) ? 'is-active' : ''}`}
                     onClick={() => handleSpriteSelect(family.name)}
                   >
                     <img src={family.image} alt="" className="sprite-chip-icon"
