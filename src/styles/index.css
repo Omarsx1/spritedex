@@ -5079,25 +5079,31 @@ body::after {
 
 /* ===== MODAL RADAR DE AMIGOS (ESTILO SDM-SHARE-PRO) ===== */
 .sdm-compare {
-  max-width: 680px;
-  width: 95%;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
   border-radius: 18px;
   max-height: 90vh;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
 }
 
 .sdm-compare__body {
   padding-top: 6px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Top Cards Grid */
 .sdm-compare__top-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: 12px;
+  margin-bottom: 14px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .sdm-compare__card {
@@ -5110,6 +5116,8 @@ body::after {
   justify-content: space-between;
   gap: 10px;
   transition: border-color 0.2s ease;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .sdm-compare__card--my-code {
@@ -5183,10 +5191,12 @@ body::after {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-shrink: 0;
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .sdm-compare__btn-copy {
+  flex: 1;
   padding: 6px 10px;
   border-radius: 7px;
   background: rgba(14, 165, 233, 0.15);
@@ -5197,6 +5207,7 @@ body::after {
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   white-space: nowrap;
   transition: all 0.2s ease;
@@ -5299,10 +5310,13 @@ body::after {
 .sdm-compare__waiting {
   padding: 36px 20px;
   text-align: center;
-  background: rgba(8, 12, 22, 0.45);
-  border: 1px dashed rgba(0, 240, 255, 0.3);
+  background: rgba(3, 7, 18, 0.85);
+  border: 1px solid rgba(0, 240, 232, 0.2);
   border-radius: 14px;
   backdrop-filter: blur(8px);
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
 }
 
 .sdm-compare__radar-icon {
