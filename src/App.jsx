@@ -121,8 +121,8 @@ export function App() {
   // Filters matching fortnite.gg
   const [activeGen, setActiveGen] = useState(2); // 2 = 2ª Generación (GLITCH) by default!
   const [searchQuery, setSearchQuery] = useState('');
-  const [baseFilter, setBaseFilter] = useState([]); // BASE = variant/theme (Array for multi-select)
-  const [spriteFilter, setSpriteFilter] = useState([]); // SPRITE = family (Array for multi-select)
+  const [baseFilter, setBaseFilter] = useState('all'); // BASE = variant/theme
+  const [spriteFilter, setSpriteFilter] = useState('all'); // SPRITE = family
   const [statusFilter, setStatusFilter] = useState('all'); // STATUS = all/owned/missing
   const [sortBy, setSortBy] = useState('default'); // SORT BY
   const [showUnreleased, setShowUnreleased] = useState(false);
@@ -351,19 +351,11 @@ export function App() {
         if (!nameMatch && !idMatch && !familyMatch && !variantMatch && !variantDisplayMatch && !quackMatch && !holofoilMatch) return false;
       }
 
-      // BASE filter (variant/theme) - supports multi-select array or single string
-      if (Array.isArray(baseFilter)) {
-        if (baseFilter.length > 0 && !baseFilter.includes(sprite.variant)) return false;
-      } else if (baseFilter && baseFilter !== 'all') {
-        if (sprite.variant !== baseFilter) return false;
-      }
+      // BASE filter (variant/theme)
+      if (baseFilter !== 'all' && sprite.variant !== baseFilter) return false;
 
-      // SPRITE filter (family) - supports multi-select array or single string
-      if (Array.isArray(spriteFilter)) {
-        if (spriteFilter.length > 0 && !spriteFilter.some(f => f.toLowerCase() === sprite.familyName.toLowerCase())) return false;
-      } else if (spriteFilter && spriteFilter !== 'all') {
-        if (sprite.familyName.toLowerCase() !== spriteFilter.toLowerCase()) return false;
-      }
+      // SPRITE filter (family)
+      if (spriteFilter !== 'all' && sprite.familyName.toLowerCase() !== spriteFilter.toLowerCase()) return false;
 
       // STATUS filter (all / owned / missing / new)
       if (statusFilter === 'owned') {
@@ -606,8 +598,8 @@ export function App() {
           activeGen={activeGen}
           activeFiltersLabel={
             [
-              Array.isArray(baseFilter) ? (baseFilter.length > 0 ? `Variante: ${baseFilter.join(', ')}` : '') : (baseFilter !== 'all' ? `Variante: ${baseFilter}` : ''),
-              Array.isArray(spriteFilter) ? (spriteFilter.length > 0 ? `Familia: ${spriteFilter.join(', ')}` : '') : (spriteFilter !== 'all' ? `Familia: ${spriteFilter}` : ''),
+              baseFilter !== 'all' ? `Variante: ${baseFilter}` : '',
+              spriteFilter !== 'all' ? `Familia: ${spriteFilter}` : '',
               searchQuery ? `Búsqueda: "${searchQuery}"` : ''
             ]
               .filter(Boolean)
