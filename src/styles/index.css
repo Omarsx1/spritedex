@@ -4616,12 +4616,16 @@ body::after {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 14px;
+  gap: 12px;
+  width: 100%;
 }
 
 .sdm-share-pro__title-wrap {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  flex: 1;
 }
 
 .sdm-share-pro__icon-badge {
@@ -4656,7 +4660,14 @@ body::after {
 .sdm-share-pro__close {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  min-width: 32px;
+  min-height: 32px;
+  max-width: 32px;
+  max-height: 32px;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
+  border-radius: 9999px;
+  padding: 0;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #94a3b8;
@@ -4664,6 +4675,7 @@ body::after {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  box-sizing: border-box;
   transition: all 0.2s ease;
 }
 
