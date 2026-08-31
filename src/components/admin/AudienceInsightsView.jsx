@@ -77,23 +77,24 @@ const AndroidIcon = ({ size = 14, color = '#34A853', style = {} }) => (
   </svg>
 );
 
-// Helper para identificar sesiones de prueba de la Mac del desarrollador/administrador
+// Helper para identificar exclusivamente sesiones de la Mac del desarrollador/administrador
 const isMacOrAdminEvent = (ev) => {
   if (!ev) return false;
   const os = (ev.os || '').toLowerCase();
-  const browser = (ev.browser || '').toLowerCase();
   const ref = (ev.referrer || '').toLowerCase();
   const path = (ev.path || '').toLowerCase();
-  return (
-    os.includes('mac') ||
-    os.includes('darwin') ||
-    browser.includes('brave') ||
-    ref.includes('studio-override') ||
-    ref.includes('override') ||
-    ref.includes('nexus') ||
-    path.includes('studio') ||
-    path.includes('override')
-  );
+
+  // Si el canal de acceso fue explícitamente el portal de administración/estudio
+  if (ref.includes('studio-override') || ref.includes('nexus') || path.includes('studio') || path.includes('override')) {
+    return true;
+  }
+
+  // Si es un dispositivo Mac del administrador
+  if (os.includes('mac') || os.includes('darwin')) {
+    return true;
+  }
+
+  return false;
 };
 
 export function AudienceInsightsView({ darkMode = false }) {
@@ -117,7 +118,14 @@ export function AudienceInsightsView({ darkMode = false }) {
 
   // Bloquea automáticamente telemetría futura mientras el admin usa este panel
   useEffect(() => {
+    try {
+      localStorage.removeItem('spritedex_purged_all_mac');
+      localStorage.removeItem('spritedex_purged_mac_ids');
+    } catch {}
     setIgnoreTelemetry(true);
+    loadAudienceData();
+    const interval = setInterval(loadAudienceData, 25000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleToggleExcludeMyDevice = () => {
@@ -131,10 +139,8 @@ export function AudienceInsightsView({ darkMode = false }) {
   };
 
   const handlePurgeMyMacRecords = async () => {
-    // 1. Bloqueo permanente de telemetría futura
     setIgnoreTelemetry(true);
     localStorage.setItem('spritedex_ignore_telemetry', 'true');
-    localStorage.setItem('spritedex_purged_all_mac', 'true');
     localStorage.setItem('spritedex_analytics_exclude_my_device', 'true');
     setExcludeMyDevice(true);
 
@@ -143,7 +149,7 @@ export function AudienceInsightsView({ darkMode = false }) {
 
     const result = await showConfirmDialog({
       title: '¿Purgar registros de tu Mac?',
-      text: `¿Confirmas eliminar permanentemente los ${count > 0 ? count : 'todos los'} registros de prueba generados desde tu Mac? Tus visitas futuras tampoco se registrarán.`,
+      text: `¿Confirmas eliminar permanentemente los registros de prueba generados desde tu Mac de la base de datos? Esto dejará intactos los registros de España, Guatemala y otros usuarios reales.`,
       confirmText: 'Sí, purgar registros',
       cancelText: 'Cancelar',
       icon: 'warning',
@@ -158,14 +164,6 @@ export function AudienceInsightsView({ darkMode = false }) {
     try {
       setIsPurging(true);
 
-      // Guardamos IDs purgados en almacenamiento local permanente
-      const prevPurged = JSON.parse(localStorage.getItem('spritedex_purged_mac_ids') || '[]');
-      const newPurgedIds = Array.from(new Set([...prevPurged, ...myMacEvents.map(e => e.id).filter(Boolean)]));
-      localStorage.setItem('spritedex_purged_mac_ids', JSON.stringify(newPurgedIds));
-
-      // Limpieza inmediata en memoria para que desaparezcan al instante
-      setEvents(prev => prev.filter(ev => !isMacOrAdminEvent(ev) && !newPurgedIds.includes(ev.id)));
-
       // Intentar borrado en base de datos Supabase
       if (isSupabaseConfigured && supabase) {
         try {
@@ -173,9 +171,6 @@ export function AudienceInsightsView({ darkMode = false }) {
         } catch (e) {}
         try {
           await supabase.from('analytics_events').delete().ilike('referrer', '%studio-override%');
-        } catch (e) {}
-        try {
-          await supabase.from('analytics_events').delete().eq('browser', 'Brave');
         } catch (e) {}
 
         const ids = myMacEvents.map(e => e.id).filter(Boolean);
@@ -189,9 +184,12 @@ export function AudienceInsightsView({ darkMode = false }) {
       // Limpiar caché local
       localStorage.removeItem('spritedex_local_analytics');
 
+      // Recargar datos actualizados
+      await loadAudienceData();
+
       await showSuccessAlert({
         title: '¡Purga completada!',
-        text: `Se eliminaron correctamente ${count > 0 ? count : ''} registros de tu Mac. Tus visitas ya no se registrarán ni aparecerán en las estadísticas.`,
+        text: `Registros de tu Mac eliminados. Las visitas de otros usuarios reales (España, Guatemala, etc.) se mantienen intactas.`,
         darkMode
       });
     } catch (err) {
@@ -218,16 +216,7 @@ export function AudienceInsightsView({ darkMode = false }) {
         }
 
         if (rawEvents && rawEvents.length > 0) {
-          const purgedIds = new Set(JSON.parse(localStorage.getItem('spritedex_purged_mac_ids') || '[]'));
-          const isPurgedAllMac = localStorage.getItem('spritedex_purged_all_mac') === 'true';
-
-          const cleanList = rawEvents.filter(ev => {
-            if (purgedIds.has(ev.id)) return false;
-            if (isPurgedAllMac && isMacOrAdminEvent(ev)) return false;
-            return true;
-          });
-
-          setEvents(cleanList);
+          setEvents(rawEvents);
         } else {
           setEvents([]);
         }
