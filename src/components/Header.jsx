@@ -204,7 +204,7 @@ export function Header({
 
       <div className="hero__content">
         {/* Title */}
-        <div className="hero__title-block" ref={titleRef}>
+        <div className="hero__title-block" ref={titleRef} style={{ position: 'relative', zIndex: 10 }}>
           <h1 className="hero__title">
             <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">FORTNITE</span>
             <span className="hero__title-line hero__title-line--accent">SPRITEDEX</span>
@@ -220,6 +220,7 @@ export function Header({
             maxWidth: '180px',
             maxHeight: '180px',
             position: 'relative',
+            zIndex: 2,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
