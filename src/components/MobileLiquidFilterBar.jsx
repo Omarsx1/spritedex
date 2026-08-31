@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Search, SlidersHorizontal, X, Check, RotateCcw } from 'lucide-react';
 import { THEMES_LIST, THEME_NAMES_ES, ALL_SPRITES, FAMILY_NAMES_MAP } from '../data/spritesData';
+import { LiquidGlassFilter } from './ui/LiquidGooey';
 
 const VARIANT_COLORS = {
   Basic:       { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' },
@@ -387,6 +388,7 @@ export function MobileLiquidFilterBar({
           </div>
         </div>
       )}
+      <LiquidGlassFilter id="liquid-glass-refraction" />
     </div>
   );
 }
