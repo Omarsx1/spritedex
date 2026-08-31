@@ -42,6 +42,9 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
   const matchedFamily = allFamilies.find(f => f.id === initialFamilyId);
   const initialFamilyName = spirit?.familyName || matchedFamily?.name || (initialFamilyId.charAt(0).toUpperCase() + initialFamilyId.slice(1));
 
+  const initialRawCost = spirit?.summonCost || spirit?.summon_cost || '2,000';
+  const initialCostDigits = (String(initialRawCost).replace(/[^\d]/g, '')) || '2000';
+
   const [formData, setFormData] = useState({
     id: spirit?.id || '',
     name: spirit?.name || '',
@@ -56,7 +59,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
     image: spirit?.image || (spirit?.id ? `/sprites/${spirit.id}.png` : ''),
     ability: spirit?.ability || 'Concede bonificaciones pasivas de combate y velocidad.',
     specialPerk: spirit?.specialPerk || spirit?.special_perk || '',
-    summonCost: spirit?.summonCost || spirit?.summon_cost || '2,000 Polvo Estelar',
+    summonCostNum: initialCostDigits,
     dropChance: spirit?.dropChance || spirit?.drop_chance || '1.50%',
     unreleased: spirit?.unreleased || false,
     releaseDate: spirit?.release_date ? new Date(spirit.release_date).toISOString().slice(0, 16) : ''
@@ -231,6 +234,11 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
       setErrorMsg('');
 
       const cleanId = formData.id || `${formData.familyId}_${formData.variant.toLowerCase()}`;
+      const costNumber = parseInt(formData.summonCostNum, 10);
+      const formattedSummonCost = !isNaN(costNumber) && costNumber >= 0 
+        ? `${costNumber.toLocaleString('en-US')} Polvo Estelar`
+        : '2,000 Polvo Estelar';
+
       const payload = {
         id: cleanId,
         name: formData.name || formData.fullName,
@@ -244,7 +252,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
         image: formData.image,
         ability: formData.ability,
         special_perk: formData.specialPerk,
-        summon_cost: formData.summonCost,
+        summon_cost: formattedSummonCost,
         drop_chance: formData.dropChance,
         unreleased: Boolean(formData.unreleased),
         release_date: formData.releaseDate ? new Date(formData.releaseDate).toISOString() : null,
@@ -648,22 +656,55 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Costo Polvo Estelar
                 </label>
-                <input
-                  type="text"
-                  value={formData.summonCost}
-                  onChange={(e) => setFormData(prev => ({ ...prev, summonCost: e.target.value }))}
-                  placeholder="2,000 Polvo Estelar"
-                  style={{
-                    width: '100%',
-                    padding: '11px 14px',
-                    borderRadius: '10px',
-                    background: c.bgInput,
-                    border: `1px solid ${c.borderInput}`,
-                    color: c.textPrimary,
-                    fontSize: '0.86rem',
-                    boxSizing: 'border-box'
-                  }}
-                />
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: c.bgInput,
+                  border: `1px solid ${c.borderInput}`,
+                  borderRadius: '10px',
+                  overflow: 'hidden'
+                }}>
+                  <input
+                    type="number"
+                    min="0"
+                    step="100"
+                    value={formData.summonCostNum}
+                    onChange={(e) => setFormData(prev => ({ ...prev, summonCostNum: e.target.value }))}
+                    placeholder="2000"
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      padding: '11px 14px',
+                      background: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      color: c.textPrimary,
+                      fontSize: '0.88rem',
+                      fontWeight: 600
+                    }}
+                  />
+                  <div style={{
+                    padding: '0 12px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    color: c.textSecondary,
+                    background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+                    borderLeft: `1px solid ${c.borderInput}`,
+                    height: '42px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    whiteSpace: 'nowrap',
+                    userSelect: 'none'
+                  }}>
+                    <img
+                      src="/img/stelar.webp"
+                      alt=""
+                      style={{ width: '16px', height: '16px', objectFit: 'contain' }}
+                    />
+                    <span>Polvo Estelar</span>
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -1199,7 +1240,10 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
               )}
 
               <div style={{ fontSize: '0.74rem', color: c.textMuted, marginBottom: '10px' }}>
-                {formData.summonCost}
+                {(() => {
+                  const n = parseInt(formData.summonCostNum, 10);
+                  return !isNaN(n) ? `${n.toLocaleString('en-US')} Polvo Estelar` : '0 Polvo Estelar';
+                })()}
               </div>
 
               {formData.unreleased ? (
