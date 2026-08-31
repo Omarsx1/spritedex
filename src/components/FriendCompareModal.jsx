@@ -176,11 +176,11 @@ export function FriendCompareModal({
           />
 
           <div className="sdm-compare__header-left">
-            <div className="sdm-compare__header-icon-box">
-              <Users size={20} color="#00F0E8" />
-            </div>
             <div className="sdm-compare__header-text">
-              <h2 className="sdm-compare__header-title">Radar de Amigos</h2>
+              <h2 className="sdm-compare__header-title">
+                <Users size={22} color="#00F0E8" className="sdm-compare__header-inline-icon" />
+                <span>Radar de Amigos</span>
+              </h2>
               <p className="sdm-compare__header-subtitle">
                 Compara colecciones en tiempo real y sincroniza con tus amigos.
               </p>
