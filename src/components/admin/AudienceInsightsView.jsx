@@ -18,7 +18,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
-  Filter
+  Filter,
+  Trash2,
+  EyeOff,
+  Eye,
+  CheckCircle,
+  ShieldAlert
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 import { resolveCountry } from '../../utils/telemetry';
@@ -79,6 +84,77 @@ export function AudienceInsightsView({ darkMode = false }) {
   const [tableSearch, setTableSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25); // 15 | 25 | 50 | 100 | 'all'
+  const [excludeMyDevice, setExcludeMyDevice] = useState(() => {
+    try {
+      const saved = localStorage.getItem('spritedex_analytics_exclude_my_device');
+      return saved !== null ? saved === 'true' : true;
+    } catch {
+      return true;
+    }
+  });
+  const [isPurging, setIsPurging] = useState(false);
+  const [purgeSuccessMsg, setPurgeSuccessMsg] = useState('');
+
+  const handleToggleExcludeMyDevice = () => {
+    setExcludeMyDevice(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem('spritedex_analytics_exclude_my_device', String(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const handlePurgeMyMacRecords = async () => {
+    const myMacEvents = events.filter(ev => {
+      const os = (ev.os || '').toLowerCase();
+      const browser = (ev.browser || '').toLowerCase();
+      const ref = (ev.referrer || '').toLowerCase();
+      return (os.includes('mac') && browser.includes('brave')) || ref.includes('studio-override');
+    });
+
+    if (myMacEvents.length === 0) {
+      alert('No se encontraron registros generados desde tu Mac en la base de datos.');
+      return;
+    }
+
+    if (!window.confirm(`¿Confirmas eliminar permanentemente los ${myMacEvents.length} registros de prueba generados desde tu Mac de la base de datos de Supabase? Esto dejará únicamente las visitas de usuarios reales.`)) {
+      return;
+    }
+
+    try {
+      setIsPurging(true);
+      if (isSupabaseConfigured && supabase) {
+        // Eliminar registros de macOS Brave
+        const { error: err1 } = await supabase
+          .from('analytics_events')
+          .delete()
+          .eq('os', 'macOS')
+          .eq('browser', 'Brave');
+
+        if (err1) throw err1;
+
+        // Eliminar accesos con canal studio-override
+        await supabase
+          .from('analytics_events')
+          .delete()
+          .ilike('referrer', '%studio-override%');
+
+        // Limpiar caché local
+        localStorage.removeItem('spritedex_local_analytics');
+
+        // Recargar datos actualizados
+        await loadAudienceData();
+        setPurgeSuccessMsg(`¡${myMacEvents.length} registros de tu Mac eliminados correctamente de la base de datos!`);
+        setTimeout(() => setPurgeSuccessMsg(''), 6000);
+      }
+    } catch (err) {
+      console.error('Error al purgar registros de Mac:', err);
+      alert('Error al purgar registros: ' + err.message);
+    } finally {
+      setIsPurging(false);
+    }
+  };
 
   const loadAudienceData = async () => {
     try {
@@ -117,7 +193,7 @@ export function AudienceInsightsView({ darkMode = false }) {
   // Reset pagination on filter change
   useEffect(() => {
     setCurrentPage(1);
-  }, [timeFilter, deviceFilter, tableSearch, pageSize]);
+  }, [timeFilter, deviceFilter, tableSearch, pageSize, excludeMyDevice]);
 
   // Filter events based on time and device filters
   const filteredEvents = useMemo(() => {
@@ -127,6 +203,16 @@ export function AudienceInsightsView({ darkMode = false }) {
     return events.filter((ev) => {
       const evDate = new Date(ev.created_at);
       const evTime = evDate.getTime();
+
+      // Exclude Admin device / macOS Brave sessions if toggle is active
+      if (excludeMyDevice) {
+        const os = (ev.os || '').toLowerCase();
+        const browser = (ev.browser || '').toLowerCase();
+        const ref = (ev.referrer || '').toLowerCase();
+        const path = (ev.path || '').toLowerCase();
+        const isMyMac = (os.includes('mac') && (browser.includes('brave') || ref.includes('studio-override') || path.includes('studio'))) || ref.includes('studio-override');
+        if (isMyMac) return false;
+      }
 
       // Time filter
       if (timeFilter === 'today') {
@@ -166,7 +252,7 @@ export function AudienceInsightsView({ darkMode = false }) {
 
       return true;
     });
-  }, [events, timeFilter, deviceFilter, tableSearch]);
+  }, [events, timeFilter, deviceFilter, tableSearch, excludeMyDevice]);
 
   // Aggregate Metrics & Device Breakdown
   const analytics = useMemo(() => {
@@ -713,7 +799,7 @@ export function AudienceInsightsView({ darkMode = false }) {
               </p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <span style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -729,6 +815,53 @@ export function AudienceInsightsView({ darkMode = false }) {
                 <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: c.badgeGreenText }} />
                 <span>En Tiempo Real</span>
               </span>
+
+              {/* Toggle Exclude My Device */}
+              <button
+                type="button"
+                onClick={handleToggleExcludeMyDevice}
+                title={excludeMyDevice ? 'Mostrando solo visitantes externos (tu Mac está oculta)' : 'Mostrando todas las sesiones (incluyendo tu Mac)'}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '5px 12px',
+                  borderRadius: '6px',
+                  border: excludeMyDevice ? '1px solid #10B981' : `1px solid ${c.borderCard}`,
+                  background: excludeMyDevice ? (darkMode ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5') : (darkMode ? '#262626' : '#FFFFFF'),
+                  color: excludeMyDevice ? (darkMode ? '#34D399' : '#059669') : c.textSecondary,
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                {excludeMyDevice ? <EyeOff size={13} /> : <Eye size={13} />}
+                <span>{excludeMyDevice ? 'Ocultando mi Mac' : 'Mostrando todo'}</span>
+              </button>
+
+              {/* Purge My Mac Records Button */}
+              <button
+                type="button"
+                onClick={handlePurgeMyMacRecords}
+                disabled={isPurging}
+                title="Eliminar permanentemente todos los registros generados desde tu Mac de la base de datos"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '5px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid rgba(239, 68, 68, 0.35)',
+                  background: darkMode ? 'rgba(239, 68, 68, 0.12)' : '#FEF2F2',
+                  color: darkMode ? '#F87171' : '#DC2626',
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  cursor: isPurging ? 'wait' : 'pointer'
+                }}
+              >
+                <Trash2 size={13} />
+                <span>{isPurging ? 'Purgando...' : 'Purgar mi Mac'}</span>
+              </button>
 
               <button
                 type="button"
@@ -776,6 +909,25 @@ export function AudienceInsightsView({ darkMode = false }) {
               </button>
             </div>
           </div>
+
+          {/* Purge Notification Alert */}
+          {purgeSuccessMsg && (
+            <div style={{
+              padding: '10px 14px',
+              borderRadius: '8px',
+              background: darkMode ? 'rgba(16, 185, 129, 0.18)' : '#D1FAE5',
+              border: '1px solid #10B981',
+              color: darkMode ? '#34D399' : '#065F46',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <CheckCircle size={16} />
+              <span>{purgeSuccessMsg}</span>
+            </div>
+          )}
 
           {/* Filter & Search Bar */}
           <div style={{
