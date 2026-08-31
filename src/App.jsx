@@ -492,8 +492,6 @@ export function App() {
 
       <Header
         spritesPool={scopedSprites}
-        allSprites={dynamicSprites.filter((s) => (activeGen === 0 || s.gen === activeGen) && (showUnreleased || !s.unreleased))}
-        userState={userState}
         ownedCount={ownedCount}
         totalCount={totalCount}
         masteredCount={masteredCount}

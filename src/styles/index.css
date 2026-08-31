@@ -5172,23 +5172,30 @@ body::after {
 
 .sdm-compare__code-badge {
   font-family: monospace;
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 900;
   color: #00F0E8;
   background: rgba(0, 0, 0, 0.55);
-  padding: 5px 10px;
+  padding: 6px 10px;
   border-radius: 7px;
   border: 1px solid rgba(0, 240, 232, 0.35);
   letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(0, 240, 232, 0.35);
+}
+
+.sdm-compare__code-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .sdm-compare__btn-copy {
-  padding: 6px 12px;
+  padding: 6px 10px;
   border-radius: 7px;
-  background: #0284c7;
-  color: #fff;
-  border: none;
-  font-size: 0.76rem;
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  font-size: 0.74rem;
   font-weight: 800;
   cursor: pointer;
   display: flex;
@@ -5198,34 +5205,28 @@ body::after {
 }
 
 .sdm-compare__btn-copy:hover {
-  background: #0369a1;
+  background: rgba(14, 165, 233, 0.3);
+  border-color: #38bdf8;
+  color: #fff;
   transform: translateY(-1px);
 }
 
+.sdm-compare__btn-copy--link {
+  background: rgba(0, 240, 232, 0.12);
+  color: #00F0E8;
+  border-color: rgba(0, 240, 232, 0.35);
+}
+
+.sdm-compare__btn-copy--link:hover {
+  background: rgba(0, 240, 232, 0.25);
+  border-color: #00F0E8;
+  color: #fff;
+}
+
 .sdm-compare__btn-copy--done {
-  background: #10b981 !important;
-}
-
-.sdm-compare__btn-link {
-  width: 100%;
-  padding: 7px 10px;
-  border-radius: 7px;
-  background: rgba(0, 240, 255, 0.08);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  font-size: 0.74rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-}
-
-.sdm-compare__btn-link:hover {
-  background: rgba(0, 240, 255, 0.16);
-  border-color: rgba(56, 189, 248, 0.6);
+  background: rgba(16, 185, 129, 0.25) !important;
+  border-color: #10b981 !important;
+  color: #4ade80 !important;
 }
 
 .sdm-compare__input-row {
@@ -5315,20 +5316,34 @@ body::after {
 
 /* Waiting Card */
 .sdm-compare__waiting {
-  padding: 34px 20px;
+  padding: 36px 20px;
   text-align: center;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px dashed rgba(0, 240, 255, 0.25);
+  background: rgba(8, 12, 22, 0.45);
+  border: 1px dashed rgba(0, 240, 255, 0.3);
   border-radius: 14px;
+  backdrop-filter: blur(8px);
 }
 
 .sdm-compare__radar-icon {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   display: inline-flex;
-  padding: 12px;
+  padding: 14px;
   border-radius: 50%;
   background: rgba(0, 240, 255, 0.1);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.25);
+  animation: radarPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes radarPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 32px rgba(168, 85, 247, 0.45);
+  }
 }
 
 .sdm-compare__waiting-title {
@@ -5343,7 +5358,7 @@ body::after {
   color: #94a3b8;
   margin: 0 auto;
   max-width: 440px;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 /* Toolbar: Season Filter & Copy Trade Plan */

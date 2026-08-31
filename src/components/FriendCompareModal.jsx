@@ -194,22 +194,22 @@ export function FriendCompareModal({
           <div
             className="sdm__hero-glow"
             style={{
-              background: 'radial-gradient(circle at 30% 50%, rgba(168, 85, 247, 0.4) 0%, rgba(0, 240, 232, 0.25) 50%, transparent 80%)'
+              background: 'radial-gradient(circle at 30% 50%, rgba(168, 85, 247, 0.35) 0%, rgba(0, 240, 232, 0.2) 50%, transparent 80%)'
             }}
           />
 
           <div className="sdm-share__hero-icon">
-            <Users size={28} color="#00F0E8" />
+            <Users size={24} color="#00F0E8" />
           </div>
 
           <div className="sdm__hero-info">
             <div className="sdm__hero-badges">
-              <span className="sdm-share__tag-chapter">FORTNITE | TEMPORADA GLITCH</span>
+              <span className="sdm-share__tag-chapter">FORTNITE</span>
               <span className="sdm-share__tag-pill" style={{ background: '#8b5cf6' }}>INTERCAMBIO EN VIVO</span>
             </div>
             <h2 className="sdm__name sdm-share__glitch-title">PLANIFICADOR DE INTERCAMBIOS</h2>
             <p className="sdm__meta">
-              Sincroniza y compara en tiempo real con tu amigo en Fortnite mediante tu Código de Amigo permanente.
+              Sincroniza y compara en tiempo real tu colección con la de un amigo mediante tu Código permanente.
             </p>
           </div>
         </div>
@@ -229,21 +229,25 @@ export function FriendCompareModal({
                 <span className="sdm-compare__code-badge">
                   {myFriendCode || 'SDEX-????'}
                 </span>
-                <button
-                  onClick={handleCopyCode}
-                  className={`sdm-compare__btn-copy ${copiedCode ? 'sdm-compare__btn-copy--done' : ''}`}
-                >
-                  {copiedCode ? <Check size={14} /> : <Copy size={14} />}
-                  <span>{copiedCode ? '¡Copiado!' : 'Copiar'}</span>
-                </button>
+                <div className="sdm-compare__code-actions">
+                  <button
+                    onClick={handleCopyCode}
+                    className={`sdm-compare__btn-copy ${copiedCode ? 'sdm-compare__btn-copy--done' : ''}`}
+                    title="Copiar solo el código"
+                  >
+                    {copiedCode ? <Check size={13} /> : <Copy size={13} />}
+                    <span>{copiedCode ? '¡Copiado!' : 'Código'}</span>
+                  </button>
+                  <button
+                    onClick={handleCopyPermanentLink}
+                    className={`sdm-compare__btn-copy sdm-compare__btn-copy--link ${copiedLink ? 'sdm-compare__btn-copy--done' : ''}`}
+                    title="Copiar enlace directo permanente"
+                  >
+                    {copiedLink ? <Check size={13} color="#10b981" /> : <Zap size={13} color="#00F0E8" />}
+                    <span>{copiedLink ? '¡Enlace!' : 'Enlace'}</span>
+                  </button>
+                </div>
               </div>
-              <button
-                onClick={handleCopyPermanentLink}
-                className="sdm-compare__btn-link"
-              >
-                {copiedLink ? <Check size={13} color="#10b981" /> : <Zap size={13} color="#00F0E8" />}
-                <span>{copiedLink ? '¡Enlace Copiado!' : 'Copiar Enlace Directo'}</span>
-              </button>
             </div>
 
             {/* 2. Conectar con Amigo en Tiempo Real */}
@@ -253,7 +257,7 @@ export function FriendCompareModal({
                   {isLiveConnected ? (
                     <span style={{ color: '#10b981' }}>🟢 CONECTADO EN VIVO</span>
                   ) : (
-                    <span>🤝 CONECTAR CON UN AMIGO</span>
+                    <span>🤝 CONECTAR CON AMIGO</span>
                   )}
                 </div>
                 {isLiveConnected && onDisconnectFriend && (
@@ -272,7 +276,7 @@ export function FriendCompareModal({
                     Amigo: <strong>{connectedFriendCode}</strong>
                   </div>
                   <span className="sdm-compare__connected-hint">
-                    ⚡ Las nuevas capturas de tu amigo se actualizan al instante.
+                    ⚡ Las capturas de tu amigo se actualizan al instante.
                   </span>
                 </div>
               ) : (
@@ -294,7 +298,7 @@ export function FriendCompareModal({
                   </button>
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    title="Cargar archivo JSON"
+                    title="Cargar archivo JSON de colección"
                     className="sdm-compare__btn-upload"
                   >
                     <Upload size={14} />
@@ -315,11 +319,11 @@ export function FriendCompareModal({
           {!hasFriendData ? (
             <div className="sdm-compare__waiting">
               <div className="sdm-compare__radar-icon">
-                <Radio size={36} color="#00F0E8" />
+                <Radio size={32} color="#00F0E8" />
               </div>
-              <h3 className="sdm-compare__waiting-title">Esperando Conexión de Amigo</h3>
+              <h3 className="sdm-compare__waiting-title">Esperando Conexión con un Amigo</h3>
               <p className="sdm-compare__waiting-text">
-                Ingresa el <strong>Código de Amigo</strong> o pega el enlace arriba para comparar colecciones y planificar préstamos en tiempo real.
+                Ingresa el <strong>Código de Amigo</strong> o pega su enlace arriba para comparar ambas colecciones y ver qué espíritus pueden prestarse en Fortnite.
               </p>
             </div>
           ) : (

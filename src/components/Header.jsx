@@ -1,14 +1,10 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import { Share2, Users, Download, Loader2, Check } from 'lucide-react';
+import { Share2, Users } from 'lucide-react';
 import gsap from 'gsap';
 import { allSprites as defaultAllSprites } from '../data/spritesData';
-import { generatePokedexCardImage } from '../utils/canvasExporter';
-import { sounds } from '../utils/audio';
 
 export function Header({
   spritesPool,
-  allSprites,
-  userState,
   totalCount,
   ownedCount,
   masteredCount,
@@ -20,9 +16,6 @@ export function Header({
   onOpenCompareModal,
   onOpenAuthModal
 }) {
-  const [isQuickDownloading, setIsQuickDownloading] = useState(false);
-  const [downloadedSuccess, setDownloadedSuccess] = useState(false);
-
   // Pool of sprites for hero rotation
   const spritePool = useMemo(() => {
     return spritesPool && spritesPool.length > 0 ? spritesPool : (defaultAllSprites || []);
@@ -157,39 +150,6 @@ export function Header({
     e.target.src = '/sprites/water_basic.png';
   }, []);
 
-  const handleQuickDownloadTemplate = async () => {
-    if (isQuickDownloading) return;
-    try {
-      setIsQuickDownloading(true);
-      sounds.playBeep();
-
-      const exportSprites = allSprites && allSprites.length > 0 ? allSprites : spritePool;
-      const url = await generatePokedexCardImage({
-        spritesList: exportSprites,
-        userState: userState || {},
-        format: 'checklist',
-        bgStyle: 'glitch_override'
-      });
-
-      if (url) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `spritedex_plantilla_todos_${new Date().toISOString().slice(0, 10)}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        setDownloadedSuccess(true);
-        sounds.playToggle(true, 2);
-        setTimeout(() => setDownloadedSuccess(false), 3000);
-      }
-    } catch (err) {
-      console.error('Error generando descarga rápida de plantilla:', err);
-    } finally {
-      setIsQuickDownloading(false);
-    }
-  };
-
   return (
     <header className="hero">
       {/* Animated background layers */}
@@ -319,26 +279,9 @@ export function Header({
                 <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
               )}
             </button>
-            <button className="hero__btn hero__btn--accent" onClick={onOpenShareModal} title="Personalizar y Compartir">
+            <button className="hero__btn hero__btn--accent" onClick={onOpenShareModal} title="Compartir Imagen">
               <Share2 size={16} className="hero__btn-icon" />
               <span className="hero__btn-text">Compartir</span>
-            </button>
-            <button
-              className="hero__btn hero__btn--cyan"
-              onClick={handleQuickDownloadTemplate}
-              disabled={isQuickDownloading}
-              title="Descarga Rápida 1-Click de la Plantilla Vertical HD"
-            >
-              {isQuickDownloading ? (
-                <Loader2 size={16} className="hero__btn-icon hero__spin-icon" />
-              ) : downloadedSuccess ? (
-                <Check size={16} className="hero__btn-icon" color="#4ade80" />
-              ) : (
-                <Download size={16} className="hero__btn-icon" />
-              )}
-              <span className="hero__btn-text">
-                {isQuickDownloading ? 'Generando...' : downloadedSuccess ? '¡Listo!' : 'Plantilla'}
-              </span>
             </button>
           </div>
 
