@@ -353,45 +353,56 @@ export function AnalyticsDashboard({ darkMode = false }) {
             </div>
 
             <div style={{ fontSize: '1.9rem', fontWeight: 800, color: textPrimary, letterSpacing: '-0.03em', margin: '4px 0 16px' }}>
-              {data.activeSessionsCount > 1 ? data.activeSessionsCount : 364} <span style={{ fontSize: '0.84rem', fontWeight: 600, color: textMuted }}>Live visitors</span>
+              {data.activeSessionsCount || 1} <span style={{ fontSize: '0.84rem', fontWeight: 600, color: textMuted }}>Live visitors</span>
             </div>
 
-            {/* Sparkline Area Chart */}
+            {/* Sparkline Area Chart dinámico según datos reales */}
             <div style={{ height: '70px', width: '100%' }}>
-              <svg viewBox="0 0 300 70" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
-                <defs>
-                  <linearGradient id="liveSparkGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={darkMode ? '#3ECF8E' : '#3C50E0'} stopOpacity="0.4" />
-                    <stop offset="100%" stopColor={darkMode ? '#3ECF8E' : '#3C50E0'} stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M 0,55 Q 50,45 100,50 T 200,30 T 280,20 T 300,35 L 300,70 L 0,70 Z"
-                  fill="url(#liveSparkGrad)"
-                />
-                <path
-                  d="M 0,55 Q 50,45 100,50 T 200,30 T 280,20 T 300,35"
-                  fill="none"
-                  stroke={darkMode ? '#3ECF8E' : '#3C50E0'}
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
-              </svg>
+              {(() => {
+                const b = data.dailyBuckets && data.dailyBuckets.length > 0 ? data.dailyBuckets : [0, 0, 1, 1, 2, 1, 2];
+                const maxB = Math.max(...b, 1);
+                const points = b.slice(-10).map((val, idx, arr) => {
+                  const x = Math.round((idx / (arr.length - 1 || 1)) * 300);
+                  const y = Math.round(55 - (val / maxB) * 40);
+                  return `${x},${y}`;
+                });
+                const pathD = points.length > 0 ? `M 0,55 L ${points.join(' L ')}` : 'M 0,55 L 300,55';
+                const areaD = `${pathD} L 300,70 L 0,70 Z`;
+
+                return (
+                  <svg viewBox="0 0 300 70" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+                    <defs>
+                      <linearGradient id="liveSparkGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={darkMode ? '#3ECF8E' : '#3C50E0'} stopOpacity="0.4" />
+                        <stop offset="100%" stopColor={darkMode ? '#3ECF8E' : '#3C50E0'} stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+                    <path d={areaD} fill="url(#liveSparkGrad)" />
+                    <path d={pathD} fill="none" stroke={darkMode ? '#3ECF8E' : '#3C50E0'} strokeWidth="2.5" strokeLinecap="round" />
+                  </svg>
+                );
+              })()}
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', paddingTop: '16px', borderTop: dividerBorder, textAlign: 'center' }}>
             <div>
-              <div style={{ fontSize: '1rem', fontWeight: 800, color: textPrimary }}>224</div>
-              <span style={{ fontSize: '0.68rem', color: textMuted }}>Avg. Daily</span>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: textPrimary }}>
+                {Math.max(1, Math.round(data.totalVisits / 30))}
+              </div>
+              <span style={{ fontSize: '0.68rem', color: textMuted }}>Avg. Diario</span>
             </div>
             <div>
-              <div style={{ fontSize: '1rem', fontWeight: 800, color: textPrimary }}>1.4K</div>
-              <span style={{ fontSize: '0.68rem', color: textMuted }}>Avg. Weekly</span>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: textPrimary }}>
+                {Math.max(1, Math.round((data.totalVisits / 30) * 7))}
+              </div>
+              <span style={{ fontSize: '0.68rem', color: textMuted }}>Avg. Semanal</span>
             </div>
             <div>
-              <div style={{ fontSize: '1rem', fontWeight: 800, color: textPrimary }}>22.1K</div>
-              <span style={{ fontSize: '0.68rem', color: textMuted }}>Avg. Monthly</span>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: textPrimary }}>
+                {data.totalVisits}
+              </div>
+              <span style={{ fontSize: '0.68rem', color: textMuted }}>Total Mes</span>
             </div>
           </div>
         </div>
