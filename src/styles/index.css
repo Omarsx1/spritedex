@@ -5137,20 +5137,13 @@ body::after {
 .sdm-compare__header-text {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
-}
-
-.sdm-compare__header-title-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
 }
 
 .sdm-compare__header-title {
   font-family: var(--font-heading);
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #ffffff;
   margin: 0;
@@ -5158,31 +5151,8 @@ body::after {
   line-height: 1.2;
 }
 
-.sdm-compare__header-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
-  border-radius: 9999px;
-  background: rgba(139, 92, 246, 0.16);
-  border: 1px solid rgba(139, 92, 246, 0.35);
-  color: #c084fc;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.sdm-compare__header-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.9);
-}
-
 .sdm-compare__header-subtitle {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: #94a3b8;
   margin: 0;
   line-height: 1.35;
@@ -5285,25 +5255,29 @@ body::after {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  flex-wrap: nowrap;
 }
 
 .sdm-compare__code-badge {
   font-family: monospace;
-  font-size: 1.12rem;
+  font-size: 1.05rem;
   font-weight: 900;
   color: #00F0E8;
   background: rgba(0, 0, 0, 0.55);
   padding: 6px 10px;
   border-radius: 7px;
   border: 1px solid rgba(0, 240, 232, 0.35);
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   text-shadow: 0 0 8px rgba(0, 240, 232, 0.35);
+  white-space: nowrap !important;
+  flex-shrink: 0;
 }
 
 .sdm-compare__code-actions {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .sdm-compare__btn-copy {
@@ -5318,6 +5292,7 @@ body::after {
   display: flex;
   align-items: center;
   gap: 5px;
+  white-space: nowrap;
   transition: all 0.2s ease;
 }
 
@@ -5348,13 +5323,13 @@ body::after {
 
 .sdm-compare__input-row {
   display: flex;
-  gap: 6px;
+  gap: 8px;
 }
 
 .sdm-compare__input {
   flex: 1;
   min-width: 0;
-  padding: 8px 10px;
+  padding: 8px 12px;
   border-radius: 7px;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -5370,7 +5345,7 @@ body::after {
 }
 
 .sdm-compare__btn-connect {
-  padding: 8px 14px;
+  padding: 8px 16px;
   border-radius: 7px;
   background: linear-gradient(135deg, #8b5cf6, #6d28d9);
   color: #fff;
@@ -5380,6 +5355,7 @@ body::after {
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   white-space: nowrap;
   transition: all 0.2s ease;
@@ -5388,24 +5364,6 @@ body::after {
 .sdm-compare__btn-connect:hover:not(:disabled) {
   box-shadow: 0 0 14px rgba(139, 92, 246, 0.5);
   transform: translateY(-1px);
-}
-
-.sdm-compare__btn-upload {
-  padding: 8px 10px;
-  border-radius: 7px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #94a3b8;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.sdm-compare__btn-upload:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.15);
 }
 
 .sdm-compare__connected-info {
@@ -5715,8 +5673,10 @@ body::after {
   }
 
   .sdm-compare__code-badge {
-    font-size: 1rem;
-    padding: 4px 8px;
+    font-size: 0.95rem;
+    padding: 5px 8px;
+    white-space: nowrap !important;
+    flex-shrink: 0;
   }
 
   .sdm-compare__btn-copy {

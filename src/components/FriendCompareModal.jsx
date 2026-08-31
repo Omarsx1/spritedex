@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { X, Users, Copy, Check, ArrowDownLeft, ArrowUpRight, Handshake, Upload, Radio, Zap, RefreshCw, Sparkles, MessageSquare } from 'lucide-react';
+import { X, Users, Copy, Check, ArrowDownLeft, ArrowUpRight, Handshake, Radio, Zap, RefreshCw, Sparkles, MessageSquare } from 'lucide-react';
 import { ALL_SPRITES, getSpriteCardStyle } from '../data/spritesData';
 import { decodeCollectionState } from '../utils/shareLink';
 import { generatePermanentFriendUrl, normalizeFriendCode } from '../utils/friendCode';
@@ -28,7 +28,6 @@ export function FriendCompareModal({
   const [friendInput, setFriendInput] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const modalRef = useRef(null);
-  const fileInputRef = useRef(null);
 
   const permanentFriendUrl = generatePermanentFriendUrl(myFriendCode || 'SDEX-0000');
 
@@ -90,25 +89,6 @@ export function FriendCompareModal({
     } else {
       alert('No se pudo encontrar la colección del amigo. Verifica el código (ej: SDEX-XXXX) o enlace.');
     }
-  };
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const json = JSON.parse(event.target.result);
-        if (typeof json === 'object') {
-          sounds.playBeep();
-          if (onLoadFriendState) onLoadFriendState(json, 'ARCHIVO');
-        }
-      } catch (err) {
-        alert('El archivo no tiene un formato de colección válido.');
-      }
-    };
-    reader.readAsText(file);
   };
 
   const currentFriendState = friendState || {};
@@ -200,13 +180,7 @@ export function FriendCompareModal({
               <Users size={20} color="#00F0E8" />
             </div>
             <div className="sdm-compare__header-text">
-              <div className="sdm-compare__header-title-row">
-                <h2 className="sdm-compare__header-title">Radar de Amigos</h2>
-                <span className="sdm-compare__header-pill">
-                  <span className="sdm-compare__header-dot" />
-                  {isLiveConnected ? 'En Vivo' : 'Modo Social'}
-                </span>
-              </div>
+              <h2 className="sdm-compare__header-title">Radar de Amigos</h2>
               <p className="sdm-compare__header-subtitle">
                 Compara colecciones en tiempo real y sincroniza con tus amigos.
               </p>
@@ -300,20 +274,6 @@ export function FriendCompareModal({
                   >
                     {isConnecting ? <RefreshCw size={14} className="animate-spin" /> : 'Conectar'}
                   </button>
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    title="Cargar archivo JSON de colección"
-                    className="sdm-compare__btn-upload"
-                  >
-                    <Upload size={14} />
-                  </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".json"
-                    onChange={handleFileUpload}
-                    style={{ display: 'none' }}
-                  />
                 </div>
               )}
             </div>
