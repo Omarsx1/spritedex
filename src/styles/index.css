@@ -1916,13 +1916,13 @@ body::after {
 }
 
 /* ==========================================================================
-   MOBILE LIQUID FILTER BAR & GOOEY EFFECTS (Jakub Antalik Morph Architecture)
+   MOBILE UNIFIED GLASS SEARCH & FILTER PILL (Refined Aesthetic)
    ========================================================================== */
 
 .mobile-liquid-wrapper {
   width: 100%;
-  max-width: 480px;
-  margin: 12px auto 36px auto; /* Espaciado amplio para evitar que se pegue al nombre del espiritu */
+  max-width: 440px;
+  margin: 10px auto 34px auto; /* Espaciado amplio y comodo sobre KLOMBO */
   padding: 0 16px;
   display: flex;
   flex-direction: column;
@@ -1931,103 +1931,48 @@ body::after {
   box-sizing: border-box;
 }
 
-/* Morph Stage Container */
-.liquid-stage-container {
-  position: relative;
+/* Unified Glassmorphic Capsule */
+.mobile-glass-search-pill {
   width: 100%;
   max-width: 380px;
   height: 48px;
   display: flex;
   align-items: center;
-  justify-content: center;
-}
-
-/* LAYER 1: Silhouette Goo Layer (Passes through SVG Filter) */
-.liquid-goo-layer {
-  position: absolute;
-  inset: -12px -30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.liquid-blob-field {
-  position: absolute;
-  left: 30px;
-  width: calc(100% - 60px);
-  height: 48px;
+  gap: 8px;
+  padding: 0 8px 0 16px;
   border-radius: 9999px;
-  background: #181c28;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
-  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease;
-}
-
-.liquid-blob-btn {
-  position: absolute;
-  right: 30px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #181c28;
-  transform: translate3d(0, 0, 0);
-  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease;
-}
-
-/* When Budded (Morphing / Droplet detachment) */
-.liquid-stage-container.is-budded .liquid-blob-field {
-  width: calc(100% - 124px);
-  transform: translate3d(-26px, 0, 0);
-  background: #1c2234;
-}
-
-.liquid-stage-container.is-budded .liquid-blob-btn {
-  transform: translate3d(26px, 0, 0);
-  background: #1c2234;
-}
-
-/* LAYER 2: Crisp Content Layer (Text, Icons, Inputs) */
-.liquid-crisp-layer {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.liquid-crisp-field-box {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  padding: 0 18px;
-  pointer-events: auto;
-  transition: width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: rgba(14, 18, 30, 0.65);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
 }
 
-.liquid-stage-container.is-budded .liquid-crisp-field-box {
-  width: calc(100% - 64px);
-  transform: translate3d(-26px, 0, 0);
+.mobile-glass-search-pill.is-focused {
+  background: rgba(18, 24, 40, 0.85);
+  border-color: #00f0ff;
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.08);
+  transform: scale(1.01);
 }
 
-.liquid-crisp-search-icon {
+.mobile-glass-search-pill.has-active-filters:not(.is-focused) {
+  border-color: rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.2);
+}
+
+.mobile-glass-search-icon {
   color: #94a3b8;
-  margin-right: 10px;
   flex-shrink: 0;
   transition: color 0.2s ease;
 }
 
-.liquid-stage-container.is-budded .liquid-crisp-search-icon {
+.mobile-glass-search-pill.is-focused .mobile-glass-search-icon {
   color: #00f0ff;
 }
 
-.liquid-crisp-input {
+.mobile-glass-search-input {
   flex: 1;
   min-width: 0;
   background: transparent;
@@ -2035,17 +1980,17 @@ body::after {
   outline: none;
   color: #f8fafc;
   font-family: var(--font-sans);
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   font-weight: 600;
 }
 
-.liquid-crisp-input::placeholder {
+.mobile-glass-search-input::placeholder {
   color: #64748b;
   font-weight: 500;
 }
 
-.liquid-crisp-clear-btn {
-  background: rgba(255, 255, 255, 0.12);
+.mobile-glass-clear-btn {
+  background: rgba(255, 255, 255, 0.1);
   border: none;
   color: #cbd5e1;
   width: 22px;
@@ -2060,52 +2005,58 @@ body::after {
   transition: all 0.15s ease;
 }
 
-.liquid-crisp-clear-btn:hover {
+.mobile-glass-clear-btn:hover {
   background: rgba(255, 255, 255, 0.25);
   color: #ffffff;
 }
 
-.liquid-crisp-btn {
-  position: absolute;
-  right: 0;
-  width: 48px;
-  height: 48px;
+.mobile-glass-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+/* Integrated Filter Button inside Capsule */
+.mobile-glass-filter-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: none;
-  background: transparent;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.04);
   color: #94a3b8;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  pointer-events: auto;
-  transform: translate3d(0, 0, 0);
-  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
   padding: 0;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   -webkit-tap-highlight-color: transparent;
 }
 
-.liquid-crisp-btn:active {
-  transform: translate3d(0, 0, 0) scale(0.92);
+.mobile-glass-filter-btn:active {
+  transform: scale(0.92);
 }
 
-.liquid-stage-container.is-budded .liquid-crisp-btn {
-  transform: translate3d(26px, 0, 0);
-  color: #f8fafc;
+.mobile-glass-filter-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
-.liquid-stage-container.is-budded .liquid-crisp-btn:active {
-  transform: translate3d(26px, 0, 0) scale(0.92);
-}
-
-.liquid-crisp-btn.has-active-filters {
+.mobile-glass-filter-btn.is-active {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(168, 85, 247, 0.25));
+  border-color: #00f0ff;
   color: #00f0ff;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
 }
 
-.liquid-crisp-badge {
+.mobile-glass-badge {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: -2px;
+  right: -2px;
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
@@ -2117,7 +2068,7 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
   animation: popInCenter 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -2166,11 +2117,11 @@ body::after {
   color: #94a3b8;
 }
 
-/* ═══ LIQUID BOTTOM SHEET / DRAWER ═══ */
+/* ═══ LIGHT TRANSLUCENT FROSTED GLASS SHEET / DRAWER ═══ */
 .mobile-liquid-sheet-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(4, 6, 15, 0.75);
+  background: rgba(3, 7, 18, 0.45); /* Mucho mas ligero y translucido */
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   z-index: 99999;
@@ -2191,11 +2142,13 @@ body::after {
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  background: rgba(14, 18, 28, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 14, 26, 0.82); /* Cristal oscuro translucido elegante */
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-bottom: none;
   border-radius: 28px 28px 0 0;
-  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.75), 0 0 24px rgba(0, 240, 255, 0.15);
+  box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.6), 0 0 35px rgba(0, 240, 255, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   animation: slideUpSheet 0.32s cubic-bezier(0.34, 1.35, 0.64, 1) forwards;
   padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);
   box-sizing: border-box;
