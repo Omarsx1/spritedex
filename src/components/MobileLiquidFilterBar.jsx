@@ -346,13 +346,10 @@ export function MobileLiquidFilterBar({
                 </div>
               </div>
 
-              {/* Section 4: No Lanzados Toggle */}
-              <div className="mobile-sheet-section">
-                <label className="mobile-toggle-card">
-                  <div className="mobile-toggle-info">
-                    <span className="mobile-toggle-title">Mostrar No Lanzados</span>
-                    <span className="mobile-toggle-desc">Espíritus filtrados o en desarrollo</span>
-                  </div>
+              {/* Section 4: Compact Subtle No Lanzados Toggle */}
+              <div className="mobile-sheet-compact-toggle-row">
+                <label className="mobile-compact-toggle-label-wrap">
+                  <span className="mobile-compact-toggle-title">Mostrar No Lanzados</span>
                   <input
                     type="checkbox"
                     checked={showUnreleased}
