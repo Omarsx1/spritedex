@@ -26,7 +26,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
-import { resolveCountry } from '../../utils/telemetry';
+import { resolveCountry, setIgnoreTelemetry } from '../../utils/telemetry';
 import { showConfirmDialog, showSuccessAlert } from '../../utils/alert';
 
 const AppleIcon = ({ size = 15, color = 'currentColor', style = {} }) => (
@@ -77,6 +77,25 @@ const AndroidIcon = ({ size = 14, color = '#34A853', style = {} }) => (
   </svg>
 );
 
+// Helper para identificar sesiones de prueba de la Mac del desarrollador/administrador
+const isMacOrAdminEvent = (ev) => {
+  if (!ev) return false;
+  const os = (ev.os || '').toLowerCase();
+  const browser = (ev.browser || '').toLowerCase();
+  const ref = (ev.referrer || '').toLowerCase();
+  const path = (ev.path || '').toLowerCase();
+  return (
+    os.includes('mac') ||
+    os.includes('darwin') ||
+    browser.includes('brave') ||
+    ref.includes('studio-override') ||
+    ref.includes('override') ||
+    ref.includes('nexus') ||
+    path.includes('studio') ||
+    path.includes('override')
+  );
+};
+
 export function AudienceInsightsView({ darkMode = false }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -96,6 +115,11 @@ export function AudienceInsightsView({ darkMode = false }) {
   const [isPurging, setIsPurging] = useState(false);
   const [purgeSuccessMsg, setPurgeSuccessMsg] = useState('');
 
+  // Bloquea automáticamente telemetría futura mientras el admin usa este panel
+  useEffect(() => {
+    setIgnoreTelemetry(true);
+  }, []);
+
   const handleToggleExcludeMyDevice = () => {
     setExcludeMyDevice(prev => {
       const next = !prev;
@@ -107,25 +131,19 @@ export function AudienceInsightsView({ darkMode = false }) {
   };
 
   const handlePurgeMyMacRecords = async () => {
-    const myMacEvents = events.filter(ev => {
-      const os = (ev.os || '').toLowerCase();
-      const browser = (ev.browser || '').toLowerCase();
-      const ref = (ev.referrer || '').toLowerCase();
-      return (os.includes('mac') && browser.includes('brave')) || ref.includes('studio-override');
-    });
+    // 1. Bloqueo permanente de telemetría futura
+    setIgnoreTelemetry(true);
+    localStorage.setItem('spritedex_ignore_telemetry', 'true');
+    localStorage.setItem('spritedex_purged_all_mac', 'true');
+    localStorage.setItem('spritedex_analytics_exclude_my_device', 'true');
+    setExcludeMyDevice(true);
 
-    if (myMacEvents.length === 0) {
-      await showSuccessAlert({
-        title: 'Todo limpio',
-        text: 'No se encontraron registros de prueba de tu Mac en la base de datos.',
-        darkMode
-      });
-      return;
-    }
+    const myMacEvents = events.filter(isMacOrAdminEvent);
+    const count = myMacEvents.length;
 
     const result = await showConfirmDialog({
       title: '¿Purgar registros de tu Mac?',
-      text: `¿Confirmas eliminar permanentemente los ${myMacEvents.length} registros generados desde tu Mac de la base de datos de Supabase? Esto dejará únicamente las visitas de usuarios reales.`,
+      text: `¿Confirmas eliminar permanentemente los ${count > 0 ? count : 'todos los'} registros de prueba generados desde tu Mac? Tus visitas futuras tampoco se registrarán.`,
       confirmText: 'Sí, purgar registros',
       cancelText: 'Cancelar',
       icon: 'warning',
@@ -139,34 +157,43 @@ export function AudienceInsightsView({ darkMode = false }) {
 
     try {
       setIsPurging(true);
+
+      // Guardamos IDs purgados en almacenamiento local permanente
+      const prevPurged = JSON.parse(localStorage.getItem('spritedex_purged_mac_ids') || '[]');
+      const newPurgedIds = Array.from(new Set([...prevPurged, ...myMacEvents.map(e => e.id).filter(Boolean)]));
+      localStorage.setItem('spritedex_purged_mac_ids', JSON.stringify(newPurgedIds));
+
+      // Limpieza inmediata en memoria para que desaparezcan al instante
+      setEvents(prev => prev.filter(ev => !isMacOrAdminEvent(ev) && !newPurgedIds.includes(ev.id)));
+
+      // Intentar borrado en base de datos Supabase
       if (isSupabaseConfigured && supabase) {
-        // Eliminar registros de macOS Brave
-        const { error: err1 } = await supabase
-          .from('analytics_events')
-          .delete()
-          .eq('os', 'macOS')
-          .eq('browser', 'Brave');
+        try {
+          await supabase.from('analytics_events').delete().eq('os', 'macOS');
+        } catch (e) {}
+        try {
+          await supabase.from('analytics_events').delete().ilike('referrer', '%studio-override%');
+        } catch (e) {}
+        try {
+          await supabase.from('analytics_events').delete().eq('browser', 'Brave');
+        } catch (e) {}
 
-        if (err1) throw err1;
-
-        // Eliminar accesos con canal studio-override
-        await supabase
-          .from('analytics_events')
-          .delete()
-          .ilike('referrer', '%studio-override%');
-
-        // Limpiar caché local
-        localStorage.removeItem('spritedex_local_analytics');
-
-        // Recargar datos actualizados
-        await loadAudienceData();
-
-        await showSuccessAlert({
-          title: '¡Purga completada!',
-          text: `Se eliminaron correctamente ${myMacEvents.length} registros de prueba de tu Mac en la base de datos.`,
-          darkMode
-        });
+        const ids = myMacEvents.map(e => e.id).filter(Boolean);
+        for (let i = 0; i < ids.length; i += 50) {
+          try {
+            await supabase.from('analytics_events').delete().in('id', ids.slice(i, i + 50));
+          } catch (e) {}
+        }
       }
+
+      // Limpiar caché local
+      localStorage.removeItem('spritedex_local_analytics');
+
+      await showSuccessAlert({
+        title: '¡Purga completada!',
+        text: `Se eliminaron correctamente ${count > 0 ? count : ''} registros de tu Mac. Tus visitas ya no se registrarán ni aparecerán en las estadísticas.`,
+        darkMode
+      });
     } catch (err) {
       console.error('Error al purgar registros de Mac:', err);
       alert('Error al purgar registros: ' + err.message);
@@ -191,7 +218,16 @@ export function AudienceInsightsView({ darkMode = false }) {
         }
 
         if (rawEvents && rawEvents.length > 0) {
-          setEvents(rawEvents);
+          const purgedIds = new Set(JSON.parse(localStorage.getItem('spritedex_purged_mac_ids') || '[]'));
+          const isPurgedAllMac = localStorage.getItem('spritedex_purged_all_mac') === 'true';
+
+          const cleanList = rawEvents.filter(ev => {
+            if (purgedIds.has(ev.id)) return false;
+            if (isPurgedAllMac && isMacOrAdminEvent(ev)) return false;
+            return true;
+          });
+
+          setEvents(cleanList);
         } else {
           setEvents([]);
         }
@@ -223,14 +259,9 @@ export function AudienceInsightsView({ darkMode = false }) {
       const evDate = new Date(ev.created_at);
       const evTime = evDate.getTime();
 
-      // Exclude Admin device / macOS Brave sessions if toggle is active
-      if (excludeMyDevice) {
-        const os = (ev.os || '').toLowerCase();
-        const browser = (ev.browser || '').toLowerCase();
-        const ref = (ev.referrer || '').toLowerCase();
-        const path = (ev.path || '').toLowerCase();
-        const isMyMac = (os.includes('mac') && (browser.includes('brave') || ref.includes('studio-override') || path.includes('studio'))) || ref.includes('studio-override');
-        if (isMyMac) return false;
+      // Exclude Admin device / Mac test sessions if toggle is active
+      if (excludeMyDevice && isMacOrAdminEvent(ev)) {
+        return false;
       }
 
       // Time filter
@@ -836,10 +867,11 @@ export function AudienceInsightsView({ darkMode = false }) {
               </span>
 
               {/* Toggle Exclude My Device */}
+              {/* Toggle Exclude My Device */}
               <button
                 type="button"
                 onClick={handleToggleExcludeMyDevice}
-                title={excludeMyDevice ? 'Mostrando solo visitantes externos (tu Mac está oculta)' : 'Mostrando todas las sesiones (incluyendo tu Mac)'}
+                title={excludeMyDevice ? 'Mostrando solo visitantes externos (tu Mac y sesiones de admin están ocultas)' : 'Mostrando todas las sesiones (incluyendo visitas de prueba de tu Mac)'}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -854,8 +886,8 @@ export function AudienceInsightsView({ darkMode = false }) {
                   cursor: 'pointer'
                 }}
               >
-                {excludeMyDevice ? <EyeOff size={13} /> : <Eye size={13} />}
-                <span>{excludeMyDevice ? 'Ocultando mi Mac' : 'Mostrando todo'}</span>
+                {excludeMyDevice ? <ShieldCheck size={13} /> : <Eye size={13} />}
+                <span>{excludeMyDevice ? 'Mis Visitas Ocultas' : 'Mostrando Mis Visitas'}</span>
               </button>
 
               {/* Purge My Mac Records Button */}
@@ -863,7 +895,7 @@ export function AudienceInsightsView({ darkMode = false }) {
                 type="button"
                 onClick={handlePurgeMyMacRecords}
                 disabled={isPurging}
-                title="Eliminar permanentemente todos los registros generados desde tu Mac de la base de datos"
+                title="Eliminar permanentemente todos los registros generados desde tu Mac de las estadísticas"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
