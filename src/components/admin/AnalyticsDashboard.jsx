@@ -39,9 +39,11 @@ export function AnalyticsDashboard({ darkMode = false }) {
   useEffect(() => {
     loadData();
 
-    // 1. WebSocket en tiempo real para eventos de telemetría
     let channel = null;
+    let presenceChannel = null;
+
     if (isSupabaseConfigured && supabase) {
+      // 1. WebSocket en tiempo real para nuevos eventos de telemetría (INSERTs)
       channel = supabase
         .channel('realtime_analytics_dashboard')
         .on(
@@ -52,15 +54,38 @@ export function AnalyticsDashboard({ darkMode = false }) {
           }
         )
         .subscribe();
+
+      // 2. WebSocket Realtime Presence para detección instantánea de entrada y salida (1 segundo)
+      const updateOnlineCount = () => {
+        const state = presenceChannel.presenceState();
+        let totalOnline = 0;
+        Object.values(state).forEach((presences) => {
+          totalOnline += presences.length;
+        });
+        setData((prev) => ({
+          ...prev,
+          activeSessionsCount: totalOnline
+        }));
+      };
+
+      presenceChannel = supabase
+        .channel('online_spritedex_users')
+        .on('presence', { event: 'sync' }, updateOnlineCount)
+        .on('presence', { event: 'join' }, updateOnlineCount)
+        .on('presence', { event: 'leave' }, updateOnlineCount)
+        .subscribe();
     }
 
-    // 2. Intervalo de respaldo periódico cada 30 segundos
+    // 3. Intervalo de respaldo periódico cada 30 segundos
     const interval = setInterval(loadData, 30000);
 
     return () => {
       clearInterval(interval);
       if (channel && supabase) {
         supabase.removeChannel(channel);
+      }
+      if (presenceChannel && supabase) {
+        supabase.removeChannel(presenceChannel);
       }
     };
   }, []);

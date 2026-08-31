@@ -57,6 +57,32 @@ export function App() {
     }
   }, [isAdminPortal, isAdminAuth]);
 
+  // Presencia en Vivo por WebSockets (Supabase Realtime Presence)
+  // Permite saber instantáneamente cuándo un usuario entra y cuándo cierra la pestaña/sale (1 segundo)
+  useEffect(() => {
+    if (!isSupabaseConfigured || !supabase || isAdminPortal || isAdminAuth || isUserAdminAuthenticated()) return;
+
+    const presenceChannel = supabase.channel('online_spritedex_users');
+    presenceChannel
+      .on('presence', { event: 'sync' }, () => {})
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          try {
+            await presenceChannel.track({
+              online_at: new Date().toISOString()
+            });
+          } catch (e) {}
+        }
+      });
+
+    return () => {
+      try {
+        presenceChannel.untrack();
+        supabase.removeChannel(presenceChannel);
+      } catch (e) {}
+    };
+  }, [isAdminPortal, isAdminAuth]);
+
   // Precarga asíncrona de sprites en segundo plano
   useEffect(() => {
     preloadCanvasAssets(dynamicSprites);
