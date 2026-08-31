@@ -107,6 +107,8 @@ export function AudienceInsightsView({ darkMode = false }) {
   const [pageSize, setPageSize] = useState(25); // 15 | 25 | 50 | 100 | 'all'
   const [excludeMyDevice, setExcludeMyDevice] = useState(() => {
     try {
+      const isPurged = localStorage.getItem('spritedex_mac_purged_active') === 'true';
+      if (isPurged) return true;
       const saved = localStorage.getItem('spritedex_analytics_exclude_my_device');
       return saved !== null ? saved === 'true' : true;
     } catch {
@@ -118,10 +120,6 @@ export function AudienceInsightsView({ darkMode = false }) {
 
   // Bloquea automáticamente telemetría futura mientras el admin usa este panel
   useEffect(() => {
-    try {
-      localStorage.removeItem('spritedex_purged_all_mac');
-      localStorage.removeItem('spritedex_purged_mac_ids');
-    } catch {}
     setIgnoreTelemetry(true);
     loadAudienceData();
     const interval = setInterval(loadAudienceData, 25000);
@@ -133,14 +131,19 @@ export function AudienceInsightsView({ darkMode = false }) {
       const next = !prev;
       try {
         localStorage.setItem('spritedex_analytics_exclude_my_device', String(next));
+        if (!next) {
+          localStorage.removeItem('spritedex_mac_purged_active');
+        }
       } catch {}
       return next;
     });
   };
 
   const handlePurgeMyMacRecords = async () => {
+    // 1. Marcar purga permanente y bloqueo de telemetría
     setIgnoreTelemetry(true);
     localStorage.setItem('spritedex_ignore_telemetry', 'true');
+    localStorage.setItem('spritedex_mac_purged_active', 'true');
     localStorage.setItem('spritedex_analytics_exclude_my_device', 'true');
     setExcludeMyDevice(true);
 
@@ -149,7 +152,7 @@ export function AudienceInsightsView({ darkMode = false }) {
 
     const result = await showConfirmDialog({
       title: '¿Purgar registros de tu Mac?',
-      text: `¿Confirmas eliminar permanentemente los registros de prueba generados desde tu Mac de la base de datos? Esto dejará intactos los registros de España, Guatemala y otros usuarios reales.`,
+      text: `¿Confirmas eliminar y ocultar permanentemente los registros de prueba generados desde tu Mac? Las visitas reales de España, Guatemala y otros países se mantendrán intactas.`,
       confirmText: 'Sí, purgar registros',
       cancelText: 'Cancelar',
       icon: 'warning',
@@ -163,6 +166,9 @@ export function AudienceInsightsView({ darkMode = false }) {
 
     try {
       setIsPurging(true);
+
+      // Limpieza inmediata en memoria para que desaparezcan en el acto
+      setEvents(prev => prev.filter(ev => !isMacOrAdminEvent(ev)));
 
       // Intentar borrado en base de datos Supabase
       if (isSupabaseConfigured && supabase) {
@@ -189,7 +195,7 @@ export function AudienceInsightsView({ darkMode = false }) {
 
       await showSuccessAlert({
         title: '¡Purga completada!',
-        text: `Registros de tu Mac eliminados. Las visitas de otros usuarios reales (España, Guatemala, etc.) se mantienen intactas.`,
+        text: `Registros de tu Mac eliminados y ocultados. Tus visitas futuras tampoco se registrarán.`,
         darkMode
       });
     } catch (err) {
@@ -216,7 +222,15 @@ export function AudienceInsightsView({ darkMode = false }) {
         }
 
         if (rawEvents && rawEvents.length > 0) {
-          setEvents(rawEvents);
+          const isPurgedActive = localStorage.getItem('spritedex_mac_purged_active') === 'true';
+          const excludeFlag = localStorage.getItem('spritedex_analytics_exclude_my_device');
+          const shouldExcludeMac = isPurgedActive || excludeFlag === null || excludeFlag === 'true';
+
+          if (shouldExcludeMac) {
+            setEvents(rawEvents.filter(ev => !isMacOrAdminEvent(ev)));
+          } else {
+            setEvents(rawEvents);
+          }
         } else {
           setEvents([]);
         }
