@@ -50,10 +50,12 @@ export function App() {
 
   const [isAdminAuth, setIsAdminAuth] = useState(() => isUserAdminAuthenticated());
 
-  // Registro de telemetría de visita al cargar la web
+  // Registro de telemetría de visita al cargar la web (solo usuarios públicos reales)
   useEffect(() => {
-    trackEvent('pageview');
-  }, []);
+    if (!isAdminPortal && !isAdminAuth && !isUserAdminAuthenticated()) {
+      trackEvent('pageview');
+    }
+  }, [isAdminPortal, isAdminAuth]);
 
   // Precarga asíncrona de sprites en segundo plano
   useEffect(() => {

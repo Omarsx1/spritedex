@@ -216,29 +216,32 @@ export function setIgnoreTelemetry(ignore = true) {
 }
 
 export function isTelemetryIgnored() {
-  if (typeof localStorage !== 'undefined') {
-    return localStorage.getItem('spritedex_ignore_telemetry') === 'true' || localStorage.getItem('spritedex_admin_override') === 'true';
-  }
+  if (typeof window === 'undefined') return true;
+  try {
+    if (localStorage.getItem('spritedex_ignore_telemetry') === 'true' ||
+        localStorage.getItem('spritedex_admin_override') === 'true' ||
+        localStorage.getItem('spritedex_purged_all_mac') === 'true' ||
+        sessionStorage.getItem('spritedex_admin_session_v1') !== null) {
+      return true;
+    }
+    const path = window.location.pathname.toLowerCase();
+    const search = window.location.search.toLowerCase();
+    const host = window.location.hostname.toLowerCase();
+    if (path.includes('studio') || path.includes('override') || path.includes('nexus') ||
+        search.includes('studio') || search.includes('override') ||
+        host === 'localhost' || host === '127.0.0.1') {
+      localStorage.setItem('spritedex_ignore_telemetry', 'true');
+      return true;
+    }
+  } catch {}
   return false;
 }
 
 // Record a pageview or custom telemetry event (Non-blocking)
 export async function trackEvent(eventType = 'pageview', meta = {}) {
   try {
-    // Evita registrar visitas de administradores, pruebas locales o dispositivos del creador
-    const isExcludedAdmin = typeof window !== 'undefined' && (
-      window.location.search.includes('studio-override') ||
-      window.location.pathname.includes('/studio') ||
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1' ||
-      localStorage.getItem('spritedex_ignore_telemetry') === 'true' ||
-      localStorage.getItem('spritedex_admin_override') === 'true'
-    );
-
-    if (isExcludedAdmin) {
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem('spritedex_ignore_telemetry', 'true');
-      }
+    // Si la telemetría está ignorada para este navegador/admin, salimos de inmediato
+    if (isTelemetryIgnored()) {
       return;
     }
 
