@@ -14,13 +14,14 @@ import {
   CheckCircle2,
   ExternalLink
 } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 import { fetchAnalyticsOverview } from '../../utils/telemetry';
 
 export function AnalyticsDashboard({ darkMode = false }) {
   const [data, setData] = useState({
     totalVisits: 0,
     todayVisits: 0,
-    activeSessionsCount: 1,
+    activeSessionsCount: 0,
     deviceBreakdown: { mobile: 0, desktop: 0, tablet: 0, iphone: 0, android: 0 },
     browserBreakdown: {},
     recentEvents: []
@@ -37,8 +38,31 @@ export function AnalyticsDashboard({ darkMode = false }) {
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 20000);
-    return () => clearInterval(interval);
+
+    // 1. WebSocket en tiempo real para eventos de telemetría
+    let channel = null;
+    if (isSupabaseConfigured && supabase) {
+      channel = supabase
+        .channel('realtime_analytics_dashboard')
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'analytics_events' },
+          () => {
+            loadData();
+          }
+        )
+        .subscribe();
+    }
+
+    // 2. Intervalo de respaldo periódico cada 30 segundos
+    const interval = setInterval(loadData, 30000);
+
+    return () => {
+      clearInterval(interval);
+      if (channel && supabase) {
+        supabase.removeChannel(channel);
+      }
+    };
   }, []);
 
   const totalEvents = data.recentEvents.length || 0;

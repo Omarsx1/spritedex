@@ -137,8 +137,31 @@ export function AudienceInsightsView({ darkMode = false }) {
   useEffect(() => {
     setIgnoreTelemetry(true);
     loadAudienceData();
-    const interval = setInterval(loadAudienceData, 25000);
-    return () => clearInterval(interval);
+
+    // 1. WebSocket en tiempo real para eventos de audiencia
+    let channel = null;
+    if (isSupabaseConfigured && supabase) {
+      channel = supabase
+        .channel('realtime_audience_insights')
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'analytics_events' },
+          () => {
+            loadAudienceData();
+          }
+        )
+        .subscribe();
+    }
+
+    // 2. Intervalo de respaldo periódico cada 30 segundos
+    const interval = setInterval(loadAudienceData, 30000);
+
+    return () => {
+      clearInterval(interval);
+      if (channel && supabase) {
+        supabase.removeChannel(channel);
+      }
+    };
   }, []);
 
   // Reset pagination on filter change
