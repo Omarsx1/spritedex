@@ -163,37 +163,28 @@ export function FriendCompareModal({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="sdm sdm-compare sdm-share--glitch" ref={modalRef} onClick={(e) => e.stopPropagation()}>
+      <div className="sdm-share-pro sdm-compare" ref={modalRef} onClick={(e) => e.stopPropagation()}>
         
-        {/* ═══ MODERN RADAR HEADER (APPLE / CYBERPUNK GLASS) ═══ */}
-        <div className="sdm-compare__header">
-          {/* Subtle Ambient Radial Glow */}
-          <div
-            className="sdm-compare__header-glow"
-            style={{
-              background: 'radial-gradient(circle at 15% 50%, rgba(0, 240, 232, 0.22) 0%, rgba(139, 92, 246, 0.16) 50%, transparent 80%)'
-            }}
-          />
-
-          <div className="sdm-compare__header-left">
-            <div className="sdm-compare__header-text">
-              <h2 className="sdm-compare__header-title">
-                <Users size={22} color="#00F0E8" className="sdm-compare__header-inline-icon" />
-                <span>Radar de Amigos</span>
-              </h2>
-              <p className="sdm-compare__header-subtitle">
-                Compara colecciones en tiempo real y sincroniza con tus amigos.
+        {/* Header Elegante y Minimalista (Idéntico a Exportar Colección) */}
+        <div className="sdm-share-pro__header">
+          <div className="sdm-share-pro__title-wrap">
+            <div className="sdm-share-pro__icon-badge">
+              <Users size={18} color="#00F0E8" />
+            </div>
+            <div>
+              <h2 className="sdm-share-pro__title">Radar de Amigos</h2>
+              <p className="sdm-share-pro__subtitle">
+                {isLiveConnected ? `Conectado en vivo con ${connectedFriendCode}` : 'Sincroniza y compara en tiempo real con amigos'}
               </p>
             </div>
           </div>
-
-          <button className="sdm-compare__close-btn" onClick={onClose} aria-label="Cerrar modal">
+          <button className="sdm-share-pro__close" onClick={onClose} aria-label="Cerrar modal">
             <X size={18} />
           </button>
         </div>
 
         {/* ═══ BODY CONTENT ═══ */}
-        <div className="sdm__body sdm-compare__body">
+        <div className="sdm-compare__body">
 
           {/* Top Cards: My Friend Code vs Connect to Friend */}
           <div className="sdm-compare__top-grid">

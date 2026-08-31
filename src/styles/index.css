@@ -5077,107 +5077,19 @@ body::after {
   }
 }
 
-/* ===== MODAL DE PLANIFICADOR DE INTERCAMBIOS (CYBER GLITCH) ===== */
+/* ===== MODAL RADAR DE AMIGOS (ESTILO SDM-SHARE-PRO) ===== */
 .sdm-compare {
-  max-width: 860px;
+  max-width: 680px;
   width: 95%;
-  border-radius: 20px;
-  background: rgba(10, 14, 26, 0.94);
-  border: 1px solid rgba(0, 240, 255, 0.25);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(139, 92, 246, 0.15);
+  border-radius: 18px;
   max-height: 90vh;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
 
-/* ═══ Modern Header for Friend Compare / Social Radar ═══ */
-.sdm-compare__header {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 22px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px 20px 0 0;
-  overflow: hidden;
-  gap: 14px;
-}
-
-.sdm-compare__header-glow {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.sdm-compare__header-left {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  flex: 1;
-}
-
-.sdm-compare__header-text {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-.sdm-compare__header-title {
-  font-family: var(--font-heading);
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #ffffff;
-  margin: 0;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.sdm-compare__header-inline-icon {
-  flex-shrink: 0;
-  filter: drop-shadow(0 0 8px rgba(0, 240, 232, 0.7));
-}
-
-.sdm-compare__header-subtitle {
-  font-size: 0.76rem;
-  color: #94a3b8;
-  margin: 0;
-  line-height: 1.35;
-}
-
-.sdm-compare__close-btn {
-  position: relative;
-  z-index: 2;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
-}
-
-.sdm-compare__close-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.25);
-  transform: rotate(90deg);
-}
-
 .sdm-compare__body {
-  padding: 18px 22px 24px 22px;
+  padding-top: 6px;
 }
 
 /* Top Cards Grid */
