@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 import { resolveCountry } from '../../utils/telemetry';
+import { showConfirmDialog, showSuccessAlert } from '../../utils/alert';
 
 const AppleIcon = ({ size = 15, color = 'currentColor', style = {} }) => (
   <svg
@@ -114,11 +115,25 @@ export function AudienceInsightsView({ darkMode = false }) {
     });
 
     if (myMacEvents.length === 0) {
-      alert('No se encontraron registros generados desde tu Mac en la base de datos.');
+      await showSuccessAlert({
+        title: 'Todo limpio',
+        text: 'No se encontraron registros de prueba de tu Mac en la base de datos.',
+        darkMode
+      });
       return;
     }
 
-    if (!window.confirm(`¿Confirmas eliminar permanentemente los ${myMacEvents.length} registros de prueba generados desde tu Mac de la base de datos de Supabase? Esto dejará únicamente las visitas de usuarios reales.`)) {
+    const result = await showConfirmDialog({
+      title: '¿Purgar registros de tu Mac?',
+      text: `¿Confirmas eliminar permanentemente los ${myMacEvents.length} registros generados desde tu Mac de la base de datos de Supabase? Esto dejará únicamente las visitas de usuarios reales.`,
+      confirmText: 'Sí, purgar registros',
+      cancelText: 'Cancelar',
+      icon: 'warning',
+      isDestructive: true,
+      darkMode
+    });
+
+    if (!result.isConfirmed) {
       return;
     }
 
@@ -145,8 +160,12 @@ export function AudienceInsightsView({ darkMode = false }) {
 
         // Recargar datos actualizados
         await loadAudienceData();
-        setPurgeSuccessMsg(`¡${myMacEvents.length} registros de tu Mac eliminados correctamente de la base de datos!`);
-        setTimeout(() => setPurgeSuccessMsg(''), 6000);
+
+        await showSuccessAlert({
+          title: '¡Purga completada!',
+          text: `Se eliminaron correctamente ${myMacEvents.length} registros de prueba de tu Mac en la base de datos.`,
+          darkMode
+        });
       }
     } catch (err) {
       console.error('Error al purgar registros de Mac:', err);

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { RARITIES } from '../../data/spritesData';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
+import { showConfirmDialog, showSuccessAlert } from '../../utils/alert';
 
 export function SpiritCatalogTable({ 
   sprites = [], 
@@ -129,7 +130,17 @@ export function SpiritCatalogTable({
   const paginatedSprites = filteredSprites.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handleDelete = async (sprite) => {
-    if (!window.confirm(`¿Estás seguro de que deseas eliminar a "${sprite.fullName}" de la base de datos?`)) {
+    const result = await showConfirmDialog({
+      title: '¿Eliminar espíritu?',
+      text: `¿Estás seguro de que deseas eliminar permanentemente a "${sprite.fullName}" del catálogo?`,
+      confirmText: 'Sí, eliminar',
+      cancelText: 'Cancelar',
+      icon: 'warning',
+      isDestructive: true,
+      darkMode
+    });
+
+    if (!result.isConfirmed) {
       return;
     }
 
@@ -140,6 +151,11 @@ export function SpiritCatalogTable({
         if (error) throw error;
       }
       onRefresh();
+      await showSuccessAlert({
+        title: 'Espíritu eliminado',
+        text: `"${sprite.fullName}" fue eliminado correctamente del catálogo.`,
+        darkMode
+      });
     } catch (err) {
       alert('Error al eliminar: ' + err.message);
     } finally {
