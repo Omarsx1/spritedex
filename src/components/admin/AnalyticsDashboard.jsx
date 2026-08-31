@@ -353,7 +353,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
             </div>
 
             <div style={{ fontSize: '1.9rem', fontWeight: 800, color: textPrimary, letterSpacing: '-0.03em', margin: '4px 0 16px' }}>
-              {data.activeSessionsCount || 1} <span style={{ fontSize: '0.84rem', fontWeight: 600, color: textMuted }}>Live visitors</span>
+              {data.activeSessionsCount ?? 0} <span style={{ fontSize: '0.84rem', fontWeight: 600, color: textMuted }}>Live visitors</span>
             </div>
 
             {/* Sparkline Area Chart dinámico según datos reales */}
