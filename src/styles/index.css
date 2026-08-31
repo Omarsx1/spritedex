@@ -2297,22 +2297,15 @@ body::after {
   color: #ffffff;
 }
 
-/* Active Status Pill (Liquid Cyan Glass) */
+/* Active Status Pill (Exact match to Navbar Menu Option Selected) */
 .mobile-status-pill.is-active {
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.18) 0%, rgba(0, 180, 216, 0.08) 100%) !important;
-  backdrop-filter: blur(16px) saturate(1.8);
-  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  background: rgba(0, 240, 255, 0.1) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(0, 240, 255, 0.5) !important;
-  font-weight: 800;
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.35),
-    0 0 12px rgba(0, 240, 255, 0.22),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.75),
-    inset 0 -1.5px 1px 0 rgba(0, 0, 0, 0.25),
-    inset 0 0 8px rgba(0, 240, 255, 0.2);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-  transform: translateY(-0.5px);
+  border: 1px solid rgba(0, 240, 255, 0.25) !important;
+  font-weight: 700;
+  border-radius: 10px;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 /* Variants Grid in Sheet */
@@ -2340,32 +2333,21 @@ body::after {
   color: #ffffff;
 }
 
-/* Active Variant Chip (Liquid Cyan Glass) */
+/* Active Variant Chip (Exact match to Navbar Menu Option Selected) */
 .mobile-variant-chip.is-active {
-  border-color: #00f0ff !important;
+  background: rgba(0, 240, 255, 0.1) !important;
   color: #ffffff !important;
-  font-weight: 800;
-  box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.4),
-    0 0 10px rgba(0, 240, 255, 0.2),
-    inset 0 1.5px 1px rgba(255, 255, 255, 0.7),
-    inset 0 -1.5px 1px rgba(0, 0, 0, 0.3);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  transform: translateY(-0.5px);
+  border: 1px solid rgba(0, 240, 255, 0.25) !important;
+  font-weight: 700;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 .mobile-variant-chip:first-child.is-active {
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.18) 0%, rgba(0, 180, 216, 0.08) 100%) !important;
-  backdrop-filter: blur(16px) saturate(1.8);
-  -webkit-backdrop-filter: blur(16px) saturate(1.8);
-  border: 1px solid rgba(0, 240, 255, 0.5) !important;
+  background: rgba(0, 240, 255, 0.1) !important;
+  border: 1px solid rgba(0, 240, 255, 0.25) !important;
   color: #ffffff !important;
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.35),
-    0 0 12px rgba(0, 240, 255, 0.22),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.75),
-    inset 0 -1.5px 1px 0 rgba(0, 0, 0, 0.25),
-    inset 0 0 8px rgba(0, 240, 255, 0.2);
+  box-shadow: none !important;
 }
 
 /* Sprites Grid in Sheet */
@@ -2401,20 +2383,14 @@ body::after {
   color: #ffffff;
 }
 
-/* Active Sprite Chip (Liquid Cyan Glass) */
+/* Active Sprite Chip (Exact match to Navbar Menu Option Selected) */
 .mobile-sprite-chip.is-active {
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.18) 0%, rgba(0, 180, 216, 0.08) 100%) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(0, 240, 255, 0.1) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(0, 240, 255, 0.5) !important;
-  font-weight: 800;
-  box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.35),
-    0 0 10px rgba(0, 240, 255, 0.2),
-    inset 0 1.5px 1px rgba(255, 255, 255, 0.7),
-    inset 0 -1.5px 1px rgba(0, 0, 0, 0.2),
-    inset 0 0 6px rgba(0, 240, 255, 0.2);
+  border: 1px solid rgba(0, 240, 255, 0.25) !important;
+  font-weight: 700;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 .mobile-sprite-chip-img {
@@ -2529,30 +2505,43 @@ body::after {
 }
 
 .mobile-sheet-btn-apply {
+  position: relative;
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   padding: 10px 20px;
   border-radius: 10px;
-  border: none;
-  background: #ffffff;
-  color: #060714;
+  background: rgba(0, 240, 232, 0.12);
+  border: 1.5px solid #00F0E8;
+  color: #00F0E8;
+  box-shadow: 0 0 12px rgba(0, 240, 232, 0.25);
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   font-family: var(--font-sans);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-  transition: opacity 0.15s ease;
+  transition: all 0.2s ease;
 }
 
-.mobile-sheet-btn-apply:hover {
-  opacity: 0.9;
+.mobile-sheet-btn-apply:hover:not(:disabled),
+.mobile-sheet-btn-apply:focus:not(:disabled) {
+  background-color: #00F0E8;
+  color: #060714;
+  border-color: #00F0E8;
+  box-shadow: 0 0 25px rgba(0, 240, 232, 0.7);
+  outline: none;
+  transform: translateY(-1px);
 }
 
-.mobile-sheet-btn-apply:active {
-  opacity: 0.8;
+.mobile-sheet-btn-apply:active:not(:disabled) {
+  transform: scale(0.97);
 }
+
+
 
 /* Hide desktop filter bar on mobile, show mobile liquid bar */
 @media (max-width: 768px) {

@@ -378,10 +378,11 @@ export function MobileLiquidFilterBar({
               )}
               <button
                 type="button"
-                className="mobile-sheet-btn-apply"
+                className="mobile-sheet-btn-apply sdm-share__glitch-btn"
+                data-text="APLICAR FILTROS"
                 onClick={() => setIsOpen(false)}
               >
-                <span>Aplicar Filtros</span>
+                <span className="sdm-share__btn-text">Aplicar Filtros</span>
               </button>
             </div>
           </div>
