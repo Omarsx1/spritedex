@@ -11,6 +11,7 @@ function sanitizeDynamicItem(item) {
   const rawFullName = item.full_name || item.fullName || '';
   const rawName = item.name || rawFullName || '';
   const rawFamilyName = item.family_name || item.familyName || '';
+  const rawSummonCost = item.summon_cost || item.summonCost || '';
 
   // Clean English placeholders only if no name exists or fallback is needed
   const cleanName = rawName
@@ -30,7 +31,11 @@ function sanitizeDynamicItem(item) {
     name: cleanName,
     fullName: cleanFullName,
     familyName: cleanFamilyName,
-    family_name: cleanFamilyName
+    family_name: cleanFamilyName,
+    summonCost: rawSummonCost,
+    summon_cost: rawSummonCost,
+    specialPerk: item.special_perk || item.specialPerk || '',
+    special_perk: item.special_perk || item.specialPerk || ''
   };
 }
 
@@ -69,9 +74,16 @@ export function useDynamicSprites() {
             sanitized.ability !== 'Concede bonificaciones pasivas.' && 
             sanitized.ability !== 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.';
           
+          const rawCost = sanitized.summon_cost || sanitized.summonCost || baseStatic?.summonCost || '2,000 Polvo Estelar';
+          const cleanCost = rawCost && !rawCost.toLowerCase().includes('polvo') ? `${rawCost} Polvo Estelar` : rawCost;
+
           const merged = {
             ...(baseStatic || {}),
             ...sanitized,
+            fullName: sanitized.fullName || baseStatic?.fullName || sanitized.name,
+            name: sanitized.name || baseStatic?.name,
+            summonCost: cleanCost,
+            summon_cost: cleanCost,
             ability: hasRealCustomAbility ? sanitized.ability : (baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.'),
             specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base')
               ? ''
@@ -114,6 +126,9 @@ export function useDynamicSprites() {
               sanitized.ability !== 'Concede bonificaciones pasivas.' && 
               sanitized.ability !== 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.';
 
+            const rawCost = sanitized.summon_cost || sanitized.summonCost || baseStatic?.summonCost || '2,000 Polvo Estelar';
+            const cleanCost = rawCost && !rawCost.toLowerCase().includes('polvo') ? `${rawCost} Polvo Estelar` : rawCost;
+
             const formatted = {
               id: sanitized.id,
               name: sanitized.name,
@@ -130,7 +145,8 @@ export function useDynamicSprites() {
                 ? '' 
                 : (sanitized.special_perk || baseStatic?.specialPerk || ''),
               location: sanitized.location || baseStatic?.location || 'Zonas de Extracción',
-              summonCost: sanitized.summon_cost || baseStatic?.summonCost || '2,000 Polvo Estelar',
+              summonCost: cleanCost,
+              summon_cost: cleanCost,
               dropChance: sanitized.drop_chance || baseStatic?.dropChance || '1.50%',
               dropChanceDisplay: sanitized.drop_chance || baseStatic?.dropChanceDisplay || '1.50%',
               dropChanceNum: parseFloat(sanitized.drop_chance || baseStatic?.dropChanceNum || '1.5'),
