@@ -38,7 +38,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
   }, [existingSprites]);
 
   // Initial family resolution
-  const initialFamilyId = (spirit?.familyId || spirit?.id?.split('_')[0] || 'klombo').toLowerCase();
+  const initialFamilyId = (spirit?.familyId || spirit?.id?.split('_')[0] || (allFamilies[0]?.id || 'custom')).toLowerCase();
   const matchedFamily = allFamilies.find(f => f.id === initialFamilyId);
   const initialFamilyName = spirit?.familyName || matchedFamily?.name || (initialFamilyId.charAt(0).toUpperCase() + initialFamilyId.slice(1));
 
@@ -276,14 +276,19 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
   const rarityObj = RARITIES[formData.rarity] || RARITIES.Common;
 
   const previewCardStyle = useMemo(() => {
+    const rawVariant = formData.variant === 'Base' ? 'Basic' : (formData.variant || 'Basic');
+    const effectiveFamilyId = isCustomFamily
+      ? (formData.customFamily?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'custom')
+      : (formData.familyId || 'custom');
+
     return getSpriteCardStyle({
-      id: formData.id || `${formData.familyId || 'water'}_${(formData.variant || 'basic').toLowerCase()}`,
-      familyId: formData.familyId,
-      variant: formData.variant === 'Base' ? 'Basic' : formData.variant,
-      theme: formData.variant === 'Base' ? 'Basic' : formData.variant,
+      id: formData.id || `${effectiveFamilyId}_${rawVariant.toLowerCase()}`,
+      familyId: effectiveFamilyId,
+      variant: rawVariant,
+      theme: rawVariant,
       rarity: formData.rarity
     });
-  }, [formData.id, formData.familyId, formData.variant, formData.rarity]);
+  }, [formData.id, formData.familyId, formData.variant, formData.rarity, isCustomFamily, formData.customFamily]);
 
   // ═══ CALENDAR MATH FOR MATERIAL 3 DATE PICKER ═══
   const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];

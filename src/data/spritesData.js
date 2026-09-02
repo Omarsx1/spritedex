@@ -116,23 +116,34 @@ export function getSpriteCardStyle(sprite) {
     return { background: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)', borderColor: '#38bdf8' };
   }
 
-  // 2. Elemental Customization for Basic sprites
-  if (theme === 'Basic' && ELEMENTAL_STYLES[familyId]) {
-    return ELEMENTAL_STYLES[familyId];
+  // 2. Klombo Mítico original de Fortnite
+  if (familyId === 'klombo' && (!rarity || rarity === 'Mythic')) {
+    return { background: 'linear-gradient(180deg, #831843 0%, #1b1c23 100%)', borderColor: '#ec4899' };
   }
 
-  // 3. Rarity-based defaults
-  if (rarity === 'Mythic') {
-    return { background: 'linear-gradient(180deg, #a89442 0%, #1b1c23 100%)', borderColor: '#f1e198' };
-  }
-  if (rarity === 'Legendary') {
-    return { background: 'linear-gradient(180deg, #743e0a 0%, #1b1c23 100%)', borderColor: '#de6e0e' };
+  // 3. Colores por Rareza (La rareza define el color de la carta básica)
+  if (rarity === 'Rare') {
+    return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };
   }
   if (rarity === 'Epic') {
     return { background: 'linear-gradient(180deg, #4d1566 0%, #1b1c23 100%)', borderColor: '#ce59ff' };
   }
-  if (rarity === 'Rare') {
-    return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };
+  if (rarity === 'Legendary') {
+    return { background: 'linear-gradient(180deg, #743e0a 0%, #1b1c23 100%)', borderColor: '#de6e0e' };
+  }
+  if (rarity === 'Mythic') {
+    return { background: 'linear-gradient(180deg, #a89442 0%, #1b1c23 100%)', borderColor: '#f1e198' };
+  }
+  if (rarity === 'Uncommon') {
+    return { background: 'linear-gradient(180deg, #1b532a 0%, #1b1c23 100%)', borderColor: '#4ade80' };
+  }
+  if (rarity === 'Common') {
+    return { background: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)', borderColor: '#94a3b8' };
+  }
+
+  // 4. Fallback a estilos elementales específicos
+  if (theme === 'Basic' && ELEMENTAL_STYLES[familyId]) {
+    return ELEMENTAL_STYLES[familyId];
   }
 
   return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };
