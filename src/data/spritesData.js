@@ -74,8 +74,8 @@ export const ELEMENTAL_STYLES = {
   sonic: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#3b82f6' },
   shadow: { background: 'linear-gradient(180deg, #31103f 0%, #1b1c23 100%)', borderColor: '#a855f7' },
   tails: { background: 'linear-gradient(180deg, #78350f 0%, #1b1c23 100%)', borderColor: '#f59e0b' },
-  klombo: { background: 'linear-gradient(180deg, #831843 0%, #1b1c23 100%)', borderColor: '#ec4899' },
-  crown: { background: 'linear-gradient(180deg, #713f12 0%, #1b1c23 100%)', borderColor: '#eab308' },
+  klombo: { background: 'linear-gradient(180deg, #a89442 0%, #1b1c23 100%)', borderColor: '#f1e198' },
+  crown: { background: 'linear-gradient(180deg, #a89442 0%, #1b1c23 100%)', borderColor: '#f1e198' },
   bush: { background: 'linear-gradient(180deg, #166534 0%, #052e16 100%)', borderColor: '#4ade80' },
   adventure: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#0ea5e9' },
   jonesy: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#0ea5e9' },
@@ -124,12 +124,7 @@ export function getSpriteCardStyle(sprite) {
     return { background: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)', borderColor: '#38bdf8' };
   }
 
-  // 2. Klombo Mítico original de Fortnite
-  if (familyId === 'klombo' && (!rarity || rarity === 'Mythic')) {
-    return { background: 'linear-gradient(180deg, #831843 0%, #1b1c23 100%)', borderColor: '#ec4899' };
-  }
-
-  // 3. Colores por Rareza (La rareza define el color de la carta básica)
+  // 2. Colores por Rareza (La rareza define el color de la carta básica)
   if (rarity === 'Rare') {
     return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };
   }
