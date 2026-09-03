@@ -27,6 +27,47 @@ export function MobileLiquidFilterBar({
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
 
+  // ═══ SMART ONE-TIME DISCOVERY COACHMARK ═══
+  const [showNewTooltip, setShowNewTooltip] = useState(() => {
+    try {
+      return !localStorage.getItem('spritedex_seen_new_spirits_v2');
+    } catch {
+      return false;
+    }
+  });
+  const [isDismissing, setIsDismissing] = useState(false);
+
+  useEffect(() => {
+    if (statusFilter === 'new') {
+      setShowNewTooltip(false);
+      try {
+        localStorage.setItem('spritedex_seen_new_spirits_v2', 'true');
+      } catch {}
+    }
+  }, [statusFilter]);
+
+  const handleExploreNew = () => {
+    setStatusFilter('new');
+    setIsDismissing(true);
+    setTimeout(() => {
+      setShowNewTooltip(false);
+    }, 220);
+    try {
+      localStorage.setItem('spritedex_seen_new_spirits_v2', 'true');
+    } catch {}
+  };
+
+  const handleDismissTooltip = (e) => {
+    e.stopPropagation();
+    setIsDismissing(true);
+    setTimeout(() => {
+      setShowNewTooltip(false);
+    }, 220);
+    try {
+      localStorage.setItem('spritedex_seen_new_spirits_v2', 'true');
+    } catch {}
+  };
+
   const handleOpen = () => {
     setIsClosing(false);
     setIsOpen(true);
@@ -131,57 +172,87 @@ export function MobileLiquidFilterBar({
 
   return (
     <div className="mobile-liquid-wrapper">
-      {/* ═══ UNIFIED GLASSMORPHIC SEARCH & FILTER PILL ═══ */}
-      <div className={`mobile-glass-search-pill ${isFocused ? 'is-focused' : ''} ${activeFiltersCount > 0 ? 'has-active-filters' : ''}`}>
-        
-        {/* Left: Search icon */}
-        <Search size={16} className="mobile-glass-search-icon" />
-
-        {/* Center: Search input */}
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder="Buscar espíritu..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          className="mobile-glass-search-input"
-        />
-
-        {/* Clear Button (only when there is text) */}
-        {searchQuery && (
-          <button
-            type="button"
-            className="mobile-glass-clear-btn"
-            onClick={() => {
-              setSearchQuery('');
-              inputRef.current?.focus();
-            }}
-            aria-label="Borrar búsqueda"
+      {/* ═══ COACHMARK WRAPPER ═══ */}
+      <div className="mobile-new-coachmark-wrap">
+        {/* Tooltip Coachmark de Nuevos Espíritus (One-Time Discovery) */}
+        {showNewTooltip && statusFilter !== 'new' && (
+          <div
+            className={`mobile-new-coachmark ${isDismissing ? 'is-dismissing' : ''}`}
+            onClick={handleExploreNew}
+            role="button"
+            tabIndex={0}
+            title="Toca para ver los nuevos espíritus"
           >
-            <X size={13} />
-          </button>
+            <div className="mobile-new-coachmark__content">
+              <span className="mobile-new-coachmark__sparkle">✨</span>
+              <span className="mobile-new-coachmark__text">¡Nuevos espíritus!</span>
+              <span className="mobile-new-coachmark__action">Ver</span>
+              <button
+                type="button"
+                className="mobile-new-coachmark__close"
+                onClick={handleDismissTooltip}
+                aria-label="Cerrar aviso"
+              >
+                <X size={12} />
+              </button>
+            </div>
+            {/* Flechita apuntando directamente al botón de filtros */}
+            <div className="mobile-new-coachmark__arrow" />
+          </div>
         )}
 
-        {/* Subtle separator divider */}
-        <div className="mobile-glass-divider" />
+        {/* ═══ UNIFIED GLASSMORPHIC SEARCH & FILTER PILL ═══ */}
+        <div className={`mobile-glass-search-pill ${isFocused ? 'is-focused' : ''} ${activeFiltersCount > 0 ? 'has-active-filters' : ''}`}>
+          
+          {/* Left: Search icon */}
+          <Search size={16} className="mobile-glass-search-icon" />
 
-        {/* Right: Integrated Filter Button */}
-        <button
-          type="button"
-          className={`mobile-glass-filter-btn ${activeFiltersCount > 0 ? 'is-active' : ''}`}
-          onClick={handleOpen}
-          aria-expanded={isOpen}
-          aria-label="Abrir filtros"
-        >
-          <SlidersHorizontal size={16} className="mobile-glass-filter-icon" />
-          {activeFiltersCount > 0 && (
-            <span className="mobile-glass-badge">
-              {activeFiltersCount}
-            </span>
+          {/* Center: Search input */}
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Buscar espíritu..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            className="mobile-glass-search-input"
+          />
+
+          {/* Clear Button (only when there is text) */}
+          {searchQuery && (
+            <button
+              type="button"
+              className="mobile-glass-clear-btn"
+              onClick={() => {
+                setSearchQuery('');
+                inputRef.current?.focus();
+              }}
+              aria-label="Borrar búsqueda"
+            >
+              <X size={13} />
+            </button>
           )}
-        </button>
+
+          {/* Subtle separator divider */}
+          <div className="mobile-glass-divider" />
+
+          {/* Right: Integrated Filter Button */}
+          <button
+            type="button"
+            className={`mobile-glass-filter-btn ${activeFiltersCount > 0 ? 'is-active' : ''}`}
+            onClick={handleOpen}
+            aria-expanded={isOpen}
+            aria-label="Abrir filtros"
+          >
+            <SlidersHorizontal size={16} className="mobile-glass-filter-icon" />
+            {activeFiltersCount > 0 && (
+              <span className="mobile-glass-badge">
+                {activeFiltersCount}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* ═══ ACTIVE FILTERS CHIPS (Quick dismiss tags) ═══ */}

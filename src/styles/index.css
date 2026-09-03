@@ -1962,6 +1962,146 @@ body::after {
   box-sizing: border-box;
 }
 
+/* ═══ COACHMARK / TOOLTIP DE NUEVOS ESPÍRITUS (One-Time Discovery) ═══ */
+.mobile-new-coachmark-wrap {
+  width: 100%;
+  max-width: 380px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mobile-new-coachmark {
+  position: relative;
+  margin-bottom: 10px;
+  margin-right: 0;
+  z-index: 50;
+  cursor: pointer;
+  animation: coachmarkFloat 3s ease-in-out infinite, coachmarkFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-new-coachmark.is-dismissing {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.92);
+  margin-bottom: 0;
+  pointer-events: none;
+}
+
+@keyframes coachmarkFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes coachmarkFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.mobile-new-coachmark__content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 12px;
+  border-radius: 9999px;
+  background: rgba(10, 15, 30, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 240, 232, 0.5);
+  box-shadow:
+    0 0 16px rgba(0, 240, 232, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: all 0.2s ease;
+}
+
+.mobile-new-coachmark:hover .mobile-new-coachmark__content {
+  border-color: #00F0E8;
+  box-shadow: 0 0 20px rgba(0, 240, 232, 0.5);
+}
+
+.mobile-new-coachmark__sparkle {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.mobile-new-coachmark__text {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.mobile-new-coachmark__action {
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #00F0E8;
+  color: #060714;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  box-shadow: 0 0 8px rgba(0, 240, 232, 0.4);
+}
+
+.mobile-new-coachmark__close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  margin-left: 2px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mobile-new-coachmark__close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.mobile-new-coachmark__arrow {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid rgba(10, 15, 30, 0.95);
+}
+
+.mobile-new-coachmark__arrow::before {
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  left: -7px;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid rgba(0, 240, 232, 0.5);
+  z-index: -1;
+}
+
 /* Glassmorphic Floating Capsule (Exact same formula as App Footer) */
 .mobile-glass-search-pill {
   width: 100%;
