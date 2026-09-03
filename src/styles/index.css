@@ -4786,11 +4786,11 @@ body::after {
 
 /* Controls Toolbar */
 .sdm-share-pro__controls {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 12px;
   margin-bottom: 14px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   background: rgba(15, 23, 42, 0.65);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -4798,18 +4798,18 @@ body::after {
 
 .sdm-share-pro__seg-group {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
   width: 100%;
 }
 
 .sdm-share-pro__seg-label {
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 900;
   color: #64748b;
   letter-spacing: 0.8px;
-  min-width: 70px;
-  flex-shrink: 0;
+  text-transform: uppercase;
 }
 
 .sdm-share-pro__segmented {
@@ -4819,13 +4819,14 @@ body::after {
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   gap: 2px;
-  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .sdm-share-pro__seg-btn {
   flex: 1;
   text-align: center;
-  padding: 5px 6px;
+  padding: 6px 4px;
   border-radius: 6px;
   border: none;
   background: transparent;
@@ -5071,13 +5072,19 @@ body::after {
     border-radius: 14px;
   }
   .sdm-share-pro__controls {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    padding: 8px 10px;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 10px 12px;
   }
   .sdm-share-pro__seg-group {
-    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .sdm-share-pro__seg-btn {
+    padding: 6px 2px;
+    font-size: 0.70rem;
   }
   .sdm-share-pro__preview-wrap {
     max-height: 380px;
