@@ -50,6 +50,7 @@ export const THEME_STYLES = {
   Gold: { bg: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', border: '#f5b642' },
   Cheatmaster: { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
   'Cheat Master': { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
+  'Loot Hacker': { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
   Candy: { bg: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)', border: '#f16f68' },
   Galaxy: { bg: 'linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%)', border: '#4a35fa' },
   Holofoil: { bg: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', border: '#ec88d8' },
@@ -96,13 +97,13 @@ export function getSpriteCardStyle(sprite) {
 
   const theme = sprite.variant || sprite.theme;
   const rarity = sprite.rarity;
-  const familyId = (sprite.familyId || sprite.id.split('_')[0] || '').toLowerCase();
+  const familyId = (sprite.familyId || sprite.id?.split('_')[0] || '').toLowerCase();
 
-  // 1. Theme-specific variants (Gold, Cheatmaster, Cube, Candy, Galaxy, Holofoil, Gem, Quack)
+  // 1. Theme-specific variants (Gold, Cheatmaster, Loot Hacker, Cube, Candy, Galaxy, Holofoil, Gem, Quack)
   if (theme === 'Gold') {
     return { background: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', borderColor: '#f5b642' };
   }
-  if (theme === 'Cheatmaster' || theme === 'Cheat Master') {
+  if (theme === 'Cheatmaster' || theme === 'Cheat Master' || theme === 'Loot Hacker' || theme === 'LootHacker') {
     return { background: 'linear-gradient(180deg, #094726 0%, #0d281a 100%)', borderColor: '#4ade80' };
   }
   if (theme === 'Cube') {
@@ -159,6 +160,7 @@ export const THEME_NAMES_ES = {
   Gold: 'Dorado',
   Cheatmaster: 'Hacker',
   'Cheat Master': 'Hacker',
+  'Loot Hacker': 'Loot Hacker',
   Candy: 'Gomita',
   Gummy: 'Gomita',
   Galaxy: 'Galáctico',
@@ -168,8 +170,8 @@ export const THEME_NAMES_ES = {
   Quack: 'Patito'
 };
 
-export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
-export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
+export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
+export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
 
 export const FAMILY_NAMES_MAP = {
   water: 'Agua',

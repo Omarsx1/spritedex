@@ -952,7 +952,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "crown_basic",
@@ -976,7 +976,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "jackrabbit_basic",
@@ -1000,7 +1000,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "sonic_basic",
@@ -1024,7 +1024,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "shadow_basic",
@@ -1048,7 +1048,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "tails_basic",
@@ -1072,7 +1072,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "killswitch_basic",
@@ -1096,7 +1096,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "bush_basic",
@@ -1120,7 +1120,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "adventure_basic",
@@ -1144,7 +1144,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "jonesy_basic",
@@ -1168,7 +1168,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "8bit_basic",
@@ -1192,7 +1192,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "stormscout_basic",
@@ -1220,7 +1220,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true,
+    "unreleased": false,
     "isNew": true,
     "releaseDate": "2026-08-30"
   },
@@ -1270,7 +1270,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "overshield_basic",
@@ -1294,7 +1294,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "xray_basic",
@@ -1318,7 +1318,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "megaman_basic",
@@ -1327,5 +1327,125 @@
     "rarity": "Epic",
     "gen": 2,
     "unreleased": false
+  },
+  {
+    "id": "8bit_loothacker",
+    "name": "8-Bit Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "adventure_loothacker",
+    "name": "Aventurero Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "bush_loothacker",
+    "name": "Arbustín Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "crown_loothacker",
+    "name": "Victorioso Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "stormscout_loothacker",
+    "name": "Exploratormentas Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "jackrabbit_loothacker",
+    "name": "Jackrabbit Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "jonesy_loothacker",
+    "name": "Jonesy Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "killswitch_loothacker",
+    "name": "Killswitch Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "klombo_loothacker",
+    "name": "Klombo Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "onigiri_loothacker",
+    "name": "Onigiri Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "overshield_loothacker",
+    "name": "Protector Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "shadow_loothacker",
+    "name": "Shadow Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "sonic_loothacker",
+    "name": "Sonic Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "tails_loothacker",
+    "name": "Tails Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "xray_loothacker",
+    "name": "Científico de Rayos X Loot Hacker",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
   }
 ]
