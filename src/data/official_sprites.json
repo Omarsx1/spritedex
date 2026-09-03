@@ -28,9 +28,9 @@
     "unreleased": false
   },
   {
-    "id": "water_quack",
-    "name": "Quack Water",
-    "theme": "Quack",
+    "id": "water_holofoil",
+    "name": "Holofoil Water",
+    "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
   },
@@ -42,9 +42,9 @@
     "unreleased": false
   },
   {
-    "id": "water_holofoil",
-    "name": "Holofoil Water",
-    "theme": "Holofoil",
+    "id": "water_quack",
+    "name": "Quack Water",
+    "theme": "Quack",
     "rarity": "Special",
     "unreleased": false
   },
@@ -77,9 +77,9 @@
     "unreleased": false
   },
   {
-    "id": "earth_quack",
-    "name": "Quack Earth",
-    "theme": "Quack",
+    "id": "earth_rift",
+    "name": "Cube Earth",
+    "theme": "Cube",
     "rarity": "Special",
     "unreleased": false
   },
@@ -91,9 +91,9 @@
     "unreleased": false
   },
   {
-    "id": "earth_rift",
-    "name": "Cube Earth",
-    "theme": "Cube",
+    "id": "earth_quack",
+    "name": "Quack Earth",
+    "theme": "Quack",
     "rarity": "Special",
     "unreleased": false
   },
@@ -126,13 +126,6 @@
     "unreleased": false
   },
   {
-    "id": "fire_quack",
-    "name": "Quack Fire",
-    "theme": "Quack",
-    "rarity": "Special",
-    "unreleased": false
-  },
-  {
     "id": "fire_rift",
     "name": "Cube Fire",
     "theme": "Cube",
@@ -143,6 +136,13 @@
     "id": "fire_holofoil",
     "name": "Holofoil Fire",
     "theme": "Holofoil",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "fire_quack",
+    "name": "Quack Fire",
+    "theme": "Quack",
     "rarity": "Special",
     "unreleased": false
   },
@@ -175,18 +175,18 @@
     "unreleased": false
   },
   {
-    "id": "duck_gem",
-    "name": "Gem Duck",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": false
-  },
-  {
     "id": "duck_holofoil",
     "name": "Holofoil Duck",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": true
+  },
+  {
+    "id": "duck_gem",
+    "name": "Gem Duck",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": false
   },
   {
     "id": "ghost_basic",
@@ -259,18 +259,18 @@
     "unreleased": false
   },
   {
-    "id": "dream_gem",
-    "name": "Gem Dream",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true
-  },
-  {
     "id": "dream_rift",
     "name": "Cube Dream",
     "theme": "Cube",
     "rarity": "Special",
     "unreleased": false
+  },
+  {
+    "id": "dream_gem",
+    "name": "Gem Dream",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
   },
   {
     "id": "demon_basic",
@@ -301,18 +301,18 @@
     "unreleased": false
   },
   {
-    "id": "demon_gem",
-    "name": "Gem Demon",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": false
-  },
-  {
     "id": "demon_holofoil",
     "name": "Holofoil Demon",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": true
+  },
+  {
+    "id": "demon_gem",
+    "name": "Gem Demon",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": false
   },
   {
     "id": "punk_basic",
@@ -343,18 +343,18 @@
     "unreleased": false
   },
   {
-    "id": "punk_gem",
-    "name": "Gem Punk",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true
-  },
-  {
     "id": "punk_rift",
     "name": "Cube Punk",
     "theme": "Cube",
     "rarity": "Special",
     "unreleased": false
+  },
+  {
+    "id": "punk_gem",
+    "name": "Gem Punk",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
   },
   {
     "id": "king_basic",
@@ -427,16 +427,9 @@
     "unreleased": false
   },
   {
-    "id": "zeropoint_gem",
-    "name": "Gem Zero Point",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": false
-  },
-  {
-    "id": "zeropoint_quack",
-    "name": "Quack Zero Point",
-    "theme": "Quack",
+    "id": "zeropoint_rift",
+    "name": "Cube Zero Point",
+    "theme": "Cube",
     "rarity": "Special",
     "unreleased": false
   },
@@ -448,9 +441,16 @@
     "unreleased": false
   },
   {
-    "id": "zeropoint_rift",
-    "name": "Cube Zero Point",
-    "theme": "Cube",
+    "id": "zeropoint_gem",
+    "name": "Gem Zero Point",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": false
+  },
+  {
+    "id": "zeropoint_quack",
+    "name": "Quack Zero Point",
+    "theme": "Quack",
     "rarity": "Special",
     "unreleased": false
   },
@@ -490,11 +490,11 @@
     "unreleased": false
   },
   {
-    "id": "fishy_gem",
-    "name": "Gem Fishy",
-    "theme": "Gem",
+    "id": "fishy_rift",
+    "name": "Cube Fishy",
+    "theme": "Cube",
     "rarity": "Special",
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "fishy_holofoil",
@@ -504,11 +504,11 @@
     "unreleased": true
   },
   {
-    "id": "fishy_rift",
-    "name": "Cube Fishy",
-    "theme": "Cube",
+    "id": "fishy_gem",
+    "name": "Gem Fishy",
+    "theme": "Gem",
     "rarity": "Special",
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "striker_basic",
@@ -539,9 +539,9 @@
     "unreleased": false
   },
   {
-    "id": "striker_gem",
-    "name": "Gem Striker",
-    "theme": "Gem",
+    "id": "striker_rift",
+    "name": "Cube Striker",
+    "theme": "Cube",
     "rarity": "Special",
     "unreleased": true
   },
@@ -553,9 +553,9 @@
     "unreleased": false
   },
   {
-    "id": "striker_rift",
-    "name": "Cube Striker",
-    "theme": "Cube",
+    "id": "striker_gem",
+    "name": "Gem Striker",
+    "theme": "Gem",
     "rarity": "Special",
     "unreleased": true
   },
@@ -588,18 +588,18 @@
     "unreleased": false
   },
   {
-    "id": "aura_gem",
-    "name": "Gem Aura",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": false
-  },
-  {
     "id": "aura_holofoil",
     "name": "Holofoil Aura",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": true
+  },
+  {
+    "id": "aura_gem",
+    "name": "Gem Aura",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": false
   },
   {
     "id": "boss_basic",
@@ -630,11 +630,11 @@
     "unreleased": false
   },
   {
-    "id": "boss_gem",
-    "name": "Gem Boss",
-    "theme": "Gem",
+    "id": "boss_rift",
+    "name": "Cube Boss",
+    "theme": "Cube",
     "rarity": "Special",
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "boss_holofoil",
@@ -644,11 +644,11 @@
     "unreleased": true
   },
   {
-    "id": "boss_rift",
-    "name": "Cube Boss",
-    "theme": "Cube",
+    "id": "boss_gem",
+    "name": "Gem Boss",
+    "theme": "Gem",
     "rarity": "Special",
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "grim_basic",
@@ -679,9 +679,9 @@
     "unreleased": false
   },
   {
-    "id": "grim_gem",
-    "name": "Gem Grim",
-    "theme": "Gem",
+    "id": "grim_rift",
+    "name": "Cube Grim",
+    "theme": "Cube",
     "rarity": "Special",
     "unreleased": false
   },
@@ -693,9 +693,9 @@
     "unreleased": false
   },
   {
-    "id": "grim_rift",
-    "name": "Cube Grim",
-    "theme": "Cube",
+    "id": "grim_gem",
+    "name": "Gem Grim",
+    "theme": "Gem",
     "rarity": "Special",
     "unreleased": false
   },
@@ -728,18 +728,18 @@
     "unreleased": false
   },
   {
-    "id": "air_gem",
-    "name": "Gem Air",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true
-  },
-  {
     "id": "air_holofoil",
     "name": "Holofoil Air",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
+  },
+  {
+    "id": "air_gem",
+    "name": "Gem Air",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
   },
   {
     "id": "seven_basic",
@@ -770,18 +770,18 @@
     "unreleased": false
   },
   {
-    "id": "seven_gem",
-    "name": "Gem Seven",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true
-  },
-  {
     "id": "seven_holofoil",
     "name": "Holofoil Seven",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false
+  },
+  {
+    "id": "seven_gem",
+    "name": "Gem Seven",
+    "theme": "Gem",
+    "rarity": "Special",
+    "unreleased": true
   },
   {
     "id": "batman_basic",
@@ -812,11 +812,11 @@
     "unreleased": false
   },
   {
-    "id": "batman_gem",
-    "name": "Gem Batman",
-    "theme": "Gem",
+    "id": "batman_rift",
+    "name": "Cube Batman",
+    "theme": "Cube",
     "rarity": "Special",
-    "unreleased": true
+    "unreleased": false
   },
   {
     "id": "batman_holofoil",
@@ -826,11 +826,11 @@
     "unreleased": false
   },
   {
-    "id": "batman_rift",
-    "name": "Cube Batman",
-    "theme": "Cube",
+    "id": "batman_gem",
+    "name": "Gem Batman",
+    "theme": "Gem",
     "rarity": "Special",
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "pollo_basic",
@@ -955,6 +955,14 @@
     "unreleased": false
   },
   {
+    "id": "klombo_loothacker",
+    "name": "Klombo Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
     "id": "crown_basic",
     "name": "Victorioso",
     "theme": "Basic",
@@ -977,6 +985,16 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false
+  },
+  {
+    "id": "crown_loothacker",
+    "name": "Victorioso Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "jackrabbit_basic",
@@ -1003,6 +1021,14 @@
     "unreleased": false
   },
   {
+    "id": "jackrabbit_loothacker",
+    "name": "Jackrabbit Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
     "id": "sonic_basic",
     "name": "Sonic",
     "theme": "Basic",
@@ -1025,6 +1051,14 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false
+  },
+  {
+    "id": "sonic_loothacker",
+    "name": "Sonic Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
   },
   {
     "id": "shadow_basic",
@@ -1051,6 +1085,14 @@
     "unreleased": false
   },
   {
+    "id": "shadow_loothacker",
+    "name": "Shadow Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
     "id": "tails_basic",
     "name": "Tails",
     "theme": "Basic",
@@ -1073,6 +1115,14 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false
+  },
+  {
+    "id": "tails_loothacker",
+    "name": "Tails Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
   },
   {
     "id": "killswitch_basic",
@@ -1099,6 +1149,14 @@
     "unreleased": false
   },
   {
+    "id": "killswitch_loothacker",
+    "name": "Killswitch Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
     "id": "bush_basic",
     "name": "Arbustín",
     "theme": "Basic",
@@ -1121,6 +1179,14 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false
+  },
+  {
+    "id": "bush_loothacker",
+    "name": "Arbustín Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
   },
   {
     "id": "adventure_basic",
@@ -1147,6 +1213,14 @@
     "unreleased": false
   },
   {
+    "id": "adventure_loothacker",
+    "name": "Aventurero Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
     "id": "jonesy_basic",
     "name": "Jonesy",
     "theme": "Basic",
@@ -1171,6 +1245,14 @@
     "unreleased": false
   },
   {
+    "id": "jonesy_loothacker",
+    "name": "Jonesy Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
     "id": "8bit_basic",
     "name": "8-Bit",
     "theme": "Basic",
@@ -1193,6 +1275,14 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false
+  },
+  {
+    "id": "8bit_loothacker",
+    "name": "8-Bit Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
   },
   {
     "id": "stormscout_basic",
@@ -1225,6 +1315,14 @@
     "releaseDate": "2026-08-30"
   },
   {
+    "id": "stormscout_loothacker",
+    "name": "Exploratormentas Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
     "id": "onigiri_basic",
     "name": "Onigiri",
     "theme": "Basic",
@@ -1253,6 +1351,14 @@
     "unreleased": false,
     "isNew": true,
     "releaseDate": "2026-09-03"
+  },
+  {
+    "id": "onigiri_loothacker",
+    "name": "Onigiri Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
   },
   {
     "id": "overshield_basic",
@@ -1285,6 +1391,14 @@
     "releaseDate": "2026-09-03"
   },
   {
+    "id": "overshield_loothacker",
+    "name": "Protector Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
     "id": "xray_basic",
     "name": "Rayos X",
     "theme": "Basic",
@@ -1315,6 +1429,14 @@
     "releaseDate": "2026-09-03"
   },
   {
+    "id": "xray_loothacker",
+    "name": "Rayos X Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
     "id": "megaman_basic",
     "name": "Megaman",
     "theme": "Basic",
@@ -1323,127 +1445,5 @@
     "unreleased": false,
     "isNew": true,
     "releaseDate": "2026-09-03"
-  },
-  {
-    "id": "8bit_loothacker",
-    "name": "8-Bit Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
-  },
-  {
-    "id": "adventure_loothacker",
-    "name": "Aventurero Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
-  },
-  {
-    "id": "bush_loothacker",
-    "name": "Arbustín Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
-  },
-  {
-    "id": "crown_loothacker",
-    "name": "Victorioso Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": true,
-    "releaseDate": "2026-09-03"
-  },
-  {
-    "id": "stormscout_loothacker",
-    "name": "Exploratormentas Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
-  },
-  {
-    "id": "jackrabbit_loothacker",
-    "name": "Jackrabbit Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
-  },
-  {
-    "id": "jonesy_loothacker",
-    "name": "Jonesy Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
-  },
-  {
-    "id": "killswitch_loothacker",
-    "name": "Killswitch Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
-  },
-  {
-    "id": "klombo_loothacker",
-    "name": "Klombo Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
-  },
-  {
-    "id": "onigiri_loothacker",
-    "name": "Onigiri Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
-  },
-  {
-    "id": "overshield_loothacker",
-    "name": "Protector Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
-  },
-  {
-    "id": "shadow_loothacker",
-    "name": "Shadow Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
-  },
-  {
-    "id": "sonic_loothacker",
-    "name": "Sonic Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
-  },
-  {
-    "id": "tails_loothacker",
-    "name": "Tails Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
-  },
-  {
-    "id": "xray_loothacker",
-    "name": "Rayos X Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true
   }
 ]
