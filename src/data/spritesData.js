@@ -50,7 +50,7 @@ export const THEME_STYLES = {
   Gold: { bg: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', border: '#f5b642' },
   Cheatmaster: { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
   'Cheat Master': { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
-  'Loot Hacker': { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
+  'Loot Hacker': { bg: 'linear-gradient(180deg, #2b29b9 0%, #0a0d1f 100%)', border: '#6366f1' },
   Candy: { bg: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)', border: '#f16f68' },
   Galaxy: { bg: 'linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%)', border: '#4a35fa' },
   Holofoil: { bg: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', border: '#ec88d8' },
@@ -102,8 +102,11 @@ export function getSpriteCardStyle(sprite) {
   if (theme === 'Gold') {
     return { background: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', borderColor: '#f5b642' };
   }
-  if (theme === 'Cheatmaster' || theme === 'Cheat Master' || theme === 'Loot Hacker' || theme === 'LootHacker') {
+  if (theme === 'Cheatmaster' || theme === 'Cheat Master') {
     return { background: 'linear-gradient(180deg, #094726 0%, #0d281a 100%)', borderColor: '#4ade80' };
+  }
+  if (theme === 'Loot Hacker' || theme === 'LootHacker') {
+    return { background: 'linear-gradient(180deg, #2b29b9 0%, #0a0d1f 100%)', borderColor: '#6366f1' };
   }
   if (theme === 'Cube') {
     return { background: 'linear-gradient(180deg, #730974 0%, #1b1c23 100%)', borderColor: '#8b008b' };
