@@ -1225,36 +1225,6 @@
     "releaseDate": "2026-08-30"
   },
   {
-    "id": "dwarf_basic",
-    "name": "Enano",
-    "theme": "Basic",
-    "rarity": "Rare",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": true,
-    "releaseDate": "2026-09-03"
-  },
-  {
-    "id": "dwarf_gold",
-    "name": "Enano Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": true,
-    "releaseDate": "2026-09-03"
-  },
-  {
-    "id": "dwarf_cheatmaster",
-    "name": "Enano Hacker",
-    "theme": "Cheatmaster",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": true,
-    "releaseDate": "2026-09-03"
-  },
-  {
     "id": "onigiri_basic",
     "name": "Onigiri",
     "theme": "Basic",
