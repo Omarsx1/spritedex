@@ -43,20 +43,32 @@ function sanitizeDynamicItem(item) {
 export function evaluateReleaseStatus(sprite) {
   if (!sprite) return sprite;
 
-  if (sprite.release_date) {
-    const releaseTime = new Date(sprite.release_date).getTime();
+  const rawRelDate = sprite.release_date || sprite.releaseDate;
+  let isNew = sprite.isNew !== undefined ? Boolean(sprite.isNew) : false;
+
+  if (rawRelDate) {
+    const releaseTime = new Date(rawRelDate).getTime();
     const now = Date.now();
     const isNowActive = now >= releaseTime;
+    const daysSince = (now - releaseTime) / (1000 * 60 * 60 * 24);
+
+    if (daysSince >= 0 && daysSince <= 14) {
+      isNew = true;
+    }
 
     return {
       ...sprite,
       unreleased: !isNowActive,
       isAutoScheduled: true,
-      timeUntilRelease: isNowActive ? 0 : Math.max(0, releaseTime - now)
+      timeUntilRelease: isNowActive ? 0 : Math.max(0, releaseTime - now),
+      isNew: isNew
     };
   }
 
-  return sprite;
+  return {
+    ...sprite,
+    isNew: isNew
+  };
 }
 
 export function useDynamicSprites() {
@@ -84,6 +96,8 @@ export function useDynamicSprites() {
             name: sanitized.name || baseStatic?.name,
             summonCost: cleanCost,
             summon_cost: cleanCost,
+            isNew: sanitized.isNew !== undefined ? sanitized.isNew : (baseStatic?.isNew || false),
+            releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate || null,
             ability: hasRealCustomAbility ? sanitized.ability : (baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.'),
             specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base')
               ? ''
@@ -151,7 +165,9 @@ export function useDynamicSprites() {
               dropChanceDisplay: sanitized.drop_chance || baseStatic?.dropChanceDisplay || '1.50%',
               dropChanceNum: parseFloat(sanitized.drop_chance || baseStatic?.dropChanceNum || '1.5'),
               unreleased: sanitized.unreleased !== undefined ? sanitized.unreleased : (baseStatic?.unreleased || false),
-              release_date: sanitized.release_date || baseStatic?.release_date
+              release_date: sanitized.release_date || baseStatic?.release_date || baseStatic?.releaseDate,
+              releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate,
+              isNew: sanitized.isNew !== undefined ? sanitized.isNew : (baseStatic?.isNew || false)
             };
             map.set(formatted.id, evaluateReleaseStatus(formatted));
           });

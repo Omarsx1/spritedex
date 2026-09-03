@@ -15,7 +15,7 @@ import {
   Calendar,
   Edit3
 } from 'lucide-react';
-import { RARITIES, THEME_NAMES_ES, FAMILY_NAMES_MAP } from '../../data/spritesData';
+import { RARITIES, THEME_NAMES_ES, FAMILY_NAMES_MAP, getSpriteCardStyle } from '../../data/spritesData';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 
 export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClose, darkMode = false }) {
@@ -38,7 +38,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
   }, [existingSprites]);
 
   // Initial family resolution
-  const initialFamilyId = (spirit?.familyId || spirit?.id?.split('_')[0] || 'klombo').toLowerCase();
+  const initialFamilyId = (spirit?.familyId || spirit?.id?.split('_')[0] || (allFamilies[0]?.id || 'custom')).toLowerCase();
   const matchedFamily = allFamilies.find(f => f.id === initialFamilyId);
   const initialFamilyName = spirit?.familyName || matchedFamily?.name || (initialFamilyId.charAt(0).toUpperCase() + initialFamilyId.slice(1));
 
@@ -274,6 +274,21 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
   };
 
   const rarityObj = RARITIES[formData.rarity] || RARITIES.Common;
+
+  const previewCardStyle = useMemo(() => {
+    const rawVariant = formData.variant === 'Base' ? 'Basic' : (formData.variant || 'Basic');
+    const effectiveFamilyId = isCustomFamily
+      ? (formData.customFamily?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'custom')
+      : (formData.familyId || 'custom');
+
+    return getSpriteCardStyle({
+      id: formData.id || `${effectiveFamilyId}_${rawVariant.toLowerCase()}`,
+      familyId: effectiveFamilyId,
+      variant: rawVariant,
+      theme: rawVariant,
+      rarity: formData.rarity
+    });
+  }, [formData.id, formData.familyId, formData.variant, formData.rarity, isCustomFamily, formData.customFamily]);
 
   // ═══ CALENDAR MATH FOR MATERIAL 3 DATE PICKER ═══
   const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -1166,13 +1181,31 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
               width: '220px',
               borderRadius: '18px',
               padding: '20px 16px',
-              background: c.bgSpriteCard,
-              border: `1px solid ${rarityObj.color || (darkMode ? '#3ECF8E' : '#2563EB')}`,
-              boxShadow: darkMode ? '0 15px 35px rgba(0,0,0,0.7)' : '0 10px 30px rgba(0,0,0,0.08)',
+              background: previewCardStyle.background,
+              border: `1.5px solid ${previewCardStyle.borderColor}`,
+              boxShadow: `0 16px 36px rgba(0, 0, 0, 0.65), 0 0 20px ${previewCardStyle.borderColor}40`,
               textAlign: 'center',
-              position: 'relative'
+              position: 'relative',
+              transition: 'background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease'
             }}>
-              {/* Badge */}
+              {/* Variant Tag (Top Left) */}
+              <div style={{
+                position: 'absolute',
+                top: '10px',
+                left: '10px',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                background: 'rgba(0, 0, 0, 0.6)',
+                border: '1px solid rgba(255, 255, 255, 0.18)',
+                color: '#FFFFFF',
+                fontSize: '0.62rem',
+                fontWeight: 900,
+                letterSpacing: '0.04em'
+              }}>
+                {(formData.variantDisplay || THEME_NAMES_ES[formData.variant] || formData.variant || 'BÁSICO').toUpperCase()}
+              </div>
+
+              {/* Rarity Badge (Top Right) */}
               <div style={{
                 position: 'absolute',
                 top: '10px',
@@ -1193,7 +1226,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
               <div style={{
                 width: '120px',
                 height: '120px',
-                margin: '12px auto 8px',
+                margin: '18px auto 8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1202,7 +1235,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 <img
                   src={formData.image || (formData.id ? `/sprites/${formData.id}.png` : '/sprites/water_basic.png')}
                   alt={formData.fullName}
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.5))' }}
                   onError={(e) => {
                     const src = e.target.src;
                     if (src.endsWith('.webp')) {
@@ -1218,7 +1251,13 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 />
               </div>
 
-              <h4 style={{ margin: '0 0 4px', fontSize: '0.92rem', fontWeight: 800, color: c.textPrimary }}>
+              <h4 style={{
+                margin: '0 0 4px',
+                fontSize: '0.94rem',
+                fontWeight: 900,
+                color: '#FFFFFF',
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)'
+              }}>
                 {formData.fullName || 'Nombre del Espíritu'}
               </h4>
 
@@ -1239,7 +1278,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 </div>
               )}
 
-              <div style={{ fontSize: '0.74rem', color: c.textMuted, marginBottom: '10px' }}>
+              <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 700, marginBottom: '10px' }}>
                 {(() => {
                   const n = parseInt(formData.summonCostNum, 10);
                   return !isNaN(n) ? `${n.toLocaleString('en-US')} Polvo Estelar` : '0 Polvo Estelar';
@@ -1250,10 +1289,12 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 <div style={{
                   padding: '5px 10px',
                   borderRadius: '8px',
-                  background: darkMode ? 'rgba(168, 85, 247, 0.2)' : '#F3E8FF',
-                  color: darkMode ? '#C084FC' : '#7E22CE',
+                  background: 'rgba(168, 85, 247, 0.25)',
+                  border: '1px solid rgba(168, 85, 247, 0.5)',
+                  color: '#d8b4fe',
                   fontSize: '0.7rem',
-                  fontWeight: 900
+                  fontWeight: 900,
+                  letterSpacing: '0.04em'
                 }}>
                   NO LANZADO
                 </div>
@@ -1261,10 +1302,12 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 <div style={{
                   padding: '5px 10px',
                   borderRadius: '8px',
-                  background: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#DCFCE7',
-                  color: darkMode ? '#3ECF8E' : '#15803D',
+                  background: 'rgba(16, 185, 129, 0.2)',
+                  border: '1px solid rgba(16, 185, 129, 0.5)',
+                  color: '#6ee7b7',
                   fontSize: '0.7rem',
-                  fontWeight: 900
+                  fontWeight: 900,
+                  letterSpacing: '0.04em'
                 }}>
                   ACTIVO
                 </div>

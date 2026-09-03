@@ -50,6 +50,7 @@ export const THEME_STYLES = {
   Gold: { bg: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', border: '#f5b642' },
   Cheatmaster: { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
   'Cheat Master': { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
+  'Loot Hacker': { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
   Candy: { bg: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)', border: '#f16f68' },
   Galaxy: { bg: 'linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%)', border: '#4a35fa' },
   Holofoil: { bg: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', border: '#ec88d8' },
@@ -81,7 +82,11 @@ export const ELEMENTAL_STYLES = {
   '8bit': { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#0ea5e9' },
   jackrabbit: { background: 'linear-gradient(180deg, #713f12 0%, #1b1c23 100%)', borderColor: '#eab308' },
   killswitch: { background: 'linear-gradient(180deg, #31103f 0%, #1b1c23 100%)', borderColor: '#a855f7' },
-  stormscout: { background: 'linear-gradient(180deg, #1e1b4b 0%, #1b1c23 100%)', borderColor: '#818cf8' }
+  stormscout: { background: 'linear-gradient(180deg, #1e1b4b 0%, #1b1c23 100%)', borderColor: '#818cf8' },
+  overshield: { background: 'linear-gradient(180deg, #1e1b4b 0%, #1b1c23 100%)', borderColor: '#818cf8' },
+  onigiri: { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' },
+  xray: { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' },
+  megaman: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#3b82f6' }
 };
 
 export function getSpriteCardStyle(sprite) {
@@ -91,13 +96,13 @@ export function getSpriteCardStyle(sprite) {
 
   const theme = sprite.variant || sprite.theme;
   const rarity = sprite.rarity;
-  const familyId = (sprite.familyId || sprite.id.split('_')[0] || '').toLowerCase();
+  const familyId = (sprite.familyId || sprite.id?.split('_')[0] || '').toLowerCase();
 
-  // 1. Theme-specific variants (Gold, Cheatmaster, Cube, Candy, Galaxy, Holofoil, Gem, Quack)
+  // 1. Theme-specific variants (Gold, Cheatmaster, Loot Hacker, Cube, Candy, Galaxy, Holofoil, Gem, Quack)
   if (theme === 'Gold') {
     return { background: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', borderColor: '#f5b642' };
   }
-  if (theme === 'Cheatmaster' || theme === 'Cheat Master') {
+  if (theme === 'Cheatmaster' || theme === 'Cheat Master' || theme === 'Loot Hacker' || theme === 'LootHacker') {
     return { background: 'linear-gradient(180deg, #094726 0%, #0d281a 100%)', borderColor: '#4ade80' };
   }
   if (theme === 'Cube') {
@@ -116,23 +121,34 @@ export function getSpriteCardStyle(sprite) {
     return { background: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)', borderColor: '#38bdf8' };
   }
 
-  // 2. Elemental Customization for Basic sprites
-  if (theme === 'Basic' && ELEMENTAL_STYLES[familyId]) {
-    return ELEMENTAL_STYLES[familyId];
+  // 2. Klombo Mítico original de Fortnite
+  if (familyId === 'klombo' && (!rarity || rarity === 'Mythic')) {
+    return { background: 'linear-gradient(180deg, #831843 0%, #1b1c23 100%)', borderColor: '#ec4899' };
   }
 
-  // 3. Rarity-based defaults
-  if (rarity === 'Mythic') {
-    return { background: 'linear-gradient(180deg, #a89442 0%, #1b1c23 100%)', borderColor: '#f1e198' };
-  }
-  if (rarity === 'Legendary') {
-    return { background: 'linear-gradient(180deg, #743e0a 0%, #1b1c23 100%)', borderColor: '#de6e0e' };
+  // 3. Colores por Rareza (La rareza define el color de la carta básica)
+  if (rarity === 'Rare') {
+    return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };
   }
   if (rarity === 'Epic') {
     return { background: 'linear-gradient(180deg, #4d1566 0%, #1b1c23 100%)', borderColor: '#ce59ff' };
   }
-  if (rarity === 'Rare') {
-    return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };
+  if (rarity === 'Legendary') {
+    return { background: 'linear-gradient(180deg, #743e0a 0%, #1b1c23 100%)', borderColor: '#de6e0e' };
+  }
+  if (rarity === 'Mythic') {
+    return { background: 'linear-gradient(180deg, #a89442 0%, #1b1c23 100%)', borderColor: '#f1e198' };
+  }
+  if (rarity === 'Uncommon') {
+    return { background: 'linear-gradient(180deg, #1b532a 0%, #1b1c23 100%)', borderColor: '#4ade80' };
+  }
+  if (rarity === 'Common') {
+    return { background: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)', borderColor: '#94a3b8' };
+  }
+
+  // 4. Fallback a estilos elementales específicos
+  if (theme === 'Basic' && ELEMENTAL_STYLES[familyId]) {
+    return ELEMENTAL_STYLES[familyId];
   }
 
   return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };
@@ -143,6 +159,8 @@ export const THEME_NAMES_ES = {
   Gold: 'Dorado',
   Cheatmaster: 'Hacker',
   'Cheat Master': 'Hacker',
+  'Loot Hacker': 'Hacker de Botín',
+  'LootHacker': 'Hacker de Botín',
   Candy: 'Gomita',
   Gummy: 'Gomita',
   Galaxy: 'Galáctico',
@@ -152,8 +170,8 @@ export const THEME_NAMES_ES = {
   Quack: 'Patito'
 };
 
-export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
-export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
+export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
+export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
 
 export const FAMILY_NAMES_MAP = {
   water: 'Agua',
@@ -193,10 +211,14 @@ export const FAMILY_NAMES_MAP = {
   adventure: 'Aventurero',
   jonesy: 'Jonesy',
   '8bit': '8-Bit',
-  stormscout: 'Exploratormentas'
+  stormscout: 'Exploratormentas',
+  overshield: 'Protector',
+  onigiri: 'Onigiri',
+  xray: 'Rayos X',
+  megaman: 'Megaman'
 };
 
-const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails'];
+const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails', 'megaman'];
 
 export const SPANISH_NAME_OVERRIDES = {
   water_quack: 'Patito de Agua',
