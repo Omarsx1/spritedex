@@ -1,8 +1,17 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import confetti from 'canvas-confetti';
-import { RARITIES, getSpriteCardStyle } from '../data/spritesData';
+import { RARITIES, getSpriteCardStyle, VARIANT_ORDER } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import { SonicRing } from './SonicRing';
+
+const getVariantPriority = (v) => {
+  if (v === 'Base' || v === 'Basic') return 0;
+  if (v === 'Gold') return 1;
+  if (v === 'Cheatmaster' || v === 'Cheat Master') return 2;
+  if (v === 'Loot Hacker' || v === 'LootHacker') return 3;
+  const idx = VARIANT_ORDER.indexOf(v);
+  return idx === -1 ? 99 : idx;
+};
 
 /**
  * Una fila individual por familia de sprites.
@@ -24,10 +33,11 @@ function FamilyRow({
   const startXRef = useRef(0);
   const isDraggingRef = useRef(false);
 
-  // Clamp index if variants change
+  // Reset al primer sprite (Base) si cambian las variantes o filtros
+  const variantsKey = variants.map(v => v.id).join(',');
   useEffect(() => {
-    setActiveIdx((prev) => Math.min(prev, variants.length - 1));
-  }, [variants.length]);
+    setActiveIdx(0);
+  }, [familyName, variantsKey]);
 
   const handleTouchStart = (e) => {
     isDraggingRef.current = true;
@@ -343,7 +353,12 @@ export function MobileSpriteSwiper({
       }
       familyMap.get(sprite.familyId).variants.push(sprite);
     });
-    return Array.from(familyMap.values());
+
+    // Ordenar variantes canónicamente dentro de cada familia (Básico -> Dorado -> Hacker -> Hacker de Botín)
+    return Array.from(familyMap.values()).map((family) => ({
+      ...family,
+      variants: [...family.variants].sort((a, b) => getVariantPriority(a.variant) - getVariantPriority(b.variant))
+    }));
   }, [sprites]);
 
   if (families.length === 0) return null;

@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ALL_SPRITES } from './data/spritesData';
+import { ALL_SPRITES, VARIANT_ORDER } from './data/spritesData';
+
+const getVariantPriority = (v) => {
+  if (v === 'Base' || v === 'Basic') return 0;
+  if (v === 'Gold') return 1;
+  if (v === 'Cheatmaster' || v === 'Cheat Master') return 2;
+  if (v === 'Loot Hacker' || v === 'LootHacker') return 3;
+  const idx = VARIANT_ORDER.indexOf(v);
+  return idx === -1 ? 99 : idx;
+};
 import { Header } from './components/Header';
 import { Navbar } from './components/Navbar';
 import { FilterBar } from './components/FilterBar';
@@ -408,7 +417,15 @@ export function App() {
           result = [...result].sort((a, b) => {
             const dateA = a.releaseDate || a.release_date ? new Date(a.releaseDate || a.release_date).getTime() : 0;
             const dateB = b.releaseDate || b.release_date ? new Date(b.releaseDate || b.release_date).getTime() : 0;
-            return dateB - dateA;
+            if (dateB !== dateA) {
+              return dateB - dateA;
+            }
+            const famA = a.familyId || (a.id ? a.id.split('_')[0] : '');
+            const famB = b.familyId || (b.id ? b.id.split('_')[0] : '');
+            if (famA !== famB) {
+              return 0;
+            }
+            return getVariantPriority(a.variant) - getVariantPriority(b.variant);
           });
         }
         break;
