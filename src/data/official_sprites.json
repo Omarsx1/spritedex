@@ -1230,7 +1230,9 @@
     "theme": "Basic",
     "rarity": "Rare",
     "gen": 2,
-    "unreleased": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "dwarf_gold",
@@ -1238,7 +1240,9 @@
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "dwarf_cheatmaster",
@@ -1246,7 +1250,9 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "onigiri_basic",
@@ -1254,7 +1260,9 @@
     "theme": "Basic",
     "rarity": "Rare",
     "gen": 2,
-    "unreleased": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "onigiri_gold",
@@ -1262,7 +1270,9 @@
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "onigiri_cheatmaster",
@@ -1270,7 +1280,9 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "overshield_basic",
@@ -1278,7 +1290,9 @@
     "theme": "Basic",
     "rarity": "Epic",
     "gen": 2,
-    "unreleased": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "overshield_gold",
@@ -1286,7 +1300,9 @@
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "overshield_cheatmaster",
@@ -1294,7 +1310,9 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "xray_basic",
@@ -1302,7 +1320,9 @@
     "theme": "Basic",
     "rarity": "Rare",
     "gen": 2,
-    "unreleased": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "xray_gold",
@@ -1310,7 +1330,9 @@
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "xray_cheatmaster",
@@ -1318,7 +1340,9 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "megaman_basic",
@@ -1326,7 +1350,9 @@
     "theme": "Basic",
     "rarity": "Epic",
     "gen": 2,
-    "unreleased": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "8bit_loothacker",
