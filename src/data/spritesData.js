@@ -81,7 +81,12 @@ export const ELEMENTAL_STYLES = {
   '8bit': { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#0ea5e9' },
   jackrabbit: { background: 'linear-gradient(180deg, #713f12 0%, #1b1c23 100%)', borderColor: '#eab308' },
   killswitch: { background: 'linear-gradient(180deg, #31103f 0%, #1b1c23 100%)', borderColor: '#a855f7' },
-  stormscout: { background: 'linear-gradient(180deg, #1e1b4b 0%, #1b1c23 100%)', borderColor: '#818cf8' }
+  stormscout: { background: 'linear-gradient(180deg, #1e1b4b 0%, #1b1c23 100%)', borderColor: '#818cf8' },
+  dwarf: { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' },
+  overshield: { background: 'linear-gradient(180deg, #1e1b4b 0%, #1b1c23 100%)', borderColor: '#818cf8' },
+  onigiri: { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' },
+  xray: { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' },
+  megaman: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#3b82f6' }
 };
 
 export function getSpriteCardStyle(sprite) {
@@ -204,10 +209,15 @@ export const FAMILY_NAMES_MAP = {
   adventure: 'Aventurero',
   jonesy: 'Jonesy',
   '8bit': '8-Bit',
-  stormscout: 'Exploratormentas'
+  stormscout: 'Exploratormentas',
+  dwarf: 'Enano',
+  overshield: 'Protector',
+  onigiri: 'Onigiri',
+  xray: 'Científico de Rayos X',
+  megaman: 'Megaman'
 };
 
-const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails'];
+const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails', 'megaman'];
 
 export const SPANISH_NAME_OVERRIDES = {
   water_quack: 'Patito de Agua',

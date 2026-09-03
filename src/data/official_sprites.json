@@ -952,7 +952,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "crown_basic",
@@ -976,7 +976,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "jackrabbit_basic",
@@ -1000,7 +1000,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "sonic_basic",
@@ -1024,7 +1024,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "shadow_basic",
@@ -1048,7 +1048,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "tails_basic",
@@ -1072,7 +1072,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "killswitch_basic",
@@ -1096,7 +1096,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "bush_basic",
@@ -1120,7 +1120,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "adventure_basic",
@@ -1144,7 +1144,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "jonesy_basic",
@@ -1168,7 +1168,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "8bit_basic",
@@ -1192,7 +1192,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false
+    "unreleased": true
   },
   {
     "id": "stormscout_basic",
@@ -1220,8 +1220,112 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": false,
+    "unreleased": true,
     "isNew": true,
     "releaseDate": "2026-08-30"
+  },
+  {
+    "id": "dwarf_basic",
+    "name": "Enano",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "gen": 2,
+    "unreleased": false
+  },
+  {
+    "id": "dwarf_gold",
+    "name": "Enano Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false
+  },
+  {
+    "id": "dwarf_cheatmaster",
+    "name": "Enano Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false
+  },
+  {
+    "id": "onigiri_basic",
+    "name": "Onigiri",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "gen": 2,
+    "unreleased": false
+  },
+  {
+    "id": "onigiri_gold",
+    "name": "Onigiri Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false
+  },
+  {
+    "id": "onigiri_cheatmaster",
+    "name": "Onigiri Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "overshield_basic",
+    "name": "Protector",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "gen": 2,
+    "unreleased": false
+  },
+  {
+    "id": "overshield_gold",
+    "name": "Protector Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false
+  },
+  {
+    "id": "overshield_cheatmaster",
+    "name": "Protector Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "xray_basic",
+    "name": "Científico de Rayos X",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "gen": 2,
+    "unreleased": false
+  },
+  {
+    "id": "xray_gold",
+    "name": "Científico de Rayos X Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false
+  },
+  {
+    "id": "xray_cheatmaster",
+    "name": "Científico de Rayos X Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true
+  },
+  {
+    "id": "megaman_basic",
+    "name": "Megaman",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "gen": 2,
+    "unreleased": false
   }
 ]
