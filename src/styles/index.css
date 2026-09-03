@@ -2693,6 +2693,17 @@ body::after {
   border-color: #f5b642;
 }
 
+.sprite-theme-hacker,
+.sprite-theme-cheatmaster {
+  background: linear-gradient(180deg, #094726 0%, #0d281a 100%);
+  border-color: #4ade80;
+}
+
+.sprite-theme-loothacker {
+  background: linear-gradient(180deg, #2b29b9 0%, #0a0d1f 100%);
+  border-color: #6366f1;
+}
+
 .sprite-theme-cube {
   background: linear-gradient(180deg, #730974 0%, #161b22 100%);
   border-color: #8b008b;
