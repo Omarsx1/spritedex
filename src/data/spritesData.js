@@ -159,7 +159,8 @@ export const THEME_NAMES_ES = {
   Gold: 'Dorado',
   Cheatmaster: 'Hacker',
   'Cheat Master': 'Hacker',
-  'Loot Hacker': 'Loot Hacker',
+  'Loot Hacker': 'Hacker de Botín',
+  'LootHacker': 'Hacker de Botín',
   Candy: 'Gomita',
   Gummy: 'Gomita',
   Galaxy: 'Galáctico',
@@ -213,7 +214,7 @@ export const FAMILY_NAMES_MAP = {
   stormscout: 'Exploratormentas',
   overshield: 'Protector',
   onigiri: 'Onigiri',
-  xray: 'Científico de Rayos X',
+  xray: 'Rayos X',
   megaman: 'Megaman'
 };
 

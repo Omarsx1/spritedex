@@ -1286,7 +1286,7 @@
   },
   {
     "id": "xray_basic",
-    "name": "Científico de Rayos X",
+    "name": "Rayos X",
     "theme": "Basic",
     "rarity": "Rare",
     "gen": 2,
@@ -1296,7 +1296,7 @@
   },
   {
     "id": "xray_gold",
-    "name": "Científico de Rayos X Dorado",
+    "name": "Rayos X Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -1306,7 +1306,7 @@
   },
   {
     "id": "xray_cheatmaster",
-    "name": "Científico de Rayos X Hacker",
+    "name": "Rayos X Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1326,7 +1326,7 @@
   },
   {
     "id": "8bit_loothacker",
-    "name": "8-Bit Loot Hacker",
+    "name": "8-Bit Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1334,7 +1334,7 @@
   },
   {
     "id": "adventure_loothacker",
-    "name": "Aventurero Loot Hacker",
+    "name": "Aventurero Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1342,7 +1342,7 @@
   },
   {
     "id": "bush_loothacker",
-    "name": "Arbustín Loot Hacker",
+    "name": "Arbustín Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1350,15 +1350,17 @@
   },
   {
     "id": "crown_loothacker",
-    "name": "Victorioso Loot Hacker",
+    "name": "Victorioso Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-03"
   },
   {
     "id": "stormscout_loothacker",
-    "name": "Exploratormentas Loot Hacker",
+    "name": "Exploratormentas Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1366,7 +1368,7 @@
   },
   {
     "id": "jackrabbit_loothacker",
-    "name": "Jackrabbit Loot Hacker",
+    "name": "Jackrabbit Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1374,7 +1376,7 @@
   },
   {
     "id": "jonesy_loothacker",
-    "name": "Jonesy Loot Hacker",
+    "name": "Jonesy Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1382,7 +1384,7 @@
   },
   {
     "id": "killswitch_loothacker",
-    "name": "Killswitch Loot Hacker",
+    "name": "Killswitch Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1390,7 +1392,7 @@
   },
   {
     "id": "klombo_loothacker",
-    "name": "Klombo Loot Hacker",
+    "name": "Klombo Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1398,7 +1400,7 @@
   },
   {
     "id": "onigiri_loothacker",
-    "name": "Onigiri Loot Hacker",
+    "name": "Onigiri Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1406,7 +1408,7 @@
   },
   {
     "id": "overshield_loothacker",
-    "name": "Protector Loot Hacker",
+    "name": "Protector Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1414,7 +1416,7 @@
   },
   {
     "id": "shadow_loothacker",
-    "name": "Shadow Loot Hacker",
+    "name": "Shadow Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1422,7 +1424,7 @@
   },
   {
     "id": "sonic_loothacker",
-    "name": "Sonic Loot Hacker",
+    "name": "Sonic Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1430,7 +1432,7 @@
   },
   {
     "id": "tails_loothacker",
-    "name": "Tails Loot Hacker",
+    "name": "Tails Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1438,7 +1440,7 @@
   },
   {
     "id": "xray_loothacker",
-    "name": "Científico de Rayos X Loot Hacker",
+    "name": "Rayos X Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
