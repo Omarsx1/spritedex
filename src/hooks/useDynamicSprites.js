@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ALL_SPRITES, SPANISH_NAME_OVERRIDES } from '../data/spritesData';
+import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES } from '../data/spritesData';
 import { supabase, isSupabaseConfigured } from '../utils/supabase';
 
 const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache';
@@ -92,6 +92,7 @@ export function useDynamicSprites() {
           const rawCost = sanitized.summon_cost || sanitized.summonCost || baseStatic?.summonCost || '2,000 Polvo Estelar';
           const cleanCost = rawCost && !rawCost.toLowerCase().includes('polvo') ? `${rawCost} Polvo Estelar` : rawCost;
 
+          const override = SPIRIT_DATA_OVERRIDES[sanitized.id];
           const merged = {
             ...(baseStatic || {}),
             ...sanitized,
@@ -101,10 +102,10 @@ export function useDynamicSprites() {
             summon_cost: cleanCost,
             isNew: sanitized.isNew !== undefined ? sanitized.isNew : (baseStatic?.isNew || false),
             releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate || null,
-            ability: hasRealCustomAbility ? sanitized.ability : (baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.'),
+            ability: override?.ability || (hasRealCustomAbility ? sanitized.ability : (baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.')),
             specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base')
               ? ''
-              : (sanitized.special_perk || sanitized.specialPerk || baseStatic?.specialPerk || '')
+              : (override?.specialPerk !== undefined ? override.specialPerk : (sanitized.special_perk || sanitized.specialPerk || baseStatic?.specialPerk || ''))
           };
           map.set(item.id, evaluateReleaseStatus(merged));
         });
@@ -157,10 +158,10 @@ export function useDynamicSprites() {
               variantDisplay: sanitized.variant_display || sanitized.variant || baseStatic?.variantDisplay,
               gen: sanitized.gen || baseStatic?.gen || 2,
               image: sanitized.image || baseStatic?.image,
-              ability: hasRealCustomAbility ? sanitized.ability : (baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.'),
+              ability: SPIRIT_DATA_OVERRIDES[sanitized.id]?.ability || (hasRealCustomAbility ? sanitized.ability : (baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.')),
               specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base') 
                 ? '' 
-                : (sanitized.special_perk || baseStatic?.specialPerk || ''),
+                : (SPIRIT_DATA_OVERRIDES[sanitized.id]?.specialPerk !== undefined ? SPIRIT_DATA_OVERRIDES[sanitized.id].specialPerk : (sanitized.special_perk || baseStatic?.specialPerk || '')),
               location: sanitized.location || baseStatic?.location || 'Zonas de Extracción',
               summonCost: cleanCost,
               summon_cost: cleanCost,

@@ -243,6 +243,284 @@ export const SPANISH_NAME_OVERRIDES = {
   jonesy_cheatmaster: 'Jonesy Hacker'
 };
 
+export const SPIRIT_DATA_OVERRIDES = {
+  // Espíritu Klombo
+  klombo_basic: {
+    ability: 'Otorga objetos aleatorios en cada nivel y solo sube de nivel al consumir objetos. ¡La calidad de los objetos aumenta con cada subida de nivel!',
+    specialPerk: ''
+  },
+  klombo_gold: {
+    ability: 'Otorga objetos aleatorios en cada nivel y solo sube de nivel al consumir objetos. ¡La calidad de los objetos aumenta con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  klombo_cheatmaster: {
+    ability: 'Otorga objetos aleatorios en cada nivel y solo sube de nivel al consumir objetos. ¡La calidad de los objetos aumenta con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  klombo_loothacker: {
+    ability: 'Otorga objetos aleatorios en cada nivel y solo sube de nivel al consumir objetos. ¡La calidad de los objetos aumenta con cada subida de nivel!',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Jackrabbit
+  jackrabbit_basic: {
+    ability: '¡Otorga la habilidad de realizar otro salto en el aire! ¡El tiempo de recarga entre saltos disminuye con cada subida de nivel!',
+    specialPerk: ''
+  },
+  jackrabbit_gold: {
+    ability: '¡Otorga la habilidad de realizar otro salto en el aire! ¡El tiempo de recarga entre saltos disminuye con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  jackrabbit_cheatmaster: {
+    ability: '¡Otorga la habilidad de realizar otro salto en el aire! ¡El tiempo de recarga entre saltos disminuye con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  jackrabbit_loothacker: {
+    ability: '(Activa - Salto en el aire) Salto doble. ¡El tiempo de recarga entre saltos disminuye con cada subida de nivel!',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Shadow
+  shadow_basic: {
+    ability: 'Recarga automáticamente las armas no equipadas a lo largo del tiempo. Recarga el arma equipada al nivel máximo. ¡La recarga automática se vuelve más rápida con cada subida de nivel!',
+    specialPerk: ''
+  },
+  shadow_gold: {
+    ability: 'Recarga automáticamente las armas no equipadas a lo largo del tiempo. Recarga el arma equipada al nivel máximo. ¡La recarga automática se vuelve más rápida con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  shadow_cheatmaster: {
+    ability: 'Recarga automáticamente las armas no equipadas a lo largo del tiempo. Recarga el arma equipada al nivel máximo. ¡La recarga automática se vuelve más rápida con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  shadow_loothacker: {
+    ability: 'Recarga automáticamente las armas no equipadas a lo largo del tiempo. Recarga el arma equipada al nivel máximo. ¡La recarga automática se vuelve más rápida con cada subida de nivel!',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Arbustín
+  bush_basic: {
+    ability: 'Te otorga un arbusto tras cierta duración; obtén un arbusto al realizar una eliminación en el nivel máximo. ¡El tiempo de activación del arbusto disminuye con cada subida de nivel!',
+    specialPerk: ''
+  },
+  bush_gold: {
+    ability: 'Te otorga un arbusto tras cierta duración; obtén un arbusto al realizar una eliminación en el nivel máximo. ¡El tiempo de activación del arbusto disminuye con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  bush_cheatmaster: {
+    ability: 'Te otorga un arbusto tras cierta duración; obtén un arbusto al realizar una eliminación en el nivel máximo. ¡El tiempo de activación del arbusto disminuye con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  bush_loothacker: {
+    ability: 'Te otorga un arbusto tras cierta duración; obtén un arbusto al realizar una eliminación en el nivel máximo. ¡El tiempo de activación del arbusto disminuye con cada subida de nivel!',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Tails
+  tails_basic: {
+    ability: '¡Otorga la habilidad de flotar en el aire con la ayuda de Tails! ¡La velocidad al flotar aumenta con cada subida de nivel!',
+    specialPerk: ''
+  },
+  tails_gold: {
+    ability: '¡Otorga la habilidad de flotar en el aire con la ayuda de Tails! ¡La velocidad al flotar aumenta con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  tails_cheatmaster: {
+    ability: '¡Otorga la habilidad de flotar en el aire con la ayuda de Tails! ¡La velocidad al flotar aumenta con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  tails_loothacker: {
+    ability: '¡Otorga la habilidad de flotar en el aire con la ayuda de Tails! ¡La velocidad al flotar aumenta con cada subida de nivel!',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Killswitch
+  killswitch_basic: {
+    ability: 'Entra en tiempo de suspensión en el aire con precisión mejorada al apuntar mientras saltas y caes. ¡La precisión aumenta con cada subida de nivel!',
+    specialPerk: ''
+  },
+  killswitch_gold: {
+    ability: 'Entra en tiempo de suspensión en el aire con precisión mejorada al apuntar mientras saltas y caes. ¡La precisión aumenta con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  killswitch_cheatmaster: {
+    ability: 'Entra en tiempo de suspensión en el aire con precisión mejorada al apuntar mientras saltas y caes. ¡La precisión aumenta con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  killswitch_loothacker: {
+    ability: '(Activa - Apuntar en el aire) Entra en tiempo de suspensión en el aire con precisión mejorada. ¡La precisión aumenta con cada subida de nivel!',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Aventurero
+  adventure_basic: {
+    ability: '¡Mejora un objeto aleatorio en el inventario del jugador con cada subida de nivel!',
+    specialPerk: ''
+  },
+  adventure_gold: {
+    ability: '¡Mejora un objeto aleatorio en el inventario del jugador con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  adventure_cheatmaster: {
+    ability: '¡Mejora un objeto aleatorio en el inventario del jugador con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  adventure_loothacker: {
+    ability: '¡Mejora un objeto aleatorio en el inventario del jugador con cada subida de nivel!',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Jonesy
+  jonesy_basic: {
+    ability: 'Recupera algo de salud o escudo tras recibir daño después de un breve período. ¡La cantidad curada aumenta con cada subida de nivel!',
+    specialPerk: ''
+  },
+  jonesy_gold: {
+    ability: 'Recupera algo de salud o escudo tras recibir daño después de un breve período. ¡La cantidad curada aumenta con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  jonesy_cheatmaster: {
+    ability: 'Recupera algo de salud o escudo tras recibir daño después de un breve período. ¡La cantidad curada aumenta con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  jonesy_loothacker: {
+    ability: 'Recupera algo de salud o escudo tras recibir daño después de un breve período. ¡La cantidad curada aumenta con cada subida de nivel!',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Sonic
+  sonic_basic: {
+    ability: '¡Hay que ir rápido! ¡Esprinta más rápido con cada subida de nivel!',
+    specialPerk: ''
+  },
+  sonic_gold: {
+    ability: '¡Hay que ir rápido! ¡Esprinta más rápido con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  sonic_cheatmaster: {
+    ability: '¡Hay que ir rápido! ¡Esprinta más rápido con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  sonic_loothacker: {
+    ability: '¡Hay que ir rápido! ¡Esprinta más rápido con cada subida de nivel!',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Victorioso
+  crown_basic: {
+    ability: 'Solo sube de nivel al ganar partidas. Sube de nivel más rápido con victorias con corona. ¡Nuevas variantes desbloqueadas tras dominarlo!',
+    specialPerk: ''
+  },
+  crown_gold: {
+    ability: 'Solo sube de nivel al ganar partidas. Sube de nivel más rápido con victorias con corona. ¡Nuevas variantes desbloqueadas tras dominarlo!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  crown_cheatmaster: {
+    ability: 'Solo sube de nivel al ganar partidas. Sube de nivel más rápido con victorias con corona. ¡Nuevas variantes desbloqueadas tras dominarlo!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  crown_loothacker: {
+    ability: 'Solo sube de nivel al ganar partidas. Sube de nivel más rápido con victorias con corona. ¡Nuevas variantes desbloqueadas tras dominarlo!',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu 8-Bit
+  '8bit_basic': {
+    ability: 'Encuentra una escopeta de 8 bits en tu primer cofre y obtén un multiplicador de puntuación para ella.',
+    specialPerk: ''
+  },
+  '8bit_gold': {
+    ability: 'Encuentra una escopeta de 8 bits en tu primer cofre y obtén un multiplicador de puntuación para ella.',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  '8bit_cheatmaster': {
+    ability: 'Encuentra una escopeta de 8 bits en tu primer cofre y obtén un multiplicador de puntuación para ella.',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  '8bit_loothacker': {
+    ability: 'Encuentra una escopeta de 8 bits en tu primer cofre y obtén un multiplicador de puntuación para ella.',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Exploratormentas
+  stormscout_basic: {
+    ability: 'Aplica Sobrecarga tras recibir cierta cantidad de daño de la tormenta. Revela futuros círculos de la tormenta al nivel máximo. ¡Reduce el daño necesario para activar la sobrecarga con cada subida de nivel!',
+    specialPerk: ''
+  },
+  stormscout_gold: {
+    ability: 'Aplica Sobrecarga tras recibir cierta cantidad de daño de la tormenta. Revela futuros círculos de la tormenta al nivel máximo. ¡Reduce el daño necesario para activar la sobrecarga con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  stormscout_cheatmaster: {
+    ability: 'Aplica Sobrecarga tras recibir cierta cantidad de daño de la tormenta. Revela futuros círculos de la tormenta al nivel máximo. ¡Reduce el daño necesario para activar la sobrecarga con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  stormscout_loothacker: {
+    ability: 'Aplica Sobrecarga tras recibir cierta cantidad de daño de la tormenta. ¡Aumenta la duración de la sobrecarga con cada subida de nivel!',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Protector
+  overshield_basic: {
+    ability: 'Otorga sobreescudo, aumentando según el nivel.',
+    specialPerk: ''
+  },
+  overshield_gold: {
+    ability: 'Otorga sobreescudo, aumentando según el nivel.',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  overshield_cheatmaster: {
+    ability: 'Otorga sobreescudo, aumentando según el nivel.',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  overshield_loothacker: {
+    ability: 'Otorga sobreescudo, aumentando según el nivel.',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Rayos X
+  xray_basic: {
+    ability: 'Marca periódicamente a los enemigos en un área a tu alrededor. ¡Marca con más frecuencia y en un radio mayor con cada subida de nivel!',
+    specialPerk: ''
+  },
+  xray_gold: {
+    ability: 'Marca periódicamente a los enemigos en un área a tu alrededor. ¡Marca con más frecuencia y en un radio mayor con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  xray_cheatmaster: {
+    ability: 'Marca periódicamente a los enemigos en un área a tu alrededor. ¡Marca con más frecuencia y en un radio mayor con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  xray_loothacker: {
+    ability: 'Marca periódicamente a los enemigos en un área a tu alrededor. ¡Marca con más frecuencia y en un radio mayor con cada subida de nivel!',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Onigiri
+  onigiri_basic: {
+    ability: 'Aplica Sobrecarga tras comer o beber un consumible. ¡La sobrecarga dura más tiempo con cada subida de nivel!',
+    specialPerk: ''
+  },
+  onigiri_gold: {
+    ability: 'Aplica Sobrecarga tras comer o beber un consumible. ¡La sobrecarga dura más tiempo con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  onigiri_cheatmaster: {
+    ability: 'Aplica Sobrecarga tras comer o beber un consumible. ¡La sobrecarga dura más tiempo con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  onigiri_loothacker: {
+    ability: 'Aplica Sobrecarga tras comer o beber un consumible. ¡La sobrecarga dura más tiempo con cada subida de nivel!',
+    specialPerk: 'Sin confirmar.'
+  },
+
+  // Espíritu Megaman
+  megaman_basic: {
+    ability: 'Deslízate con fricción reducida al deslizarte. ¡Deslízate más lejos con cada subida de nivel!',
+    specialPerk: ''
+  }
+};
+
 const SUMMON_COST_OVERRIDES = {
   'klombo_basic': '2,000 Polvo Estelar',
   'klombo_gold': '2,400 Polvo Estelar',
@@ -372,8 +650,8 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     familyName: spanishFamilyName,
     location: official?.location || 'Cofres de Sprite & Zonas de Extracción',
     summonCost: SUMMON_COST_OVERRIDES[item.id] || officialCost || '5,000 Polvo Estelar',
-    ability: official?.ability || 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.',
-    specialPerk: isBaseVariant ? '' : (official?.specialPerk || '')
+    ability: SPIRIT_DATA_OVERRIDES[item.id]?.ability || official?.ability || 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.',
+    specialPerk: isBaseVariant ? '' : (SPIRIT_DATA_OVERRIDES[item.id]?.specialPerk !== undefined ? SPIRIT_DATA_OVERRIDES[item.id].specialPerk : (official?.specialPerk || ''))
   };
 });
 
