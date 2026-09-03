@@ -57,6 +57,8 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     switch (scope) {
       case 'all':
         return allSprites;
+      case 'new':
+        return allSprites.filter(s => s.isNew);
       case 'filtered':
         return filteredSprites;
       case 'owned':
@@ -73,6 +75,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   // Scope counts for display
   const counts = useMemo(() => ({
     all: allSprites.length,
+    new: allSprites.filter(s => s.isNew).length,
     filtered: filteredSprites.length,
     owned: allSprites.filter(s => userState[s.id]?.owned).length,
     missing: allSprites.filter(s => !userState[s.id]?.owned).length,
@@ -140,6 +143,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
 
     const scopeLabels = {
       all: '🌐 Colección Completa Override',
+      new: '✨ Nuevos Espíritus',
       filtered: `🔍 Filtrado (${activeFiltersLabel})`,
       owned: '✔️ Solo Desencriptados',
       missing: '❌ Solo Faltantes / Bloqueados',
@@ -326,6 +330,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
             <div className="sdm-share-pro__segmented">
               {[
                 { id: 'all', label: 'Todos' },
+                { id: 'new', label: 'Nuevos' },
                 { id: 'owned', label: 'Atrapados' },
                 { id: 'missing', label: 'Faltantes' }
               ].map(opt => (
