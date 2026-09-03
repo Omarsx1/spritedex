@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES } from '../data/spritesData';
+import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES, SUMMON_COST_OVERRIDES } from '../data/spritesData';
 import { supabase, isSupabaseConfigured } from '../utils/supabase';
 
 const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache';
@@ -89,7 +89,7 @@ export function useDynamicSprites() {
             sanitized.ability !== 'Concede bonificaciones pasivas.' && 
             sanitized.ability !== 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.';
           
-          const rawCost = sanitized.summon_cost || sanitized.summonCost || baseStatic?.summonCost || '2,000 Polvo Estelar';
+          const rawCost = SUMMON_COST_OVERRIDES[sanitized.id] || sanitized.summon_cost || sanitized.summonCost || baseStatic?.summonCost || '2,000 Polvo Estelar';
           const cleanCost = rawCost && !rawCost.toLowerCase().includes('polvo') ? `${rawCost} Polvo Estelar` : rawCost;
 
           const override = SPIRIT_DATA_OVERRIDES[sanitized.id];
@@ -144,7 +144,7 @@ export function useDynamicSprites() {
               sanitized.ability !== 'Concede bonificaciones pasivas.' && 
               sanitized.ability !== 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.';
 
-            const rawCost = sanitized.summon_cost || sanitized.summonCost || baseStatic?.summonCost || '2,000 Polvo Estelar';
+            const rawCost = SUMMON_COST_OVERRIDES[sanitized.id] || sanitized.summon_cost || sanitized.summonCost || baseStatic?.summonCost || '2,000 Polvo Estelar';
             const cleanCost = rawCost && !rawCost.toLowerCase().includes('polvo') ? `${rawCost} Polvo Estelar` : rawCost;
 
             const formatted = {

@@ -521,11 +521,99 @@ export const SPIRIT_DATA_OVERRIDES = {
   }
 };
 
-const SUMMON_COST_OVERRIDES = {
-  'klombo_basic': '2,000 Polvo Estelar',
-  'klombo_gold': '2,400 Polvo Estelar',
+export const SUMMON_COST_OVERRIDES = {
+  // Aventurero
+  'adventure_basic': '100 Polvo Estelar',
+  'adventure_gold': '2,400 Polvo Estelar',
+  'adventure_cheatmaster': '2,400 Polvo Estelar',
+  'adventure_loothacker': '2,400 Polvo Estelar',
+
+  // Arbustín
+  'bush_basic': '1,250 Polvo Estelar',
+  'bush_gold': '1,500 Polvo Estelar',
+  'bush_cheatmaster': '1,500 Polvo Estelar',
+  'bush_loothacker': '1,500 Polvo Estelar',
+
+  // 8-Bit
+  '8bit_basic': '1,250 Polvo Estelar',
+  '8bit_gold': '1,500 Polvo Estelar',
+  '8bit_cheatmaster': '1,500 Polvo Estelar',
+  '8bit_loothacker': '1,500 Polvo Estelar',
+
+  // Jonesy
+  'jonesy_basic': '1,250 Polvo Estelar',
+  'jonesy_gold': '1,500 Polvo Estelar',
+  'jonesy_cheatmaster': '1,500 Polvo Estelar',
+  'jonesy_loothacker': '1,500 Polvo Estelar',
+
+  // Exploratormentas
+  'stormscout_basic': '1,250 Polvo Estelar',
+  'stormscout_gold': '1,500 Polvo Estelar',
+  'stormscout_cheatmaster': '1,500 Polvo Estelar',
+  'stormscout_loothacker': '1,500 Polvo Estelar',
+
+  // Protector
+  'overshield_basic': '1,250 Polvo Estelar',
+  'overshield_gold': '1,500 Polvo Estelar',
+  'overshield_cheatmaster': '1,500 Polvo Estelar',
+  'overshield_loothacker': '1,500 Polvo Estelar',
+
+  // Onigiri
+  'onigiri_basic': '1,250 Polvo Estelar',
+  'onigiri_gold': '1,500 Polvo Estelar',
+  'onigiri_cheatmaster': '1,500 Polvo Estelar',
+  'onigiri_loothacker': '1,500 Polvo Estelar',
+
+  // Megaman
+  'megaman_basic': '1,250 Polvo Estelar',
+
+  // Killswitch
+  'killswitch_basic': '1,750 Polvo Estelar',
+  'killswitch_gold': '1,800 Polvo Estelar',
+  'killswitch_cheatmaster': '1,800 Polvo Estelar',
+  'killswitch_loothacker': '1,800 Polvo Estelar',
+
+  // Sonic
+  'sonic_basic': '1,750 Polvo Estelar',
+  'sonic_gold': '1,800 Polvo Estelar',
+  'sonic_cheatmaster': '1,800 Polvo Estelar',
+  'sonic_loothacker': '1,800 Polvo Estelar',
+
+  // Tails
+  'tails_basic': '1,750 Polvo Estelar',
+  'tails_gold': '1,800 Polvo Estelar',
+  'tails_cheatmaster': '1,800 Polvo Estelar',
+  'tails_loothacker': '1,800 Polvo Estelar',
+
+  // Shadow
+  'shadow_basic': '1,750 Polvo Estelar',
+  'shadow_gold': '1,800 Polvo Estelar',
+  'shadow_cheatmaster': '1,800 Polvo Estelar',
+  'shadow_loothacker': '1,800 Polvo Estelar',
+
+  // Jackrabbit
+  'jackrabbit_basic': '1,750 Polvo Estelar',
+  'jackrabbit_gold': '2,000 Polvo Estelar',
+  'jackrabbit_cheatmaster': '2,000 Polvo Estelar',
+  'jackrabbit_loothacker': '2,000 Polvo Estelar',
+
+  // Rayos X
+  'xray_basic': '1,750 Polvo Estelar',
+  'xray_gold': '2,000 Polvo Estelar',
+  'xray_cheatmaster': '2,000 Polvo Estelar',
+  'xray_loothacker': '2,000 Polvo Estelar',
+
+  // Victorioso
   'crown_basic': '2,000 Polvo Estelar',
-  'crown_gold': '2,400 Polvo Estelar'
+  'crown_gold': '2,250 Polvo Estelar',
+  'crown_cheatmaster': '2,250 Polvo Estelar',
+  'crown_loothacker': '2,250 Polvo Estelar',
+
+  // Klombo
+  'klombo_basic': '2,000 Polvo Estelar',
+  'klombo_gold': '2,250 Polvo Estelar',
+  'klombo_cheatmaster': '2,250 Polvo Estelar',
+  'klombo_loothacker': '2,250 Polvo Estelar'
 };
 
 // Format and group official sprites
