@@ -444,6 +444,7 @@ export const SPIRIT_DATA_OVERRIDES = {
 
   // Espíritu Exploratormentas
   stormscout_basic: {
+    rarity: 'Rare',
     ability: 'Aplica Sobrecarga tras recibir cierta cantidad de daño de la tormenta. Revela futuros círculos de la tormenta al nivel máximo. ¡Reduce el daño necesario para activar la sobrecarga con cada subida de nivel!',
     specialPerk: ''
   },
@@ -462,6 +463,7 @@ export const SPIRIT_DATA_OVERRIDES = {
 
   // Espíritu Protector
   overshield_basic: {
+    rarity: 'Rare',
     ability: 'Otorga sobreescudo, aumentando según el nivel.',
     specialPerk: ''
   },
@@ -480,6 +482,7 @@ export const SPIRIT_DATA_OVERRIDES = {
 
   // Espíritu Rayos X
   xray_basic: {
+    rarity: 'Legendary',
     ability: 'Marca periódicamente a los enemigos en un área a tu alrededor. ¡Marca con más frecuencia y en un radio mayor con cada subida de nivel!',
     specialPerk: ''
   },
@@ -620,10 +623,12 @@ export const SUMMON_COST_OVERRIDES = {
 export const ALL_SPRITES = officialSpritesJson.map((item) => {
   let gen = item.gen || 1;
 
+  const finalRarity = SPIRIT_DATA_OVERRIDES[item.id]?.rarity || item.rarity;
+
   let dropChance = '8.73%';
-  if (item.rarity === 'Mythic') dropChance = '0.0003%';
-  else if (item.rarity === 'Legendary') dropChance = '1.50%';
-  else if (item.rarity === 'Epic') dropChance = '4.20%';
+  if (finalRarity === 'Mythic') dropChance = '0.0003%';
+  else if (finalRarity === 'Legendary') dropChance = '1.50%';
+  else if (finalRarity === 'Epic') dropChance = '4.20%';
   else if (item.theme === 'Gold') dropChance = '0.75%';
   else if (item.theme === 'Galaxy') dropChance = '0.04%';
   else if (item.theme === 'Holofoil') dropChance = '0.01%';
@@ -725,7 +730,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     fullName: fullName,
     variant: item.theme,
     variantDisplay: spanishTheme,
-    rarity: item.rarity,
+    rarity: finalRarity,
     gen: gen,
     dropChance: item.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
     dropChanceDisplay: item.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
