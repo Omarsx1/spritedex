@@ -4787,21 +4787,20 @@ body::after {
 /* Controls Toolbar */
 .sdm-share-pro__controls {
   display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 10px;
   margin-bottom: 14px;
-  padding: 8px 12px;
+  padding: 10px 12px;
   background: rgba(15, 23, 42, 0.65);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  flex-wrap: wrap;
 }
 
 .sdm-share-pro__seg-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  width: 100%;
 }
 
 .sdm-share-pro__seg-label {
@@ -4809,6 +4808,8 @@ body::after {
   font-weight: 900;
   color: #64748b;
   letter-spacing: 0.8px;
+  min-width: 70px;
+  flex-shrink: 0;
 }
 
 .sdm-share-pro__segmented {
@@ -4818,10 +4819,13 @@ body::after {
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   gap: 2px;
+  flex: 1;
 }
 
 .sdm-share-pro__seg-btn {
-  padding: 5px 12px;
+  flex: 1;
+  text-align: center;
+  padding: 5px 6px;
   border-radius: 6px;
   border: none;
   background: transparent;
@@ -4831,6 +4835,7 @@ body::after {
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
+  white-space: nowrap;
 }
 
 .sdm-share-pro__seg-btn:hover {
