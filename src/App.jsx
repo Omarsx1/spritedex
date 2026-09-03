@@ -404,6 +404,13 @@ export function App() {
         });
         break;
       default:
+        if (statusFilter === 'new') {
+          result = [...result].sort((a, b) => {
+            const dateA = a.releaseDate || a.release_date ? new Date(a.releaseDate || a.release_date).getTime() : 0;
+            const dateB = b.releaseDate || b.release_date ? new Date(b.releaseDate || b.release_date).getTime() : 0;
+            return dateB - dateA;
+          });
+        }
         break;
     }
 

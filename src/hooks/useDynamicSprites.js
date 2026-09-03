@@ -44,7 +44,8 @@ export function evaluateReleaseStatus(sprite) {
   if (!sprite) return sprite;
 
   const rawRelDate = sprite.release_date || sprite.releaseDate;
-  let isNew = sprite.isNew !== undefined ? Boolean(sprite.isNew) : false;
+  const hasExplicitIsNew = sprite.is_new !== undefined || sprite.isNew !== undefined;
+  let isNew = sprite.is_new !== undefined ? Boolean(sprite.is_new) : (sprite.isNew !== undefined ? Boolean(sprite.isNew) : false);
 
   if (rawRelDate) {
     const releaseTime = new Date(rawRelDate).getTime();
@@ -52,8 +53,10 @@ export function evaluateReleaseStatus(sprite) {
     const isNowActive = now >= releaseTime;
     const daysSince = (now - releaseTime) / (1000 * 60 * 60 * 24);
 
-    if (daysSince >= 0 && daysSince <= 14) {
-      isNew = true;
+    if (!hasExplicitIsNew) {
+      if (daysSince >= 0 && daysSince <= 14) {
+        isNew = true;
+      }
     }
 
     return {
@@ -167,7 +170,8 @@ export function useDynamicSprites() {
               unreleased: sanitized.unreleased !== undefined ? sanitized.unreleased : (baseStatic?.unreleased || false),
               release_date: sanitized.release_date || baseStatic?.release_date || baseStatic?.releaseDate,
               releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate,
-              isNew: sanitized.isNew !== undefined ? sanitized.isNew : (baseStatic?.isNew || false)
+              isNew: sanitized.is_new !== undefined ? Boolean(sanitized.is_new) : (sanitized.isNew !== undefined ? Boolean(sanitized.isNew) : (baseStatic?.isNew || false)),
+              is_new: sanitized.is_new !== undefined ? Boolean(sanitized.is_new) : (sanitized.isNew !== undefined ? Boolean(sanitized.isNew) : (baseStatic?.isNew || false))
             };
             map.set(formatted.id, evaluateReleaseStatus(formatted));
           });

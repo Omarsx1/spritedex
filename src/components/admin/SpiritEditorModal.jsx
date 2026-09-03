@@ -62,6 +62,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
     summonCostNum: initialCostDigits,
     dropChance: spirit?.dropChance || spirit?.drop_chance || '1.50%',
     unreleased: spirit?.unreleased || false,
+    isNew: !spirit?.id ? true : Boolean(spirit?.is_new ?? spirit?.isNew ?? false),
     releaseDate: spirit?.release_date ? new Date(spirit.release_date).toISOString().slice(0, 16) : ''
   });
 
@@ -255,6 +256,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
         summon_cost: formattedSummonCost,
         drop_chance: formData.dropChance,
         unreleased: Boolean(formData.unreleased),
+        is_new: Boolean(formData.isNew),
         release_date: formData.releaseDate ? new Date(formData.releaseDate).toISOString() : null,
         updated_at: new Date().toISOString()
       };
@@ -1114,6 +1116,41 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   )}
                 </div>
               )}
+            </div>
+
+            {/* Control de Novedad / Pestaña Nuevos */}
+            <div style={{
+              padding: '16px 18px',
+              borderRadius: '14px',
+              background: c.bgScheduled,
+              border: `1px solid ${formData.isNew ? (darkMode ? 'rgba(62, 207, 142, 0.4)' : 'rgba(37, 99, 235, 0.4)') : c.borderScheduled}`,
+              position: 'relative',
+              transition: 'all 0.2s ease'
+            }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={formData.isNew}
+                  onChange={(e) => setFormData(prev => ({ ...prev, isNew: e.target.checked }))}
+                  style={{ width: '18px', height: '18px', accentColor: darkMode ? '#3ECF8E' : '#2563EB' }}
+                />
+                <span style={{ fontSize: '0.88rem', fontWeight: 800, color: c.textPrimary, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>Marcar como "Espíritu Nuevo"</span>
+                  <span style={{
+                    fontSize: '0.68rem',
+                    fontWeight: 900,
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    background: formData.isNew ? (darkMode ? 'rgba(62, 207, 142, 0.2)' : 'rgba(37, 99, 235, 0.15)') : (darkMode ? '#262626' : '#E2E8F0'),
+                    color: formData.isNew ? (darkMode ? '#3ECF8E' : '#2563EB') : c.textMuted
+                  }}>
+                    {formData.isNew ? 'ACTIVO EN "NUEVOS"' : 'DESACTIVADO'}
+                  </span>
+                </span>
+              </label>
+              <span style={{ fontSize: '0.72rem', color: c.textMuted, display: 'block', marginTop: '6px' }}>
+                Al estar marcado, el espíritu aparece en el filtro de "Nuevos" de la web y en la modal de exportación. Al agregar un espíritu nuevo viene marcado por defecto.
+              </span>
             </div>
 
             {/* Form Action Footer */}
