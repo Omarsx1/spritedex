@@ -442,7 +442,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
           overflowY: 'auto'
         }}>
           {/* LEFT: Form Controls */}
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             {errorMsg && (
               <div style={{
                 padding: '12px 16px',
@@ -684,7 +684,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   <input
                     type="number"
                     min="0"
-                    step="100"
+                    step="any"
                     value={formData.summonCostNum}
                     onChange={(e) => setFormData(prev => ({ ...prev, summonCostNum: e.target.value }))}
                     placeholder="2000"
