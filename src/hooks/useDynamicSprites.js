@@ -43,9 +43,17 @@ function sanitizeDynamicItem(item) {
 export function evaluateReleaseStatus(sprite) {
   if (!sprite) return sprite;
 
+  let manualIsNewMap = {};
+  try {
+    manualIsNewMap = JSON.parse(localStorage.getItem('spritedex_manual_is_new_map') || '{}');
+  } catch {}
+
+  const hasManualOverride = manualIsNewMap[sprite.id] !== undefined;
   const rawRelDate = sprite.release_date || sprite.releaseDate;
-  const hasExplicitIsNew = sprite.is_new !== undefined || sprite.isNew !== undefined;
-  let isNew = sprite.is_new !== undefined ? Boolean(sprite.is_new) : (sprite.isNew !== undefined ? Boolean(sprite.isNew) : false);
+  const hasExplicitIsNew = hasManualOverride || sprite.is_new !== undefined || sprite.isNew !== undefined;
+  let isNew = hasManualOverride 
+    ? Boolean(manualIsNewMap[sprite.id]) 
+    : (sprite.is_new !== undefined ? Boolean(sprite.is_new) : (sprite.isNew !== undefined ? Boolean(sprite.isNew) : false));
 
   if (rawRelDate) {
     const releaseTime = new Date(rawRelDate).getTime();

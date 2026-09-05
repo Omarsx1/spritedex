@@ -62,7 +62,15 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
     summonCostNum: initialCostDigits,
     dropChance: spirit?.dropChance || spirit?.drop_chance || '1.50%',
     unreleased: spirit?.unreleased || false,
-    isNew: !spirit?.id ? true : Boolean(spirit?.is_new ?? spirit?.isNew ?? false),
+    isNew: (() => {
+      try {
+        const manualMap = JSON.parse(localStorage.getItem('spritedex_manual_is_new_map') || '{}');
+        if (spirit?.id && manualMap[spirit.id] !== undefined) {
+          return Boolean(manualMap[spirit.id]);
+        }
+      } catch {}
+      return !spirit?.id ? true : Boolean(spirit?.is_new ?? spirit?.isNew ?? false);
+    })(),
     releaseDate: spirit?.release_date ? new Date(spirit.release_date).toISOString().slice(0, 16) : ''
   });
 
@@ -262,11 +270,25 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
       };
 
       if (isSupabaseConfigured && supabase) {
-        const { error } = await supabase.from('sprites').upsert(payload);
-        if (error) throw error;
+        let { error } = await supabase.from('sprites').upsert(payload);
+        if (error && (error.message?.includes('is_new') || error.code === 'PGRST204')) {
+          // Si la columna is_new no existe aún en la tabla de Supabase, reintentamos sin ella
+          const { is_new, ...safePayload } = payload;
+          const retry = await supabase.from('sprites').upsert(safePayload);
+          if (retry.error) throw retry.error;
+        } else if (error) {
+          throw error;
+        }
       }
 
-      onSave(payload);
+      // Guardar el estado manual de is_new en localStorage para persistencia garantizada
+      try {
+        const manualMap = JSON.parse(localStorage.getItem('spritedex_manual_is_new_map') || '{}');
+        manualMap[cleanId] = Boolean(formData.isNew);
+        localStorage.setItem('spritedex_manual_is_new_map', JSON.stringify(manualMap));
+      } catch {}
+
+      onSave({ ...payload, isNew: Boolean(formData.isNew) });
     } catch (err) {
       console.error('Error guardando espíritu:', err);
       setErrorMsg(err.message || 'Error al guardar en la base de datos.');
