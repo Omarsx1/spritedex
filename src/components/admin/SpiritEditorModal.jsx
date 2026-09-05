@@ -288,6 +288,18 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
         localStorage.setItem('spritedex_manual_is_new_map', JSON.stringify(manualMap));
       } catch {}
 
+      // Actualizar también inmediatamente la caché local spritedex_dynamic_sprites_cache
+      try {
+        const cached = JSON.parse(localStorage.getItem('spritedex_dynamic_sprites_cache') || '[]');
+        const idx = cached.findIndex(s => s.id === cleanId);
+        if (idx >= 0) {
+          cached[idx] = { ...cached[idx], ...payload };
+        } else {
+          cached.unshift(payload);
+        }
+        localStorage.setItem('spritedex_dynamic_sprites_cache', JSON.stringify(cached));
+      } catch {}
+
       onSave({ ...payload, isNew: Boolean(formData.isNew) });
     } catch (err) {
       console.error('Error guardando espíritu:', err);

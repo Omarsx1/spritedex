@@ -97,7 +97,7 @@ export function useDynamicSprites() {
             sanitized.ability !== 'Concede bonificaciones pasivas.' && 
             sanitized.ability !== 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.';
           
-          const rawCost = SUMMON_COST_OVERRIDES[sanitized.id] || sanitized.summon_cost || sanitized.summonCost || baseStatic?.summonCost || '2,000 Polvo Estelar';
+          const rawCost = sanitized.summon_cost || sanitized.summonCost || SUMMON_COST_OVERRIDES[sanitized.id] || baseStatic?.summonCost || '2,000 Polvo Estelar';
           const cleanCost = rawCost && !rawCost.toLowerCase().includes('polvo') ? `${rawCost} Polvo Estelar` : rawCost;
 
           const override = SPIRIT_DATA_OVERRIDES[sanitized.id];
@@ -108,13 +108,13 @@ export function useDynamicSprites() {
             name: sanitized.name || baseStatic?.name,
             summonCost: cleanCost,
             summon_cost: cleanCost,
-            rarity: override?.rarity || baseStatic?.rarity || sanitized.rarity,
+            rarity: sanitized.rarity || override?.rarity || baseStatic?.rarity,
             isNew: sanitized.isNew !== undefined ? sanitized.isNew : (baseStatic?.isNew || false),
             releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate || null,
-            ability: override?.ability || (hasRealCustomAbility ? sanitized.ability : (baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.')),
+            ability: (hasRealCustomAbility ? sanitized.ability : null) || override?.ability || baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.',
             specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base')
               ? ''
-              : (override?.specialPerk !== undefined ? override.specialPerk : (sanitized.special_perk || sanitized.specialPerk || baseStatic?.specialPerk || ''))
+              : (sanitized.special_perk || sanitized.specialPerk || override?.specialPerk || baseStatic?.specialPerk || '')
           };
           map.set(item.id, evaluateReleaseStatus(merged));
         });
@@ -129,6 +129,46 @@ export function useDynamicSprites() {
 
   // Fetch dynamic catalog from Supabase
   const refreshDynamicSprites = useCallback(async () => {
+    // 1. Recarga inmediata desde caché local para reflejo instantáneo en UI
+    try {
+      const cached = localStorage.getItem(DYNAMIC_SPRITES_CACHE_KEY);
+      if (cached) {
+        const dynamicList = JSON.parse(cached);
+        setSprites(() => {
+          const map = new Map(ALL_SPRITES.map(s => [s.id, s]));
+          dynamicList.forEach(item => {
+            const sanitized = sanitizeDynamicItem(item);
+            const baseStatic = map.get(sanitized.id);
+            const hasRealCustomAbility = sanitized.ability && 
+              sanitized.ability !== 'Concede bonificaciones pasivas.' && 
+              sanitized.ability !== 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.';
+            
+            const rawCost = sanitized.summon_cost || sanitized.summonCost || SUMMON_COST_OVERRIDES[sanitized.id] || baseStatic?.summonCost || '2,000 Polvo Estelar';
+            const cleanCost = rawCost && !rawCost.toLowerCase().includes('polvo') ? `${rawCost} Polvo Estelar` : rawCost;
+
+            const override = SPIRIT_DATA_OVERRIDES[sanitized.id];
+            const merged = {
+              ...(baseStatic || {}),
+              ...sanitized,
+              fullName: sanitized.fullName || baseStatic?.fullName || sanitized.name,
+              name: sanitized.name || baseStatic?.name,
+              summonCost: cleanCost,
+              summon_cost: cleanCost,
+              rarity: sanitized.rarity || override?.rarity || baseStatic?.rarity,
+              isNew: sanitized.isNew !== undefined ? sanitized.isNew : (baseStatic?.isNew || false),
+              releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate || null,
+              ability: (hasRealCustomAbility ? sanitized.ability : null) || override?.ability || baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.',
+              specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base')
+                ? ''
+                : (sanitized.special_perk || sanitized.specialPerk || override?.specialPerk || baseStatic?.specialPerk || '')
+            };
+            map.set(item.id, evaluateReleaseStatus(merged));
+          });
+          return Array.from(map.values());
+        });
+      }
+    } catch {}
+
     if (!isSupabaseConfigured || !supabase) return;
 
     try {
@@ -153,7 +193,7 @@ export function useDynamicSprites() {
               sanitized.ability !== 'Concede bonificaciones pasivas.' && 
               sanitized.ability !== 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.';
 
-            const rawCost = SUMMON_COST_OVERRIDES[sanitized.id] || sanitized.summon_cost || sanitized.summonCost || baseStatic?.summonCost || '2,000 Polvo Estelar';
+            const rawCost = sanitized.summon_cost || sanitized.summonCost || SUMMON_COST_OVERRIDES[sanitized.id] || baseStatic?.summonCost || '2,000 Polvo Estelar';
             const cleanCost = rawCost && !rawCost.toLowerCase().includes('polvo') ? `${rawCost} Polvo Estelar` : rawCost;
 
             const formatted = {
@@ -162,15 +202,15 @@ export function useDynamicSprites() {
               fullName: sanitized.fullName || sanitized.name,
               familyId: sanitized.family_id || baseStatic?.familyId,
               familyName: sanitized.familyName || sanitized.family_name || baseStatic?.familyName,
-              rarity: SPIRIT_DATA_OVERRIDES[sanitized.id]?.rarity || baseStatic?.rarity || sanitized.rarity,
+              rarity: sanitized.rarity || SPIRIT_DATA_OVERRIDES[sanitized.id]?.rarity || baseStatic?.rarity,
               variant: sanitized.variant || baseStatic?.variant,
               variantDisplay: sanitized.variant_display || sanitized.variant || baseStatic?.variantDisplay,
               gen: sanitized.gen || baseStatic?.gen || 2,
               image: sanitized.image || baseStatic?.image,
-              ability: SPIRIT_DATA_OVERRIDES[sanitized.id]?.ability || (hasRealCustomAbility ? sanitized.ability : (baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.')),
+              ability: (hasRealCustomAbility ? sanitized.ability : null) || SPIRIT_DATA_OVERRIDES[sanitized.id]?.ability || baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.',
               specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base') 
                 ? '' 
-                : (SPIRIT_DATA_OVERRIDES[sanitized.id]?.specialPerk !== undefined ? SPIRIT_DATA_OVERRIDES[sanitized.id].specialPerk : (sanitized.special_perk || baseStatic?.specialPerk || '')),
+                : (sanitized.special_perk || SPIRIT_DATA_OVERRIDES[sanitized.id]?.specialPerk || baseStatic?.specialPerk || ''),
               location: sanitized.location || baseStatic?.location || 'Zonas de Extracción',
               summonCost: cleanCost,
               summon_cost: cleanCost,
