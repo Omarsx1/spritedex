@@ -960,7 +960,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "crown_basic",
@@ -1026,7 +1027,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "sonic_basic",
@@ -1058,7 +1060,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "shadow_basic",
@@ -1090,7 +1093,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "tails_basic",
@@ -1122,7 +1126,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "killswitch_basic",
@@ -1154,7 +1159,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "bush_basic",
@@ -1186,7 +1192,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "adventure_basic",
@@ -1218,7 +1225,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "jonesy_basic",
@@ -1250,7 +1258,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "8bit_basic",
@@ -1282,7 +1291,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "stormscout_basic",
@@ -1320,7 +1330,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "onigiri_basic",
@@ -1358,7 +1369,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "overshield_basic",
@@ -1396,7 +1408,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "xray_basic",
@@ -1434,7 +1447,8 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true
+    "unreleased": true,
+    "release_date": "2026-09-10T11:50:00.000Z"
   },
   {
     "id": "megaman_basic",
