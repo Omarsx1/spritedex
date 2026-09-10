@@ -18,6 +18,19 @@ import {
 import { RARITIES, THEME_NAMES_ES, FAMILY_NAMES_MAP, getSpriteCardStyle } from '../../data/spritesData';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 
+// Convierte una fecha ISO (UTC o local) en string YYYY-MM-DDTHH:mm local sin desplazamiento de zona horaria
+function formatToLocalInputString(dateInput) {
+  if (!dateInput) return '';
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return '';
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
 export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClose, darkMode = false }) {
   const isEditing = Boolean(spirit?.id);
 
@@ -71,7 +84,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
       } catch {}
       return !spirit?.id ? true : Boolean(spirit?.is_new ?? spirit?.isNew ?? false);
     })(),
-    releaseDate: spirit?.release_date ? new Date(spirit.release_date).toISOString().slice(0, 16) : ''
+    releaseDate: (spirit?.release_date || spirit?.releaseDate) ? formatToLocalInputString(spirit?.release_date || spirit?.releaseDate) : ''
   });
 
   const [isCustomFamily, setIsCustomFamily] = useState(!matchedFamily && Boolean(spirit?.familyName));
@@ -362,13 +375,28 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
     const finalDate = new Date(pickerSelectedDate);
     finalDate.setHours(pickerHour);
     finalDate.setMinutes(pickerMinute);
+    finalDate.setSeconds(0);
+    finalDate.setMilliseconds(0);
     
-    // Format YYYY-MM-DDTHH:mm
-    const tzOffset = finalDate.getTimezoneOffset() * 60000;
-    const localIso = new Date(finalDate.getTime() - tzOffset).toISOString().slice(0, 16);
-    
-    setFormData(prev => ({ ...prev, releaseDate: localIso }));
+    setFormData(prev => ({ ...prev, releaseDate: formatToLocalInputString(finalDate) }));
     setShowDatePicker(false);
+  };
+
+  const handleToggleDatePicker = () => {
+    setShowDatePicker(currentShow => {
+      const willOpen = !currentShow;
+      if (willOpen) {
+        const d = formData.releaseDate ? new Date(formData.releaseDate) : new Date();
+        if (!isNaN(d.getTime())) {
+          setPickerSelectedDate(d);
+          setPickerViewYear(d.getFullYear());
+          setPickerViewMonth(d.getMonth());
+          setPickerHour(d.getHours());
+          setPickerMinute(d.getMinutes());
+        }
+      }
+      return willOpen;
+    });
   };
 
   // Header display string: "Lun, 17 ago" (Matching Image 2)
@@ -847,6 +875,12 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                     const isChecked = e.target.checked;
                     setFormData(prev => ({ ...prev, unreleased: isChecked }));
                     if (isChecked && !formData.releaseDate) {
+                      const now = new Date();
+                      setPickerSelectedDate(now);
+                      setPickerViewYear(now.getFullYear());
+                      setPickerViewMonth(now.getMonth());
+                      setPickerHour(now.getHours());
+                      setPickerMinute(now.getMinutes());
                       setShowDatePicker(true);
                     }
                   }}
@@ -866,7 +900,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                   {/* Material 3 Date Trigger Button */}
                   <button
                     type="button"
-                    onClick={() => setShowDatePicker(v => !v)}
+                    onClick={handleToggleDatePicker}
                     style={{
                       width: '100%',
                       padding: '12px 16px',
