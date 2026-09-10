@@ -712,8 +712,9 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
 
   // Calculate isNew based on explicit flag or releaseDate (last 14 days)
   let isNew = Boolean(item.isNew);
-  if (item.releaseDate) {
-    const relDate = new Date(item.releaseDate);
+  const relDateVal = item.releaseDate || item.release_date;
+  if (relDateVal) {
+    const relDate = new Date(relDateVal);
     const now = new Date();
     const daysSince = (now.getTime() - relDate.getTime()) / (1000 * 60 * 60 * 24);
     if (daysSince >= 0 && daysSince <= 14) {
@@ -733,7 +734,8 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     dropChanceNum: item.unreleased ? 0 : dropChanceNum,
     unreleased: item.unreleased || false,
     isNew: isNew,
-    releaseDate: item.releaseDate || null,
+    releaseDate: relDateVal || null,
+    release_date: relDateVal || null,
     image: imagePath,
     familyId: familyId,
     familyName: spanishFamilyName,
