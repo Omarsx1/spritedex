@@ -56,22 +56,33 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
   const ownedInFamily = familySprites.filter(v => userState[v.id]?.owned).length;
   const progressPct = (ownedInFamily / familySprites.length) * 100;
 
-  const openTimeRef = useRef(Date.now());
+  const [canDismiss, setCanDismiss] = useState(false);
   useEffect(() => {
-    if (activeSprite) {
-      openTimeRef.current = Date.now();
-    }
+    setCanDismiss(false);
+    const timer = setTimeout(() => {
+      setCanDismiss(true);
+    }, 350);
+    return () => clearTimeout(timer);
   }, [activeSprite]);
 
   const handleBackdropClick = (e) => {
+    if (!canDismiss) return;
     if (e.target !== e.currentTarget) return;
-    if (Date.now() - openTimeRef.current < 400) return;
     onClose();
   };
 
   return (
-    <div className="modal-overlay" onClick={handleBackdropClick}>
-      <div className="sdm" ref={modalRef} onClick={(e) => e.stopPropagation()}>
+    <div
+      className="modal-overlay"
+      onClick={handleBackdropClick}
+      style={{ pointerEvents: canDismiss ? 'auto' : 'none' }}
+    >
+      <div
+        className="sdm"
+        ref={modalRef}
+        onClick={(e) => e.stopPropagation()}
+        style={{ pointerEvents: 'auto' }}
+      >
 
         {/* Close */}
         <button className="sdm__close" onClick={onClose}>

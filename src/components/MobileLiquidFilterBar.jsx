@@ -88,14 +88,32 @@ export function MobileLiquidFilterBar({
     } catch {}
   };
 
-  const openTimeRef = useRef(0);
+  const [canDismiss, setCanDismiss] = useState(false);
+  const closeTimerRef = useRef(null);
 
-  const handleOpen = (e) => {
-    if (e) {
-      if (typeof e.preventDefault === 'function') e.preventDefault();
-      if (typeof e.stopPropagation === 'function') e.stopPropagation();
+  useEffect(() => {
+    if (isOpen) {
+      setCanDismiss(false);
+      const timer = setTimeout(() => {
+        setCanDismiss(true);
+      }, 350);
+      return () => clearTimeout(timer);
+    } else {
+      setCanDismiss(false);
     }
-    openTimeRef.current = Date.now();
+  }, [isOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
+
+  const handleOpen = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
     setIsClosing(false);
     setIsOpen(true);
   };
@@ -103,16 +121,17 @@ export function MobileLiquidFilterBar({
   const handleClose = () => {
     if (isClosing) return;
     setIsClosing(true);
-    setTimeout(() => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = setTimeout(() => {
       setIsOpen(false);
       setIsClosing(false);
+      closeTimerRef.current = null;
     }, 240);
   };
 
   const handleBackdropClick = (e) => {
+    if (!canDismiss) return;
     if (e.target !== e.currentTarget) return;
-    // Evita que el clic fantasma retardado (~300ms) de iOS Safari cierre la modal
-    if (Date.now() - openTimeRef.current < 400) return;
     handleClose();
   };
 
@@ -351,10 +370,12 @@ export function MobileLiquidFilterBar({
         <div
           className={`mobile-liquid-sheet-backdrop ${isClosing ? 'is-closing' : ''}`}
           onClick={handleBackdropClick}
+          style={{ pointerEvents: canDismiss ? 'auto' : 'none' }}
         >
           <div
             className={`mobile-liquid-sheet ${isClosing ? 'is-closing' : ''}`}
             onClick={(e) => e.stopPropagation()}
+            style={{ pointerEvents: 'auto' }}
             role="dialog"
             aria-modal="true"
             aria-label="Filtros de Espíritus"
