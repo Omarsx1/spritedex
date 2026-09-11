@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Download, User, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone } from 'lucide-react';
 import { supabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
+import { safeStorage } from '../utils/safeStorage';
 
 export function Navbar({
   user,
@@ -18,7 +19,7 @@ export function Navbar({
     if (typeof window === 'undefined') return true;
 
     // 1. Si el usuario ya tiene una preferencia guardada, respetarla
-    const stored = localStorage.getItem('spritedex_animations_enabled');
+    const stored = safeStorage.getItem('spritedex_animations_enabled');
     if (stored !== null) {
       return stored === 'true';
     }
@@ -43,11 +44,11 @@ export function Navbar({
     if (animationsEnabled) {
       document.documentElement.classList.remove('motion-disabled');
       document.body.classList.remove('motion-disabled');
-      localStorage.setItem('spritedex_animations_enabled', 'true');
+      safeStorage.setItem('spritedex_animations_enabled', 'true');
     } else {
       document.documentElement.classList.add('motion-disabled');
       document.body.classList.add('motion-disabled');
-      localStorage.setItem('spritedex_animations_enabled', 'false');
+      safeStorage.setItem('spritedex_animations_enabled', 'false');
     }
   }, [animationsEnabled]);
 

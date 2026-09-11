@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Search, SlidersHorizontal, X, RotateCcw } from 'lucide-react';
 import { THEMES_LIST, THEME_NAMES_ES, ALL_SPRITES, FAMILY_NAMES_MAP } from '../data/spritesData';
+import { safeStorage } from '../utils/safeStorage';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'Todos' },
@@ -32,12 +33,8 @@ export function MobileLiquidFilterBar({
   const NEW_SPIRITS_COACHMARK_KEY = 'spritedex_seen_new_spirits_v3_loothacker';
 
   const [showNewTooltip, setShowNewTooltip] = useState(() => {
-    try {
-      if (localStorage.getItem(NEW_SPIRITS_COACHMARK_KEY)) return false;
-      return Date.now() >= LOOTHACKER_RELEASE_TIMESTAMP;
-    } catch {
-      return false;
-    }
+    if (safeStorage.getItem(NEW_SPIRITS_COACHMARK_KEY)) return false;
+    return Date.now() >= LOOTHACKER_RELEASE_TIMESTAMP;
   });
   const [isDismissing, setIsDismissing] = useState(false);
 
@@ -47,11 +44,9 @@ export function MobileLiquidFilterBar({
     if (now < LOOTHACKER_RELEASE_TIMESTAMP) {
       const msUntilRelease = LOOTHACKER_RELEASE_TIMESTAMP - now;
       const timer = setTimeout(() => {
-        try {
-          if (!localStorage.getItem(NEW_SPIRITS_COACHMARK_KEY) && statusFilter !== 'new') {
-            setShowNewTooltip(true);
-          }
-        } catch {}
+        if (!safeStorage.getItem(NEW_SPIRITS_COACHMARK_KEY) && statusFilter !== 'new') {
+          setShowNewTooltip(true);
+        }
       }, msUntilRelease);
       return () => clearTimeout(timer);
     }
@@ -60,9 +55,7 @@ export function MobileLiquidFilterBar({
   useEffect(() => {
     if (statusFilter === 'new') {
       setShowNewTooltip(false);
-      try {
-        localStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
-      } catch {}
+      safeStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
     }
   }, [statusFilter]);
 
@@ -72,9 +65,7 @@ export function MobileLiquidFilterBar({
     setTimeout(() => {
       setShowNewTooltip(false);
     }, 220);
-    try {
-      localStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
-    } catch {}
+    safeStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
   };
 
   const handleDismissTooltip = (e) => {
@@ -83,9 +74,7 @@ export function MobileLiquidFilterBar({
     setTimeout(() => {
       setShowNewTooltip(false);
     }, 220);
-    try {
-      localStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
-    } catch {}
+    safeStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
   };
 
   const [canDismiss, setCanDismiss] = useState(false);

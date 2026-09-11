@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, X, Share, PlusSquare, Smartphone, Check } from 'lucide-react';
 import { sounds } from '../utils/audio';
+import { safeStorage } from '../utils/safeStorage';
 
 const STORAGE_KEY = 'spritedex_install_dismissed_v1';
 
@@ -27,22 +28,18 @@ export function InstallPrompt() {
     setIsIOS(isIOSDevice);
 
     // 3. Check if user previously dismissed automatic prompt
-    try {
-      if (!localStorage.getItem(STORAGE_KEY)) {
-        if (isIOSDevice) {
-          const timer = setTimeout(() => setShowPrompt(true), 1500);
-          return () => clearTimeout(timer);
-        }
+    if (!safeStorage.getItem(STORAGE_KEY)) {
+      if (isIOSDevice) {
+        const timer = setTimeout(() => setShowPrompt(true), 1500);
+        return () => clearTimeout(timer);
       }
-    } catch (e) {
-      console.error(e);
     }
 
     // 4. Android / Chrome / Desktop PWA prompt listener
     const handleBeforeInstall = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      if (!localStorage.getItem(STORAGE_KEY)) {
+      if (!safeStorage.getItem(STORAGE_KEY)) {
         setShowPrompt(true);
       }
     };
@@ -68,11 +65,7 @@ export function InstallPrompt() {
     sounds.playBeep?.();
     setShowPrompt(false);
     setManualChromeGuide(false);
-    try {
-      localStorage.setItem(STORAGE_KEY, 'true');
-    } catch (e) {
-      console.error(e);
-    }
+    safeStorage.setItem(STORAGE_KEY, 'true');
   };
 
   const handleInstallClick = async () => {
@@ -82,9 +75,7 @@ export function InstallPrompt() {
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
         setShowPrompt(false);
-        try {
-          localStorage.setItem(STORAGE_KEY, 'true');
-        } catch (e) {}
+        safeStorage.setItem(STORAGE_KEY, 'true');
       }
       setDeferredPrompt(null);
     } else {

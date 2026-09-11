@@ -24,6 +24,7 @@ import { trackEvent } from './utils/telemetry';
 import { isUserAdminAuthenticated } from './utils/adminAuth';
 import { decodeCollectionState } from './utils/shareLink';
 import { supabase, isSupabaseConfigured } from './utils/supabase';
+import { safeStorage } from './utils/safeStorage';
 import {
   getMyFriendCode,
   fetchCollectionByFriendCode,
@@ -97,9 +98,9 @@ export function App() {
 
   const [userState, setUserState] = useState(() => {
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      const saved = safeStorage.getItem(LOCAL_STORAGE_KEY);
       return saved ? JSON.parse(saved) : {};
-    } catch (e) {
+    } catch {
       return {};
     }
   });
@@ -227,9 +228,7 @@ export function App() {
 
       if (data?.friend_code) {
         setMyFriendCode(data.friend_code);
-        try {
-          localStorage.setItem('spritedex_my_friend_code', data.friend_code);
-        } catch {}
+        safeStorage.setItem('spritedex_my_friend_code', data.friend_code);
       }
 
       if (data?.user_state && Object.keys(data.user_state).length > 0) {
@@ -250,20 +249,12 @@ export function App() {
 
   const handleSignOutCleanup = () => {
     setUserState({});
-    try {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-    } catch (e) {
-      console.error('Failed to clear localStorage on sign out:', e);
-    }
+    safeStorage.removeItem(LOCAL_STORAGE_KEY);
   };
 
   // Sync to localStorage & Supabase Cloud
   useEffect(() => {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userState));
-    } catch (e) {
-      console.error('Failed to save to localStorage:', e);
-    }
+    safeStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userState));
 
     if (isSupabaseConfigured && supabase && user) {
       const timer = setTimeout(async () => {
