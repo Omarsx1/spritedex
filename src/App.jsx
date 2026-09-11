@@ -184,52 +184,21 @@ export function App() {
     };
   }, [connectedFriendCode]);
 
-  // Pre-calentamiento silencioso en tiempo de inactividad (idle) para que la captura sea 100% instantánea (0ms)
+  // Precarga silenciosa no bloqueante del chunk del modal e imagen de fondo (0 impacto en CPU)
   useEffect(() => {
-    if (typeof window === 'undefined' || !dynamicSprites || dynamicSprites.length === 0) return;
+    if (typeof window === 'undefined') return;
 
     const idleTimer = setTimeout(() => {
-      const runPrewarm = async () => {
-        try {
-          // 1. Precarga del chunk del modal
-          import('./components/ShareImageModal');
+      // 1. Precarga del chunk del modal en la caché del navegador
+      import('./components/ShareImageModal');
 
-          // 2. Precarga de imágenes y pre-renderizado de canvas en caché de fondo
-          const { preloadCanvasAssets, generatePokedexCardImage } = await import('./utils/canvasExporter');
-          preloadCanvasAssets(dynamicSprites, 8);
-
-          const currentScopeSprites = dynamicSprites.filter(
-            (s) => (activeGen === 0 || s.gen === activeGen) && (showUnreleased || !s.unreleased)
-          );
-
-          if (currentScopeSprites.length > 0) {
-            await generatePokedexCardImage({
-              spritesList: currentScopeSprites,
-              userState,
-              format: 'checklist',
-              bgStyle: 'glitch_override'
-            });
-            await generatePokedexCardImage({
-              spritesList: currentScopeSprites,
-              userState,
-              format: 'square',
-              bgStyle: 'glitch_override'
-            });
-          }
-        } catch (e) {
-          // Prewarm silencioso en segundo plano
-        }
-      };
-
-      if (window.requestIdleCallback) {
-        window.requestIdleCallback(runPrewarm, { timeout: 3500 });
-      } else {
-        setTimeout(runPrewarm, 1000);
-      }
-    }, 1200);
+      // 2. Precarga del fondo oficial webp en la caché de red/imagen
+      const bgImg = new Image();
+      bgImg.src = '/background.webp';
+    }, 2000);
 
     return () => clearTimeout(idleTimer);
-  }, [dynamicSprites?.length, activeGen]);
+  }, []);
 
   // Listen to Supabase Auth State & Sync Cloud Data
   useEffect(() => {

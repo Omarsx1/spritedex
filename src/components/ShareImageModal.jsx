@@ -3,7 +3,7 @@ import {
   X, Download, Share2, Copy, Check, Image as ImageIcon, Filter, Globe,
   CheckCircle, XCircle, Sparkles, Repeat, ShieldCheck, Flame
 } from 'lucide-react';
-import { generatePokedexCardImage, globalCanvasCache } from '../utils/canvasExporter';
+import { generatePokedexCardImage, globalCanvasCache, getCanvasCacheKey } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 
@@ -15,8 +15,10 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
   const [bgStyle, setBgStyle] = useState('glitch_override'); // 'glitch_override', 'blueprint', 'dark_matrix'
 
-  // Clave de preview inicial para mostrar la plantilla en 0ms si ya está en caché
-  const initialCacheKey = `checklist_all_glitch_override_${allSprites.length}_${allSprites.filter(s => userState[s.id]?.owned).length}`;
+  // Clave de preview canónica para mostrar la plantilla en 0ms si ya está en caché
+  const initialCount = allSprites.length;
+  const initialOwned = allSprites.filter(s => userState[s.id]?.owned).length;
+  const initialCacheKey = getCanvasCacheKey('checklist', 'glitch_override', initialCount, initialOwned);
   const initialCached = globalTemplatePreviewCache.get(initialCacheKey) || globalCanvasCache.get(initialCacheKey);
 
   const [dataUrl, setDataUrl] = useState(() => initialCached?.url || initialCached?.dataUrl || (typeof initialCached === 'string' ? initialCached : ''));
@@ -29,6 +31,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const modalRef = useRef(null);
   const headerRef = useRef(null);
   const openTimeRef = useRef(Date.now());
+  const hasEnteredRef = useRef(false);
 
   const handleClose = () => {
     if (isClosing) return;
@@ -56,14 +59,27 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isClosing]);
 
-  // Entrance animation matching modern spring physics
+  // Entrance animation matching modern spring physics (rápido y a 60/120fps)
   useEffect(() => {
     if (modalRef.current) {
       gsap.fromTo(modalRef.current,
-        { opacity: 0, scale: 0.94, y: 12 },
-        { opacity: 1, scale: 1, y: 0, duration: 0.28, ease: 'power3.out' }
+        { opacity: 0, scale: 0.95, y: 10 },
+        {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          duration: 0.22,
+          ease: 'power2.out',
+          onComplete: () => {
+            hasEnteredRef.current = true;
+          }
+        }
       );
     }
+    const timer = setTimeout(() => {
+      hasEnteredRef.current = true;
+    }, 220);
+    return () => clearTimeout(timer);
   }, []);
 
   // Determine which sprites to include based on scope
@@ -114,9 +130,8 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       return;
     }
 
-    const cacheKey = `${format}_${scope}_${bgStyle}_${spritesList.length}_${ownedInScope}`;
-    const genericKey = `${format}_${bgStyle}_${spritesList.length}_${ownedInScope}`;
-    const cached = globalTemplatePreviewCache.get(cacheKey) || globalCanvasCache.get(genericKey);
+    const currentKey = getCanvasCacheKey(format, bgStyle, spritesList.length, ownedInScope);
+    const cached = globalTemplatePreviewCache.get(currentKey) || globalCanvasCache.get(currentKey);
     if (cached) {
       const url = typeof cached === 'string' ? cached : (cached.url || cached.dataUrl);
       setDataUrl(url);
@@ -129,8 +144,11 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     setIsGenerating(true);
     let isCancelled = false;
 
-    // Asynchronous requestAnimationFrame to allow the entrance animation to glide with zero stutter
-    const frameId = requestAnimationFrame(() => {
+    // Desacoplar la animación de apertura del modal (220ms) para que Android abra a 60/120fps fluidos.
+    // Si el modal ya completó su entrada (usuario cambiando formato/categoría), el retardo es de solo 20ms.
+    const delay = hasEnteredRef.current ? 20 : 180;
+
+    const timer = setTimeout(() => {
       generatePokedexCardImage({
         spritesList,
         userState,
@@ -141,7 +159,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           const url = typeof res === 'string' ? res : res.dataUrl;
           const file = res?.file || null;
           const blob = res?.blob || null;
-          globalTemplatePreviewCache.set(cacheKey, { url, file, blob });
+          globalTemplatePreviewCache.set(currentKey, { url, file, blob });
           setDataUrl(url);
           setCachedFile(file);
           setCachedBlob(blob);
@@ -153,13 +171,13 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           setIsGenerating(false);
         }
       });
-    });
+    }, delay);
 
     return () => {
       isCancelled = true;
-      cancelAnimationFrame(frameId);
+      clearTimeout(timer);
     };
-  }, [spritesList, userState, format, bgStyle, scope, ownedInScope]);
+  }, [spritesList, userState, format, bgStyle, ownedInScope]);
 
   const getShareableText = () => {
     const total = spritesList.length;

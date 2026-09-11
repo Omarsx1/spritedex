@@ -5037,6 +5037,18 @@ body::after {
   border-radius: 8px;
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85);
   display: block;
+  animation: fadeInPreview 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInPreview {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .sdm-share-pro__empty,

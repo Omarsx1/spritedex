@@ -62,6 +62,11 @@ const globalImageCache = new Map();
 // Caché global persistente de plantillas renderizadas para carga 0ms instantánea
 export const globalCanvasCache = new Map();
 
+// Clave canónica unificada para caché de plantillas de canvas (0ms instantáneo)
+export function getCanvasCacheKey(format = 'checklist', bgStyle = 'glitch_override', count = 0, ownedCount = 0) {
+  return `${format}_${bgStyle}_${count}_${ownedCount}`;
+}
+
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
 export function loadImage(src) {
   if (!src) return Promise.resolve(null);
@@ -261,10 +266,10 @@ function drawCyberMatrixBackground(ctx, width, height, style = 'glitch_override'
     ctx.fillRect(0, 0, width, height);
   }
 
-  // Glitch decorative scanlines
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.015)';
-  for (let y = 0; y < height; y += 4) {
-    ctx.fillRect(0, y, width, 1.5);
+  // Glitch decorative scanlines (optimizado por pasos de 8px para máximo rendimiento de pintado)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.018)';
+  for (let y = 0; y < height; y += 8) {
+    ctx.fillRect(0, y, width, 2);
   }
 
   // Cyber corner pixels / chromatic artifacts
@@ -347,16 +352,16 @@ export async function generatePokedexCardImage({
   bgStyle = 'glitch_override', // 'glitch_override', 'blueprint', 'dark_matrix'
   useBackgroundTemplate = true
 }) {
+  const effectiveBgStyle = bgStyle || (useBackgroundTemplate ? 'glitch_override' : 'dark_matrix');
   const ownedCount = spritesList.filter(s => userState[s.id]?.owned).length;
-  const cacheKey = `${format}_${bgStyle}_${spritesList.length}_${ownedCount}`;
+  const cacheKey = getCanvasCacheKey(format, effectiveBgStyle, spritesList.length, ownedCount);
 
-  // 1. Devolución instantánea a 0ms si la plantilla ya fue pre-calentada en memoria
+  // 1. Devolución instantánea a 0ms si la plantilla ya fue generada previamente
   if (globalCanvasCache.has(cacheKey)) {
     return globalCanvasCache.get(cacheKey);
   }
 
   const loadedImagesMap = {};
-  const effectiveBgStyle = bgStyle || (useBackgroundTemplate ? 'glitch_override' : 'dark_matrix');
 
   // Load official glitch wallpaper
   const bgImgPromise = loadImage('/background.webp');
