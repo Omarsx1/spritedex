@@ -27,7 +27,7 @@ import { SpiritEditorModal } from './SpiritEditorModal';
 import { FamilyManagerModal } from './FamilyManagerModal';
 import { UserManagementTable } from './UserManagementTable';
 import { AudienceInsightsView } from './AudienceInsightsView';
-import { clearAdminSession } from './AdminAuthGate';
+import { clearAdminSession } from '../../utils/adminAuth';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 
 export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {

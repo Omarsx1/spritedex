@@ -333,5 +333,3 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
     </div>
   );
 }
-
-export { isUserAdminAuthenticated, clearAdminSession };

@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { safeStorage } from './safeStorage';
 
 const STORAGE_MY_CODE_KEY = 'spritedex_my_friend_code';
 const STORAGE_CONNECTED_FRIEND_CODE_KEY = 'spritedex_connected_friend_code';
@@ -19,22 +20,18 @@ export function generateRandomFriendCode() {
  * Gets or creates the local user's permanent Friend Code
  */
 export function getMyFriendCode(userId = null) {
-  try {
-    let code = localStorage.getItem(STORAGE_MY_CODE_KEY);
-    if (!code) {
-      if (userId) {
-        // Derive clean 4-char suffix from user id
-        const clean = userId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-        code = `SDEX-${clean.slice(0, 4)}`;
-      } else {
-        code = generateRandomFriendCode();
-      }
-      localStorage.setItem(STORAGE_MY_CODE_KEY, code);
+  let code = safeStorage.getItem(STORAGE_MY_CODE_KEY);
+  if (!code) {
+    if (userId) {
+      // Derive clean 4-char suffix from user id
+      const clean = userId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      code = `SDEX-${clean.slice(0, 4)}`;
+    } else {
+      code = generateRandomFriendCode();
     }
-    return code;
-  } catch {
-    return generateRandomFriendCode();
+    safeStorage.setItem(STORAGE_MY_CODE_KEY, code);
   }
+  return code;
 }
 
 /**
@@ -158,21 +155,13 @@ export function generatePermanentFriendUrl(friendCode) {
 }
 
 export function saveLastConnectedFriendCode(friendCode) {
-  try {
-    if (friendCode) {
-      localStorage.setItem(STORAGE_CONNECTED_FRIEND_CODE_KEY, friendCode);
-    } else {
-      localStorage.removeItem(STORAGE_CONNECTED_FRIEND_CODE_KEY);
-    }
-  } catch (e) {
-    console.error(e);
+  if (friendCode) {
+    safeStorage.setItem(STORAGE_CONNECTED_FRIEND_CODE_KEY, friendCode);
+  } else {
+    safeStorage.removeItem(STORAGE_CONNECTED_FRIEND_CODE_KEY);
   }
 }
 
 export function getLastConnectedFriendCode() {
-  try {
-    return localStorage.getItem(STORAGE_CONNECTED_FRIEND_CODE_KEY) || null;
-  } catch {
-    return null;
-  }
+  return safeStorage.getItem(STORAGE_CONNECTED_FRIEND_CODE_KEY) || null;
 }

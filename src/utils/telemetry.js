@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { allSprites } from '../data/spritesData';
+import { safeStorage } from './safeStorage';
 
 const SESSION_STORAGE_KEY = 'spritedex_session_id';
 const LOCAL_ANALYTICS_KEY = 'spritedex_telemetry_cache';
@@ -208,22 +209,25 @@ let lastTrackedTimestamp = 0;
 let lastTrackedPath = '';
 
 export function setIgnoreTelemetry(ignore = true) {
-  if (typeof localStorage !== 'undefined') {
-    if (ignore) {
-      localStorage.setItem('spritedex_ignore_telemetry', 'true');
-    } else {
-      localStorage.removeItem('spritedex_ignore_telemetry');
-    }
+  if (ignore) {
+    safeStorage.setItem('spritedex_ignore_telemetry', 'true');
+  } else {
+    safeStorage.removeItem('spritedex_ignore_telemetry');
   }
 }
 
 export function isTelemetryIgnored() {
   if (typeof window === 'undefined') return true;
   try {
-    if (localStorage.getItem('spritedex_ignore_telemetry') === 'true' ||
-        localStorage.getItem('spritedex_admin_override') === 'true' ||
-        localStorage.getItem('spritedex_purged_all_mac') === 'true' ||
-        sessionStorage.getItem('spritedex_admin_session_v1') !== null) {
+    let sessionAdmin = null;
+    try {
+      sessionAdmin = sessionStorage.getItem('spritedex_admin_session_v1');
+    } catch {}
+
+    if (safeStorage.getItem('spritedex_ignore_telemetry') === 'true' ||
+        safeStorage.getItem('spritedex_admin_override') === 'true' ||
+        safeStorage.getItem('spritedex_purged_all_mac') === 'true' ||
+        sessionAdmin !== null) {
       return true;
     }
     const path = window.location.pathname.toLowerCase();
@@ -232,7 +236,7 @@ export function isTelemetryIgnored() {
     if (path.includes('studio') || path.includes('override') || path.includes('nexus') ||
         search.includes('studio') || search.includes('override') ||
         host === 'localhost' || host === '127.0.0.1') {
-      localStorage.setItem('spritedex_ignore_telemetry', 'true');
+      safeStorage.setItem('spritedex_ignore_telemetry', 'true');
       return true;
     }
   } catch {}
@@ -284,7 +288,7 @@ export async function trackEvent(eventType = 'pageview', meta = {}) {
 
     // Cache locally
     try {
-      const existing = JSON.parse(localStorage.getItem(LOCAL_ANALYTICS_KEY) || '[]');
+      const existing = JSON.parse(safeStorage.getItem(LOCAL_ANALYTICS_KEY) || '[]');
       const updated = [{
         event_type: eventType,
         session_id: sessionId,
@@ -296,7 +300,7 @@ export async function trackEvent(eventType = 'pageview', meta = {}) {
         created_at: new Date().toISOString(),
         ...meta
       }, ...existing].slice(0, 100);
-      localStorage.setItem(LOCAL_ANALYTICS_KEY, JSON.stringify(updated));
+      safeStorage.setItem(LOCAL_ANALYTICS_KEY, JSON.stringify(updated));
     } catch {}
 
     // Send to Supabase if configured
