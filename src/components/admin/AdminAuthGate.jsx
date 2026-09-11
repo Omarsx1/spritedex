@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Lock, Key, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
-
-const ADMIN_AUTH_KEY = 'spritedex_admin_session_v1';
+import { ADMIN_AUTH_KEY, isUserAdminAuthenticated, clearAdminSession } from '../../utils/adminAuth';
 const DEFAULT_PASSCODE = 'override2026';
 
 export function AdminAuthGate({ onAuthenticated, onExit }) {
@@ -335,19 +334,4 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
   );
 }
 
-export function isUserAdminAuthenticated() {
-  try {
-    const raw = sessionStorage.getItem(ADMIN_AUTH_KEY);
-    if (!raw) return false;
-    const parsed = JSON.parse(raw);
-    return Boolean(parsed?.authenticatedAt);
-  } catch {
-    return false;
-  }
-}
-
-export function clearAdminSession() {
-  try {
-    sessionStorage.removeItem(ADMIN_AUTH_KEY);
-  } catch {}
-}
+export { isUserAdminAuthenticated, clearAdminSession };
