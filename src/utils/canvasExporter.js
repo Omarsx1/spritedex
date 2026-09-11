@@ -711,20 +711,50 @@ function renderGlitchOverrideTemplate({
       const imgX = cardX + (cardW - imgSize) / 2;
       const imgY = contentStartY;
 
-      // Halo Luminoso de Fondo Universal (Iluminación circular suave de alto rendimiento)
+      // Halo Luminoso de Fondo Universal (Degradado radial difuso y resplandor idéntico a Imagen 3)
       const centerX = imgX + imgSize / 2;
       const centerY = imgY + imgSize / 2;
-      const auraRadius = Math.round(imgSize * 0.52);
+      const auraRadius = Math.round(imgSize * 0.58);
+      const auraGrad = ctx.createRadialGradient(
+        centerX,
+        centerY,
+        Math.round(imgSize * 0.08),
+        centerX,
+        centerY,
+        auraRadius
+      );
 
-      ctx.fillStyle = isOwned ? hexToRgba(spiritHue, 0.22) : hexToRgba(spiritHue, 0.10);
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
-      ctx.fill();
+      if (isOwned) {
+        // En atrapados: resplandor luminoso vibrante con degradado suave hacia transparencia total
+        const glowColor = isMastered ? '#facc15' : spiritHue;
+        auraGrad.addColorStop(0, isMastered ? 'rgba(250, 204, 21, 0.50)' : hexToRgba(glowColor, 0.40));
+        auraGrad.addColorStop(0.55, isMastered ? 'rgba(250, 204, 21, 0.18)' : hexToRgba(glowColor, 0.14));
+        auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-      if (!isOwned) {
-        ctx.globalAlpha = 0.88;
+        ctx.fillStyle = auraGrad;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Resplandor directo sobre la silueta del espíritu
+        const imgShadowBlur = isUltraCompact ? 8 : (isCompact ? 10 : 16);
+        ctx.shadowColor = hexToRgba(glowColor, isMastered ? 0.80 : 0.65);
+        ctx.shadowBlur = imgShadowBlur;
+        ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
+        ctx.shadowBlur = 0;
+      } else {
+        // En NO atrapados: resplandor muy sutil y suave sin manchas ni círculos duros
+        auraGrad.addColorStop(0, hexToRgba(spiritHue, 0.08));
+        auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        ctx.fillStyle = auraGrad;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.globalAlpha = 0.85;
+        ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
       }
-      ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
       ctx.restore();
     }
 
