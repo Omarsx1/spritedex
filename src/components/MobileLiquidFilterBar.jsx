@@ -94,9 +94,11 @@ export function MobileLiquidFilterBar({
   useEffect(() => {
     if (isOpen) {
       setCanDismiss(false);
+      const isMotionDisabled = typeof document !== 'undefined' && document.body.classList.contains('motion-disabled');
+      const delay = isMotionDisabled ? 60 : 350;
       const timer = setTimeout(() => {
         setCanDismiss(true);
-      }, 350);
+      }, delay);
       return () => clearTimeout(timer);
     } else {
       setCanDismiss(false);
@@ -120,6 +122,14 @@ export function MobileLiquidFilterBar({
 
   const handleClose = () => {
     if (isClosing) return;
+    const isMotionDisabled = typeof document !== 'undefined' && document.body.classList.contains('motion-disabled');
+    if (isMotionDisabled) {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+      setIsOpen(false);
+      setIsClosing(false);
+      return;
+    }
     setIsClosing(true);
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     closeTimerRef.current = setTimeout(() => {
