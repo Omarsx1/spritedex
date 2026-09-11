@@ -21,6 +21,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
 
   const modalRef = useRef(null);
   const headerRef = useRef(null);
+  const openTimeRef = useRef(Date.now());
 
   const handleClose = () => {
     if (isClosing) return;
@@ -29,6 +30,12 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     setTimeout(() => {
       onClose();
     }, 220);
+  };
+
+  const handleBackdropClick = (e) => {
+    if (e.target !== e.currentTarget) return;
+    if (Date.now() - openTimeRef.current < 400) return;
+    handleClose();
   };
 
   // Close on Escape with smooth exit
@@ -303,7 +310,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   ];
 
   return (
-    <div className={`modal-overlay ${isClosing ? 'is-closing' : ''}`} onClick={handleClose}>
+    <div className={`modal-overlay ${isClosing ? 'is-closing' : ''}`} onClick={handleBackdropClick}>
       <div className={`sdm-share-pro ${isClosing ? 'is-closing' : ''}`} ref={modalRef} onClick={(e) => e.stopPropagation()}>
         {/* Header Elegante y Minimalista */}
         <div className="sdm-share-pro__header">

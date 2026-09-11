@@ -4,6 +4,13 @@ import { sounds } from '../utils/audio';
 
 export function BackupModal({ userState, setUserState, onClose }) {
   const fileInputRef = useRef(null);
+  const openTimeRef = useRef(Date.now());
+
+  const handleBackdropClick = (e) => {
+    if (e.target !== e.currentTarget) return;
+    if (Date.now() - openTimeRef.current < 400) return;
+    onClose();
+  };
 
   const handleExportJSON = () => {
     sounds.playBeep();
@@ -44,7 +51,7 @@ export function BackupModal({ userState, setUserState, onClose }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={handleBackdropClick}>
       <div className="modal-content glass-panel" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-btn" onClick={onClose}>
           <X size={20} />
