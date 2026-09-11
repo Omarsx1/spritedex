@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { ALL_SPRITES, VARIANT_ORDER } from './data/spritesData';
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import { VARIANT_ORDER } from './data/spritesData';
 
 const getVariantPriority = (v) => {
   if (v === 'Base' || v === 'Basic') return 0;
@@ -14,23 +14,16 @@ import { Navbar } from './components/Navbar';
 import { FilterBar } from './components/FilterBar';
 import { SpriteCard } from './components/SpriteCard';
 import { SpriteDetailModal } from './components/SpriteDetailModal';
-import { ShareImageModal } from './components/ShareImageModal';
-import { BackupModal } from './components/BackupModal';
-import { FriendCompareModal } from './components/FriendCompareModal';
-import { AuthModal } from './components/AuthModal';
 import { PrivacyNotice } from './components/PrivacyNotice';
-import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
 import { InstallPrompt } from './components/InstallPrompt';
 import { Footer } from './components/Footer';
 import { MobileSpriteSwiper } from './components/MobileSpriteSwiper';
 import { useIsMobile } from './hooks/useIsMobile';
 import { useDynamicSprites } from './hooks/useDynamicSprites';
 import { trackEvent } from './utils/telemetry';
-import { AdminLayout } from './components/admin/AdminLayout';
-import { AdminAuthGate, isUserAdminAuthenticated } from './components/admin/AdminAuthGate';
+import { isUserAdminAuthenticated } from './utils/adminAuth';
 import { decodeCollectionState } from './utils/shareLink';
 import { supabase, isSupabaseConfigured } from './utils/supabase';
-import { preloadCanvasAssets } from './utils/canvasExporter';
 import {
   getMyFriendCode,
   fetchCollectionByFriendCode,
@@ -38,6 +31,15 @@ import {
   saveLastConnectedFriendCode,
   getLastConnectedFriendCode
 } from './utils/friendCode';
+
+// Carga diferida (code splitting) para modales secundarios y suite administrativa
+const AdminLayout = lazy(() => import('./components/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
+const AdminAuthGate = lazy(() => import('./components/admin/AdminAuthGate').then(m => ({ default: m.AdminAuthGate })));
+const ShareImageModal = lazy(() => import('./components/ShareImageModal').then(m => ({ default: m.ShareImageModal })));
+const BackupModal = lazy(() => import('./components/BackupModal').then(m => ({ default: m.BackupModal })));
+const FriendCompareModal = lazy(() => import('./components/FriendCompareModal').then(m => ({ default: m.FriendCompareModal })));
+const AuthModal = lazy(() => import('./components/AuthModal').then(m => ({ default: m.AuthModal })));
+const PrivacyPolicyModal = lazy(() => import('./components/PrivacyPolicyModal').then(m => ({ default: m.PrivacyPolicyModal })));
 
 const LOCAL_STORAGE_KEY = 'fortnite_sprites_pokedex_v3';
 
@@ -92,10 +94,7 @@ export function App() {
     };
   }, [isAdminPortal, isAdminAuth]);
 
-  // Precarga asíncrona de sprites en segundo plano
-  useEffect(() => {
-    preloadCanvasAssets(dynamicSprites);
-  }, [dynamicSprites]);
+
   const [userState, setUserState] = useState(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -466,9 +465,36 @@ export function App() {
   if (isAdminPortal) {
     if (!isAdminAuth) {
       return (
-        <AdminAuthGate
-          onAuthenticated={() => setIsAdminAuth(true)}
-          onExit={() => {
+        <Suspense fallback={
+          <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#060714', color: '#00F0E8', fontFamily: 'monospace' }}>
+            <span>AUTENTICANDO NÚCLEO...</span>
+          </div>
+        }>
+          <AdminAuthGate
+            onAuthenticated={() => setIsAdminAuth(true)}
+            onExit={() => {
+              setIsAdminPortal(false);
+              const url = new URL(window.location.href);
+              url.searchParams.delete('studio');
+              url.searchParams.delete('portal');
+              const targetPath = url.pathname.includes('override') || url.pathname.includes('nexus') ? '/' : url.toString();
+              window.history.pushState({}, '', targetPath);
+            }}
+          />
+        </Suspense>
+      );
+    }
+
+    return (
+      <Suspense fallback={
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#060714', color: '#00F0E8', fontFamily: 'monospace' }}>
+          <span>CARGANDO STUDIO OVERRIDE...</span>
+        </div>
+      }>
+        <AdminLayout
+          sprites={dynamicSprites}
+          onRefreshSprites={refreshDynamicSprites}
+          onExitAdmin={() => {
             setIsAdminPortal(false);
             const url = new URL(window.location.href);
             url.searchParams.delete('studio');
@@ -477,22 +503,7 @@ export function App() {
             window.history.pushState({}, '', targetPath);
           }}
         />
-      );
-    }
-
-    return (
-      <AdminLayout
-        sprites={dynamicSprites}
-        onRefreshSprites={refreshDynamicSprites}
-        onExitAdmin={() => {
-          setIsAdminPortal(false);
-          const url = new URL(window.location.href);
-          url.searchParams.delete('studio');
-          url.searchParams.delete('portal');
-          const targetPath = url.pathname.includes('override') || url.pathname.includes('nexus') ? '/' : url.toString();
-          window.history.pushState({}, '', targetPath);
-        }}
-      />
+      </Suspense>
     );
   }
 
@@ -586,10 +597,11 @@ export function App() {
           />
         ) : (
           <div className={`sprites-grid ${viewMode === 'list' ? 'list-view' : ''}`}>
-            {filteredSprites.map((sprite) => (
+            {filteredSprites.map((sprite, idx) => (
               <SpriteCard
                 key={sprite.id}
                 sprite={sprite}
+                index={idx}
                 userState={userState}
                 friendState={friendState}
                 isFriendView={activeProfile === 'friend'}
@@ -614,73 +626,75 @@ export function App() {
         />
       )}
 
-      {showShareModal && (
-        <ShareImageModal
-          filteredSprites={filteredSprites}
-          allSprites={dynamicSprites.filter((s) => (activeGen === 0 || s.gen === activeGen) && (showUnreleased || !s.unreleased))}
-          userState={userState}
-          activeGen={activeGen}
-          activeFiltersLabel={
-            [
-              baseFilter !== 'all' ? `Variante: ${baseFilter}` : '',
-              spriteFilter !== 'all' ? `Familia: ${spriteFilter}` : '',
-              searchQuery ? `Búsqueda: "${searchQuery}"` : ''
-            ]
-              .filter(Boolean)
-              .join(' · ') || 'Ningún filtro activo'
-          }
-          onClose={() => setShowShareModal(false)}
-        />
-      )}
+      <Suspense fallback={null}>
+        {showShareModal && (
+          <ShareImageModal
+            filteredSprites={filteredSprites}
+            allSprites={dynamicSprites.filter((s) => (activeGen === 0 || s.gen === activeGen) && (showUnreleased || !s.unreleased))}
+            userState={userState}
+            activeGen={activeGen}
+            activeFiltersLabel={
+              [
+                baseFilter !== 'all' ? `Variante: ${baseFilter}` : '',
+                spriteFilter !== 'all' ? `Familia: ${spriteFilter}` : '',
+                searchQuery ? `Búsqueda: "${searchQuery}"` : ''
+              ]
+                .filter(Boolean)
+                .join(' · ') || 'Ningún filtro activo'
+            }
+            onClose={() => setShowShareModal(false)}
+          />
+        )}
 
-      {showBackupModal && (
-        <BackupModal
-          userState={userState}
-          setUserState={setUserState}
-          onClose={() => setShowBackupModal(false)}
-        />
-      )}
+        {showBackupModal && (
+          <BackupModal
+            userState={userState}
+            setUserState={setUserState}
+            onClose={() => setShowBackupModal(false)}
+          />
+        )}
 
-      {showCompareModal && (
-        <FriendCompareModal
-          userState={userState}
-          friendState={friendState}
-          isLiveConnected={isLiveConnected}
-          connectedFriendCode={connectedFriendCode}
-          myFriendCode={myFriendCode}
-          activeProfile={activeProfile}
-          onSetActiveProfile={setActiveProfile}
-          onConnectFriendCode={handleConnectFriendCode}
-          onDisconnectFriend={handleDisconnectFriend}
-          onLoadFriendState={(state, sourceLabel) => {
-            setFriendState(state);
-            setActiveProfile('friend');
-            if (sourceLabel) setConnectedFriendCode(sourceLabel);
-          }}
-          onToggleOwned={handleToggleOwned}
-          onClose={() => setShowCompareModal(false)}
-        />
-      )}
+        {showCompareModal && (
+          <FriendCompareModal
+            userState={userState}
+            friendState={friendState}
+            isLiveConnected={isLiveConnected}
+            connectedFriendCode={connectedFriendCode}
+            myFriendCode={myFriendCode}
+            activeProfile={activeProfile}
+            onSetActiveProfile={setActiveProfile}
+            onConnectFriendCode={handleConnectFriendCode}
+            onDisconnectFriend={handleDisconnectFriend}
+            onLoadFriendState={(state, sourceLabel) => {
+              setFriendState(state);
+              setActiveProfile('friend');
+              if (sourceLabel) setConnectedFriendCode(sourceLabel);
+            }}
+            onToggleOwned={handleToggleOwned}
+            onClose={() => setShowCompareModal(false)}
+          />
+        )}
 
-      {showAuthModal && !user && (
-        <AuthModal
-          user={user}
-          onClose={() => setShowAuthModal(false)}
-          onAuthSuccess={() => {
-            setShowAuthModal(false);
-          }}
-          onSignOut={handleSignOutCleanup}
-        />
-      )}
+        {showAuthModal && !user && (
+          <AuthModal
+            user={user}
+            onClose={() => setShowAuthModal(false)}
+            onAuthSuccess={() => {
+              setShowAuthModal(false);
+            }}
+            onSignOut={handleSignOutCleanup}
+          />
+        )}
+
+        {showFooterPrivacyModal && (
+          <PrivacyPolicyModal onClose={() => setShowFooterPrivacyModal(false)} />
+        )}
+      </Suspense>
 
       <Footer
         totalSprites={totalCount}
         onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
       />
-
-      {showFooterPrivacyModal && (
-        <PrivacyPolicyModal onClose={() => setShowFooterPrivacyModal(false)} />
-      )}
     </div>
   );
 }

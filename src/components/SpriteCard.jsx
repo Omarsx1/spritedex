@@ -6,6 +6,7 @@ import { SonicRing } from './SonicRing';
 
 export function SpriteCard({
   sprite,
+  index = 0,
   userState,
   friendState,
   isFriendView,
@@ -91,12 +92,18 @@ export function SpriteCard({
               src="/img/x/sprites/crown.webp"
               alt="Corona"
               className="list-item-image__crown"
+              decoding="async"
+              loading="lazy"
+              width="24"
+              height="24"
             />
           )}
           <img
             src={sprite.image}
             alt={sprite.fullName}
-            loading="lazy"
+            loading={index < 8 ? "eager" : "lazy"}
+            fetchPriority={index < 4 ? "high" : "auto"}
+            decoding="async"
             onClick={handleImageClick}
             title="Haz clic exclusivamente en la figura del espíritu para ver detalles y variantes"
             style={{ filter: !isOwned ? 'grayscale(80%) opacity(0.5)' : 'none', cursor: 'pointer' }}
@@ -231,12 +238,18 @@ export function SpriteCard({
             src="/img/x/sprites/crown.webp"
             alt="Corona"
             className="card-image__crown"
+            decoding="async"
+            loading="lazy"
+            width="32"
+            height="32"
           />
         )}
         <img
           src={sprite.image}
           alt={sprite.fullName}
-          loading="lazy"
+          loading={index < 8 ? "eager" : "lazy"}
+          fetchPriority={index < 4 ? "high" : "auto"}
+          decoding="async"
           onClick={handleImageClick}
           title="Haz clic exclusivamente en la figura del espíritu para ver detalles y variantes"
           style={{

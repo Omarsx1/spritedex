@@ -238,12 +238,18 @@ function FamilyRow({
                     src="/img/x/sprites/crown.webp"
                     alt="Corona"
                     className="ms-card__crown"
+                    decoding="async"
+                    loading="lazy"
+                    width="32"
+                    height="32"
                   />
                 )}
                 <img
                   src={sprite.image}
                   alt={sprite.fullName}
-                  loading="lazy"
+                  loading={isCurrent ? "eager" : "lazy"}
+                  fetchPriority={isCurrent ? "high" : "auto"}
+                  decoding="async"
                   style={{
                     filter: !isOwned ? 'grayscale(55%) opacity(0.68) brightness(1.2) contrast(1.15)' : 'drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
                     cursor: 'pointer'

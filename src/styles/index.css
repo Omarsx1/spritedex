@@ -2820,6 +2820,9 @@ body::after {
 
 /* ===== Sprite Card (fortnite.gg style) ===== */
 .sprite-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 280px;
+  contain: layout style;
   border-radius: 14px;
   padding: 22px 14px 14px;
   display: flex;
@@ -6705,6 +6708,7 @@ body::after {
 
 /* ── Individual Card (Slender collectible proportion) ── */
 .ms-card {
+  contain: layout style;
   position: absolute !important;
   top: 0 !important;
   left: 0 !important;

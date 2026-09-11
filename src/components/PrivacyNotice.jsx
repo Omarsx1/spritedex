@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { ShieldCheck, X, Check, Cookie, Settings } from 'lucide-react';
-import { PrivacyPolicyModal } from './PrivacyPolicyModal';
+
+const PrivacyPolicyModal = lazy(() => import('./PrivacyPolicyModal').then(m => ({ default: m.PrivacyPolicyModal })));
 
 const LOCAL_STORAGE_PRIVACY_KEY = 'fortnite_sprites_privacy_notice_v1';
 
@@ -179,13 +180,15 @@ export function PrivacyNotice() {
 
       {/* Modal explicativo de Gestión de Cookies */}
       {showPolicyModal && (
-        <PrivacyPolicyModal
-          onClose={() => setShowPolicyModal(false)}
-          onOpenPreferences={() => {
-            setIsVisible(true);
-            setShowPersonalize(true);
-          }}
-        />
+        <Suspense fallback={null}>
+          <PrivacyPolicyModal
+            onClose={() => setShowPolicyModal(false)}
+            onOpenPreferences={() => {
+              setIsVisible(true);
+              setShowPersonalize(true);
+            }}
+          />
+        </Suspense>
       )}
     </>
   );
