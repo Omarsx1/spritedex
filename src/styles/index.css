@@ -2204,7 +2204,6 @@ body::after {
   padding: 0;
   flex-shrink: 0;
   transition: all 0.15s ease;
-  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -2216,6 +2215,10 @@ body::after {
 .mobile-glass-filter-btn.is-active {
   color: #ffffff;
   background: rgba(255, 255, 255, 0.14);
+}
+
+.mobile-glass-filter-icon {
+  pointer-events: none;
 }
 
 .mobile-glass-badge {
@@ -2233,6 +2236,7 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
 }
 
 /* Active Chips Horizontal Scroll Row */
@@ -2290,7 +2294,6 @@ body::after {
   justify-content: center;
   animation: fadeInFilterBackdrop 0.28s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
   will-change: opacity, backdrop-filter;
-  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -3817,7 +3820,6 @@ body::after {
   padding: 20px;
   animation: fadeInModalBackdrop 0.28s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
   will-change: opacity, backdrop-filter;
-  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
