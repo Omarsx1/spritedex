@@ -279,7 +279,17 @@ export function Header({
                 <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
               )}
             </button>
-            <button className="hero__btn hero__btn--accent" onClick={onOpenShareModal} title="Compartir Imagen">
+            <button
+              className="hero__btn hero__btn--accent"
+              onClick={onOpenShareModal}
+              onMouseEnter={() => {
+                import('../components/ShareImageModal');
+              }}
+              onTouchStart={() => {
+                import('../components/ShareImageModal');
+              }}
+              title="Compartir Imagen"
+            >
               <Share2 size={16} className="hero__btn-icon" />
               <span className="hero__btn-text">Compartir</span>
             </button>

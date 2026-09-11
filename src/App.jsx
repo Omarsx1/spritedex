@@ -184,6 +184,22 @@ export function App() {
     };
   }, [connectedFriendCode]);
 
+  // Precarga silenciosa en tiempo de inactividad (idle) del modal de exportación
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const idleTimer = setTimeout(() => {
+      if (window.requestIdleCallback) {
+        window.requestIdleCallback(() => {
+          import('./components/ShareImageModal');
+        }, { timeout: 3000 });
+      } else {
+        import('./components/ShareImageModal');
+      }
+    }, 2500);
+
+    return () => clearTimeout(idleTimer);
+  }, []);
+
   // Listen to Supabase Auth State & Sync Cloud Data
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return;

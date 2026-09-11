@@ -71,54 +71,86 @@ export function loadImage(src) {
   }
 
   // 2. Reutilización instantánea si la imagen ya está presente en el DOM del navegador
-  if (typeof document !== 'undefined') {
-    const domImg = document.querySelector(`img[src="${src}"]`);
-    if (domImg && domImg.complete && domImg.naturalWidth > 0) {
-      globalImageCache.set(src, domImg);
-      return Promise.resolve(domImg);
+  if (typeof document !== 'undefined' && document.images) {
+    for (let i = 0; i < document.images.length; i++) {
+      const domImg = document.images[i];
+      if (domImg && domImg.complete && domImg.naturalWidth > 0) {
+        if (domImg.src === src || domImg.getAttribute('src') === src || domImg.src.endsWith(src)) {
+          globalImageCache.set(src, domImg);
+          return Promise.resolve(domImg);
+        }
+      }
     }
   }
 
-  // 3. Carga y decodificación asíncrona acelerada por GPU
+  // 3. Carga rápida acelerada con fallback por timeout para que nunca bloquee la plantilla
   return new Promise((resolve) => {
     const img = new Image();
-    img.crossOrigin = 'Anonymous';
-    img.decoding = 'async';
-    img.onload = () => {
-      if (img.decode) {
-        img.decode().then(() => {
-          globalImageCache.set(src, img);
-          resolve(img);
-        }).catch(() => {
-          globalImageCache.set(src, img);
-          resolve(img);
-        });
-      } else {
-        globalImageCache.set(src, img);
-        resolve(img);
-      }
+    // Solo requerir CORS si es una URL externa http(s) fuera del origen actual
+    const isExternal = (src.startsWith('http://') || src.startsWith('https://')) &&
+      (typeof window !== 'undefined' && !src.startsWith(window.location.origin));
+    if (isExternal) {
+      img.crossOrigin = 'Anonymous';
+    }
+
+    let settled = false;
+    const finish = (result) => {
+      if (settled) return;
+      settled = true;
+      if (result) globalImageCache.set(src, result);
+      resolve(result);
     };
-    img.onerror = () => resolve(null);
+
+    // Timeout de seguridad (1.2s máx por imagen individual para nunca colgar la exportación)
+    const timer = setTimeout(() => {
+      finish(null);
+    }, 1200);
+
+    img.onload = () => {
+      clearTimeout(timer);
+      finish(img);
+    };
+    img.onerror = () => {
+      clearTimeout(timer);
+      finish(null);
+    };
     img.src = src;
 
     if (img.complete && img.naturalWidth > 0) {
-      globalImageCache.set(src, img);
-      resolve(img);
+      clearTimeout(timer);
+      finish(img);
     }
   });
 }
 
-// Precarga anticipada de recursos para generación instantánea
-export function preloadCanvasAssets(spritesList = []) {
+// Precarga anticipada de recursos por lotes en reposo (idle) sin saturar la red ni bloquear el hilo
+export function preloadCanvasAssets(spritesList = [], batchSize = 6) {
   if (typeof window === 'undefined') return;
   loadImage('/background.webp');
-  if (Array.isArray(spritesList)) {
-    // Precarga todos los sprites en lotes concurrentes rápidos
-    spritesList.forEach(s => {
-      if (s && s.image) {
-        loadImage(s.image);
+
+  if (Array.isArray(spritesList) && spritesList.length > 0) {
+    let index = 0;
+    const processBatch = () => {
+      if (index >= spritesList.length) return;
+      const slice = spritesList.slice(index, index + batchSize);
+      index += batchSize;
+      slice.forEach(s => {
+        if (s && s.image) loadImage(s.image);
+      });
+      if (index < spritesList.length) {
+        if (window.requestIdleCallback) {
+          window.requestIdleCallback(processBatch, { timeout: 1500 });
+        } else {
+          setTimeout(processBatch, 120);
+        }
       }
-    });
+    };
+
+    if (window.requestIdleCallback) {
+      window.requestIdleCallback(processBatch, { timeout: 2000 });
+    } else {
+      setTimeout(processBatch, 150);
+    }
   }
 }
 
@@ -321,7 +353,7 @@ export async function generatePokedexCardImage({
     bgImgPromise.then((img) => {
       if (img) loadedImagesMap['__bg_override__'] = img;
     }),
-    ...spritesList.slice(0, 160).map(async (s) => {
+    ...spritesList.slice(0, 250).map(async (s) => {
       const img = await loadImage(s.image);
       if (img) loadedImagesMap[s.id] = img;
     })
@@ -337,7 +369,8 @@ export async function generatePokedexCardImage({
 }
 
 // -------------------------------------------------------------
-// Renders the GLITCH / OVERRIDE style template (Matching Image 2)
+// Renders the GLITCH / OVERRIDE style template
+// Adaptación geométrica matemática simétrica para cualquier cantidad de espíritus (Gen 1, Gen 2, etc.)
 // -------------------------------------------------------------
 function renderGlitchOverrideTemplate({
   spritesList,
@@ -351,50 +384,76 @@ function renderGlitchOverrideTemplate({
   const ownedCount = spritesList.filter(s => userState[s.id]?.owned).length;
   const pctOwned = totalSprites > 0 ? Math.round((ownedCount / totalSprites) * 100) : 0;
 
+  const totalSlotsNeeded = totalSprites + 1; // Reserva espacio para el código QR
+  const isSquare = format === 'square';
+
   let width = 1080;
   let height = 1520;
   let cols = 6;
+  let headerH = 195;
+  let footerH = 45;
   const paddingX = 36;
-  const headerH = 195;
-  const footerH = 45;
 
   // -------------------------------------------------------------
   // Configuración de cuadrícula y dimensiones adaptativas
   // -------------------------------------------------------------
-  if (format === 'square') {
-    width = 1200;
-    height = 1200;
+  if (isSquare) {
+    // Escala de resolución adaptativa para mantener nitidez Retina y celdas amplias
+    if (totalSprites <= 35) {
+      width = 1200;
+      height = 1200;
+      headerH = 190;
+      footerH = 45;
+    } else if (totalSprites <= 68) {
+      width = 1600;
+      height = 1600;
+      headerH = 165;
+      footerH = 45;
+    } else {
+      // Colecciones grandes (como los 117 de Gen 1)
+      width = 1800;
+      height = 1800;
+      headerH = 160;
+      footerH = 42;
+    }
+
+    // Cuadrícula simétrica 1:1 (cols nunca menores que rows)
     if (totalSprites <= 5) cols = 3;
     else if (totalSprites <= 11) cols = 3;
     else if (totalSprites <= 19) cols = 4;
-    else if (totalSprites <= 29) cols = 5;
-    else if (totalSprites <= 41) cols = 6;
-    else cols = 7;
+    else if (totalSprites <= 35) cols = 6; // Caso ideal Imagen 3 (6x6 = 36)
+    else if (totalSprites <= 63) cols = 8; // Caso ideal Imagen 2 (8x8 = 64)
+    else cols = Math.max(8, Math.ceil(Math.sqrt(totalSlotsNeeded))); // 11x11 para 117
   } else {
-    // Vertical Mobile / Story Poster Format (Matching Reference Image)
-    width = 1080;
-    if (totalSprites <= 8) cols = 4;
-    else if (totalSprites <= 15) cols = 5;
-    else cols = 6; // 6 columns standard for Gen 2
+    // Formato Vertical (📱 Checklist / Poster móvil)
+    if (totalSprites <= 8) {
+      cols = 4;
+      width = 1080;
+    } else if (totalSprites <= 18) {
+      cols = 5;
+      width = 1080;
+    } else if (totalSprites <= 70) {
+      cols = 6;
+      width = 1080; // Caso ideal Imagen 4 (61 espíritus)
+    } else {
+      // Colecciones grandes en vertical (p.ej. 117 de Gen 1): 8 columnas
+      cols = 8;
+      width = 1280;
+    }
   }
 
-  // Reserva espacio para la tarjeta del código QR en el último slot de la cuadrícula
-  const totalSlotsNeeded = totalSprites + 1;
   const rows = Math.max(1, Math.ceil(totalSlotsNeeded / cols));
   const availW = width - paddingX * 2;
   const cellW = Math.floor(availW / cols);
 
   let cellH;
-  if (format === 'checklist') {
-    const desiredCellH = 190;
+  if (!isSquare) {
+    const desiredCellH = totalSprites > 70 ? 175 : 190;
     height = headerH + rows * desiredCellH + footerH;
     cellH = desiredCellH;
   } else {
-    // En formato cuadrado 1:1, limitamos cellH para mantener una proporción armónica
-    // y centramos verticalmente toda la cuadrícula en el lienzo
-    const maxCellHByRatio = Math.round(cellW * 1.15);
-    const maxCellHBySpace = Math.floor((1200 - headerH - footerH) / rows);
-    cellH = Math.min(maxCellHBySpace, Math.max(170, maxCellHByRatio));
+    // En formato cuadrado 1:1, distribuimos el espacio vertical simétricamente
+    cellH = Math.floor((height - headerH - footerH) / rows);
   }
 
   const availH = height - headerH - footerH;
@@ -409,47 +468,49 @@ function renderGlitchOverrideTemplate({
 
   // 2. HEADER SECTION (GLITCH OVERRIDE STYLE)
   ctx.save();
+  const scale = width / 1200;
 
   // Top Small Header: "FORTNITE , NUEVOS"
-  ctx.font = '900 14px "Inter", "Arial Black", sans-serif';
+  ctx.font = `900 ${Math.round(14 * Math.min(1.2, scale))}px "Inter", "Arial Black", sans-serif`;
   ctx.fillStyle = '#00F0E8';
   ctx.textAlign = 'center';
   ctx.letterSpacing = '3px';
   ctx.shadowColor = 'rgba(0, 240, 232, 0.7)';
   ctx.shadowBlur = 8;
-  ctx.fillText('FORTNITE , NUEVOS', width / 2, 34);
+  const topTextY = Math.round(34 * Math.min(1.15, scale));
+  ctx.fillText('FORTNITE , NUEVOS', width / 2, topTextY);
 
   // Main Big Title: "SPRITEDEX OVERRIDE"
   const titleText = 'SPRITEDEX OVERRIDE';
-  const titleFontSize = format === 'checklist' ? 52 : 48;
+  const baseTitleFontSize = isSquare ? (cols >= 8 ? 44 : 48) : 52;
+  const titleFontSize = Math.round(baseTitleFontSize * Math.min(1.22, Math.max(0.9, scale)));
   ctx.font = `900 ${titleFontSize}px "Burbank Big Condensed", "Impact", "Arial Black", sans-serif`;
 
+  const titleY = topTextY + Math.round(50 * Math.min(1.15, scale));
+
   // Chromatic Aberration Shadows
-  // Cyan shadow right
   ctx.fillStyle = '#00F0E8';
-  ctx.fillText(titleText, width / 2 + 3, 86);
+  ctx.fillText(titleText, width / 2 + 3, titleY);
 
-  // Magenta shadow left
   ctx.fillStyle = '#ff0055';
-  ctx.fillText(titleText, width / 2 - 3, 86);
+  ctx.fillText(titleText, width / 2 - 3, titleY);
 
-  // Main white text
   ctx.fillStyle = '#ffffff';
   ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
   ctx.shadowBlur = 14;
-  ctx.fillText(titleText, width / 2, 86);
+  ctx.fillText(titleText, width / 2, titleY);
   ctx.shadowBlur = 0;
 
-  // Tagline Pill Capsule: "ROMPE LAS REGLAS • CAMBIA EL JUEGO" (Magenta Capsule)
+  // Tagline Pill Capsule: "ROMPE LAS REGLAS • CAMBIA EL JUEGO"
   const capsuleText = 'ROMPE LAS REGLAS • CAMBIA EL JUEGO';
-  ctx.font = '900 10.5px "Inter", "Arial Black", sans-serif';
+  const capsuleFontSize = Math.round(10.5 * Math.min(1.15, scale));
+  ctx.font = `900 ${capsuleFontSize}px "Inter", "Arial Black", sans-serif`;
   ctx.letterSpacing = '1px';
-  const capsuleW = ctx.measureText(capsuleText).width + 28;
-  const capsuleH = 22;
+  const capsuleW = ctx.measureText(capsuleText).width + Math.round(28 * scale);
+  const capsuleH = Math.round(22 * Math.min(1.15, scale));
   const capsuleX = (width - capsuleW) / 2;
-  const capsuleY = 100;
+  const capsuleY = titleY + Math.round(14 * Math.min(1.1, scale));
 
-  // Capsule Background (Gradient Magenta)
   roundRect(ctx, capsuleX, capsuleY, capsuleW, capsuleH, 5);
   const capsuleGrad = ctx.createLinearGradient(capsuleX, capsuleY, capsuleX + capsuleW, capsuleY);
   capsuleGrad.addColorStop(0, '#ff0055');
@@ -457,18 +518,15 @@ function renderGlitchOverrideTemplate({
   ctx.fillStyle = capsuleGrad;
   ctx.fill();
 
-  // Capsule Text (White)
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'center';
-  ctx.fillText(capsuleText, width / 2, capsuleY + 15);
+  ctx.fillText(capsuleText, width / 2, capsuleY + Math.round(15 * Math.min(1.15, scale)));
 
-  // -------------------------------------------------------------
   // HUD Status Bar: "X/Y Espíritus atrapados" | "PROGRESO: X%"
-  // -------------------------------------------------------------
-  const hudW = Math.min(availW, 580);
-  const hudH = 38;
+  const hudW = Math.min(availW - 30, Math.round(580 * Math.min(1.25, scale)));
+  const hudH = Math.round(36 * Math.min(1.15, scale));
   const hudX = (width - hudW) / 2;
-  const hudY = capsuleY + 30;
+  const hudY = capsuleY + capsuleH + Math.round(8 * Math.min(1.1, scale));
 
   // HUD Frame Border
   ctx.strokeStyle = 'rgba(0, 240, 232, 0.55)';
@@ -487,36 +545,34 @@ function renderGlitchOverrideTemplate({
   ctx.fillRect(hudX + hudW - 5, hudY + hudH - 1, 6, 2);
   ctx.fillRect(hudX + hudW - 1, hudY + hudH - 5, 2, 6);
 
-  // HUD Text Left: "X / Y ESPÍRITUS DESENCRIPTADOS"
+  // HUD Text
+  const hudTextY = hudY + Math.round(18 * Math.min(1.15, scale));
   ctx.textAlign = 'left';
-  ctx.font = '900 12px "Inter", sans-serif';
+  ctx.font = `900 ${Math.round(12 * Math.min(1.15, scale))}px "Inter", sans-serif`;
   ctx.fillStyle = '#ff0055';
-  ctx.fillText(`${ownedCount} / ${totalSprites}`, hudX + 14, hudY + 19);
-  ctx.font = '700 10px "Inter", sans-serif';
+  ctx.fillText(`${ownedCount} / ${totalSprites}`, hudX + 14, hudTextY);
+  ctx.font = `700 ${Math.round(10 * Math.min(1.15, scale))}px "Inter", sans-serif`;
   ctx.fillStyle = '#94a3b8';
-  ctx.fillText(' espíritus atrapados', hudX + 14 + ctx.measureText(`${ownedCount} / ${totalSprites} `).width + 4, hudY + 19);
+  ctx.fillText(' espíritus atrapados', hudX + 14 + ctx.measureText(`${ownedCount} / ${totalSprites} `).width + 4, hudTextY);
 
-  // HUD Text Right: "PROGRESO: X%"
   ctx.textAlign = 'right';
-  ctx.font = '900 11px "Inter", sans-serif';
+  ctx.font = `900 ${Math.round(11 * Math.min(1.15, scale))}px "Inter", sans-serif`;
   ctx.fillStyle = '#00F0E8';
-  ctx.fillText(`PROGRESO ${pctOwned}%`, hudX + hudW - 14, hudY + 19);
+  ctx.fillText(`PROGRESO ${pctOwned}%`, hudX + hudW - 14, hudTextY);
 
   // Neon Progress Bar inside HUD
   const barX = hudX + 14;
-  const barY = hudY + 26;
+  const barH = Math.round(6 * Math.min(1.15, scale));
+  const barY = hudY + hudH - barH - 5;
   const barW = hudW - 28;
-  const barH = 7;
 
-  // Background track
-  roundRect(ctx, barX, barY, barW, barH, 3.5);
+  roundRect(ctx, barX, barY, barW, barH, 3);
   ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
   ctx.fill();
 
-  // Active Fill
   const fillW = Math.max(barH, (barW * Math.min(100, Math.max(0, pctOwned))) / 100);
   if (fillW > 0) {
-    roundRect(ctx, barX, barY, fillW, barH, 3.5);
+    roundRect(ctx, barX, barY, fillW, barH, 3);
     const grad = ctx.createLinearGradient(barX, barY, barX + fillW, barY);
     grad.addColorStop(0, '#ff0055');
     grad.addColorStop(0.7, '#ec4899');
@@ -534,7 +590,10 @@ function renderGlitchOverrideTemplate({
   const gridW = cols * cellW;
   const gridH = rows * cellH;
   const startX = (width - gridW) / 2;
-  const startY = headerH + Math.max(10, Math.floor((availH - gridH) / 2));
+  const startY = headerH + Math.max(8, Math.floor((availH - gridH) / 2));
+
+  const isCompact = cols >= 8;
+  const isUltraCompact = cols >= 10;
 
   spritesList.forEach((sprite, idx) => {
     const colIdx = idx % cols;
@@ -550,16 +609,18 @@ function renderGlitchOverrideTemplate({
 
     const spiritHue = getSpiritHue(sprite);
 
-    const cardMarginX = 6;
-    const cardMarginY = 6;
+    // Margen para garantizar canal oscuro limpio ("calle") entre tarjetas vecinas
+    const cardMarginX = Math.max(4, Math.round(cellW * 0.035));
+    const cardMarginY = Math.max(4, Math.round(cellH * 0.035));
     const cardX = x + cardMarginX;
     const cardY = y + cardMarginY;
     const cardW = cellW - cardMarginX * 2;
     const cardH = cellH - cardMarginY * 2;
+    const cornerRadius = Math.min(10, Math.max(5, Math.round(cardW * 0.055)));
 
-    // A. Cyber Tile Container (Homogéneo y Elegante para TODAS las tarjetas)
+    // A. Cyber Tile Container
     ctx.save();
-    roundRect(ctx, cardX, cardY, cardW, cardH, 12);
+    roundRect(ctx, cardX, cardY, cardW, cardH, cornerRadius);
     if (isOwned) {
       ctx.fillStyle = isMastered
         ? 'rgba(234, 179, 8, 0.14)'
@@ -570,13 +631,12 @@ function renderGlitchOverrideTemplate({
         : hexToRgba(spiritHue, 0.55);
       ctx.lineWidth = isMastered ? 1.5 : 1;
       if (isMastered) {
-        ctx.shadowColor = 'rgba(234, 179, 8, 0.4)';
-        ctx.shadowBlur = 8;
+        ctx.shadowColor = 'rgba(234, 179, 8, 0.35)';
+        ctx.shadowBlur = Math.min(6, cardMarginX);
       }
       ctx.stroke();
       ctx.shadowBlur = 0;
     } else {
-      // Contenedor oscuro homogéneo tipo Cyber Glass para todas las tarjetas sin atrapar
       ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
       ctx.fill();
       ctx.strokeStyle = hexToRgba(spiritHue, 0.28);
@@ -585,32 +645,40 @@ function renderGlitchOverrideTemplate({
     }
 
     // Corner pixel ticks con el color del espíritu
+    const tickSize = Math.max(2, Math.min(4, Math.round(cardW * 0.025)));
     ctx.fillStyle = isOwned ? (isMastered ? '#facc15' : spiritHue) : hexToRgba(spiritHue, 0.50);
-    ctx.fillRect(cardX + 2, cardY + 2, 4, 4);
-    ctx.fillRect(cardX + cardW - 6, cardY + 2, 4, 4);
-    ctx.fillRect(cardX + 2, cardY + cardH - 6, 4, 4);
-    ctx.fillRect(cardX + cardW - 6, cardY + cardH - 6, 4, 4);
+    ctx.fillRect(cardX + 2, cardY + 2, tickSize, tickSize);
+    ctx.fillRect(cardX + cardW - 2 - tickSize, cardY + 2, tickSize, tickSize);
+    ctx.fillRect(cardX + 2, cardY + cardH - 2 - tickSize, tickSize, tickSize);
+    ctx.fillRect(cardX + cardW - 2 - tickSize, cardY + cardH - 2 - tickSize, tickSize, tickSize);
     ctx.restore();
 
     // B. Proporciones y Centrado Vertical Dinámico
-    const maxImgCap = format === 'square'
-      ? (totalSprites <= 6 ? 240 : totalSprites <= 12 ? 180 : totalSprites <= 20 ? 140 : 110)
-      : (totalSprites <= 8 ? 140 : 105);
+    const imgSize = Math.max(
+      36,
+      Math.min(
+        Math.floor(cardW * 0.62),
+        Math.floor(cardH * (isUltraCompact ? 0.50 : 0.52))
+      )
+    );
 
-    const imgSize = Math.max(50, Math.min(maxImgCap, Math.floor(cardW * 0.68), Math.floor(cardH * 0.58)));
+    const nameFontSize = Math.max(
+      8,
+      Math.min(
+        isUltraCompact ? 9 : (isCompact ? 10.5 : 12),
+        Math.floor(cardW * 0.08)
+      )
+    );
 
-    const nameFontSize = Math.max(10, Math.min(
-      format === 'square' && totalSprites <= 6 ? 18 : totalSprites <= 12 ? 15 : totalSprites <= 20 ? 13 : 11,
-      Math.floor(cardW * 0.08)
-    ));
+    const badgeH = isUltraCompact ? 14 : Math.max(16, Math.min(22, Math.round(cardH * 0.135)));
+    const badgeW = Math.max(46, Math.min(cardW - 14, Math.round(cardW * (isUltraCompact ? 0.88 : 0.82))));
+    const badgeFontSize = isUltraCompact ? 7.5 : Math.max(8, Math.min(10, badgeH * 0.50));
 
-    const badgeW = Math.max(70, Math.min(cardW - 24, format === 'square' && totalSprites <= 6 ? 130 : totalSprites <= 12 ? 105 : 84));
-    const badgeH = format === 'square' && totalSprites <= 6 ? 26 : totalSprites <= 12 ? 22 : 18;
-    const badgeFontSize = format === 'square' && totalSprites <= 6 ? 11 : totalSprites <= 12 ? 10 : 8.5;
+    const gapImgText = isUltraCompact ? 3 : Math.max(4, Math.round(cardH * 0.035));
+    const gapTextBadge = isUltraCompact ? 3 : Math.max(4, Math.round(cardH * 0.03));
 
-    // Altura total del contenido: Imagen + Espacio + Texto + Espacio + Badge
-    const totalContentH = imgSize + 14 + nameFontSize + 8 + badgeH;
-    const contentStartY = cardY + Math.max(8, Math.floor((cardH - totalContentH) / 2));
+    const totalContentH = imgSize + gapImgText + nameFontSize + gapTextBadge + badgeH;
+    const contentStartY = cardY + Math.max(4, Math.floor((cardH - totalContentH) / 2));
 
     const spriteImg = loadedImagesMap[sprite.id];
 
@@ -619,14 +687,14 @@ function renderGlitchOverrideTemplate({
       const imgX = cardX + (cardW - imgSize) / 2;
       const imgY = contentStartY;
 
-      // Halo Luminoso de Fondo Universal (Iluminación trasera armónica para TODOS los espíritus)
+      // Halo Luminoso de Fondo Universal (Iluminación trasera contenida dentro de la tarjeta)
       const centerX = imgX + imgSize / 2;
       const centerY = imgY + imgSize / 2;
-      const auraRadius = Math.round(imgSize * 0.58);
-      const auraGrad = ctx.createRadialGradient(centerX, centerY, 4, centerX, centerY, auraRadius);
+      const auraRadius = Math.round(imgSize * 0.55);
+      const auraGrad = ctx.createRadialGradient(centerX, centerY, 3, centerX, centerY, auraRadius);
 
-      auraGrad.addColorStop(0, isOwned ? hexToRgba(spiritHue, 0.40) : hexToRgba(spiritHue, 0.26));
-      auraGrad.addColorStop(0.65, isOwned ? hexToRgba(spiritHue, 0.18) : hexToRgba(spiritHue, 0.10));
+      auraGrad.addColorStop(0, isOwned ? hexToRgba(spiritHue, 0.38) : hexToRgba(spiritHue, 0.22));
+      auraGrad.addColorStop(0.65, isOwned ? hexToRgba(spiritHue, 0.15) : hexToRgba(spiritHue, 0.08));
       auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       ctx.fillStyle = auraGrad;
@@ -634,18 +702,14 @@ function renderGlitchOverrideTemplate({
       ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
       ctx.fill();
 
+      // Desenfoque contenido para que el resplandor no invada tarjetas vecinas
+      const imgShadowBlur = isCompact ? 8 : 16;
+      ctx.shadowColor = hexToRgba(spiritHue, isOwned ? 0.70 : 0.30);
+      ctx.shadowBlur = imgShadowBlur;
       if (!isOwned) {
         ctx.globalAlpha = 0.88;
-        ctx.shadowColor = hexToRgba(spiritHue, 0.35);
-        ctx.shadowBlur = 14;
-        ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
-      } else {
-        ctx.shadowColor = hexToRgba(spiritHue, 0.80);
-        ctx.shadowBlur = 24;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-        ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
       }
+      ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
       ctx.restore();
     }
 
@@ -654,10 +718,10 @@ function renderGlitchOverrideTemplate({
     ctx.textAlign = 'center';
     ctx.font = `800 ${nameFontSize}px "Inter", sans-serif`;
     ctx.fillStyle = isOwned ? '#ffffff' : 'rgba(255, 255, 255, 0.75)';
-    const textY = contentStartY + imgSize + 14 + Math.floor(nameFontSize * 0.8);
+    const textY = contentStartY + imgSize + gapImgText + Math.floor(nameFontSize * 0.82);
 
     let nameText = sprite.fullName || sprite.name;
-    const maxTextW = cardW - 12;
+    const maxTextW = cardW - 10;
     if (ctx.measureText(nameText).width > maxTextW) {
       while (nameText.length > 3 && ctx.measureText(nameText + '...').width > maxTextW) {
         nameText = nameText.slice(0, -1);
@@ -668,13 +732,14 @@ function renderGlitchOverrideTemplate({
 
     // D. Cyber Badge at Bottom
     const badgeX = cardX + (cardW - badgeW) / 2;
-    const badgeY = textY + 8;
+    const badgeY = textY + gapTextBadge;
+    const badgeCornerR = Math.max(3, Math.min(5, Math.round(badgeH * 0.25)));
 
     if (isOwned) {
-      roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 4);
+      roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeCornerR);
       ctx.fillStyle = '#00F0E8';
-      ctx.shadowColor = 'rgba(0, 240, 232, 0.55)';
-      ctx.shadowBlur = 6;
+      ctx.shadowColor = 'rgba(0, 240, 232, 0.45)';
+      ctx.shadowBlur = Math.min(4, cardMarginX);
       ctx.fill();
       ctx.shadowBlur = 0;
 
@@ -682,10 +747,10 @@ function renderGlitchOverrideTemplate({
       ctx.fillStyle = '#060714';
       ctx.fillText('HACKEADO', cardX + cardW / 2, badgeY + badgeH / 2 + Math.floor(badgeFontSize * 0.35));
     } else {
-      roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 4);
+      roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeCornerR);
       ctx.fillStyle = '#EF4444';
-      ctx.shadowColor = 'rgba(239, 68, 68, 0.65)';
-      ctx.shadowBlur = 6;
+      ctx.shadowColor = 'rgba(239, 68, 68, 0.50)';
+      ctx.shadowBlur = Math.min(4, cardMarginX);
       ctx.fill();
       ctx.shadowBlur = 0;
 
@@ -696,15 +761,17 @@ function renderGlitchOverrideTemplate({
     ctx.restore();
   });
 
-  // 3.B. CÓDIGO QR DE PUNTOS MODERNO (Centrado perfectamente en el último slot)
+  // 3.B. CÓDIGO QR DE PUNTOS MODERNO (Centrado en el último slot)
   const qrColIdx = cols - 1;
   const qrRowIdx = rows - 1;
-  const qrCardX = startX + qrColIdx * cellW + 6;
-  const qrCardY = startY + qrRowIdx * cellH + 6;
-  const qrCardW = cellW - 12;
-  const qrCardH = cellH - 12;
+  const qrCardMarginX = Math.max(4, Math.round(cellW * 0.035));
+  const qrCardMarginY = Math.max(4, Math.round(cellH * 0.035));
+  const qrCardX = startX + qrColIdx * cellW + qrCardMarginX;
+  const qrCardY = startY + qrRowIdx * cellH + qrCardMarginY;
+  const qrCardW = cellW - qrCardMarginX * 2;
+  const qrCardH = cellH - qrCardMarginY * 2;
 
-  const qrSize = Math.min(qrCardW - 24, qrCardH - 24, format === 'square' && totalSprites <= 6 ? 240 : 170);
+  const qrSize = Math.min(qrCardW - 14, qrCardH - 14, 180);
   const qrInnerX = qrCardX + (qrCardW - qrSize) / 2;
   const qrInnerY = qrCardY + (qrCardH - qrSize) / 2;
 
@@ -713,16 +780,39 @@ function renderGlitchOverrideTemplate({
   drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, targetUrl);
   ctx.restore();
 
-  // 4. FOOTER WATERMARK (CENTRADO)
+  // 4. FOOTER WATERMARK
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.font = '700 12px "Inter", monospace, sans-serif';
+  ctx.font = `700 ${Math.round(12 * (width / 1200))}px "Inter", monospace, sans-serif`;
   ctx.fillStyle = '#38bdf8';
   ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
   ctx.shadowBlur = 6;
   ctx.fillText('#FNGGOverride  •  spritedex.com', width / 2, height - 16);
   ctx.restore();
 
-  return canvas.toDataURL('image/png');
+  // Retornar promesa con dataUrl, blob y file listo para Web Share API
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      const filename = `spritedex_${Date.now()}.png`;
+      if (blob) {
+        const file = new File([blob], filename, { type: 'image/png' });
+        const blobUrl = URL.createObjectURL(blob);
+        resolve({
+          dataUrl: blobUrl,
+          blobUrl,
+          blob,
+          file
+        });
+      } else {
+        const dataUrl = canvas.toDataURL('image/png');
+        resolve({
+          dataUrl,
+          blobUrl: dataUrl,
+          blob: null,
+          file: null
+        });
+      }
+    }, 'image/png');
+  });
 }
 
