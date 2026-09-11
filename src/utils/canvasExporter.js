@@ -397,6 +397,62 @@ export async function generatePokedexCardImage({
   return result;
 }
 
+// Ajusta nombres largos para que se muestren completos (1 o 2 líneas) sin truncado (...)
+function getSpriteNameLines(ctx, fullName, maxW, baseFontSize) {
+  if (!fullName) return { lines: [''], fontSize: baseFontSize };
+
+  // 1. Probar en 1 sola línea con tamaño base
+  ctx.font = `800 ${baseFontSize}px "Inter", sans-serif`;
+  if (ctx.measureText(fullName).width <= maxW) {
+    return { lines: [fullName], fontSize: baseFontSize };
+  }
+
+  // 2. Probar en 1 sola línea con reducción suave (hasta baseFontSize - 1.5)
+  const slightlySmaller = Math.max(7.5, baseFontSize - 1.5);
+  ctx.font = `800 ${slightlySmaller}px "Inter", sans-serif`;
+  if (ctx.measureText(fullName).width <= maxW) {
+    return { lines: [fullName], fontSize: slightlySmaller };
+  }
+
+  // 3. Dividir en 2 líneas equilibradas por palabras
+  const words = fullName.split(' ');
+  if (words.length > 1) {
+    let bestL1 = '';
+    let bestL2 = '';
+    let bestDiff = Infinity;
+
+    for (let i = 1; i < words.length; i++) {
+      const l1 = words.slice(0, i).join(' ');
+      const l2 = words.slice(i).join(' ');
+      const diff = Math.abs(l1.length - l2.length);
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        bestL1 = l1;
+        bestL2 = l2;
+      }
+    }
+
+    // Probar el tamaño óptimo para que ambas líneas entren holgadamente
+    for (let s = baseFontSize; s >= 7; s -= 0.5) {
+      ctx.font = `800 ${s}px "Inter", sans-serif`;
+      if (ctx.measureText(bestL1).width <= maxW && ctx.measureText(bestL2).width <= maxW) {
+        return { lines: [bestL1, bestL2], fontSize: s };
+      }
+    }
+    return { lines: [bestL1, bestL2], fontSize: 7 };
+  }
+
+  // 4. Si es una sola palabra muy larga, reducir tamaño
+  for (let s = baseFontSize; s >= 6.5; s -= 0.5) {
+    ctx.font = `800 ${s}px "Inter", sans-serif`;
+    if (ctx.measureText(fullName).width <= maxW) {
+      return { lines: [fullName], fontSize: s };
+    }
+  }
+
+  return { lines: [fullName], fontSize: 6.5 };
+}
+
 // -------------------------------------------------------------
 // Renders the GLITCH / OVERRIDE style template
 // Adaptación geométrica matemática simétrica para cualquier cantidad de espíritus (Gen 1, Gen 2, etc.)
@@ -677,41 +733,32 @@ function renderGlitchOverrideTemplate({
     ctx.fillRect(cardX + cardW - 2 - tickSize, cardY + cardH - 2 - tickSize, tickSize, tickSize);
     ctx.restore();
 
-    // B. Proporciones y Centrado Vertical Dinámico
-    const imgSize = Math.max(
-      36,
-      Math.min(
-        Math.floor(cardW * 0.62),
-        Math.floor(cardH * (isUltraCompact ? 0.50 : 0.52))
-      )
-    );
-
-    const nameFontSize = Math.max(
-      8,
-      Math.min(
-        isUltraCompact ? 9 : (isCompact ? 10.5 : 12),
-        Math.floor(cardW * 0.08)
-      )
-    );
-
-    const badgeH = isUltraCompact ? 14 : Math.max(16, Math.min(22, Math.round(cardH * 0.135)));
-    const badgeW = Math.max(46, Math.min(cardW - 14, Math.round(cardW * (isUltraCompact ? 0.88 : 0.82))));
+    // B. Proporciones y Geometría Interna Adaptativa
+    const badgeH = isUltraCompact ? 14 : Math.max(16, Math.min(20, Math.round(cardH * 0.125)));
+    const badgeW = Math.max(46, Math.min(cardW - 12, Math.round(cardW * (isUltraCompact ? 0.88 : 0.82))));
     const badgeFontSize = isUltraCompact ? 7.5 : Math.max(8, Math.min(10, badgeH * 0.50));
 
-    const gapImgText = isUltraCompact ? 3 : Math.max(4, Math.round(cardH * 0.035));
-    const gapTextBadge = isUltraCompact ? 3 : Math.max(4, Math.round(cardH * 0.03));
+    // Posicionamiento del Badge: Exactamente a 4px encima del filo inferior del cuadro
+    const bottomGutter = 4;
+    const badgeX = cardX + (cardW - badgeW) / 2;
+    const badgeY = cardY + cardH - badgeH - bottomGutter;
 
-    const totalContentH = imgSize + gapImgText + nameFontSize + gapTextBadge + badgeH;
-    const contentStartY = cardY + Math.max(4, Math.floor((cardH - totalContentH) / 2));
+    // Posicionamiento del Espíritu en la parte superior
+    const topMargin = Math.max(4, Math.round(cardH * 0.04));
+    const imgSize = Math.max(
+      34,
+      Math.min(
+        Math.floor(cardW * 0.58),
+        Math.floor((cardH - badgeH - 24) * 0.58)
+      )
+    );
+    const imgX = cardX + (cardW - imgSize) / 2;
+    const imgY = cardY + topMargin;
 
     const spriteImg = loadedImagesMap[sprite.id];
 
     if (spriteImg) {
       ctx.save();
-      const imgX = cardX + (cardW - imgSize) / 2;
-      const imgY = contentStartY;
-
-      // Halo Luminoso de Fondo Universal (Degradado radial difuso y resplandor idéntico a Imagen 3)
       const centerX = imgX + imgSize / 2;
       const centerY = imgY + imgSize / 2;
       const auraRadius = Math.round(imgSize * 0.58);
@@ -758,26 +805,40 @@ function renderGlitchOverrideTemplate({
       ctx.restore();
     }
 
-    // C. Sprite Name
+    // C. Sprite Name: centrado en la zona vertical entre la imagen y el badge
+    const nameZoneTop = imgY + imgSize + 2;
+    const nameZoneBottom = badgeY - 2;
+    const nameZoneH = Math.max(12, nameZoneBottom - nameZoneTop);
+
+    const baseNameFontSize = Math.max(
+      8,
+      Math.min(
+        isUltraCompact ? 9 : (isCompact ? 10 : 11.5),
+        Math.floor(cardW * 0.08)
+      )
+    );
+
     ctx.save();
     ctx.textAlign = 'center';
-    ctx.font = `800 ${nameFontSize}px "Inter", sans-serif`;
-    ctx.fillStyle = isOwned ? '#ffffff' : 'rgba(255, 255, 255, 0.75)';
-    const textY = contentStartY + imgSize + gapImgText + Math.floor(nameFontSize * 0.82);
+    ctx.fillStyle = isOwned ? '#ffffff' : 'rgba(255, 255, 255, 0.78)';
 
-    let nameText = sprite.fullName || sprite.name;
-    const maxTextW = cardW - 10;
-    if (ctx.measureText(nameText).width > maxTextW) {
-      while (nameText.length > 3 && ctx.measureText(nameText + '...').width > maxTextW) {
-        nameText = nameText.slice(0, -1);
-      }
-      nameText += '...';
+    const maxTextW = cardW - 8;
+    const nameFit = getSpriteNameLines(ctx, sprite.fullName || sprite.name, maxTextW, baseNameFontSize);
+    ctx.font = `800 ${nameFit.fontSize}px "Inter", sans-serif`;
+
+    if (nameFit.lines.length === 1) {
+      const textY = nameZoneTop + Math.floor(nameZoneH / 2) + Math.floor(nameFit.fontSize * 0.35);
+      ctx.fillText(nameFit.lines[0], cardX + cardW / 2, textY);
+    } else {
+      const lineHeight = Math.round(nameFit.fontSize * 1.15);
+      const blockH = lineHeight + nameFit.fontSize;
+      const startY = nameZoneTop + Math.floor((nameZoneH - blockH) / 2) + Math.floor(nameFit.fontSize * 0.85);
+      ctx.fillText(nameFit.lines[0], cardX + cardW / 2, startY);
+      ctx.fillText(nameFit.lines[1], cardX + cardW / 2, startY + lineHeight);
     }
-    ctx.fillText(nameText, cardX + cardW / 2, textY);
+    ctx.restore();
 
-    // D. Cyber Badge at Bottom (100% vectorial nítido sin shadowBlur)
-    const badgeX = cardX + (cardW - badgeW) / 2;
-    const badgeY = textY + gapTextBadge;
+    // D. Cyber Badge at Bottom (Exactamente a 4px encima del filo inferior del cuadro)
     const badgeCornerR = Math.max(3, Math.min(5, Math.round(badgeH * 0.25)));
 
     if (isOwned) {
