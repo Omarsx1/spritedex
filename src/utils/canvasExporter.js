@@ -73,7 +73,7 @@ export const globalCanvasCache = new Map();
 
 // Clave canónica unificada para caché de plantillas de canvas (0ms instantáneo)
 export function getCanvasCacheKey(format = 'checklist', bgStyle = 'glitch_override', count = 0, ownedCount = 0) {
-  return `v7_${format}_${bgStyle}_${count}_${ownedCount}`;
+  return `v10_${format}_${bgStyle}_${count}_${ownedCount}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -772,27 +772,33 @@ function renderGlitchOverrideTemplate({
     ctx.fillRect(cardX + cardW - 2 - tickSize, cardY + cardH - 2 - tickSize, tickSize, tickSize);
     ctx.restore();
 
-    // B. Proporciones y Geometría Interna Adaptativa
+    // B. Proporciones y Geometría Interna Adaptativa (Distribución vertical simétrica y centrada)
     const badgeH = isUltraCompact ? 14 : Math.max(16, Math.min(20, Math.round(cardH * 0.125)));
     const badgeW = Math.max(46, Math.min(cardW - 12, Math.round(cardW * (isUltraCompact ? 0.88 : 0.82))));
     const badgeFontSize = isUltraCompact ? 7.5 : Math.max(8, Math.min(10, badgeH * 0.50));
 
-    // Posicionamiento del Badge: Exactamente a 4px encima del filo inferior del cuadro
+    // 1. Badge inferior: Anclado exactamente a 4px del filo inferior del cuadro
     const bottomGutter = 4;
     const badgeX = cardX + (cardW - badgeW) / 2;
     const badgeY = cardY + cardH - badgeH - bottomGutter;
 
-    // Posicionamiento del Espíritu en la parte superior
-    const topMargin = Math.max(4, Math.round(cardH * 0.04));
+    // 2. Zona de Nombre: Bounding box simétrico con gap limpio sobre el badge (nombre bajado un poco)
+    const gapNameBadge = isUltraCompact ? 3 : 4;
+    const nameZoneH = isUltraCompact ? 22 : Math.max(26, Math.min(32, Math.round(cardH * 0.18)));
+    const nameZoneBottom = badgeY - gapNameBadge;
+    const nameZoneTop = nameZoneBottom - nameZoneH;
+
+    // 3. Zona del Espíritu: Tamaño aumentado un poquito y centrado en el espacio superior
+    const spriteZoneH = Math.max(36, nameZoneTop - cardY);
     const imgSize = Math.max(
-      34,
+      36,
       Math.min(
-        Math.floor(cardW * 0.58),
-        Math.floor((cardH - badgeH - 24) * 0.58)
+        Math.floor(cardW * 0.62),
+        Math.floor(spriteZoneH * 0.80)
       )
     );
     const imgX = cardX + (cardW - imgSize) / 2;
-    const imgY = cardY + topMargin;
+    const imgY = cardY + Math.floor((spriteZoneH - imgSize) / 2);
 
     const spriteImg = loadedImagesMap[sprite.id];
 
@@ -844,11 +850,7 @@ function renderGlitchOverrideTemplate({
       ctx.restore();
     }
 
-    // C. Sprite Name: centrado en la zona vertical entre la imagen y el badge
-    const nameZoneTop = imgY + imgSize + 2;
-    const nameZoneBottom = badgeY - 2;
-    const nameZoneH = Math.max(12, nameZoneBottom - nameZoneTop);
-
+    // C. Sprite Name: centrado y bajado un poco dentro de nameZoneH
     const baseNameFontSize = Math.max(
       8,
       Math.min(
@@ -875,12 +877,12 @@ function renderGlitchOverrideTemplate({
     ctx.font = `800 ${nameFit.fontSize}px "Outfit", "Inter", sans-serif`;
 
     if (nameFit.lines.length === 1) {
-      const textY = nameZoneTop + Math.floor(nameZoneH / 2) + Math.floor(nameFit.fontSize * 0.35);
+      const textY = nameZoneTop + Math.floor(nameZoneH / 2) + Math.floor(nameFit.fontSize * 0.35) + 2;
       ctx.fillText(nameFit.lines[0], cardX + cardW / 2, textY);
     } else {
-      const lineHeight = Math.round(nameFit.fontSize * 1.18);
+      const lineHeight = Math.round(nameFit.fontSize * 1.16);
       const blockH = lineHeight + nameFit.fontSize;
-      const startY = nameZoneTop + Math.floor((nameZoneH - blockH) / 2) + Math.floor(nameFit.fontSize * 0.85);
+      const startY = nameZoneTop + Math.floor((nameZoneH - blockH) / 2) + Math.floor(nameFit.fontSize * 0.85) + 2;
       ctx.fillText(nameFit.lines[0], cardX + cardW / 2, startY);
       ctx.fillText(nameFit.lines[1], cardX + cardW / 2, startY + lineHeight);
     }
@@ -889,22 +891,28 @@ function renderGlitchOverrideTemplate({
     // D. Cyber Badge at Bottom (Exactamente a 4px encima del filo inferior del cuadro)
     const badgeCornerR = Math.max(3, Math.min(5, Math.round(badgeH * 0.25)));
 
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `900 ${badgeFontSize}px "Outfit", "Inter", sans-serif`;
+
+    const badgeCenterX = cardX + cardW / 2;
+    const badgeCenterY = badgeY + badgeH / 2;
+
     if (isOwned) {
       roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeCornerR);
       ctx.fillStyle = '#00F0E8';
       ctx.fill();
 
-      ctx.font = `900 ${badgeFontSize}px "Outfit", "Inter", sans-serif`;
       ctx.fillStyle = '#060714';
-      ctx.fillText('HACKEADO', cardX + cardW / 2, badgeY + badgeH / 2 + Math.floor(badgeFontSize * 0.35));
+      ctx.fillText('HACKEADO', badgeCenterX, badgeCenterY);
     } else {
       roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeCornerR);
       ctx.fillStyle = '#EF4444';
       ctx.fill();
 
-      ctx.font = `900 ${badgeFontSize}px "Outfit", "Inter", sans-serif`;
       ctx.fillStyle = '#FFFFFF';
-      ctx.fillText('FALTANTE', cardX + cardW / 2, badgeY + badgeH / 2 + Math.floor(badgeFontSize * 0.35));
+      ctx.fillText('FALTANTE', badgeCenterX, badgeCenterY);
     }
     ctx.restore();
   });
