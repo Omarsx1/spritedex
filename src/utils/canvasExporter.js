@@ -73,7 +73,7 @@ export const globalCanvasCache = new Map();
 
 // Clave canónica unificada para caché de plantillas de canvas (0ms instantáneo)
 export function getCanvasCacheKey(format = 'checklist', bgStyle = 'glitch_override', count = 0, ownedCount = 0) {
-  return `${format}_${bgStyle}_${count}_${ownedCount}`;
+  return `v7_${format}_${bgStyle}_${count}_${ownedCount}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -370,6 +370,13 @@ export async function generatePokedexCardImage({
     return globalCanvasCache.get(cacheKey);
   }
 
+  // Asegura que las fuentes web (Inter y Outfit) estén listas para el canvas
+  if (typeof document !== 'undefined' && document.fonts) {
+    try {
+      await document.fonts.ready;
+    } catch {}
+  }
+
   const loadedImagesMap = {};
 
   // Load official glitch wallpaper
@@ -397,24 +404,57 @@ export async function generatePokedexCardImage({
   return result;
 }
 
-// Ajusta nombres largos para que se muestren completos (1 o 2 líneas) sin truncado (...)
-function getSpriteNameLines(ctx, fullName, maxW, baseFontSize) {
+// Ajusta nombres inspirándose en el diseño de alta calidad de la app (Imagen 2):
+// - Tipografía Outfit bold/extrabold
+// - Nombres con variante larga "Hacker de Botín" se dividen en 2 líneas equilibradas (Espíritu arriba, Hacker de Botín abajo)
+// - Mantiene el tamaño tipográfico grande y legible (sin comprimir a 7px en 1 línea)
+// - Cero truncado (...)
+function getSpriteNameLines(ctx, fullName, maxW, baseFontSize, familyName) {
   if (!fullName) return { lines: [''], fontSize: baseFontSize };
 
-  // 1. Probar en 1 sola línea con tamaño base
-  ctx.font = `800 ${baseFontSize}px "Inter", sans-serif`;
-  if (ctx.measureText(fullName).width <= maxW) {
+  // 1. Variante larga "Hacker de Botín" (inspirado directamente en la tarjeta de la app - Imagen 2)
+  if (fullName.includes('Hacker de Botín')) {
+    const prefix = fullName.replace('Hacker de Botín', '').trim();
+    const l1 = prefix || 'Espíritu';
+    const l2 = 'Hacker de Botín';
+
+    for (let s = baseFontSize; s >= 8; s -= 0.5) {
+      ctx.font = `800 ${s}px "Outfit", "Inter", sans-serif`;
+      if (ctx.measureText(l1).width <= maxW && ctx.measureText(l2).width <= maxW) {
+        return { lines: [l1, l2], fontSize: s };
+      }
+    }
+    return { lines: [l1, l2], fontSize: 8 };
+  }
+
+  // 2. Variante con familia conocida (si no entra holgadamente en 1 línea a tamaño completo)
+  if (familyName && fullName.startsWith(familyName)) {
+    const variantPart = fullName.slice(familyName.length).trim();
+    if (variantPart) {
+      // Probar si entra cómodamente en 1 línea a tamaño completo con margen generoso (14px)
+      ctx.font = `800 ${baseFontSize}px "Outfit", "Inter", sans-serif`;
+      if (ctx.measureText(fullName).width <= maxW - 14) {
+        return { lines: [fullName], fontSize: baseFontSize };
+      }
+
+      // Si no entra holgadamente, dividir como en la app: Familia arriba, Variante abajo
+      for (let s = baseFontSize; s >= 8; s -= 0.5) {
+        ctx.font = `800 ${s}px "Outfit", "Inter", sans-serif`;
+        if (ctx.measureText(familyName).width <= maxW && ctx.measureText(variantPart).width <= maxW) {
+          return { lines: [familyName, variantPart], fontSize: s };
+        }
+      }
+      return { lines: [familyName, variantPart], fontSize: 8 };
+    }
+  }
+
+  // 3. Probar en 1 sola línea con tamaño base completo (sin apretar)
+  ctx.font = `800 ${baseFontSize}px "Outfit", "Inter", sans-serif`;
+  if (ctx.measureText(fullName).width <= maxW - 10) {
     return { lines: [fullName], fontSize: baseFontSize };
   }
 
-  // 2. Probar en 1 sola línea con reducción suave (hasta baseFontSize - 1.5)
-  const slightlySmaller = Math.max(7.5, baseFontSize - 1.5);
-  ctx.font = `800 ${slightlySmaller}px "Inter", sans-serif`;
-  if (ctx.measureText(fullName).width <= maxW) {
-    return { lines: [fullName], fontSize: slightlySmaller };
-  }
-
-  // 3. Dividir en 2 líneas equilibradas por palabras
+  // 4. Si tiene múltiples palabras y no cabe cómodamente en 1 línea, dividir en 2 líneas equilibradas
   const words = fullName.split(' ');
   if (words.length > 1) {
     let bestL1 = '';
@@ -432,25 +472,24 @@ function getSpriteNameLines(ctx, fullName, maxW, baseFontSize) {
       }
     }
 
-    // Probar el tamaño óptimo para que ambas líneas entren holgadamente
-    for (let s = baseFontSize; s >= 7; s -= 0.5) {
-      ctx.font = `800 ${s}px "Inter", sans-serif`;
+    for (let s = baseFontSize; s >= 8; s -= 0.5) {
+      ctx.font = `800 ${s}px "Outfit", "Inter", sans-serif`;
       if (ctx.measureText(bestL1).width <= maxW && ctx.measureText(bestL2).width <= maxW) {
         return { lines: [bestL1, bestL2], fontSize: s };
       }
     }
-    return { lines: [bestL1, bestL2], fontSize: 7 };
+    return { lines: [bestL1, bestL2], fontSize: 8 };
   }
 
-  // 4. Si es una sola palabra muy larga, reducir tamaño
-  for (let s = baseFontSize; s >= 6.5; s -= 0.5) {
-    ctx.font = `800 ${s}px "Inter", sans-serif`;
+  // 5. Si es una sola palabra muy larga, reducir tamaño suavemente
+  for (let s = baseFontSize; s >= 7; s -= 0.5) {
+    ctx.font = `800 ${s}px "Outfit", "Inter", sans-serif`;
     if (ctx.measureText(fullName).width <= maxW) {
       return { lines: [fullName], fontSize: s };
     }
   }
 
-  return { lines: [fullName], fontSize: 6.5 };
+  return { lines: [fullName], fontSize: 7 };
 }
 
 // -------------------------------------------------------------
@@ -556,7 +595,7 @@ function renderGlitchOverrideTemplate({
   const scale = width / 1200;
 
   // Top Small Header: "FORTNITE , NUEVOS"
-  ctx.font = `900 ${Math.round(14 * Math.min(1.2, scale))}px "Inter", "Arial Black", sans-serif`;
+  ctx.font = `900 ${Math.round(14 * Math.min(1.2, scale))}px "Outfit", "Inter", "Arial Black", sans-serif`;
   ctx.fillStyle = '#00F0E8';
   ctx.textAlign = 'center';
   ctx.letterSpacing = '3px';
@@ -589,7 +628,7 @@ function renderGlitchOverrideTemplate({
   // Tagline Pill Capsule: "ROMPE LAS REGLAS • CAMBIA EL JUEGO"
   const capsuleText = 'ROMPE LAS REGLAS • CAMBIA EL JUEGO';
   const capsuleFontSize = Math.round(10.5 * Math.min(1.15, scale));
-  ctx.font = `900 ${capsuleFontSize}px "Inter", "Arial Black", sans-serif`;
+  ctx.font = `900 ${capsuleFontSize}px "Outfit", "Inter", "Arial Black", sans-serif`;
   ctx.letterSpacing = '1px';
   const capsuleW = ctx.measureText(capsuleText).width + Math.round(28 * scale);
   const capsuleH = Math.round(22 * Math.min(1.15, scale));
@@ -633,15 +672,15 @@ function renderGlitchOverrideTemplate({
   // HUD Text
   const hudTextY = hudY + Math.round(18 * Math.min(1.15, scale));
   ctx.textAlign = 'left';
-  ctx.font = `900 ${Math.round(12 * Math.min(1.15, scale))}px "Inter", sans-serif`;
+  ctx.font = `900 ${Math.round(12 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
   ctx.fillStyle = '#ff0055';
   ctx.fillText(`${ownedCount} / ${totalSprites}`, hudX + 14, hudTextY);
-  ctx.font = `700 ${Math.round(10 * Math.min(1.15, scale))}px "Inter", sans-serif`;
+  ctx.font = `700 ${Math.round(10 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
   ctx.fillStyle = '#94a3b8';
   ctx.fillText(' espíritus atrapados', hudX + 14 + ctx.measureText(`${ownedCount} / ${totalSprites} `).width + 4, hudTextY);
 
   ctx.textAlign = 'right';
-  ctx.font = `900 ${Math.round(11 * Math.min(1.15, scale))}px "Inter", sans-serif`;
+  ctx.font = `900 ${Math.round(11 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
   ctx.fillStyle = '#00F0E8';
   ctx.fillText(`PROGRESO ${pctOwned}%`, hudX + hudW - 14, hudTextY);
 
@@ -820,17 +859,26 @@ function renderGlitchOverrideTemplate({
 
     ctx.save();
     ctx.textAlign = 'center';
-    ctx.fillStyle = isOwned ? '#ffffff' : 'rgba(255, 255, 255, 0.78)';
+    ctx.fillStyle = isOwned ? '#ffffff' : 'rgba(255, 255, 255, 0.88)';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+    ctx.shadowBlur = 3;
+    ctx.shadowOffsetY = 1;
 
     const maxTextW = cardW - 8;
-    const nameFit = getSpriteNameLines(ctx, sprite.fullName || sprite.name, maxTextW, baseNameFontSize);
-    ctx.font = `800 ${nameFit.fontSize}px "Inter", sans-serif`;
+    const nameFit = getSpriteNameLines(
+      ctx,
+      sprite.fullName || sprite.name,
+      maxTextW,
+      baseNameFontSize,
+      sprite.familyName || sprite.family_name
+    );
+    ctx.font = `800 ${nameFit.fontSize}px "Outfit", "Inter", sans-serif`;
 
     if (nameFit.lines.length === 1) {
       const textY = nameZoneTop + Math.floor(nameZoneH / 2) + Math.floor(nameFit.fontSize * 0.35);
       ctx.fillText(nameFit.lines[0], cardX + cardW / 2, textY);
     } else {
-      const lineHeight = Math.round(nameFit.fontSize * 1.15);
+      const lineHeight = Math.round(nameFit.fontSize * 1.18);
       const blockH = lineHeight + nameFit.fontSize;
       const startY = nameZoneTop + Math.floor((nameZoneH - blockH) / 2) + Math.floor(nameFit.fontSize * 0.85);
       ctx.fillText(nameFit.lines[0], cardX + cardW / 2, startY);
@@ -846,7 +894,7 @@ function renderGlitchOverrideTemplate({
       ctx.fillStyle = '#00F0E8';
       ctx.fill();
 
-      ctx.font = `900 ${badgeFontSize}px "Inter", sans-serif`;
+      ctx.font = `900 ${badgeFontSize}px "Outfit", "Inter", sans-serif`;
       ctx.fillStyle = '#060714';
       ctx.fillText('HACKEADO', cardX + cardW / 2, badgeY + badgeH / 2 + Math.floor(badgeFontSize * 0.35));
     } else {
@@ -854,7 +902,7 @@ function renderGlitchOverrideTemplate({
       ctx.fillStyle = '#EF4444';
       ctx.fill();
 
-      ctx.font = `900 ${badgeFontSize}px "Inter", sans-serif`;
+      ctx.font = `900 ${badgeFontSize}px "Outfit", "Inter", sans-serif`;
       ctx.fillStyle = '#FFFFFF';
       ctx.fillText('FALTANTE', cardX + cardW / 2, badgeY + badgeH / 2 + Math.floor(badgeFontSize * 0.35));
     }
@@ -883,7 +931,7 @@ function renderGlitchOverrideTemplate({
   // 4. FOOTER WATERMARK
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.font = `700 ${Math.round(12 * (width / 1200))}px "Inter", monospace, sans-serif`;
+  ctx.font = `700 ${Math.round(12 * (width / 1200))}px "Outfit", "Inter", monospace, sans-serif`;
   ctx.fillStyle = '#38bdf8';
   ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
   ctx.shadowBlur = 6;
