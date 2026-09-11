@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { X, Cloud, LogIn, LogOut, CheckCircle, Mail, Key, ShieldCheck } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../utils/supabase';
 import { trackEvent } from '../utils/telemetry';
@@ -10,10 +10,17 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
+  const openTimeRef = useRef(Date.now());
+
+  const handleBackdropClick = (e) => {
+    if (e.target !== e.currentTarget) return;
+    if (Date.now() - openTimeRef.current < 400) return;
+    onClose();
+  };
 
   if (!isSupabaseConfigured) {
     return (
-      <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-overlay" onClick={handleBackdropClick}>
         <div className="modal-content glass-panel auth-modal__content--unconfigured" onClick={(e) => e.stopPropagation()}>
           <button className="modal-close-btn" onClick={onClose}>
             <X size={20} />
@@ -136,7 +143,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={handleBackdropClick}>
       <div className="modal-content glass-panel auth-modal__content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-btn" onClick={onClose}>
           <X size={20} />

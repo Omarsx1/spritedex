@@ -88,7 +88,14 @@ export function MobileLiquidFilterBar({
     } catch {}
   };
 
-  const handleOpen = () => {
+  const openTimeRef = useRef(0);
+
+  const handleOpen = (e) => {
+    if (e) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    }
+    openTimeRef.current = Date.now();
     setIsClosing(false);
     setIsOpen(true);
   };
@@ -100,6 +107,13 @@ export function MobileLiquidFilterBar({
       setIsOpen(false);
       setIsClosing(false);
     }, 240);
+  };
+
+  const handleBackdropClick = (e) => {
+    if (e.target !== e.currentTarget) return;
+    // Evita que el clic fantasma retardado (~300ms) de iOS Safari cierre la modal
+    if (Date.now() - openTimeRef.current < 400) return;
+    handleClose();
   };
 
   // Smart Single-Touch with Toggle-Off (Apple & Spotify Standard)
@@ -336,7 +350,7 @@ export function MobileLiquidFilterBar({
       {isOpen && (
         <div
           className={`mobile-liquid-sheet-backdrop ${isClosing ? 'is-closing' : ''}`}
-          onClick={handleClose}
+          onClick={handleBackdropClick}
         >
           <div
             className={`mobile-liquid-sheet ${isClosing ? 'is-closing' : ''}`}

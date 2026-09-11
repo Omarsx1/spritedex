@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, ShieldCheck, Cookie, Key, Globe, Check, Sliders, CheckCircle2 } from 'lucide-react';
 
 const LOCAL_STORAGE_PRIVACY_KEY = 'fortnite_sprites_privacy_notice_v1';
@@ -6,6 +6,13 @@ const LOCAL_STORAGE_PRIVACY_KEY = 'fortnite_sprites_privacy_notice_v1';
 export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
   const [activeTab, setActiveTab] = useState(initialTab); // 'preferences' | 'guide'
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const openTimeRef = useRef(Date.now());
+
+  const handleBackdropClick = (e) => {
+    if (e.target !== e.currentTarget) return;
+    if (Date.now() - openTimeRef.current < 400) return;
+    onClose();
+  };
 
   // Preference state
   const [preferences, setPreferences] = useState({
@@ -73,7 +80,7 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
   return (
     <div
       className="modal-overlay"
-      onClick={onClose}
+      onClick={handleBackdropClick}
       style={{
         position: 'fixed',
         top: 0,

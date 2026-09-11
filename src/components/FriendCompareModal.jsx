@@ -29,6 +29,7 @@ export function FriendCompareModal({
   const [isConnecting, setIsConnecting] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const modalRef = useRef(null);
+  const openTimeRef = useRef(Date.now());
 
   const permanentFriendUrl = generatePermanentFriendUrl(myFriendCode || 'SDEX-0000');
 
@@ -39,6 +40,12 @@ export function FriendCompareModal({
     setTimeout(() => {
       onClose();
     }, 220);
+  };
+
+  const handleBackdropClick = (e) => {
+    if (e.target !== e.currentTarget) return;
+    if (Date.now() - openTimeRef.current < 400) return;
+    handleClose();
   };
 
   // Close on Escape with smooth exit
@@ -184,7 +191,7 @@ export function FriendCompareModal({
   };
 
   return (
-    <div className={`modal-overlay ${isClosing ? 'is-closing' : ''}`} onClick={handleClose}>
+    <div className={`modal-overlay ${isClosing ? 'is-closing' : ''}`} onClick={handleBackdropClick}>
       <div className={`sdm-share-pro sdm-compare ${isClosing ? 'is-closing' : ''}`} ref={modalRef} onClick={(e) => e.stopPropagation()}>
         
         {/* Header Elegante y Minimalista (Idéntico a Exportar Colección) */}
