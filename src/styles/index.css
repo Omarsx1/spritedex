@@ -7366,7 +7366,47 @@ body::after {
 .motion-disabled *,
 .motion-disabled *::before,
 .motion-disabled *::after {
-  animation-play-state: paused !important;
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* Modales, overlays y bottom sheets: siempre 100% visibles y operativos de inmediato */
+.motion-disabled .modal-overlay,
+.motion-disabled .mobile-liquid-sheet-backdrop {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+.motion-disabled .mobile-liquid-sheet {
+  animation: none !important;
+  transform: translate3d(0, 0, 0) !important;
+  opacity: 1 !important;
+}
+
+.motion-disabled .modal-content,
+.motion-disabled .sdm,
+.motion-disabled .sdm-share-pro {
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+/* Desactivar bucles infinitos continuos que consumen batería y GPU en móvil */
+.motion-disabled .hero-bg-grid,
+.motion-disabled .hero-ambient-glow,
+.motion-disabled .hero-floating-particles,
+.motion-disabled .hero-sprite-orbit-container,
+.motion-disabled .hero__orbit,
+.motion-disabled .hero__satellite,
+.motion-disabled .hero__satellite-img,
+.motion-disabled .scan-line,
+.motion-disabled .cyber-lines,
+.motion-disabled .card-particles,
+.motion-disabled .glowing-elements,
+.motion-disabled .sdm-share__glitch-btn,
+.motion-disabled .mobile-new-coachmark {
+  animation: none !important;
 }
 
 

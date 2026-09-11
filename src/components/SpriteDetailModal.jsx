@@ -59,9 +59,11 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
   const [canDismiss, setCanDismiss] = useState(false);
   useEffect(() => {
     setCanDismiss(false);
+    const isMotionDisabled = typeof document !== 'undefined' && document.body.classList.contains('motion-disabled');
+    const delay = isMotionDisabled ? 60 : 350;
     const timer = setTimeout(() => {
       setCanDismiss(true);
-    }, 350);
+    }, delay);
     return () => clearTimeout(timer);
   }, [activeSprite]);
 
