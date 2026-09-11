@@ -2,10 +2,19 @@
 // Inspirado en el diseño 'CHAPTER 7 | SEASON 4: OVERRIDE' de Fortnite
 import { generateQRMatrix } from './qrGenerator';
 
+// Caché en memoria de matriz QR para evitar recalcular polinomios en cada exportación
+let cachedQRMatrix = null;
+function getCachedQR(url) {
+  if (!cachedQRMatrix) {
+    cachedQRMatrix = generateQRMatrix(url);
+  }
+  return cachedQRMatrix;
+}
+
 // Renderiza un código QR moderno con estilo de puntos/círculos y acentos cibernéticos (100% escaneable)
 function drawModernDotQR(ctx, qrX, qrY, qrSize, url = 'https://spritedex-two.vercel.app/') {
   try {
-    const qr = generateQRMatrix(url);
+    const qr = getCachedQR(url);
     const count = qr.getModuleCount();
     const cellSize = qrSize / count;
 
@@ -638,24 +647,19 @@ function renderGlitchOverrideTemplate({
     const cardH = cellH - cardMarginY * 2;
     const cornerRadius = Math.min(10, Math.max(5, Math.round(cardW * 0.055)));
 
-    // A. Cyber Tile Container
+    // A. Cyber Tile Container (Renderizado vectorial ultrarrápido sin shadowBlur)
     ctx.save();
     roundRect(ctx, cardX, cardY, cardW, cardH, cornerRadius);
     if (isOwned) {
       ctx.fillStyle = isMastered
-        ? 'rgba(234, 179, 8, 0.14)'
-        : hexToRgba(spiritHue, 0.10);
+        ? 'rgba(234, 179, 8, 0.16)'
+        : hexToRgba(spiritHue, 0.12);
       ctx.fill();
       ctx.strokeStyle = isMastered
-        ? 'rgba(234, 179, 8, 0.75)'
-        : hexToRgba(spiritHue, 0.55);
+        ? 'rgba(234, 179, 8, 0.85)'
+        : hexToRgba(spiritHue, 0.65);
       ctx.lineWidth = isMastered ? 1.5 : 1;
-      if (isMastered) {
-        ctx.shadowColor = 'rgba(234, 179, 8, 0.35)';
-        ctx.shadowBlur = Math.min(6, cardMarginX);
-      }
       ctx.stroke();
-      ctx.shadowBlur = 0;
     } else {
       ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
       ctx.fill();
@@ -707,17 +711,12 @@ function renderGlitchOverrideTemplate({
       const imgX = cardX + (cardW - imgSize) / 2;
       const imgY = contentStartY;
 
-      // Halo Luminoso de Fondo Universal (Iluminación trasera contenida dentro de la tarjeta)
+      // Halo Luminoso de Fondo Universal (Iluminación circular suave de alto rendimiento)
       const centerX = imgX + imgSize / 2;
       const centerY = imgY + imgSize / 2;
-      const auraRadius = Math.round(imgSize * 0.55);
-      const auraGrad = ctx.createRadialGradient(centerX, centerY, 3, centerX, centerY, auraRadius);
+      const auraRadius = Math.round(imgSize * 0.52);
 
-      auraGrad.addColorStop(0, isOwned ? hexToRgba(spiritHue, 0.38) : hexToRgba(spiritHue, 0.22));
-      auraGrad.addColorStop(0.65, isOwned ? hexToRgba(spiritHue, 0.15) : hexToRgba(spiritHue, 0.08));
-      auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-      ctx.fillStyle = auraGrad;
+      ctx.fillStyle = isOwned ? hexToRgba(spiritHue, 0.22) : hexToRgba(spiritHue, 0.10);
       ctx.beginPath();
       ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
       ctx.fill();
@@ -746,7 +745,7 @@ function renderGlitchOverrideTemplate({
     }
     ctx.fillText(nameText, cardX + cardW / 2, textY);
 
-    // D. Cyber Badge at Bottom
+    // D. Cyber Badge at Bottom (100% vectorial nítido sin shadowBlur)
     const badgeX = cardX + (cardW - badgeW) / 2;
     const badgeY = textY + gapTextBadge;
     const badgeCornerR = Math.max(3, Math.min(5, Math.round(badgeH * 0.25)));
@@ -754,10 +753,7 @@ function renderGlitchOverrideTemplate({
     if (isOwned) {
       roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeCornerR);
       ctx.fillStyle = '#00F0E8';
-      ctx.shadowColor = 'rgba(0, 240, 232, 0.45)';
-      ctx.shadowBlur = Math.min(4, cardMarginX);
       ctx.fill();
-      ctx.shadowBlur = 0;
 
       ctx.font = `900 ${badgeFontSize}px "Inter", sans-serif`;
       ctx.fillStyle = '#060714';
@@ -765,10 +761,7 @@ function renderGlitchOverrideTemplate({
     } else {
       roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeCornerR);
       ctx.fillStyle = '#EF4444';
-      ctx.shadowColor = 'rgba(239, 68, 68, 0.50)';
-      ctx.shadowBlur = Math.min(4, cardMarginX);
       ctx.fill();
-      ctx.shadowBlur = 0;
 
       ctx.font = `900 ${badgeFontSize}px "Inter", sans-serif`;
       ctx.fillStyle = '#FFFFFF';

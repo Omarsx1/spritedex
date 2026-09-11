@@ -32,6 +32,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const headerRef = useRef(null);
   const openTimeRef = useRef(Date.now());
   const hasEnteredRef = useRef(false);
+  const activeJobIdRef = useRef(0);
 
   const handleClose = () => {
     if (isClosing) return;
@@ -142,20 +143,22 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     }
 
     setIsGenerating(true);
-    let isCancelled = false;
+    const jobId = ++activeJobIdRef.current;
 
     // Desacoplar la animación de apertura del modal (220ms) para que Android abra a 60/120fps fluidos.
-    // Si el modal ya completó su entrada (usuario cambiando formato/categoría), el retardo es de solo 20ms.
-    const delay = hasEnteredRef.current ? 20 : 180;
+    // Si el modal ya completó su entrada, usar un debounce suave de 60ms para evitar colisiones entre clics rápidos.
+    const delay = hasEnteredRef.current ? 60 : 180;
 
     const timer = setTimeout(() => {
+      if (activeJobIdRef.current !== jobId) return;
+
       generatePokedexCardImage({
         spritesList,
         userState,
         format,
         bgStyle
       }).then((res) => {
-        if (!isCancelled) {
+        if (activeJobIdRef.current === jobId) {
           const url = typeof res === 'string' ? res : res.dataUrl;
           const file = res?.file || null;
           const blob = res?.blob || null;
@@ -166,7 +169,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           setIsGenerating(false);
         }
       }).catch((err) => {
-        if (!isCancelled) {
+        if (activeJobIdRef.current === jobId) {
           console.error('Error generando imagen de plantilla:', err);
           setIsGenerating(false);
         }
@@ -174,7 +177,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     }, delay);
 
     return () => {
-      isCancelled = true;
       clearTimeout(timer);
     };
   }, [spritesList, userState, format, bgStyle, ownedInScope]);
@@ -391,10 +393,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
                 <button
                   key={opt.id}
                   className={`sdm-share-pro__seg-btn ${scope === opt.id ? 'sdm-share-pro__seg-btn--active' : ''}`}
-                  onClick={() => {
-                    setScope(opt.id);
-                    sounds.playBeep();
-                  }}
+                  onClick={() => setScope(opt.id)}
                 >
                   {opt.label}
                 </button>
@@ -412,10 +411,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
                 <button
                   key={f.id}
                   className={`sdm-share-pro__seg-btn ${format === f.id ? 'sdm-share-pro__seg-btn--active' : ''}`}
-                  onClick={() => {
-                    setFormat(f.id);
-                    sounds.playBeep();
-                  }}
+                  onClick={() => setFormat(f.id)}
                 >
                   {f.label}
                 </button>

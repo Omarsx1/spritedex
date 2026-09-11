@@ -184,7 +184,7 @@ export function App() {
     };
   }, [connectedFriendCode]);
 
-  // Precarga silenciosa no bloqueante del chunk del modal e imagen de fondo (0 impacto en CPU)
+  // Precarga silenciosa no bloqueante en reposo (idle) para que la exportación sea instantánea
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -192,13 +192,16 @@ export function App() {
       // 1. Precarga del chunk del modal en la caché del navegador
       import('./components/ShareImageModal');
 
-      // 2. Precarga del fondo oficial webp en la caché de red/imagen
-      const bgImg = new Image();
-      bgImg.src = '/background.webp';
-    }, 2000);
+      // 2. Precarga de recursos gráficos (fondo y sprites) por lotes en reposo
+      import('./utils/canvasExporter').then(({ preloadCanvasAssets }) => {
+        if (dynamicSprites && dynamicSprites.length > 0) {
+          preloadCanvasAssets(dynamicSprites, 10);
+        }
+      });
+    }, 1500);
 
     return () => clearTimeout(idleTimer);
-  }, []);
+  }, [dynamicSprites?.length]);
 
   // Listen to Supabase Auth State & Sync Cloud Data
   useEffect(() => {
