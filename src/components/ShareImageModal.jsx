@@ -15,6 +15,8 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
   const [bgStyle, setBgStyle] = useState('glitch_override'); // 'glitch_override', 'blueprint', 'dark_matrix'
   const [dataUrl, setDataUrl] = useState('');
+  const [cachedFile, setCachedFile] = useState(null);
+  const [cachedBlob, setCachedBlob] = useState(null);
   const [isGenerating, setIsGenerating] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
@@ -101,13 +103,19 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   useEffect(() => {
     if (spritesList.length === 0) {
       setDataUrl('');
+      setCachedFile(null);
+      setCachedBlob(null);
       setIsGenerating(false);
       return;
     }
 
     const cacheKey = `${format}_${scope}_${bgStyle}_${spritesList.length}_${ownedInScope}`;
     if (globalTemplatePreviewCache.has(cacheKey)) {
-      setDataUrl(globalTemplatePreviewCache.get(cacheKey));
+      const cached = globalTemplatePreviewCache.get(cacheKey);
+      const url = typeof cached === 'string' ? cached : cached.url;
+      setDataUrl(url);
+      setCachedFile(cached?.file || null);
+      setCachedBlob(cached?.blob || null);
       setIsGenerating(false);
       return;
     }
@@ -122,10 +130,15 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         userState,
         format,
         bgStyle
-      }).then((url) => {
+      }).then((res) => {
         if (!isCancelled) {
-          globalTemplatePreviewCache.set(cacheKey, url);
+          const url = typeof res === 'string' ? res : res.dataUrl;
+          const file = res?.file || null;
+          const blob = res?.blob || null;
+          globalTemplatePreviewCache.set(cacheKey, { url, file, blob });
           setDataUrl(url);
+          setCachedFile(file);
+          setCachedBlob(blob);
           setIsGenerating(false);
         }
       }).catch((err) => {
@@ -192,23 +205,27 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   );
 
   const handleDownload = async () => {
-    if (!dataUrl) return;
+    if (!dataUrl && !cachedBlob) return;
     sounds.playBeep();
 
     try {
-      const res = await fetch(dataUrl);
-      const blob = await res.blob();
-      const filename = getCaptureFilename();
-      const file = new File([blob], filename, { type: 'image/png' });
+      let blobToUse = cachedBlob;
+      let fileToUse = cachedFile;
 
-      // En iOS / iPhone Safari, la descarga sintética de Data URLs falla/parpadea.
-      // Usamos la Web Share API nativa que abre la hoja de iOS para "Guardar imagen" en el Carrete.
-      if (isIOS && navigator.canShare && navigator.canShare({ files: [file] })) {
+      if (!blobToUse && dataUrl) {
+        const res = await fetch(dataUrl);
+        blobToUse = await res.blob();
+        fileToUse = new File([blobToUse], getCaptureFilename(), { type: 'image/png' });
+      }
+
+      // En iOS / iPhone Safari, la descarga sintética suele parpadear.
+      // Usamos la Web Share API nativa sincrónica con el File ya precargado para "Guardar imagen" en el Carrete
+      if (isIOS && fileToUse && navigator.canShare && navigator.canShare({ files: [fileToUse] })) {
         try {
           await navigator.share({
             title: 'Plantilla de Espíritus Fortnite',
             text: getShareableText(),
-            files: [file]
+            files: [fileToUse]
           });
           return;
         } catch (shareErr) {
@@ -218,17 +235,20 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       }
 
       // Método Blob universal para navegadores estándar
-      const blobUrl = URL.createObjectURL(blob);
+      const filename = getCaptureFilename();
+      const blobUrl = blobToUse ? URL.createObjectURL(blobToUse) : dataUrl;
       const a = document.createElement('a');
       a.href = blobUrl;
       a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+      if (blobToUse) {
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+      }
     } catch (err) {
       console.error('Error al descargar:', err);
-      // Fallback
+      // Fallback básico
       const a = document.createElement('a');
       a.href = dataUrl;
       a.download = getCaptureFilename();
@@ -239,19 +259,22 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   };
 
   const handleNativeShare = async () => {
-    if (!dataUrl) return;
+    if (!dataUrl && !cachedFile) return;
     sounds.playBeep();
     try {
-      const filename = getCaptureFilename();
-      const res = await fetch(dataUrl);
-      const blob = await res.blob();
-      const file = new File([blob], filename, { type: 'image/png' });
+      let fileToShare = cachedFile;
+      if (!fileToShare && dataUrl) {
+        const res = await fetch(dataUrl);
+        const blob = await res.blob();
+        fileToShare = new File([blob], getCaptureFilename(), { type: 'image/png' });
+      }
 
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      // Invocación directa e instantánea sin perder el User Gesture en iOS Safari y Android Chrome
+      if (fileToShare && navigator.canShare && navigator.canShare({ files: [fileToShare] })) {
         await navigator.share({
           title: 'Plantilla de Espíritus Fortnite',
           text: getShareableText(),
-          files: [file]
+          files: [fileToShare]
         });
       } else if (navigator.share) {
         await navigator.share({
