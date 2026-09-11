@@ -55,38 +55,43 @@ export function Header({
   const ringRadius = 48;
   const ringCircumference = 2 * Math.PI * ringRadius;
 
-  // Entrance animations
+  // Entrance animations - Optimizado para rendimiento 60/120fps sin colisiones
   useEffect(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
 
     if (titleRef.current) {
       tl.fromTo(titleRef.current,
-        { y: -30, opacity: 0, scale: 0.95 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.7 }
+        { y: -16, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.35 }
       );
     }
 
     if (activeSpriteRef.current) {
       tl.fromTo(activeSpriteRef.current,
-        { scale: 0, opacity: 0, rotation: -15 },
-        { scale: 1, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.7)' },
-        '-=0.3'
+        { scale: 0.6, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.4)' },
+        '-=0.2'
       );
     }
 
     if (statsRef.current) {
-      tl.fromTo(statsRef.current.children,
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, stagger: 0.12 },
-        '-=0.2'
-      );
+      // Animar únicamente los dos anillos de progreso, sin animar el contenedor hero__actions
+      const rings = statsRef.current.querySelectorAll('.hero__stat-ring');
+      if (rings.length > 0) {
+        tl.fromTo(rings,
+          { y: 12, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.3, stagger: 0.05 },
+          '-=0.2'
+        );
+      }
     }
 
     if (actionsRef.current) {
+      // Animar directamente los botones de acción sin doble transformación en el padre
       tl.fromTo(actionsRef.current.children,
-        { y: 15, opacity: 0, scale: 0.9 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.4, stagger: 0.08 },
-        '-=0.2'
+        { y: 10, opacity: 0, scale: 0.95 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.28, stagger: 0.04 },
+        '-=0.22'
       );
     }
   }, []);
