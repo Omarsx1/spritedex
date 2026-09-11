@@ -26,9 +26,10 @@ function drawModernDotQR(ctx, qrX, qrY, qrSize, url = 'https://spritedex-two.ver
     drawFinderPattern(qrX + (count - 7) * cellSize, qrY); // Superior derecho
     drawFinderPattern(qrX, qrY + (count - 7) * cellSize); // Inferior izquierdo
 
-    // 2. Dibuja todos los módulos de datos como puntos circulares de alto contraste
+    // 2. Dibuja todos los módulos de datos como puntos circulares de alto contraste en un solo pase
     const dotRadius = cellSize * 0.44;
     ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
 
     for (let r = 0; r < count; r++) {
       for (let c = 0; c < count; c++) {
@@ -44,12 +45,12 @@ function drawModernDotQR(ctx, qrX, qrY, qrSize, url = 'https://spritedex-two.ver
           const centerX = qrX + c * cellSize + cellSize / 2;
           const centerY = qrY + r * cellSize + cellSize / 2;
 
-          ctx.beginPath();
+          ctx.moveTo(centerX + dotRadius, centerY);
           ctx.arc(centerX, centerY, dotRadius, 0, Math.PI * 2);
-          ctx.fill();
         }
       }
     }
+    ctx.fill();
   } catch (err) {
     console.warn('Error rendering modern dot QR on canvas:', err);
   }
@@ -57,6 +58,9 @@ function drawModernDotQR(ctx, qrX, qrY, qrSize, url = 'https://spritedex-two.ver
 
 // Caché global en memoria para acelerar la generación instantánea de imágenes
 const globalImageCache = new Map();
+
+// Caché global persistente de plantillas renderizadas para carga 0ms instantánea
+export const globalCanvasCache = new Map();
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
 export function loadImage(src) {
@@ -343,6 +347,14 @@ export async function generatePokedexCardImage({
   bgStyle = 'glitch_override', // 'glitch_override', 'blueprint', 'dark_matrix'
   useBackgroundTemplate = true
 }) {
+  const ownedCount = spritesList.filter(s => userState[s.id]?.owned).length;
+  const cacheKey = `${format}_${bgStyle}_${spritesList.length}_${ownedCount}`;
+
+  // 1. Devolución instantánea a 0ms si la plantilla ya fue pre-calentada en memoria
+  if (globalCanvasCache.has(cacheKey)) {
+    return globalCanvasCache.get(cacheKey);
+  }
+
   const loadedImagesMap = {};
   const effectiveBgStyle = bgStyle || (useBackgroundTemplate ? 'glitch_override' : 'dark_matrix');
 
@@ -359,13 +371,16 @@ export async function generatePokedexCardImage({
     })
   ]);
 
-  return renderGlitchOverrideTemplate({
+  const result = await renderGlitchOverrideTemplate({
     spritesList,
     userState,
     format,
     bgStyle: effectiveBgStyle,
     loadedImagesMap
   });
+
+  globalCanvasCache.set(cacheKey, result);
+  return result;
 }
 
 // -------------------------------------------------------------
@@ -702,10 +717,6 @@ function renderGlitchOverrideTemplate({
       ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
       ctx.fill();
 
-      // Desenfoque contenido para que el resplandor no invada tarjetas vecinas
-      const imgShadowBlur = isCompact ? 8 : 16;
-      ctx.shadowColor = hexToRgba(spiritHue, isOwned ? 0.70 : 0.30);
-      ctx.shadowBlur = imgShadowBlur;
       if (!isOwned) {
         ctx.globalAlpha = 0.88;
       }

@@ -3,7 +3,7 @@ import {
   X, Download, Share2, Copy, Check, Image as ImageIcon, Filter, Globe,
   CheckCircle, XCircle, Sparkles, Repeat, ShieldCheck, Flame
 } from 'lucide-react';
-import { generatePokedexCardImage } from '../utils/canvasExporter';
+import { generatePokedexCardImage, globalCanvasCache } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 
@@ -14,10 +14,15 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const [format, setFormat] = useState('checklist'); // 'checklist', 'square'
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
   const [bgStyle, setBgStyle] = useState('glitch_override'); // 'glitch_override', 'blueprint', 'dark_matrix'
-  const [dataUrl, setDataUrl] = useState('');
-  const [cachedFile, setCachedFile] = useState(null);
-  const [cachedBlob, setCachedBlob] = useState(null);
-  const [isGenerating, setIsGenerating] = useState(true);
+
+  // Clave de preview inicial para mostrar la plantilla en 0ms si ya está en caché
+  const initialCacheKey = `checklist_all_glitch_override_${allSprites.length}_${allSprites.filter(s => userState[s.id]?.owned).length}`;
+  const initialCached = globalTemplatePreviewCache.get(initialCacheKey) || globalCanvasCache.get(initialCacheKey);
+
+  const [dataUrl, setDataUrl] = useState(() => initialCached?.url || initialCached?.dataUrl || (typeof initialCached === 'string' ? initialCached : ''));
+  const [cachedFile, setCachedFile] = useState(() => initialCached?.file || null);
+  const [cachedBlob, setCachedBlob] = useState(() => initialCached?.blob || null);
+  const [isGenerating, setIsGenerating] = useState(() => !initialCached);
   const [isClosing, setIsClosing] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
 
@@ -110,9 +115,10 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     }
 
     const cacheKey = `${format}_${scope}_${bgStyle}_${spritesList.length}_${ownedInScope}`;
-    if (globalTemplatePreviewCache.has(cacheKey)) {
-      const cached = globalTemplatePreviewCache.get(cacheKey);
-      const url = typeof cached === 'string' ? cached : cached.url;
+    const genericKey = `${format}_${bgStyle}_${spritesList.length}_${ownedInScope}`;
+    const cached = globalTemplatePreviewCache.get(cacheKey) || globalCanvasCache.get(genericKey);
+    if (cached) {
+      const url = typeof cached === 'string' ? cached : (cached.url || cached.dataUrl);
       setDataUrl(url);
       setCachedFile(cached?.file || null);
       setCachedBlob(cached?.blob || null);
