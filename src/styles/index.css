@@ -6139,10 +6139,8 @@ body::after {
     display: none !important;
   }
 
-  .ms-family-stack,
-  .ms-card {
+  .ms-family-stack {
     will-change: transform;
-    transform: translateZ(0);
   }
 }
 
@@ -6698,11 +6696,11 @@ body::after {
 /* ── Card Stack Container (per family) ── */
 .ms-family-stack {
   position: relative;
-  perspective: 1200px;
   width: 205px;
   height: 300px;
   margin: 0 auto;
   touch-action: pan-y;
+  isolation: isolate;
 }
 
 /* ── Individual Card (Slender collectible proportion) ── */
@@ -6713,7 +6711,8 @@ body::after {
   width: 100% !important;
   height: 100% !important;
   border-radius: 20px;
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  background-color: #0c0e16;
+  transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.45s cubic-bezier(0.23, 1, 0.32, 1);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -6722,17 +6721,21 @@ body::after {
   padding: 14px 12px 14px 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   overflow: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform-style: flat;
+  transform-style: flat;
 }
 
 .ms-card--active {
   z-index: 10;
-  transform: translateX(0) scale(1);
+  transform: translate3d(0, 0, 0) scale(1);
   opacity: 1;
 }
 
 .ms-card--next {
   z-index: 9;
-  transform: translateX(20px) scale(0.96) rotateY(-3deg);
+  transform: translate3d(18px, 0, 0) scale(0.95);
   opacity: 0.85;
   filter: brightness(0.85);
   pointer-events: none;
@@ -6740,7 +6743,7 @@ body::after {
 
 .ms-card--next-2 {
   z-index: 8;
-  transform: translateX(35px) scale(0.92) rotateY(-5deg);
+  transform: translate3d(32px, 0, 0) scale(0.90);
   opacity: 0.55;
   filter: brightness(0.75);
   pointer-events: none;
@@ -6748,7 +6751,7 @@ body::after {
 
 .ms-card--next-3 {
   z-index: 7;
-  transform: translateX(48px) scale(0.88) rotateY(-7deg);
+  transform: translate3d(44px, 0, 0) scale(0.85);
   opacity: 0.3;
   filter: brightness(0.6);
   pointer-events: none;
@@ -6756,9 +6759,21 @@ body::after {
 
 .ms-card--hidden {
   z-index: 1;
-  transform: translateX(60px) scale(0.85);
+  transform: translate3d(56px, 0, 0) scale(0.80);
   opacity: 0;
   pointer-events: none;
+}
+
+/* Ocultar textos y botones en cartas secundarias para evitar solapamiento visual en Safari */
+.ms-card:not(.ms-card--active) .ms-card__info,
+.ms-card:not(.ms-card--active) .card-level-stars,
+.ms-card:not(.ms-card--active) .card-owned-btn,
+.ms-card:not(.ms-card--active) .ms-variant-tag,
+.ms-card:not(.ms-card--active) .ms-level-tag,
+.ms-card:not(.ms-card--active) .ms-card__crown {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* ── Variant Tag (Top-Left) ── */
