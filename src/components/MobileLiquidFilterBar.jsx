@@ -28,21 +28,21 @@ export function MobileLiquidFilterBar({
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
 
-  // ═══ SMART ONE-TIME DISCOVERY COACHMARK (PROGRAMADO PARA ESTRENO) ═══
-  const LOOTHACKER_RELEASE_TIMESTAMP = 1789041000000; // 2026-09-10T11:50:00.000Z (6:50 a. m. local UTC-5)
-  const NEW_SPIRITS_COACHMARK_KEY = 'spritedex_seen_new_spirits_v3_loothacker';
+  // ═══ SMART ONE-TIME DISCOVERY COACHMARK (NUEVO DROP C7S4 - 12 ESPÍRITUS LANZADOS) ═══
+  const NEW_SPIRITS_RELEASE_TIMESTAMP = 1789645200000; // 2026-09-17T11:40:00.000Z
+  const NEW_SPIRITS_COACHMARK_KEY = 'spritedex_seen_new_spirits_v5_c7s4_12';
 
   const [showNewTooltip, setShowNewTooltip] = useState(() => {
     if (safeStorage.getItem(NEW_SPIRITS_COACHMARK_KEY)) return false;
-    return Date.now() >= LOOTHACKER_RELEASE_TIMESTAMP;
+    return Date.now() >= NEW_SPIRITS_RELEASE_TIMESTAMP;
   });
   const [isDismissing, setIsDismissing] = useState(false);
 
   // Activación automática si el usuario tiene la página abierta al llegar las 6:50 a. m.
   useEffect(() => {
     const now = Date.now();
-    if (now < LOOTHACKER_RELEASE_TIMESTAMP) {
-      const msUntilRelease = LOOTHACKER_RELEASE_TIMESTAMP - now;
+    if (now < NEW_SPIRITS_RELEASE_TIMESTAMP) {
+      const msUntilRelease = NEW_SPIRITS_RELEASE_TIMESTAMP - now;
       const timer = setTimeout(() => {
         if (!safeStorage.getItem(NEW_SPIRITS_COACHMARK_KEY) && statusFilter !== 'new') {
           setShowNewTooltip(true);
@@ -50,7 +50,7 @@ export function MobileLiquidFilterBar({
       }, msUntilRelease);
       return () => clearTimeout(timer);
     }
-  }, [statusFilter, LOOTHACKER_RELEASE_TIMESTAMP]);
+  }, [statusFilter, NEW_SPIRITS_RELEASE_TIMESTAMP]);
 
   useEffect(() => {
     if (statusFilter === 'new') {
@@ -237,7 +237,7 @@ export function MobileLiquidFilterBar({
           >
             <div className="mobile-new-coachmark__content">
               <span className="mobile-new-coachmark__sparkle">✨</span>
-              <span className="mobile-new-coachmark__text">¡Nuevos espíritus!</span>
+              <span className="mobile-new-coachmark__text">¡12 Nuevos espíritus!</span>
               <span className="mobile-new-coachmark__action">Ver</span>
               <button
                 type="button"
