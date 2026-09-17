@@ -1,0 +1,76 @@
+name: Sincronización Automática de Espíritus
+
+on:
+  schedule:
+    # Ejecución automática los jueves a las 11:00, 14:00 y 17:00 UTC (horarios habituales de parches de Fortnite)
+    - cron: '0 11,14,17 * * 4'
+  workflow_dispatch: # Permite ejecución manual bajo demanda desde GitHub Actions
+
+permissions:
+  contents: write
+
+jobs:
+  sync-sprites:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 11.21.0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Instalar Google Chrome
+        uses: browser-actions/setup-chrome@latest
+        id: setup-chrome
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Ejecutar sincronización de espíritus
+        env:
+          PUPPETEER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: node scripts/sync-sprites.js
+
+      - name: Validar integridad con OxLint
+        run: npx oxlint --deny=error
+
+      - name: Validar compilación con Vite
+        run: pnpm run build
+
+      - name: Guardar y pushear cambios si hay novedades
+        run: |
+          if [ -n "$(git status --porcelain src/data/ public/sprites/)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add src/data/ public/sprites/
+            git commit -m "Actualiza catálogo de espíritus desde fortnite.gg"
+
+            CURRENT_BRANCH="${GITHUB_REF_NAME:-dev}"
+            echo "Pusheando a rama $CURRENT_BRANCH..."
+            git push origin "$CURRENT_BRANCH"
+
+            # Mantener dev y main sincronizados
+            if [ "$CURRENT_BRANCH" = "dev" ]; then
+              echo "Sincronizando con rama main..."
+              git fetch origin main
+              git checkout main
+              git merge dev -m "Merge dev: Actualiza catálogo de espíritus desde fortnite.gg"
+              git push origin main
+              git checkout dev
+            fi
+            echo "✅ Catálogo sincronizado y cambios subidos con éxito."
+          else
+            echo "ℹ️ No hay cambios en el catálogo. Todo al día."
+          fi
