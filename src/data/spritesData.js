@@ -768,7 +768,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   let dropChanceNum = parseFloat(dropChance);
 
   // Dynamic image resolution for real webp and png assets
-  let imagePath = item.gen === 2 ? `/sprites/${item.id}.webp` : `/sprites/${item.id}.png`;
+  let imagePath = (item.gen === 2 || item.id.endsWith('_cube')) ? `/sprites/${item.id}.webp` : `/sprites/${item.id}.png`;
   const webpMap = {
     'ironmouse_basic': '/sprites/ironmouse_basic.webp',
     'llama_basic': '/sprites/llama_basic.webp',
