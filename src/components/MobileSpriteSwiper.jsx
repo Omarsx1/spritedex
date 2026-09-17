@@ -1,7 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import confetti from 'canvas-confetti';
-import { Lock } from 'lucide-react';
-import { RARITIES, getSpriteCardStyle, VARIANT_ORDER } from '../data/spritesData';
+import { RARITIES, getSpriteCardStyle, getRarityInfo, VARIANT_ORDER } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import { SonicRing } from './SonicRing';
 
@@ -128,7 +127,7 @@ function FamilyRow({
           const isMastered = isOwned && level === 5;
           const myOwned = userState[sprite.id]?.owned;
           const friendCanLend = isFriendView && isOwned && !myOwned;
-          const rarityInfo = RARITIES[sprite.rarity] || { name: sprite.rarity, bg: '#1e293b' };
+          const rarityInfo = getRarityInfo(sprite.rarity);
           const styleInfo = getSpriteCardStyle(sprite);
 
           const rarityGlows = {

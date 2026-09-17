@@ -42,22 +42,56 @@ export const RARITIES = {
   Rare: { name: 'RARO', label: 'Raro', color: '#00fffb', bg: '#00458a', border: '#00458a', classKey: 'rare', cardGradient: 'linear-gradient(180deg, #00458a 0%, #1b1c23 100%)' },
   Uncommon: { name: 'POCO COMÚN', label: 'Poco Común', color: '#4ade80', bg: '#14532d', border: '#4ade80', classKey: 'uncommon', cardGradient: 'linear-gradient(180deg, #14532d 0%, #1b1c23 100%)' },
   Common: { name: 'COMÚN', label: 'Común', color: '#94a3b8', bg: '#334155', border: '#94a3b8', classKey: 'common', cardGradient: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)' },
-  Special: { name: 'ESPECIAL', label: 'Especial', color: '#5dffe4', bg: '#134e4a', border: '#5dffe4', classKey: 'special', cardGradient: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)' }
+  Special: { name: 'ESPECIAL', label: 'Especial', color: '#5dffe4', bg: '#134e4a', border: '#5dffe4', classKey: 'special', cardGradient: 'linear-gradient(180deg, #134e4a 0%, #1b1c23 100%)' },
+  // Series especiales oficiales de Fortnite
+  Exotic: { name: 'EXÓTICO', label: 'Exótico', color: '#5df0e4', bg: '#0e4a52', border: '#06b6d4', classKey: 'exotic', cardGradient: 'linear-gradient(180deg, #0e4a52 0%, #1b1c23 100%)' },
+  Dark: { name: 'OSCURO', label: 'Oscuro', color: '#f0abfc', bg: '#581c87', border: '#a21caf', classKey: 'dark', cardGradient: 'linear-gradient(180deg, #581c87 0%, #1b1c23 100%)' },
+  Gaming: { name: 'GAMING', label: 'Gaming', color: '#a5b4fc', bg: '#312e81', border: '#6366f1', classKey: 'gaming', cardGradient: 'linear-gradient(180deg, #312e81 0%, #1b1c23 100%)' },
+  Marvel: { name: 'MARVEL', label: 'Marvel', color: '#fca5a5', bg: '#7f1d1d', border: '#ef4444', classKey: 'marvel', cardGradient: 'linear-gradient(180deg, #7f1d1d 0%, #1b1c23 100%)' },
+  DC: { name: 'DC', label: 'DC', color: '#93c5fd', bg: '#1e3a8a', border: '#3b82f6', classKey: 'dc', cardGradient: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)' },
+  Icon: { name: 'ÍDOLO', label: 'Ídolo', color: '#5eead4', bg: '#115e59', border: '#14b8a6', classKey: 'icon', cardGradient: 'linear-gradient(180deg, #115e59 0%, #1b1c23 100%)' },
+  Frozen: { name: 'CONGELADO', label: 'Congelado', color: '#bae6fd', bg: '#0c4a6e', border: '#38bdf8', classKey: 'frozen', cardGradient: 'linear-gradient(180deg, #0c4a6e 0%, #1b1c23 100%)' },
+  Lava: { name: 'LAVA', label: 'Lava', color: '#fdba74', bg: '#7c2d12', border: '#ea580c', classKey: 'lava', cardGradient: 'linear-gradient(180deg, #7c2d12 0%, #1b1c23 100%)' },
+  Shadow: { name: 'SOMBRA', label: 'Sombra', color: '#f8fafc', bg: '#18181b', border: '#52525b', classKey: 'shadow', cardGradient: 'linear-gradient(180deg, #27272a 0%, #09090b 100%)' },
+  Slurp: { name: 'SORBETE', label: 'Sorbete', color: '#6ee7b7', bg: '#064e3b', border: '#10b981', classKey: 'slurp', cardGradient: 'linear-gradient(180deg, #064e3b 0%, #1b1c23 100%)' }
 };
+
+export function getRarityInfo(rarity) {
+  if (!rarity) return RARITIES.Rare;
+  if (RARITIES[rarity]) return RARITIES[rarity];
+  const foundKey = Object.keys(RARITIES).find(
+    (k) => k.toLowerCase() === String(rarity).trim().toLowerCase()
+  );
+  if (foundKey) return RARITIES[foundKey];
+
+  const cleanName = String(rarity).trim();
+  return {
+    name: cleanName.toUpperCase(),
+    label: cleanName.charAt(0).toUpperCase() + cleanName.slice(1).toLowerCase(),
+    color: '#5dffe4',
+    bg: '#134e4a',
+    border: '#14b8a6',
+    classKey: cleanName.toLowerCase().replace(/[^a-z0-9]/g, ''),
+    cardGradient: 'linear-gradient(180deg, #134e4a 0%, #1b1c23 100%)'
+  };
+}
 
 export const THEME_STYLES = {
   Basic: { bg: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', border: '#00afff' },
   Gold: { bg: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', border: '#f5b642' },
-  Cheatmaster: { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
-  'Cheat Master': { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
+  Cheatmaster: { bg: 'linear-gradient(180deg, #094726 0%, #0d281a 100%)', border: '#4ade80' },
+  'Cheat Master': { bg: 'linear-gradient(180deg, #094726 0%, #0d281a 100%)', border: '#4ade80' },
   'Loot Hacker': { bg: 'linear-gradient(180deg, #2b29b9 0%, #0a0d1f 100%)', border: '#6366f1' },
+  LootHacker: { bg: 'linear-gradient(180deg, #2b29b9 0%, #0a0d1f 100%)', border: '#6366f1' },
   'Bounty Hunter': { bg: 'linear-gradient(180deg, #6b1426 0%, #15080c 100%)', border: '#f43f5e' },
-  'BountyHunter': { bg: 'linear-gradient(180deg, #6b1426 0%, #15080c 100%)', border: '#f43f5e' },
+  BountyHunter: { bg: 'linear-gradient(180deg, #6b1426 0%, #15080c 100%)', border: '#f43f5e' },
+  reaper: { bg: 'linear-gradient(180deg, #6b1426 0%, #15080c 100%)', border: '#f43f5e' },
   Candy: { bg: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)', border: '#f16f68' },
+  Gummy: { bg: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)', border: '#f16f68' },
   Galaxy: { bg: 'linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%)', border: '#4a35fa' },
   Holofoil: { bg: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', border: '#ec88d8' },
   Cube: { bg: 'linear-gradient(180deg, #730974 0%, #1b1c23 100%)', border: '#8b008b' },
-  Gem: { bg: 'linear-gradient(180deg, #0f6c7d 0%, #1b1c23 100%)', border: '#22d3ee' },
+  Gem: { bg: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)', border: '#38bdf8' },
   Quack: { bg: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', border: '#ec88d8' }
 };
 
@@ -100,58 +134,28 @@ export function getSpriteCardStyle(sprite) {
   const rarity = sprite.rarity;
   const familyId = (sprite.familyId || sprite.id?.split('_')[0] || '').toLowerCase();
 
-  // 1. Theme-specific variants (Gold, Cheatmaster, Loot Hacker, Cube, Candy, Galaxy, Holofoil, Gem, Quack)
-  if (theme === 'Gold') {
-    return { background: 'linear-gradient(180deg, #9d752a 0%, #1b1c23 100%)', borderColor: '#f5b642' };
-  }
-  if (theme === 'Cheatmaster' || theme === 'Cheat Master') {
-    return { background: 'linear-gradient(180deg, #094726 0%, #0d281a 100%)', borderColor: '#4ade80' };
-  }
-  if (theme === 'Loot Hacker' || theme === 'LootHacker') {
-    return { background: 'linear-gradient(180deg, #2b29b9 0%, #0a0d1f 100%)', borderColor: '#6366f1' };
-  }
-  if (theme === 'Bounty Hunter' || theme === 'BountyHunter' || theme === 'reaper') {
-    return { background: 'linear-gradient(180deg, #6b1426 0%, #15080c 100%)', borderColor: '#f43f5e' };
-  }
-  if (theme === 'Cube') {
-    return { background: 'linear-gradient(180deg, #730974 0%, #1b1c23 100%)', borderColor: '#8b008b' };
-  }
-  if (theme === 'Candy' || theme === 'Gummy') {
-    return { background: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)', borderColor: '#f16f68' };
-  }
-  if (theme === 'Galaxy') {
-    return { background: 'linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%)', borderColor: '#4a35fa' };
-  }
-  if (theme === 'Holofoil' || theme === 'Quack') {
-    return { background: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', borderColor: '#ec88d8' };
-  }
-  if (theme === 'Gem') {
-    return { background: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)', borderColor: '#38bdf8' };
+  // 1. Variantes con estilo temático específico (Gold, Cheatmaster, Galaxy, Cube, etc.)
+  if (theme && theme !== 'Basic' && theme !== 'Base') {
+    if (THEME_STYLES[theme]) {
+      return { background: THEME_STYLES[theme].bg, borderColor: THEME_STYLES[theme].border };
+    }
+    const normTheme = theme.toLowerCase().replace(/[^a-z0-9]/g, '');
+    for (const [tKey, style] of Object.entries(THEME_STYLES)) {
+      if (tKey.toLowerCase().replace(/[^a-z0-9]/g, '') === normTheme) {
+        return { background: style.bg, borderColor: style.border };
+      }
+    }
   }
 
-  // 2. Colores por Rareza (La rareza define el color de la carta básica)
-  if (rarity === 'Rare') {
-    return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };
-  }
-  if (rarity === 'Epic') {
-    return { background: 'linear-gradient(180deg, #4d1566 0%, #1b1c23 100%)', borderColor: '#ce59ff' };
-  }
-  if (rarity === 'Legendary') {
-    return { background: 'linear-gradient(180deg, #743e0a 0%, #1b1c23 100%)', borderColor: '#de6e0e' };
-  }
-  if (rarity === 'Mythic') {
-    return { background: 'linear-gradient(180deg, #a89442 0%, #1b1c23 100%)', borderColor: '#f1e198' };
-  }
-  if (rarity === 'Uncommon') {
-    return { background: 'linear-gradient(180deg, #1b532a 0%, #1b1c23 100%)', borderColor: '#4ade80' };
-  }
-  if (rarity === 'Common') {
-    return { background: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)', borderColor: '#94a3b8' };
-  }
-
-  // 4. Fallback a estilos elementales específicos
-  if (theme === 'Basic' && ELEMENTAL_STYLES[familyId]) {
+  // 2. Si es variante básica y cuenta con estilo elemental propio (Fuego, Tierra, Agua, etc.)
+  if ((!theme || theme === 'Basic' || theme === 'Base') && ELEMENTAL_STYLES[familyId]) {
     return ELEMENTAL_STYLES[familyId];
+  }
+
+  // 3. Estilo por Rareza (Mítico, Legendario, Épico, Raro, Poco Común, Especial, Exótico, etc.)
+  const rarityObj = getRarityInfo(rarity);
+  if (rarityObj && rarityObj.cardGradient && rarityObj.border) {
+    return { background: rarityObj.cardGradient, borderColor: rarityObj.border };
   }
 
   return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };

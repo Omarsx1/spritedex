@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
-import { RARITIES } from '../data/spritesData';
+import { RARITIES, getRarityInfo } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import confetti from 'canvas-confetti';
 
@@ -16,7 +16,7 @@ export function PokedexHandheld({ spritesList, userState, onToggleOwned, onSetLe
   const isOwned = currentState.owned;
   const level = currentState.level || 1;
   const isMastered = isOwned && level === 5;
-  const rarityInfo = RARITIES[sprite.rarity] || { name: sprite.rarity, color: '#94a3b8' };
+  const rarityInfo = getRarityInfo(sprite.rarity);
 
   const handlePrev = () => {
     sounds.playBeep();

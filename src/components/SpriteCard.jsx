@@ -1,7 +1,7 @@
 import React from 'react';
 import confetti from 'canvas-confetti';
 import { Lock } from 'lucide-react';
-import { RARITIES, getSpriteCardStyle } from '../data/spritesData';
+import { RARITIES, getSpriteCardStyle, getRarityInfo } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import { SonicRing } from './SonicRing';
 
@@ -27,7 +27,7 @@ export function SpriteCard({
   const myOwned = userState[sprite.id]?.owned;
   const friendCanLend = isFriendView && isOwned && !myOwned;
 
-  const rarityInfo = RARITIES[sprite.rarity] || { name: sprite.rarity, color: '#94a3b8', bg: '#1e293b' };
+  const rarityInfo = getRarityInfo(sprite.rarity);
   const styleInfo = getSpriteCardStyle(sprite);
 
   const handleToggleClick = (e) => {

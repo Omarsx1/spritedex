@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Zap, Sparkles } from 'lucide-react';
-import { SPRITE_FAMILIES, RARITIES, getSpriteCardStyle } from '../data/spritesData';
+import { SPRITE_FAMILIES, RARITIES, getSpriteCardStyle, getRarityInfo } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 
@@ -43,7 +43,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
 
   const family = SPRITE_FAMILIES.find(f => f.id === activeSprite.familyId);
   const familySprites = family ? family.sprites : [activeSprite];
-  const rarityInfo = RARITIES[activeSprite.rarity] || { name: activeSprite.rarity, color: '#94a3b8', bg: '#1e293b' };
+  const rarityInfo = getRarityInfo(activeSprite.rarity);
   const mainStyle = getSpriteCardStyle(activeSprite);
   const currentState = userState[activeSprite.id] || { owned: false, level: 1 };
   const isMastered = currentState.owned && currentState.level === 5;
