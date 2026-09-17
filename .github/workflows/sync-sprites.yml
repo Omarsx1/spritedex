@@ -2,8 +2,12 @@ name: Sincronización Automática de Espíritus
 
 on:
   schedule:
-    # Ejecución automática los jueves a las 11:00, 14:00 y 17:00 UTC (horarios habituales de parches de Fortnite)
-    - cron: '0 11,14,17 * * 4'
+    # JUEVES (Día de parches de Fortnite): Cada 2 horas de 5:00 a. m. a 5:00 p. m. (hora local UTC-5)
+    - cron: '0 10,12,14,16,18,20,22 * * 4'
+    # JUEVES NOCHE: 7:00 p. m. y 9:00 p. m. (hora local UTC-5)
+    - cron: '0 0,2 * * 5'
+    # RESTO DE LA SEMANA: 2 revisiones diarias a las 10:00 a. m. y 4:00 p. m. (hora local UTC-5)
+    - cron: '0 15,21 * * 0,1,2,3,6'
   workflow_dispatch: # Permite ejecución manual bajo demanda desde GitHub Actions
 
 permissions:
