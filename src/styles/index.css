@@ -3549,6 +3549,43 @@ body::after {
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.45);
 }
 
+/* Unreleased state pill replacing action button */
+.card-unreleased-pill {
+  width: 100%;
+  height: 36px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 8px;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px dashed rgba(148, 163, 184, 0.3);
+  color: rgba(148, 163, 184, 0.7);
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  user-select: none;
+  cursor: not-allowed;
+  transition: all 0.2s ease;
+}
+
+.card-unreleased-pill svg {
+  opacity: 0.75;
+}
+
+.card-unreleased-pill.list-unreleased-pill {
+  width: auto;
+  min-width: 110px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0 12px;
+  font-size: 0.72rem;
+  border-radius: 6px;
+}
+
 /* ===== CYBER GLITCH BUTTON (Uiverse pharmacist-sabot) ===== */
 .card-owned-btn.is-glitch-btn {
   position: relative;
@@ -4737,6 +4774,12 @@ body::after {
 .sdm__pill--gold {
   background: linear-gradient(135deg, #facc15, #ef4444);
   color: #000;
+}
+
+.sdm__pill--unreleased {
+  background: rgba(148, 163, 184, 0.12) !important;
+  color: rgba(148, 163, 184, 0.75) !important;
+  border: 1px dashed rgba(148, 163, 184, 0.35) !important;
 }
 
 .sdm__variant-levels {

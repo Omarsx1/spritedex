@@ -1,5 +1,6 @@
 import React from 'react';
 import confetti from 'canvas-confetti';
+import { Lock } from 'lucide-react';
 import { RARITIES, getSpriteCardStyle } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import { SonicRing } from './SonicRing';
@@ -31,6 +32,7 @@ export function SpriteCard({
 
   const handleToggleClick = (e) => {
     e.stopPropagation();
+    if (sprite.unreleased) return;
     if (isFriendView) {
       // In friend view, clicking action button toggles ownership in MY collection
       const nextOwned = !myOwned;
@@ -61,7 +63,9 @@ export function SpriteCard({
     // Filter out clicks on outer transparent margins (sides, top, bottom):
     // Left 22%, Right 22%, Top 20%, Bottom 15% -> treat as card toggle click!
     if (clickXRatio < 0.22 || clickXRatio > 0.78 || clickYRatio < 0.20 || clickYRatio > 0.85) {
-      handleToggleClick(e);
+      if (!sprite.unreleased) {
+        handleToggleClick(e);
+      }
       return;
     }
 
@@ -70,6 +74,7 @@ export function SpriteCard({
 
   const handleLevelClick = (e, newLevel) => {
     e.stopPropagation();
+    if (sprite.unreleased) return;
     if (isFriendView) return; // Only adjust levels in my view
     onSetLevel(sprite.id, newLevel);
     sounds.playLevelUp(newLevel, sprite.gen);
@@ -84,7 +89,7 @@ export function SpriteCard({
       <div
         className={`sprite-list-item ${isOwned ? 'is-owned' : ''} ${isMastered ? ('is-mastered ' + (sprite.gen === 2 ? 'is-glitch-mastered' : 'is-classic-mastered')) : ''}`}
         onClick={handleToggleClick}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: sprite.unreleased ? 'default' : 'pointer' }}
       >
         <div className="list-item-image">
           {isMastered && (
@@ -139,32 +144,41 @@ export function SpriteCard({
           </div>
         </div>
         <div className="list-item-actions">
-          {isOwned && !isFriendView && (
-            <div className="list-level-stars" onClick={(e) => e.stopPropagation()}>
-              {[1, 2, 3, 4, 5].map((num) => (
-                <button
-                  key={num}
-                  className={`star-btn-sm ${level >= num ? 'active' : ''}`}
-                  onClick={(e) => handleLevelClick(e, num)}
-                >
-                  {sprite.gen === 2 ? (
-                    <SonicRing active={level >= num} mastered={isMastered && num === 5} size={14} />
-                  ) : (
-                    '★'
-                  )}
-                </button>
-              ))}
+          {sprite.unreleased ? (
+            <div className="card-unreleased-pill list-unreleased-pill" onClick={(e) => e.stopPropagation()}>
+              <Lock size={12} />
+              <span>No lanzado</span>
             </div>
+          ) : (
+            <>
+              {isOwned && !isFriendView && (
+                <div className="list-level-stars" onClick={(e) => e.stopPropagation()}>
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <button
+                      key={num}
+                      className={`star-btn-sm ${level >= num ? 'active' : ''}`}
+                      onClick={(e) => handleLevelClick(e, num)}
+                    >
+                      {sprite.gen === 2 ? (
+                        <SonicRing active={level >= num} mastered={isMastered && num === 5} size={14} />
+                      ) : (
+                        '★'
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <button
+                className={`owned-btn-sm ${isMastered ? 'mastered' : isOwned ? 'owned' : ''}`}
+                onClick={handleToggleClick}
+                style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff' } : {}}
+              >
+                {isFriendView
+                  ? (friendCanLend ? (myOwned ? '✓ Registrado' : '+ Registrar en mi Dex') : isOwned ? '✓ Tu amigo lo tiene' : 'No lo tiene')
+                  : (isMastered ? '⭐ Maxeado' : isOwned ? `✓ Atrapado (Niv.${level})` : 'Sin atrapar')}
+              </button>
+            </>
           )}
-          <button
-            className={`owned-btn-sm ${isMastered ? 'mastered' : isOwned ? 'owned' : ''}`}
-            onClick={handleToggleClick}
-            style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff' } : {}}
-          >
-            {isFriendView
-              ? (friendCanLend ? (myOwned ? '✓ Registrado' : '+ Registrar en mi Dex') : isOwned ? '✓ Tu amigo lo tiene' : 'No lo tiene')
-              : (isMastered ? '⭐ Maxeado' : isOwned ? `✓ Atrapado (Niv.${level})` : 'Sin atrapar')}
-          </button>
         </div>
       </div>
     );
@@ -178,7 +192,7 @@ export function SpriteCard({
         background: styleInfo.background,
         borderColor: styleInfo.borderColor,
         position: 'relative',
-        cursor: 'pointer'
+        cursor: sprite.unreleased ? 'default' : 'pointer'
       }}
       onClick={handleToggleClick}
     >
@@ -209,8 +223,8 @@ export function SpriteCard({
         {rarityInfo.name}
       </div>
 
-      {/* Badge de nivel o amigo (esquina superior derecha, solo si está atrapado o vista amigo) */}
-      {isFriendView ? (
+      {/* Badge de nivel o amigo (esquina superior derecha, solo si no es unreleased y está atrapado o vista amigo) */}
+      {!sprite.unreleased && (isFriendView ? (
         friendCanLend ? (
           <div className="ms-level-tag ms-level-tag--lend" onClick={handleToggleClick}>
             {myOwned ? '✓ REGISTRADO' : '🎁 PRESTA'}
@@ -228,7 +242,7 @@ export function SpriteCard({
         >
           {isMastered ? 'MAX' : `LVL.${level}`}
         </div>
-      ) : null}
+      ) : null)}
 
       {/* Imagen del Sprite: Clic exclusivamente en la figura abre la modal de detalles y variantes */}
       <div className="card-image">
@@ -275,10 +289,13 @@ export function SpriteCard({
       {/* Nombre */}
       <div className="card-name">{sprite.fullName}</div>
 
-
-
-      {/* Control inferior: Anillos de Sonic para Gen 2 o Estrellas para Gen 1 si está atrapado */}
-      {isOwned ? (
+      {/* Control inferior: Pill No lanzado si unreleased, Anillos de Sonic para Gen 2 o Estrellas para Gen 1 si está atrapado */}
+      {sprite.unreleased ? (
+        <div className="card-unreleased-pill" onClick={(e) => e.stopPropagation()}>
+          <Lock size={13} />
+          <span>No lanzado</span>
+        </div>
+      ) : isOwned ? (
         <div className="card-level-stars" onClick={(e) => e.stopPropagation()}>
           {[1, 2, 3, 4, 5].map((num) => (
             <button
