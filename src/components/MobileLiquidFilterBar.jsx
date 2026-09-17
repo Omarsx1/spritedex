@@ -169,9 +169,9 @@ export function MobileLiquidFilterBar({
     return count;
   }, [statusFilter, baseFilter, spriteFilter, showUnreleased]);
 
-  // Compute available families scoped to activeGen
+  // Compute available families scoped to activeGen and showUnreleased
   const availableFamiliesWithImages = useMemo(() => {
-    const scopedSprites = ALL_SPRITES.filter(s => activeGen === 0 || s.gen === activeGen);
+    const scopedSprites = ALL_SPRITES.filter(s => (activeGen === 0 || s.gen === activeGen) && (showUnreleased || !s.unreleased));
     const uniqueFamilyIds = [...new Set(scopedSprites.map(s => s.familyId))];
     return uniqueFamilyIds.map(familyId => {
       const sprite = scopedSprites.find(s => s.familyId === familyId && s.variant === 'Basic')
@@ -183,19 +183,37 @@ export function MobileLiquidFilterBar({
         image: sprite ? sprite.image : (activeGen === 2 ? `/sprites/${familyId}_basic.webp` : `/sprites/${familyId}_basic.png`)
       };
     }).sort((a, b) => a.name.localeCompare(b.name));
-  }, [activeGen]);
+  }, [activeGen, showUnreleased]);
 
-  // Compute available variants scoped to activeGen
+  // Compute available variants scoped to activeGen and showUnreleased
   const availableThemes = useMemo(() => {
-    const scopedSprites = ALL_SPRITES.filter(s => activeGen === 0 || s.gen === activeGen);
+    const scopedSprites = ALL_SPRITES.filter(s => (activeGen === 0 || s.gen === activeGen) && (showUnreleased || !s.unreleased));
     const uniqueThemes = [...new Set(scopedSprites.map(s => s.variant))];
     return THEMES_LIST.filter(t => uniqueThemes.includes(t));
-  }, [activeGen]);
+  }, [activeGen, showUnreleased]);
+
+  // Auto-reset baseFilter if the selected variant becomes unavailable without showUnreleased
+  useEffect(() => {
+    if (!showUnreleased && baseFilter !== 'all' && !availableThemes.includes(baseFilter)) {
+      setBaseFilter('all');
+    }
+  }, [showUnreleased, baseFilter, availableThemes, setBaseFilter]);
+
+  // Auto-reset spriteFilter if the selected family becomes unavailable without showUnreleased
+  useEffect(() => {
+    if (!showUnreleased && spriteFilter !== 'all') {
+      const familyNames = availableFamiliesWithImages.map(f => f.name);
+      if (!familyNames.includes(spriteFilter)) {
+        setSpriteFilter('all');
+      }
+    }
+  }, [showUnreleased, spriteFilter, availableFamiliesWithImages, setSpriteFilter]);
 
   const handleResetFilters = () => {
     setStatusFilter('all');
     setBaseFilter('all');
     setSpriteFilter('all');
+    setSearchQuery('');
     setShowUnreleased(false);
   };
 
