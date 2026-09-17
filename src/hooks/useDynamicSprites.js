@@ -50,7 +50,6 @@ export function evaluateReleaseStatus(sprite) {
 
   const hasManualOverride = manualIsNewMap[sprite.id] !== undefined;
   const rawRelDate = sprite.release_date || sprite.releaseDate;
-  const hasExplicitIsNew = hasManualOverride || sprite.is_new !== undefined || sprite.isNew !== undefined;
   let isNew = hasManualOverride 
     ? Boolean(manualIsNewMap[sprite.id]) 
     : (sprite.is_new !== undefined ? Boolean(sprite.is_new) : (sprite.isNew !== undefined ? Boolean(sprite.isNew) : false));
@@ -61,10 +60,16 @@ export function evaluateReleaseStatus(sprite) {
     const isNowActive = now >= releaseTime;
     const daysSince = (now - releaseTime) / (1000 * 60 * 60 * 24);
 
-    if (!hasExplicitIsNew) {
-      if (daysSince >= 0 && daysSince <= 2) {
+    if (!hasManualOverride) {
+      if (daysSince >= 0 && daysSince <= 7) {
         isNew = true;
+      } else if (daysSince > 7) {
+        isNew = false;
       }
+    }
+
+    if (!isNowActive) {
+      isNew = false;
     }
 
     return {

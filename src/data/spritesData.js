@@ -843,16 +843,21 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     ? (official.summonCost.includes('Polvo') ? official.summonCost : `${official.summonCost} Polvo Estelar`)
     : null;
 
-  // Calculate isNew based on explicit flag or recent releaseDate (fallback only if undefined)
+  // Calculate isNew based on explicit flag or releaseDate (1 week / 7 days window)
   let isNew = item.isNew !== undefined ? Boolean(item.isNew) : false;
   const relDateVal = item.releaseDate || item.release_date;
-  if (item.isNew === undefined && relDateVal) {
+  if (relDateVal) {
     const relDate = new Date(relDateVal);
     const now = new Date();
     const daysSince = (now.getTime() - relDate.getTime()) / (1000 * 60 * 60 * 24);
-    if (daysSince >= 0 && daysSince <= 3) {
+    if (daysSince >= 0 && daysSince <= 7) {
       isNew = true;
+    } else if (daysSince > 7) {
+      isNew = false;
     }
+  }
+  if (item.unreleased) {
+    isNew = false;
   }
 
   return {
