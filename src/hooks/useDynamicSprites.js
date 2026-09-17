@@ -54,36 +54,44 @@ export function evaluateReleaseStatus(sprite) {
     ? Boolean(manualIsNewMap[sprite.id]) 
     : (sprite.is_new !== undefined ? Boolean(sprite.is_new) : (sprite.isNew !== undefined ? Boolean(sprite.isNew) : false));
 
+  let unreleased = sprite.unreleased === true;
+  let isAutoScheduled = Boolean(sprite.isAutoScheduled);
+  let timeUntilRelease = 0;
+
   if (rawRelDate) {
     const releaseTime = new Date(rawRelDate).getTime();
     const now = Date.now();
-    const isNowActive = now >= releaseTime;
-    const daysSince = (now - releaseTime) / (1000 * 60 * 60 * 24);
 
+    if (releaseTime > now) {
+      unreleased = true;
+      isAutoScheduled = true;
+      timeUntilRelease = releaseTime - now;
+    } else if (sprite.isAutoScheduled) {
+      unreleased = false;
+      isAutoScheduled = false;
+      timeUntilRelease = 0;
+    }
+
+    const daysSince = (now - releaseTime) / (1000 * 60 * 60 * 24);
     if (!hasManualOverride) {
-      if (daysSince >= 0 && daysSince <= 7) {
+      if (daysSince >= 0 && daysSince <= 7 && !unreleased) {
         isNew = true;
-      } else if (daysSince > 7) {
+      } else {
         isNew = false;
       }
     }
+  }
 
-    if (!isNowActive) {
-      isNew = false;
-    }
-
-    return {
-      ...sprite,
-      unreleased: !isNowActive,
-      isAutoScheduled: true,
-      timeUntilRelease: isNowActive ? 0 : Math.max(0, releaseTime - now),
-      isNew: isNew
-    };
+  if (unreleased) {
+    isNew = false;
   }
 
   return {
     ...sprite,
-    isNew: isNew
+    unreleased,
+    isAutoScheduled,
+    timeUntilRelease,
+    isNew
   };
 }
 
