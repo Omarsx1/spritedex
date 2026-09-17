@@ -131,7 +131,6 @@ export function SpriteCard({
             >
               {rarityInfo.name}
             </span>
-            <span className="drop-text">{sprite.dropChanceDisplay}</span>
             {friendCanLend && (
               <span style={{ fontSize: '0.68rem', background: '#10b981', color: '#fff', padding: '1px 6px', borderRadius: '4px', fontWeight: 800 }}>
                 🎁 Te lo presta
@@ -203,12 +202,12 @@ export function SpriteCard({
           </div>
         </div>
       )}
-      {/* Etiqueta de variante (esquina superior izquierda) */}
-      {(sprite.variantDisplay || sprite.variant) && (
-        <div className="ms-variant-tag">
-          {sprite.variantDisplay || sprite.variant}
-        </div>
-      )}
+      {/* Badge de rareza (esquina superior izquierda) */}
+      <div
+        className={`card-rarity-tag sprite-pill rarity-badge ${rarityInfo.classKey ? `sprite-rarity-${rarityInfo.classKey}` : ''}`}
+      >
+        {rarityInfo.name}
+      </div>
 
       {/* Badge de nivel o amigo (esquina superior derecha, solo si está atrapado o vista amigo) */}
       {isFriendView ? (
@@ -276,15 +275,7 @@ export function SpriteCard({
       {/* Nombre */}
       <div className="card-name">{sprite.fullName}</div>
 
-      {/* Badge de rareza + drop % */}
-      <div className="card-meta">
-        <span
-          className={`sprite-pill rarity-badge ${rarityInfo.classKey ? `sprite-rarity-${rarityInfo.classKey}` : ''}`}
-        >
-          {rarityInfo.name}
-        </span>
-        <span className="drop-pct">{sprite.dropChanceDisplay}</span>
-      </div>
+
 
       {/* Control inferior: Anillos de Sonic para Gen 2 o Estrellas para Gen 1 si está atrapado */}
       {isOwned ? (

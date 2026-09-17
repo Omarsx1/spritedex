@@ -16,6 +16,17 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
     setActiveSprite(sprite);
   }, [sprite]);
 
+  const [canDismiss, setCanDismiss] = useState(false);
+  useEffect(() => {
+    setCanDismiss(false);
+    const isMotionDisabled = typeof document !== 'undefined' && document.body.classList.contains('motion-disabled');
+    const delay = isMotionDisabled ? 60 : 350;
+    const timer = setTimeout(() => {
+      setCanDismiss(true);
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [activeSprite]);
+
   // Entrance animation when activeSprite changes
   useEffect(() => {
     if (!activeSprite || !modalRef.current) return;
@@ -55,17 +66,6 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
   // Progress bar width
   const ownedInFamily = familySprites.filter(v => userState[v.id]?.owned).length;
   const progressPct = (ownedInFamily / familySprites.length) * 100;
-
-  const [canDismiss, setCanDismiss] = useState(false);
-  useEffect(() => {
-    setCanDismiss(false);
-    const isMotionDisabled = typeof document !== 'undefined' && document.body.classList.contains('motion-disabled');
-    const delay = isMotionDisabled ? 60 : 350;
-    const timer = setTimeout(() => {
-      setCanDismiss(true);
-    }, delay);
-    return () => clearTimeout(timer);
-  }, [activeSprite]);
 
   const handleBackdropClick = (e) => {
     if (!canDismiss) return;
