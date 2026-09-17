@@ -1,7 +1,6 @@
 import puppeteer from 'puppeteer-core';
 import fs from 'fs';
 import path from 'path';
-import https from 'https';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -650,13 +649,29 @@ async function syncSprites() {
         isCardUnreleased = true;
       }
 
+      // Buscar en el catálogo oficial tanto por ID exacto, como por ID alternativo de rift, como por familia + tema
+      const themeNorm = theme.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const riftId = `${familyId}_rift`;
+      const existingKey = officialMap.has(expectedId)
+        ? expectedId
+        : (themeNorm === 'cube' && officialMap.has(riftId))
+        ? riftId
+        : Array.from(officialMap.keys()).find((k) => {
+            const { item } = officialMap.get(k);
+            const itemFam = item.id.split('_')[0].toLowerCase();
+            const itemTheme = (item.theme || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            return itemFam === familyId && itemTheme === themeNorm;
+          });
+
+      const effectiveId = existingKey || expectedId;
+
       // Asegurar descarga de imagen si no existe localmente
       if (card.img) {
-        await ensureSpriteImage(page, expectedId, card.img);
+        await ensureSpriteImage(page, effectiveId, card.img);
       }
 
-      if (officialMap.has(expectedId)) {
-        const { item } = officialMap.get(expectedId);
+      if (existingKey) {
+        const { item } = officialMap.get(existingKey);
 
         // Caso: espíritu antes no lanzado que acaba de publicarse oficialmente
         if (item.unreleased === true && isCardUnreleased === false) {
