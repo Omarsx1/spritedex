@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES, SUMMON_COST_OVERRIDES } from '../data/spritesData';
 import { supabase, isSupabaseConfigured } from '../utils/supabase';
 
-const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache';
+const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache_v2';
 
 function sanitizeDynamicItem(item) {
   if (!item) return item;
@@ -66,7 +66,7 @@ export function evaluateReleaseStatus(sprite) {
       unreleased = true;
       isAutoScheduled = true;
       timeUntilRelease = releaseTime - now;
-    } else if (sprite.isAutoScheduled) {
+    } else {
       unreleased = false;
       isAutoScheduled = false;
       timeUntilRelease = 0;
@@ -122,6 +122,9 @@ export function useDynamicSprites() {
             summonCost: cleanCost,
             summon_cost: cleanCost,
             rarity: sanitized.rarity || override?.rarity || baseStatic?.rarity,
+            unreleased: (baseStatic && baseStatic.unreleased === false)
+              ? false
+              : (sanitized.unreleased !== undefined ? Boolean(sanitized.unreleased) : (baseStatic?.unreleased || false)),
             isNew: sanitized.isNew !== undefined ? sanitized.isNew : (baseStatic?.isNew || false),
             releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate || null,
             ability: (hasRealCustomAbility ? sanitized.ability : null) || override?.ability || baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.',
@@ -230,7 +233,9 @@ export function useDynamicSprites() {
               dropChance: sanitized.drop_chance || baseStatic?.dropChance || '1.50%',
               dropChanceDisplay: sanitized.drop_chance || baseStatic?.dropChanceDisplay || '1.50%',
               dropChanceNum: parseFloat(sanitized.drop_chance || baseStatic?.dropChanceNum || '1.5'),
-              unreleased: sanitized.unreleased !== undefined ? sanitized.unreleased : (baseStatic?.unreleased || false),
+              unreleased: (baseStatic && baseStatic.unreleased === false)
+                ? false
+                : (sanitized.unreleased !== undefined ? Boolean(sanitized.unreleased) : (baseStatic?.unreleased || false)),
               release_date: sanitized.release_date || baseStatic?.release_date || baseStatic?.releaseDate,
               releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate,
               isNew: sanitized.is_new !== undefined ? Boolean(sanitized.is_new) : (sanitized.isNew !== undefined ? Boolean(sanitized.isNew) : (baseStatic?.isNew || false)),
