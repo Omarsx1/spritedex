@@ -62,7 +62,7 @@ export function evaluateReleaseStatus(sprite) {
     const daysSince = (now - releaseTime) / (1000 * 60 * 60 * 24);
 
     if (!hasExplicitIsNew) {
-      if (daysSince >= 0 && daysSince <= 14) {
+      if (daysSince >= 0 && daysSince <= 2) {
         isNew = true;
       }
     }

@@ -51,6 +51,8 @@ export const THEME_STYLES = {
   Cheatmaster: { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
   'Cheat Master': { bg: 'linear-gradient(180deg, #052e16 0%, #1b1c23 100%)', border: '#22c55e' },
   'Loot Hacker': { bg: 'linear-gradient(180deg, #2b29b9 0%, #0a0d1f 100%)', border: '#6366f1' },
+  'Bounty Hunter': { bg: 'linear-gradient(180deg, #6b1426 0%, #15080c 100%)', border: '#f43f5e' },
+  'BountyHunter': { bg: 'linear-gradient(180deg, #6b1426 0%, #15080c 100%)', border: '#f43f5e' },
   Candy: { bg: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)', border: '#f16f68' },
   Galaxy: { bg: 'linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%)', border: '#4a35fa' },
   Holofoil: { bg: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', border: '#ec88d8' },
@@ -108,6 +110,9 @@ export function getSpriteCardStyle(sprite) {
   if (theme === 'Loot Hacker' || theme === 'LootHacker') {
     return { background: 'linear-gradient(180deg, #2b29b9 0%, #0a0d1f 100%)', borderColor: '#6366f1' };
   }
+  if (theme === 'Bounty Hunter' || theme === 'BountyHunter' || theme === 'reaper') {
+    return { background: 'linear-gradient(180deg, #6b1426 0%, #15080c 100%)', borderColor: '#f43f5e' };
+  }
   if (theme === 'Cube') {
     return { background: 'linear-gradient(180deg, #730974 0%, #1b1c23 100%)', borderColor: '#8b008b' };
   }
@@ -159,6 +164,9 @@ export const THEME_NAMES_ES = {
   'Cheat Master': 'Hacker',
   'Loot Hacker': 'Hacker de Botín',
   'LootHacker': 'Hacker de Botín',
+  'Bounty Hunter': 'Cazador de Recompensas',
+  'BountyHunter': 'Cazador de Recompensas',
+  reaper: 'Cazador de Recompensas',
   Candy: 'Gomita',
   Gummy: 'Gomita',
   Galaxy: 'Galáctico',
@@ -168,8 +176,8 @@ export const THEME_NAMES_ES = {
   Quack: 'Patito'
 };
 
-export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
-export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
+export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
+export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
 
 export const FAMILY_NAMES_MAP = {
   water: 'Agua',
@@ -213,10 +221,15 @@ export const FAMILY_NAMES_MAP = {
   overshield: 'Protector',
   onigiri: 'Onigiri',
   xray: 'Rayos X',
-  megaman: 'Megaman'
+  megaman: 'Megaman',
+  crash: 'Crash Bandicoot',
+  morgana: 'Morgana',
+  blinky: 'Blinky',
+  birthday: 'Pastel de Cumpleaños',
+  pond: 'Estanque'
 };
 
-const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails', 'megaman'];
+const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails', 'megaman', 'crash', 'morgana', 'blinky'];
 
 export const SPANISH_NAME_OVERRIDES = {
   water_quack: 'Patito de Agua',
@@ -517,6 +530,121 @@ export const SPIRIT_DATA_OVERRIDES = {
   megaman_basic: {
     ability: 'Deslízate con fricción reducida al deslizarte. ¡Deslízate más lejos con cada subida de nivel!',
     specialPerk: ''
+  },
+
+  // Espíritu Crash Bandicoot
+  crash_basic: {
+    rarity: 'Legendary',
+    ability: 'Otorga un ataque de torbellino en el aire que inflige daño y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!',
+    specialPerk: ''
+  },
+  crash_gold: {
+    ability: 'Otorga un ataque de torbellino en el aire que inflige daño y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  crash_cheatmaster: {
+    ability: 'Otorga un ataque de torbellino en el aire que inflige daño y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  crash_loothacker: {
+    ability: 'Otorga un ataque de torbellino en el aire que inflige daño y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!',
+    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
+  },
+  crash_bountyhunter: {
+    ability: 'Otorga un ataque de torbellino en el aire que inflige daño y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!',
+    specialPerk: 'Cazador de recompensas: rastrea y otorga bonificaciones adicionales al eliminar objetivos marcados.'
+  },
+
+  // Espíritu Blinky
+  blinky_basic: {
+    rarity: 'Legendary',
+    ability: 'Otorga invisibilidad tras recibir daño. ¡La duración de la invisibilidad aumenta con cada subida de nivel!',
+    specialPerk: ''
+  },
+  blinky_gold: {
+    ability: 'Otorga invisibilidad tras recibir daño. ¡La duración de la invisibilidad aumenta con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  blinky_cheatmaster: {
+    ability: 'Otorga invisibilidad tras recibir daño. ¡La duración de la invisibilidad aumenta con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  blinky_loothacker: {
+    ability: 'Otorga invisibilidad tras recibir daño. ¡La duración de la invisibilidad aumenta con cada subida de nivel!',
+    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
+  },
+  blinky_bountyhunter: {
+    ability: 'Otorga invisibilidad tras recibir daño. ¡La duración de la invisibilidad aumenta con cada subida de nivel!',
+    specialPerk: 'Cazador de recompensas: rastrea y otorga bonificaciones adicionales al eliminar objetivos marcados.'
+  },
+
+  // Espíritu Estanque (Pond)
+  pond_basic: {
+    rarity: 'Epic',
+    ability: 'Permite realizar un supersalto al acumular cargas a lo largo del tiempo, emitiendo una onda de choque al aterrizar. ¡La fuerza del salto aumenta y la recarga disminuye por nivel!',
+    specialPerk: ''
+  },
+  pond_gold: {
+    ability: 'Permite realizar un supersalto al acumular cargas a lo largo del tiempo, emitiendo una onda de choque al aterrizar. ¡La fuerza del salto aumenta y la recarga disminuye por nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  pond_cheatmaster: {
+    ability: 'Permite realizar un supersalto al acumular cargas a lo largo del tiempo, emitiendo una onda de choque al aterrizar. ¡La fuerza del salto aumenta y la recarga disminuye por nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  pond_loothacker: {
+    ability: 'Permite realizar un supersalto al acumular cargas a lo largo del tiempo, emitiendo una onda de choque al aterrizar. ¡La fuerza del salto aumenta y la recarga disminuye por nivel!',
+    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
+  },
+  pond_bountyhunter: {
+    ability: 'Permite realizar un supersalto al acumular cargas a lo largo del tiempo, emitiendo una onda de choque al aterrizar. ¡La fuerza del salto aumenta y la recarga disminuye por nivel!',
+    specialPerk: 'Cazador de recompensas: rastrea y otorga bonificaciones adicionales al eliminar objetivos marcados.'
+  },
+
+  // Espíritu Pastel de Cumpleaños
+  birthday_basic: {
+    rarity: 'Rare',
+    ability: 'Al abrir cofres o eliminar enemigos, existe la posibilidad de generar porciones de pastel que restauran salud y escudo.',
+    specialPerk: ''
+  },
+  birthday_gold: {
+    ability: 'Al abrir cofres o eliminar enemigos, existe la posibilidad de generar porciones de pastel que restauran salud y escudo.',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  birthday_cheatmaster: {
+    ability: 'Al abrir cofres o eliminar enemigos, existe la posibilidad de generar porciones de pastel que restauran salud y escudo.',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  birthday_loothacker: {
+    ability: 'Al abrir cofres o eliminar enemigos, existe la posibilidad de generar porciones de pastel que restauran salud y escudo.',
+    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
+  },
+  birthday_bountyhunter: {
+    ability: 'Al abrir cofres o eliminar enemigos, existe la posibilidad de generar porciones de pastel que restauran salud y escudo.',
+    specialPerk: 'Cazador de recompensas: rastrea y otorga bonificaciones adicionales al eliminar objetivos marcados.'
+  },
+
+  // Espíritu Morgana
+  morgana_basic: {
+    rarity: 'Epic',
+    ability: 'Aumenta la efectividad de los objetos de curación consumibles. ¡La efectividad de curación aumenta con cada subida de nivel!',
+    specialPerk: ''
+  },
+  morgana_gold: {
+    ability: 'Aumenta la efectividad de los objetos de curación consumibles. ¡La efectividad de curación aumenta con cada subida de nivel!',
+    specialPerk: 'Obtén PE de bonificación x3 con eliminaciones.'
+  },
+  morgana_cheatmaster: {
+    ability: 'Aumenta la efectividad de los objetos de curación consumibles. ¡La efectividad de curación aumenta con cada subida de nivel!',
+    specialPerk: '¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.'
+  },
+  morgana_loothacker: {
+    ability: 'Aumenta la efectividad de los objetos de curación consumibles. ¡La efectividad de curación aumenta con cada subida de nivel!',
+    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
+  },
+  morgana_bountyhunter: {
+    ability: 'Aumenta la efectividad de los objetos de curación consumibles. ¡La efectividad de curación aumenta con cada subida de nivel!',
+    specialPerk: 'Cazador de recompensas: rastrea y otorga bonificaciones adicionales al eliminar objetivos marcados.'
   }
 };
 
@@ -677,7 +805,12 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     'tails': ['tails', 'narrowfleamonkey'],
     'adventure': ['adventure', 'dwarf'],
     'sonic': ['sonic', 'narrowflea', 'narrowfleaobsidian'],
-    'stormscout': ['stormscout']
+    'stormscout': ['stormscout'],
+    'crash': ['crash', 'crashbandicoot', 'bodyslam'],
+    'morgana': ['morgana', 'increaseheals'],
+    'blinky': ['blinky', 'ghostdamage'],
+    'birthday': ['birthday'],
+    'pond': ['pond', 'winnera']
   };
 
   const keysToTry = [
@@ -710,14 +843,14 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     ? (official.summonCost.includes('Polvo') ? official.summonCost : `${official.summonCost} Polvo Estelar`)
     : null;
 
-  // Calculate isNew based on explicit flag or releaseDate (last 14 days)
-  let isNew = Boolean(item.isNew);
+  // Calculate isNew based on explicit flag or recent releaseDate (fallback only if undefined)
+  let isNew = item.isNew !== undefined ? Boolean(item.isNew) : false;
   const relDateVal = item.releaseDate || item.release_date;
-  if (relDateVal) {
+  if (item.isNew === undefined && relDateVal) {
     const relDate = new Date(relDateVal);
     const now = new Date();
     const daysSince = (now.getTime() - relDate.getTime()) / (1000 * 60 * 60 * 24);
-    if (daysSince >= 0 && daysSince <= 14) {
+    if (daysSince >= 0 && daysSince <= 3) {
       isNew = true;
     }
   }
