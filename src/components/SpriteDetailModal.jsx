@@ -116,12 +116,12 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
               <span className={`sprite-pill rarity-badge ${rarityInfo.classKey ? `sprite-rarity-${rarityInfo.classKey}` : ''}`}>
                 {rarityInfo.name}
               </span>
-              <span className="sdm__drop">{activeSprite.dropChance}</span>
+              <span className="sdm__drop">{activeSprite.unreleased ? 'NO LANZADO' : activeSprite.dropChance}</span>
             </div>
             <h2 className="sdm__name">{activeSprite.fullName}</h2>
             <div className="sdm__meta">
               <span>{activeSprite.variantDisplay || activeSprite.variant} · Gen {activeSprite.gen}</span>
-              {currentState.owned && (
+              {currentState.owned && !activeSprite.unreleased && (
                 <span className={`sdm__meta-lvl ${isMastered ? 'sdm__meta-lvl--mastered' : ''}`}>
                   {' · '}{isMastered ? '⭐ MAXEADO' : `Nivel ${currentState.level}/5`}
                 </span>
@@ -237,17 +237,19 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                   className="sdm__variant-status"
                   onClick={(e) => {
                     e.stopPropagation();
+                    if (v.unreleased) return;
                     onToggleOwned(v.id);
                     sounds.playToggle(!vOwned, v.gen);
                   }}
+                  style={{ cursor: v.unreleased ? 'not-allowed' : 'pointer' }}
                 >
-                  <span className={`sdm__pill ${vMastered ? 'sdm__pill--gold' : vOwned ? 'sdm__pill--green' : ''}`}>
-                    {vMastered ? '⭐ MAX' : vOwned ? '✔ Atrapado' : 'Faltante'}
+                  <span className={`sdm__pill ${v.unreleased ? 'sdm__pill--unreleased' : vMastered ? 'sdm__pill--gold' : vOwned ? 'sdm__pill--green' : ''}`}>
+                    {v.unreleased ? '🔒 No lanzado' : vMastered ? '⭐ MAX' : vOwned ? '✔ Atrapado' : 'Faltante'}
                   </span>
                 </div>
 
                 {/* Level selectors */}
-                {vOwned && (
+                {vOwned && !v.unreleased && (
                   <div className="sdm__variant-levels">
                     {[1, 2, 3, 4, 5].map((lvl) => (
                       <button
