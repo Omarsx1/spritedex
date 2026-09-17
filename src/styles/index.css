@@ -2821,7 +2821,7 @@ body::after {
 /* ===== Sprite Card (fortnite.gg style) ===== */
 .sprite-card {
   content-visibility: auto;
-  contain-intrinsic-size: 0 280px;
+  contain-intrinsic-size: 0 245px;
   contain: layout style;
   border-radius: 14px;
   padding: 22px 14px 14px;
@@ -6712,7 +6712,7 @@ body::after {
 .ms-family-stack {
   position: relative;
   width: 205px;
-  height: 300px;
+  height: 284px;
   margin: 0 auto;
   touch-action: pan-y;
   isolation: isolate;
@@ -6731,10 +6731,10 @@ body::after {
   transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.45s cubic-bezier(0.23, 1, 0.32, 1);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   box-sizing: border-box;
-  padding: 14px 12px 14px 12px;
+  padding: 12px 10px 10px 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   overflow: hidden;
   -webkit-backface-visibility: hidden;
@@ -6781,15 +6781,33 @@ body::after {
 }
 
 /* Ocultar textos y botones en cartas secundarias para evitar solapamiento visual en Safari */
+.ms-card:not(.ms-card--active) .ms-card__footer,
 .ms-card:not(.ms-card--active) .ms-card__info,
+.ms-card:not(.ms-card--active) .ms-card__action,
 .ms-card:not(.ms-card--active) .card-level-stars,
 .ms-card:not(.ms-card--active) .card-owned-btn,
+.ms-card:not(.ms-card--active) .card-rarity-tag,
 .ms-card:not(.ms-card--active) .ms-variant-tag,
 .ms-card:not(.ms-card--active) .ms-level-tag,
 .ms-card:not(.ms-card--active) .ms-card__crown {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
+}
+
+/* ── Rarity Tag (Top-Left on Cards) ── */
+.card-rarity-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  height: 20px;
+  padding: 0 7px;
+  font-size: 10.5px;
+  font-weight: 800;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
 }
 
 /* ── Variant Tag (Top-Left) ── */
@@ -6856,23 +6874,23 @@ body::after {
   border-color: rgba(167, 139, 250, 0.35);
 }
 
-/* ── Card Image (Generous, prominent proportions) ── */
+/* ── Card Image (Hero Stage - Prominent, centered proportions) ── */
 .ms-card__image {
   position: relative;
-  height: 120px;
-  max-height: 120px;
-  flex: none;
+  flex: 1;
+  width: 100%;
+  min-height: 122px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  margin-top: 22px;
-  margin-bottom: 4px;
+  margin-top: 18px;
+  margin-bottom: 2px;
   padding: 0;
 }
 
 .ms-card__image img:not(.ms-card__crown) {
-  max-height: 116px;
-  max-width: 118px;
+  max-height: 124px;
+  max-width: 126px;
   object-fit: contain;
   transition: transform 0.2s ease;
 }
@@ -6881,35 +6899,64 @@ body::after {
   transform: scale(0.95);
 }
 
+/* ── Card Footer Group (Gestalt Proximity: Name + Action) ── */
+.ms-card__footer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
 /* ── Card Info ── */
 .ms-card__info {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  width: 100%;
   text-align: center;
-  margin-bottom: 2px;
 }
 
 .ms-card__info .card-name {
-  font-size: 0.95rem;
+  font-size: 0.96rem;
   font-weight: 800;
   margin: 0;
   white-space: normal;
   overflow-wrap: break-word;
   word-break: break-word;
   line-height: 1.2;
-  min-height: 2.4em;
+  min-height: 2.3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: font-size 0.2s ease;
+}
+
+.ms-card__info .card-name.card-name--long {
+  font-size: 0.82rem;
+  line-height: 1.15;
+}
+
+/* ── Unified Action Zone (Fixed 36px bounding box) ── */
+.ms-card__action {
+  width: 100%;
+  height: 36px;
+  min-height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* ── Stars & Button Controls ── */
 .ms-stars {
-  margin-top: 8px;
-  margin-bottom: 4px;
+  margin: 0;
   width: 100%;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ms-stars .star-btn {
@@ -6917,11 +6964,15 @@ body::after {
 }
 
 .ms-card .card-owned-btn {
-  margin-top: 8px;
-  margin-bottom: 4px;
-  padding: 8px 12px;
+  margin: 0;
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
   font-size: 0.82rem;
   border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ── Swipe Hint ── */

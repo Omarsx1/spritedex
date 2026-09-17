@@ -203,12 +203,12 @@ function FamilyRow({
                 </div>
               )}
 
-              {/* Etiqueta de variante (esquina superior izquierda) */}
-              {variants.length > 1 && (
-                <div className="ms-variant-tag">
-                  {sprite.variantDisplay || sprite.variant}
-                </div>
-              )}
+              {/* Badge de rareza (esquina superior izquierda) */}
+              <div
+                className={`card-rarity-tag sprite-pill rarity-badge ${rarityInfo.classKey ? `sprite-rarity-${rarityInfo.classKey}` : ''}`}
+              >
+                {rarityInfo.name}
+              </div>
 
               {/* Badge de nivel o amigo (esquina superior derecha, solo si está atrapado o vista amigo) */}
               {isFriendView ? (
@@ -271,52 +271,52 @@ function FamilyRow({
                 />
               </div>
 
-              {/* Info: nombre, rareza, drop */}
-              <div className="ms-card__info">
-                <div className="card-name" style={{ fontSize: '1.02rem' }}>{sprite.fullName}</div>
-                <div className="card-meta">
-                  <span className={`sprite-pill rarity-badge ${rarityInfo.classKey ? `sprite-rarity-${rarityInfo.classKey}` : ''}`}>
-                    {rarityInfo.name}
-                  </span>
-                  <span className="drop-pct">{sprite.dropChanceDisplay}</span>
+              {/* Footer unificado: Nombre + Acción (proporciones normalizadas) */}
+              <div className="ms-card__footer">
+                <div className="ms-card__info">
+                  <div className={`card-name ${sprite.fullName && sprite.fullName.length > 18 ? 'card-name--long' : ''}`}>
+                    {sprite.fullName}
+                  </div>
+                </div>
+
+                {/* Zona de acción normalizada a 36px */}
+                <div className="ms-card__action">
+                  {isOwned ? (
+                    <div
+                      className="card-level-stars ms-stars"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {[1, 2, 3, 4, 5].map((num) => (
+                        <button
+                          key={num}
+                          className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''} ${sprite.gen === 2 ? 'is-sonic-ring-btn' : ''}`}
+                          onClick={(e) => handleLevelClick(e, num)}
+                          style={isFriendView ? { pointerEvents: 'none' } : {}}
+                          title={level === 1 && num === 1 ? 'Toca para desmarcar' : `Nivel ${num}`}
+                        >
+                          {sprite.gen === 2 ? (
+                            <SonicRing active={level >= num} mastered={isMastered && num === 5} size={20} />
+                          ) : (
+                            '★'
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <button
+                      className="card-owned-btn"
+                      onClick={handleToggleBadgeClick}
+                      style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800 } : {}}
+                    >
+                      <span className="btn-text">
+                        {isFriendView
+                          ? (friendCanLend ? '+ Registrar en mi Dex' : 'No lo tiene')
+                          : 'Sin atrapar'}
+                      </span>
+                    </button>
+                  )}
                 </div>
               </div>
-
-              {/* Control inferior: Estrellas si está atrapado, botón estándar si no */}
-              {isOwned ? (
-                <div
-                  className="card-level-stars ms-stars"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {[1, 2, 3, 4, 5].map((num) => (
-                    <button
-                      key={num}
-                      className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''} ${sprite.gen === 2 ? 'is-sonic-ring-btn' : ''}`}
-                      onClick={(e) => handleLevelClick(e, num)}
-                      style={isFriendView ? { pointerEvents: 'none' } : {}}
-                      title={level === 1 && num === 1 ? 'Toca para desmarcar' : `Nivel ${num}`}
-                    >
-                      {sprite.gen === 2 ? (
-                        <SonicRing active={level >= num} mastered={isMastered && num === 5} size={20} />
-                      ) : (
-                        '★'
-                      )}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <button
-                  className="card-owned-btn"
-                  onClick={handleToggleBadgeClick}
-                  style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800 } : {}}
-                >
-                  <span className="btn-text">
-                    {isFriendView
-                      ? (friendCanLend ? '+ Registrar en mi Dex' : 'No lo tiene')
-                      : 'Sin atrapar'}
-                  </span>
-                </button>
-              )}
             </div>
           );
         })}
