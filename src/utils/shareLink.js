@@ -1,4 +1,4 @@
-import officialSpritesJson from '../data/official_sprites.json';
+import shareSpritesOrder from '../data/share_sprites_order.json';
 
 const B64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 
@@ -11,12 +11,12 @@ export function encodeCollectionState(userState) {
     if (!userState || typeof userState !== 'object') return '';
 
     let chars = [];
-    for (let i = 0; i < officialSpritesJson.length; i += 2) {
-      const s1 = officialSpritesJson[i];
-      const s2 = officialSpritesJson[i + 1];
+    for (let i = 0; i < shareSpritesOrder.length; i += 2) {
+      const id1 = shareSpritesOrder[i];
+      const id2 = shareSpritesOrder[i + 1];
 
-      const lvl1 = (userState[s1.id]?.owned ? (userState[s1.id]?.level || 1) : 0) & 7;
-      const lvl2 = s2 ? ((userState[s2.id]?.owned ? (userState[s2.id]?.level || 1) : 0) & 7) : 0;
+      const lvl1 = (userState[id1]?.owned ? (userState[id1]?.level || 1) : 0) & 7;
+      const lvl2 = id2 ? ((userState[id2]?.owned ? (userState[id2]?.level || 1) : 0) & 7) : 0;
 
       const val = lvl1 | (lvl2 << 3);
       chars.push(B64_CHARS[val]);
@@ -55,11 +55,11 @@ export function decodeCollectionState(encodedString) {
         const i1 = cIdx * 2;
         const i2 = cIdx * 2 + 1;
 
-        if (i1 < officialSpritesJson.length && lvl1 > 0) {
-          result[officialSpritesJson[i1].id] = { owned: true, level: lvl1 };
+        if (i1 < shareSpritesOrder.length && lvl1 > 0) {
+          result[shareSpritesOrder[i1]] = { owned: true, level: lvl1 };
         }
-        if (i2 < officialSpritesJson.length && lvl2 > 0) {
-          result[officialSpritesJson[i2].id] = { owned: true, level: lvl2 };
+        if (i2 < shareSpritesOrder.length && lvl2 > 0) {
+          result[shareSpritesOrder[i2]] = { owned: true, level: lvl2 };
         }
       }
       return result;
