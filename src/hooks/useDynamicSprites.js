@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES, SUMMON_COST_OVERRIDES } from '../data/spritesData';
 import { supabase, isSupabaseConfigured } from '../utils/supabase';
 
-const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache_v2';
+export const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache_v2';
 
 function sanitizeDynamicItem(item) {
   if (!item) return item;

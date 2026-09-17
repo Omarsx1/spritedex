@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { RARITIES, THEME_NAMES_ES, FAMILY_NAMES_MAP, getSpriteCardStyle } from '../../data/spritesData';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
+import { DYNAMIC_SPRITES_CACHE_KEY } from '../../hooks/useDynamicSprites';
 
 // Convierte una fecha ISO (UTC o local) en string YYYY-MM-DDTHH:mm local sin desplazamiento de zona horaria
 function formatToLocalInputString(dateInput) {
@@ -301,16 +302,16 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
         localStorage.setItem('spritedex_manual_is_new_map', JSON.stringify(manualMap));
       } catch {}
 
-      // Actualizar también inmediatamente la caché local spritedex_dynamic_sprites_cache
+      // Actualizar también inmediatamente la caché local DYNAMIC_SPRITES_CACHE_KEY
       try {
-        const cached = JSON.parse(localStorage.getItem('spritedex_dynamic_sprites_cache') || '[]');
+        const cached = JSON.parse(localStorage.getItem(DYNAMIC_SPRITES_CACHE_KEY) || '[]');
         const idx = cached.findIndex(s => s.id === cleanId);
         if (idx >= 0) {
           cached[idx] = { ...cached[idx], ...payload };
         } else {
           cached.unshift(payload);
         }
-        localStorage.setItem('spritedex_dynamic_sprites_cache', JSON.stringify(cached));
+        localStorage.setItem(DYNAMIC_SPRITES_CACHE_KEY, JSON.stringify(cached));
       } catch {}
 
       onSave({ ...payload, isNew: Boolean(formData.isNew) });
