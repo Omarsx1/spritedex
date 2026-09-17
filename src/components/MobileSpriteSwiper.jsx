@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import confetti from 'canvas-confetti';
+import { Lock } from 'lucide-react';
 import { RARITIES, getSpriteCardStyle, VARIANT_ORDER } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import { SonicRing } from './SonicRing';
@@ -28,16 +29,21 @@ function FamilyRow({
   onSetLevel,
   onOpenDetail
 }) {
+  const variantsKey = variants.map(v => v.id).join(',');
+  const [prevVariantsKey, setPrevVariantsKey] = useState(variantsKey);
   const [activeIdx, setActiveIdx] = useState(0);
+
+  // Reset síncrono al renderizar si cambian las variantes o filtros
+  if (prevVariantsKey !== variantsKey) {
+    setPrevVariantsKey(variantsKey);
+    setActiveIdx(0);
+  }
+
+  const safeActiveIdx = Math.min(Math.max(0, activeIdx), Math.max(0, variants.length - 1));
+
   const [dragOffset, setDragOffset] = useState(0);
   const startXRef = useRef(0);
   const isDraggingRef = useRef(false);
-
-  // Reset al primer sprite (Base) si cambian las variantes o filtros
-  const variantsKey = variants.map(v => v.id).join(',');
-  useEffect(() => {
-    setActiveIdx(0);
-  }, [familyName, variantsKey]);
 
   const handleTouchStart = (e) => {
     isDraggingRef.current = true;
@@ -49,18 +55,18 @@ function FamilyRow({
     const diff = e.touches[0].clientX - startXRef.current;
     // Resistencia elástica en los bordes
     let offset = diff;
-    if (activeIdx === 0 && diff > 0) offset = diff * 0.3;
-    else if (activeIdx === variants.length - 1 && diff < 0) offset = diff * 0.3;
+    if (safeActiveIdx === 0 && diff > 0) offset = diff * 0.3;
+    else if (safeActiveIdx === variants.length - 1 && diff < 0) offset = diff * 0.3;
     setDragOffset(offset);
   };
 
   const handleTouchEnd = () => {
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
-    if (dragOffset < -50 && activeIdx < variants.length - 1) {
-      setActiveIdx((prev) => prev + 1);
-    } else if (dragOffset > 50 && activeIdx > 0) {
-      setActiveIdx((prev) => prev - 1);
+    if (dragOffset < -50 && safeActiveIdx < variants.length - 1) {
+      setActiveIdx(safeActiveIdx + 1);
+    } else if (dragOffset > 50 && safeActiveIdx > 0) {
+      setActiveIdx(safeActiveIdx - 1);
     }
     setDragOffset(0);
   };
@@ -80,7 +86,7 @@ function FamilyRow({
                 <button
                   key={v.id || i}
                   type="button"
-                  className={`ms-dot ${i === activeIdx ? 'ms-dot--active' : ''} ${isVarOwned ? 'ms-dot--owned' : ''}`}
+                  className={`ms-dot ${i === safeActiveIdx ? 'ms-dot--active' : ''} ${isVarOwned ? 'ms-dot--owned' : ''}`}
                   onClick={() => {
                     setActiveIdx(i);
                     sounds.playBeep();
@@ -102,10 +108,10 @@ function FamilyRow({
       >
         {variants.map((sprite, idx) => {
           // Solo renderizar la card activa + 3 siguientes
-          if (idx < activeIdx || idx > activeIdx + 3) return null;
+          if (idx < safeActiveIdx || idx > safeActiveIdx + 3) return null;
 
-          const isCurrent = idx === activeIdx;
-          const offset = idx - activeIdx;
+          const isCurrent = idx === safeActiveIdx;
+          const offset = idx - safeActiveIdx;
 
           let posClass = 'ms-card--hidden';
           if (offset === 0) posClass = 'ms-card--active';
@@ -136,6 +142,7 @@ function FamilyRow({
 
           const handleToggleBadgeClick = (e) => {
             e.stopPropagation();
+            if (sprite.unreleased) return;
             if (isFriendView) {
               if (friendCanLend) {
                 const nextOwned = !myOwned;
@@ -158,6 +165,7 @@ function FamilyRow({
 
           const handleLevelClick = (e, newLevel) => {
             e.stopPropagation();
+            if (sprite.unreleased) return;
             if (isFriendView) return;
             if (!isOwned) {
               onToggleOwned(sprite.id);
@@ -210,8 +218,8 @@ function FamilyRow({
                 {rarityInfo.name}
               </div>
 
-              {/* Badge de nivel o amigo (esquina superior derecha, solo si está atrapado o vista amigo) */}
-              {isFriendView ? (
+              {/* Badge de nivel o amigo (esquina superior derecha, solo si no es unreleased y está atrapado o vista amigo) */}
+              {!sprite.unreleased && (isFriendView ? (
                 friendCanLend ? (
                   <div className="ms-level-tag ms-level-tag--lend" onClick={handleToggleBadgeClick}>
                     {myOwned ? '✓ REGISTRADO' : '🎁 PRESTA'}
@@ -229,7 +237,7 @@ function FamilyRow({
                 >
                   {isMastered ? 'MAX' : `LVL.${level}`}
                 </div>
-              ) : null}
+              ) : null)}
 
               {/* Imagen del Sprite (proporciones esbeltas) */}
               <div className="ms-card__image" onClick={handleImageClick}>
@@ -281,7 +289,12 @@ function FamilyRow({
 
                 {/* Zona de acción normalizada a 36px */}
                 <div className="ms-card__action">
-                  {isOwned ? (
+                  {sprite.unreleased ? (
+                    <div className="card-unreleased-pill" onClick={(e) => e.stopPropagation()}>
+                      <Lock size={13} />
+                      <span>No lanzado</span>
+                    </div>
+                  ) : isOwned ? (
                     <div
                       className="card-level-stars ms-stars"
                       onClick={(e) => e.stopPropagation()}
