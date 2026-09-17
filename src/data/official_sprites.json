@@ -96,6 +96,15 @@
     "isNew": false
   },
   {
+    "id": "earth_cube",
+    "name": "Tierra Cúbico",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
+  },
+  {
     "id": "earth_gem",
     "name": "Gem Earth",
     "theme": "Gem",
@@ -150,6 +159,15 @@
     "rarity": "Special",
     "unreleased": false,
     "isNew": false
+  },
+  {
+    "id": "fire_cube",
+    "name": "Fuego Cúbico",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
   },
   {
     "id": "fire_holofoil",
@@ -304,6 +322,15 @@
     "isNew": false
   },
   {
+    "id": "dream_cube",
+    "name": "Dormilón Cúbico",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
+  },
+  {
     "id": "dream_gem",
     "name": "Gem Dream",
     "theme": "Gem",
@@ -398,6 +425,15 @@
     "rarity": "Special",
     "unreleased": false,
     "isNew": false
+  },
+  {
+    "id": "punk_cube",
+    "name": "Punk Cúbico",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
   },
   {
     "id": "punk_gem",
@@ -496,6 +532,15 @@
     "isNew": false
   },
   {
+    "id": "zeropoint_cube",
+    "name": "Punto Cero Cúbico",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
+  },
+  {
     "id": "zeropoint_holofoil",
     "name": "Holofoil Zero Point",
     "theme": "Holofoil",
@@ -566,6 +611,15 @@
     "rarity": "Special",
     "unreleased": false,
     "isNew": false
+  },
+  {
+    "id": "fishy_cube",
+    "name": "Pescado Cúbico",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
   },
   {
     "id": "fishy_holofoil",
@@ -728,6 +782,15 @@
     "isNew": false
   },
   {
+    "id": "boss_cube",
+    "name": "Jefe Cúbico",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
+  },
+  {
     "id": "boss_holofoil",
     "name": "Holofoil Boss",
     "theme": "Holofoil",
@@ -782,6 +845,15 @@
     "rarity": "Special",
     "unreleased": false,
     "isNew": false
+  },
+  {
+    "id": "grim_cube",
+    "name": "Parca Cúbico",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
   },
   {
     "id": "grim_holofoil",
@@ -934,6 +1006,15 @@
     "rarity": "Special",
     "unreleased": false,
     "isNew": false
+  },
+  {
+    "id": "batman_cube",
+    "name": "Batman Cúbico",
+    "theme": "Cube",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
   },
   {
     "id": "batman_holofoil",
