@@ -2,8 +2,8 @@ name: Sincronización Automática de Espíritus
 
 on:
   schedule:
-    # JUEVES (Día de parches de Fortnite): Cada 2 horas de 5:00 a. m. a 5:00 p. m. (hora local UTC-5)
-    - cron: '0 10,12,14,16,18,20,22 * * 4'
+    # JUEVES: Cada hora en la mañana pico (5, 6, 7, 8, 9, 10, 11 AM y 12, 1 PM local UTC-5) + tarde (3 y 5 PM)
+    - cron: '0 10,11,12,13,14,15,16,17,18,20,22 * * 4'
     # JUEVES NOCHE: 7:00 p. m. y 9:00 p. m. (hora local UTC-5)
     - cron: '0 0,2 * * 5'
     # RESTO DE LA SEMANA: 2 revisiones diarias a las 10:00 a. m. y 4:00 p. m. (hora local UTC-5)
