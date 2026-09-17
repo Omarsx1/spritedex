@@ -1,5 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import confetti from 'canvas-confetti';
+import { Lock } from 'lucide-react';
 import { RARITIES, getSpriteCardStyle, getRarityInfo, VARIANT_ORDER } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import { SonicRing } from './SonicRing';
