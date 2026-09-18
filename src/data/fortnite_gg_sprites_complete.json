@@ -208,22 +208,6 @@
     "dropChance": "0%"
   },
   {
-    "id": "205",
-    "name": "Bounty Hunter Bush",
-    "fullName": "Bounty Hunter Bush Sprite",
-    "parent": "BushRanger",
-    "rarity": "Special",
-    "variant": "Bounty hunter",
-    "season": "C7 S4",
-    "unreleased": true,
-    "image": "https://fortnite.gg/img/x/sprites/icons/T_Icon_BR_Creature_Sprite_BushRanger_BountyHunter_L.webp",
-    "ability": "Te otorga un arbusto tras cierta duración; obtén un arbusto al realizar una eliminación en el nivel máximo. ¡El tiempo de activación del arbusto disminuye con cada subida de nivel!",
-    "specialPerk": "Cazador de recompensas: rastrea y otorga bonificaciones adicionales al eliminar objetivos marcados.",
-    "location": "Distribuido por la isla de Fortnite",
-    "summonCost": "0",
-    "dropChance": "0%"
-  },
-  {
     "id": "105",
     "name": "Loot Hacker Bushranger",
     "fullName": "Loot Hacker Bushranger Sprite",
@@ -237,6 +221,22 @@
     "specialPerk": "Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.",
     "location": "Distribuido por la isla de Fortnite",
     "summonCost": "2,000 Polvo Estelar",
+    "dropChance": "0%"
+  },
+  {
+    "id": "205",
+    "name": "Bounty Hunter Bush",
+    "fullName": "Bounty Hunter Bush Sprite",
+    "parent": "BushRanger",
+    "rarity": "Special",
+    "variant": "Bounty hunter",
+    "season": "C7 S4",
+    "unreleased": true,
+    "image": "https://fortnite.gg/img/x/sprites/icons/T_Icon_BR_Creature_Sprite_BushRanger_BountyHunter_L.webp",
+    "ability": "Te otorga un arbusto tras cierta duración; obtén un arbusto al realizar una eliminación en el nivel máximo. ¡El tiempo de activación del arbusto disminuye con cada subida de nivel!",
+    "specialPerk": "Cazador de recompensas: rastrea y otorga bonificaciones adicionales al eliminar objetivos marcados.",
+    "location": "Distribuido por la isla de Fortnite",
+    "summonCost": "0",
     "dropChance": "0%"
   },
   {
