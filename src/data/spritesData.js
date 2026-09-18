@@ -436,6 +436,10 @@ export const SPIRIT_DATA_OVERRIDES = {
     ability: 'Solo sube de nivel al ganar partidas. Sube de nivel más rápido con victorias con corona. ¡Nuevas variantes desbloqueadas tras dominarlo!',
     specialPerk: 'Sin confirmar.'
   },
+  crown_bountyhunter: {
+    ability: 'Solo sube de nivel al ganar partidas. Sube de nivel más rápido con victorias con corona. ¡Nuevas variantes desbloqueadas tras dominarlo!',
+    specialPerk: 'Cazador de recompensas: rastrea y otorga bonificaciones adicionales al eliminar objetivos marcados.'
+  },
 
   // Espíritu 8-Bit
   '8bit_basic': {
@@ -739,6 +743,7 @@ export const SUMMON_COST_OVERRIDES = {
   'crown_gold': '2,250 Polvo Estelar',
   'crown_cheatmaster': '2,250 Polvo Estelar',
   'crown_loothacker': '2,250 Polvo Estelar',
+  'crown_bountyhunter': '2,500 Polvo Estelar',
 
   // Klombo
   'klombo_basic': '2,000 Polvo Estelar',

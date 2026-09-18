@@ -591,9 +591,11 @@ async function syncSprites() {
       const isBase = resolvedTheme === 'Basic' || resolvedTheme === 'Base';
       const resolvedName = c.name || (isBase ? (c.parentName || c.parent) : `${resolvedTheme} ${c.parentName || c.parent}`);
 
-      // Mantener condición de no lanzado para Bounty Hunters mientras el paquete no esté lanzado globalmente
+      // Mantener condición de no lanzado para Bounty Hunters mientras el paquete no esté lanzado globalmente (excepto Victorioso que sí está activo)
       let isUnreleased = c.unreleased;
-      if (resolvedTheme === 'Bounty Hunter' && hasUnreleasedBountyHunters) {
+      if (resolvedTheme === 'Bounty Hunter' && (c.parent?.toLowerCase() === 'crown' || c.name?.toLowerCase().includes('crown') || c.name?.toLowerCase().includes('victorioso'))) {
+        isUnreleased = false;
+      } else if (resolvedTheme === 'Bounty Hunter' && hasUnreleasedBountyHunters) {
         isUnreleased = true;
       }
 
@@ -643,9 +645,11 @@ async function syncSprites() {
       const themeKey = normalizeKey(theme);
       const expectedId = `${familyId}_${themeKey}`;
 
-      // Determinar si es no lanzado respetando la regla del paquete de Bounty Hunters
+      // Determinar si es no lanzado respetando la regla del paquete de Bounty Hunters (excepto Victorioso que sí está activo)
       let isCardUnreleased = card.unreleased;
-      if (theme === 'Bounty Hunter' && hasUnreleasedBountyHunters) {
+      if (theme === 'Bounty Hunter' && (familyId === 'crown' || parentNorm === 'crown')) {
+        isCardUnreleased = false;
+      } else if (theme === 'Bounty Hunter' && hasUnreleasedBountyHunters) {
         isCardUnreleased = true;
       }
 

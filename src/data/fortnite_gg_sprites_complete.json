@@ -711,7 +711,7 @@
     "rarity": "Special",
     "variant": "Bounty hunter",
     "season": "C7 S4",
-    "unreleased": true,
+    "unreleased": false,
     "image": "https://fortnite.gg/img/x/sprites/icons/T_Icon_BR_Creature_Sprite_Crown_BountyHunter_L.webp",
     "ability": "Solo sube de nivel al ganar partidas. Sube de nivel más rápido con victorias con corona. ¡Nuevas variantes desbloqueadas tras dominarlo!",
     "specialPerk": "Cazador de recompensas: rastrea y otorga bonificaciones adicionales al eliminar objetivos marcados.",

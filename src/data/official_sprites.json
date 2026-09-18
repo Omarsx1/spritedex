@@ -1152,8 +1152,9 @@
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true,
-    "isNew": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
   },
   {
     "id": "jackrabbit_basic",
