@@ -116,14 +116,15 @@ export function SpriteCard({
               if (!e.target.dataset.triedBase) {
                 e.target.dataset.triedBase = 'true';
                 const baseId = sprite.id ? sprite.id.split('_')[0] : 'water';
-                if (baseId === 'peely' || baseId === 'llama' || baseId === 'ironmouse') {
+                const isWebpBase = sprite.gen === 2 || ['pond', 'klombo', 'sonic', 'shadow', 'tails', 'crash', 'blinky', 'birthday', 'morgana', '8bit', 'adventure', 'bush', 'jonesy', 'killswitch', 'stormscout', 'onigiri', 'overshield', 'xray', 'peely', 'llama', 'ironmouse'].includes(baseId);
+                if (isWebpBase) {
                   e.target.src = `/sprites/${baseId}_basic.webp`;
                 } else {
                   e.target.src = `/sprites/${baseId}_basic.png`;
                 }
               } else {
                 e.target.onerror = null;
-                e.target.src = '/sprites/water_basic.png';
+                e.target.src = sprite.gen === 2 ? '/sprites/sonic_basic.webp' : '/sprites/water_basic.png';
               }
             }}
           />
@@ -273,14 +274,15 @@ export function SpriteCard({
             if (!e.target.dataset.triedBase) {
               e.target.dataset.triedBase = 'true';
               const baseId = sprite.id ? sprite.id.split('_')[0] : 'water';
-              if (baseId === 'peely' || baseId === 'llama' || baseId === 'ironmouse') {
+              const isWebpBase = sprite.gen === 2 || ['pond', 'klombo', 'sonic', 'shadow', 'tails', 'crash', 'blinky', 'birthday', 'morgana', '8bit', 'adventure', 'bush', 'jonesy', 'killswitch', 'stormscout', 'onigiri', 'overshield', 'xray', 'peely', 'llama', 'ironmouse'].includes(baseId);
+              if (isWebpBase) {
                 e.target.src = `/sprites/${baseId}_basic.webp`;
               } else {
                 e.target.src = `/sprites/${baseId}_basic.png`;
               }
             } else {
               e.target.onerror = null;
-              e.target.src = '/sprites/water_basic.png';
+              e.target.src = sprite.gen === 2 ? '/sprites/sonic_basic.webp' : '/sprites/water_basic.png';
             }
           }}
         />

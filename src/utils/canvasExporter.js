@@ -71,9 +71,23 @@ const globalImageCache = new Map();
 // Caché global persistente de plantillas renderizadas para carga 0ms instantánea
 export const globalCanvasCache = new Map();
 
-// Clave canónica unificada para caché de plantillas de canvas (0ms instantáneo)
-export function getCanvasCacheKey(format = 'checklist', bgStyle = 'glitch_override', count = 0, ownedCount = 0) {
-  return `v10_${format}_${bgStyle}_${count}_${ownedCount}`;
+// Clave canónica unificada para caché de plantillas de canvas (0ms instantáneo y sin colisiones entre filtros)
+export function getCanvasCacheKey(format = 'checklist', bgStyle = 'glitch_override', count = 0, ownedCount = 0, spritesList = [], userState = {}) {
+  let hash = 0;
+  if (Array.isArray(spritesList) && spritesList.length > 0) {
+    for (let i = 0; i < spritesList.length; i++) {
+      const s = spritesList[i];
+      const id = s?.id || '';
+      const st = userState ? userState[id] : null;
+      const stateBit = st?.owned ? (st?.level || 1) : 0;
+      const str = `${id}:${stateBit};`;
+      for (let j = 0; j < str.length; j++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(j);
+        hash |= 0;
+      }
+    }
+  }
+  return `v11_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -90,10 +104,18 @@ export function loadImage(src) {
 
   // 2. Reutilización instantánea si la imagen ya está presente en el DOM del navegador
   if (typeof document !== 'undefined' && document.images) {
+    let targetUrl = src;
+    try {
+      if (typeof window !== 'undefined' && !src.startsWith('http://') && !src.startsWith('https://')) {
+        targetUrl = new URL(src, window.location.origin).href;
+      }
+    } catch {}
+
     for (let i = 0; i < document.images.length; i++) {
       const domImg = document.images[i];
-      if (domImg && domImg.complete && domImg.naturalWidth > 0) {
-        if (domImg.src === src || domImg.getAttribute('src') === src || domImg.src.endsWith(src)) {
+      // Excluir imágenes marcadas con fallback/error (dataset.triedBase)
+      if (domImg && domImg.complete && domImg.naturalWidth > 0 && !domImg.dataset.triedBase) {
+        if (domImg.src === targetUrl || domImg.getAttribute('src') === src) {
           globalImageCache.set(src, domImg);
           return Promise.resolve(domImg);
         }
@@ -363,7 +385,7 @@ export async function generatePokedexCardImage({
 }) {
   const effectiveBgStyle = bgStyle || (useBackgroundTemplate ? 'glitch_override' : 'dark_matrix');
   const ownedCount = spritesList.filter(s => userState[s.id]?.owned).length;
-  const cacheKey = getCanvasCacheKey(format, effectiveBgStyle, spritesList.length, ownedCount);
+  const cacheKey = getCanvasCacheKey(format, effectiveBgStyle, spritesList.length, ownedCount, spritesList, userState);
 
   // 1. Devolución instantánea a 0ms si la plantilla ya fue generada previamente
   if (globalCanvasCache.has(cacheKey)) {
@@ -387,7 +409,8 @@ export async function generatePokedexCardImage({
       if (img) loadedImagesMap['__bg_override__'] = img;
     }),
     ...spritesList.slice(0, 250).map(async (s) => {
-      const img = await loadImage(s.image);
+      const targetSrc = (s.id === 'pond_gold') ? '/sprites/pond_gold.webp' : (s.image || (s.gen === 2 ? `/sprites/${s.id}.webp` : `/sprites/${s.id}.png`));
+      const img = await loadImage(targetSrc);
       if (img) loadedImagesMap[s.id] = img;
     })
   ]);

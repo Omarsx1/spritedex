@@ -18,7 +18,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   // Clave de preview canónica para mostrar la plantilla en 0ms si ya está en caché
   const initialCount = allSprites.length;
   const initialOwned = allSprites.filter(s => userState[s.id]?.owned).length;
-  const initialCacheKey = getCanvasCacheKey('checklist', 'glitch_override', initialCount, initialOwned);
+  const initialCacheKey = getCanvasCacheKey('checklist', 'glitch_override', initialCount, initialOwned, allSprites, userState);
   const initialCached = globalTemplatePreviewCache.get(initialCacheKey) || globalCanvasCache.get(initialCacheKey);
 
   const [dataUrl, setDataUrl] = useState(() => initialCached?.url || initialCached?.dataUrl || (typeof initialCached === 'string' ? initialCached : ''));
@@ -131,7 +131,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       return;
     }
 
-    const currentKey = getCanvasCacheKey(format, bgStyle, spritesList.length, ownedInScope);
+    const currentKey = getCanvasCacheKey(format, bgStyle, spritesList.length, ownedInScope, spritesList, userState);
     const cached = globalTemplatePreviewCache.get(currentKey) || globalCanvasCache.get(currentKey);
     if (cached) {
       const url = typeof cached === 'string' ? cached : (cached.url || cached.dataUrl);
