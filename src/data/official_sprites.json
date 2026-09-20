@@ -1064,17 +1064,17 @@
     "isNew": false
   },
   {
-    "id": "klombo_basic",
-    "name": "Klombo",
+    "id": "jonesy_basic",
+    "name": "Jonesy",
     "theme": "Basic",
-    "rarity": "Mythic",
+    "rarity": "Rare",
     "gen": 2,
     "unreleased": false,
     "isNew": false
   },
   {
-    "id": "klombo_gold",
-    "name": "Klombo Dorado",
+    "id": "jonesy_gold",
+    "name": "Jonesy Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -1082,8 +1082,8 @@
     "isNew": false
   },
   {
-    "id": "klombo_cheatmaster",
-    "name": "Klombo Hacker",
+    "id": "jonesy_cheatmaster",
+    "name": "Jonesy Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1091,8 +1091,8 @@
     "isNew": false
   },
   {
-    "id": "klombo_loothacker",
-    "name": "Klombo Hacker de Botín",
+    "id": "jonesy_loothacker",
+    "name": "Jonesy Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1101,8 +1101,330 @@
     "isNew": false
   },
   {
-    "id": "klombo_bountyhunter",
-    "name": "Klombo Cazador de Recompensas",
+    "id": "jonesy_bountyhunter",
+    "name": "Jonesy Cazador de Recompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true,
+    "isNew": false
+  },
+  {
+    "id": "adventure_basic",
+    "name": "Aventurero",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "adventure_gold",
+    "name": "Aventurero Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "adventure_cheatmaster",
+    "name": "Aventurero Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "adventure_loothacker",
+    "name": "Aventurero Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "release_date": "2026-09-10T11:50:00.000Z",
+    "isNew": false
+  },
+  {
+    "id": "adventure_bountyhunter",
+    "name": "Aventurero Cazador de Recompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true,
+    "isNew": false
+  },
+  {
+    "id": "bush_basic",
+    "name": "Arbustín",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "bush_gold",
+    "name": "Arbustín Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "bush_cheatmaster",
+    "name": "Arbustín Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "bush_loothacker",
+    "name": "Arbustín Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "release_date": "2026-09-10T11:50:00.000Z",
+    "isNew": false
+  },
+  {
+    "id": "bush_bountyhunter",
+    "name": "Arbustín Cazador de Recompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true,
+    "isNew": false
+  },
+  {
+    "id": "sonic_basic",
+    "name": "Sonic",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "sonic_gold",
+    "name": "Sonic Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "sonic_cheatmaster",
+    "name": "Sonic Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "sonic_loothacker",
+    "name": "Sonic Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "release_date": "2026-09-10T11:50:00.000Z",
+    "isNew": false
+  },
+  {
+    "id": "sonic_bountyhunter",
+    "name": "Sonic Cazador de Recompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true,
+    "isNew": false
+  },
+  {
+    "id": "tails_basic",
+    "name": "Tails",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "tails_gold",
+    "name": "Tails Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "tails_cheatmaster",
+    "name": "Tails Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "tails_loothacker",
+    "name": "Tails Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "release_date": "2026-09-10T11:50:00.000Z",
+    "isNew": false
+  },
+  {
+    "id": "tails_bountyhunter",
+    "name": "Tails Cazador de Recompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true,
+    "isNew": false
+  },
+  {
+    "id": "shadow_basic",
+    "name": "Shadow",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "shadow_gold",
+    "name": "Shadow Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "shadow_cheatmaster",
+    "name": "Shadow Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "shadow_loothacker",
+    "name": "Shadow Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "release_date": "2026-09-10T11:50:00.000Z",
+    "isNew": false
+  },
+  {
+    "id": "shadow_bountyhunter",
+    "name": "Shadow Cazador de Recompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true,
+    "isNew": false
+  },
+  {
+    "id": "8bit_basic",
+    "name": "8-Bit",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "8bit_gold",
+    "name": "8-Bit Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "8bit_cheatmaster",
+    "name": "8-Bit Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "8bit_loothacker",
+    "name": "8-Bit Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "release_date": "2026-09-10T11:50:00.000Z",
+    "isNew": false
+  },
+  {
+    "id": "8bit_bountyhunter",
+    "name": "8-Bit Cazador de Recompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true,
+    "isNew": false
+  },
+  {
+    "id": "jackrabbit_basic",
+    "name": "Jackrabbit",
+    "theme": "Basic",
+    "rarity": "Legendary",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "jackrabbit_gold",
+    "name": "Gold Jackrabbit",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "jackrabbit_cheatmaster",
+    "name": "Hacker Jackrabbit",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false
+  },
+  {
+    "id": "jackrabbit_loothacker",
+    "name": "Jackrabbit Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "release_date": "2026-09-10T11:50:00.000Z",
+    "isNew": false
+  },
+  {
+    "id": "jackrabbit_bountyhunter",
+    "name": "Jackrabbit Cazador de Recompensas",
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "gen": 2,
@@ -1157,190 +1479,6 @@
     "releaseDate": "2026-09-17"
   },
   {
-    "id": "jackrabbit_basic",
-    "name": "Jackrabbit",
-    "theme": "Basic",
-    "rarity": "Legendary",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "jackrabbit_gold",
-    "name": "Gold Jackrabbit",
-    "theme": "Gold",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "jackrabbit_cheatmaster",
-    "name": "Hacker Jackrabbit",
-    "theme": "Cheatmaster",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "jackrabbit_loothacker",
-    "name": "Jackrabbit Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "release_date": "2026-09-10T11:50:00.000Z",
-    "isNew": false
-  },
-  {
-    "id": "jackrabbit_bountyhunter",
-    "name": "Jackrabbit Cazador de Recompensas",
-    "theme": "Bounty Hunter",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true,
-    "isNew": false
-  },
-  {
-    "id": "sonic_basic",
-    "name": "Sonic",
-    "theme": "Basic",
-    "rarity": "Epic",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "sonic_gold",
-    "name": "Sonic Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "sonic_cheatmaster",
-    "name": "Sonic Hacker",
-    "theme": "Cheatmaster",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "sonic_loothacker",
-    "name": "Sonic Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "release_date": "2026-09-10T11:50:00.000Z",
-    "isNew": false
-  },
-  {
-    "id": "sonic_bountyhunter",
-    "name": "Sonic Cazador de Recompensas",
-    "theme": "Bounty Hunter",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true,
-    "isNew": false
-  },
-  {
-    "id": "shadow_basic",
-    "name": "Shadow",
-    "theme": "Basic",
-    "rarity": "Epic",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "shadow_gold",
-    "name": "Shadow Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "shadow_cheatmaster",
-    "name": "Shadow Hacker",
-    "theme": "Cheatmaster",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "shadow_loothacker",
-    "name": "Shadow Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "release_date": "2026-09-10T11:50:00.000Z",
-    "isNew": false
-  },
-  {
-    "id": "shadow_bountyhunter",
-    "name": "Shadow Cazador de Recompensas",
-    "theme": "Bounty Hunter",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true,
-    "isNew": false
-  },
-  {
-    "id": "tails_basic",
-    "name": "Tails",
-    "theme": "Basic",
-    "rarity": "Epic",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "tails_gold",
-    "name": "Tails Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "tails_cheatmaster",
-    "name": "Tails Hacker",
-    "theme": "Cheatmaster",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "tails_loothacker",
-    "name": "Tails Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "release_date": "2026-09-10T11:50:00.000Z",
-    "isNew": false
-  },
-  {
-    "id": "tails_bountyhunter",
-    "name": "Tails Cazador de Recompensas",
-    "theme": "Bounty Hunter",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true,
-    "isNew": false
-  },
-  {
     "id": "killswitch_basic",
     "name": "Killswitch",
     "theme": "Basic",
@@ -1387,17 +1525,17 @@
     "isNew": false
   },
   {
-    "id": "bush_basic",
-    "name": "Arbustín",
+    "id": "klombo_basic",
+    "name": "Klombo",
     "theme": "Basic",
-    "rarity": "Rare",
+    "rarity": "Mythic",
     "gen": 2,
     "unreleased": false,
     "isNew": false
   },
   {
-    "id": "bush_gold",
-    "name": "Arbustín Dorado",
+    "id": "klombo_gold",
+    "name": "Klombo Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -1405,8 +1543,8 @@
     "isNew": false
   },
   {
-    "id": "bush_cheatmaster",
-    "name": "Arbustín Hacker",
+    "id": "klombo_cheatmaster",
+    "name": "Klombo Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1414,8 +1552,8 @@
     "isNew": false
   },
   {
-    "id": "bush_loothacker",
-    "name": "Arbustín Hacker de Botín",
+    "id": "klombo_loothacker",
+    "name": "Klombo Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1424,8 +1562,8 @@
     "isNew": false
   },
   {
-    "id": "bush_bountyhunter",
-    "name": "Arbustín Cazador de Recompensas",
+    "id": "klombo_bountyhunter",
+    "name": "Klombo Cazador de Recompensas",
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "gen": 2,
@@ -1433,240 +1571,14 @@
     "isNew": false
   },
   {
-    "id": "adventure_basic",
-    "name": "Aventurero",
-    "theme": "Basic",
-    "rarity": "Rare",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "adventure_gold",
-    "name": "Aventurero Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "adventure_cheatmaster",
-    "name": "Aventurero Hacker",
-    "theme": "Cheatmaster",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "adventure_loothacker",
-    "name": "Aventurero Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "release_date": "2026-09-10T11:50:00.000Z",
-    "isNew": false
-  },
-  {
-    "id": "adventure_bountyhunter",
-    "name": "Aventurero Cazador de Recompensas",
-    "theme": "Bounty Hunter",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true,
-    "isNew": false
-  },
-  {
-    "id": "jonesy_basic",
-    "name": "Jonesy",
-    "theme": "Basic",
-    "rarity": "Rare",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "jonesy_gold",
-    "name": "Jonesy Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "jonesy_cheatmaster",
-    "name": "Jonesy Hacker",
-    "theme": "Cheatmaster",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "jonesy_loothacker",
-    "name": "Jonesy Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "release_date": "2026-09-10T11:50:00.000Z",
-    "isNew": false
-  },
-  {
-    "id": "jonesy_bountyhunter",
-    "name": "Jonesy Cazador de Recompensas",
-    "theme": "Bounty Hunter",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true,
-    "isNew": false
-  },
-  {
-    "id": "8bit_basic",
-    "name": "8-Bit",
-    "theme": "Basic",
-    "rarity": "Rare",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "8bit_gold",
-    "name": "8-Bit Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "8bit_cheatmaster",
-    "name": "8-Bit Hacker",
-    "theme": "Cheatmaster",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "8bit_loothacker",
-    "name": "8-Bit Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "release_date": "2026-09-10T11:50:00.000Z",
-    "isNew": false
-  },
-  {
-    "id": "8bit_bountyhunter",
-    "name": "8-Bit Cazador de Recompensas",
-    "theme": "Bounty Hunter",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true,
-    "isNew": false
-  },
-  {
-    "id": "stormscout_basic",
-    "name": "Exploratormentas",
-    "theme": "Basic",
-    "rarity": "Rare",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false,
-    "releaseDate": "2026-08-30"
-  },
-  {
-    "id": "stormscout_gold",
-    "name": "Exploratormentas Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false,
-    "releaseDate": "2026-08-30"
-  },
-  {
-    "id": "stormscout_cheatmaster",
-    "name": "Exploratormentas Hacker",
-    "theme": "Cheatmaster",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false,
-    "releaseDate": "2026-08-30"
-  },
-  {
-    "id": "stormscout_loothacker",
-    "name": "Exploratormentas Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "release_date": "2026-09-10T11:50:00.000Z",
-    "isNew": false
-  },
-  {
-    "id": "stormscout_bountyhunter",
-    "name": "Exploratormentas Cazador de Recompensas",
-    "theme": "Bounty Hunter",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true,
-    "isNew": false
-  },
-  {
-    "id": "onigiri_basic",
-    "name": "Onigiri",
+    "id": "megaman_basic",
+    "name": "Megaman",
     "theme": "Basic",
     "rarity": "Rare",
     "gen": 2,
     "unreleased": false,
     "isNew": false,
     "releaseDate": "2026-09-03"
-  },
-  {
-    "id": "onigiri_gold",
-    "name": "Onigiri Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false,
-    "releaseDate": "2026-09-03"
-  },
-  {
-    "id": "onigiri_cheatmaster",
-    "name": "Onigiri Hacker",
-    "theme": "Cheatmaster",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false,
-    "releaseDate": "2026-09-03"
-  },
-  {
-    "id": "onigiri_loothacker",
-    "name": "Onigiri Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "release_date": "2026-09-10T11:50:00.000Z",
-    "isNew": false
-  },
-  {
-    "id": "onigiri_bountyhunter",
-    "name": "Onigiri Cazador de Recompensas",
-    "theme": "Bounty Hunter",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": true,
-    "isNew": false
   },
   {
     "id": "overshield_basic",
@@ -1711,6 +1623,55 @@
   {
     "id": "overshield_bountyhunter",
     "name": "Protector Cazador de Recompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true,
+    "isNew": false
+  },
+  {
+    "id": "pond_basic",
+    "name": "Estanque",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
+  },
+  {
+    "id": "pond_gold",
+    "name": "Estanque Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
+  },
+  {
+    "id": "pond_cheatmaster",
+    "name": "Estanque Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
+  },
+  {
+    "id": "pond_loothacker",
+    "name": "Estanque Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-17"
+  },
+  {
+    "id": "pond_bountyhunter",
+    "name": "Estanque Cazador de Recompensas",
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "gen": 2,
@@ -1767,8 +1728,8 @@
     "isNew": false
   },
   {
-    "id": "megaman_basic",
-    "name": "Megaman",
+    "id": "onigiri_basic",
+    "name": "Onigiri",
     "theme": "Basic",
     "rarity": "Rare",
     "gen": 2,
@@ -1777,48 +1738,87 @@
     "releaseDate": "2026-09-03"
   },
   {
-    "id": "crash_basic",
-    "name": "Crash Bandicoot",
-    "theme": "Basic",
-    "rarity": "Legendary",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": true,
-    "releaseDate": "2026-09-17"
-  },
-  {
-    "id": "crash_gold",
-    "name": "Crash Bandicoot Dorado",
+    "id": "onigiri_gold",
+    "name": "Onigiri Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
-    "releaseDate": "2026-09-17"
+    "isNew": false,
+    "releaseDate": "2026-09-03"
   },
   {
-    "id": "crash_cheatmaster",
-    "name": "Crash Bandicoot Hacker",
+    "id": "onigiri_cheatmaster",
+    "name": "Onigiri Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
-    "releaseDate": "2026-09-17"
+    "isNew": false,
+    "releaseDate": "2026-09-03"
   },
   {
-    "id": "crash_loothacker",
-    "name": "Crash Bandicoot Hacker de Botín",
+    "id": "onigiri_loothacker",
+    "name": "Onigiri Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
-    "releaseDate": "2026-09-17"
+    "release_date": "2026-09-10T11:50:00.000Z",
+    "isNew": false
   },
   {
-    "id": "crash_bountyhunter",
-    "name": "Crash Bandicoot Cazador de Recompensas",
+    "id": "onigiri_bountyhunter",
+    "name": "Onigiri Cazador de Recompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": true,
+    "isNew": false
+  },
+  {
+    "id": "stormscout_basic",
+    "name": "Exploratormentas",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false,
+    "releaseDate": "2026-08-30"
+  },
+  {
+    "id": "stormscout_gold",
+    "name": "Exploratormentas Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false,
+    "releaseDate": "2026-08-30"
+  },
+  {
+    "id": "stormscout_cheatmaster",
+    "name": "Exploratormentas Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false,
+    "releaseDate": "2026-08-30"
+  },
+  {
+    "id": "stormscout_loothacker",
+    "name": "Exploratormentas Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "release_date": "2026-09-10T11:50:00.000Z",
+    "isNew": false
+  },
+  {
+    "id": "stormscout_bountyhunter",
+    "name": "Exploratormentas Cazador de Recompensas",
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "gen": 2,
@@ -1875,18 +1875,18 @@
     "isNew": false
   },
   {
-    "id": "pond_basic",
-    "name": "Estanque",
+    "id": "crash_basic",
+    "name": "Crash Bandicoot",
     "theme": "Basic",
-    "rarity": "Epic",
+    "rarity": "Legendary",
     "gen": 2,
     "unreleased": false,
     "isNew": true,
     "releaseDate": "2026-09-17"
   },
   {
-    "id": "pond_gold",
-    "name": "Estanque Dorado",
+    "id": "crash_gold",
+    "name": "Crash Bandicoot Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
@@ -1895,8 +1895,8 @@
     "releaseDate": "2026-09-17"
   },
   {
-    "id": "pond_cheatmaster",
-    "name": "Estanque Hacker",
+    "id": "crash_cheatmaster",
+    "name": "Crash Bandicoot Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
@@ -1905,8 +1905,8 @@
     "releaseDate": "2026-09-17"
   },
   {
-    "id": "pond_loothacker",
-    "name": "Estanque Hacker de Botín",
+    "id": "crash_loothacker",
+    "name": "Crash Bandicoot Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
@@ -1915,8 +1915,8 @@
     "releaseDate": "2026-09-17"
   },
   {
-    "id": "pond_bountyhunter",
-    "name": "Estanque Cazador de Recompensas",
+    "id": "crash_bountyhunter",
+    "name": "Crash Bandicoot Cazador de Recompensas",
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "gen": 2,

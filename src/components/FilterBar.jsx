@@ -57,7 +57,7 @@ export function FilterBar({
         familyId,
         image: sprite ? sprite.image : (activeGen === 2 ? `/sprites/${familyId}_basic.webp` : `/sprites/${familyId}_basic.png`)
       };
-    }).sort((a, b) => a.name.localeCompare(b.name));
+    });
   }, [activeGen, showUnreleased]);
 
   // Compute available variants scoped to activeGen and showUnreleased

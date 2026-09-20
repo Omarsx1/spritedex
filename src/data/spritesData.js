@@ -921,10 +921,35 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
 
 export const allSprites = ALL_SPRITES;
 
-// All unique sprite families for the SPRITE filter dropdown
-export const SPRITE_FAMILIES_LIST = [...new Set(ALL_SPRITES.map(s => s.familyName))].sort();
+// Orden oficial de familias de 2ª Generación idéntico a la secuencia de Fortnite
+export const FORTNITE_GEN2_FAMILY_ORDER = [
+  'jonesy',
+  'adventure',
+  'bush',
+  'sonic',
+  'tails',
+  'shadow',
+  '8bit',
+  'jackrabbit',
+  'crown',
+  'killswitch',
+  'klombo',
+  'megaman',
+  'overshield',
+  'pond',
+  'xray',
+  'onigiri',
+  'stormscout',
+  'blinky',
+  'crash',
+  'birthday',
+  'morgana'
+];
 
-// Sprite families with image paths for the visual dropdown
+// All unique sprite families for the SPRITE filter dropdown (preserva orden oficial del Dex)
+export const SPRITE_FAMILIES_LIST = [...new Set(ALL_SPRITES.map(s => s.familyName))];
+
+// Sprite families with image paths for the visual dropdown (preserva orden oficial del Dex)
 export const SPRITE_FAMILIES_WITH_IMAGES = [...new Set(ALL_SPRITES.map(s => s.familyId))]
   .map(familyId => {
     const sprite = ALL_SPRITES.find(s => s.familyId === familyId && s.variant === 'Basic');
@@ -934,8 +959,7 @@ export const SPRITE_FAMILIES_WITH_IMAGES = [...new Set(ALL_SPRITES.map(s => s.fa
       familyId,
       image: sprite ? sprite.image : `/sprites/${familyId}_basic.png`
     };
-  })
-  .sort((a, b) => a.name.localeCompare(b.name));
+  });
 
 // Group sprites into families for detail view (sorted canonically by variant order)
 export const SPRITE_FAMILIES = Object.values(
