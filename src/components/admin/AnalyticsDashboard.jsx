@@ -131,13 +131,16 @@ export function AnalyticsDashboard({ darkMode = false }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* ═══ TOP 4 KPI CARDS (Real Supabase Metrics) ═══ */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '20px'
-      }}>
+      <div
+        className="studio-admin-grid-kpi"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
+          gap: '16px'
+        }}
+      >
         {/* Card 1: Visitantes Únicos */}
-        <div style={cardStyle}>
+        <div className="studio-admin-kpi-card" style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Visitantes Totales</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: darkMode ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5', color: '#10B981', fontSize: '0.72rem', fontWeight: 800 }}>
@@ -151,7 +154,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
         </div>
 
         {/* Card 2: Total Pageviews */}
-        <div style={cardStyle}>
+        <div className="studio-admin-kpi-card" style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Total Pageviews</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '20px', background: darkMode ? 'rgba(60, 80, 224, 0.15)' : '#EFF6FF', color: '#3C50E0', fontSize: '0.72rem', fontWeight: 800 }}>
@@ -165,7 +168,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
         </div>
 
         {/* Card 3: Tráfico iPhone & Android */}
-        <div style={cardStyle}>
+        <div className="studio-admin-kpi-card" style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Móviles (iOS & Android)</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '20px', background: darkMode ? 'rgba(60, 80, 224, 0.15)' : '#EFF6FF', color: '#3C50E0', fontSize: '0.72rem', fontWeight: 800 }}>
@@ -181,7 +184,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
         </div>
 
         {/* Card 4: Sesiones Activas */}
-        <div style={cardStyle}>
+        <div className="studio-admin-kpi-card" style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Sesiones Activas</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '20px', background: darkMode ? 'rgba(239, 68, 68, 0.15)' : '#FEF2F2', color: '#EF4444', fontSize: '0.72rem', fontWeight: 800 }}>
@@ -196,7 +199,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
       </div>
 
       {/* ═══ MAIN BIG CHART: ANALYTICS VISITOR BARS (Real 30 Days) ═══ */}
-      <div style={widgetCardStyle}>
+      <div className="studio-admin-widget-card" style={widgetCardStyle}>
         {/* Header */}
         <div style={{
           display: 'flex',
@@ -293,13 +296,16 @@ export function AnalyticsDashboard({ darkMode = false }) {
       </div>
 
       {/* ═══ MIDDLE 3 WIDGETS ROW (TailAdmin Style) ═══ */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
-        gap: '20px'
-      }}>
+      <div
+        className="studio-admin-grid-2col"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+          gap: '20px'
+        }}
+      >
         {/* Widget 1: Top Channels */}
-        <div style={widgetCardStyle}>
+        <div className="studio-admin-widget-card" style={widgetCardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: textPrimary, margin: 0 }}>
               Top Canales & Fuentes
@@ -360,7 +366,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
         </div>
 
         {/* Widget 2: Top Espíritus Más Atrapados */}
-        <div style={widgetCardStyle}>
+        <div className="studio-admin-widget-card" style={widgetCardStyle}>
           <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: textPrimary, margin: '0 0 16px' }}>
             Espíritus Más Populares
           </h3>
@@ -386,12 +392,15 @@ export function AnalyticsDashboard({ darkMode = false }) {
         </div>
 
         {/* Widget 3: Active Users (Live Sparkline) */}
-        <div style={{
-          ...widgetCardStyle,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between'
-        }}>
+        <div
+          className="studio-admin-widget-card"
+          style={{
+            ...widgetCardStyle,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}
+        >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
               <span style={{ fontSize: '0.82rem', fontWeight: 600, color: textMuted }}>Usuarios Activos</span>
@@ -458,13 +467,16 @@ export function AnalyticsDashboard({ darkMode = false }) {
       </div>
 
       {/* ═══ BOTTOM ROW: DEVICE DONUT + LIVE TELEMETRY TABLE ═══ */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-        gap: '20px'
-      }}>
+      <div
+        className="studio-admin-grid-2col"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+          gap: '20px'
+        }}
+      >
         {/* Device Breakdown Donut */}
-        <div style={widgetCardStyle}>
+        <div className="studio-admin-widget-card" style={widgetCardStyle}>
           <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: textPrimary, margin: '0 0 16px' }}>
             Sessions By Device
           </h3>
@@ -525,12 +537,12 @@ export function AnalyticsDashboard({ darkMode = false }) {
         </div>
 
         {/* Live Stream Table */}
-        <div style={widgetCardStyle}>
+        <div className="studio-admin-widget-card" style={widgetCardStyle}>
           <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: textPrimary, margin: '0 0 16px' }}>
             Live Stream de Visitas
           </h3>
 
-          <div style={{ overflowX: 'auto' }}>
+          <div className="studio-admin-table-scroll" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', width: '100%' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
               <thead>
                 <tr style={{ borderBottom: dividerBorder, color: textMuted }}>

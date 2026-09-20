@@ -19,8 +19,10 @@ import {
   Sun,
   Moon,
   Globe,
-  ChevronDown
+  ChevronDown,
+  X
 } from 'lucide-react';
+import './adminResponsive.css';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
 import { SpiritCatalogTable } from './SpiritCatalogTable';
 import { SpiritEditorModal } from './SpiritEditorModal';
@@ -31,6 +33,19 @@ import { clearAdminSession } from '../../utils/adminAuth';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 
 export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < 768;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const [activeTab, setActiveTab] = useState(() => {
     try {
       const urlParams = new URLSearchParams(window.location.search);
@@ -52,6 +67,9 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
 
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
     try {
       localStorage.setItem('spritedex_studio_active_tab', tabId);
       const url = new URL(window.location.href);
@@ -60,7 +78,12 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
     } catch {}
   };
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      return false;
+    }
+    return true;
+  });
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [usersCount, setUsersCount] = useState(0);
   const [editingSpirit, setEditingSpirit] = useState(null);
@@ -141,27 +164,37 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
       display: 'flex',
       transition: 'background-color 0.2s ease, color 0.2s ease'
     }}>
+      {/* ═══ MOBILE BACKDROP OVERLAY ═══ */}
+      <div
+        className={`studio-admin-backdrop ${isMobile && sidebarOpen ? 'is-open' : ''}`}
+        onClick={() => setSidebarOpen(false)}
+        aria-hidden="true"
+      />
+
       {/* ═══ SILICON VALLEY LEFT SIDEBAR (TailAdmin Style) ═══ */}
-      <aside style={{
-        width: sidebarOpen ? '280px' : '76px',
-        minWidth: sidebarOpen ? '280px' : '76px',
-        background: darkMode ? '#171717' : '#FFFFFF',
-        borderRight: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-        position: 'sticky',
-        top: 0,
-        height: '100vh',
-        zIndex: 50,
-        boxSizing: 'border-box'
-      }}>
+      <aside
+        className={`studio-admin-sidebar ${sidebarOpen ? 'is-open' : ''}`}
+        style={{
+          width: sidebarOpen ? '280px' : '76px',
+          minWidth: sidebarOpen ? '280px' : '76px',
+          background: darkMode ? '#171717' : '#FFFFFF',
+          borderRight: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
+          display: 'flex',
+          flexDirection: 'column',
+          transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+          position: 'sticky',
+          top: 0,
+          height: '100vh',
+          zIndex: 50,
+          boxSizing: 'border-box'
+        }}
+      >
         {/* Brand Header */}
         <div style={{
           padding: '24px 20px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: sidebarOpen ? 'space-between' : 'center',
+          justifyContent: (sidebarOpen || isMobile) ? 'space-between' : 'center',
           borderBottom: darkMode ? '1px solid #2E2E2E' : '1px solid #F1F5F9'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -179,7 +212,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             }}>
               <ShieldCheck size={20} />
             </div>
-            {sidebarOpen && (
+            {(sidebarOpen || isMobile) && (
               <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                 <div style={{ fontSize: '1.05rem', fontWeight: 800, color: darkMode ? '#EDEDED' : '#1E293B', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
                   Spritedex
@@ -190,11 +223,22 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
               </div>
             )}
           </div>
+
+          {/* Close button for mobile drawer */}
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+            className="studio-admin-close-btn"
+            style={{ color: darkMode ? '#A1A1A1' : '#64748B' }}
+            aria-label="Cerrar menú"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         {/* Navigation Sections */}
         <div style={{ flex: 1, padding: '20px 14px', overflowY: 'auto' }}>
-          {sidebarOpen && (
+          {(sidebarOpen || isMobile) && (
             <div style={{ fontSize: '0.68rem', fontWeight: 800, color: darkMode ? '#737373' : '#8A99AD', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '10px', paddingLeft: '10px' }}>
               MENU
             </div>
@@ -219,13 +263,13 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                 fontWeight: activeTab === 'analytics' ? 800 : 600,
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
-                justifyContent: sidebarOpen ? 'flex-start' : 'center',
+                justifyContent: (sidebarOpen || isMobile) ? 'flex-start' : 'center',
                 whiteSpace: 'nowrap'
               }}
               title="Dashboard de Analíticas"
             >
               <LayoutDashboard size={18} style={{ color: activeTab === 'analytics' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'), flexShrink: 0 }} />
-              {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>Dashboard & Métricas</span>}
+              {(sidebarOpen || isMobile) && <span style={{ whiteSpace: 'nowrap' }}>Dashboard & Métricas</span>}
             </button>
 
             {/* Audience, Devices & Geography */}
@@ -235,7 +279,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: sidebarOpen ? 'space-between' : 'center',
+                justifyContent: (sidebarOpen || isMobile) ? 'space-between' : 'center',
                 width: '100%',
                 padding: '12px 14px',
                 borderRadius: '10px',
@@ -252,9 +296,9 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
                 <Globe size={18} style={{ color: activeTab === 'audience' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'), flexShrink: 0 }} />
-                {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>Dispositivos & Países</span>}
+                {(sidebarOpen || isMobile) && <span style={{ whiteSpace: 'nowrap' }}>Dispositivos & Países</span>}
               </div>
-              {sidebarOpen && (
+              {(sidebarOpen || isMobile) && (
                 <span style={{
                   fontSize: '0.64rem',
                   fontWeight: 800,
@@ -276,7 +320,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: sidebarOpen ? 'space-between' : 'center',
+                justifyContent: (sidebarOpen || isMobile) ? 'space-between' : 'center',
                 width: '100%',
                 padding: '12px 14px',
                 borderRadius: '10px',
@@ -293,9 +337,9 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
                 <Layers size={18} style={{ color: activeTab === 'catalog' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'), flexShrink: 0 }} />
-                {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>Catálogo de Espíritus</span>}
+                {(sidebarOpen || isMobile) && <span style={{ whiteSpace: 'nowrap' }}>Catálogo de Espíritus</span>}
               </div>
-              {sidebarOpen && (
+              {(sidebarOpen || isMobile) && (
                 <span style={{
                   fontSize: '0.72rem',
                   fontWeight: 800,
@@ -317,7 +361,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: sidebarOpen ? 'space-between' : 'center',
+                justifyContent: (sidebarOpen || isMobile) ? 'space-between' : 'center',
                 width: '100%',
                 padding: '12px 14px',
                 borderRadius: '10px',
@@ -334,9 +378,9 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
                 <Users size={18} style={{ color: activeTab === 'users' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'), flexShrink: 0 }} />
-                {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>Usuarios & Cuentas</span>}
+                {(sidebarOpen || isMobile) && <span style={{ whiteSpace: 'nowrap' }}>Usuarios & Cuentas</span>}
               </div>
-              {sidebarOpen && (
+              {(sidebarOpen || isMobile) && (
                 <span style={{
                   fontSize: '0.72rem',
                   fontWeight: 800,
@@ -358,7 +402,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: sidebarOpen ? 'space-between' : 'center',
+                justifyContent: (sidebarOpen || isMobile) ? 'space-between' : 'center',
                 width: '100%',
                 padding: '12px 14px',
                 borderRadius: '10px',
@@ -375,9 +419,9 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
                 <PlusCircle size={18} style={{ color: '#3ECF8E', flexShrink: 0 }} />
-                {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>Nuevo Espíritu</span>}
+                {(sidebarOpen || isMobile) && <span style={{ whiteSpace: 'nowrap' }}>Nuevo Espíritu</span>}
               </div>
-              {sidebarOpen && (
+              {(sidebarOpen || isMobile) && (
                 <span style={{
                   fontSize: '0.68rem',
                   fontWeight: 800,
@@ -393,7 +437,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             </button>
           </nav>
 
-          {sidebarOpen && (
+          {(sidebarOpen || isMobile) && (
             <div style={{ fontSize: '0.68rem', fontWeight: 800, color: darkMode ? '#737373' : '#8A99AD', letterSpacing: '0.06em', textTransform: 'uppercase', marginTop: '28px', marginBottom: '10px', paddingLeft: '10px' }}>
               SISTEMA & WEB
             </div>
@@ -405,6 +449,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
               href="/"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => { if (isMobile) setSidebarOpen(false); }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -418,7 +463,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                 fontSize: '0.86rem',
                 fontWeight: 600,
                 cursor: 'pointer',
-                justifyContent: sidebarOpen ? 'flex-start' : 'center',
+                justifyContent: (sidebarOpen || isMobile) ? 'flex-start' : 'center',
                 whiteSpace: 'nowrap',
                 textDecoration: 'none',
                 boxSizing: 'border-box'
@@ -426,7 +471,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
               title="Ver Sitio Web Público en nueva pestaña"
             >
               <ExternalLink size={18} style={{ flexShrink: 0 }} />
-              {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>Ver Web Pública</span>}
+              {(sidebarOpen || isMobile) && <span style={{ whiteSpace: 'nowrap' }}>Ver Web Pública</span>}
             </a>
           </nav>
         </div>
@@ -438,26 +483,26 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
           background: darkMode ? '#171717' : '#F8FAFC',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: sidebarOpen ? 'flex-start' : 'center'
+          justifyContent: (sidebarOpen || isMobile) ? 'flex-start' : 'center'
         }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            padding: sidebarOpen ? '6px 12px' : '8px',
+            padding: (sidebarOpen || isMobile) ? '6px 12px' : '8px',
             borderRadius: '12px',
             background: isSupabaseConfigured ? (darkMode ? 'rgba(62, 207, 142, 0.15)' : '#ECFDF5') : (darkMode ? 'rgba(245, 158, 11, 0.15)' : '#FEF3C7'),
             color: isSupabaseConfigured ? (darkMode ? '#3ECF8E' : '#10B981') : '#F59E0B',
             fontSize: '0.74rem',
             fontWeight: 800,
-            width: sidebarOpen ? '100%' : 'auto',
-            justifyContent: sidebarOpen ? 'flex-start' : 'center',
+            width: (sidebarOpen || isMobile) ? '100%' : 'auto',
+            justifyContent: (sidebarOpen || isMobile) ? 'flex-start' : 'center',
             boxSizing: 'border-box'
           }}
           title={isSupabaseConfigured ? 'Supabase Cloud Sync: Activo' : 'Modo Autónomo'}
           >
             <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: isSupabaseConfigured ? '#3ECF8E' : '#F59E0B', flexShrink: 0 }} />
-            {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>{isSupabaseConfigured ? 'Supabase Cloud Sync: Activo' : 'Modo Autónomo'}</span>}
+            {(sidebarOpen || isMobile) && <span style={{ whiteSpace: 'nowrap' }}>{isSupabaseConfigured ? 'Supabase Cloud Sync: Activo' : 'Modo Autónomo'}</span>}
           </div>
         </div>
       </aside>
@@ -465,20 +510,23 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
       {/* ═══ MAIN CONTENT AREA ═══ */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         {/* Top Header Bar */}
-        <header style={{
-          background: darkMode ? '#171717' : '#FFFFFF',
-          borderBottom: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
-          padding: '14px 28px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          position: 'sticky',
-          top: 0,
-          zIndex: 40,
-          transition: 'background-color 0.2s ease, border-color 0.2s ease'
-        }}>
+        <header
+          className="studio-admin-header"
+          style={{
+            background: darkMode ? '#171717' : '#FFFFFF',
+            borderBottom: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
+            padding: '14px 28px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            position: 'sticky',
+            top: 0,
+            zIndex: 40,
+            transition: 'background-color 0.2s ease, border-color 0.2s ease'
+          }}
+        >
           {/* Left: Sidebar Toggle + Search */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, maxWidth: '480px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '16px', flex: 1, maxWidth: '480px', minWidth: 0 }}>
             <button
               type="button"
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -490,18 +538,20 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                 padding: '6px',
                 borderRadius: '8px',
                 display: 'flex',
-                alignItems: 'center'
+                alignItems: 'center',
+                flexShrink: 0
               }}
+              aria-label="Abrir menú"
             >
               <Menu size={20} />
             </button>
 
-            <div style={{ position: 'relative', width: '100%' }}>
+            <div className="studio-admin-search-wrapper" style={{ position: 'relative', width: '100%', minWidth: 0 }}>
               <input
                 type="text"
                 value={searchFilter}
                 onChange={(e) => setSearchFilter(e.target.value)}
-                placeholder="Buscar o presiona ⌘K..."
+                placeholder={isMobile ? "Buscar..." : "Buscar o presiona ⌘K..."}
                 style={{
                   width: '100%',
                   padding: '9px 14px 9px 38px',
@@ -515,26 +565,29 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                 }}
               />
               <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: darkMode ? '#737373' : '#94A3B8' }} />
-              <div style={{
-                position: 'absolute',
-                right: '10px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                fontSize: '0.68rem',
-                fontWeight: 700,
-                color: darkMode ? '#737373' : '#94A3B8',
-                background: darkMode ? '#171717' : '#FFFFFF',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0'
-              }}>
+              <div
+                className="studio-admin-kbd"
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  fontSize: '0.68rem',
+                  fontWeight: 700,
+                  color: darkMode ? '#737373' : '#94A3B8',
+                  background: darkMode ? '#171717' : '#FFFFFF',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0'
+                }}
+              >
                 ⌘K
               </div>
             </div>
           </div>
 
           {/* Right: Theme Toggle & User Avatar Dropdown */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="studio-admin-header-actions" style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '12px', flexShrink: 0 }}>
             {/* Dark / Light Theme Toggle Button */}
             <button
               type="button"
@@ -550,7 +603,8 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                 border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
                 color: darkMode ? '#3ECF8E' : '#475569',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                flexShrink: 0
               }}
               title={darkMode ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
             >
@@ -589,7 +643,8 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: darkMode ? '0 2px 8px rgba(62, 207, 142, 0.3)' : '0 2px 8px rgba(60, 80, 224, 0.25)',
-                  position: 'relative'
+                  position: 'relative',
+                  flexShrink: 0
                 }}>
                   AD
                   <span style={{
@@ -604,7 +659,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                   }} />
                 </div>
 
-                <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
+                <div className="studio-admin-profile-text" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
                   <span style={{ fontSize: '0.82rem', fontWeight: 800, color: darkMode ? '#EDEDED' : '#0F172A', lineHeight: 1.1 }}>
                     Admin
                   </span>
@@ -613,7 +668,7 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                   </span>
                 </div>
 
-                <ChevronDown size={14} style={{ color: darkMode ? '#A1A1A1' : '#64748B', transform: profileDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
+                <ChevronDown size={14} style={{ color: darkMode ? '#A1A1A1' : '#64748B', transform: profileDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease', flexShrink: 0 }} />
               </button>
 
               {/* Profile Dropdown Popover */}
@@ -715,7 +770,18 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
         </header>
 
         {/* Page Content */}
-        <main style={{ padding: '28px', flex: 1, maxWidth: '1440px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
+        <main
+          className="studio-admin-main"
+          style={{
+            padding: isMobile ? '16px 12px' : '28px',
+            flex: 1,
+            maxWidth: '1440px',
+            width: '100%',
+            boxSizing: 'border-box',
+            margin: '0 auto',
+            overflowX: 'hidden'
+          }}
+        >
           {activeTab === 'analytics' && (
             <AnalyticsDashboard darkMode={darkMode} />
           )}

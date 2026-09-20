@@ -200,7 +200,7 @@ export function SpiritCatalogTable({
         gap: '16px'
       }}>
         {/* Search */}
-        <div style={{ position: 'relative', minWidth: '280px', flex: 1, maxWidth: '400px' }}>
+        <div style={{ position: 'relative', minWidth: 'min(100%, 280px)', flex: 1, maxWidth: '400px' }}>
           <input
             type="text"
             value={localSearch}
@@ -292,7 +292,7 @@ export function SpiritCatalogTable({
         ...containerStyle,
         overflow: 'hidden'
       }}>
-        <div style={{ overflowX: 'auto' }}>
+        <div className="studio-admin-table-scroll" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', width: '100%' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0', color: textMuted, background: tableHeaderBg }}>

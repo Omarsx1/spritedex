@@ -469,13 +469,16 @@ export function AudienceInsightsView({ darkMode = false }) {
       </div>
 
       {/* ═══ TOP 4 AUDIENCE KPI CARDS ═══ */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '16px'
-      }}>
+      <div
+        className="studio-admin-grid-kpi"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
+          gap: '16px'
+        }}
+      >
         {/* KPI 1: Mobile vs Desktop */}
-        <div style={cardStyle}>
+        <div className="studio-admin-kpi-card" style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Móviles vs Desktop</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: c.badgeGreenBg, border: `1px solid ${c.badgeGreenBorder}`, color: c.badgeGreenText, fontSize: '0.72rem', fontWeight: 700 }}>
@@ -493,7 +496,7 @@ export function AudienceInsightsView({ darkMode = false }) {
         </div>
 
         {/* KPI 2: Unique Countries */}
-        <div style={cardStyle}>
+        <div className="studio-admin-kpi-card" style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Países & Regiones</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: darkMode ? 'rgba(56, 189, 248, 0.12)' : '#EFF6FF', border: `1px solid ${darkMode ? 'rgba(56, 189, 248, 0.25)' : '#BFDBFE'}`, color: darkMode ? '#38BDF8' : '#1E40AF', fontSize: '0.72rem', fontWeight: 700 }}>
@@ -513,7 +516,7 @@ export function AudienceInsightsView({ darkMode = false }) {
         </div>
 
         {/* KPI 3: Peak Traffic Hour */}
-        <div style={cardStyle}>
+        <div className="studio-admin-kpi-card" style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Hora Pico de Mayor Tráfico</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: darkMode ? 'rgba(245, 158, 11, 0.12)' : '#FEF3C7', border: `1px solid ${darkMode ? 'rgba(245, 158, 11, 0.25)' : '#FDE68A'}`, color: '#D97706', fontSize: '0.72rem', fontWeight: 700 }}>
@@ -530,7 +533,7 @@ export function AudienceInsightsView({ darkMode = false }) {
         </div>
 
         {/* KPI 4: Top Browser */}
-        <div style={cardStyle}>
+        <div className="studio-admin-kpi-card" style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Navegador Principal</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: darkMode ? 'rgba(168, 85, 247, 0.12)' : '#F5F3FF', border: `1px solid ${darkMode ? 'rgba(168, 85, 247, 0.25)' : '#DDD6FE'}`, color: darkMode ? '#A855F7' : '#6D28D9', fontSize: '0.72rem', fontWeight: 700 }}>
@@ -548,7 +551,7 @@ export function AudienceInsightsView({ darkMode = false }) {
       </div>
 
       {/* ═══ 24-HOUR HOURLY DISTRIBUTION HEATMAP & BAR CHART ═══ */}
-      <div style={widgetCardStyle}>
+      <div className="studio-admin-widget-card" style={widgetCardStyle}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
           <div>
             <h3 style={{ fontSize: '0.96rem', fontWeight: 800, color: c.textPrimary, margin: 0 }}>
@@ -564,74 +567,81 @@ export function AudienceInsightsView({ darkMode = false }) {
           </div>
         </div>
 
-        {/* 24-Hour Bar Graph */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(24, 1fr)',
-          gap: '4px',
-          height: '110px',
-          alignItems: 'flex-end',
-          padding: '10px 0',
-          borderBottom: `1px solid ${c.borderCard}`
-        }}>
-          {analytics.hourHistogram.map((count, hour) => {
-            const heightPct = Math.max(8, Math.round((count / maxHourVal) * 100));
-            const isPeak = count === analytics.peakHourCount && count > 0;
+        {/* 24-Hour Bar Graph Container */}
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', width: '100%' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(24, 1fr)',
+            gap: '2px',
+            height: '110px',
+            alignItems: 'flex-end',
+            padding: '10px 0',
+            borderBottom: `1px solid ${c.borderCard}`,
+            minWidth: '280px'
+          }}>
+            {analytics.hourHistogram.map((count, hour) => {
+              const heightPct = Math.max(8, Math.round((count / maxHourVal) * 100));
+              const isPeak = count === analytics.peakHourCount && count > 0;
 
-            return (
-              <div
-                key={hour}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  height: '100%',
-                  justifyContent: 'flex-end',
-                  position: 'relative'
-                }}
-                title={`Hora: ${hour}:00 - ${count} visitas`}
-              >
+              return (
                 <div
+                  key={hour}
                   style={{
-                    width: '100%',
-                    height: `${heightPct}%`,
-                    borderRadius: '3px 3px 0 0',
-                    background: isPeak 
-                      ? (darkMode ? '#3ECF8E' : '#0F172A')
-                      : count > 0 ? c.barFillBlue : (darkMode ? '#222222' : '#F1F5F9'),
-                    transition: 'all 0.3s ease'
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    height: '100%',
+                    justifyContent: 'flex-end',
+                    position: 'relative'
                   }}
-                />
-              </div>
-            );
-          })}
-        </div>
+                  title={`Hora: ${hour}:00 - ${count} visitas`}
+                >
+                  <div
+                    style={{
+                      width: '100%',
+                      height: `${heightPct}%`,
+                      borderRadius: '3px 3px 0 0',
+                      background: isPeak 
+                        ? (darkMode ? '#3ECF8E' : '#0F172A')
+                        : count > 0 ? c.barFillBlue : (darkMode ? '#222222' : '#F1F5F9'),
+                      transition: 'all 0.3s ease'
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
 
-        {/* 24-Hour Legend Labels */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(24, 1fr)',
-          gap: '4px',
-          marginTop: '6px',
-          fontSize: '0.64rem',
-          color: c.textMuted,
-          textAlign: 'center',
-          fontFamily: 'monospace'
-        }}>
-          {Array.from({ length: 24 }).map((_, h) => (
-            <span key={h}>{h % 3 === 0 ? `${h}h` : ''}</span>
-          ))}
+          {/* 24-Hour Legend Labels */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(24, 1fr)',
+            gap: '2px',
+            marginTop: '6px',
+            fontSize: '0.64rem',
+            color: c.textMuted,
+            textAlign: 'center',
+            fontFamily: 'monospace',
+            minWidth: '280px'
+          }}>
+            {Array.from({ length: 24 }).map((_, h) => (
+              <span key={h}>{h % 3 === 0 ? `${h}h` : ''}</span>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* ═══ 2-COLUMN GRID: DETAILED PLATFORMS & TOP COUNTRIES ═══ */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-        gap: '20px'
-      }}>
+      <div
+        className="studio-admin-grid-2col"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+          gap: '20px'
+        }}
+      >
         {/* Column 1: Detailed Operating Systems & Platforms */}
-        <div style={widgetCardStyle}>
+        <div className="studio-admin-widget-card" style={widgetCardStyle}>
           <h3 style={{ fontSize: '0.94rem', fontWeight: 800, color: c.textPrimary, margin: '0 0 16px' }}>
             Desglose de Dispositivos y Sistemas
           </h3>
@@ -700,7 +710,7 @@ export function AudienceInsightsView({ darkMode = false }) {
         </div>
 
         {/* Column 2: Geographic Distribution (Países) */}
-        <div style={widgetCardStyle}>
+        <div className="studio-admin-widget-card" style={widgetCardStyle}>
           <h3 style={{ fontSize: '0.94rem', fontWeight: 800, color: c.textPrimary, margin: '0 0 16px' }}>
             Distribución Geográfica (Top Países)
           </h3>
@@ -713,11 +723,11 @@ export function AudienceInsightsView({ darkMode = false }) {
                 return (
                   <div key={country.code || idx}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '5px' }}>
-                      <span style={{ fontWeight: 700, color: c.textPrimary, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '1.05rem' }}>{country.flag}</span>
-                        <span>{country.name}</span>
+                      <span style={{ fontWeight: 700, color: c.textPrimary, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <span style={{ fontSize: '1.05rem', flexShrink: 0 }}>{country.flag}</span>
+                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{country.name}</span>
                       </span>
-                      <span style={{ fontWeight: 800, color: c.textPrimary }}>
+                      <span style={{ fontWeight: 800, color: c.textPrimary, flexShrink: 0, paddingLeft: '8px' }}>
                         {country.count} visitas <span style={{ color: c.textMuted, fontWeight: 500 }}>({pct}%)</span>
                       </span>
                     </div>
@@ -737,7 +747,7 @@ export function AudienceInsightsView({ darkMode = false }) {
       </div>
 
       {/* ═══ LIVE CONNECTIONS STREAM (Real Time Table & Historical Pagination) ═══ */}
-      <div style={{ ...widgetCardStyle, overflow: 'hidden', padding: 0 }}>
+      <div className="studio-admin-widget-card" style={{ ...widgetCardStyle, overflow: 'hidden', padding: 0 }}>
         {/* Table Header & Controls Bar */}
         <div style={{
           padding: '18px 22px',
@@ -927,7 +937,7 @@ export function AudienceInsightsView({ darkMode = false }) {
         </div>
 
         {/* Table Content */}
-        <div style={{ overflowX: 'auto' }}>
+        <div className="studio-admin-table-scroll" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', width: '100%' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: `1px solid ${c.borderCard}`, color: c.textSecondary, background: c.tableHeaderBg }}>

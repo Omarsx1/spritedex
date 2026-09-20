@@ -203,40 +203,49 @@ export function FamilyManagerModal({
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      zIndex: 9999,
-      background: c.bgOverlay,
-      backdropFilter: 'blur(12px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-      overflowY: 'auto'
-    }}>
-      <div style={{
-        background: c.bgModal,
-        borderRadius: '20px',
-        border: `1px solid ${c.borderModal}`,
-        width: '100%',
-        maxWidth: '820px',
-        maxHeight: '90vh',
+    <div
+      className="studio-admin-modal-overlay"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        background: c.bgOverlay,
+        backdropFilter: 'blur(12px)',
         display: 'flex',
-        flexDirection: 'column',
-        boxShadow: darkMode ? '0 25px 60px rgba(0,0,0,0.7)' : '0 25px 50px rgba(15, 23, 42, 0.2)',
-        overflow: 'hidden',
-        animation: 'fadeInModal 0.2s ease-out'
-      }}>
-        {/* Header */}
-        <div style={{
-          padding: '20px 24px',
-          borderBottom: `1px solid ${c.borderModal}`,
-          background: c.headerBg,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        overflowY: 'auto'
+      }}
+    >
+      <div
+        className="studio-admin-modal-container"
+        style={{
+          background: c.bgModal,
+          borderRadius: '20px',
+          border: `1px solid ${c.borderModal}`,
+          width: '100%',
+          maxWidth: '820px',
+          maxHeight: '90vh',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
+          flexDirection: 'column',
+          boxShadow: darkMode ? '0 25px 60px rgba(0,0,0,0.7)' : '0 25px 50px rgba(15, 23, 42, 0.2)',
+          overflow: 'hidden',
+          animation: 'fadeInModal 0.2s ease-out'
+        }}
+      >
+        {/* Header */}
+        <div
+          className="studio-admin-modal-header"
+          style={{
+            padding: '20px 24px',
+            borderBottom: `1px solid ${c.borderModal}`,
+            background: c.headerBg,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
               width: '40px',

@@ -341,13 +341,16 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', fontFamily: 'inherit' }}>
       
       {/* ═══ 4 KPI CARDS ═══ */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '16px'
-      }}>
+      <div
+        className="studio-admin-grid-kpi"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
+          gap: '16px'
+        }}
+      >
         {/* Card 1: Total Users */}
-        <div style={cardStyle}>
+        <div className="studio-admin-kpi-card" style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Cuentas en Nube</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: c.pillNeutralBg, border: `1px solid ${c.pillNeutralBorder}`, color: c.pillNeutralText, fontSize: '0.72rem', fontWeight: 700 }}>
@@ -361,7 +364,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         </div>
 
         {/* Card 2: Conversion Rate */}
-        <div style={cardStyle}>
+        <div className="studio-admin-kpi-card" style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Tasa de Conversión</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: c.pillNeutralBg, border: `1px solid ${c.pillNeutralBorder}`, color: c.pillNeutralText, fontSize: '0.72rem', fontWeight: 700 }}>
@@ -375,7 +378,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         </div>
 
         {/* Card 3: Total Caught Spirits */}
-        <div style={cardStyle}>
+        <div className="studio-admin-kpi-card" style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Espíritus Atrapados</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: c.pillNeutralBg, border: `1px solid ${c.pillNeutralBorder}`, color: c.pillNeutralText, fontSize: '0.72rem', fontWeight: 700 }}>
@@ -389,7 +392,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         </div>
 
         {/* Card 4: Avg Collection Progress */}
-        <div style={cardStyle}>
+        <div className="studio-admin-kpi-card" style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Progreso Promedio</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: c.pillNeutralBg, border: `1px solid ${c.pillNeutralBorder}`, color: c.pillNeutralText, fontSize: '0.72rem', fontWeight: 700 }}>
@@ -574,7 +577,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         boxShadow: c.shadowCard,
         overflow: 'hidden'
       }}>
-        <div style={{ overflowX: 'auto' }}>
+        <div className="studio-admin-table-scroll" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', width: '100%' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: `1px solid ${c.borderCard}`, color: c.textSecondary, background: c.tableHeaderBg }}>

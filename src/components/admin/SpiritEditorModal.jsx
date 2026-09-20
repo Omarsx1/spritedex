@@ -425,41 +425,50 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
   }, [formData.releaseDate]);
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      zIndex: 9999,
-      background: c.bgOverlay,
-      backdropFilter: 'blur(16px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-      overflowY: 'auto'
-    }}>
-      <div style={{
-        maxWidth: '960px',
-        width: '100%',
-        background: c.bgModal,
-        border: `1px solid ${c.borderModal}`,
-        borderRadius: '24px',
-        boxShadow: darkMode ? '0 30px 80px rgba(0, 0, 0, 0.9)' : '0 20px 60px rgba(15, 23, 42, 0.15)',
-        overflow: 'visible',
+    <div
+      className="studio-admin-modal-overlay"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        background: c.bgOverlay,
+        backdropFilter: 'blur(16px)',
         display: 'flex',
-        flexDirection: 'column',
-        maxHeight: '92vh',
-        transition: 'all 0.2s ease'
-      }}>
-        {/* Silicon Valley Enterprise Header */}
-        <div style={{
-          padding: '20px 28px',
-          borderBottom: `1px solid ${c.headerBorder}`,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        overflowY: 'auto'
+      }}
+    >
+      <div
+        className="studio-admin-modal-container"
+        style={{
+          maxWidth: '960px',
+          width: '100%',
+          background: c.bgModal,
+          border: `1px solid ${c.borderModal}`,
+          borderRadius: '24px',
+          boxShadow: darkMode ? '0 30px 80px rgba(0, 0, 0, 0.9)' : '0 20px 60px rgba(15, 23, 42, 0.15)',
+          overflow: 'visible',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: c.headerBg,
-          borderRadius: '24px 24px 0 0'
-        }}>
+          flexDirection: 'column',
+          maxHeight: '92vh',
+          transition: 'all 0.2s ease'
+        }}
+      >
+        {/* Silicon Valley Enterprise Header */}
+        <div
+          className="studio-admin-modal-header"
+          style={{
+            padding: '20px 28px',
+            borderBottom: `1px solid ${c.headerBorder}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: c.headerBg,
+            borderRadius: '24px 24px 0 0'
+          }}
+        >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
               <span style={{ fontSize: '0.72rem', fontWeight: 800, color: c.badgeStudioText, background: c.badgeStudioBg, padding: '2px 8px', borderRadius: '6px', textTransform: 'uppercase' }}>
@@ -497,13 +506,16 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
         </div>
 
         {/* Modal Body: 2 Columns */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1.25fr 0.75fr',
-          gap: '28px',
-          padding: '28px',
-          overflowY: 'auto'
-        }}>
+        <div
+          className="studio-admin-modal-body-2col"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1.25fr 0.75fr',
+            gap: '28px',
+            padding: '28px',
+            overflowY: 'auto'
+          }}
+        >
           {/* LEFT: Form Controls */}
           <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             {errorMsg && (

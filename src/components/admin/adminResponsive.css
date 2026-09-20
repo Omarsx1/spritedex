@@ -1,0 +1,189 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   SPRITEDEX STUDIO OVERRIDE (CMS) — RESPONSIVE MOBILE STYLESHEET
+   100% scoped to studio-admin-* classes to ensure ZERO impact on public site.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+@keyframes studioFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes studioSlideLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+/* ═══ MOBILE BACKDROP OVERLAY ═══ */
+.studio-admin-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .studio-admin-backdrop.is-open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 95;
+    animation: studioFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+/* ═══ SIDEBAR RESPONSIVE BEHAVIOR ═══ */
+@media (max-width: 768px) {
+  .studio-admin-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    width: 285px !important;
+    min-width: 285px !important;
+    max-width: 85vw !important;
+    z-index: 100 !important;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1) !important;
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .studio-admin-sidebar.is-open {
+    transform: translateX(0) !important;
+  }
+}
+
+/* ═══ SIDEBAR CLOSE BUTTON (MOBILE ONLY) ═══ */
+.studio-admin-close-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .studio-admin-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+}
+
+/* ═══ HEADER RESPONSIVE OPTIMIZATIONS ═══ */
+@media (max-width: 768px) {
+  .studio-admin-header {
+    padding: 10px 14px !important;
+    gap: 8px !important;
+  }
+
+  .studio-admin-search-wrapper {
+    max-width: 100% !important;
+    flex: 1 !important;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Hide ⌘K keyboard shortcut hint on touch/mobile */
+  .studio-admin-kbd {
+    display: none !important;
+  }
+
+  /* Compact Admin user badge: hide text labels on mobile to prevent header overcrowding */
+  .studio-admin-profile-text {
+    display: none !important;
+  }
+
+  .studio-admin-header-actions {
+    gap: 8px !important;
+  }
+}
+
+/* ═══ MAIN CONTENT PADDING ON MOBILE ═══ */
+@media (max-width: 768px) {
+  .studio-admin-main {
+    padding: 16px 12px !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .studio-admin-main {
+    padding: 12px 10px !important;
+  }
+}
+
+/* ═══ RESPONSIVE GRIDS FOR AUDIENCE & ANALYTICS CARDS ═══ */
+@media (max-width: 768px) {
+  /* Make 2-column comparison cards stack cleanly on mobile without horizontal clipping */
+  .studio-admin-grid-2col {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Top 4 KPI Cards: 2x2 grid on mobile phones instead of overflow */
+  .studio-admin-grid-kpi {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .studio-admin-kpi-card {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+  }
+
+  .studio-admin-kpi-val {
+    font-size: 1.45rem !important;
+  }
+
+  .studio-admin-widget-card {
+    padding: 16px 14px !important;
+    border-radius: 14px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  /* On very small phones, let KPIs stack or remain 2x2 with smaller font */
+  .studio-admin-grid-kpi {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ═══ HORIZONTAL SCROLL CONTAINERS FOR TABLES ═══ */
+.studio-admin-table-scroll {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* ═══ RESPONSIVE MODAL DIALOGS ═══ */
+@media (max-width: 768px) {
+  .studio-admin-modal-overlay {
+    padding: 10px !important;
+  }
+
+  .studio-admin-modal-container {
+    max-height: 95vh !important;
+    max-height: 95dvh !important;
+    border-radius: 18px !important;
+    width: 100% !important;
+  }
+
+  .studio-admin-modal-header {
+    padding: 14px 18px !important;
+  }
+
+  /* Stack modal columns vertically on mobile */
+  .studio-admin-modal-body-2col {
+    grid-template-columns: 1fr !important;
+    padding: 16px 14px !important;
+    gap: 20px !important;
+  }
+}
