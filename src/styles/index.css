@@ -2836,6 +2836,13 @@ body::after {
   background-color: #161b22;
 }
 
+@media (max-width: 768px) {
+  .sprite-card {
+    content-visibility: visible !important;
+    contain: none !important;
+  }
+}
+
 /* Theme Gradients & Border Colors (Fortnite.gg Exact Design) */
 .sprite-theme-gold {
   background: linear-gradient(180deg, #9d752a 0%, #161b22 100%);
@@ -6690,9 +6697,6 @@ body::after {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  content-visibility: auto;
-  contain-intrinsic-size: 0 360px;
-  contain: layout style paint;
 }
 
 .ms-family-header {
@@ -6763,7 +6767,8 @@ body::after {
 
 /* ── Individual Card (Slender collectible proportion) ── */
 .ms-card {
-  contain: layout style;
+  content-visibility: visible !important;
+  contain: none !important;
   position: absolute !important;
   top: 0 !important;
   left: 0 !important;
