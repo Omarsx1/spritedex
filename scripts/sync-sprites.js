@@ -432,10 +432,6 @@ async function syncSprites() {
       return;
     }
 
-    // Comprobar si la variante Bounty Hunter / Cazador de Recompensas sigue en estado no lanzado en el juego
-    const hasUnreleasedBountyHunters = cardsInfo.some(
-      (c) => (c.variant === 'reaper' || c.variant.toLowerCase().includes('bounty')) && c.unreleased
-    );
 
     // Cargar catálogos existentes para reutilizar traducciones y evitar requests innecesarios
     const existingCompleteMap = new Map();
@@ -591,12 +587,10 @@ async function syncSprites() {
       const isBase = resolvedTheme === 'Basic' || resolvedTheme === 'Base';
       const resolvedName = c.name || (isBase ? (c.parentName || c.parent) : `${resolvedTheme} ${c.parentName || c.parent}`);
 
-      // Mantener condición de no lanzado para Bounty Hunters mientras el paquete no esté lanzado globalmente (excepto Victorioso que sí está activo)
+      // Respetar estado de no lanzado de Fortnite.gg (Victorioso Cazador de Recompensas se mantiene activo)
       let isUnreleased = c.unreleased;
       if (resolvedTheme === 'Bounty Hunter' && (c.parent?.toLowerCase() === 'crown' || c.name?.toLowerCase().includes('crown') || c.name?.toLowerCase().includes('victorioso'))) {
         isUnreleased = false;
-      } else if (resolvedTheme === 'Bounty Hunter' && hasUnreleasedBountyHunters) {
-        isUnreleased = true;
       }
 
       fullSprites.push({
@@ -645,12 +639,10 @@ async function syncSprites() {
       const themeKey = normalizeKey(theme);
       const expectedId = `${familyId}_${themeKey}`;
 
-      // Determinar si es no lanzado respetando la regla del paquete de Bounty Hunters (excepto Victorioso que sí está activo)
+      // Determinar si es no lanzado respetando el estado directo de Fortnite.gg (Victorioso siempre activo)
       let isCardUnreleased = card.unreleased;
       if (theme === 'Bounty Hunter' && (familyId === 'crown' || parentNorm === 'crown')) {
         isCardUnreleased = false;
-      } else if (theme === 'Bounty Hunter' && hasUnreleasedBountyHunters) {
-        isCardUnreleased = true;
       }
 
       // Buscar en el catálogo oficial tanto por ID exacto, como por ID alternativo de rift, como por familia + tema

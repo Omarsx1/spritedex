@@ -73,6 +73,13 @@ jobs:
               git merge dev -m "Merge dev: Actualiza catálogo de espíritus desde fortnite.gg"
               git push origin main
               git checkout dev
+            elif [ "$CURRENT_BRANCH" = "main" ]; then
+              echo "Sincronizando con rama dev..."
+              git fetch origin dev
+              git checkout dev
+              git merge main -m "Merge main: Actualiza catálogo de espíritus desde fortnite.gg"
+              git push origin dev
+              git checkout main
             fi
             echo "✅ Catálogo sincronizado y cambios subidos con éxito."
           else
