@@ -1475,7 +1475,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-17"
   },
   {
@@ -1636,7 +1636,7 @@
     "rarity": "Epic",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-17"
   },
   {
@@ -1646,7 +1646,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-17"
   },
   {
@@ -1656,7 +1656,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-17"
   },
   {
@@ -1666,7 +1666,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-17"
   },
   {
@@ -1832,7 +1832,7 @@
     "rarity": "Legendary",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-17"
   },
   {
@@ -1842,7 +1842,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-17"
   },
   {
@@ -1852,7 +1852,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-17"
   },
   {
@@ -1862,7 +1862,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-17"
   },
   {
@@ -1881,7 +1881,7 @@
     "rarity": "Legendary",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-17"
   },
   {
@@ -1891,7 +1891,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-17"
   },
   {
@@ -1901,7 +1901,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-17"
   },
   {
@@ -1911,7 +1911,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-17"
   },
   {
@@ -1974,8 +1974,9 @@
     "theme": "Basic",
     "rarity": "Epic",
     "gen": 2,
-    "unreleased": true,
-    "isNew": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-24"
   },
   {
     "id": "morgana_gold",
@@ -1983,8 +1984,9 @@
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true,
-    "isNew": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-24"
   },
   {
     "id": "morgana_cheatmaster",
@@ -1992,8 +1994,9 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true,
-    "isNew": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-24"
   },
   {
     "id": "morgana_loothacker",
@@ -2001,8 +2004,9 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true,
-    "isNew": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-24"
   },
   {
     "id": "morgana_bountyhunter",
