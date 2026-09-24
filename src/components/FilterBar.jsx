@@ -44,6 +44,11 @@ export function FilterBar({
   const [variantOpen, setVariantOpen] = useState(false);
   const [spriteOpen, setSpriteOpen] = useState(false);
 
+  // Compute number of active new spirits
+  const newSpiritsCount = useMemo(() => {
+    return ALL_SPRITES.filter(s => s.isNew && !s.unreleased).length;
+  }, []);
+
   // Compute available families scoped to activeGen and showUnreleased
   const availableFamiliesWithImages = useMemo(() => {
     const scopedSprites = ALL_SPRITES.filter(s => (activeGen === 0 || s.gen === activeGen) && (showUnreleased || !s.unreleased));
@@ -141,7 +146,10 @@ export function FilterBar({
             className={`status-pill-btn ${statusFilter === opt.value ? 'is-active' : ''}`}
             onClick={() => setStatusFilter(statusFilter === opt.value ? 'all' : opt.value)}
           >
-            {opt.label}
+            <span>{opt.label}</span>
+            {opt.value === 'new' && newSpiritsCount > 0 && (
+              <span className="status-pill-count-badge">{newSpiritsCount}</span>
+            )}
           </button>
         ))}
       </div>

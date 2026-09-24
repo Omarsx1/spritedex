@@ -28,29 +28,18 @@ export function MobileLiquidFilterBar({
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
 
-  // ═══ SMART ONE-TIME DISCOVERY COACHMARK (NUEVO DROP C7S4 - 12 ESPÍRITUS LANZADOS) ═══
-  const NEW_SPIRITS_RELEASE_TIMESTAMP = 1789645200000; // 2026-09-17T11:40:00.000Z
-  const NEW_SPIRITS_COACHMARK_KEY = 'spritedex_seen_new_spirits_v5_c7s4_12';
+  // ═══ SMART ONE-TIME DISCOVERY COACHMARK (NUEVO DROP CAZADORES Y MORGANA - 2026-09-24) ═══
+  const newSpiritsCount = useMemo(() => {
+    return ALL_SPRITES.filter(s => s.isNew && !s.unreleased).length;
+  }, []);
+
+  const NEW_SPIRITS_COACHMARK_KEY = 'spritedex_seen_new_drop_2026_09_24_bounty_morgana';
 
   const [showNewTooltip, setShowNewTooltip] = useState(() => {
     if (safeStorage.getItem(NEW_SPIRITS_COACHMARK_KEY)) return false;
-    return Date.now() >= NEW_SPIRITS_RELEASE_TIMESTAMP;
+    return newSpiritsCount > 0;
   });
   const [isDismissing, setIsDismissing] = useState(false);
-
-  // Activación automática si el usuario tiene la página abierta al llegar las 6:50 a. m.
-  useEffect(() => {
-    const now = Date.now();
-    if (now < NEW_SPIRITS_RELEASE_TIMESTAMP) {
-      const msUntilRelease = NEW_SPIRITS_RELEASE_TIMESTAMP - now;
-      const timer = setTimeout(() => {
-        if (!safeStorage.getItem(NEW_SPIRITS_COACHMARK_KEY) && statusFilter !== 'new') {
-          setShowNewTooltip(true);
-        }
-      }, msUntilRelease);
-      return () => clearTimeout(timer);
-    }
-  }, [statusFilter, NEW_SPIRITS_RELEASE_TIMESTAMP]);
 
   useEffect(() => {
     if (statusFilter === 'new') {
@@ -255,7 +244,7 @@ export function MobileLiquidFilterBar({
           >
             <div className="mobile-new-coachmark__content">
               <span className="mobile-new-coachmark__sparkle">✨</span>
-              <span className="mobile-new-coachmark__text">¡12 Nuevos espíritus!</span>
+              <span className="mobile-new-coachmark__text">¡{newSpiritsCount} Nuevos espíritus!</span>
               <span className="mobile-new-coachmark__action">Ver</span>
               <button
                 type="button"
