@@ -649,6 +649,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
             <thead>
               <tr style={{ borderBottom: `1px solid ${c.borderCard}`, color: c.textSecondary, background: c.tableHeaderBg }}>
                 <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>ENTRENADOR</th>
+                <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>PAÍS</th>
                 <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>CÓDIGO</th>
                 <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>PROGRESO</th>
                 <th style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.04em' }}>ESTRELLAS</th>
@@ -717,20 +718,6 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                               <span style={{ fontWeight: 800, color: c.textPrimary, fontSize: '0.86rem' }}>
                                 {user.name}
                               </span>
-                              {user.countryFlag && (
-                                <span 
-                                  title={user.countryName || 'País'}
-                                  style={{
-                                    fontSize: '0.96rem',
-                                    lineHeight: 1,
-                                    cursor: 'help',
-                                    display: 'inline-flex',
-                                    alignItems: 'center'
-                                  }}
-                                >
-                                  {user.countryFlag}
-                                </span>
-                              )}
                               {isMe && (
                                 <span style={{
                                   padding: '1px 6px',
@@ -751,6 +738,30 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                               {shortId}
                             </span>
                           </div>
+                        </div>
+                      </td>
+
+                      {/* Country Flag & Name */}
+                      <td style={{ padding: '12px 18px', whiteSpace: 'nowrap' }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                          <span 
+                            title={user.countryName || 'País'}
+                            style={{
+                              fontSize: '1.15rem',
+                              lineHeight: 1,
+                              display: 'inline-flex',
+                              alignItems: 'center'
+                            }}
+                          >
+                            {user.countryFlag || '🌐'}
+                          </span>
+                          <span style={{
+                            fontSize: '0.8rem',
+                            fontWeight: 600,
+                            color: user.countryName && user.countryName !== 'Internacional' ? c.textPrimary : c.textMuted
+                          }}>
+                            {user.countryName || 'Internacional'}
+                          </span>
                         </div>
                       </td>
 
@@ -893,7 +904,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                 })
               ) : (
                 <tr>
-                  <td colSpan={6} style={{ padding: '36px', textAlign: 'center', color: c.textSecondary }}>
+                  <td colSpan={7} style={{ padding: '36px', textAlign: 'center', color: c.textSecondary }}>
                     {loading ? 'Cargando usuarios de Supabase...' : 'No se encontraron usuarios registrados con los filtros seleccionados.'}
                   </td>
                 </tr>
