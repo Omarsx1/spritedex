@@ -19,9 +19,19 @@ import {
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../utils/supabase';
 import { getMyFriendCode } from '../../utils/friendCode';
+import { getClientCountry, resolveCountry } from '../../utils/telemetry';
 
 export function UserManagementTable({ sprites = [], darkMode = false }) {
   const [rawCollections, setRawCollections] = useState([]);
+  const [analyticsEvents, setAnalyticsEvents] = useState([]);
+  const [myDetectedGeo, setMyDetectedGeo] = useState(() => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      return resolveCountry('', tz);
+    } catch {
+      return null;
+    }
+  });
   const [totalVisits, setTotalVisits] = useState(0);
   const [currentAuthUser, setCurrentAuthUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -68,6 +78,12 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         }
       });
     }
+
+    getClientCountry().then((geo) => {
+      if (geo && geo.code !== 'GL') {
+        setMyDetectedGeo(geo);
+      }
+    });
   }, []);
 
   // Filter pool of sprites according to selected generation (matching released spirits on home screen)
@@ -103,6 +119,18 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
           .select('*', { count: 'exact', head: true });
 
         setTotalVisits(visitCount || 0);
+
+        // 3. Fetch geo-tagged analytics events to correlate user location
+        const { data: geoEvents } = await supabase
+          .from('analytics_events')
+          .select('created_at, referrer')
+          .ilike('referrer', '%[geo:%')
+          .order('created_at', { ascending: false })
+          .limit(2500);
+
+        if (geoEvents) {
+          setAnalyticsEvents(geoEvents);
+        }
 
         if (collections) {
           setRawCollections(collections);
@@ -168,8 +196,43 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
       }
 
       const avatarUrl = profile.avatar_url || (isMe && (currentAuthUser?.user_metadata?.avatar_url || currentAuthUser?.user_metadata?.picture) ? (currentAuthUser.user_metadata.avatar_url || currentAuthUser.user_metadata.picture) : '');
-      const countryFlag = profile.country_flag || (isMe ? '🇬🇹' : '🌐');
-      const countryName = profile.country_name || (isMe ? 'Guatemala' : 'Internacional');
+      
+      let countryFlag = '';
+      let countryName = '';
+
+      if (profile.country_flag && profile.country_flag !== '🌐') {
+        countryFlag = profile.country_flag;
+        countryName = profile.country_name || '';
+      } else if (isMe && myDetectedGeo && myDetectedGeo.flag && myDetectedGeo.code !== 'GL') {
+        countryFlag = myDetectedGeo.flag;
+        countryName = myDetectedGeo.name;
+      } else if (analyticsEvents && analyticsEvents.length > 0) {
+        const colTime = new Date(col.updated_at).getTime();
+        let closest = null;
+        let minDiff = Infinity;
+        for (let i = 0; i < analyticsEvents.length; i++) {
+          const ev = analyticsEvents[i];
+          const diff = Math.abs(new Date(ev.created_at).getTime() - colTime);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closest = ev;
+            if (minDiff < 5000) break;
+          }
+        }
+        // Match with geo event if within 24 hours (86,400,000 ms)
+        if (closest && closest.referrer && minDiff < 86400000) {
+          const geo = resolveCountry(closest.referrer, '');
+          if (geo && geo.flag && geo.code !== 'GL') {
+            countryFlag = geo.flag;
+            countryName = geo.name;
+          }
+        }
+      }
+
+      if (!countryFlag) {
+        countryFlag = '🌐';
+        countryName = 'Internacional';
+      }
 
       return {
         id: col.id || `usr_${idx}`,
@@ -186,7 +249,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         updatedAt: col.updated_at || new Date().toISOString()
       };
     });
-  }, [rawCollections, scopedSprites, myFriendCode, currentAuthUser]);
+  }, [rawCollections, scopedSprites, myFriendCode, currentAuthUser, analyticsEvents, myDetectedGeo]);
 
   // Find active user's matched record
   const myUserRow = useMemo(() => {
