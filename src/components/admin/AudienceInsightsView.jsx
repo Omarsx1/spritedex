@@ -598,7 +598,7 @@ export function AudienceInsightsView({ darkMode = false }) {
 
         {/* 24-Hour Bar Graph Container */}
         <div 
-          style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', width: '100%', position: 'relative' }}
+          style={{ width: '100%', position: 'relative' }}
           onMouseLeave={() => setHoveredHour(null)}
         >
           <div style={{
@@ -607,7 +607,7 @@ export function AudienceInsightsView({ darkMode = false }) {
             gap: '3px',
             height: '110px',
             alignItems: 'flex-end',
-            padding: '10px 0',
+            paddingBottom: '8px',
             borderBottom: `1px solid ${c.borderCard}`,
             minWidth: '280px',
             position: 'relative'
@@ -637,42 +637,6 @@ export function AudienceInsightsView({ darkMode = false }) {
                   onMouseEnter={() => setHoveredHour({ hour, count, isPeak })}
                   onTouchStart={() => setHoveredHour({ hour, count, isPeak })}
                 >
-                  {/* Floating tooltip above hovered bar */}
-                  {isHovered && (
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '105%',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      background: darkMode ? '#0F172A' : '#1E293B',
-                      border: darkMode ? '1px solid #334155' : '1px solid #475569',
-                      borderRadius: '8px',
-                      padding: '6px 10px',
-                      color: '#FFFFFF',
-                      fontSize: '0.72rem',
-                      whiteSpace: 'nowrap',
-                      pointerEvents: 'none',
-                      zIndex: 30,
-                      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.35)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '2px'
-                    }}>
-                      <div style={{ color: '#94A3B8', fontSize: '0.68rem', fontWeight: 600 }}>
-                        {formatHourLabel(hour)}
-                      </div>
-                      <div style={{ color: darkMode ? '#3ECF8E' : '#60A5FA', fontSize: '0.82rem', fontWeight: 800 }}>
-                        {count} {count === 1 ? 'visita' : 'visitas'}
-                      </div>
-                      {isPeak && (
-                        <div style={{ color: '#FBBF24', fontSize: '0.64rem', fontWeight: 700 }}>
-                          ⚡ Hora Pico
-                        </div>
-                      )}
-                    </div>
-                  )}
-
                   <div
                     style={{
                       width: '100%',
