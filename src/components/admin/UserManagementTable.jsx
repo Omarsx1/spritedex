@@ -168,6 +168,8 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
       }
 
       const avatarUrl = profile.avatar_url || (isMe && (currentAuthUser?.user_metadata?.avatar_url || currentAuthUser?.user_metadata?.picture) ? (currentAuthUser.user_metadata.avatar_url || currentAuthUser.user_metadata.picture) : '');
+      const countryFlag = profile.country_flag || (isMe ? '🇬🇹' : '🌐');
+      const countryName = profile.country_name || (isMe ? 'Guatemala' : 'Internacional');
 
       return {
         id: col.id || `usr_${idx}`,
@@ -175,6 +177,8 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
         friendCode: col.friend_code || `SDEX-${(col.user_id || 'USER').slice(0, 4).toUpperCase()}`,
         name: displayName,
         avatarUrl: avatarUrl,
+        countryFlag: countryFlag,
+        countryName: countryName,
         caughtCount: caught,
         starCount: stars,
         progressPct: pct,
@@ -437,8 +441,8 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
               <div style={{ fontSize: '0.84rem', fontWeight: 700, color: c.textPrimary, display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span>Tu Cuenta de Entrenador:</span>
                 {myUserRow?.name && (
-                  <strong style={{ color: darkMode ? '#3ECF8E' : '#2563EB' }}>
-                    {myUserRow.name}
+                  <strong style={{ color: darkMode ? '#3ECF8E' : '#2563EB', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    {myUserRow.name} {myUserRow.countryFlag}
                   </strong>
                 )}
                 <span style={{
@@ -650,6 +654,20 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                               <span style={{ fontWeight: 800, color: c.textPrimary, fontSize: '0.86rem' }}>
                                 {user.name}
                               </span>
+                              {user.countryFlag && (
+                                <span 
+                                  title={user.countryName || 'País'}
+                                  style={{
+                                    fontSize: '0.96rem',
+                                    lineHeight: 1,
+                                    cursor: 'help',
+                                    display: 'inline-flex',
+                                    alignItems: 'center'
+                                  }}
+                                >
+                                  {user.countryFlag}
+                                </span>
+                              )}
                               {isMe && (
                                 <span style={{
                                   padding: '1px 6px',

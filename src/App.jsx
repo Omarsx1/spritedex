@@ -20,7 +20,7 @@ import { Footer } from './components/Footer';
 import { MobileSpriteSwiper } from './components/MobileSpriteSwiper';
 import { useIsMobile } from './hooks/useIsMobile';
 import { useDynamicSprites } from './hooks/useDynamicSprites';
-import { trackEvent } from './utils/telemetry';
+import { trackEvent, resolveCountry } from './utils/telemetry';
 import { isUserAdminAuthenticated } from './utils/adminAuth';
 import { decodeCollectionState } from './utils/shareLink';
 import { supabase, isSupabaseConfigured } from './utils/supabase';
@@ -300,11 +300,39 @@ export function App() {
             ? `Entrenador #${myFriendCode.replace('SDEX-', '')}`
             : `Entrenador #${user.id.slice(0, 4).toUpperCase()}`;
           const isAnon = user.is_anonymous || (!user.email && !user.user_metadata?.full_name);
+
+          let countryCode = '';
+          let countryFlag = '';
+          let countryName = '';
+          try {
+            const cachedGeo = safeStorage.getItem('spritedex_cached_geo');
+            if (cachedGeo) {
+              const parsed = JSON.parse(cachedGeo);
+              if (parsed?.flag) {
+                countryFlag = parsed.flag;
+                countryCode = parsed.code;
+                countryName = parsed.name;
+              }
+            }
+            if (!countryFlag) {
+              const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+              const geo = resolveCountry('', tz);
+              if (geo && geo.code !== 'GL') {
+                countryCode = geo.code;
+                countryFlag = geo.flag;
+                countryName = geo.name;
+              }
+            }
+          } catch {}
+
           const profileMeta = {
             name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || defaultAnonName,
             email: user.email || '',
             avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || '',
             is_anonymous: Boolean(isAnon),
+            country_code: countryCode,
+            country_flag: countryFlag,
+            country_name: countryName,
           };
 
           await supabase.from('user_collections').upsert(
