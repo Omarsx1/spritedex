@@ -105,6 +105,15 @@ export function AudienceInsightsView({ darkMode = false }) {
   const [tableSearch, setTableSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25); // 15 | 25 | 50 | 100 | 'all'
+  const [hoveredHour, setHoveredHour] = useState(null);
+  const [hoveredPlatform, setHoveredPlatform] = useState(null);
+  const [hoveredCountry, setHoveredCountry] = useState(null);
+
+  const formatHourLabel = (h) => {
+    const period = h >= 12 ? 'PM' : 'AM';
+    const displayH = h % 12 === 0 ? 12 : h % 12;
+    return `${displayH}:00 ${period} (${String(h).padStart(2, '0')}:00)`;
+  };
 
   const loadAudienceData = async () => {
     try {
@@ -554,9 +563,29 @@ export function AudienceInsightsView({ darkMode = false }) {
       <div className="studio-admin-widget-card" style={widgetCardStyle}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
           <div>
-            <h3 style={{ fontSize: '0.96rem', fontWeight: 800, color: c.textPrimary, margin: 0 }}>
-              Distribución de Tráfico por Horas del Día (00:00 a 23:00)
-            </h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <h3 style={{ fontSize: '0.96rem', fontWeight: 800, color: c.textPrimary, margin: 0 }}>
+                Distribución de Tráfico por Horas del Día (00:00 a 23:00)
+              </h3>
+              {hoveredHour && (
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '2px 10px',
+                  borderRadius: '20px',
+                  background: darkMode ? 'rgba(62, 207, 142, 0.15)' : 'rgba(60, 80, 224, 0.1)',
+                  border: darkMode ? '1px solid rgba(62, 207, 142, 0.3)' : '1px solid rgba(60, 80, 224, 0.2)',
+                  color: darkMode ? '#3ECF8E' : '#3C50E0',
+                  fontSize: '0.74rem',
+                  fontWeight: 800
+                }}>
+                  <span>{formatHourLabel(hoveredHour.hour)}:</span>
+                  <span style={{ fontWeight: 900 }}>{hoveredHour.count} {hoveredHour.count === 1 ? 'visita' : 'visitas'}</span>
+                  {hoveredHour.isPeak && <span style={{ marginLeft: '4px', fontSize: '0.7rem' }}>⚡ Pico</span>}
+                </div>
+              )}
+            </div>
             <p style={{ fontSize: '0.74rem', color: c.textSecondary, margin: '2px 0 0' }}>
               Identifica a qué horas tus entrenadores están más activos jugando y sincronizando espíritus.
             </p>
@@ -568,20 +597,25 @@ export function AudienceInsightsView({ darkMode = false }) {
         </div>
 
         {/* 24-Hour Bar Graph Container */}
-        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', width: '100%' }}>
+        <div 
+          style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', width: '100%', position: 'relative' }}
+          onMouseLeave={() => setHoveredHour(null)}
+        >
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(24, 1fr)',
-            gap: '2px',
+            gap: '3px',
             height: '110px',
             alignItems: 'flex-end',
             padding: '10px 0',
             borderBottom: `1px solid ${c.borderCard}`,
-            minWidth: '280px'
+            minWidth: '280px',
+            position: 'relative'
           }}>
             {analytics.hourHistogram.map((count, hour) => {
               const heightPct = Math.max(8, Math.round((count / maxHourVal) * 100));
               const isPeak = count === analytics.peakHourCount && count > 0;
+              const isHovered = hoveredHour?.hour === hour;
 
               return (
                 <div
@@ -592,19 +626,66 @@ export function AudienceInsightsView({ darkMode = false }) {
                     alignItems: 'center',
                     height: '100%',
                     justifyContent: 'flex-end',
-                    position: 'relative'
+                    position: 'relative',
+                    cursor: 'pointer',
+                    borderRadius: '4px 4px 0 0',
+                    background: isHovered 
+                      ? (darkMode ? 'rgba(62, 207, 142, 0.12)' : 'rgba(60, 80, 224, 0.08)')
+                      : 'transparent',
+                    transition: 'background 0.15s ease'
                   }}
-                  title={`Hora: ${hour}:00 - ${count} visitas`}
+                  onMouseEnter={() => setHoveredHour({ hour, count, isPeak })}
+                  onTouchStart={() => setHoveredHour({ hour, count, isPeak })}
                 >
+                  {/* Floating tooltip above hovered bar */}
+                  {isHovered && (
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '105%',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      background: darkMode ? '#0F172A' : '#1E293B',
+                      border: darkMode ? '1px solid #334155' : '1px solid #475569',
+                      borderRadius: '8px',
+                      padding: '6px 10px',
+                      color: '#FFFFFF',
+                      fontSize: '0.72rem',
+                      whiteSpace: 'nowrap',
+                      pointerEvents: 'none',
+                      zIndex: 30,
+                      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.35)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '2px'
+                    }}>
+                      <div style={{ color: '#94A3B8', fontSize: '0.68rem', fontWeight: 600 }}>
+                        {formatHourLabel(hour)}
+                      </div>
+                      <div style={{ color: darkMode ? '#3ECF8E' : '#60A5FA', fontSize: '0.82rem', fontWeight: 800 }}>
+                        {count} {count === 1 ? 'visita' : 'visitas'}
+                      </div>
+                      {isPeak && (
+                        <div style={{ color: '#FBBF24', fontSize: '0.64rem', fontWeight: 700 }}>
+                          ⚡ Hora Pico
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div
                     style={{
                       width: '100%',
                       height: `${heightPct}%`,
                       borderRadius: '3px 3px 0 0',
                       background: isPeak 
-                        ? (darkMode ? '#3ECF8E' : '#0F172A')
-                        : count > 0 ? c.barFillBlue : (darkMode ? '#222222' : '#F1F5F9'),
-                      transition: 'all 0.3s ease'
+                        ? (isHovered ? (darkMode ? '#5EEAD4' : '#1E293B') : (darkMode ? '#3ECF8E' : '#0F172A'))
+                        : count > 0 
+                          ? (isHovered ? (darkMode ? '#5EEAD4' : '#4F46E5') : c.barFillBlue)
+                          : (isHovered ? (darkMode ? '#333333' : '#E2E8F0') : (darkMode ? '#222222' : '#F1F5F9')),
+                      transform: isHovered ? 'scaleY(1.04)' : 'scaleY(1)',
+                      transformOrigin: 'bottom',
+                      transition: 'all 0.15s ease'
                     }}
                   />
                 </div>
@@ -616,7 +697,7 @@ export function AudienceInsightsView({ darkMode = false }) {
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(24, 1fr)',
-            gap: '2px',
+            gap: '3px',
             marginTop: '6px',
             fontSize: '0.64rem',
             color: c.textMuted,
@@ -624,9 +705,20 @@ export function AudienceInsightsView({ darkMode = false }) {
             fontFamily: 'monospace',
             minWidth: '280px'
           }}>
-            {Array.from({ length: 24 }).map((_, h) => (
-              <span key={h}>{h % 3 === 0 ? `${h}h` : ''}</span>
-            ))}
+            {Array.from({ length: 24 }).map((_, h) => {
+              const isHovered = hoveredHour?.hour === h;
+              return (
+                <span 
+                  key={h}
+                  style={{
+                    fontWeight: isHovered ? 800 : 500,
+                    color: isHovered ? c.textPrimary : c.textMuted
+                  }}
+                >
+                  {h % 3 === 0 ? `${h}h` : ''}
+                </span>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -642,13 +734,30 @@ export function AudienceInsightsView({ darkMode = false }) {
       >
         {/* Column 1: Detailed Operating Systems & Platforms */}
         <div className="studio-admin-widget-card" style={widgetCardStyle}>
-          <h3 style={{ fontSize: '0.94rem', fontWeight: 800, color: c.textPrimary, margin: '0 0 16px' }}>
-            Desglose de Dispositivos y Sistemas
-          </h3>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '0.94rem', fontWeight: 800, color: c.textPrimary, margin: 0 }}>
+              Desglose de Dispositivos y Sistemas
+            </h3>
+            {hoveredPlatform && (
+              <span style={{ fontSize: '0.72rem', color: darkMode ? '#3ECF8E' : '#3C50E0', fontWeight: 800 }}>
+                {hoveredPlatform}
+              </span>
+            )}
+          </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }} onMouseLeave={() => setHoveredPlatform(null)}>
             {/* iOS (iPhone) */}
-            <div>
+            <div 
+              style={{
+                cursor: 'pointer',
+                padding: '4px 6px',
+                borderRadius: '8px',
+                transition: 'background 0.15s ease',
+                background: hoveredPlatform?.startsWith('iOS') ? (darkMode ? 'rgba(56, 189, 248, 0.08)' : 'rgba(56, 189, 248, 0.06)') : 'transparent'
+              }}
+              onMouseEnter={() => setHoveredPlatform(`iOS: ${analytics.iphone} sesiones`)}
+              onTouchStart={() => setHoveredPlatform(`iOS: ${analytics.iphone} sesiones`)}
+            >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '5px' }}>
                 <span style={{ fontWeight: 700, color: c.textPrimary, display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <AppleIcon size={14} color={c.textPrimary} /> iOS (iPhone)
@@ -658,12 +767,22 @@ export function AudienceInsightsView({ darkMode = false }) {
                 </span>
               </div>
               <div style={{ width: '100%', height: '6px', background: c.barTrack, borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ width: `${analytics.total > 0 ? (analytics.iphone / analytics.total) * 100 : 0}%`, height: '100%', background: '#38BDF8', borderRadius: '3px' }} />
+                <div style={{ width: `${analytics.total > 0 ? (analytics.iphone / analytics.total) * 100 : 0}%`, height: '100%', background: '#38BDF8', borderRadius: '3px', transition: 'width 0.3s ease' }} />
               </div>
             </div>
 
             {/* Android */}
-            <div>
+            <div 
+              style={{
+                cursor: 'pointer',
+                padding: '4px 6px',
+                borderRadius: '8px',
+                transition: 'background 0.15s ease',
+                background: hoveredPlatform?.startsWith('Android') ? (darkMode ? 'rgba(52, 168, 83, 0.08)' : 'rgba(52, 168, 83, 0.06)') : 'transparent'
+              }}
+              onMouseEnter={() => setHoveredPlatform(`Android: ${analytics.android} sesiones`)}
+              onTouchStart={() => setHoveredPlatform(`Android: ${analytics.android} sesiones`)}
+            >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '5px' }}>
                 <span style={{ fontWeight: 700, color: c.textPrimary, display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <AndroidIcon size={14} color="#34A853" /> Android Mobile
@@ -673,12 +792,22 @@ export function AudienceInsightsView({ darkMode = false }) {
                 </span>
               </div>
               <div style={{ width: '100%', height: '6px', background: c.barTrack, borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ width: `${analytics.total > 0 ? (analytics.android / analytics.total) * 100 : 0}%`, height: '100%', background: '#34A853', borderRadius: '3px' }} />
+                <div style={{ width: `${analytics.total > 0 ? (analytics.android / analytics.total) * 100 : 0}%`, height: '100%', background: '#34A853', borderRadius: '3px', transition: 'width 0.3s ease' }} />
               </div>
             </div>
 
             {/* macOS */}
-            <div>
+            <div 
+              style={{
+                cursor: 'pointer',
+                padding: '4px 6px',
+                borderRadius: '8px',
+                transition: 'background 0.15s ease',
+                background: hoveredPlatform?.startsWith('macOS') ? (darkMode ? 'rgba(129, 140, 248, 0.08)' : 'rgba(129, 140, 248, 0.06)') : 'transparent'
+              }}
+              onMouseEnter={() => setHoveredPlatform(`macOS: ${analytics.mac} sesiones`)}
+              onTouchStart={() => setHoveredPlatform(`macOS: ${analytics.mac} sesiones`)}
+            >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '5px' }}>
                 <span style={{ fontWeight: 700, color: c.textPrimary, display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <AppleIcon size={14} color={c.textPrimary} /> Apple Mac (macOS)
@@ -688,12 +817,22 @@ export function AudienceInsightsView({ darkMode = false }) {
                 </span>
               </div>
               <div style={{ width: '100%', height: '6px', background: c.barTrack, borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ width: `${analytics.total > 0 ? (analytics.mac / analytics.total) * 100 : 0}%`, height: '100%', background: '#818CF8', borderRadius: '3px' }} />
+                <div style={{ width: `${analytics.total > 0 ? (analytics.mac / analytics.total) * 100 : 0}%`, height: '100%', background: '#818CF8', borderRadius: '3px', transition: 'width 0.3s ease' }} />
               </div>
             </div>
 
             {/* Windows */}
-            <div>
+            <div 
+              style={{
+                cursor: 'pointer',
+                padding: '4px 6px',
+                borderRadius: '8px',
+                transition: 'background 0.15s ease',
+                background: hoveredPlatform?.startsWith('Windows') ? (darkMode ? 'rgba(0, 173, 239, 0.08)' : 'rgba(0, 173, 239, 0.06)') : 'transparent'
+              }}
+              onMouseEnter={() => setHoveredPlatform(`Windows: ${analytics.windows} sesiones`)}
+              onTouchStart={() => setHoveredPlatform(`Windows: ${analytics.windows} sesiones`)}
+            >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '5px' }}>
                 <span style={{ fontWeight: 700, color: c.textPrimary, display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <WindowsIcon size={14} color="#00adef" /> Microsoft Windows PC
@@ -703,7 +842,7 @@ export function AudienceInsightsView({ darkMode = false }) {
                 </span>
               </div>
               <div style={{ width: '100%', height: '6px', background: c.barTrack, borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ width: `${analytics.total > 0 ? (analytics.windows / analytics.total) * 100 : 0}%`, height: '100%', background: '#00adef', borderRadius: '3px' }} />
+                <div style={{ width: `${analytics.total > 0 ? (analytics.windows / analytics.total) * 100 : 0}%`, height: '100%', background: '#00adef', borderRadius: '3px', transition: 'width 0.3s ease' }} />
               </div>
             </div>
           </div>
@@ -711,17 +850,36 @@ export function AudienceInsightsView({ darkMode = false }) {
 
         {/* Column 2: Geographic Distribution (Países) */}
         <div className="studio-admin-widget-card" style={widgetCardStyle}>
-          <h3 style={{ fontSize: '0.94rem', fontWeight: 800, color: c.textPrimary, margin: '0 0 16px' }}>
-            Distribución Geográfica (Top Países)
-          </h3>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '0.94rem', fontWeight: 800, color: c.textPrimary, margin: 0 }}>
+              Distribución Geográfica (Top Países)
+            </h3>
+            {hoveredCountry && (
+              <span style={{ fontSize: '0.72rem', color: darkMode ? '#3ECF8E' : '#3C50E0', fontWeight: 800 }}>
+                {hoveredCountry}
+              </span>
+            )}
+          </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }} onMouseLeave={() => setHoveredCountry(null)}>
             {analytics.topCountries.length > 0 ? (
               analytics.topCountries.slice(0, 5).map((country, idx) => {
                 const pct = analytics.total > 0 ? Math.round((country.count / analytics.total) * 100) : 0;
+                const isHovered = hoveredCountry?.startsWith(country.name);
 
                 return (
-                  <div key={country.code || idx}>
+                  <div 
+                    key={country.code || idx}
+                    style={{
+                      cursor: 'pointer',
+                      padding: '4px 6px',
+                      borderRadius: '8px',
+                      transition: 'background 0.15s ease',
+                      background: isHovered ? (darkMode ? 'rgba(62, 207, 142, 0.08)' : 'rgba(60, 80, 224, 0.06)') : 'transparent'
+                    }}
+                    onMouseEnter={() => setHoveredCountry(`${country.name}: ${country.count} visitas (${pct}%)`)}
+                    onTouchStart={() => setHoveredCountry(`${country.name}: ${country.count} visitas (${pct}%)`)}
+                  >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '5px' }}>
                       <span style={{ fontWeight: 700, color: c.textPrimary, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         <span style={{ fontSize: '1.05rem', flexShrink: 0 }}>{country.flag}</span>
@@ -732,7 +890,7 @@ export function AudienceInsightsView({ darkMode = false }) {
                       </span>
                     </div>
                     <div style={{ width: '100%', height: '6px', background: c.barTrack, borderRadius: '3px', overflow: 'hidden' }}>
-                      <div style={{ width: `${pct}%`, height: '100%', background: country.code === 'GL' ? (darkMode ? '#525252' : '#94A3B8') : c.barFillBlue, borderRadius: '3px' }} />
+                      <div style={{ width: `${pct}%`, height: '100%', background: country.code === 'GL' ? (darkMode ? '#525252' : '#94A3B8') : (isHovered ? (darkMode ? '#5EEAD4' : '#4F46E5') : c.barFillBlue), borderRadius: '3px', transition: 'all 0.25s ease' }} />
                     </div>
                   </div>
                 );
