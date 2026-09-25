@@ -66,18 +66,18 @@ export function evaluateReleaseStatus(sprite) {
       unreleased = true;
       isAutoScheduled = true;
       timeUntilRelease = releaseTime - now;
+      isNew = false;
     } else {
       unreleased = false;
       isAutoScheduled = false;
       timeUntilRelease = 0;
-    }
 
-    const daysSince = (now - releaseTime) / (1000 * 60 * 60 * 24);
-    if (!hasManualOverride) {
-      if (daysSince >= 0 && daysSince <= 7 && !unreleased) {
-        isNew = true;
-      } else {
+      const daysSince = (now - releaseTime) / (1000 * 60 * 60 * 24);
+      // Regla estricta: expiran automáticamente tras 7 días de su estreno
+      if (daysSince > 7) {
         isNew = false;
+      } else if (daysSince >= 0) {
+        isNew = true;
       }
     }
   }
@@ -126,7 +126,7 @@ export function useDynamicSprites() {
             unreleased: (baseStatic && baseStatic.unreleased === false)
               ? false
               : (sanitized.unreleased !== undefined ? Boolean(sanitized.unreleased) : (baseStatic?.unreleased || false)),
-            isNew: sanitized.isNew !== undefined ? sanitized.isNew : (baseStatic?.isNew || false),
+            isNew: sanitized.is_new !== undefined ? Boolean(sanitized.is_new) : (sanitized.isNew !== undefined ? Boolean(sanitized.isNew) : (baseStatic?.isNew || false)),
             releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate || null,
             ability: (hasRealCustomAbility ? sanitized.ability : null) || override?.ability || baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.',
             specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base')
@@ -172,7 +172,7 @@ export function useDynamicSprites() {
               summonCost: cleanCost,
               summon_cost: cleanCost,
               rarity: sanitized.rarity || override?.rarity || baseStatic?.rarity,
-              isNew: sanitized.isNew !== undefined ? sanitized.isNew : (baseStatic?.isNew || false),
+              isNew: sanitized.is_new !== undefined ? Boolean(sanitized.is_new) : (sanitized.isNew !== undefined ? Boolean(sanitized.isNew) : (baseStatic?.isNew || false)),
               releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate || null,
               ability: (hasRealCustomAbility ? sanitized.ability : null) || override?.ability || baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.',
               specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base')

@@ -381,17 +381,46 @@ export function SpiritCatalogTable({
 
                       {/* Status */}
                       <td style={{ padding: '12px 20px' }}>
-                        {sprite.unreleased ? (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '8px', background: darkMode ? 'rgba(124, 58, 237, 0.2)' : '#F5F3FF', color: '#A78BFA', fontSize: '0.76rem', fontWeight: 800 }}>
-                            <Clock size={13} />
-                            <span>{sprite.release_date ? 'Programado' : 'No Lanzado'}</span>
-                          </span>
-                        ) : (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '8px', background: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#ECFDF5', color: '#3ECF8E', fontSize: '0.76rem', fontWeight: 800 }}>
-                            <CheckCircle2 size={13} />
-                            <span>Activo</span>
-                          </span>
-                        )}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-start' }}>
+                          {sprite.unreleased ? (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '8px', background: darkMode ? 'rgba(124, 58, 237, 0.2)' : '#F5F3FF', color: '#A78BFA', fontSize: '0.76rem', fontWeight: 800 }}>
+                              <Clock size={13} />
+                              <span>{sprite.release_date ? 'Programado' : 'No Lanzado'}</span>
+                            </span>
+                          ) : (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '8px', background: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#ECFDF5', color: '#3ECF8E', fontSize: '0.76rem', fontWeight: 800 }}>
+                              <CheckCircle2 size={13} />
+                              <span>Activo</span>
+                            </span>
+                          )}
+
+                          {sprite.isNew && (() => {
+                            const rel = sprite.release_date || sprite.releaseDate;
+                            let badgeText = '✨ Nuevo';
+                            if (rel) {
+                              const daysSince = (Date.now() - new Date(rel).getTime()) / (1000 * 60 * 60 * 24);
+                              if (daysSince >= 0 && daysSince <= 7) {
+                                const rem = Math.max(1, Math.ceil(7 - daysSince));
+                                badgeText = `✨ Nuevo (${rem}d)`;
+                              }
+                            }
+                            return (
+                              <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: '2px 8px',
+                                borderRadius: '6px',
+                                background: darkMode ? 'rgba(37, 99, 235, 0.2)' : '#EFF6FF',
+                                color: darkMode ? '#60A5FA' : '#2563EB',
+                                fontSize: '0.68rem',
+                                fontWeight: 800
+                              }}>
+                                {badgeText}
+                              </span>
+                            );
+                          })()}
+                        </div>
                       </td>
 
                       {/* Actions */}

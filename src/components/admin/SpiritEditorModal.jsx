@@ -424,6 +424,63 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
     return `📅 ${dayName}, ${dayNum} ${monthName} ${year} · ${timeStr}`;
   }, [formData.releaseDate]);
 
+  // Indicator of remaining or expired days for the "Nuevo" status
+  const newStatusInfo = useMemo(() => {
+    const relVal = formData.releaseDate || spirit?.release_date || spirit?.releaseDate;
+    if (!relVal) {
+      return {
+        hasDate: false,
+        text: 'Sin fecha de estreno registrada',
+        status: 'manual'
+      };
+    }
+    const relDate = new Date(relVal);
+    if (isNaN(relDate.getTime())) {
+      return {
+        hasDate: false,
+        text: 'Fecha no válida',
+        status: 'manual'
+      };
+    }
+    const now = new Date();
+    const diffMs = now.getTime() - relDate.getTime();
+    const daysSince = diffMs / (1000 * 60 * 60 * 24);
+
+    if (daysSince < 0) {
+      const daysUntil = Math.ceil(-daysSince);
+      return {
+        hasDate: true,
+        days: daysUntil,
+        status: 'future',
+        badgeColor: '#A78BFA',
+        badgeBg: darkMode ? 'rgba(124, 58, 237, 0.2)' : '#F5F3FF',
+        text: `⏳ Se estrena en ${daysUntil === 1 ? '1 día' : `${daysUntil} días`} (${relDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })})`
+      };
+    }
+
+    if (daysSince <= 7) {
+      const daysRemaining = Math.max(1, Math.ceil(7 - daysSince));
+      return {
+        hasDate: true,
+        days: daysRemaining,
+        status: 'active',
+        badgeColor: darkMode ? '#3ECF8E' : '#16A34A',
+        badgeBg: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#DCFCE7',
+        text: `⏱️ Quedan ${daysRemaining === 1 ? '1 día' : `${daysRemaining} días`} como Nuevo (hasta ${new Date(relDate.getTime() + 7 * 86400000).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })})`
+      };
+    }
+
+    const daysExpired = Math.floor(daysSince - 7);
+    return {
+      hasDate: true,
+      days: daysExpired,
+      status: 'expired',
+      badgeColor: '#F59E0B',
+      badgeBg: darkMode ? 'rgba(245, 158, 11, 0.15)' : '#FEF3C7',
+      text: `⚠️ Expiró hace ${daysExpired === 0 ? 'menos de 1 día' : `${daysExpired} días`} (estrenado el ${relDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })})`
+    };
+  }, [formData.releaseDate, spirit?.release_date, spirit?.releaseDate, darkMode]);
+
   return (
     <div
       className="studio-admin-modal-overlay"
@@ -1232,6 +1289,24 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
               <span style={{ fontSize: '0.72rem', color: c.textMuted, display: 'block', marginTop: '6px' }}>
                 Al estar marcado, el espíritu aparece en el filtro de "Nuevos" de la web y en la modal de exportación. Al agregar un espíritu nuevo viene marcado por defecto.
               </span>
+
+              {newStatusInfo.hasDate && (
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  marginTop: '10px',
+                  padding: '5px 12px',
+                  borderRadius: '8px',
+                  background: newStatusInfo.badgeBg,
+                  color: newStatusInfo.badgeColor,
+                  fontSize: '0.76rem',
+                  fontWeight: 800,
+                  border: `1px solid ${newStatusInfo.badgeColor}33`
+                }}>
+                  <span>{newStatusInfo.text}</span>
+                </div>
+              )}
             </div>
 
             {/* Form Action Footer */}
