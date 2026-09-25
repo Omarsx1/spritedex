@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import { VARIANT_ORDER } from './data/spritesData';
 
 const getVariantPriority = (v) => {
@@ -207,8 +207,26 @@ export function App() {
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const currentUser = session?.user ?? null;
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      let currentUser = session?.user ?? null;
+
+      // Respaldo silencioso de progreso existente: si no hay cuenta vinculada pero el usuario
+      // ya tiene espíritus marcados localmente, inicializamos de forma transparente su sesión anónima
+      // en segundo plano para que toda su colección se respalde en Supabase de inmediato.
+      if (!currentUser && isSupabaseConfigured && supabase) {
+        const hasLocalSpirits = Object.values(userState || {}).some((s) => s?.owned);
+        if (hasLocalSpirits) {
+          try {
+            const { data: anonData } = await supabase.auth.signInAnonymously();
+            if (anonData?.user) {
+              currentUser = anonData.user;
+            }
+          } catch (e) {
+            console.warn('Silent anonymous sync on init notice:', e);
+          }
+        }
+      }
+
       setUser(currentUser);
       if (currentUser) {
         setShowAuthModal(false);
@@ -278,10 +296,15 @@ export function App() {
     if (isSupabaseConfigured && supabase && user) {
       const timer = setTimeout(async () => {
         try {
+          const defaultAnonName = myFriendCode
+            ? `Entrenador #${myFriendCode.replace('SDEX-', '')}`
+            : `Entrenador #${user.id.slice(0, 4).toUpperCase()}`;
+          const isAnon = user.is_anonymous || (!user.email && !user.user_metadata?.full_name);
           const profileMeta = {
-            name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Entrenador',
+            name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || defaultAnonName,
             email: user.email || '',
             avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || '',
+            is_anonymous: Boolean(isAnon),
           };
 
           await supabase.from('user_collections').upsert(
@@ -304,7 +327,20 @@ export function App() {
     }
   }, [userState, user, myFriendCode]);
 
+  const ensureCloudSessionForAction = useCallback(async () => {
+    if (user || !isSupabaseConfigured || !supabase) return;
+    try {
+      const { data } = await supabase.auth.signInAnonymously();
+      if (data?.user) {
+        setUser(data.user);
+      }
+    } catch (e) {
+      console.warn('Anonymous session on action notice:', e);
+    }
+  }, [user]);
+
   const handleToggleOwned = (spriteId) => {
+    ensureCloudSessionForAction();
     setUserState((prev) => {
       const current = prev[spriteId] || { owned: false, level: 1 };
       const nextOwned = !current.owned;
@@ -319,6 +355,7 @@ export function App() {
   };
 
   const handleSetLevel = (spriteId, level) => {
+    ensureCloudSessionForAction();
     setUserState((prev) => ({
       ...prev,
       [spriteId]: {
