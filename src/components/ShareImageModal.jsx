@@ -249,8 +249,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       if (isIOS && fileToUse && navigator.canShare && navigator.canShare({ files: [fileToUse] })) {
         try {
           await navigator.share({
-            title: 'Plantilla de Espíritus Fortnite',
-            text: getShareableText(),
             files: [fileToUse]
           });
           return;
@@ -296,10 +294,10 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       }
 
       // Invocación directa e instantánea sin perder el User Gesture en iOS Safari y Android Chrome
+      // Se envía ÚNICAMENTE el archivo para que WhatsApp, Telegram y Facebook lo abran como foto limpia,
+      // sin convertirlo en documento ni incrustar dimensiones o textos en el pie de imagen.
       if (fileToShare && navigator.canShare && navigator.canShare({ files: [fileToShare] })) {
         await navigator.share({
-          title: 'Plantilla de Espíritus Fortnite',
-          text: getShareableText(),
           files: [fileToShare]
         });
       } else if (navigator.share) {
