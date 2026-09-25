@@ -43,56 +43,101 @@ function sanitizeDynamicItem(item) {
 export function evaluateReleaseStatus(sprite) {
   if (!sprite) return sprite;
 
-  let manualIsNewMap = {};
-  try {
-    manualIsNewMap = JSON.parse(localStorage.getItem('spritedex_manual_is_new_map') || '{}');
-  } catch {}
-
-  const hasManualOverride = manualIsNewMap[sprite.id] !== undefined;
   const rawRelDate = sprite.release_date || sprite.releaseDate;
-  let isNew = hasManualOverride 
-    ? Boolean(manualIsNewMap[sprite.id]) 
-    : (sprite.is_new !== undefined ? Boolean(sprite.is_new) : (sprite.isNew !== undefined ? Boolean(sprite.isNew) : false));
-
-  let unreleased = sprite.unreleased === true;
-  let isAutoScheduled = Boolean(sprite.isAutoScheduled);
-  let timeUntilRelease = 0;
-
-  if (rawRelDate) {
-    const releaseTime = new Date(rawRelDate).getTime();
-    const now = Date.now();
-
-    if (releaseTime > now) {
-      unreleased = true;
-      isAutoScheduled = true;
-      timeUntilRelease = releaseTime - now;
-      isNew = false;
-    } else {
-      unreleased = false;
-      isAutoScheduled = false;
-      timeUntilRelease = 0;
-
-      const daysSince = (now - releaseTime) / (1000 * 60 * 60 * 24);
-      // Regla estricta: expiran automáticamente tras 7 días de su estreno
-      if (daysSince > 7) {
-        isNew = false;
-      } else if (daysSince >= 0) {
-        isNew = true;
-      }
-    }
-  }
-
-  if (unreleased) {
-    isNew = false;
-  }
+  const releaseTime = rawRelDate ? new Date(rawRelDate).getTime() : 0;
+  const now = Date.now();
+  const isScheduled = releaseTime > now;
+  const unreleased = sprite.unreleased === true || isScheduled;
+  const isAutoScheduled = isScheduled;
+  const timeUntilRelease = isScheduled ? releaseTime - now : 0;
+  const daysSince = (!unreleased && releaseTime > 0) ? (now - releaseTime) / (1000 * 60 * 60 * 24) : 999;
+  const isNew = unreleased ? false : (daysSince <= 7 ? true : Boolean(sprite.is_new ?? sprite.isNew ?? false));
 
   return {
     ...sprite,
     unreleased,
     isAutoScheduled,
     timeUntilRelease,
+    daysSince,
+    releaseTime,
     isNew
   };
+}
+
+// Industry-Standard Novelty Rule (Fortnite / Steam standard):
+// 1. If spirits exist within 7-day window -> highlight them.
+// 2. If NO spirits exist within 7 days (content drought) -> fallback to the latest drop batch so "Nuevos" is never empty!
+export function applyBatchNoveltyRules(spritesList) {
+  if (!Array.isArray(spritesList) || spritesList.length === 0) return spritesList;
+
+  const now = Date.now();
+
+  // 1. Evaluate release timing for each sprite
+  const withTiming = spritesList.map(sprite => {
+    const rawRelDate = sprite.release_date || sprite.releaseDate;
+    const releaseTime = rawRelDate ? new Date(rawRelDate).getTime() : 0;
+    const isScheduled = releaseTime > now;
+    const unreleased = sprite.unreleased === true || isScheduled;
+    const isAutoScheduled = isScheduled;
+    const timeUntilRelease = isScheduled ? releaseTime - now : 0;
+    const daysSince = (!unreleased && releaseTime > 0) ? (now - releaseTime) / (1000 * 60 * 60 * 24) : 999;
+
+    return {
+      ...sprite,
+      unreleased,
+      isAutoScheduled,
+      timeUntilRelease,
+      daysSince,
+      releaseTime
+    };
+  });
+
+  // 2. Identify active Gen 2 released spirits with valid dates
+  const releasedGen2 = withTiming.filter(s => !s.unreleased && s.releaseTime > 0 && s.gen === 2);
+  const activeRecent = releasedGen2.filter(s => s.daysSince >= 0 && s.daysSince <= 7);
+
+  // 3. Fallback: If no spirits released in the last 7 days, find the latest drop batch date
+  let latestBatchTime = 0;
+  if (activeRecent.length === 0 && releasedGen2.length > 0) {
+    latestBatchTime = Math.max(...releasedGen2.map(s => s.releaseTime));
+  }
+
+  // 4. Map novelty status
+  return withTiming.map(s => {
+    if (s.unreleased) {
+      return {
+        ...s,
+        isNew: false,
+        noveltyReason: 'unreleased'
+      };
+    }
+
+    // Normal case: We have spirits released in the last 7 days
+    if (activeRecent.length > 0) {
+      const isWithin7 = s.daysSince >= 0 && s.daysSince <= 7;
+      return {
+        ...s,
+        isNew: isWithin7,
+        noveltyReason: isWithin7 ? 'recent' : 'expired'
+      };
+    }
+
+    // Drought case: Fallback to the latest drop batch (within 36h of the latest drop)
+    if (latestBatchTime > 0) {
+      const isLatestDrop = Math.abs(s.releaseTime - latestBatchTime) <= (36 * 60 * 60 * 1000);
+      return {
+        ...s,
+        isNew: isLatestDrop,
+        noveltyReason: isLatestDrop ? 'latest_drop' : 'older_drop'
+      };
+    }
+
+    return {
+      ...s,
+      isNew: Boolean(s.is_new ?? s.isNew ?? false),
+      noveltyReason: 'manual'
+    };
+  });
 }
 
 export function useDynamicSprites() {
@@ -135,10 +180,10 @@ export function useDynamicSprites() {
           };
           map.set(item.id, evaluateReleaseStatus(merged));
         });
-        return Array.from(map.values());
+        return applyBatchNoveltyRules(Array.from(map.values()));
       }
     } catch {}
-    return ALL_SPRITES.map(evaluateReleaseStatus);
+    return applyBatchNoveltyRules(ALL_SPRITES.map(evaluateReleaseStatus));
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -181,7 +226,7 @@ export function useDynamicSprites() {
             };
             map.set(item.id, evaluateReleaseStatus(merged));
           });
-          return Array.from(map.values());
+          return applyBatchNoveltyRules(Array.from(map.values()));
         });
       }
     } catch {}
@@ -244,7 +289,7 @@ export function useDynamicSprites() {
             };
             map.set(formatted.id, evaluateReleaseStatus(formatted));
           });
-          return Array.from(map.values());
+          return applyBatchNoveltyRules(Array.from(map.values()));
         });
       }
     } catch (err) {
@@ -276,7 +321,7 @@ export function useDynamicSprites() {
 
     // Interval to check automatic scheduled releases every 30 seconds
     const interval = setInterval(() => {
-      setSprites(prev => prev.map(evaluateReleaseStatus));
+      setSprites(prev => applyBatchNoveltyRules(prev.map(evaluateReleaseStatus)));
     }, 30000);
 
     return () => {
