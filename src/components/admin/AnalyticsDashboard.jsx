@@ -28,6 +28,7 @@ export function AnalyticsDashboard({ darkMode = false }) {
   });
   const [timeRange, setTimeRange] = useState('monthly'); // 'monthly' | 'quarterly' | 'annually'
   const [loading, setLoading] = useState(true);
+  const [hoveredBar, setHoveredBar] = useState(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -210,9 +211,28 @@ export function AnalyticsDashboard({ darkMode = false }) {
           marginBottom: '28px'
         }}>
           <div>
-            <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: textPrimary, margin: '0 0 4px' }}>
-              Analytics
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: textPrimary, margin: '0 0 4px' }}>
+                Analytics
+              </h2>
+              {hoveredBar && (
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '2px 10px',
+                  borderRadius: '20px',
+                  background: darkMode ? 'rgba(62, 207, 142, 0.15)' : 'rgba(60, 80, 224, 0.1)',
+                  border: darkMode ? '1px solid rgba(62, 207, 142, 0.3)' : '1px solid rgba(60, 80, 224, 0.2)',
+                  color: darkMode ? '#3ECF8E' : '#3C50E0',
+                  fontSize: '0.76rem',
+                  fontWeight: 800
+                }}>
+                  <span>{hoveredBar.labelDate}:</span>
+                  <span style={{ fontWeight: 900 }}>{hoveredBar.val} {hoveredBar.val === 1 ? 'visita' : 'visitas'}</span>
+                </div>
+              )}
+            </div>
             <span style={{ fontSize: '0.8rem', color: textMuted }}>
               Distribución de visitas de los últimos 30 días
             </span>
@@ -245,7 +265,17 @@ export function AnalyticsDashboard({ darkMode = false }) {
 
         {/* 30-Bar SVG Chart */}
         <div style={{ width: '100%', height: '220px', position: 'relative' }}>
-          <svg viewBox="0 0 900 220" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+          <svg
+            viewBox="0 0 900 220"
+            style={{ width: '100%', height: '100%', overflow: 'visible' }}
+            onMouseLeave={() => setHoveredBar(null)}
+          >
+            <defs>
+              <filter id="chartTooltipShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#000000" floodOpacity="0.35" />
+              </filter>
+            </defs>
+
             {/* Horizontal Grid lines */}
             <line x1="30" y1="20" x2="890" y2="20" stroke={darkMode ? '#262626' : '#F1F5F9'} strokeWidth="1" />
             <line x1="30" y1="70" x2="890" y2="70" stroke={darkMode ? '#262626' : '#F1F5F9'} strokeWidth="1" />
@@ -259,38 +289,150 @@ export function AnalyticsDashboard({ darkMode = false }) {
             <text x="5" y="174" fill={textMuted} fontSize="10" fontWeight="600">{Math.round(maxBucket * 0.25)}</text>
             <text x="15" y="210" fill={textMuted} fontSize="10" fontWeight="600">0</text>
 
+            {/* Active column highlight behind bars */}
+            {hoveredBar && (
+              <g style={{ pointerEvents: 'none' }}>
+                <rect
+                  x={hoveredBar.x - 6}
+                  y={18}
+                  width="26"
+                  height="184"
+                  rx="6"
+                  fill={darkMode ? 'rgba(62, 207, 142, 0.08)' : 'rgba(60, 80, 224, 0.06)'}
+                />
+                <line
+                  x1={hoveredBar.x + 7}
+                  y1={20}
+                  x2={hoveredBar.x + 7}
+                  y2={200}
+                  stroke={darkMode ? 'rgba(62, 207, 142, 0.35)' : 'rgba(60, 80, 224, 0.3)'}
+                  strokeWidth="1"
+                  strokeDasharray="2 3"
+                />
+              </g>
+            )}
+
             {/* 30 Supabase Emerald Real Bars */}
             {buckets.map((val, i) => {
               const x = 40 + i * 28;
               const barH = maxBucket > 0 ? (val / maxBucket) * 170 : 0;
               const actualH = Math.max(val > 0 ? barH : 4, 4);
               const y = 200 - actualH;
+              const isHovered = hoveredBar?.i === i;
+
+              const daysAgo = 29 - i;
+              const d = new Date();
+              d.setDate(d.getDate() - daysAgo);
+              const dateFormatted = d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+              const labelDate = daysAgo === 0 ? `Hoy (${dateFormatted})` : daysAgo === 1 ? `Ayer (${dateFormatted})` : `${dateFormatted} (Día ${i + 1})`;
+
+              const barColor = val > 0
+                ? isHovered
+                  ? (darkMode ? '#5EEAD4' : '#4F46E5')
+                  : (darkMode ? '#3ECF8E' : '#3C50E0')
+                : isHovered
+                  ? (darkMode ? '#3A3A3A' : '#CBD5E1')
+                  : (darkMode ? '#262626' : '#E2E8F0');
+
               return (
                 <g key={i}>
+                  {/* Real visual bar */}
                   <rect
-                    x={x}
-                    y={y}
-                    width="14"
-                    height={actualH}
+                    x={isHovered ? x - 1 : x}
+                    y={isHovered ? y - 2 : y}
+                    width={isHovered ? 16 : 14}
+                    height={isHovered ? actualH + 2 : actualH}
                     rx="4"
-                    fill={val > 0 ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#262626' : '#E2E8F0')}
-                    style={{ transition: 'all 0.3s ease' }}
-                  >
-                    <title>Día {i + 1}: {val} visitas</title>
-                  </rect>
+                    fill={barColor}
+                    style={{ transition: 'all 0.15s ease' }}
+                  />
+
+                  {/* Day label on X axis */}
                   <text
                     x={x + 7}
                     y="216"
-                    fill={textMuted}
-                    fontSize="9"
-                    fontWeight="600"
+                    fill={isHovered ? textPrimary : textMuted}
+                    fontSize={isHovered ? '10' : '9'}
+                    fontWeight={isHovered ? '800' : '600'}
                     textAnchor="middle"
                   >
                     {i + 1}
                   </text>
+
+                  {/* Full column hit area for instant hover and tap */}
+                  <rect
+                    x={x - 7}
+                    y={10}
+                    width="28"
+                    height="208"
+                    fill="transparent"
+                    style={{ cursor: 'pointer' }}
+                    onMouseEnter={() => setHoveredBar({ i, val, x, y, actualH, labelDate })}
+                    onMouseMove={() => {
+                      if (!hoveredBar || hoveredBar.i !== i) {
+                        setHoveredBar({ i, val, x, y, actualH, labelDate });
+                      }
+                    }}
+                    onTouchStart={() => setHoveredBar({ i, val, x, y, actualH, labelDate })}
+                  />
                 </g>
               );
             })}
+
+            {/* Interactive Floating SVG Tooltip */}
+            {hoveredBar && (() => {
+              const { x, y, val, labelDate } = hoveredBar;
+              const tipWidth = 136;
+              const tipHeight = 48;
+              let tipX = x + 7 - tipWidth / 2;
+              if (tipX < 32) tipX = 32;
+              if (tipX + tipWidth > 892) tipX = 892 - tipWidth;
+
+              let tipY = y - tipHeight - 12;
+              if (tipY < 12) {
+                // If bar is too close to top, show tooltip below bar top
+                tipY = Math.min(y + 20, 150);
+              }
+
+              return (
+                <g style={{ pointerEvents: 'none', transition: 'all 0.1s ease' }}>
+                  {/* Tooltip Card Background */}
+                  <rect
+                    x={tipX}
+                    y={tipY}
+                    width={tipWidth}
+                    height={tipHeight}
+                    rx="8"
+                    fill={darkMode ? '#0F172A' : '#1E293B'}
+                    stroke={darkMode ? '#334155' : '#475569'}
+                    strokeWidth="1"
+                    filter="url(#chartTooltipShadow)"
+                  />
+                  {/* Tooltip Date / Day */}
+                  <text
+                    x={tipX + tipWidth / 2}
+                    y={tipY + 18}
+                    fill="#94A3B8"
+                    fontSize="10"
+                    fontWeight="600"
+                    textAnchor="middle"
+                  >
+                    {labelDate}
+                  </text>
+                  {/* Tooltip Count */}
+                  <text
+                    x={tipX + tipWidth / 2}
+                    y={tipY + 37}
+                    fill={darkMode ? '#3ECF8E' : '#60A5FA'}
+                    fontSize="13"
+                    fontWeight="800"
+                    textAnchor="middle"
+                  >
+                    {val} {val === 1 ? 'visita' : 'visitas'}
+                  </text>
+                </g>
+              );
+            })()}
           </svg>
         </div>
       </div>
