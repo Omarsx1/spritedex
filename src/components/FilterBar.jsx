@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Grid, List, ChevronDown, X, GalleryHorizontal } from 'lucide-react';
+import { Search, Grid, List, ChevronDown, X } from 'lucide-react';
 import { THEMES_LIST, THEME_NAMES_ES, ALL_SPRITES, FAMILY_NAMES_MAP } from '../data/spritesData';
 import { MobileLiquidFilterBar } from './MobileLiquidFilterBar';
 import { safeStorage } from '../utils/safeStorage';
@@ -328,7 +328,7 @@ export function FilterBar({
           />
         </label>
 
-        {/* View Mode Toggle (Grid/List/Spotlight) */}
+        {/* View Mode Toggle (Grid/List) */}
         {!isMobile && (
           <div className="filter-view-toggle">
             <button
@@ -344,13 +344,6 @@ export function FilterBar({
               title="Vista lista"
             >
               <List size={15} />
-            </button>
-            <button
-              className={`view-toggle-btn ${viewMode === 'spotlight' ? 'active' : ''}`}
-              onClick={() => setViewMode('spotlight')}
-              title="Vista Spotlight (Carrusel fluido estilo Apple)"
-            >
-              <GalleryHorizontal size={15} />
             </button>
           </div>
         )}
