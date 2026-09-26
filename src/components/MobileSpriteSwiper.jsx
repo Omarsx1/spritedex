@@ -468,7 +468,7 @@ function FamilySpotlightRow({
             className="ms-spotlight-track"
             style={{
               transform: trackTransform,
-              transition: isDragging ? 'none' : 'transform 0.45s cubic-bezier(0.32, 0.72, 0, 1)'
+              transition: isDragging ? 'none' : 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
           >
             {variants.map((v, i) => renderCard(v, i, i === safeActiveIdx))}

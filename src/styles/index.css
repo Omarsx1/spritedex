@@ -6846,11 +6846,11 @@ body::after {
   overflow: hidden;
   box-sizing: border-box;
   flex-shrink: 0;
-  transition: width 0.45s cubic-bezier(0.32, 0.72, 0, 1),
-              transform 0.45s cubic-bezier(0.32, 0.72, 0, 1),
-              opacity 0.45s cubic-bezier(0.32, 0.72, 0, 1),
-              filter 0.45s cubic-bezier(0.32, 0.72, 0, 1),
-              box-shadow 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.4s ease,
+              filter 0.4s ease,
+              box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: width, transform, opacity;
   background-color: #0c0e16;
   outline: none;
@@ -6866,17 +6866,17 @@ body::after {
 }
 
 .ms-spotlight-card.is-inactive {
-  opacity: 0.58;
-  filter: brightness(0.72) contrast(1.05);
-  transform: scale(0.96);
+  opacity: 0.5;
+  filter: brightness(0.62) contrast(1.08) saturate(0.85);
+  transform: scale(0.90);
   z-index: 5;
   cursor: pointer;
 }
 
 .ms-spotlight-card.is-inactive:hover {
   opacity: 0.85;
-  filter: brightness(0.9);
-  transform: scale(0.98);
+  filter: brightness(0.88) contrast(1.05) saturate(1);
+  transform: scale(0.93);
 }
 
 /* Contenedor interior fijo para efecto de re-crop */
@@ -6901,14 +6901,16 @@ body::after {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
-  transition: opacity 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .ms-spotlight-card.is-active .ms-spotlight-fade {
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
-  transition: opacity 0.35s cubic-bezier(0.32, 0.72, 0, 1) 0.08s;
+  transform: translateY(0);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.1s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
 }
 
 /* ── Card Stack Container (per family legacy) ── */
