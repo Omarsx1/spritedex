@@ -125,9 +125,24 @@ export const ELEMENTAL_STYLES = {
   megaman: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#3b82f6' }
 };
 
+// Deja el contorno de las tarjetas en un tono sutil en lugar de un borde
+// saturado. Acerca CARD_BORDER_ALPHA a 1 para recuperar el color original.
+const CARD_BORDER_ALPHA = 0.45;
+
+function softenBorderColor(color) {
+  if (typeof color !== 'string') return color;
+  const match = /^#([0-9a-fA-F]{6})$/.exec(color.trim());
+  if (!match) return color;
+  const value = parseInt(match[1], 16);
+  const red = (value >> 16) & 255;
+  const green = (value >> 8) & 255;
+  const blue = value & 255;
+  return 'rgba(' + red + ', ' + green + ', ' + blue + ', ' + CARD_BORDER_ALPHA + ')';
+}
+
 export function getSpriteCardStyle(sprite) {
   if (!sprite) {
-    return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };
+    return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: softenBorderColor('#00afff') };
   }
 
   const theme = sprite.variant || sprite.theme;
@@ -137,28 +152,29 @@ export function getSpriteCardStyle(sprite) {
   // 1. Variantes con estilo temático específico (Gold, Cheatmaster, Galaxy, Cube, etc.)
   if (theme && theme !== 'Basic' && theme !== 'Base') {
     if (THEME_STYLES[theme]) {
-      return { background: THEME_STYLES[theme].bg, borderColor: THEME_STYLES[theme].border };
+      return { background: THEME_STYLES[theme].bg, borderColor: softenBorderColor(THEME_STYLES[theme].border) };
     }
     const normTheme = theme.toLowerCase().replace(/[^a-z0-9]/g, '');
     for (const [tKey, style] of Object.entries(THEME_STYLES)) {
       if (tKey.toLowerCase().replace(/[^a-z0-9]/g, '') === normTheme) {
-        return { background: style.bg, borderColor: style.border };
+        return { background: style.bg, borderColor: softenBorderColor(style.border) };
       }
     }
   }
 
   // 2. Si es variante básica y cuenta con estilo elemental propio (Fuego, Tierra, Agua, etc.)
   if ((!theme || theme === 'Basic' || theme === 'Base') && ELEMENTAL_STYLES[familyId]) {
-    return ELEMENTAL_STYLES[familyId];
+    const elemental = ELEMENTAL_STYLES[familyId];
+    return { ...elemental, borderColor: softenBorderColor(elemental.borderColor) };
   }
 
   // 3. Estilo por Rareza (Mítico, Legendario, Épico, Raro, Poco Común, Especial, Exótico, etc.)
   const rarityObj = getRarityInfo(rarity);
   if (rarityObj && rarityObj.cardGradient && rarityObj.border) {
-    return { background: rarityObj.cardGradient, borderColor: rarityObj.border };
+    return { background: rarityObj.cardGradient, borderColor: softenBorderColor(rarityObj.border) };
   }
 
-  return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' };
+  return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: softenBorderColor('#00afff') };
 }
 
 export const THEME_NAMES_ES = {
