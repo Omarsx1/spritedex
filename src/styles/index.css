@@ -2878,8 +2878,8 @@ body::after {
 
 .sprite-theme-bountyhunter,
 .sprite-theme-bounty-hunter {
-  background: linear-gradient(to right, #fc93de 0%, #feab94 18%, #fdbf84 32%, #fcef85 50%, #bffc95 68%, #8ae8f8 84%, #847dee 100%);
-  border-color: rgba(255, 255, 255, 0.55);
+  background: linear-gradient(180deg, #2D0D4A 0%, #120520 100%);
+  border-color: #a855f7;
 }
 
 .sprite-theme-cube {
