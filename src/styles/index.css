@@ -3258,7 +3258,7 @@ body::after {
 /* 3. Mobile Swiper Crown - Altura sobre la cresta derecha */
 .ms-card__crown {
   position: absolute;
-  top: 6px;
+  top: 12px;
   left: 56%;
   right: auto;
   transform: rotate(10deg);
