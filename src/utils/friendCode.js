@@ -35,64 +35,114 @@ export function getMyFriendCode(userId = null) {
 }
 
 /**
- * Normalizes friend code input (strips spaces, URLs, leading #)
+ * Normalizes friend code input:
+ * - Extracts code from full URLs (?code=... or ?friend=...)
+ * - Strips leading '#', spaces, symbols
+ * - Handles 4-character short codes (e.g. 'BDZ8' -> 'SDEX-BDZ8')
+ * - Fixes missing hyphens (e.g. 'SDEXBDZ8' or 'sdex bdz8' -> 'SDEX-BDZ8')
  */
 export function normalizeFriendCode(input) {
   if (!input) return '';
-  let str = input.trim().toUpperCase();
+  let str = input.trim();
 
-  // If user pasted a full URL with ?code= or ?friend=
-  if (str.includes('CODE=')) {
-    const match = str.match(/[?&]CODE=([^&#\s]+)/i);
-    if (match) str = decodeURIComponent(match[1]).toUpperCase();
+  // If user pasted a full URL
+  if (str.includes('code=') || str.includes('CODE=')) {
+    const match = str.match(/[?&]code=([^&#\s]+)/i);
+    if (match) str = decodeURIComponent(match[1]);
+  } else if (str.includes('friend=') || str.includes('FRIEND=')) {
+    const match = str.match(/[?&]friend=([^&#\s]+)/i);
+    if (match) str = decodeURIComponent(match[1]);
   }
 
-  // Remove leading # or spaces
-  str = str.replace(/^#/, '').trim();
+  // Remove leading #, symbols, clean spaces and uppercase
+  str = str.replace(/^[#@]+/, '').trim().toUpperCase();
+  str = str.replace(/\s+/g, '-');
+
+  // Handle 'SDEXXXXX' without hyphen
+  if (/^SDEX[A-Z0-9]{4}$/.test(str)) {
+    str = 'SDEX-' + str.slice(4);
+  }
+
+  // Handle 4-alphanumeric character code (e.g. 'BDZ8' -> 'SDEX-BDZ8')
+  if (/^[A-Z0-9]{4}$/.test(str)) {
+    str = 'SDEX-' + str;
+  }
+
   return str;
 }
 
 /**
  * Fetches friend collection from Supabase by Friend Code
+ * Resilient multi-tier lookup:
+ * 1. Exact match by friend_code
+ * 2. Case-insensitive ilike by friend_code
+ * 3. Suffix match by 4-char suffix (e.g. %BDZ8)
+ * 4. Fallback by user_id if input was a UUID
  */
 export async function fetchCollectionByFriendCode(friendCode) {
   if (!isSupabaseConfigured || !supabase || !friendCode) return null;
 
   const normalized = normalizeFriendCode(friendCode);
+  const cleanSuffix = normalized.replace(/^SDEX-/, '').replace(/[^A-Z0-9]/g, '');
 
   try {
-    // 1. Try querying by friend_code column
-    const { data, error } = await supabase
+    // 1. Try querying by exact friend_code column
+    let { data, error } = await supabase
       .from('user_collections')
       .select('user_id, friend_code, user_state, updated_at')
       .eq('friend_code', normalized)
       .maybeSingle();
 
+    // 2. Case-insensitive ilike query fallback
+    if (!data) {
+      const res = await supabase
+        .from('user_collections')
+        .select('user_id, friend_code, user_state, updated_at')
+        .ilike('friend_code', normalized)
+        .maybeSingle();
+      data = res.data;
+      if (res.error && !error) error = res.error;
+    }
+
+    // 3. Suffix match (e.g. searching 'BDZ8' or 'SDEX-BDZ8' where DB has '%BDZ8')
+    if (!data && cleanSuffix.length === 4) {
+      const res = await supabase
+        .from('user_collections')
+        .select('user_id, friend_code, user_state, updated_at')
+        .ilike('friend_code', '%' + cleanSuffix)
+        .maybeSingle();
+      data = res.data;
+    }
+
+    // 4. Fallback: query by user_id if input was a UUID
+    if (!data && (normalized.length >= 30 || cleanSuffix.length >= 30)) {
+      const targetId = friendCode.trim();
+      const { data: byId } = await supabase
+        .from('user_collections')
+        .select('user_id, friend_code, user_state, updated_at')
+        .eq('user_id', targetId)
+        .maybeSingle();
+
+      if (byId) {
+        data = byId;
+      }
+    }
+
     if (data && data.user_state) {
+      const profile = data.user_state._profile || {
+        name: `Entrenador #${(data.friend_code || normalized).replace('SDEX-', '')}`,
+        country_flag: '🌐',
+        country_name: '',
+        is_anonymous: true
+      };
+
       return {
         userId: data.user_id,
         friendCode: data.friend_code || normalized,
         userState: data.user_state,
+        profile,
         updatedAt: data.updated_at
       };
-    }
-
-    // 2. Fallback: query by user_id if input was a UUID
-    if (normalized.length >= 30) {
-      const { data: byId } = await supabase
-        .from('user_collections')
-        .select('user_id, friend_code, user_state, updated_at')
-        .eq('user_id', friendCode)
-        .maybeSingle();
-
-      if (byId && byId.user_state) {
-        return {
-          userId: byId.user_id,
-          friendCode: byId.friend_code || normalized,
-          userState: byId.user_state,
-          updatedAt: byId.updated_at
-        };
-      }
     }
 
     if (error) {
