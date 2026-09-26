@@ -363,7 +363,7 @@ export function App() {
     }
   }, [user]);
 
-  const handleToggleOwned = (spriteId) => {
+  const handleToggleOwned = useCallback((spriteId) => {
     ensureCloudSessionForAction();
     setUserState((prev) => {
       const current = prev[spriteId] || { owned: false, level: 1 };
@@ -376,9 +376,9 @@ export function App() {
         }
       };
     });
-  };
+  }, [ensureCloudSessionForAction]);
 
-  const handleSetLevel = (spriteId, level) => {
+  const handleSetLevel = useCallback((spriteId, level) => {
     ensureCloudSessionForAction();
     setUserState((prev) => ({
       ...prev,
@@ -387,7 +387,7 @@ export function App() {
         level: Math.min(Math.max(level, 1), 5)
       }
     }));
-  };
+  }, [ensureCloudSessionForAction]);
 
   const handleConnectFriendCode = async (code) => {
     const data = await fetchCollectionByFriendCode(code);

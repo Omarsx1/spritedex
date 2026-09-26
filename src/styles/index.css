@@ -2118,7 +2118,7 @@ body::after {
   z-index: -1;
 }
 
-/* Glassmorphic Floating Capsule (Exact same formula as App Footer) */
+/* Glassmorphic Floating Capsule (Equilibrio de contraste y profundidad) */
 .mobile-glass-search-pill {
   width: 100%;
   max-width: 380px;
@@ -2128,33 +2128,34 @@ body::after {
   gap: 8px;
   padding: 0 8px 0 16px;
   border-radius: 9999px;
-  background: rgba(12, 14, 22, 0.65);
-  backdrop-filter: blur(24px) saturate(1.8);
-  -webkit-backdrop-filter: blur(24px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 14, 26, 0.86);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 6px 24px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
 
 .mobile-glass-search-pill.is-focused {
-  background: rgba(16, 20, 32, 0.85);
-  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(14, 20, 36, 0.95);
+  border-color: rgba(0, 240, 232, 0.55);
   box-shadow:
-    0 6px 24px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 8px 28px rgba(0, 0, 0, 0.6),
+    0 0 18px rgba(0, 240, 232, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .mobile-glass-search-icon {
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.72);
   flex-shrink: 0;
   transition: color 0.15s ease;
 }
 
 .mobile-glass-search-pill.is-focused .mobile-glass-search-icon {
-  color: #ffffff;
+  color: #00f0e8;
 }
 
 .mobile-glass-search-input {
@@ -2171,14 +2172,14 @@ body::after {
 }
 
 .mobile-glass-search-input::placeholder {
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.60);
   font-weight: 500;
 }
 
 .mobile-glass-clear-btn {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
   border: none;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.75);
   width: 22px;
   height: 22px;
   border-radius: 50%;
@@ -2192,14 +2193,14 @@ body::after {
 }
 
 .mobile-glass-clear-btn:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.22);
   color: #ffffff;
 }
 
 .mobile-glass-divider {
   width: 1px;
   height: 20px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.15);
   margin: 0 2px;
   flex-shrink: 0;
 }
@@ -2212,7 +2213,7 @@ body::after {
   border-radius: 50%;
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2224,13 +2225,14 @@ body::after {
 }
 
 .mobile-glass-filter-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
   color: #ffffff;
 }
 
 .mobile-glass-filter-btn.is-active {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.14);
+  color: #00f0e8;
+  background: rgba(0, 240, 232, 0.16);
+  border: 1px solid rgba(0, 240, 232, 0.35);
 }
 
 .mobile-glass-filter-icon {
@@ -6740,6 +6742,7 @@ body::after {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  contain: layout paint;
 }
 
 .ms-family-header {
@@ -6834,7 +6837,15 @@ body::after {
   align-items: center;
   gap: 8px;
   will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: auto;
+}
+
+/* Durante el arrastre el transform lo escribe JS en cada frame: sin transición. */
+.ms-spotlight-track.is-dragging {
+  transition: none;
 }
 
 /* Tarjeta individual con re-encuadre y físicas Apple (205px x 284px) */
@@ -6847,11 +6858,12 @@ body::after {
   box-sizing: border-box;
   flex-shrink: 0;
   transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.4s ease,
-              filter 0.4s ease,
-              box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: width, transform, opacity;
+              transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+  contain: layout paint;
+  content-visibility: visible;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   background-color: #0c0e16;
   outline: none;
   -webkit-tap-highlight-color: transparent;
@@ -6859,23 +6871,29 @@ body::after {
 
 .ms-spotlight-card.is-active {
   opacity: 1;
-  filter: none;
   transform: scale(1);
   z-index: 10;
   cursor: default;
 }
 
 .ms-spotlight-card.is-inactive {
-  opacity: 0.5;
-  filter: brightness(0.62) contrast(1.08) saturate(0.85);
+  opacity: 0.55;
   transform: scale(0.90);
   z-index: 5;
   cursor: pointer;
 }
 
+/* Atenuar sin animar filter: tinte sobre la tarjeta inactiva. */
+.ms-spotlight-card.is-inactive::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 7, 14, 0.45);
+  pointer-events: none;
+}
+
 .ms-spotlight-card.is-inactive:hover {
   opacity: 0.85;
-  filter: brightness(0.88) contrast(1.05) saturate(1);
   transform: scale(0.93);
 }
 

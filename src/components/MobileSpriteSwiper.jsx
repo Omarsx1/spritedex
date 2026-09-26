@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useRef, useMemo, useCallback, useEffect, memo } from 'react';
 import confetti from 'canvas-confetti';
 import { Lock } from 'lucide-react';
 import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER } from '../data/spritesData';
@@ -29,6 +29,19 @@ const CARD_HEIGHT = 284;
 const W_INACTIVE = 56;
 const GAP = 8;
 
+// Cache de estilos por sprite: evita recalcular gradientes, rareza y colores
+// en cada render de la fila.
+const cardStyleCache = new Map();
+
+function getCachedCardStyle(sprite) {
+  if (!sprite) return getSpriteCardStyle(sprite);
+  const cached = cardStyleCache.get(sprite.id);
+  if (cached) return cached;
+  const style = getSpriteCardStyle(sprite);
+  cardStyleCache.set(sprite.id, style);
+  return style;
+}
+
 /**
  * Fila individual por familia de espíritus con Spotlight Carousel estilo Apple.
  * - Mantiene las dimensiones originales exactas de las tarjetas (205px x 284px).
@@ -46,8 +59,6 @@ function FamilySpotlightRow({
   onOpenDetail
 }) {
   const [activeIdx, setActiveIdx] = useState(0);
-  const [dragOffset, setDragOffset] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
 
   const count = variants ? variants.length : 0;
   const safeActiveIdx = Math.min(Math.max(0, activeIdx), Math.max(0, count - 1));
@@ -71,14 +82,96 @@ function FamilySpotlightRow({
   const startTimeRef = useRef(0);
   const isPointerDownRef = useRef(false);
   const hasMovedRef = useRef(false);
+  const dragOffsetRef = useRef(0);
+  const trackRef = useRef(null);
+  const rafRef = useRef(0);
 
   const goTo = useCallback((nextIdx) => {
     const target = Math.min(Math.max(0, nextIdx), count - 1);
     if (target !== safeActiveIdx) {
       setActiveIdx(target);
-      sounds.playBeep();
     }
   }, [count, safeActiveIdx]);
+
+  // Cancela el frame pendiente si la fila se desmonta a mitad de un gesto.
+  useEffect(() => () => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  // Aplica el desplazamiento sin re-renderizar: un solo rAF escribe el transform.
+  const applyDrag = (diffX, diffY, moveThreshold) => {
+    if (!isPointerDownRef.current) return;
+
+    // Si el usuario desliza verticalmente para hacer scroll en la página, liberar control
+    if (!hasMovedRef.current && diffY !== 0 && Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 8) {
+      isPointerDownRef.current = false;
+      return;
+    }
+
+    if (Math.abs(diffX) <= moveThreshold) return;
+    hasMovedRef.current = true;
+
+    // Resistencia elástica en extremos
+    let offset = diffX;
+    if (safeActiveIdx === 0 && diffX > 0) {
+      offset = diffX * 0.25;
+    } else if (safeActiveIdx === count - 1 && diffX < 0) {
+      offset = diffX * 0.25;
+    }
+    dragOffsetRef.current = offset;
+
+    const track = trackRef.current;
+    if (!track) return;
+    track.classList.add('is-dragging');
+    if (rafRef.current) return;
+
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = 0;
+      const el = trackRef.current;
+      if (el) {
+        el.style.transform = 'translate3d(' + (-centerOffset + dragOffsetRef.current) + 'px, 0, 0)';
+      }
+    });
+  };
+
+  const endDrag = () => {
+    if (!isPointerDownRef.current) return;
+    isPointerDownRef.current = false;
+
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+    }
+
+    const offset = dragOffsetRef.current;
+    dragOffsetRef.current = 0;
+
+    const track = trackRef.current;
+    if (track) track.classList.remove('is-dragging');
+
+    let target = safeActiveIdx;
+    if (hasMovedRef.current) {
+      const elapsed = Date.now() - startTimeRef.current;
+      const isQuickFlick = elapsed < 260 && Math.abs(offset) > 20;
+      const isDistanceSwipe = Math.abs(offset) > 36;
+
+      if (isQuickFlick || isDistanceSwipe) {
+        if (offset < 0 && safeActiveIdx < count - 1) {
+          target = safeActiveIdx + 1;
+        } else if (offset > 0 && safeActiveIdx > 0) {
+          target = safeActiveIdx - 1;
+        }
+      }
+    }
+    hasMovedRef.current = false;
+
+    if (target !== safeActiveIdx) {
+      goTo(target);
+    } else if (track) {
+      // Sin cambio de variante: vuelve al centro con la transición CSS.
+      track.style.transform = 'translate3d(' + (-centerOffset) + 'px, 0, 0)';
+    }
+  };
 
   // Touch handlers
   const handleTouchStart = (e) => {
@@ -92,51 +185,12 @@ function FamilySpotlightRow({
   };
 
   const handleTouchMove = (e) => {
-    if (!isPointerDownRef.current) return;
     const touch = e.touches[0];
-    const diffX = touch.clientX - startXRef.current;
-    const diffY = touch.clientY - startYRef.current;
-
-    // Si el usuario desliza verticalmente para hacer scroll en la página, liberar control
-    if (!hasMovedRef.current && Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 8) {
-      isPointerDownRef.current = false;
-      return;
-    }
-
-    if (Math.abs(diffX) > 6) {
-      hasMovedRef.current = true;
-      setIsDragging(true);
-
-      // Resistencia elástica en extremos
-      let offset = diffX;
-      if (safeActiveIdx === 0 && diffX > 0) {
-        offset = diffX * 0.25;
-      } else if (safeActiveIdx === count - 1 && diffX < 0) {
-        offset = diffX * 0.25;
-      }
-      setDragOffset(offset);
-    }
+    applyDrag(touch.clientX - startXRef.current, touch.clientY - startYRef.current, 6);
   };
 
   const handleTouchEnd = () => {
-    if (!isPointerDownRef.current) return;
-    isPointerDownRef.current = false;
-    setIsDragging(false);
-
-    if (hasMovedRef.current) {
-      const elapsed = Date.now() - startTimeRef.current;
-      const isQuickFlick = elapsed < 260 && Math.abs(dragOffset) > 20;
-      const isDistanceSwipe = Math.abs(dragOffset) > 36;
-
-      if (isQuickFlick || isDistanceSwipe) {
-        if (dragOffset < 0 && safeActiveIdx < count - 1) {
-          goTo(safeActiveIdx + 1);
-        } else if (dragOffset > 0 && safeActiveIdx > 0) {
-          goTo(safeActiveIdx - 1);
-        }
-      }
-    }
-    setDragOffset(0);
+    endDrag();
   };
 
   // Mouse handlers
@@ -150,40 +204,11 @@ function FamilySpotlightRow({
   };
 
   const handleMouseMove = (e) => {
-    if (!isPointerDownRef.current) return;
-    const diffX = e.clientX - startXRef.current;
-    if (Math.abs(diffX) > 5) {
-      hasMovedRef.current = true;
-      setIsDragging(true);
-      let offset = diffX;
-      if (safeActiveIdx === 0 && diffX > 0) {
-        offset = diffX * 0.25;
-      } else if (safeActiveIdx === count - 1 && diffX < 0) {
-        offset = diffX * 0.25;
-      }
-      setDragOffset(offset);
-    }
+    applyDrag(e.clientX - startXRef.current, 0, 5);
   };
 
   const handleMouseUp = () => {
-    if (!isPointerDownRef.current) return;
-    isPointerDownRef.current = false;
-    setIsDragging(false);
-
-    if (hasMovedRef.current) {
-      const elapsed = Date.now() - startTimeRef.current;
-      const isQuickFlick = elapsed < 260 && Math.abs(dragOffset) > 20;
-      const isDistanceSwipe = Math.abs(dragOffset) > 36;
-
-      if (isQuickFlick || isDistanceSwipe) {
-        if (dragOffset < 0 && safeActiveIdx < count - 1) {
-          goTo(safeActiveIdx + 1);
-        } else if (dragOffset > 0 && safeActiveIdx > 0) {
-          goTo(safeActiveIdx - 1);
-        }
-      }
-    }
-    setDragOffset(0);
+    endDrag();
   };
 
   if (count === 0) return null;
@@ -191,7 +216,7 @@ function FamilySpotlightRow({
   // Cálculo matemático del riel centrado:
   // centerOffset = k * (W_INACTIVE + GAP) + W_ACTIVE / 2
   const centerOffset = safeActiveIdx * (W_INACTIVE + GAP) + W_ACTIVE / 2;
-  const trackTransform = `translate3d(${-centerOffset + dragOffset}px, 0, 0)`;
+  const trackTransform = `translate3d(${-centerOffset}px, 0, 0)`;
 
   const renderCard = (sprite, idx, isActive) => {
     const spriteState = isFriendView
@@ -204,7 +229,7 @@ function FamilySpotlightRow({
     const myOwned = userState[sprite.id]?.owned;
     const friendCanLend = isFriendView && isOwned && !myOwned;
     const rarityInfo = getRarityInfo(sprite.rarity);
-    const styleInfo = getSpriteCardStyle(sprite);
+    const styleInfo = getCachedCardStyle(sprite);
 
     const cardWidth = isActive ? W_ACTIVE : W_INACTIVE;
 
@@ -341,6 +366,9 @@ function FamilySpotlightRow({
               alt={sprite.fullName}
               loading="lazy"
               decoding="async"
+              width={W_ACTIVE}
+              height={CARD_HEIGHT}
+              draggable={false}
               style={{
                 filter: !isOwned
                   ? 'grayscale(55%) opacity(0.68) brightness(1.2) contrast(1.15)'
@@ -463,11 +491,9 @@ function FamilySpotlightRow({
           onMouseLeave={handleMouseUp}
         >
           <div
+            ref={trackRef}
             className="ms-spotlight-track"
-            style={{
-              transform: trackTransform,
-              transition: isDragging ? 'none' : 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
-            }}
+            style={{ transform: trackTransform }}
           >
             {variants.map((v, i) => renderCard(v, i, i === safeActiveIdx))}
           </div>
@@ -483,6 +509,9 @@ function FamilySpotlightRow({
     </div>
   );
 }
+
+// Memoizado: alternar una tarjeta no debe re-renderizar el resto de las filas.
+const MemoizedFamilySpotlightRow = memo(FamilySpotlightRow);
 
 /**
  * MobileSpriteSwiper principal.
@@ -530,7 +559,7 @@ export function MobileSpriteSwiper({
 
       <div className="mobile-swiper__content">
         {families.map((family) => (
-          <FamilySpotlightRow
+          <MemoizedFamilySpotlightRow
             key={family.familyId}
             familyName={family.familyName}
             variants={family.variants}
