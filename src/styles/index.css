@@ -5842,6 +5842,12 @@ body::after {
   box-shadow: 0 0 14px rgba(139, 92, 246, 0.4);
 }
 
+.sdm-compare__tab--active-gold {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  color: #fff !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+}
+
 /* Sprites Comparison Grid */
 .sdm-compare__empty {
   padding: 30px;

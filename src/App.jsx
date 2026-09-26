@@ -210,20 +210,16 @@ export function App() {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       let currentUser = session?.user ?? null;
 
-      // Respaldo silencioso de progreso existente: si no hay cuenta vinculada pero el usuario
-      // ya tiene espíritus marcados localmente, inicializamos de forma transparente su sesión anónima
-      // en segundo plano para que toda su colección se respalde en Supabase de inmediato.
+      // Inicialización silenciosa de sesión en segundo plano para que el código de amigo
+      // y la colección del usuario queden respaldados y accesibles para sus amigos en Supabase.
       if (!currentUser && isSupabaseConfigured && supabase) {
-        const hasLocalSpirits = Object.values(userState || {}).some((s) => s?.owned);
-        if (hasLocalSpirits) {
-          try {
-            const { data: anonData } = await supabase.auth.signInAnonymously();
-            if (anonData?.user) {
-              currentUser = anonData.user;
-            }
-          } catch (e) {
-            console.warn('Silent anonymous sync on init notice:', e);
+        try {
+          const { data: anonData } = await supabase.auth.signInAnonymously();
+          if (anonData?.user) {
+            currentUser = anonData.user;
           }
+        } catch (e) {
+          console.warn('Silent anonymous sync on init notice:', e);
         }
       }
 

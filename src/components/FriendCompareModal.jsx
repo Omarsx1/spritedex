@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { X, Users, Copy, Check, ArrowDownLeft, ArrowUpRight, Handshake, Radio, Zap, RefreshCw, Sparkles, MessageSquare } from 'lucide-react';
+import { X, Users, Copy, Check, ArrowDownLeft, ArrowUpRight, Handshake, Radio, Zap, RefreshCw, MessageSquare } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { ALL_SPRITES, getSpriteCardStyle } from '../data/spritesData';
 import { decodeCollectionState } from '../utils/shareLink';
 import { generatePermanentFriendUrl, normalizeFriendCode } from '../utils/friendCode';
@@ -20,7 +21,7 @@ export function FriendCompareModal({
   onToggleOwned,
   onClose
 }) {
-  const [activeTab, setActiveTab] = useState('friendToMe'); // 'friendToMe' | 'meToFriend' | 'common'
+  const [activeTab, setActiveTab] = useState('friendAll'); // 'friendAll' | 'friendToMe' | 'meToFriend' | 'common'
   const [seasonFilter, setSeasonFilter] = useState('active'); // 'active' (Gen 2) | 'all'
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -28,6 +29,7 @@ export function FriendCompareModal({
   const [friendInput, setFriendInput] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const modalRef = useRef(null);
   const openTimeRef = useRef(Date.now());
 
@@ -83,45 +85,64 @@ export function FriendCompareModal({
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
+  const currentFriendState = useMemo(() => friendState || {}, [friendState]);
+  const hasFriendData = useMemo(() => {
+    return Object.keys(currentFriendState).some(k => k !== '_profile' && currentFriendState[k]?.owned);
+  }, [currentFriendState]);
+
   const handleConnectFriend = async () => {
     if (!friendInput.trim()) return;
+    setErrorMessage('');
+    const raw = friendInput.trim();
+    const code = normalizeFriendCode(raw);
+
+    if (myFriendCode && code.toUpperCase() === myFriendCode.toUpperCase()) {
+      setErrorMessage('¡Ese es tu propio código de amigo! Ingresa el código de un amigo para ver o comparar su colección.');
+      return;
+    }
+
     sounds.playBeep();
     setIsConnecting(true);
 
-    let raw = friendInput.trim();
+    let found = false;
 
-    // 1. If user entered a Friend Code or URL with ?code=
-    if (onConnectFriendCode && (raw.includes('code=') || raw.toUpperCase().startsWith('SDEX-') || !raw.includes('friend='))) {
-      const code = normalizeFriendCode(raw);
+    // 1. Conectar por código de amigo en la nube (ej: BDZ8, SDEX-BDZ8, o URL)
+    if (onConnectFriendCode) {
       const success = await onConnectFriendCode(code);
-      setIsConnecting(false);
       if (success) {
+        found = true;
         setFriendInput('');
-        return;
+        setActiveTab('friendAll');
+        sounds.playToggle(true, 2);
+        confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
       }
     }
 
-    // 2. Fallback: Legacy encoded state / URL with ?friend=
-    let code = raw;
-    if (code.includes('friend=')) {
-      const match = code.match(/[?&]friend=([^&#\s]+)/);
-      if (match) {
-        code = decodeURIComponent(match[1]);
+    // 2. Fallback: enlace codificado legado (?friend=...)
+    if (!found) {
+      let legacyCode = raw;
+      if (legacyCode.includes('friend=')) {
+        const match = legacyCode.match(/[?&]friend=([^&#\s]+)/);
+        if (match) {
+          legacyCode = decodeURIComponent(match[1]);
+        }
+      }
+      const decoded = decodeCollectionState(legacyCode);
+      if (Object.keys(decoded).length > 0) {
+        found = true;
+        if (onLoadFriendState) onLoadFriendState(decoded, 'ENLACE');
+        setFriendInput('');
+        setActiveTab('friendAll');
+        sounds.playToggle(true, 2);
       }
     }
 
-    const decoded = decodeCollectionState(code);
     setIsConnecting(false);
-    if (Object.keys(decoded).length > 0) {
-      if (onLoadFriendState) onLoadFriendState(decoded, 'ENLACE');
-      setFriendInput('');
-    } else {
-      alert('No se pudo encontrar la colección del amigo. Verifica el código (ej: SDEX-XXXX) o enlace.');
+
+    if (!found) {
+      setErrorMessage(`No se encontró ninguna colección con el código "${code}". Asegúrate de que tu amigo tenga su Spritedex abierto.`);
     }
   };
-
-  const currentFriendState = friendState || {};
-  const hasFriendData = Object.keys(currentFriendState).length > 0;
 
   // Base list depending on season filter
   const baseSpritesList = useMemo(() => {
@@ -130,6 +151,13 @@ export function FriendCompareModal({
     }
     return ALL_SPRITES;
   }, [seasonFilter]);
+
+  // Sprites friend owns (Friend has it)
+  const friendOwnedList = useMemo(() => {
+    return baseSpritesList.filter((s) => {
+      return Boolean(currentFriendState[s.id]?.owned);
+    });
+  }, [baseSpritesList, currentFriendState]);
 
   // Sprites friend can lend to me (Friend has it, I don't)
   const friendToMeList = useMemo(() => {
@@ -158,12 +186,29 @@ export function FriendCompareModal({
     });
   }, [baseSpritesList, currentFriendState, userState]);
 
-  const activeList = activeTab === 'friendToMe' ? friendToMeList : activeTab === 'meToFriend' ? meToFriendList : commonList;
+  const activeList = useMemo(() => {
+    switch (activeTab) {
+      case 'friendAll':
+        return friendOwnedList;
+      case 'friendToMe':
+        return friendToMeList;
+      case 'meToFriend':
+        return meToFriendList;
+      case 'common':
+        return commonList;
+      default:
+        return friendOwnedList;
+    }
+  }, [activeTab, friendOwnedList, friendToMeList, meToFriendList, commonList]);
 
   const handleCopyTradePlan = () => {
     sounds.playBeep();
     let text = `🎮 ¡RADAR DE AMIGOS - FORTNITE SPRITEDEX! ⚡\n`;
     text += `👥 Sincronizados: Mi Código (${myFriendCode}) ⇄ Amigo (${connectedFriendCode || 'Amigo'})\n\n`;
+
+    if (friendOwnedList.length > 0) {
+      text += `🌟 TU AMIGO TIENE ATAPADOS ${friendOwnedList.length} ESPÍRITUS EN TOTAL.\n\n`;
+    }
 
     if (friendToMeList.length > 0) {
       text += `🟢 TE FALTAN Y TU AMIGO TIENE (${friendToMeList.length}):\n`;
@@ -194,7 +239,7 @@ export function FriendCompareModal({
     <div className={`modal-overlay ${isClosing ? 'is-closing' : ''}`} onClick={handleBackdropClick}>
       <div className={`sdm-share-pro sdm-compare ${isClosing ? 'is-closing' : ''}`} ref={modalRef} onClick={(e) => e.stopPropagation()}>
         
-        {/* Header Elegante y Minimalista (Idéntico a Exportar Colección) */}
+        {/* Header Elegante y Minimalista */}
         <div className="sdm-share-pro__header">
           <div className="sdm-share-pro__title-wrap">
             <div className="sdm-share-pro__icon-badge">
@@ -271,19 +316,34 @@ export function FriendCompareModal({
               {isLiveConnected ? (
                 <div className="sdm-compare__connected-info">
                   <div className="sdm-compare__connected-target">
-                    Amigo: <strong>{connectedFriendCode}</strong>
+                    <span>Amigo: <strong>{connectedFriendCode}</strong></span>
+                    <span style={{
+                      marginLeft: '8px',
+                      background: 'rgba(0, 240, 232, 0.15)',
+                      color: '#00F0E8',
+                      border: '1px solid rgba(0, 240, 232, 0.3)',
+                      padding: '2px 8px',
+                      borderRadius: '9999px',
+                      fontSize: '0.72rem',
+                      fontWeight: 800
+                    }}>
+                      {friendOwnedList.length} espíritus
+                    </span>
                   </div>
                   <span className="sdm-compare__connected-hint">
-                    ⚡ Las capturas de tu amigo se actualizan al instante.
+                    ⚡ Las capturas y niveles de tu amigo se actualizan al instante.
                   </span>
                 </div>
               ) : (
                 <div className="sdm-compare__input-row">
                   <input
                     type="text"
-                    placeholder="Código (ej: SDEX-7K9X) o enlace..."
+                    placeholder="Código (ej: BDZ8 o SDEX-BDZ8)..."
                     value={friendInput}
-                    onChange={(e) => setFriendInput(e.target.value)}
+                    onChange={(e) => {
+                      setFriendInput(e.target.value);
+                      if (errorMessage) setErrorMessage('');
+                    }}
                     onKeyDown={(e) => e.key === 'Enter' && handleConnectFriend()}
                     className="sdm-compare__input"
                   />
@@ -292,12 +352,29 @@ export function FriendCompareModal({
                     disabled={isConnecting}
                     className="sdm-compare__btn-connect"
                   >
-                    {isConnecting ? <RefreshCw size={14} className="animate-spin" /> : 'Conectar'}
+                    {isConnecting ? <RefreshCw size={14} className="animate-spin" /> : 'Ver Lista'}
                   </button>
                 </div>
               )}
             </div>
           </div>
+
+          {/* Mensaje de error amigable si el código no se encuentra */}
+          {errorMessage && (
+            <div style={{
+              background: 'rgba(239, 68, 68, 0.15)',
+              border: '1px solid rgba(239, 68, 68, 0.35)',
+              color: '#fca5a5',
+              padding: '8px 14px',
+              borderRadius: '8px',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              marginBottom: '12px',
+              textAlign: 'center'
+            }}>
+              ⚠️ {errorMessage}
+            </div>
+          )}
 
           {/* Trade Comparison Results */}
           {!hasFriendData ? (
@@ -307,7 +384,7 @@ export function FriendCompareModal({
               </div>
               <h3 className="sdm-compare__waiting-title">Esperando Conexión con un Amigo</h3>
               <p className="sdm-compare__waiting-text">
-                Ingresa el <strong>Código de Amigo</strong> o abre su enlace para sincronizar colecciones en tiempo real.
+                Ingresa el <strong>Código de Amigo</strong> (ej: <code>BDZ8</code> o <code>SDEX-BDZ8</code>) para ver su lista y sincronizar en tiempo real.
               </p>
             </div>
           ) : (
@@ -319,30 +396,30 @@ export function FriendCompareModal({
                   <button
                     onClick={() => {
                       sounds.playBeep();
-                      onSetActiveProfile(activeProfile === 'friend' ? 'mine' : 'friend');
+                      onSetActiveProfile('friend');
                       onClose();
                     }}
                     style={{
-                      background: activeProfile === 'friend' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(168, 85, 247, 0.2)',
-                      border: `1.5px solid ${activeProfile === 'friend' ? '#3b82f6' : '#a855f7'}`,
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(59, 130, 246, 0.25))',
+                      border: '1.5px solid #a855f7',
                       color: '#ffffff',
-                      padding: '8px 16px',
-                      borderRadius: '10px',
-                      fontSize: '0.82rem',
+                      padding: '9px 18px',
+                      borderRadius: '12px',
+                      fontSize: '0.84rem',
                       fontWeight: 800,
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px',
-                      boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-                      transition: 'all 0.2s ease'
+                      boxShadow: '0 4px 18px rgba(168, 85, 247, 0.3)',
+                      transition: 'all 0.2s ease',
+                      width: '100%',
+                      justifyContent: 'center'
                     }}
                   >
-                    <Users size={16} color={activeProfile === 'friend' ? '#3b82f6' : '#a855f7'} />
+                    <Users size={16} color="#a855f7" />
                     <span>
-                      {activeProfile === 'friend'
-                        ? '👤 Salir y Ver Mi Colección Personal en la Dex'
-                        : '👥 Explorar Colección de Amigo en la Pantalla Principal'}
+                      🚀 Explorar toda la colección de <strong>{connectedFriendCode || 'tu amigo'}</strong> en la Pantalla Principal
                     </span>
                   </button>
                 </div>
@@ -374,13 +451,21 @@ export function FriendCompareModal({
                 </button>
               </div>
 
-              {/* Tabs */}
+              {/* 4 Tabs: Colección Amigo, Te Faltan, Le Faltan, En Común */}
               <div className="sdm-compare__tabs">
+                <button
+                  onClick={() => setActiveTab('friendAll')}
+                  className={`sdm-compare__tab ${activeTab === 'friendAll' ? 'sdm-compare__tab--active-purple' : ''}`}
+                >
+                  <Users size={15} />
+                  <span>Lista Amigo ({friendOwnedList.length})</span>
+                </button>
+
                 <button
                   onClick={() => setActiveTab('friendToMe')}
                   className={`sdm-compare__tab ${activeTab === 'friendToMe' ? 'sdm-compare__tab--active-green' : ''}`}
                 >
-                  <ArrowDownLeft size={16} />
+                  <ArrowDownLeft size={15} />
                   <span>Te Faltan ({friendToMeList.length})</span>
                 </button>
 
@@ -388,15 +473,15 @@ export function FriendCompareModal({
                   onClick={() => setActiveTab('meToFriend')}
                   className={`sdm-compare__tab ${activeTab === 'meToFriend' ? 'sdm-compare__tab--active-blue' : ''}`}
                 >
-                  <ArrowUpRight size={16} />
+                  <ArrowUpRight size={15} />
                   <span>Le Faltan ({meToFriendList.length})</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('common')}
-                  className={`sdm-compare__tab ${activeTab === 'common' ? 'sdm-compare__tab--active-purple' : ''}`}
+                  className={`sdm-compare__tab ${activeTab === 'common' ? 'sdm-compare__tab--active-gold' : ''}`}
                 >
-                  <Handshake size={16} />
+                  <Handshake size={15} />
                   <span>En Común ({commonList.length})</span>
                 </button>
               </div>
@@ -404,9 +489,10 @@ export function FriendCompareModal({
               {/* Sprites Grid */}
               {activeList.length === 0 ? (
                 <div className="sdm-compare__empty">
-                  {activeTab === 'friendToMe' && '🎉 ¡Genial! Tu amigo no tiene ningún espíritu que te falte en esta categoría.'}
-                  {activeTab === 'meToFriend' && '🤝 No tienes espíritus adicionales para pasarle a tu amigo en esta categoría.'}
-                  {activeTab === 'common' && 'Aún no tienen espíritus repetidos en común en esta categoría.'}
+                  {activeTab === 'friendAll' && 'Tu amigo aún no tiene espíritus registrados en esta categoría.'}
+                  {activeTab === 'friendToMe' && '🎉 ¡Genial! Tu amigo no tiene ningún espíritu que te falte en esta categoría. ¡Tienes todos los que él tiene!'}
+                  {activeTab === 'meToFriend' && '🤝 Tu amigo ya tiene todos los espíritus que tú posees en esta categoría.'}
+                  {activeTab === 'common' && 'Aún no tienen espíritus en común en esta categoría.'}
                 </div>
               ) : (
                 <div className="sdm-compare__grid">
@@ -415,6 +501,8 @@ export function FriendCompareModal({
                     const isMine = userState[sprite.id]?.owned;
                     const friendLvl = currentFriendState[sprite.id]?.level || 1;
                     const myLvl = userState[sprite.id]?.level || 1;
+                    const isFriendMastered = friendLvl === 5;
+                    const isMyMastered = isMine && myLvl === 5;
 
                     return (
                       <div
@@ -430,23 +518,64 @@ export function FriendCompareModal({
                           alt={sprite.fullName}
                           className="sdm-compare__sprite-img"
                         />
-                        <div className="sdm-compare__sprite-name">
+                        <div className="sdm-compare__sprite-name" title={sprite.fullName}>
                           {sprite.fullName}
                         </div>
 
                         <div className="sdm-compare__sprite-levels">
-                          {activeTab === 'friendToMe' && `Amigo: Niv.${friendLvl}`}
-                          {activeTab === 'meToFriend' && `Tú: Niv.${myLvl}`}
-                          {activeTab === 'common' && `Tú: N.${myLvl} · Amigo: N.${friendLvl}`}
+                          {activeTab === 'friendAll' && (
+                            <>
+                              <div style={{ color: '#00F0E8', fontWeight: 800 }}>
+                                Amigo: {isFriendMastered ? 'MAX ★5' : `Niv.${friendLvl}`}
+                              </div>
+                              <div style={{ color: isMine ? '#4ade80' : '#f87171', fontSize: '0.62rem', fontWeight: 700 }}>
+                                {isMine ? `✓ En tu Dex (${isMyMastered ? 'MAX' : `Niv.${myLvl}`})` : '✕ Te falta'}
+                              </div>
+                            </>
+                          )}
+                          {activeTab === 'friendToMe' && (
+                            <>
+                              <div style={{ color: '#00F0E8', fontWeight: 700 }}>Amigo: Niv.{friendLvl}</div>
+                              <div style={{ color: '#f87171', fontSize: '0.62rem' }}>✕ Te falta</div>
+                            </>
+                          )}
+                          {activeTab === 'meToFriend' && (
+                            <>
+                              <div style={{ color: '#38bdf8', fontWeight: 700 }}>Tú: Niv.{myLvl}</div>
+                              <div style={{ color: '#94a3b8', fontSize: '0.62rem' }}>Amigo lo necesita</div>
+                            </>
+                          )}
+                          {activeTab === 'common' && (
+                            <div>Tú: N.{myLvl} · Amigo: N.{friendLvl}</div>
+                          )}
                         </div>
 
-                        {activeTab === 'friendToMe' && onToggleOwned && (
+                        {/* Botón para marcar si a mí me falta */}
+                        {!isMine && onToggleOwned && (
                           <button
-                            onClick={() => onToggleOwned(sprite.id)}
-                            className={`sdm-compare__sprite-mark-btn ${isMine ? 'sdm-compare__sprite-mark-btn--owned' : ''}`}
+                            onClick={() => {
+                              onToggleOwned(sprite.id);
+                              sounds.playToggle(true, sprite.gen);
+                              confetti({ particleCount: 25, spread: 45, origin: { y: 0.8 } });
+                            }}
+                            className="sdm-compare__sprite-mark-btn"
                           >
-                            {isMine ? '✓ Registrado' : '+ Marcar'}
+                            + Marcar en mi Dex
                           </button>
+                        )}
+                        {isMine && activeTab === 'friendAll' && (
+                          <div style={{
+                            marginTop: '6px',
+                            padding: '3px 6px',
+                            borderRadius: '5px',
+                            background: 'rgba(34, 197, 94, 0.15)',
+                            color: '#4ade80',
+                            fontSize: '0.62rem',
+                            fontWeight: 800,
+                            border: '1px solid rgba(34, 197, 94, 0.3)'
+                          }}>
+                            ✓ Registrado
+                          </div>
                         )}
                       </div>
                     );
