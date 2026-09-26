@@ -27,3 +27,7 @@ dist-ssr
 
 .pnpm-store
 
+# Media captures & temporary files
+*.mov
+*.mp4
+.atl/
