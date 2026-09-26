@@ -98,7 +98,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
           style={{ background: mainStyle.background }}
           ref={headerRef}
         >
-          <div className="sdm__hero-glow" style={{ background: `radial-gradient(circle at 30% 50%, ${mainStyle.borderColor}40 0%, transparent 70%)` }} />
+          <div className="sdm__hero-glow" style={{ background: `radial-gradient(circle at 30% 50%, ${mainStyle.borderColor?.startsWith('#') ? `${mainStyle.borderColor}40` : (mainStyle.borderColor || 'rgba(255, 255, 255, 0.25)')} 0%, transparent 70%)` }} />
 
           <div className="sdm__hero-img-wrap">
             {isMastered && (

@@ -2876,6 +2876,12 @@ body::after {
   border-color: #6366f1;
 }
 
+.sprite-theme-bountyhunter,
+.sprite-theme-bounty-hunter {
+  background: linear-gradient(to right, #fc93de 0%, #feab94 18%, #fdbf84 32%, #fcef85 50%, #bffc95 68%, #8ae8f8 84%, #847dee 100%);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
 .sprite-theme-cube {
   background: linear-gradient(180deg, #730974 0%, #161b22 100%);
   border-color: #8b008b;
@@ -3340,6 +3346,7 @@ body::after {
   width: 100%;
   position: relative;
   z-index: 1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75), 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .card-name.card-name--long {
