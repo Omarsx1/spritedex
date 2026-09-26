@@ -106,7 +106,7 @@ export function FriendCompareModal({
 
     let found = false;
 
-    // 1. Conectar por código de amigo en la nube (ej: BDZ8, SDEX-BDZ8, o URL)
+    // 1. Conectar por código de amigo en la nube (ej: SDEX-XXXX, XXXX, o URL)
     if (onConnectFriendCode) {
       const success = await onConnectFriendCode(code);
       if (success) {
@@ -338,7 +338,7 @@ export function FriendCompareModal({
                 <div className="sdm-compare__input-row">
                   <input
                     type="text"
-                    placeholder="Código (ej: BDZ8 o SDEX-BDZ8)..."
+                    placeholder="Código (ej: SDEX-XXXX o XXXX)..."
                     value={friendInput}
                     onChange={(e) => {
                       setFriendInput(e.target.value);
@@ -384,7 +384,7 @@ export function FriendCompareModal({
               </div>
               <h3 className="sdm-compare__waiting-title">Esperando Conexión con un Amigo</h3>
               <p className="sdm-compare__waiting-text">
-                Ingresa el <strong>Código de Amigo</strong> (ej: <code>BDZ8</code> o <code>SDEX-BDZ8</code>) para ver su lista y sincronizar en tiempo real.
+                Ingresa el <strong>Código de Amigo</strong> (ej: <code>SDEX-XXXX</code> o <code>XXXX</code>) para ver su lista y sincronizar en tiempo real.
               </p>
             </div>
           ) : (

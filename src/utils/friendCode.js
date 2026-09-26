@@ -38,8 +38,8 @@ export function getMyFriendCode(userId = null) {
  * Normalizes friend code input:
  * - Extracts code from full URLs (?code=... or ?friend=...)
  * - Strips leading '#', spaces, symbols
- * - Handles 4-character short codes (e.g. 'BDZ8' -> 'SDEX-BDZ8')
- * - Fixes missing hyphens (e.g. 'SDEXBDZ8' or 'sdex bdz8' -> 'SDEX-BDZ8')
+ * - Handles 4-character short codes (e.g. 'XXXX' -> 'SDEX-XXXX')
+ * - Fixes missing hyphens (e.g. 'SDEXXXXX' or 'sdex xxxx' -> 'SDEX-XXXX')
  */
 export function normalizeFriendCode(input) {
   if (!input) return '';
@@ -63,7 +63,7 @@ export function normalizeFriendCode(input) {
     str = 'SDEX-' + str.slice(4);
   }
 
-  // Handle 4-alphanumeric character code (e.g. 'BDZ8' -> 'SDEX-BDZ8')
+  // Handle 4-alphanumeric character code (e.g. 'XXXX' -> 'SDEX-XXXX')
   if (/^[A-Z0-9]{4}$/.test(str)) {
     str = 'SDEX-' + str;
   }
@@ -76,7 +76,7 @@ export function normalizeFriendCode(input) {
  * Resilient multi-tier lookup:
  * 1. Exact match by friend_code
  * 2. Case-insensitive ilike by friend_code
- * 3. Suffix match by 4-char suffix (e.g. %BDZ8)
+ * 3. Suffix match by 4-char suffix (e.g. %XXXX)
  * 4. Fallback by user_id if input was a UUID
  */
 export async function fetchCollectionByFriendCode(friendCode) {
@@ -104,7 +104,7 @@ export async function fetchCollectionByFriendCode(friendCode) {
       if (res.error && !error) error = res.error;
     }
 
-    // 3. Suffix match (e.g. searching 'BDZ8' or 'SDEX-BDZ8' where DB has '%BDZ8')
+    // 3. Suffix match (e.g. searching 'XXXX' or 'SDEX-XXXX' where DB has '%XXXX')
     if (!data && cleanSuffix.length === 4) {
       const res = await supabase
         .from('user_collections')
