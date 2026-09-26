@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Grid, List, ChevronDown } from 'lucide-react';
+import { Search, Grid, List, ChevronDown, X } from 'lucide-react';
 import { THEMES_LIST, THEME_NAMES_ES, ALL_SPRITES, FAMILY_NAMES_MAP } from '../data/spritesData';
 import { MobileLiquidFilterBar } from './MobileLiquidFilterBar';
+import { safeStorage } from '../utils/safeStorage';
 
 const VARIANT_COLORS = {
   Basic:       { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' },
@@ -48,6 +49,39 @@ export function FilterBar({
   const newSpiritsCount = useMemo(() => {
     return ALL_SPRITES.filter(s => s.isNew && !s.unreleased).length;
   }, []);
+
+  const NEW_SPIRITS_COACHMARK_KEY = 'spritedex_seen_new_drop_2026_09_26_birthday';
+
+  const [showNewTooltip, setShowNewTooltip] = useState(() => {
+    if (safeStorage.getItem(NEW_SPIRITS_COACHMARK_KEY)) return false;
+    return newSpiritsCount > 0;
+  });
+  const [isDismissing, setIsDismissing] = useState(false);
+
+  useEffect(() => {
+    if (statusFilter === 'new') {
+      setShowNewTooltip(false);
+      safeStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
+    }
+  }, [statusFilter]);
+
+  const handleExploreNew = () => {
+    setStatusFilter('new');
+    setIsDismissing(true);
+    setTimeout(() => {
+      setShowNewTooltip(false);
+    }, 220);
+    safeStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
+  };
+
+  const handleDismissTooltip = (e) => {
+    e.stopPropagation();
+    setIsDismissing(true);
+    setTimeout(() => {
+      setShowNewTooltip(false);
+    }, 220);
+    safeStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
+  };
 
   // Compute available families scoped to activeGen and showUnreleased
   const availableFamiliesWithImages = useMemo(() => {
@@ -139,7 +173,39 @@ export function FilterBar({
   return (
     <div className="filter-bar-container desktop-only">
       {/* Status Filter Pill Buttons (Top line) */}
-      <div className="status-pill-group">
+      <div className="status-pill-group" style={{ position: 'relative' }}>
+        {/* Tooltip Coachmark de Nuevos Espíritus (Desktop) */}
+        {showNewTooltip && statusFilter !== 'new' && (
+          <div
+            className={`mobile-new-coachmark ${isDismissing ? 'is-dismissing' : ''}`}
+            onClick={handleExploreNew}
+            role="button"
+            tabIndex={0}
+            title="Haz clic para ver los nuevos espíritus"
+            style={{
+              position: 'absolute',
+              bottom: 'calc(100% + 8px)',
+              left: '54px',
+              zIndex: 50,
+              cursor: 'pointer'
+            }}
+          >
+            <div className="mobile-new-coachmark__content">
+              <span className="mobile-new-coachmark__sparkle">✨</span>
+              <span className="mobile-new-coachmark__text">¡{newSpiritsCount} Nuevos espíritus!</span>
+              <span className="mobile-new-coachmark__action">Ver</span>
+              <button
+                type="button"
+                className="mobile-new-coachmark__close"
+                onClick={handleDismissTooltip}
+                aria-label="Cerrar aviso"
+              >
+                <X size={12} />
+              </button>
+            </div>
+            <div className="mobile-new-coachmark__arrow" />
+          </div>
+        )}
         {STATUS_OPTIONS.map(opt => (
           <button
             key={opt.value}

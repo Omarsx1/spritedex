@@ -28,12 +28,12 @@ export function MobileLiquidFilterBar({
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
 
-  // ═══ SMART ONE-TIME DISCOVERY COACHMARK (NUEVO DROP CAZADORES Y MORGANA - 2026-09-24) ═══
+  // ═══ SMART ONE-TIME DISCOVERY COACHMARK (NUEVO DROP CUMPLEAÑOS - 2026-09-26) ═══
   const newSpiritsCount = useMemo(() => {
     return ALL_SPRITES.filter(s => s.isNew && !s.unreleased).length;
   }, []);
 
-  const NEW_SPIRITS_COACHMARK_KEY = 'spritedex_seen_new_drop_2026_09_24_bounty_morgana';
+  const NEW_SPIRITS_COACHMARK_KEY = 'spritedex_seen_new_drop_2026_09_26_birthday';
 
   const [showNewTooltip, setShowNewTooltip] = useState(() => {
     if (safeStorage.getItem(NEW_SPIRITS_COACHMARK_KEY)) return false;

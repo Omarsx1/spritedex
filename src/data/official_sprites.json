@@ -1946,8 +1946,9 @@
     "theme": "Basic",
     "rarity": "Rare",
     "gen": 2,
-    "unreleased": true,
-    "isNew": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-26"
   },
   {
     "id": "birthday_gold",
@@ -1955,8 +1956,9 @@
     "theme": "Gold",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true,
-    "isNew": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-26"
   },
   {
     "id": "birthday_cheatmaster",
@@ -1964,8 +1966,9 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true,
-    "isNew": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-26"
   },
   {
     "id": "birthday_loothacker",
@@ -1973,8 +1976,9 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true,
-    "isNew": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-26"
   },
   {
     "id": "birthday_bountyhunter",
@@ -1982,8 +1986,9 @@
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "gen": 2,
-    "unreleased": true,
-    "isNew": false
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-26"
   },
   {
     "id": "morgana_basic",
