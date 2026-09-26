@@ -660,7 +660,7 @@ export function App() {
             <h2 style={{ fontSize: '1.4rem', marginBottom: '8px' }}>No se encontraron Sprites</h2>
             <p>Prueba ajustando la búsqueda o los filtros.</p>
           </div>
-        ) : isMobile ? (
+        ) : (isMobile || viewMode === 'spotlight') ? (
           <MobileSpriteSwiper
             sprites={filteredSprites}
             userState={userState}
