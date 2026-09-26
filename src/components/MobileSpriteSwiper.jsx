@@ -294,27 +294,25 @@ function FamilySpotlightRow({
 
           {/* Badge de nivel o amigo */}
           {!sprite.unreleased && (
-            <div className="ms-spotlight-fade">
-              {isFriendView ? (
-                friendCanLend ? (
-                  <div className="ms-level-tag ms-level-tag--lend" onClick={handleToggleBadgeClick}>
-                    {myOwned ? '✓ REGISTRADO' : '🎁 PRESTA'}
-                  </div>
-                ) : isOwned ? (
-                  <div className="ms-level-tag ms-level-tag--friend">
-                    ✓ AMIGO
-                  </div>
-                ) : null
-              ) : isOwned ? (
-                <div
-                  className={`ms-level-tag ${isMastered ? 'ms-level-tag--mastered' : ''}`}
-                  onClick={handleToggleBadgeClick}
-                  title="Toca para desmarcar o cambiar"
-                >
-                  {isMastered ? 'MAX' : `LVL.${level}`}
+            isFriendView ? (
+              friendCanLend ? (
+                <div className="ms-level-tag ms-level-tag--lend ms-spotlight-fade" onClick={handleToggleBadgeClick}>
+                  {myOwned ? '✓ REGISTRADO' : '🎁 PRESTA'}
                 </div>
-              ) : null}
-            </div>
+              ) : isOwned ? (
+                <div className="ms-level-tag ms-level-tag--friend ms-spotlight-fade">
+                  ✓ AMIGO
+                </div>
+              ) : null
+            ) : isOwned ? (
+              <div
+                className={`ms-level-tag ${isMastered ? 'ms-level-tag--mastered' : ''} ms-spotlight-fade`}
+                onClick={handleToggleBadgeClick}
+                title="Toca para desmarcar o cambiar"
+              >
+                {isMastered ? 'MAX' : `LVL.${level}`}
+              </div>
+            ) : null
           )}
 
           {/* Imagen del Sprite */}
