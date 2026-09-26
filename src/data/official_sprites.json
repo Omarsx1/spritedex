@@ -1891,56 +1891,6 @@
     "releaseDate": "2026-09-24"
   },
   {
-    "id": "crash_basic",
-    "name": "Crash Bandicoot",
-    "theme": "Basic",
-    "rarity": "Legendary",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false,
-    "releaseDate": "2026-09-17"
-  },
-  {
-    "id": "crash_gold",
-    "name": "Crash Bandicoot Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false,
-    "releaseDate": "2026-09-17"
-  },
-  {
-    "id": "crash_cheatmaster",
-    "name": "Crash Bandicoot Hacker",
-    "theme": "Cheatmaster",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false,
-    "releaseDate": "2026-09-17"
-  },
-  {
-    "id": "crash_loothacker",
-    "name": "Crash Bandicoot Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": false,
-    "releaseDate": "2026-09-17"
-  },
-  {
-    "id": "crash_bountyhunter",
-    "name": "Crash Bandicoot Cazador de Recompensas",
-    "theme": "Bounty Hunter",
-    "rarity": "Special",
-    "gen": 2,
-    "unreleased": false,
-    "isNew": true,
-    "releaseDate": "2026-09-24"
-  },
-  {
     "id": "birthday_basic",
     "name": "Pastel de Cumpleaños",
     "theme": "Basic",
@@ -1989,6 +1939,56 @@
     "unreleased": false,
     "isNew": true,
     "releaseDate": "2026-09-26"
+  },
+  {
+    "id": "crash_basic",
+    "name": "Crash Bandicoot",
+    "theme": "Basic",
+    "rarity": "Legendary",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false,
+    "releaseDate": "2026-09-17"
+  },
+  {
+    "id": "crash_gold",
+    "name": "Crash Bandicoot Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false,
+    "releaseDate": "2026-09-17"
+  },
+  {
+    "id": "crash_cheatmaster",
+    "name": "Crash Bandicoot Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false,
+    "releaseDate": "2026-09-17"
+  },
+  {
+    "id": "crash_loothacker",
+    "name": "Crash Bandicoot Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": false,
+    "releaseDate": "2026-09-17"
+  },
+  {
+    "id": "crash_bountyhunter",
+    "name": "Crash Bandicoot Cazador de Recompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "gen": 2,
+    "unreleased": false,
+    "isNew": true,
+    "releaseDate": "2026-09-24"
   },
   {
     "id": "morgana_basic",

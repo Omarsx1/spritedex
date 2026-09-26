@@ -957,8 +957,8 @@ export const FORTNITE_GEN2_FAMILY_ORDER = [
   'onigiri',
   'stormscout',
   'blinky',
-  'crash',
   'birthday',
+  'crash',
   'morgana'
 ];
 
