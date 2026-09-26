@@ -266,7 +266,6 @@ export function Navbar({
                   >
                     <div className="gen-option-content">
                       <span className="gen-option-title">2da Gen</span>
-                      <span className="gen-option-subtitle">33 sprites · Actual</span>
                     </div>
                     {activeGen === 2 && <span className="gen-option-check">✓</span>}
                   </button>
@@ -277,7 +276,6 @@ export function Navbar({
                   >
                     <div className="gen-option-content">
                       <span className="gen-option-title">1ra Gen</span>
-                      <span className="gen-option-subtitle">117 sprites</span>
                     </div>
                     {activeGen === 1 && <span className="gen-option-check">✓</span>}
                   </button>
@@ -288,7 +286,6 @@ export function Navbar({
                   >
                     <div className="gen-option-content">
                       <span className="gen-option-title">Todas</span>
-                      <span className="gen-option-subtitle">150 sprites total</span>
                     </div>
                     {activeGen === 0 && <span className="gen-option-check">✓</span>}
                   </button>
