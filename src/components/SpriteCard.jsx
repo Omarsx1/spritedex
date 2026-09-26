@@ -289,7 +289,7 @@ export function SpriteCard({
       </div>
 
       {/* Nombre */}
-      <div className="card-name">{sprite.fullName}</div>
+      <div className={`card-name ${sprite.fullName && sprite.fullName.length > 20 ? 'card-name--long' : ''}`}>{sprite.fullName}</div>
 
       {/* Control inferior: Pill No lanzado si unreleased, Anillos de Sonic para Gen 2 o Estrellas para Gen 1 si está atrapado */}
       {sprite.unreleased ? (

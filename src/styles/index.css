@@ -3342,6 +3342,12 @@ body::after {
   z-index: 1;
 }
 
+.card-name.card-name--long {
+  font-size: 0.76rem;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+}
+
 /* Card meta (rarity badge + drop %) */
 .card-meta {
   display: flex;
@@ -3442,7 +3448,8 @@ body::after {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  margin-bottom: 8px;
+  margin-top: auto;
+  min-height: 36px;
   width: 100%;
   position: relative;
   z-index: 1;
@@ -3538,6 +3545,8 @@ body::after {
 /* Owned button on card */
 .card-owned-btn {
   width: 100%;
+  height: 36px;
+  min-height: 36px;
   padding: 7px 10px;
   border-radius: 8px;
   border: none;
@@ -3548,6 +3557,10 @@ body::after {
   transition: all 0.2s ease;
   position: relative;
   z-index: 1;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.5);
 }
@@ -3593,6 +3606,7 @@ body::after {
   user-select: none;
   cursor: not-allowed;
   transition: all 0.2s ease;
+  margin-top: auto;
 }
 
 .card-unreleased-pill svg {
