@@ -6769,10 +6769,25 @@ body::after {
   letter-spacing: 0.03em;
   white-space: nowrap;
   animation: ms-hint-pulse 2.5s ease-in-out infinite;
+  transition: opacity 0.25s ease, transform 0.25s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+
+/* Salida de la pista cuando el usuario ya aprendió a deslizar. */
+.ms-family-hint.is-dismissing {
+  opacity: 0;
+  transform: translateY(-4px);
+  animation: none;
+}
+
+/* Va después de la regla base: a igual especificidad, gana la última. */
+@media (prefers-reduced-motion: reduce) {
+  .ms-family-hint {
+    animation: none;
+  }
 }
 
 .ms-family-name {
@@ -7220,18 +7235,6 @@ body::after {
 }
 
 /* ── Swipe Hint ── */
-.ms-swipe-hint {
-  text-align: center;
-  width: 205px;
-  margin: 0 auto;
-  font-size: 0.68rem;
-  color: rgba(14, 165, 233, 0.7);
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  padding: 6px 0 0 0;
-  animation: ms-hint-pulse 2.5s ease-in-out infinite;
-}
-
 @keyframes ms-hint-pulse {
   0%, 100% { opacity: 0.65; transform: translateX(0); }
   50% { opacity: 1; transform: translateX(3px); }

@@ -4,6 +4,8 @@ import { Lock } from 'lucide-react';
 import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import { SonicRing } from './SonicRing';
+import { safeStorage } from '../utils/safeStorage';
+import { trackEvent } from '../utils/telemetry';
 
 const RARITY_GLOWS = {
   'Mítico': '0 12px 28px rgba(245, 182, 66, 0.45), 0 0 16px rgba(245, 182, 66, 0.25)',
@@ -42,6 +44,11 @@ function getCachedCardStyle(sprite) {
   return style;
 }
 
+// Pista de swipe: se enseña una sola vez por dispositivo. Sube la versión para
+// volver a mostrarla a todos tras un rediseño.
+const SWIPE_HINT_KEY = 'spritedex_swipe_hint_seen_v1';
+const SWIPE_HINT_FADE_MS = 260;
+
 /**
  * Fila individual por familia de espíritus con Spotlight Carousel estilo Apple.
  * - Mantiene las dimensiones originales exactas de las tarjetas (205px x 284px).
@@ -56,7 +63,10 @@ function FamilySpotlightRow({
   isFriendView,
   onToggleOwned,
   onSetLevel,
-  onOpenDetail
+  onOpenDetail,
+  showHint = false,
+  isDismissing = false,
+  onSwipeLearned
 }) {
   const [activeIdx, setActiveIdx] = useState(0);
 
@@ -189,6 +199,8 @@ function FamilySpotlightRow({
 
     if (target !== safeActiveIdx) {
       goTo(target);
+      // Solo el gesto que cambia de variante marca la pista como aprendida.
+      if (onSwipeLearned) onSwipeLearned();
     } else if (track) {
       // Sin cambio de variante: vuelve al centro con la transición CSS.
       track.style.transform = 'translate3d(' + (-centerOffset) + 'px, 0, 0)';
@@ -473,9 +485,9 @@ function FamilySpotlightRow({
   return (
     <div className="ms-family-row" ref={rowRef}>
       {/* Header con hint de variantes centrado encima de la tarjeta (solo si hay más de 1 variante) */}
-      {count > 1 && (
+      {count > 1 && showHint && (
         <div className="ms-family-header">
-          <span className="ms-family-hint">
+          <span className={'ms-family-hint' + (isDismissing ? ' is-dismissing' : '')}>
             Desliza para ver {count} variantes →
           </span>
         </div>
@@ -550,6 +562,30 @@ export function MobileSpriteSwiper({
     }));
   }, [sprites]);
 
+  // La pista se apaga en todas las filas a la vez, la primera vez que el usuario
+  // cambia de variante con un deslizamiento.
+  const [showSwipeHint, setShowSwipeHint] = useState(() => safeStorage.getItem(SWIPE_HINT_KEY) !== 'true');
+  const [isDismissingHint, setIsDismissingHint] = useState(false);
+  const hintDismissedRef = useRef(false);
+  const hintTimerRef = useRef(0);
+
+  const handleSwipeLearned = useCallback(() => {
+    if (hintDismissedRef.current) return;
+    hintDismissedRef.current = true;
+    safeStorage.setItem(SWIPE_HINT_KEY, 'true');
+    setIsDismissingHint(true);
+    trackEvent('swipe_hint_dismissed');
+    hintTimerRef.current = setTimeout(() => {
+      hintTimerRef.current = 0;
+      setShowSwipeHint(false);
+      setIsDismissingHint(false);
+    }, SWIPE_HINT_FADE_MS);
+  }, []);
+
+  useEffect(() => () => {
+    if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+  }, []);
+
   if (!families || families.length === 0) return null;
 
   return (
@@ -570,6 +606,9 @@ export function MobileSpriteSwiper({
             onToggleOwned={onToggleOwned}
             onSetLevel={onSetLevel}
             onOpenDetail={onOpenDetail}
+            showHint={showSwipeHint || isDismissingHint}
+            isDismissing={isDismissingHint}
+            onSwipeLearned={handleSwipeLearned}
           />
         ))}
       </div>
