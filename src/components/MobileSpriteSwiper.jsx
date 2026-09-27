@@ -472,27 +472,11 @@ function FamilySpotlightRow({
 
   return (
     <div className="ms-family-row" ref={rowRef}>
-      {/* Header con hint de variantes a la izquierda y puntos a la derecha (solo si hay más de 1 variante) */}
+      {/* Header con hint de variantes centrado encima de la tarjeta (solo si hay más de 1 variante) */}
       {count > 1 && (
         <div className="ms-family-header">
           <span className="ms-family-hint">
             Desliza para ver {count} variantes →
-          </span>
-          <span className="ms-family-dots">
-            {variants.map((v, i) => {
-              const isVarOwned = isFriendView ? friendState?.[v.id]?.owned : userState[v.id]?.owned;
-              return (
-                <button
-                  key={v.id || i}
-                  type="button"
-                  className={`ms-dot ${i === safeActiveIdx ? 'ms-dot--active' : ''} ${isVarOwned ? 'ms-dot--owned' : ''}`}
-                  onClick={() => {
-                    goTo(i);
-                  }}
-                  aria-label={`Ver ${v.variantDisplay || v.variant || v.fullName}`}
-                />
-              );
-            })}
           </span>
         </div>
       )}
