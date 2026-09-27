@@ -827,6 +827,9 @@ body::after {
   flex-direction: column;
   align-items: center;
   gap: 0;
+  /* Ajuste fino: sube los títulos 10px sin mover el showcase ni chocar con el tween de GSAP
+     (GSAP anima .hero__title-block; este transform vive en el hijo). */
+  transform: translateY(-10px);
 }
 
 .hero__title-line {
@@ -3258,7 +3261,7 @@ body::after {
 /* 3. Mobile Swiper Crown - Altura sobre la cresta derecha */
 .ms-card__crown {
   position: absolute;
-  top: 12px;
+  top: 26px;
   left: 56%;
   right: auto;
   transform: rotate(10deg);
