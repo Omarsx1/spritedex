@@ -1281,10 +1281,6 @@ body::after {
   width: 140px;
   height: 140px;
   pointer-events: none;
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
 }
 
 .pm {
@@ -1292,8 +1288,6 @@ body::after {
   width: 140px;
   height: 140px;
   pointer-events: none;
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
 }
 
 .pm-slot {
@@ -1310,10 +1304,11 @@ body::after {
 .pm-btn {
   width: 44px;
   height: 44px;
-  border: 0;
+  border: 0 !important;
+  outline: none !important;
   padding: 0;
   border-radius: 50%;
-  background: transparent;
+  background: transparent !important;
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -1322,11 +1317,15 @@ body::after {
   user-select: none;
   pointer-events: auto;
   position: relative;
+  box-shadow: none !important;
 }
 
-.pm-btn:focus-visible {
-  outline: 2px solid #00f0e8;
-  outline-offset: 2px;
+.pm-btn:focus,
+.pm-btn:focus-visible,
+.pm-btn:active {
+  outline: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }
 
 .pm-btn:active {
@@ -1340,10 +1339,6 @@ body::after {
 
 .pm-open .pm-sat {
   pointer-events: auto;
-}
-
-.pm-open .pm-sat:hover {
-  background: rgba(0, 240, 232, 0.12);
 }
 
 /* Los iconos satélites aparecen con cross-blur y pop elástico al separarse la gota */

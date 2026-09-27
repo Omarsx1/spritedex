@@ -53,19 +53,33 @@ export function Header({
   // Menú gooey de acciones (solo móvil): réplica 1:1 de libraries.dev/gooey
   const isMobile = useIsMobile(768);
   const [actionsOpen, setActionsOpen] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  // Evita que el modo Ahorro de Batería de Android active prefers-reduced-motion
+  // y apague la física líquida de liquid-gooey salvo que el usuario lo desactive en el menú
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const isMotionDisabled = () => document.documentElement.classList.contains('motion-disabled') || document.body?.classList.contains('motion-disabled');
+    const origMatchMedia = window.matchMedia;
+    window.matchMedia = function (query) {
+      if (query === '(prefers-reduced-motion: reduce)') {
+        const matches = Boolean(isMotionDisabled());
+        return {
+          matches,
+          media: query,
+          onchange: null,
+          addListener: () => {},
+          removeListener: () => {},
+          addEventListener: () => {},
+          removeEventListener: () => {},
+          dispatchEvent: () => false,
+        };
+      }
+      return origMatchMedia.call(window, query);
+    };
+  }, []);
 
   const toggleActions = useCallback(() => {
     setActionsOpen((prev) => !prev);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
-    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mql.matches);
-    const handler = (event) => setPrefersReducedMotion(event.matches);
-    mql.addEventListener('change', handler);
-    return () => mql.removeEventListener('change', handler);
   }, []);
 
   // Al volver a escritorio el menú no debe quedar abierto.
@@ -92,7 +106,7 @@ export function Header({
     };
   }, [actionsOpen, toggleActions]);
 
-  const gooeyTransition = prefersReducedMotion ? { duration: 0 } : 'bouncy';
+  const gooeyTransition = 'bouncy';
   const currentSprite = spritePool[spriteIndex] || spritePool[0];
 
   // Progress percentages
@@ -376,19 +390,19 @@ export function Header({
       {isMobile && typeof document !== 'undefined' && createPortal(
         <div className="hero__dock" ref={dockRef}>
           <Liquid
-            blur={6}
-            contrast={18}
+            blur={7}
+            contrast={19}
             fill="#0c152d"
             filterPadding={80}
-            shadow="0 0 0 1.5px rgba(0, 240, 232, 0.45) inset, 0 1px 0 0 rgba(255, 255, 255, 0.1) inset, 0 0 0 1px rgba(0, 0, 0, 0.4), 0 2px 6px 0 rgba(0, 0, 0, 0.3), 0 4px 20px 0 rgba(0, 0, 0, 0.6)"
+            shadow="0 4px 18px rgba(0, 0, 0, 0.55), 0 0 12px rgba(0, 240, 232, 0.18)"
             className={`pm ${actionsOpen ? 'pm-open' : ''}`}
           >
             <Liquid.Item
               className="pm-slot"
-              x={actionsOpen ? -54 : 0}
+              x={actionsOpen ? -56 : 0}
               y={actionsOpen ? -34 : 0}
               transition={gooeyTransition}
-              delay={actionsOpen ? 0 : 0}
+              delay={0}
             >
               <button
                 type="button"
@@ -403,7 +417,7 @@ export function Header({
                 <span
                   className="pm-sat-icon"
                   style={{
-                    transitionDelay: actionsOpen ? '120ms' : '0ms'
+                    transitionDelay: actionsOpen ? '110ms' : '0ms'
                   }}
                 >
                   <Users size={19} strokeWidth={2.2} />
@@ -414,9 +428,9 @@ export function Header({
             <Liquid.Item
               className="pm-slot"
               x={0}
-              y={actionsOpen ? -64 : 0}
+              y={actionsOpen ? -66 : 0}
               transition={gooeyTransition}
-              delay={actionsOpen ? 40 : 0}
+              delay={actionsOpen ? 35 : 0}
             >
               <button
                 type="button"
@@ -437,7 +451,7 @@ export function Header({
                 <span
                   className="pm-sat-icon"
                   style={{
-                    transitionDelay: actionsOpen ? '160ms' : '0ms'
+                    transitionDelay: actionsOpen ? '150ms' : '0ms'
                   }}
                 >
                   <Share2 size={19} strokeWidth={2.2} />
