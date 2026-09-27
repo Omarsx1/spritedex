@@ -378,15 +378,15 @@ export function Header({
           <Liquid
             blur={6}
             contrast={18}
-            fill="#6366f1"
-            filterPadding={120}
-            shadow="0 0 22px rgba(99, 102, 241, 0.45), 0 4px 14px rgba(0, 0, 0, 0.4)"
+            fill="#0c152d"
+            filterPadding={80}
+            shadow="0 0 0 1.5px rgba(0, 240, 232, 0.45) inset, 0 1px 0 0 rgba(255, 255, 255, 0.1) inset, 0 0 0 1px rgba(0, 0, 0, 0.4), 0 2px 6px 0 rgba(0, 0, 0, 0.3), 0 4px 20px 0 rgba(0, 0, 0, 0.6)"
             className={`pm ${actionsOpen ? 'pm-open' : ''}`}
           >
             <Liquid.Item
               className="pm-slot"
-              x={actionsOpen ? -72 : 0}
-              y={actionsOpen ? -20 : 0}
+              x={actionsOpen ? -54 : 0}
+              y={actionsOpen ? -34 : 0}
               transition={gooeyTransition}
               delay={actionsOpen ? 0 : 0}
             >
@@ -403,20 +403,20 @@ export function Header({
                 <span
                   className="pm-sat-icon"
                   style={{
-                    transitionDelay: actionsOpen ? '90ms' : '0ms'
+                    transitionDelay: actionsOpen ? '120ms' : '0ms'
                   }}
                 >
-                  <Users size={18} strokeWidth={2} />
+                  <Users size={19} strokeWidth={2.2} />
                 </span>
               </button>
             </Liquid.Item>
 
             <Liquid.Item
               className="pm-slot"
-              x={actionsOpen ? -20 : 0}
-              y={actionsOpen ? -72 : 0}
+              x={0}
+              y={actionsOpen ? -64 : 0}
               transition={gooeyTransition}
-              delay={actionsOpen ? 25 : 0}
+              delay={actionsOpen ? 40 : 0}
             >
               <button
                 type="button"
@@ -437,10 +437,10 @@ export function Header({
                 <span
                   className="pm-sat-icon"
                   style={{
-                    transitionDelay: actionsOpen ? '130ms' : '0ms'
+                    transitionDelay: actionsOpen ? '160ms' : '0ms'
                   }}
                 >
-                  <Share2 size={18} strokeWidth={2} />
+                  <Share2 size={19} strokeWidth={2.2} />
                 </span>
               </button>
             </Liquid.Item>
@@ -454,8 +454,8 @@ export function Header({
                 onClick={toggleActions}
               >
                 <span className="pm-main-icon-wrap">
-                  <Gamepad2 size={20} strokeWidth={2} className={`pm-icon-pad ${actionsOpen ? 'is-hidden' : ''}`} />
-                  <X size={19} strokeWidth={2.2} className={`pm-icon-close ${actionsOpen ? 'is-visible' : ''}`} />
+                  <Gamepad2 size={22} strokeWidth={2.2} className={`pm-icon-pad ${actionsOpen ? 'is-hidden' : ''}`} />
+                  <X size={20} strokeWidth={2.4} className={`pm-icon-close ${actionsOpen ? 'is-visible' : ''}`} />
                 </span>
               </button>
             </Liquid.Item>

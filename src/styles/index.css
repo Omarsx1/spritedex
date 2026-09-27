@@ -1275,35 +1275,35 @@ body::after {
 /* ── Plus Menu Gooey (exactamente como en libraries.dev/gooey) ── */
 .hero__dock {
   position: fixed;
-  right: 16px;
-  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 0px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   z-index: 9999;
-  width: 40px;
-  height: 40px;
+  width: 140px;
+  height: 140px;
   pointer-events: none;
 }
 
 .pm {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 140px;
+  height: 140px;
   pointer-events: none;
 }
 
 .pm-slot {
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 40px;
-  height: 40px;
+  left: 80px;
+  top: 80px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   pointer-events: none;
   will-change: transform;
 }
 
 .pm-btn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border: 0;
   padding: 0;
   border-radius: 50%;
@@ -1311,7 +1311,7 @@ body::after {
   display: grid;
   place-items: center;
   cursor: pointer;
-  color: #ffffff;
+  color: #00f0e8;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   pointer-events: auto;
@@ -1319,7 +1319,7 @@ body::after {
 }
 
 .pm-btn:focus-visible {
-  outline: 2px solid #ffffff;
+  outline: 2px solid #00f0e8;
   outline-offset: 2px;
 }
 
@@ -1337,7 +1337,7 @@ body::after {
 }
 
 .pm-open .pm-sat:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 240, 232, 0.12);
 }
 
 /* Los iconos satélites aparecen con cross-blur y pop elástico al separarse la gota */
@@ -1361,8 +1361,8 @@ body::after {
 /* Animación del icono principal: Gamepad <-> Cruz de cierre */
 .pm-main-icon-wrap {
   position: relative;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   display: grid;
   place-items: center;
 }
