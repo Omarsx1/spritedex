@@ -1271,6 +1271,70 @@ body::after {
   display: inline;
 }
 
+/* Menú gooey de acciones del hero (solo móvil): el mando esconde Amigos y Compartir */
+/* Botón flotante gooey de acciones (solo móvil, esquina inferior derecha) */
+.hero__dock {
+  position: fixed;
+  right: 16px;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  z-index: 60;
+}
+
+.hero__gooey {
+  position: relative;
+  z-index: 40;
+  width: 48px;
+  height: 48px;
+}
+
+/* Los ítems se apilan en el mismo punto: cerrado es un solo blob; abierto se separan con x/y */
+.hero__gooey > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.hero__fab-slot {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+
+.hero__fab-slot.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hero__fab {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: #0b1220;
+  color: #dbe4f5;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.hero__fab:active {
+  transform: scale(0.94);
+}
+
+.hero__fab--trigger {
+  color: #7dd3fc;
+  border-color: rgba(14, 165, 233, 0.45);
+}
+
+.hero__fab--trigger.is-open {
+  color: #f0f9ff;
+  border-color: rgba(14, 165, 233, 0.8);
+}
+
 .hero__btn::before {
   content: '';
   position: absolute;

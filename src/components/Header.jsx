@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import { Share2, Users } from 'lucide-react';
+import { Gamepad2, Share2, Users } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import gsap from 'gsap';
+import { Liquid } from 'liquid-gooey';
 import { allSprites as defaultAllSprites } from '../data/spritesData';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 export function Header({
   spritesPool,
@@ -45,6 +48,49 @@ export function Header({
   const titleRef = useRef(null);
   const statsRef = useRef(null);
   const actionsRef = useRef(null);
+  const dockRef = useRef(null);
+
+  // Menú gooey de acciones (solo móvil): el mando esconde Amigos y Compartir.
+  const isMobile = useIsMobile(600);
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mql.matches);
+    const handler = (event) => setPrefersReducedMotion(event.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+
+  // Al volver a escritorio el menú no debe quedar abierto.
+  useEffect(() => {
+    if (!isMobile) setActionsOpen(false);
+  }, [isMobile]);
+
+  // Escape y toque fuera cierran el menú.
+  useEffect(() => {
+    if (!actionsOpen) return undefined;
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') setActionsOpen(false);
+    };
+    const onPointerDown = (event) => {
+      if (dockRef.current && !dockRef.current.contains(event.target)) {
+        setActionsOpen(false);
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('pointerdown', onPointerDown);
+    };
+  }, [actionsOpen]);
+
+  const gooeyTransition = prefersReducedMotion
+    ? { duration: 0 }
+    : { duration: 550, ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)' };
   const currentSprite = spritePool[spriteIndex] || spritePool[0];
 
   // Progress percentages
@@ -86,7 +132,7 @@ export function Header({
       }
     }
 
-    if (actionsRef.current) {
+    if (actionsRef.current && actionsRef.current.children.length > 0) {
       // Animar directamente los botones de acción sin doble transformación en el padre
       tl.fromTo(actionsRef.current.children,
         { y: 10, opacity: 0, scale: 0.95 },
@@ -272,32 +318,36 @@ export function Header({
           </div>
 
           <div className="hero__actions" ref={actionsRef}>
-            <button
-              className="hero__btn hero__btn--primary"
-              onClick={onOpenCompareModal}
-              title={isLiveConnected ? `Radar de Amigos conectado (${connectedFriendCode})` : "Radar de Amigos"}
-              style={{ position: 'relative' }}
-            >
-              <Users size={16} className="hero__btn-icon" />
-              <span className="hero__btn-text">Amigos</span>
-              {isLiveConnected && (
-                <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
-              )}
-            </button>
-            <button
-              className="hero__btn hero__btn--accent"
-              onClick={onOpenShareModal}
-              onMouseEnter={() => {
-                import('../components/ShareImageModal');
-              }}
-              onTouchStart={() => {
-                import('../components/ShareImageModal');
-              }}
-              title="Compartir Imagen"
-            >
-              <Share2 size={16} className="hero__btn-icon" />
-              <span className="hero__btn-text">Compartir</span>
-            </button>
+            {!isMobile && (
+              <>
+                <button
+                  className="hero__btn hero__btn--primary"
+                  onClick={onOpenCompareModal}
+                  title={isLiveConnected ? `Radar de Amigos conectado (${connectedFriendCode})` : "Radar de Amigos"}
+                  style={{ position: 'relative' }}
+                >
+                  <Users size={16} className="hero__btn-icon" />
+                  <span className="hero__btn-text">Amigos</span>
+                  {isLiveConnected && (
+                    <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
+                  )}
+                </button>
+                <button
+                  className="hero__btn hero__btn--accent"
+                  onClick={onOpenShareModal}
+                  onMouseEnter={() => {
+                    import('../components/ShareImageModal');
+                  }}
+                  onTouchStart={() => {
+                    import('../components/ShareImageModal');
+                  }}
+                  title="Compartir Imagen"
+                >
+                  <Share2 size={16} className="hero__btn-icon" />
+                  <span className="hero__btn-text">Compartir</span>
+                </button>
+              </>
+            )}
           </div>
 
           <div className="hero__stat-ring">
@@ -320,6 +370,78 @@ export function Header({
           </div>
         </div>
       </div>
+
+      {isMobile && typeof document !== 'undefined' && createPortal(
+        <div className="hero__dock" ref={dockRef}>
+          <Liquid
+                className="hero__gooey"
+                fill="#0b1220"
+                blur={12}
+                contrast={18}
+                filterPadding={180}
+                shadow="0 10px 24px rgba(0, 0, 0, 0.45)"
+              >
+                <Liquid.Item x={0} y={actionsOpen ? -62 : 0} delay={40} transition={gooeyTransition}>
+                  <div className={`hero__fab-slot${actionsOpen ? ' is-open' : ''}`}>
+                    <button
+                      className="hero__fab"
+                      onClick={() => {
+                        setActionsOpen(false);
+                        onOpenCompareModal();
+                      }}
+                      tabIndex={actionsOpen ? 0 : -1}
+                      aria-hidden={!actionsOpen}
+                      title={isLiveConnected ? `Radar de Amigos conectado (${connectedFriendCode})` : 'Radar de Amigos'}
+                      aria-label="Radar de Amigos"
+                    >
+                      <Users size={18} />
+                      {isLiveConnected && (
+                        <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
+                      )}
+                    </button>
+                  </div>
+                </Liquid.Item>
+
+                <Liquid.Item x={0} y={actionsOpen ? -124 : 0} transition={gooeyTransition}>
+                  <div className={`hero__fab-slot${actionsOpen ? ' is-open' : ''}`}>
+                    <button
+                      className="hero__fab"
+                      onClick={() => {
+                        setActionsOpen(false);
+                        onOpenShareModal();
+                      }}
+                      onMouseEnter={() => {
+                        import('../components/ShareImageModal');
+                      }}
+                      onTouchStart={() => {
+                        import('../components/ShareImageModal');
+                      }}
+                      tabIndex={actionsOpen ? 0 : -1}
+                      aria-hidden={!actionsOpen}
+                      title="Compartir Imagen"
+                      aria-label="Compartir imagen"
+                    >
+                      <Share2 size={18} />
+                    </button>
+                  </div>
+                </Liquid.Item>
+
+                <Liquid.Item>
+                  <button
+                    className={`hero__fab hero__fab--trigger${actionsOpen ? ' is-open' : ''}`}
+                    onClick={() => setActionsOpen((open) => !open)}
+                    aria-expanded={actionsOpen}
+                    aria-label={actionsOpen ? 'Cerrar acciones' : 'Abrir acciones'}
+                    title="Acciones"
+                  >
+                    <Gamepad2 size={20} />
+                  </button>
+                </Liquid.Item>
+              </Liquid>
+        </div>,
+        document.body
+      )}
     </header>
+
   );
 }
