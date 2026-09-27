@@ -1281,6 +1281,10 @@ body::after {
   width: 140px;
   height: 140px;
   pointer-events: none;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .pm {
@@ -1288,6 +1292,8 @@ body::after {
   width: 140px;
   height: 140px;
   pointer-events: none;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 
 .pm-slot {
@@ -7803,7 +7809,7 @@ body::after {
    USER-CONTROLLED MOTION PREFERENCE (.motion-disabled)
    Guarda y respeta la preferencia del usuario en localStorage
    ========================================================================== */
-.motion-disabled *,
+.motion-disabled *:not(.hero__dock, .hero__dock *, .pm, .pm *),
 .motion-disabled *::before,
 .motion-disabled *::after {
   animation-duration: 0.001ms !important;

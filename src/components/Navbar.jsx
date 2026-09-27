@@ -24,15 +24,7 @@ export function Navbar({
       return stored === 'true';
     }
 
-    // 2. Si es primera visita, desactivar por defecto en iPhone / iPad (iOS) para cuidar batería y temperatura
-    const ua = navigator.userAgent || navigator.vendor || '';
-    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-    const isIPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-
-    if (isIOS || isIPadOS) {
-      return false;
-    }
-
+    // 2. Por defecto animaciones fluidas activas en todos los dispositivos
     return true;
   });
   const userDropdownRef = useRef(null);
