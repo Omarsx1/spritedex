@@ -50,31 +50,13 @@ export function Header({
   const actionsRef = useRef(null);
   const dockRef = useRef(null);
 
-  // Menú gooey de acciones (solo móvil): réplica 1:1 de libraries.dev/gooey (PlusMenu)
+  // Menú gooey de acciones (solo móvil): réplica 1:1 de libraries.dev/gooey
   const isMobile = useIsMobile(768);
   const [actionsOpen, setActionsOpen] = useState(false);
-  const [anticipating, setAnticipating] = useState(false);
-  const anticipTimerRef = useRef(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   const toggleActions = useCallback(() => {
-    setActionsOpen((prev) => {
-      const next = !prev;
-      if (!next) {
-        // Anticipación al cerrar como en libraries.dev
-        if (anticipTimerRef.current) clearTimeout(anticipTimerRef.current);
-        setAnticipating(false);
-        requestAnimationFrame(() => setAnticipating(true));
-        anticipTimerRef.current = setTimeout(() => setAnticipating(false), 700);
-      }
-      return next;
-    });
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (anticipTimerRef.current) clearTimeout(anticipTimerRef.current);
-    };
+    setActionsOpen((prev) => !prev);
   }, []);
 
   useEffect(() => {
@@ -110,11 +92,7 @@ export function Header({
     };
   }, [actionsOpen, toggleActions]);
 
-  const gooeyTransition = prefersReducedMotion
-    ? { duration: 0 }
-    : actionsOpen
-      ? { duration: 550, ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }
-      : { duration: 250, ease: 'cubic-bezier(0.22, 1, 0.36, 1)' };
+  const gooeyTransition = prefersReducedMotion ? { duration: 0 } : 'bouncy';
   const currentSprite = spritePool[spriteIndex] || spritePool[0];
 
   // Progress percentages
@@ -400,15 +378,15 @@ export function Header({
           <Liquid
             blur={6}
             contrast={18}
-            fill="#202020"
+            fill="#6366f1"
             filterPadding={120}
-            shadow="0 0 0 1px rgba(255, 255, 255, 0.04) inset, 0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 0 0 1px rgba(0, 0, 0, 0.06), 0 2px 6px 0 rgba(0, 0, 0, 0.05), 0 4px 42px 0 rgba(0, 0, 0, 0.24)"
-            className={`pm ${actionsOpen ? 'pm-open' : ''} ${anticipating ? 'pm-anticipating' : ''}`}
+            shadow="0 0 22px rgba(99, 102, 241, 0.45), 0 4px 14px rgba(0, 0, 0, 0.4)"
+            className={`pm ${actionsOpen ? 'pm-open' : ''}`}
           >
             <Liquid.Item
               className="pm-slot"
-              x={actionsOpen ? -54 : 0}
-              y={actionsOpen ? -34 : 0}
+              x={actionsOpen ? -72 : 0}
+              y={actionsOpen ? -20 : 0}
               transition={gooeyTransition}
               delay={actionsOpen ? 0 : 0}
             >
@@ -425,20 +403,20 @@ export function Header({
                 <span
                   className="pm-sat-icon"
                   style={{
-                    transitionDelay: actionsOpen ? '120ms' : '0ms'
+                    transitionDelay: actionsOpen ? '90ms' : '0ms'
                   }}
                 >
-                  <Users size={17} strokeWidth={1.8} />
+                  <Users size={18} strokeWidth={2} />
                 </span>
               </button>
             </Liquid.Item>
 
             <Liquid.Item
               className="pm-slot"
-              x={0}
-              y={actionsOpen ? -64 : 0}
+              x={actionsOpen ? -20 : 0}
+              y={actionsOpen ? -72 : 0}
               transition={gooeyTransition}
-              delay={actionsOpen ? 40 : 0}
+              delay={actionsOpen ? 25 : 0}
             >
               <button
                 type="button"
@@ -459,10 +437,10 @@ export function Header({
                 <span
                   className="pm-sat-icon"
                   style={{
-                    transitionDelay: actionsOpen ? '160ms' : '0ms'
+                    transitionDelay: actionsOpen ? '130ms' : '0ms'
                   }}
                 >
-                  <Share2 size={17} strokeWidth={1.8} />
+                  <Share2 size={18} strokeWidth={2} />
                 </span>
               </button>
             </Liquid.Item>
@@ -475,10 +453,9 @@ export function Header({
                 aria-label={actionsOpen ? 'Cerrar acciones' : 'Abrir acciones'}
                 onClick={toggleActions}
               >
-                <span className="pm-plus">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
-                    <path d="M10 4V16M4 10H16" />
-                  </svg>
+                <span className="pm-main-icon-wrap">
+                  <Gamepad2 size={20} strokeWidth={2} className={`pm-icon-pad ${actionsOpen ? 'is-hidden' : ''}`} />
+                  <X size={19} strokeWidth={2.2} className={`pm-icon-close ${actionsOpen ? 'is-visible' : ''}`} />
                 </span>
               </button>
             </Liquid.Item>
