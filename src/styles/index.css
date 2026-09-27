@@ -3267,7 +3267,7 @@ body::after {
 /* 3. Mobile Swiper Crown - Calibrado idéntico a Fortnite sobre la coronilla de la cabeza */
 .ms-card__crown {
   position: absolute;
-  top: 15px;
+  top: 20px;
   left: 51%;
   right: auto;
   transform: translateX(-10%) rotate(8deg);
