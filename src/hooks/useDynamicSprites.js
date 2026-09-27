@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES, SUMMON_COST_OVERRIDES, WEBP_MAP } from '../data/spritesData';
+import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES, SUMMON_COST_OVERRIDES, WEBP_MAP, getSpriteThumb } from '../data/spritesData';
 import { supabase, isSupabaseConfigured } from '../utils/supabase';
 
 export const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache_v2';
@@ -269,6 +269,7 @@ export function useDynamicSprites() {
               variantDisplay: sanitized.variant_display || sanitized.variant || baseStatic?.variantDisplay,
               gen: sanitized.gen || baseStatic?.gen || 2,
               image: WEBP_MAP[sanitized.id] || sanitized.image || baseStatic?.image,
+              thumb: getSpriteThumb(sanitized.id) || baseStatic?.thumb || null,
               ability: (hasRealCustomAbility ? sanitized.ability : null) || SPIRIT_DATA_OVERRIDES[sanitized.id]?.ability || baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.',
               specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base') 
                 ? '' 

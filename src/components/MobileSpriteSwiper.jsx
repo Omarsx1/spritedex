@@ -85,6 +85,8 @@ function FamilySpotlightRow({
   const dragOffsetRef = useRef(0);
   const trackRef = useRef(null);
   const rafRef = useRef(0);
+  const rowRef = useRef(null);
+  const prefetchedRef = useRef(false);
 
   const goTo = useCallback((nextIdx) => {
     const target = Math.min(Math.max(0, nextIdx), count - 1);
@@ -97,6 +99,26 @@ function FamilySpotlightRow({
   useEffect(() => () => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
   }, []);
+
+  // Precarga las miniaturas de la fila antes de que entre en pantalla.
+  useEffect(() => {
+    const el = rowRef.current;
+    if (!el || prefetchedRef.current || typeof IntersectionObserver === 'undefined') return undefined;
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      prefetchedRef.current = true;
+      variants.forEach((v) => {
+        const src = v.thumb || v.image;
+        if (!src) return;
+        const img = new Image();
+        img.decoding = 'async';
+        img.src = src;
+      });
+      io.disconnect();
+    }, { rootMargin: '250% 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [variants]);
 
   // Aplica el desplazamiento sin re-renderizar: un solo rAF escribe el transform.
   const applyDrag = (diffX, diffY, moveThreshold) => {
@@ -362,7 +384,7 @@ function FamilySpotlightRow({
               />
             )}
             <img
-              src={sprite.image}
+              src={sprite.thumb || sprite.image}
               alt={sprite.fullName}
               loading="lazy"
               decoding="async"
@@ -449,7 +471,7 @@ function FamilySpotlightRow({
   };
 
   return (
-    <div className="ms-family-row">
+    <div className="ms-family-row" ref={rowRef}>
       {/* Header con nombre de familia y puntos de variantes a la derecha */}
       <div className="ms-family-header">
         <span className="ms-family-name">{familyName}</span>

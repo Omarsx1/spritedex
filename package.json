@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "sync-sprites": "node scripts/sync-sprites.js"
+    "sync-sprites": "node scripts/sync-sprites.js",
+    "thumbs": "node scripts/generate_sprite_thumbs.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.2",

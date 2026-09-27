@@ -104,7 +104,7 @@ export function SpriteCard({
             />
           )}
           <img
-            src={sprite.image}
+            src={sprite.thumb || sprite.image}
             alt={sprite.fullName}
             loading={index < 8 ? "eager" : "lazy"}
             fetchPriority={index < 4 ? "high" : "auto"}
@@ -259,7 +259,7 @@ export function SpriteCard({
           />
         )}
         <img
-          src={sprite.image}
+          src={sprite.thumb || sprite.image}
           alt={sprite.fullName}
           loading={index < 8 ? "eager" : "lazy"}
           fetchPriority={index < 4 ? "high" : "auto"}

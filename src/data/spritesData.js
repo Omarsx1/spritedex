@@ -1,6 +1,15 @@
 import officialSpritesJson from './official_sprites.json';
 import fortniteGgJson from './fortnite_gg_sprites_complete.json';
 
+// Miniaturas WebP para tarjetas, generadas por scripts/generate_sprite_thumbs.js.
+import spriteThumbsJson from './sprite_thumbs.json';
+
+export const SPRITE_THUMBS = spriteThumbsJson;
+
+export function getSpriteThumb(id) {
+  return id && spriteThumbsJson[id] ? spriteThumbsJson[id] : null;
+}
+
 // Mapa de búsqueda rápida por nombre normalizado de Fortnite.gg
 const fortniteGgMap = new Map();
 if (Array.isArray(fortniteGgJson)) {
@@ -926,6 +935,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     releaseDate: relDateVal || null,
     release_date: relDateVal || null,
     image: imagePath,
+    thumb: getSpriteThumb(item.id),
     familyId: familyId,
     familyName: spanishFamilyName,
     location: official?.location || 'Cofres de Sprite & Zonas de Extracción',
