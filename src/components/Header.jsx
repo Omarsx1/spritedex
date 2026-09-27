@@ -401,6 +401,7 @@ export function Header({
             blur={6}
             contrast={18}
             fill="#202020"
+            filterPadding={80}
             shadow="0 0 0 1px rgba(255, 255, 255, 0.04) inset, 0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 0 0 1px rgba(0, 0, 0, 0.06), 0 2px 6px 0 rgba(0, 0, 0, 0.05), 0 4px 42px 0 rgba(0, 0, 0, 0.24)"
             className={`pm ${actionsOpen ? 'pm-open' : ''} ${anticipating ? 'pm-anticipating' : ''}`}
           >
@@ -427,10 +428,7 @@ export function Header({
                     transitionDelay: actionsOpen ? '120ms' : '0ms'
                   }}
                 >
-                  <Users size={17} />
-                  {isLiveConnected && (
-                    <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
-                  )}
+                  <Users size={17} strokeWidth={1.8} />
                 </span>
               </button>
             </Liquid.Item>
@@ -464,7 +462,7 @@ export function Header({
                     transitionDelay: actionsOpen ? '160ms' : '0ms'
                   }}
                 >
-                  <Share2 size={17} />
+                  <Share2 size={17} strokeWidth={1.8} />
                 </span>
               </button>
             </Liquid.Item>
