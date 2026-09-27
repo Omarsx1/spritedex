@@ -472,10 +472,12 @@ function FamilySpotlightRow({
 
   return (
     <div className="ms-family-row" ref={rowRef}>
-      {/* Header con nombre de familia y puntos de variantes a la derecha */}
-      <div className="ms-family-header">
-        <span className="ms-family-name">{familyName}</span>
-        {count > 1 && (
+      {/* Header con hint de variantes a la izquierda y puntos a la derecha (solo si hay más de 1 variante) */}
+      {count > 1 && (
+        <div className="ms-family-header">
+          <span className="ms-family-hint">
+            Desliza para ver {count} variantes →
+          </span>
           <span className="ms-family-dots">
             {variants.map((v, i) => {
               const isVarOwned = isFriendView ? friendState?.[v.id]?.owned : userState[v.id]?.owned;
@@ -492,8 +494,8 @@ function FamilySpotlightRow({
               );
             })}
           </span>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Escenario de navegación */}
       {count === 1 ? (
@@ -519,13 +521,6 @@ function FamilySpotlightRow({
           >
             {variants.map((v, i) => renderCard(v, i, i === safeActiveIdx))}
           </div>
-        </div>
-      )}
-
-      {/* Hint inferior si hay más de 1 variante */}
-      {count > 1 && (
-        <div className="ms-swipe-hint">
-          Desliza para ver {count} variantes →
         </div>
       )}
     </div>
