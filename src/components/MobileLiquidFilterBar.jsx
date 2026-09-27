@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, SlidersHorizontal, X, RotateCcw } from 'lucide-react';
 import { THEMES_LIST, THEME_NAMES_ES, ALL_SPRITES, FAMILY_NAMES_MAP } from '../data/spritesData';
 import { safeStorage } from '../utils/safeStorage';
@@ -372,7 +373,7 @@ export function MobileLiquidFilterBar({
       )}
 
       {/* ═══ CONSISTENT GLASS FILTER SHEET / MODAL ═══ */}
-      {isOpen && (
+      {isOpen && typeof document !== 'undefined' && createPortal(
         <div
           className={`mobile-liquid-sheet-backdrop ${isClosing ? 'is-closing' : ''}`}
           onClick={handleBackdropClick}
@@ -528,7 +529,8 @@ export function MobileLiquidFilterBar({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
