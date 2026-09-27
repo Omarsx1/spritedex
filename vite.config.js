@@ -4,6 +4,12 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  // Vercel expone VERCEL_ENV ('production' | 'preview' | 'development') en el build.
+  // Se inyecta como constante para que la app pueda saltarse la sesion anonima y la
+  // telemetria en previews, sin depender del hostname.
+  define: {
+    __VERCEL_ENV__: JSON.stringify(process.env.VERCEL_ENV || '')
+  },
   build: {
     rollupOptions: {
       output: {
@@ -27,4 +33,3 @@ export default defineConfig({
     }
   }
 })
-

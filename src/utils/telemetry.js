@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured, isLocalEnvironment } from './supabase';
+import { supabase, isSupabaseConfigured, isLocalEnvironment, isPreviewEnvironment, isAutomatedClient, isAdminPortalPath } from './supabase';
 import { allSprites } from '../data/spritesData';
 import { safeStorage } from './safeStorage';
 
@@ -230,11 +230,7 @@ export function isTelemetryIgnored() {
         sessionAdmin !== null) {
       return true;
     }
-    const path = window.location.pathname.toLowerCase();
-    const search = window.location.search.toLowerCase();
-    if (path.includes('studio') || path.includes('override') || path.includes('nexus') ||
-        search.includes('studio') || search.includes('override') ||
-        isLocalEnvironment()) {
+    if (isAdminPortalPath() || isLocalEnvironment() || isPreviewEnvironment() || isAutomatedClient()) {
       safeStorage.setItem('spritedex_ignore_telemetry', 'true');
       return true;
     }
