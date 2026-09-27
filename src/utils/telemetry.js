@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from './supabase';
+import { supabase, isSupabaseConfigured, isLocalEnvironment } from './supabase';
 import { allSprites } from '../data/spritesData';
 import { safeStorage } from './safeStorage';
 
@@ -232,10 +232,9 @@ export function isTelemetryIgnored() {
     }
     const path = window.location.pathname.toLowerCase();
     const search = window.location.search.toLowerCase();
-    const host = window.location.hostname.toLowerCase();
     if (path.includes('studio') || path.includes('override') || path.includes('nexus') ||
         search.includes('studio') || search.includes('override') ||
-        host === 'localhost' || host === '127.0.0.1') {
+        isLocalEnvironment()) {
       safeStorage.setItem('spritedex_ignore_telemetry', 'true');
       return true;
     }
