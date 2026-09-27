@@ -23,7 +23,7 @@ import { useDynamicSprites } from './hooks/useDynamicSprites';
 import { trackEvent, resolveCountry } from './utils/telemetry';
 import { isUserAdminAuthenticated } from './utils/adminAuth';
 import { decodeCollectionState } from './utils/shareLink';
-import { supabase, isSupabaseConfigured } from './utils/supabase';
+import { supabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from './utils/supabase';
 import { safeStorage } from './utils/safeStorage';
 import {
   getMyFriendCode,
@@ -212,7 +212,7 @@ export function App() {
 
       // Inicialización silenciosa de sesión en segundo plano para que el código de amigo
       // y la colección del usuario queden respaldados y accesibles para sus amigos en Supabase.
-      if (!currentUser && isSupabaseConfigured && supabase) {
+      if (!currentUser && isSupabaseConfigured && supabase && !shouldSkipAnonymousAuth()) {
         try {
           const { data: anonData } = await supabase.auth.signInAnonymously();
           if (anonData?.user) {
@@ -352,7 +352,7 @@ export function App() {
   }, [userState, user, myFriendCode]);
 
   const ensureCloudSessionForAction = useCallback(async () => {
-    if (user || !isSupabaseConfigured || !supabase) return;
+    if (user || !isSupabaseConfigured || !supabase || shouldSkipAnonymousAuth()) return;
     try {
       const { data } = await supabase.auth.signInAnonymously();
       if (data?.user) {
