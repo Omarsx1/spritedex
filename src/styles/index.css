@@ -1292,6 +1292,7 @@ body::after {
   position: absolute;
   top: 0;
   left: 0;
+  border-radius: 50%;
 }
 
 .hero__fab-slot {
@@ -1314,8 +1315,9 @@ body::after {
   justify-content: center;
   position: relative;
   background: #0b1220;
-  color: #dbe4f5;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #e6edf7;
+  /* Sin borde: el líquido y los botones deben leerse como una sola superficie */
+  border: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.18s ease, color 0.18s ease, border-color 0.18s ease;
@@ -1326,13 +1328,11 @@ body::after {
 }
 
 .hero__fab--trigger {
-  color: #7dd3fc;
-  border-color: rgba(14, 165, 233, 0.45);
+  color: #e6edf7;
 }
 
 .hero__fab--trigger.is-open {
-  color: #f0f9ff;
-  border-color: rgba(14, 165, 233, 0.8);
+  color: #7dd3fc;
 }
 
 .hero__btn::before {
@@ -7786,5 +7786,4 @@ body::after {
 .motion-disabled .mobile-new-coachmark {
   animation: none !important;
 }
-
 

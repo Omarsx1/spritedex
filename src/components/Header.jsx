@@ -381,7 +381,7 @@ export function Header({
                 filterPadding={180}
                 shadow="0 10px 24px rgba(0, 0, 0, 0.45)"
               >
-                <Liquid.Item x={0} y={actionsOpen ? -62 : 0} delay={40} transition={gooeyTransition}>
+                <Liquid.Item radius={24} x={actionsOpen ? -46 : 0} y={actionsOpen ? -28 : 0} delay={40} transition={gooeyTransition}>
                   <div className={`hero__fab-slot${actionsOpen ? ' is-open' : ''}`}>
                     <button
                       className="hero__fab"
@@ -402,7 +402,7 @@ export function Header({
                   </div>
                 </Liquid.Item>
 
-                <Liquid.Item x={0} y={actionsOpen ? -124 : 0} transition={gooeyTransition}>
+                <Liquid.Item radius={24} x={0} y={actionsOpen ? -58 : 0} transition={gooeyTransition}>
                   <div className={`hero__fab-slot${actionsOpen ? ' is-open' : ''}`}>
                     <button
                       className="hero__fab"
@@ -426,7 +426,7 @@ export function Header({
                   </div>
                 </Liquid.Item>
 
-                <Liquid.Item>
+                <Liquid.Item radius={24}>
                   <button
                     className={`hero__fab hero__fab--trigger${actionsOpen ? ' is-open' : ''}`}
                     onClick={() => setActionsOpen((open) => !open)}
