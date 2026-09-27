@@ -50,10 +50,32 @@ export function Header({
   const actionsRef = useRef(null);
   const dockRef = useRef(null);
 
-  // Menú gooey de acciones (solo móvil): el mando esconde Amigos y Compartir.
-  const isMobile = useIsMobile(600);
+  // Menú gooey de acciones (solo móvil): réplica 1:1 de libraries.dev/gooey (PlusMenu)
+  const isMobile = useIsMobile(768);
   const [actionsOpen, setActionsOpen] = useState(false);
+  const [anticipating, setAnticipating] = useState(false);
+  const anticipTimerRef = useRef(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  const toggleActions = useCallback(() => {
+    setActionsOpen((prev) => {
+      const next = !prev;
+      if (!next) {
+        // Anticipación al cerrar como en libraries.dev
+        if (anticipTimerRef.current) clearTimeout(anticipTimerRef.current);
+        setAnticipating(false);
+        requestAnimationFrame(() => setAnticipating(true));
+        anticipTimerRef.current = setTimeout(() => setAnticipating(false), 700);
+      }
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (anticipTimerRef.current) clearTimeout(anticipTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return undefined;
@@ -73,11 +95,11 @@ export function Header({
   useEffect(() => {
     if (!actionsOpen) return undefined;
     const onKeyDown = (event) => {
-      if (event.key === 'Escape') setActionsOpen(false);
+      if (event.key === 'Escape') toggleActions();
     };
     const onPointerDown = (event) => {
       if (dockRef.current && !dockRef.current.contains(event.target)) {
-        setActionsOpen(false);
+        toggleActions();
       }
     };
     document.addEventListener('keydown', onKeyDown);
@@ -86,9 +108,13 @@ export function Header({
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('pointerdown', onPointerDown);
     };
-  }, [actionsOpen]);
+  }, [actionsOpen, toggleActions]);
 
-  const gooeyTransition = prefersReducedMotion ? { duration: 0 } : 'bouncy';
+  const gooeyTransition = prefersReducedMotion
+    ? { duration: 0 }
+    : actionsOpen
+      ? { duration: 550, ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }
+      : { duration: 250, ease: 'cubic-bezier(0.22, 1, 0.36, 1)' };
   const currentSprite = spritePool[spriteIndex] || spritePool[0];
 
   // Progress percentages
@@ -372,85 +398,89 @@ export function Header({
       {isMobile && typeof document !== 'undefined' && createPortal(
         <div className="hero__dock" ref={dockRef}>
           <Liquid
-            className="hero__gooey"
-            fill="#121826"
             blur={6}
             contrast={18}
-            filterPadding={80}
-            shadow="0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12)"
+            fill="#202020"
+            shadow="0 0 0 1px rgba(255, 255, 255, 0.04) inset, 0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 0 0 1px rgba(0, 0, 0, 0.06), 0 2px 6px 0 rgba(0, 0, 0, 0.05), 0 4px 42px 0 rgba(0, 0, 0, 0.24)"
+            className={`pm ${actionsOpen ? 'pm-open' : ''} ${anticipating ? 'pm-anticipating' : ''}`}
           >
             <Liquid.Item
-              radius={24}
-              x={actionsOpen ? -68 : 0}
-              y={actionsOpen ? -36 : 0}
-              delay={actionsOpen ? 30 : 0}
+              className="pm-slot"
+              x={actionsOpen ? -54 : 0}
+              y={actionsOpen ? -34 : 0}
               transition={gooeyTransition}
+              delay={actionsOpen ? 0 : 0}
             >
-              <div className={`hero__fab-slot${actionsOpen ? ' is-open' : ''}`}>
-                <button
-                  className="hero__fab hero__fab--satellite"
-                  onClick={() => {
-                    setActionsOpen(false);
-                    onOpenCompareModal();
+              <button
+                type="button"
+                className="pm-btn pm-sat"
+                aria-label="Radar de Amigos"
+                tabIndex={actionsOpen ? 0 : -1}
+                onClick={() => {
+                  toggleActions();
+                  onOpenCompareModal();
+                }}
+              >
+                <span
+                  className="pm-sat-icon"
+                  style={{
+                    transitionDelay: actionsOpen ? '120ms' : '0ms'
                   }}
-                  tabIndex={actionsOpen ? 0 : -1}
-                  aria-hidden={!actionsOpen}
-                  title={isLiveConnected ? `Radar de Amigos conectado (${connectedFriendCode})` : 'Radar de Amigos'}
-                  aria-label="Radar de Amigos"
                 >
-                  <span className="hero__fab-sat-icon">
-                    <Users size={19} />
-                    {isLiveConnected && (
-                      <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
-                    )}
-                  </span>
-                </button>
-              </div>
+                  <Users size={17} />
+                  {isLiveConnected && (
+                    <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
+                  )}
+                </span>
+              </button>
             </Liquid.Item>
 
             <Liquid.Item
-              radius={24}
+              className="pm-slot"
               x={0}
-              y={actionsOpen ? -72 : 0}
-              delay={actionsOpen ? 60 : 0}
+              y={actionsOpen ? -64 : 0}
               transition={gooeyTransition}
+              delay={actionsOpen ? 40 : 0}
             >
-              <div className={`hero__fab-slot${actionsOpen ? ' is-open' : ''}`}>
-                <button
-                  className="hero__fab hero__fab--satellite"
-                  onClick={() => {
-                    setActionsOpen(false);
-                    onOpenShareModal();
+              <button
+                type="button"
+                className="pm-btn pm-sat"
+                aria-label="Compartir imagen"
+                tabIndex={actionsOpen ? 0 : -1}
+                onClick={() => {
+                  toggleActions();
+                  onOpenShareModal();
+                }}
+                onMouseEnter={() => {
+                  import('../components/ShareImageModal');
+                }}
+                onTouchStart={() => {
+                  import('../components/ShareImageModal');
+                }}
+              >
+                <span
+                  className="pm-sat-icon"
+                  style={{
+                    transitionDelay: actionsOpen ? '160ms' : '0ms'
                   }}
-                  onMouseEnter={() => {
-                    import('../components/ShareImageModal');
-                  }}
-                  onTouchStart={() => {
-                    import('../components/ShareImageModal');
-                  }}
-                  tabIndex={actionsOpen ? 0 : -1}
-                  aria-hidden={!actionsOpen}
-                  title="Compartir Imagen"
-                  aria-label="Compartir imagen"
                 >
-                  <span className="hero__fab-sat-icon">
-                    <Share2 size={19} />
-                  </span>
-                </button>
-              </div>
+                  <Share2 size={17} />
+                </span>
+              </button>
             </Liquid.Item>
 
-            <Liquid.Item radius={24} transition={gooeyTransition}>
+            <Liquid.Item className="pm-slot">
               <button
-                className={`hero__fab hero__fab--trigger${actionsOpen ? ' is-open' : ''}`}
-                onClick={() => setActionsOpen((open) => !open)}
+                type="button"
+                className="pm-btn pm-main"
                 aria-expanded={actionsOpen}
                 aria-label={actionsOpen ? 'Cerrar acciones' : 'Abrir acciones'}
-                title="Acciones"
+                onClick={toggleActions}
               >
-                <span className="hero__fab-icon-wrap">
-                  <Gamepad2 size={20} className={`hero__fab-icon hero__fab-icon--gamepad${actionsOpen ? ' is-hidden' : ''}`} />
-                  <X size={20} className={`hero__fab-icon hero__fab-icon--close${actionsOpen ? ' is-visible' : ''}`} />
+                <span className="pm-plus">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+                    <path d="M10 4V16M4 10H16" />
+                  </svg>
                 </span>
               </button>
             </Liquid.Item>
