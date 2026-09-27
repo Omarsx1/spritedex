@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import { Gamepad2, Share2, Users } from 'lucide-react';
+import { Gamepad2, Share2, Users, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import gsap from 'gsap';
 import { Liquid } from 'liquid-gooey';
@@ -88,9 +88,7 @@ export function Header({
     };
   }, [actionsOpen]);
 
-  const gooeyTransition = prefersReducedMotion
-    ? { duration: 0 }
-    : { duration: 550, ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)' };
+  const gooeyTransition = prefersReducedMotion ? { duration: 0 } : 'bouncy';
   const currentSprite = spritePool[spriteIndex] || spritePool[0];
 
   // Progress percentages
@@ -374,70 +372,89 @@ export function Header({
       {isMobile && typeof document !== 'undefined' && createPortal(
         <div className="hero__dock" ref={dockRef}>
           <Liquid
-                className="hero__gooey"
-                fill="#0b1220"
-                blur={12}
-                contrast={18}
-                filterPadding={180}
-                shadow="0 10px 24px rgba(0, 0, 0, 0.45)"
+            className="hero__gooey"
+            fill="#121826"
+            blur={6}
+            contrast={18}
+            filterPadding={80}
+            shadow="0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12)"
+          >
+            <Liquid.Item
+              radius={24}
+              x={actionsOpen ? -68 : 0}
+              y={actionsOpen ? -36 : 0}
+              delay={actionsOpen ? 30 : 0}
+              transition={gooeyTransition}
+            >
+              <div className={`hero__fab-slot${actionsOpen ? ' is-open' : ''}`}>
+                <button
+                  className="hero__fab hero__fab--satellite"
+                  onClick={() => {
+                    setActionsOpen(false);
+                    onOpenCompareModal();
+                  }}
+                  tabIndex={actionsOpen ? 0 : -1}
+                  aria-hidden={!actionsOpen}
+                  title={isLiveConnected ? `Radar de Amigos conectado (${connectedFriendCode})` : 'Radar de Amigos'}
+                  aria-label="Radar de Amigos"
+                >
+                  <span className="hero__fab-sat-icon">
+                    <Users size={19} />
+                    {isLiveConnected && (
+                      <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
+                    )}
+                  </span>
+                </button>
+              </div>
+            </Liquid.Item>
+
+            <Liquid.Item
+              radius={24}
+              x={0}
+              y={actionsOpen ? -72 : 0}
+              delay={actionsOpen ? 60 : 0}
+              transition={gooeyTransition}
+            >
+              <div className={`hero__fab-slot${actionsOpen ? ' is-open' : ''}`}>
+                <button
+                  className="hero__fab hero__fab--satellite"
+                  onClick={() => {
+                    setActionsOpen(false);
+                    onOpenShareModal();
+                  }}
+                  onMouseEnter={() => {
+                    import('../components/ShareImageModal');
+                  }}
+                  onTouchStart={() => {
+                    import('../components/ShareImageModal');
+                  }}
+                  tabIndex={actionsOpen ? 0 : -1}
+                  aria-hidden={!actionsOpen}
+                  title="Compartir Imagen"
+                  aria-label="Compartir imagen"
+                >
+                  <span className="hero__fab-sat-icon">
+                    <Share2 size={19} />
+                  </span>
+                </button>
+              </div>
+            </Liquid.Item>
+
+            <Liquid.Item radius={24} transition={gooeyTransition}>
+              <button
+                className={`hero__fab hero__fab--trigger${actionsOpen ? ' is-open' : ''}`}
+                onClick={() => setActionsOpen((open) => !open)}
+                aria-expanded={actionsOpen}
+                aria-label={actionsOpen ? 'Cerrar acciones' : 'Abrir acciones'}
+                title="Acciones"
               >
-                <Liquid.Item radius={24} x={actionsOpen ? -46 : 0} y={actionsOpen ? -28 : 0} delay={40} transition={gooeyTransition}>
-                  <div className={`hero__fab-slot${actionsOpen ? ' is-open' : ''}`}>
-                    <button
-                      className="hero__fab"
-                      onClick={() => {
-                        setActionsOpen(false);
-                        onOpenCompareModal();
-                      }}
-                      tabIndex={actionsOpen ? 0 : -1}
-                      aria-hidden={!actionsOpen}
-                      title={isLiveConnected ? `Radar de Amigos conectado (${connectedFriendCode})` : 'Radar de Amigos'}
-                      aria-label="Radar de Amigos"
-                    >
-                      <Users size={18} />
-                      {isLiveConnected && (
-                        <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
-                      )}
-                    </button>
-                  </div>
-                </Liquid.Item>
-
-                <Liquid.Item radius={24} x={0} y={actionsOpen ? -58 : 0} transition={gooeyTransition}>
-                  <div className={`hero__fab-slot${actionsOpen ? ' is-open' : ''}`}>
-                    <button
-                      className="hero__fab"
-                      onClick={() => {
-                        setActionsOpen(false);
-                        onOpenShareModal();
-                      }}
-                      onMouseEnter={() => {
-                        import('../components/ShareImageModal');
-                      }}
-                      onTouchStart={() => {
-                        import('../components/ShareImageModal');
-                      }}
-                      tabIndex={actionsOpen ? 0 : -1}
-                      aria-hidden={!actionsOpen}
-                      title="Compartir Imagen"
-                      aria-label="Compartir imagen"
-                    >
-                      <Share2 size={18} />
-                    </button>
-                  </div>
-                </Liquid.Item>
-
-                <Liquid.Item radius={24}>
-                  <button
-                    className={`hero__fab hero__fab--trigger${actionsOpen ? ' is-open' : ''}`}
-                    onClick={() => setActionsOpen((open) => !open)}
-                    aria-expanded={actionsOpen}
-                    aria-label={actionsOpen ? 'Cerrar acciones' : 'Abrir acciones'}
-                    title="Acciones"
-                  >
-                    <Gamepad2 size={20} />
-                  </button>
-                </Liquid.Item>
-              </Liquid>
+                <span className="hero__fab-icon-wrap">
+                  <Gamepad2 size={20} className={`hero__fab-icon hero__fab-icon--gamepad${actionsOpen ? ' is-hidden' : ''}`} />
+                  <X size={20} className={`hero__fab-icon hero__fab-icon--close${actionsOpen ? ' is-visible' : ''}`} />
+                </span>
+              </button>
+            </Liquid.Item>
+          </Liquid>
         </div>,
         document.body
       )}
