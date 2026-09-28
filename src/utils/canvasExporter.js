@@ -1,6 +1,8 @@
 // HTML5 Canvas Exporter for Social Media - Estilo Oficial GLITCH / OVERRIDE
 // Inspirado en el diseño 'CHAPTER 7 | SEASON 4: OVERRIDE' de Fortnite
-import { generateQRMatrix } from './qrGenerator';
+// Extension explicita: Vite resuelve igual, y asi el modulo tambien carga en Node
+// (el runner de pruebas nativo no completa extensiones).
+import { generateQRMatrix } from './qrGenerator.js';
 
 // Caché en memoria de matriz QR para evitar recalcular polinomios en cada exportación
 let cachedQRMatrix = null;

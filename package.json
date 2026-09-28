@@ -8,6 +8,8 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
+    "test": "node --test",
+    "smoke": "node scripts/smoke-share.mjs",
     "sync-sprites": "node scripts/sync-sprites.js",
     "thumbs": "node scripts/generate_sprite_thumbs.js"
   },
