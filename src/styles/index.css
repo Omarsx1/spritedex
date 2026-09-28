@@ -644,12 +644,18 @@ body::after {
 }
 
 .app-navbar__dropdown-item--danger {
-  color: #f87171;
+  justify-content: center;
+  margin-top: 6px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #fff5f5;
+  background: #dc2626;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .app-navbar__dropdown-item--danger:hover {
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
+  background: #ef4444;
+  color: #ffffff;
 }
 
 /* --- Responsive --- */
