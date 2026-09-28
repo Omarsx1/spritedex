@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Download, User, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone } from 'lucide-react';
+import { Download, User, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone, AlertTriangle } from 'lucide-react';
 import { getSupabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
 import { safeStorage } from '../utils/safeStorage';
@@ -14,6 +14,9 @@ export function Navbar({
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
+  // Sesion anonima (acceso rapido 1-clic): su progreso solo vive en este dispositivo.
+  // Debe verlo claro y tener a mano el camino para vincular su cuenta.
+  const esAnonimo = Boolean(user?.is_anonymous);
   const myFriendCode = useMemo(() => getMyFriendCode(user?.id), [user]);
   const [animationsEnabled, setAnimationsEnabled] = useState(() => {
     if (typeof window === 'undefined') return true;
@@ -190,14 +193,21 @@ export function Navbar({
                   )}
                   <div className="app-navbar__dropdown-meta">
                     <span className="app-navbar__dropdown-name">{fullName}</span>
-                    <span className="app-navbar__dropdown-email">{user.email || 'Sesión Activa'}</span>
+                    <span className="app-navbar__dropdown-email">{user.email || (esAnonimo ? 'Sesión de invitado' : 'Sesión Activa')}</span>
                   </div>
                 </div>
 
-                <div className="app-navbar__dropdown-status">
-                  <ShieldCheck size={13} color="#10b981" />
-                  <span>Sincronizado en la nube</span>
-                </div>
+                {esAnonimo ? (
+                  <div className="app-navbar__dropdown-status app-navbar__dropdown-status--aviso">
+                    <AlertTriangle size={13} color="#fbbf24" />
+                    <span>Solo en este dispositivo</span>
+                  </div>
+                ) : (
+                  <div className="app-navbar__dropdown-status">
+                    <ShieldCheck size={13} color="#10b981" />
+                    <span>Sincronizado en la nube</span>
+                  </div>
+                )}
 
                 <div style={{
                   marginTop: '8px',
@@ -218,6 +228,22 @@ export function Navbar({
               </div>
 
               <div className="app-navbar__dropdown-divider" />
+
+              {esAnonimo && (
+                <>
+                  <p className="app-navbar__dropdown-nota">
+                    Tu progreso está guardado solo aquí. Si cierras sesión o cambias de
+                    dispositivo, no podrías recuperarlo. Vincula tu cuenta para conservarlo.
+                  </p>
+                  <button
+                    onClick={() => { setIsUserMenuOpen(false); onOpenAuthModal(); }}
+                    className="app-navbar__dropdown-item app-navbar__dropdown-item--vincular"
+                  >
+                    <ShieldCheck size={15} />
+                    <span>Vincular con Google o correo</span>
+                  </button>
+                </>
+              )}
 
               <button
                 onClick={handleSignOutClick}

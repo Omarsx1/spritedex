@@ -577,6 +577,27 @@ body::after {
   width: fit-content;
 }
 
+/* Aviso para la sesion anonima: su progreso no viaja a otro dispositivo */
+.app-navbar__dropdown-status--aviso {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+.app-navbar__dropdown-nota {
+  margin: 8px 0 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: #94a3b8;
+}
+
+.app-navbar__dropdown-item--vincular {
+  margin-top: 8px;
+  color: #00f0e8;
+  background: rgba(0, 240, 232, 0.08);
+  border: 1px solid rgba(0, 240, 232, 0.25);
+}
+
 .app-navbar__dropdown-divider {
   height: 1px;
   background: rgba(255, 255, 255, 0.08);
