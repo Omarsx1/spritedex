@@ -28,6 +28,12 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const [isGenerating, setIsGenerating] = useState(() => !initialCached);
   const [isClosing, setIsClosing] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
+  const [perf, setPerf] = useState(null);
+  // Medidor de diagnostico para probar en el telefono: se activa con ?perf=1
+  const showPerf = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return new URLSearchParams(window.location.search).has('perf');
+  }, []);
 
   const modalRef = useRef(null);
   const headerRef = useRef(null);
@@ -42,6 +48,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     if (!canvasToEncode) return;
     const run = () => {
       if (onlyForJobId !== undefined && activeJobIdRef.current !== onlyForJobId) return;
+      const inicioCodificacion = Date.now();
       encodeCanvasToImage(canvasToEncode).then((enc) => {
         if (onlyForJobId !== undefined && activeJobIdRef.current !== onlyForJobId) return;
         const prev = globalTemplatePreviewCache.get(key) || {};
@@ -51,6 +58,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         setCachedFile(enc.file);
         // Persiste para que la proxima visita no tenga que dibujar ni codificar nada.
         if (enc.blob) writeCachedCapture(key, enc.blob);
+        setPerf((previo) => ({ ...(previo || {}), codificacionMs: Date.now() - inicioCodificacion, totalMs: Date.now() - openTimeRef.current }));
       }).catch((err) => {
         console.error('Error codificando la captura:', err);
       });
@@ -171,6 +179,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       setCachedBlob(cached?.blob || null);
       setIsGenerating(false);
       if (cachedCanvas && !url) queuePngEncode(cachedCanvas, currentKey);
+      if (showPerf) setPerf({ cache: 'memoria', totalMs: Date.now() - openTimeRef.current, lienzo: cachedCanvas ? cachedCanvas.width + 'x' + cachedCanvas.height : '' });
       return;
     }
 
@@ -193,9 +202,11 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         setCachedBlob(guardada.blob);
         setCachedFile(guardada.file);
         setIsGenerating(false);
+        if (showPerf) setPerf({ cache: 'disco', totalMs: Date.now() - openTimeRef.current });
         return;
       }
 
+      const inicioDibujo = Date.now();
       generatePokedexCardImage({
         spritesList,
         userState,
@@ -204,10 +215,11 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       }).then((res) => {
         if (activeJobIdRef.current === jobId) {
           const canvasListo = res?.canvas || null;
-          // La captura se pinta ya; el PNG llega despues sin bloquear la vista previa.
+          // La captura se pinta ya; el archivo llega despues sin bloquear la vista previa.
           setPreviewCanvas(canvasListo);
           globalTemplatePreviewCache.set(currentKey, { canvas: canvasListo, url: '', file: null, blob: null });
           setIsGenerating(false);
+          if (showPerf) setPerf({ cache: 'no', dibujoMs: Date.now() - inicioDibujo, lienzo: canvasListo ? canvasListo.width + 'x' + canvasListo.height : '' });
           queuePngEncode(canvasListo, currentKey, jobId);
         }
       }).catch((err) => {
@@ -221,7 +233,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     return () => {
       clearTimeout(timer);
     };
-  }, [spritesList, userState, format, bgStyle, ownedInScope, queuePngEncode]);
+  }, [spritesList, userState, format, bgStyle, ownedInScope, queuePngEncode, showPerf]);
 
   // El canvas se inserta a mano para que React no lo recree en cada render.
   useEffect(() => {
@@ -527,6 +539,16 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
             <span className="sdm-share__btn-text">Descargar</span>
           </button>
         </div>
+
+        {showPerf && perf && (
+          <div className="sdm-share-perf">
+            caché: {perf.cache || '—'}
+            {perf.dibujoMs != null ? ` · dibujo ${perf.dibujoMs} ms` : ''}
+            {perf.codificacionMs != null ? ` · archivo ${perf.codificacionMs} ms` : ''}
+            {perf.totalMs != null ? ` · total ${perf.totalMs} ms` : ''}
+            {perf.lienzo ? ` · ${perf.lienzo}` : ''}
+          </div>
+        )}
       </div>
     </div>
   );

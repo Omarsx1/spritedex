@@ -5272,6 +5272,17 @@ body::after {
   width: 100%;
 }
 
+/* Medidor de diagnostico, solo visible con ?perf=1 en la URL */
+.sdm-share-perf {
+  margin-top: 8px;
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: #7dd3fc;
+  opacity: 0.85;
+}
+
 @keyframes fadeInPreview {
   from {
     opacity: 0;
