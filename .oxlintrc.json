@@ -16,7 +16,8 @@
         "allowConstantExport": true
       }
     ],
-    "no-undef": "error"
+    "no-undef": "error",
+    "no-use-before-define": "error"
   },
   "globals": {
     "__VERCEL_ENV__": "readonly"
