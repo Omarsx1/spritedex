@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
+import { Modal } from './ui/Modal';
 import { X, Cloud, LogIn, LogOut, CheckCircle, Mail, Key, ShieldCheck } from 'lucide-react';
 import { getSupabase, isSupabaseConfigured } from '../utils/supabase';
 import { trackEvent } from '../utils/telemetry';
@@ -10,18 +11,10 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
-  const openTimeRef = useRef(Date.now());
-
-  const handleBackdropClick = (e) => {
-    if (e.target !== e.currentTarget) return;
-    if (Date.now() - openTimeRef.current < 400) return;
-    onClose();
-  };
 
   if (!isSupabaseConfigured) {
     return (
-      <div className="modal-overlay" onClick={handleBackdropClick}>
-        <div className="modal-content glass-panel auth-modal__content--unconfigured" onClick={(e) => e.stopPropagation()}>
+      <Modal onClose={onClose} className="modal-content glass-panel auth-modal__content--unconfigured">
           <button className="modal-close-btn" onClick={onClose}>
             <X size={20} />
           </button>
@@ -35,8 +28,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
               ✓ Mientras tanto, tus datos están 100% seguros guardados localmente en tu dispositivo.
             </p>
           </div>
-        </div>
-      </div>
+      </Modal>
     );
   }
 
@@ -148,8 +140,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={handleBackdropClick}>
-      <div className="modal-content glass-panel auth-modal__content" onClick={(e) => e.stopPropagation()}>
+    <Modal onClose={onClose} className="modal-content glass-panel auth-modal__content">
         <button className="modal-close-btn" onClick={onClose}>
           <X size={20} />
         </button>
@@ -345,7 +336,6 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </Modal>
   );
 }

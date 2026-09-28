@@ -27,7 +27,9 @@ arriesgar la app en produccion.
 - [~] Paso 4. Migrar el resto, verificando cada uno.
       - [x] PrivacyPolicyModal: conserva z-index 99999 y sus estilos propios (el
             componente pasa `overlayStyle`), cierra con Escape y con el fondo.
-      - [ ] AuthModal (tiene DOS overlays en el mismo archivo, hay que separarlos).
+      - [x] AuthModal: no eran dos modales sino DOS VISTAS del mismo (nube sin
+            configurar y acceso normal). Las dos usan la primitiva. Verificada la vista
+            normal en navegador (abre, conserva clases, cierra con Escape y con el fondo).
       - [x] FriendCompareModal y SpriteDetailModal: verificados (abren, cierran con
             Escape y con el fondo; el detalle conserva su pointerEvents condicional).
       - [x] ShareImageModal: verificado que el medidor sigue anclado a la pantalla
