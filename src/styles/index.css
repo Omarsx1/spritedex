@@ -607,6 +607,9 @@ body::after {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.14);
+  /* El icono de correo dibuja con currentColor: sin color propio heredaba uno oscuro
+     y se perdia sobre el fondo del menu. */
+  color: #e2e8f0;
   cursor: pointer;
   line-height: 0;
 }
@@ -614,6 +617,7 @@ body::after {
 .app-navbar__vincular-btn:hover {
   background: rgba(0, 240, 232, 0.08);
   border-color: rgba(0, 240, 232, 0.3);
+  color: #00f0e8;
 }
 
 .app-navbar__dropdown-divider {
