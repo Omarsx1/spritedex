@@ -1,16 +1,10 @@
 import React, { useRef } from 'react';
 import { X, Download, Upload, Trash2 } from 'lucide-react';
 import { sounds } from '../utils/audio';
+import { Modal } from './ui/Modal';
 
 export function BackupModal({ userState, setUserState, onClose }) {
   const fileInputRef = useRef(null);
-  const openTimeRef = useRef(Date.now());
-
-  const handleBackdropClick = (e) => {
-    if (e.target !== e.currentTarget) return;
-    if (Date.now() - openTimeRef.current < 400) return;
-    onClose();
-  };
 
   const handleExportJSON = () => {
     sounds.playBeep();
@@ -51,8 +45,7 @@ export function BackupModal({ userState, setUserState, onClose }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={handleBackdropClick}>
-      <div className="modal-content glass-panel" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
+    <Modal onClose={onClose} className="modal-content glass-panel" style={{ maxWidth: '500px' }}>
         <button className="modal-close-btn" onClick={onClose}>
           <X size={20} />
         </button>
@@ -93,7 +86,6 @@ export function BackupModal({ userState, setUserState, onClose }) {
             <span>Reiniciar Toda la Colección</span>
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
