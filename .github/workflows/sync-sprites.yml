@@ -56,7 +56,9 @@ jobs:
           node scripts/generate_sprite_thumbs.js
 
       - name: Validar integridad con OxLint
-        run: npx oxlint --deny=error
+        # La configuracion se fija a mano: sin esto, en el runner el lint no aplicaba
+        # las reglas del proyecto y el gate pasaba con 0 errores aunque hubiera fallos.
+        run: npx oxlint --config .oxlintrc.json --deny=error
 
       - name: Validar compilación con Vite
         run: pnpm run build
