@@ -608,6 +608,44 @@ export function App() {
     });
   }, [dynamicSprites, activeGen, showUnreleased]);
 
+  // Precalcula en segundo plano la captura de la modal de compartir. Es lo que hace
+  // que la app local se sienta inmediata: alli la modal sale de cache. Sin esto, cada
+  // espiritu marcado invalida la captura y la codificacion (4 s en un telefono) se
+  // paga con la modal abierta. Aqui se paga mientras el usuario navega, en reposo y
+  // una sola vez por cambio de progreso.
+  // OJO: va despues de scopedSprites a proposito; usarlo antes seria un TDZ.
+  useEffect(() => {
+    if (typeof window === 'undefined' || isAdminPortal || showShareModal) return;
+    if (!Array.isArray(scopedSprites) || scopedSprites.length === 0) return;
+
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const slowConnection = Boolean(connection && (connection.saveData || /(^|-)2g$/.test(connection.effectiveType || '')));
+    if (slowConnection || document.visibilityState !== 'visible') return;
+
+    const timer = setTimeout(() => {
+      const run = async () => {
+        if (document.visibilityState !== 'visible') return;
+        const { getCanvasCacheKey, readCachedCapture, writeCachedCapture, generatePokedexCardImage } = await import('./utils/canvasExporter');
+        const ownedInScope = scopedSprites.filter((s) => userState[s.id]?.owned).length;
+        const key = getCanvasCacheKey('checklist', 'glitch_override', scopedSprites.length, ownedInScope, scopedSprites, userState);
+        if (await readCachedCapture(key)) return;
+        const res = await generatePokedexCardImage({
+          spritesList: scopedSprites,
+          userState,
+          format: 'checklist',
+          bgStyle: 'glitch_override'
+        });
+        const enc = await res.encode();
+        if (enc?.blob) await writeCachedCapture(key, enc.blob);
+      };
+      // En reposo y con margen: si el usuario sigue interactuando, no se dispara.
+      if (window.requestIdleCallback) window.requestIdleCallback(run, { timeout: 4000 });
+      else run();
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, [scopedSprites, userState, isAdminPortal, showShareModal]);
+
   const activeState = activeProfile === 'friend' && friendState ? friendState : userState;
   const totalCount = scopedSprites.length;
   const ownedCount = scopedSprites.filter((s) => activeState[s.id]?.owned).length;
