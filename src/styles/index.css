@@ -5272,15 +5272,26 @@ body::after {
   width: 100%;
 }
 
-/* Medidor de diagnostico, solo visible con ?perf=1 en la URL */
+/* Medidor de diagnostico, solo con ?perf=1. Va anclado arriba y a la izquierda
+   porque el modal recorta su contenido: abajo quedaba fuera de la pantalla del
+   telefono. Deja libre la esquina derecha, donde esta el boton de cerrar. */
 .sdm-share-perf {
-  margin-top: 8px;
-  text-align: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  max-width: 78%;
+  padding: 5px 9px;
+  border-bottom-right-radius: 10px;
+  text-align: left;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 11px;
-  letter-spacing: 0.02em;
-  color: #7dd3fc;
-  opacity: 0.85;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: #04121c;
+  background: linear-gradient(180deg, #7dd3fc, #38bdf8);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
 }
 
 @keyframes fadeInPreview {

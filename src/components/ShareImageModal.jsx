@@ -32,7 +32,22 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   // Medidor de diagnostico para probar en el telefono: se activa con ?perf=1
   const showPerf = useMemo(() => {
     if (typeof window === 'undefined') return false;
-    return new URLSearchParams(window.location.search).has('perf');
+    const params = new URLSearchParams(window.location.search);
+    const enHash = window.location.hash.toLowerCase().includes('perf');
+    let activo = params.has('perf') || enHash;
+    try {
+      // ?perf=0 lo apaga. Una vez encendido queda en el dispositivo, porque el
+      // parametro se pierde al navegar dentro de la app o al abrir como PWA.
+      if (params.get('perf') === '0') {
+        localStorage.removeItem('spritedex_perf');
+        return false;
+      }
+      if (activo) localStorage.setItem('spritedex_perf', '1');
+      else activo = localStorage.getItem('spritedex_perf') === '1';
+    } catch {
+      // Sin storage solo vale el parametro de la URL.
+    }
+    return activo;
   }, []);
 
   const modalRef = useRef(null);
@@ -425,6 +440,13 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   return (
     <div className={`modal-overlay ${isClosing ? 'is-closing' : ''}`} onClick={handleBackdropClick}>
       <div className={`sdm-share-pro ${isClosing ? 'is-closing' : ''}`} ref={modalRef} onClick={(e) => e.stopPropagation()}>
+        {showPerf && (
+          <div className="sdm-share-perf">
+            {perf
+              ? `caché ${perf.cache || '—'}${perf.dibujoMs != null ? ` · dibujo ${perf.dibujoMs} ms` : ''}${perf.codificacionMs != null ? ` · archivo ${perf.codificacionMs} ms` : ''}${perf.totalMs != null ? ` · total ${perf.totalMs} ms` : ''}${perf.lienzo ? ` · ${perf.lienzo}` : ''}`
+              : 'midiendo…'}
+          </div>
+        )}
         {/* Header Elegante y Minimalista */}
         <div className="sdm-share-pro__header">
           <div className="sdm-share-pro__title-wrap">
@@ -540,15 +562,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           </button>
         </div>
 
-        {showPerf && perf && (
-          <div className="sdm-share-perf">
-            caché: {perf.cache || '—'}
-            {perf.dibujoMs != null ? ` · dibujo ${perf.dibujoMs} ms` : ''}
-            {perf.codificacionMs != null ? ` · archivo ${perf.codificacionMs} ms` : ''}
-            {perf.totalMs != null ? ` · total ${perf.totalMs} ms` : ''}
-            {perf.lienzo ? ` · ${perf.lienzo}` : ''}
-          </div>
-        )}
       </div>
     </div>
   );
