@@ -214,21 +214,17 @@ export function App() {
       if (slowConnection) return;
 
       import('./utils/canvasExporter').then(({ preloadCanvasAssets }) => {
-        // Solo la generacion activa: es el alcance que el usuario exporta por defecto.
-        // Se calcula aqui dentro porque scopedSprites se declara mas abajo en el componente.
-        const scoped = (dynamicSprites || []).filter((s) => {
-          if (!showUnreleased && s.unreleased) return false;
-          if (activeGen !== 0 && s.gen !== activeGen) return false;
-          return true;
-        });
-        if (scoped.length > 0) {
-          preloadCanvasAssets(scoped, 10);
+        // Todo el catalogo, no solo la generacion activa: la modal exporta por defecto
+        // "todas las generaciones", asi que precargar una sola dejaba la mitad en frio.
+        // Son miniaturas (~3,7 MB), no los 19 MB de originales de antes.
+        if (dynamicSprites && dynamicSprites.length > 0) {
+          preloadCanvasAssets(dynamicSprites, 30);
         }
       });
     }, 1500);
 
     return () => clearTimeout(idleTimer);
-  }, [dynamicSprites, activeGen, showUnreleased]);
+  }, [dynamicSprites]);
 
   // Listen to Supabase Auth State & Sync Cloud Data
   useEffect(() => {

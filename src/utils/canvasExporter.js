@@ -179,7 +179,13 @@ export function preloadCanvasAssets(spritesList = [], batchSize = 6) {
         if (s && s.image) loadImage(s.thumb || s.image);
       });
       if (index < spritesList.length) {
-        if (window.requestIdleCallback) {
+        // En conexion rapida no se espera al reposo: cada tanda cede el hilo con un
+        // temporizador corto. Asi el catalogo completo queda caliente en segundos.
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        const fastConnection = !connection || connection.effectiveType === '4g' || connection.effectiveType === undefined;
+        if (fastConnection) {
+          setTimeout(processBatch, 16);
+        } else if (window.requestIdleCallback) {
           window.requestIdleCallback(processBatch, { timeout: 1500 });
         } else {
           setTimeout(processBatch, 120);
@@ -187,7 +193,11 @@ export function preloadCanvasAssets(spritesList = [], batchSize = 6) {
       }
     };
 
-    if (window.requestIdleCallback) {
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const fast = !connection || connection.effectiveType === '4g' || connection.effectiveType === undefined;
+    if (fast) {
+      setTimeout(processBatch, 16);
+    } else if (window.requestIdleCallback) {
       window.requestIdleCallback(processBatch, { timeout: 2000 });
     } else {
       setTimeout(processBatch, 150);
