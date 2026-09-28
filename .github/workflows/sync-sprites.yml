@@ -47,6 +47,14 @@ jobs:
           PUPPETEER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: node scripts/sync-sprites.js
 
+      # Los espiritus nuevos llegan con su imagen original (512 px, ~148 KB). Sin este
+      # paso se quedaban sin miniatura WebP y las tarjetas y la captura de compartir
+      # caian al original, que es lo que hacia pesada la app en movil.
+      - name: Generar miniaturas WebP
+        run: |
+          sudo apt-get install -y webp
+          node scripts/generate_sprite_thumbs.js
+
       - name: Validar integridad con OxLint
         run: npx oxlint --deny=error
 
