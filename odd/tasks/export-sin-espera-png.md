@@ -34,6 +34,28 @@ No se toca Supabase, ni rutas, ni datos, ni el resto de componentes.
 - [x] T3 (ShareImageModal) Codifica el PNG en reposo (requestIdleCallback, timeout 1500 ms) y habilita Descargar/Compartir cuando el blob esta listo.
 - [x] T4 (ambos) La cache guarda el canvas; reabrir con la misma clave pinta al instante y solo re-codifica si falta el blob.
 - [x] T5 Verificacion: oxlint sin hallazgos nuevos, build correcto, medicion headless antes/despues.
+- [x] T6 (canvasExporter) Cartel vertical grande de 1280 a 1080 px de ancho, con la celda escalada en la misma proporcion (175 -> 148) para conservar la composicion, y clave de cache a v12.
+- [x] T7 (canvasExporter + ShareImageModal) Cache en disco (Cache Storage) de la captura ya codificada, con poda a las ultimas 8, para que la segunda visita no redibuje ni recodifique.
+
+## Resultado de T6 (CPU 20x, dist local)
+| Metrica | 1280 | 1080 |
+|---|---|---|
+| Pixeles | 3,22 MP | 2,34 MP (-27%) |
+| Peso del PNG | 1,94 MB | 1,46 MB (-25%) |
+| Vista previa | 3965 ms | 4295 / 4659 ms (2 corridas) |
+
+El tiempo NO mejora: el encode baja con los pixeles, pero el dibujo sube un poco, muy
+probablemente por el bucle de ajuste de tamano de fuente de los nombres, que necesita
+mas iteraciones (y mas cambios de ctx.font) cuando la tarjeta es mas angosta. Se
+mantiene el cambio por el peso del archivo compartido, no por el tiempo.
+
+## Resultado de T7 (CPU 20x, dist local)
+| Metrica | Primera visita | Segunda visita (recarga) |
+|---|---|---|
+| Captura lista | 4295-4659 ms | **943-1065 ms** |
+
+La segunda visita muestra la captura guardada (nodo IMG desde Cache Storage) sin
+dibujar ni codificar nada.
 
 ## Resultado medido (CPU 20x, dist local, supabase bloqueado)
 Escenario: vista previa visible (antes vs ahora) y disponibilidad del archivo.
