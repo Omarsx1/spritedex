@@ -655,7 +655,8 @@ body::after {
 
 .app-navbar__dropdown-item--danger {
   justify-content: center;
-  margin-top: 6px;
+  /* Mas aire respecto a los botones de vincular */
+  margin-top: 18px;
   font-weight: 800;
   letter-spacing: 0.02em;
   color: #fff5f5;
