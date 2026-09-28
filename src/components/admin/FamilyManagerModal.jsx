@@ -13,7 +13,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { FAMILY_NAMES_MAP, THEME_NAMES_ES } from '../../data/spritesData';
-import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
+import { getSupabase } from '../../utils/supabase';
 
 export function FamilyManagerModal({ 
   sprites = [], 
@@ -114,7 +114,8 @@ export function FamilyManagerModal({
       const targetFamily = familiesList.find(f => f.id === famId);
       const associatedSprites = targetFamily?.sprites || [];
 
-      if (isSupabaseConfigured && supabase) {
+      const supabase = await getSupabase();
+      if (supabase) {
         // Batch update in Supabase
         for (const sprite of associatedSprites) {
           const varKey = sprite.variant || 'Base';
@@ -141,8 +142,7 @@ export function FamilyManagerModal({
             updated_at: new Date().toISOString()
           };
 
-          const supabase = await getSupabase();
-          if (supabase) await supabase.from('sprites').upsert(payload);
+          await supabase.from('sprites').upsert(payload);
         }
       }
 
@@ -169,7 +169,8 @@ export function FamilyManagerModal({
       setStatusMsg({ type: 'info', text: `Registrando nueva familia "${safeName}"...` });
 
       // Create base spirit template in Supabase so the family becomes permanent
-      if (isSupabaseConfigured && supabase) {
+      const supabase = await getSupabase();
+      if (supabase) {
         const baseId = `${safeId}_basic`;
         const payload = {
           id: baseId,
@@ -187,8 +188,7 @@ export function FamilyManagerModal({
           updated_at: new Date().toISOString()
         };
 
-        const supabase = await getSupabase();
-        if (supabase) await supabase.from('sprites').upsert(payload);
+        await supabase.from('sprites').upsert(payload);
       }
 
       setStatusMsg({ type: 'success', text: `¡Familia "${safeName}" creada con éxito!` });

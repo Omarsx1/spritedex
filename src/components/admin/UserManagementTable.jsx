@@ -105,7 +105,8 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
   const loadUserData = async () => {
     try {
       setLoading(true);
-      if (isSupabaseConfigured && supabase) {
+      const supabase = await getSupabase();
+      if (supabase) {
         // 1. Fetch user collections
         const { data: collections, error: colError } = await supabase
           .from('user_collections')

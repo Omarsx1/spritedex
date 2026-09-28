@@ -118,7 +118,8 @@ export function AudienceInsightsView({ darkMode = false }) {
   const loadAudienceData = async () => {
     try {
       setLoading(true);
-      if (isSupabaseConfigured && supabase) {
+      const supabase = await getSupabase();
+      if (supabase) {
         // Fetch up to 2500 recent analytics events for complete historical date analysis
         const { data: rawEvents, error } = await supabase
           .from('analytics_events')
