@@ -17,6 +17,7 @@ export function Modal({
   style,
   overlayStyle,
   innerRef,
+  afterCard,
   closeOnBackdrop = true,
   closeOnEscape = true,
   guardMs = 400
@@ -44,6 +45,9 @@ export function Modal({
       <div ref={innerRef} className={className} style={style} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
+      {/* Contenido que debe vivir fuera de la tarjeta: si la tarjeta tiene transform,
+          un position fixed dentro de ella se ancla a la tarjeta y no a la pantalla. */}
+      {afterCard}
     </div>
   );
 }

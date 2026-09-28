@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { generatePokedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
+import { Modal } from './ui/Modal';
 import gsap from 'gsap';
 
 // Caché persistente global para previews de plantillas generadas (0ms instantáneo entre aperturas y formatos)
@@ -66,7 +67,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
 
   const modalRef = useRef(null);
   const headerRef = useRef(null);
-  const openTimeRef = useRef(Date.now());
   const hasEnteredRef = useRef(false);
   const activeJobIdRef = useRef(0);
   const previewHostRef = useRef(null);
@@ -113,23 +113,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       onClose();
     }, 220);
   };
-
-  const handleBackdropClick = (e) => {
-    if (e.target !== e.currentTarget) return;
-    if (Date.now() - openTimeRef.current < 400) return;
-    handleClose();
-  };
-
-  // Close on Escape with smooth exit
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && !isClosing) {
-        handleClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isClosing]);
 
   // Entrance animation matching modern spring physics (rápido y a 60/120fps)
   useEffect(() => {
@@ -487,9 +470,31 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     }
   ];
 
+  // El medidor vive fuera de la tarjeta: dentro, el transform de la tarjeta ancla su
+  // position fixed a la tarjeta y no a la pantalla, y se pierde.
+  const medidorPerf = showPerf ? (
+    <div className="sdm-share-perf">
+      {perf?.ultima ? (
+        <div>
+          dibujo {perf.ultima.dibujoMs} ms · archivo {perf.ultima.codificacionMs ?? '—'} ms · total {perf.ultima.totalMs ?? '—'} ms
+          {perf.ultima.lienzo ? ` · ${perf.ultima.lienzo}` : ''}
+        </div>
+      ) : null}
+      <div>
+        caché {perf?.cache || '…'} · pasada {perf?.pasadaMs ?? '…'} ms · generaciones {perf?.generaciones || 0} · repasadas {perf?.revisitas || 0}
+      </div>
+    </div>
+  ) : null;
+
   return (
-    <div className={`modal-overlay ${isClosing ? 'is-closing' : ''}`} onClick={handleBackdropClick}>
-      <div className={`sdm-share-pro ${isClosing ? 'is-closing' : ''}`} ref={modalRef} onClick={(e) => e.stopPropagation()}>
+    <Modal
+      onClose={handleClose}
+      closeOnEscape={!isClosing}
+      overlayClassName={isClosing ? 'is-closing' : ''}
+      className={`sdm-share-pro ${isClosing ? 'is-closing' : ''}`}
+      innerRef={modalRef}
+      afterCard={medidorPerf}
+    >
         {/* Header Elegante y Minimalista */}
         <div className="sdm-share-pro__header">
           <div className="sdm-share-pro__title-wrap">
@@ -605,22 +610,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           </button>
         </div>
 
-      </div>
-      {/* Va fuera del modal y anclado a la pantalla: el modal es mas alto que el
-          telefono y se recorta por arriba, asi que dentro se pierde. */}
-      {showPerf && (
-        <div className="sdm-share-perf">
-          {perf?.ultima ? (
-            <div>
-              dibujo {perf.ultima.dibujoMs} ms · archivo {perf.ultima.codificacionMs ?? '—'} ms · total {perf.ultima.totalMs ?? '—'} ms
-              {perf.ultima.lienzo ? ` · ${perf.ultima.lienzo}` : ''}
-            </div>
-          ) : null}
-          <div>
-            caché {perf?.cache || '…'} · pasada {perf?.pasadaMs ?? '…'} ms · generaciones {perf?.generaciones || 0} · repasadas {perf?.revisitas || 0}
-          </div>
-        </div>
-      )}
-    </div>
+    </Modal>
   );
 }

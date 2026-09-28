@@ -28,7 +28,11 @@ arriesgar la app en produccion.
       - [x] PrivacyPolicyModal: conserva z-index 99999 y sus estilos propios (el
             componente pasa `overlayStyle`), cierra con Escape y con el fondo.
       - [ ] AuthModal (tiene DOS overlays en el mismo archivo, hay que separarlos).
-      - [ ] FriendCompareModal, SpriteDetailModal, ShareImageModal.
+      - [x] FriendCompareModal y SpriteDetailModal: verificados (abren, cierran con
+            Escape y con el fondo; el detalle conserva su pointerEvents condicional).
+      - [x] ShareImageModal: verificado que el medidor sigue anclado a la pantalla
+            (la primitiva estrena `afterCard` para el contenido que debe ir fuera de la
+            tarjeta, porque el transform de la tarjeta ancla los position fixed).
       - [ ] admin/FamilyManagerModal, admin/SpiritEditorModal (1516 lineas, el ultimo).
 - [ ] Paso 5. Borrar el andamiaje que quede sin uso.
 
