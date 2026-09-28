@@ -44,6 +44,9 @@ export function Header({
   });
 
   const activeSpriteRef = useRef(null);
+  // Indice ya elegido para la proxima rotacion: se decide un tick antes para que su
+  // miniatura tenga tiempo de cargar y el cambio no muestre un hueco.
+  const upcomingSpriteRef = useRef(null);
   const orbitContainerRef = useRef(null);
   const titleRef = useRef(null);
   const statsRef = useRef(null);
@@ -158,6 +161,33 @@ export function Header({
     }
   }, []);
 
+  const pickNextSpriteIndex = useCallback((exclude) => {
+    if (spritePool.length <= 1) return 0;
+    let next;
+    do {
+      next = Math.floor(Math.random() * spritePool.length);
+    } while (next === exclude);
+    return next;
+  }, [spritePool]);
+
+  const preloadThumb = useCallback((sprite) => {
+    const src = sprite && (sprite.thumb || sprite.image);
+    if (!src) return;
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = src;
+  }, []);
+
+  // Precarga la miniatura del proximo sprite y la de los satelites actuales, para
+  // que el cambio de la rotacion no muestre un hueco.
+  useEffect(() => {
+    if (spritePool.length === 0) return;
+    const next = pickNextSpriteIndex(spriteIndex);
+    upcomingSpriteRef.current = next;
+    preloadThumb(spritePool[next]);
+    orbitIndices.forEach((idx) => preloadThumb(spritePool[idx]));
+  }, [spritePool, spriteIndex, orbitIndices, pickNextSpriteIndex, preloadThumb]);
+
   // Rotate hero sprite with visibility and performance awareness
   useEffect(() => {
     if (spritePool.length === 0) return;
@@ -174,12 +204,12 @@ export function Header({
         ease: 'power2.in',
         onComplete: () => {
           setSpriteIndex((prev) => {
-            if (spritePool.length <= 1) return 0;
-            let next;
-            do {
-              next = Math.floor(Math.random() * spritePool.length);
-            } while (next === prev);
-            return next;
+            const planned = upcomingSpriteRef.current;
+            if (planned !== null && planned !== undefined && planned !== prev) {
+              upcomingSpriteRef.current = null;
+              return planned;
+            }
+            return pickNextSpriteIndex(prev);
           });
 
           // Also shuffle one random orbit sprite
@@ -199,7 +229,7 @@ export function Header({
     }, intervalTime);
 
     return () => clearInterval(interval);
-  }, [spritePool, spriteIndex]);
+  }, [spritePool, spriteIndex, pickNextSpriteIndex]);
 
   // GSAP animate in when spriteIndex changes
   useEffect(() => {
