@@ -82,14 +82,37 @@ export function getSupabase() {
   return clientPromise;
 }
 
+let warmPromise = null;
+
+// Resuelve cuando la pagina termino de cargar y el navegador esta libre. El
+// arranque de auth lo espera para que la descarga del SDK no compita con la
+// imagen y las fuentes del primer pintado.
 export function warmSupabase() {
-  if (!isSupabaseConfigured || typeof window === 'undefined') return;
-  const run = () => {
-    getSupabase().catch(() => {});
-  };
-  if (typeof requestIdleCallback === 'function') {
-    requestIdleCallback(run, { timeout: 2000 });
-  } else {
-    setTimeout(run, 1);
+  if (!isSupabaseConfigured || typeof window === 'undefined') return Promise.resolve(null);
+  if (!warmPromise) {
+    warmPromise = new Promise((resolve) => {
+      let done = false;
+      const run = () => {
+        if (done) return;
+        done = true;
+        getSupabase().then(resolve).catch(() => resolve(null));
+      };
+      const schedule = () => {
+        if (typeof requestIdleCallback === 'function') {
+          requestIdleCallback(run, { timeout: 3000 });
+        } else {
+          setTimeout(run, 200);
+        }
+      };
+      if (document.readyState === 'complete') {
+        schedule();
+      } else {
+        window.addEventListener('load', schedule, { once: true });
+        // Red de seguridad: si el evento load nunca llega (un recurso colgado),
+        // el arranque de auth no debe quedarse esperando para siempre.
+        setTimeout(run, 4000);
+      }
+    });
   }
+  return warmPromise;
 }

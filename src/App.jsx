@@ -221,6 +221,8 @@ export function App() {
     let cancelled = false;
 
     (async () => {
+      // Espera al final del load: la descarga del SDK no debe competir con el primer pintado.
+      await warmSupabase();
       const supabase = await getSupabase();
       if (!supabase || cancelled) return;
 
