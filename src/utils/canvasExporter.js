@@ -1023,3 +1023,47 @@ export function encodeCanvasToPng(canvas) {
     }, 'image/png');
   });
 }
+
+// ---------------------------------------------------------------------------
+// Cache en disco (Cache Storage) de la captura ya codificada. Asi la segunda
+// visita no redibuja ni recodifica: la captura esta lista al abrir la modal.
+// ---------------------------------------------------------------------------
+const EXPORT_CACHE_NAME = 'spritedex-export-v1';
+const EXPORT_CACHE_MAX = 8;
+
+function hasExportCache() {
+  return typeof caches !== 'undefined' && typeof Response !== 'undefined' && typeof URL !== 'undefined';
+}
+
+export async function readCachedCapture(key) {
+  if (!hasExportCache() || !key) return null;
+  try {
+    const cache = await caches.open(EXPORT_CACHE_NAME);
+    const hit = await cache.match(key);
+    if (!hit) return null;
+    const blob = await hit.blob();
+    if (!blob || blob.size === 0) return null;
+    return {
+      blob,
+      file: new File([blob], `spritedex_${Date.now()}.png`, { type: 'image/png' }),
+      url: URL.createObjectURL(blob)
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function writeCachedCapture(key, blob) {
+  if (!hasExportCache() || !key || !blob || blob.size === 0) return;
+  try {
+    const cache = await caches.open(EXPORT_CACHE_NAME);
+    await cache.put(key, new Response(blob, { headers: { 'Content-Type': 'image/png' } }));
+    // Cada cambio de progreso estrena clave, asi que solo se conservan las ultimas.
+    const keys = await cache.keys();
+    for (let i = 0; i < keys.length - EXPORT_CACHE_MAX; i += 1) {
+      await cache.delete(keys[i]);
+    }
+  } catch {
+    // Sin Cache Storage (http no seguro o modo privado) la app funciona igual: solo no persiste.
+  }
+}

@@ -3,7 +3,7 @@ import {
   X, Download, Share2, Copy, Check, Image as ImageIcon, Filter, Globe,
   CheckCircle, XCircle, Sparkles, Repeat, ShieldCheck, Flame
 } from 'lucide-react';
-import { generatePokedexCardImage, encodeCanvasToPng, globalCanvasCache, getCanvasCacheKey } from '../utils/canvasExporter';
+import { generatePokedexCardImage, encodeCanvasToPng, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 
@@ -49,6 +49,8 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         setDataUrl(enc.dataUrl);
         setCachedBlob(enc.blob);
         setCachedFile(enc.file);
+        // Persiste para que la proxima visita no tenga que dibujar ni codificar nada.
+        if (enc.blob) writeCachedCapture(key, enc.blob);
       }).catch((err) => {
         console.error('Error codificando la captura:', err);
       });
@@ -179,8 +181,20 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     // Si el modal ya completó su entrada, usar un debounce suave de 60ms para evitar colisiones entre clics rápidos.
     const delay = hasEnteredRef.current ? 60 : 180;
 
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       if (activeJobIdRef.current !== jobId) return;
+
+      // Antes de dibujar nada: ¿esta misma captura ya se genero en este dispositivo?
+      const guardada = await readCachedCapture(currentKey);
+      if (activeJobIdRef.current !== jobId) return;
+      if (guardada) {
+        globalTemplatePreviewCache.set(currentKey, { canvas: null, url: guardada.url, blob: guardada.blob, file: guardada.file });
+        setDataUrl(guardada.url);
+        setCachedBlob(guardada.blob);
+        setCachedFile(guardada.file);
+        setIsGenerating(false);
+        return;
+      }
 
       generatePokedexCardImage({
         spritesList,
@@ -207,7 +221,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     return () => {
       clearTimeout(timer);
     };
-  }, [spritesList, userState, format, bgStyle, ownedInScope]);
+  }, [spritesList, userState, format, bgStyle, ownedInScope, queuePngEncode]);
 
   // El canvas se inserta a mano para que React no lo recree en cada render.
   useEffect(() => {
