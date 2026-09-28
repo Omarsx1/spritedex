@@ -1,22 +1,12 @@
 import { getSupabase } from './supabase';
 import { trackEvent } from './telemetry';
+import { mensajeDeAuth } from './authMessages';
 
 // Acciones de autenticacion compartidas por la modal de acceso y el menu del usuario.
 // Estaban dentro de la modal, pero el menu tambien necesita lanzar la vinculacion.
 
 export function origenActual() {
   return typeof window !== 'undefined' ? window.location.origin : undefined;
-}
-
-function mensajeAmigable(error, esAnonimo) {
-  const mensaje = error?.message || '';
-  if (esAnonimo && /manual linking|linking is disabled|not enabled/i.test(mensaje)) {
-    return 'Vincular con Google todavia no esta activado en el proyecto. Vincula con correo: conserva todo tu progreso igual.';
-  }
-  if (mensaje.includes('provider is not enabled') || error?.code === 'validation_failed') {
-    return 'Google Sign-In requiere activar Google en el proyecto. Puedes usar el acceso rapido sin registrarte.';
-  }
-  return mensaje || 'Error con Google Sign-In';
 }
 
 // Con sesion anonima hay que VINCULAR la identidad (linkIdentity), no iniciar sesion:
@@ -37,9 +27,13 @@ export async function conGoogle(esAnonimo) {
     const { error } = esAnonimo
       ? await supabase.auth.linkIdentity(opciones)
       : await supabase.auth.signInWithOAuth(opciones);
-    return { error: error ? new Error(mensajeAmigable(error, esAnonimo)) : null };
+    if (error) {
+      // El error crudo queda en consola: el mensaje amigable puede dejar fuera la causa.
+      console.warn('[auth] Google fallo', { code: error.code, message: error.message, esAnonimo });
+    }
+    return { error: error ? new Error(mensajeDeAuth(error, esAnonimo)) : null };
   } catch (err) {
-    return { error: new Error(mensajeAmigable(err, esAnonimo)) };
+    console.warn('[auth] Google fallo', { message: err?.message, esAnonimo });
+    return { error: new Error(mensajeDeAuth(err, esAnonimo)) };
   }
 }
-
