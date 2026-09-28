@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Modal } from './ui/Modal';
+import { Google } from './ui/Google';
+import { conGoogle } from '../utils/authActions';
 import { X, Cloud, LogIn, LogOut, CheckCircle, Mail, Key, ShieldCheck } from 'lucide-react';
 import { getSupabase, isSupabaseConfigured } from '../utils/supabase';
 import { trackEvent } from '../utils/telemetry';
@@ -85,35 +87,8 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
     try {
       setLoading(true);
       setError(null);
-      const supabase = await getSupabase();
-      // Con sesion anonima hay que VINCULAR la identidad, no iniciar sesion: un login
-      // normal crea un usuario NUEVO y la coleccion se queda atras (asi se perdio el
-      // progreso de una usuaria). Vincular exige "Manual Linking" activado en Supabase.
-      const esAnonimo = Boolean(user?.is_anonymous);
-      const opciones = {
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin,
-          queryParams: {
-            prompt: 'select_account',
-            access_type: 'offline'
-          }
-        }
-      };
-      trackEvent(esAnonimo ? 'link' : 'login', { method: 'google' });
-      const { error: googleError } = esAnonimo
-        ? await supabase.auth.linkIdentity(opciones)
-        : await supabase.auth.signInWithOAuth(opciones);
-      if (googleError) {
-        const mensaje = googleError.message || '';
-        if (esAnonimo && /manual linking|linking is disabled|not enabled/i.test(mensaje)) {
-          throw new Error('Vincular con Google todavia no esta activado en el proyecto. Usa "Vincular con correo": conserva todo tu progreso igual.');
-        }
-        if (mensaje.includes('provider is not enabled') || googleError.code === 'validation_failed') {
-          throw new Error('Google Sign-In requiere activar Google en Supabase. Puedes usar "Acceso Rápido 1-Clic" arriba sin registrarte.');
-        }
-        throw googleError;
-      }
+      const { error: errorGoogle } = await conGoogle(Boolean(user?.is_anonymous));
+      if (errorGoogle) throw errorGoogle;
     } catch (err) {
       setError(err.message || 'Error con Google Sign-In');
       setLoading(false);
@@ -209,6 +184,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
                   </svg>
+                  <Google width="16" height="16" />
                   <span>Vincular con Google</span>
                 </button>
 
@@ -282,6 +258,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
               </svg>
+              <Google width="18" height="18" />
               <span>Continuar con Google</span>
             </button>
 

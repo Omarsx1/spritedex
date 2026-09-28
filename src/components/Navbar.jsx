@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Download, User, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone, AlertTriangle } from 'lucide-react';
+import { Download, User, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone, AlertTriangle, Mail } from 'lucide-react';
+import { Google } from './ui/Google';
 import { getSupabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
 import { safeStorage } from '../utils/safeStorage';
@@ -9,6 +10,7 @@ export function Navbar({
   activeGen = 2,
   onGenChange,
   onOpenAuthModal,
+  onLinkGoogle,
   onOpenBackupModal,
   onSignOut
 }) {
@@ -235,13 +237,24 @@ export function Navbar({
                     Tu progreso está guardado solo aquí. Si cierras sesión o cambias de
                     dispositivo, no podrías recuperarlo. Vincula tu cuenta para conservarlo.
                   </p>
+                  <div className="app-navbar__vincular-row">
+                  <button
+                    onClick={() => { setIsUserMenuOpen(false); onLinkGoogle(); }}
+                    className="app-navbar__vincular-btn"
+                    title="Vincular con Google"
+                    aria-label="Vincular con Google"
+                  >
+                    <Google width={18} height={18} />
+                  </button>
                   <button
                     onClick={() => { setIsUserMenuOpen(false); onOpenAuthModal(); }}
-                    className="app-navbar__dropdown-item app-navbar__dropdown-item--vincular"
+                    className="app-navbar__vincular-btn"
+                    title="Vincular con correo"
+                    aria-label="Vincular con correo"
                   >
-                    <ShieldCheck size={15} />
-                    <span>Vincular con Google o correo</span>
+                    <Mail size={18} />
                   </button>
+                  </div>
                 </>
               )}
 

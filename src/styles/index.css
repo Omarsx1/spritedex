@@ -591,11 +591,29 @@ body::after {
   color: #94a3b8;
 }
 
-.app-navbar__dropdown-item--vincular {
-  margin-top: 8px;
-  color: #00f0e8;
+/* Dos iconos para vincular: Google y correo */
+.app-navbar__vincular-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.app-navbar__vincular-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+  line-height: 0;
+}
+
+.app-navbar__vincular-btn:hover {
   background: rgba(0, 240, 232, 0.08);
-  border: 1px solid rgba(0, 240, 232, 0.25);
+  border-color: rgba(0, 240, 232, 0.3);
 }
 
 .app-navbar__dropdown-divider {

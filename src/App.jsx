@@ -24,6 +24,7 @@ import { trackEvent, resolveCountry } from './utils/telemetry';
 import { isUserAdminAuthenticated } from './utils/adminAuth';
 import { decodeCollectionState } from './utils/shareLink';
 import { getSupabase, warmSupabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from './utils/supabase';
+import { conGoogle } from './utils/authActions';
 import { setSyncSession, queueCloudSync, clearCloudSync, flushCloudSync } from './utils/pendingSync';
 import { safeStorage } from './utils/safeStorage';
 import {
@@ -333,6 +334,12 @@ export function App() {
     } catch (err) {
       console.error('Failed to load collection from cloud:', err);
     }
+  };
+
+  // Vincular con Google directamente desde el menu del invitado, sin abrir la modal.
+  const handleLinkGoogle = async () => {
+    const { error } = await conGoogle(Boolean(user?.is_anonymous));
+    if (error) alert(error.message);
   };
 
   const handleSignOutCleanup = () => {
@@ -758,6 +765,7 @@ export function App() {
           setSpriteFilter('all');
         }}
         onOpenAuthModal={() => setShowAuthModal(true)}
+        onLinkGoogle={handleLinkGoogle}
         onOpenBackupModal={() => setShowBackupModal(true)}
         onSignOut={handleSignOutCleanup}
       />
