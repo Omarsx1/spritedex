@@ -24,7 +24,10 @@ export default defineConfig({
             if (id.includes('lucide-react')) {
               return 'vendor-icons';
             }
-            if (id.includes('canvas-confetti') || id.includes('sweetalert2') || id.includes('gsap')) {
+            // Solo GSAP va en el chunk de la entrada (lo necesita la animación del hero).
+            // SweetAlert2 y canvas-confetti se quedan en los chunks que los usan de
+            // verdad: el admin perezoso y las acciones puntuales.
+            if (id.includes('gsap')) {
               return 'vendor-ui';
             }
           }
