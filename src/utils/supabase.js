@@ -49,13 +49,22 @@ export function isAdminPortalPath() {
     search.includes('studio') || search.includes('override');
 }
 
+// Tuneles de desarrollo (cloudflare, ngrok, etc.): su host es publico, asi que sin
+// esto la app los trata como produccion y crea usuarios reales durante las pruebas.
+export function isDevTunnelHost() {
+  if (typeof window === 'undefined') return false;
+  const host = window.location.hostname.toLowerCase();
+  return ['.trycloudflare.com', '.ngrok-free.app', '.ngrok.io', '.loca.lt', '.localhost.run', '.serveo.net', '.devtunnels.ms']
+    .some((suffix) => host.endsWith(suffix));
+}
+
 export function shouldSkipAnonymousAuth() {
   if (typeof window === 'undefined') return true;
   // Modo demo (tuneles, presentaciones): nunca crea usuarios reales.
   if (import.meta.env.VITE_DEMO_MODE === 'true') return true;
   // El override solo relaja la proteccion local, nunca la de preview o bots.
   if (import.meta.env.VITE_ALLOW_ANON_AUTH === 'true' && isLocalEnvironment()) return false;
-  return isLocalEnvironment() || isPreviewEnvironment() || isAutomatedClient() || isAdminPortalPath();
+  return isLocalEnvironment() || isPreviewEnvironment() || isAutomatedClient() || isAdminPortalPath() || isDevTunnelHost();
 }
 
 // El SDK pesa ~52 KB gzip y no hace falta para el primer pintado: se importa

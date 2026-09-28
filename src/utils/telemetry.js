@@ -1,4 +1,4 @@
-import { getSupabase, isLocalEnvironment, isPreviewEnvironment, isAutomatedClient, isAdminPortalPath } from './supabase';
+import { getSupabase, isLocalEnvironment, isPreviewEnvironment, isAutomatedClient, isAdminPortalPath, isDevTunnelHost } from './supabase';
 import { allSprites } from '../data/spritesData';
 import { safeStorage } from './safeStorage';
 
@@ -231,7 +231,7 @@ export function isTelemetryIgnored() {
         sessionAdmin !== null) {
       return true;
     }
-    if (isAdminPortalPath() || isLocalEnvironment() || isPreviewEnvironment() || isAutomatedClient()) {
+    if (isAdminPortalPath() || isLocalEnvironment() || isPreviewEnvironment() || isAutomatedClient() || isDevTunnelHost()) {
       safeStorage.setItem('spritedex_ignore_telemetry', 'true');
       return true;
     }
