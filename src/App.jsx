@@ -45,6 +45,11 @@ const PrivacyPolicyModal = lazy(() => import('./components/PrivacyPolicyModal').
 
 const LOCAL_STORAGE_KEY = 'fortnite_sprites_pokedex_v3';
 const LOCAL_STATE_UPDATED_KEY = 'spritedex_state_updated_at_v1';
+// Copia recuperable del progreso. Un invitado que cierra sesion pierde el acceso a su
+// cuenta anonima (documentacion de Supabase), asi que borrar la copia local equivale a
+// perder la coleccion para siempre. Se guarda aqui y se restaura sola.
+const RECOVERY_STORAGE_KEY = 'spritedex_state_recovery_v1';
+const RECOVERY_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
 export function App() {
   const isMobile = useIsMobile(600);
@@ -331,9 +336,42 @@ export function App() {
   };
 
   const handleSignOutCleanup = () => {
+    // Antes de limpiar, guardar la copia de recuperacion: es lo unico que le queda a
+    // un usuario anonimo despues de cerrar sesion.
+    try {
+      if (userState && Object.keys(userState).length > 0) {
+        safeStorage.setItem(RECOVERY_STORAGE_KEY, JSON.stringify({ estado: userState, guardadoEn: Date.now() }));
+      }
+    } catch {
+      // Sin storage no hay copia posible; se sigue limpiando como antes.
+    }
     setUserState({});
     safeStorage.removeItem(LOCAL_STORAGE_KEY);
   };
+
+  // Restaura la copia recuperable cuando no hay progreso local y la sesion es de
+  // invitado (o no hay sesion). Nunca pisa el progreso de una cuenta con sesion
+  // iniciada: en ese caso el merge de la nube decide.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (user && !user.is_anonymous) return;
+    if (userState && Object.keys(userState).length > 0) return;
+    try {
+      const crudo = safeStorage.getItem(RECOVERY_STORAGE_KEY);
+      if (!crudo) return;
+      const guardado = JSON.parse(crudo);
+      const edad = Date.now() - (guardado?.guardadoEn || 0);
+      if (!guardado?.estado || Object.keys(guardado.estado).length === 0 || edad > RECOVERY_MAX_AGE_MS) {
+        safeStorage.removeItem(RECOVERY_STORAGE_KEY);
+        return;
+      }
+      console.info('Restaurando el progreso guardado en este dispositivo.');
+      setUserState(guardado.estado);
+      safeStorage.removeItem(RECOVERY_STORAGE_KEY);
+    } catch {
+      safeStorage.removeItem(RECOVERY_STORAGE_KEY);
+    }
+  }, [user, userState]);
 
   // Sync to localStorage & Supabase Cloud
   useEffect(() => {
