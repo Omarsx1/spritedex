@@ -36,6 +36,27 @@ No se toca Supabase, ni rutas, ni datos, ni el resto de componentes.
 - [x] T5 Verificacion: oxlint sin hallazgos nuevos, build correcto, medicion headless antes/despues.
 - [x] T6 (canvasExporter) Cartel vertical grande a 1080 px: probado y REVERTIDO a 1280. El PNG pesaba 25% menos, pero el tiempo no bajaba (subia 5-12%) y se prefiere velocidad a peso.
 - [x] T7 (canvasExporter + ShareImageModal) Cache en disco (Cache Storage) de la captura ya codificada, con poda a las ultimas 8, para que la segunda visita no redibuje ni recodifique.
+- [x] T8 (canvasExporter + ShareImageModal) La captura se comparte en JPEG q0.92 en vez de PNG, con la clave de cache a v12.
+
+## Resultado de T8: formato del archivo compartido
+Benchmark sobre la captura real (1280x2515, CPU 20x, 3 muestras con orden invertido):
+
+| Formato | Tiempo | Peso |
+|---|---|---|
+| PNG | 1590-1664 ms | 1,99 MB |
+| JPEG q0.92 | 1370-1396 ms | **718 KB** |
+| JPEG q0.95 | 1385 ms | 897 KB |
+| WebP q0.9 | **220-231 ms** | **371 KB** |
+
+Prueba en dispositivo real (la hizo el usuario): el WebP llega como FOTO en WhatsApp
+pero como STICKER en Telegram, asi que queda descartado por mas rapido y liviano que
+sea. JPEG llega como foto en las dos apps. Comparado a 1:1 con el PNG en la cabecera,
+los textos neon y las insignias, no se aprecia diferencia.
+
+Verificacion end-to-end: la descarga produce spritedex_AAAA-MM-DD_HH-MM-SS.jpg de 719 KB.
+El tiempo hasta tener el archivo listo baja poco (6585 -> 6361 ms en la primera visita,
+4338 -> 4108 ms tras marcar); la ganancia real es el peso (2,8x menos), o sea subida mas
+rapida a WhatsApp y Telegram.
 
 ## Resultado de T6 (CPU 20x, dist local) - revertido
 | Metrica | 1280 (se mantiene) | 1080 (descartado) |
