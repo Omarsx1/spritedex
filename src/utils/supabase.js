@@ -51,6 +51,8 @@ export function isAdminPortalPath() {
 
 export function shouldSkipAnonymousAuth() {
   if (typeof window === 'undefined') return true;
+  // Modo demo (tuneles, presentaciones): nunca crea usuarios reales.
+  if (import.meta.env.VITE_DEMO_MODE === 'true') return true;
   // El override solo relaja la proteccion local, nunca la de preview o bots.
   if (import.meta.env.VITE_ALLOW_ANON_AUTH === 'true' && isLocalEnvironment()) return false;
   return isLocalEnvironment() || isPreviewEnvironment() || isAutomatedClient() || isAdminPortalPath();

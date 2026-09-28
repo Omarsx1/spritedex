@@ -227,6 +227,7 @@ export function isTelemetryIgnored() {
     if (safeStorage.getItem('spritedex_ignore_telemetry') === 'true' ||
         safeStorage.getItem('spritedex_admin_override') === 'true' ||
         safeStorage.getItem('spritedex_purged_all_mac') === 'true' ||
+        import.meta.env.VITE_DEMO_MODE === 'true' ||
         sessionAdmin !== null) {
       return true;
     }
