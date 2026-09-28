@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import {
-  X, Download, Share2, Copy, Check, Image as ImageIcon, Filter, Globe,
-  CheckCircle, XCircle, Sparkles, Repeat, ShieldCheck, Flame
-} from 'lucide-react';
+import { X, Download, Share2, Copy, Check, Sparkles } from 'lucide-react';
 import { generatePokedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import { Modal } from './ui/Modal';
@@ -29,7 +26,7 @@ function leerPerfActivado() {
 export function ShareImageModal({ filteredSprites, allSprites, userState, activeFiltersLabel, onClose }) {
   const [format, setFormat] = useState(DEFAULT_EXPORT_FORMAT); // 'checklist', 'square'
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
-  const [bgStyle, setBgStyle] = useState(DEFAULT_EXPORT_BG_STYLE); // 'glitch_override', 'blueprint', 'dark_matrix'
+  const [bgStyle] = useState(DEFAULT_EXPORT_BG_STYLE); // 'glitch_override', 'blueprint', 'dark_matrix'
 
   // Clave de preview canónica para mostrar la plantilla en 0ms si ya está en caché
   const initialCount = allSprites.length;
@@ -66,7 +63,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   }, [alternarPerf]);
 
   const modalRef = useRef(null);
-  const headerRef = useRef(null);
   const hasEnteredRef = useRef(false);
   const activeJobIdRef = useRef(0);
   const previewHostRef = useRef(null);
@@ -436,39 +432,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     setCopiedText(true);
     setTimeout(() => setCopiedText(false), 2000);
   };
-
-  const scopeOptions = [
-    {
-      id: 'all',
-      label: 'TODOS',
-      icon: <Globe size={15} color="#38bdf8" />,
-      count: counts.all
-    },
-    {
-      id: 'owned',
-      label: 'ATRAPADOS',
-      icon: <CheckCircle size={15} color="#10b981" />,
-      count: counts.owned
-    },
-    {
-      id: 'missing',
-      label: 'FALTANTES',
-      icon: <XCircle size={15} color="#ef4444" />,
-      count: counts.missing
-    },
-    {
-      id: 'mastered',
-      label: 'MAXEADOS',
-      icon: <ShieldCheck size={15} color="#eab308" />,
-      count: counts.mastered
-    },
-    {
-      id: 'filtered',
-      label: 'FILTRO ACTUAL',
-      icon: <Filter size={15} color="#a855f7" />,
-      count: counts.filtered
-    }
-  ];
 
   // El medidor vive fuera de la tarjeta: dentro, el transform de la tarjeta ancla su
   // position fixed a la tarjeta y no a la pantalla, y se pierde.

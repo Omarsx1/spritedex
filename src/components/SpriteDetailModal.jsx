@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Zap, Sparkles } from 'lucide-react';
-import { SPRITE_FAMILIES, RARITIES, getSpriteCardStyle, getRarityInfo } from '../data/spritesData';
+import { SPRITE_FAMILIES, getSpriteCardStyle, getRarityInfo } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 import { Modal } from './ui/Modal';

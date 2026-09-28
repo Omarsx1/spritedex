@@ -35,8 +35,17 @@ arriesgar la app en produccion.
       - [x] ShareImageModal: verificado que el medidor sigue anclado a la pantalla
             (la primitiva estrena `afterCard` para el contenido que debe ir fuera de la
             tarjeta, porque el transform de la tarjeta ancla los position fixed).
-      - [ ] admin/FamilyManagerModal, admin/SpiritEditorModal (1516 lineas, el ultimo).
-- [ ] Paso 5. Borrar el andamiaje que quede sin uso.
+      - [x] admin/FamilyManagerModal y admin/SpiritEditorModal: NO forman parte de la
+            familia. Usan su propia clase del CMS (studio-admin-modal-overlay), cuyo
+            nombre contiene "modal-overlay" y por eso aparecian en el conteo inicial.
+            Migrarlos a la primitiva es una decision aparte (es otro sistema de diseno).
+      - Correccion: la familia eran SEIS modales, no nueve. Los otros tres resultados
+            del grep inicial eran dos modales del CMS y un archivo de estilos.
+
+## Estado final
+Los SEIS modales de la familia usan la primitiva: BackupModal, PrivacyPolicyModal,
+FriendCompareModal, SpriteDetailModal, ShareImageModal y AuthModal. Cero componentes
+llevan ya la clase modal-overlay a mano, y los cuatro gates estan en verde.
 
 ## Reglas de trabajo
 - Nada se despliega a produccion sin autorizacion explicita del usuario.

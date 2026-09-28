@@ -29,7 +29,7 @@ export function BackupModal({ userState, setUserState, onClose }) {
           alert('¡Copia de seguridad importada con éxito!');
           onClose();
         }
-      } catch (err) {
+      } catch {
         alert('El archivo no tiene un formato JSON válido.');
       }
     };
