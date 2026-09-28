@@ -278,6 +278,55 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
   }, [users, totalVisits]);
 
   // Filtered Users
+  // Captura de solo lectura: descarga los usuarios y sus movimientos tal como
+  // estan cargados en el panel. No escribe nada en la base de datos.
+  const handleExportUsers = (format) => {
+    const stateById = new Map();
+    (rawCollections || []).forEach((col) => {
+      if (col.id) stateById.set(col.id, col.user_state);
+      if (col.user_id) stateById.set(col.user_id, col.user_state);
+    });
+    const rows = users.map((u) => ({
+      user_id: u.userId,
+      nombre: u.name,
+      codigo_amigo: u.friendCode,
+      pais: u.countryName,
+      es_yo: u.isMe,
+      atrapados: u.caughtCount,
+      estrellas: u.starCount,
+      progreso_pct: u.progressPct,
+      actualizado: u.updatedAt,
+      user_state: stateById.get(u.id) || stateById.get(u.userId) || null
+    }));
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    let blob;
+    let filename;
+    if (format === 'csv') {
+      const headers = ['user_id', 'nombre', 'codigo_amigo', 'pais', 'atrapados', 'estrellas', 'progreso_pct', 'actualizado'];
+      const cell = (value) => '"' + String(value === null || value === undefined ? '' : value).replace(/"/g, '""') + '"';
+      const lines = [headers.join(',')].concat(rows.map((row) => headers.map((h) => cell(row[h])).join(',')));
+      blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+      filename = 'spritedex-usuarios-' + stamp + '.csv';
+    } else {
+      blob = new Blob([JSON.stringify({
+        exportado: new Date().toISOString(),
+        total_usuarios: rows.length,
+        total_eventos: (analyticsEvents || []).length,
+        usuarios: rows,
+        eventos: analyticsEvents || []
+      }, null, 2)], { type: 'application/json' });
+      filename = 'spritedex-usuarios-' + stamp + '.json';
+    }
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const filteredUsers = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return users.filter((u) => {
@@ -572,6 +621,41 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
 
         {/* Action Selects */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {/* Captura de solo lectura para blindar el estado actual antes y despues de las pruebas */}
+          <button
+            type="button"
+            onClick={() => handleExportUsers('json')}
+            title="Descarga una copia de lectura con los usuarios y sus movimientos (no modifica nada)"
+            style={{
+              padding: '9px 14px',
+              borderRadius: '8px',
+              border: '1px solid ' + c.borderInput,
+              background: c.bgInput,
+              color: c.textPrimary,
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            Exportar JSON
+          </button>
+          <button
+            type="button"
+            onClick={() => handleExportUsers('csv')}
+            title="Descarga solo la tabla de usuarios en CSV, para revisar en hoja de calculo"
+            style={{
+              padding: '9px 14px',
+              borderRadius: '8px',
+              border: '1px solid ' + c.borderInput,
+              background: c.bgInput,
+              color: c.textPrimary,
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            Exportar CSV
+          </button>
           {/* Generation Scope Select */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Layers size={15} style={{ color: darkMode ? '#3ECF8E' : '#2563EB' }} />
