@@ -15,6 +15,7 @@ export function Modal({
   className = '',
   overlayClassName = '',
   style,
+  overlayStyle,
   closeOnBackdrop = true,
   closeOnEscape = true,
   guardMs = 400
@@ -38,11 +39,10 @@ export function Modal({
   };
 
   return (
-    <div className={`modal-overlay ${overlayClassName}`.trim()} onClick={alTocarFondo}>
+    <div className={`modal-overlay ${overlayClassName}`.trim()} style={overlayStyle} onClick={alTocarFondo}>
       <div className={className} style={style} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
     </div>
   );
 }
-

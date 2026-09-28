@@ -1,18 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ShieldCheck, Cookie, Key, Globe, Check, Sliders, CheckCircle2 } from 'lucide-react';
+import { Modal } from './ui/Modal';
 
 const LOCAL_STORAGE_PRIVACY_KEY = 'fortnite_sprites_privacy_notice_v1';
 
 export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
   const [activeTab, setActiveTab] = useState(initialTab); // 'preferences' | 'guide'
   const [savedSuccess, setSavedSuccess] = useState(false);
-  const openTimeRef = useRef(Date.now());
-
-  const handleBackdropClick = (e) => {
-    if (e.target !== e.currentTarget) return;
-    if (Date.now() - openTimeRef.current < 400) return;
-    onClose();
-  };
 
   // Preference state
   const [preferences, setPreferences] = useState({
@@ -78,10 +72,9 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
   };
 
   return (
-    <div
-      className="modal-overlay"
-      onClick={handleBackdropClick}
-      style={{
+    <Modal
+      onClose={onClose}
+      overlayStyle={{
         position: 'fixed',
         top: 0,
         left: 0,
@@ -97,11 +90,8 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
         padding: '20px',
         boxSizing: 'border-box'
       }}
-    >
-      <div
-        className="modal-content glass-panel"
-        onClick={(e) => e.stopPropagation()}
-        style={{
+      className="modal-content glass-panel"
+      style={{
           background: '#0e1322',
           border: '1px solid rgba(0, 240, 232, 0.35)',
           borderRadius: '20px',
@@ -116,7 +106,7 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
           boxSizing: 'border-box',
           color: '#EDEDED'
         }}
-      >
+    >
         <button
           className="modal-close-btn"
           onClick={onClose}
@@ -468,8 +458,6 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
             </button>
           )}
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
-
