@@ -3,6 +3,7 @@ import { X, Zap, Sparkles } from 'lucide-react';
 import { SPRITE_FAMILIES, RARITIES, getSpriteCardStyle, getRarityInfo } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
+import { Modal } from './ui/Modal';
 
 export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel, onClose }) {
   const [activeSprite, setActiveSprite] = useState(sprite);
@@ -68,24 +69,16 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
   const ownedInFamily = familySprites.filter(v => userState[v.id]?.owned).length;
   const progressPct = (ownedInFamily / familySprites.length) * 100;
 
-  const handleBackdropClick = (e) => {
-    if (!canDismiss) return;
-    if (e.target !== e.currentTarget) return;
-    onClose();
-  };
-
   return (
-    <div
-      className="modal-overlay"
-      onClick={handleBackdropClick}
-      style={{ pointerEvents: canDismiss ? 'auto' : 'none' }}
+    <Modal
+      onClose={onClose}
+      closeOnBackdrop={canDismiss}
+      closeOnEscape={canDismiss}
+      overlayStyle={{ pointerEvents: canDismiss ? 'auto' : 'none' }}
+      className="sdm"
+      style={{ pointerEvents: 'auto' }}
+      innerRef={modalRef}
     >
-      <div
-        className="sdm"
-        ref={modalRef}
-        onClick={(e) => e.stopPropagation()}
-        style={{ pointerEvents: 'auto' }}
-      >
 
         {/* Close */}
         <button className="sdm__close" onClick={onClose}>
@@ -271,8 +264,6 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
             );
           })}
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
-

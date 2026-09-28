@@ -16,6 +16,7 @@ export function Modal({
   overlayClassName = '',
   style,
   overlayStyle,
+  innerRef,
   closeOnBackdrop = true,
   closeOnEscape = true,
   guardMs = 400
@@ -40,7 +41,7 @@ export function Modal({
 
   return (
     <div className={`modal-overlay ${overlayClassName}`.trim()} style={overlayStyle} onClick={alTocarFondo}>
-      <div className={className} style={style} onClick={(e) => e.stopPropagation()}>
+      <div ref={innerRef} className={className} style={style} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
     </div>
