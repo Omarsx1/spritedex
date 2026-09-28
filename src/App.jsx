@@ -214,17 +214,20 @@ export function App() {
       if (slowConnection) return;
 
       import('./utils/canvasExporter').then(({ preloadCanvasAssets }) => {
-        // Todo el catalogo, no solo la generacion activa: la modal exporta por defecto
-        // "todas las generaciones", asi que precargar una sola dejaba la mitad en frio.
-        // Son miniaturas (~3,7 MB), no los 19 MB de originales de antes.
-        if (dynamicSprites && dynamicSprites.length > 0) {
-          preloadCanvasAssets(dynamicSprites, 30);
+        // Solo la generacion activa: es exactamente lo que exporta la modal, porque
+        // App ya le pasa allSprites filtrado por activeGen. Precargar el catalogo
+        // completo eran ~3 MB en movil compitiendo con la generacion de la captura.
+        const preloadList = activeGen === 0
+          ? dynamicSprites
+          : dynamicSprites.filter((s) => s.gen === activeGen);
+        if (preloadList && preloadList.length > 0) {
+          preloadCanvasAssets(preloadList, 30);
         }
       });
     }, 1500);
 
     return () => clearTimeout(idleTimer);
-  }, [dynamicSprites]);
+  }, [dynamicSprites, activeGen]);
 
   // Listen to Supabase Auth State & Sync Cloud Data
   useEffect(() => {
