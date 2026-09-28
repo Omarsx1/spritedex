@@ -10,6 +10,26 @@ import gsap from 'gsap';
 // Caché persistente global para previews de plantillas generadas (0ms instantáneo entre aperturas y formatos)
 const globalTemplatePreviewCache = new Map();
 
+// Estado del medidor de diagnostico. Se enciende con ?perf=1, con #perf o con un
+// doble toque en el titulo del modal, y queda recordado en el dispositivo.
+function leerPerfActivado() {
+  if (typeof window === 'undefined') return false;
+  const params = new URLSearchParams(window.location.search);
+  try {
+    if (params.get('perf') === '0') {
+      localStorage.removeItem('spritedex_perf');
+      return false;
+    }
+    if (params.has('perf') || window.location.hash.toLowerCase().includes('perf')) {
+      localStorage.setItem('spritedex_perf', '1');
+      return true;
+    }
+    return localStorage.getItem('spritedex_perf') === '1';
+  } catch {
+    return params.has('perf');
+  }
+}
+
 export function ShareImageModal({ filteredSprites, allSprites, userState, activeFiltersLabel, onClose }) {
   const [format, setFormat] = useState('checklist'); // 'checklist', 'square'
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
@@ -29,26 +49,30 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const [isClosing, setIsClosing] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
   const [perf, setPerf] = useState(null);
-  // Medidor de diagnostico para probar en el telefono: se activa con ?perf=1
-  const showPerf = useMemo(() => {
-    if (typeof window === 'undefined') return false;
-    const params = new URLSearchParams(window.location.search);
-    const enHash = window.location.hash.toLowerCase().includes('perf');
-    let activo = params.has('perf') || enHash;
-    try {
-      // ?perf=0 lo apaga. Una vez encendido queda en el dispositivo, porque el
-      // parametro se pierde al navegar dentro de la app o al abrir como PWA.
-      if (params.get('perf') === '0') {
-        localStorage.removeItem('spritedex_perf');
-        return false;
+  const [showPerf, setShowPerf] = useState(leerPerfActivado);
+  const tapPerfRef = useRef(0);
+  const alternarPerf = useCallback(() => {
+    setShowPerf((activo) => {
+      const nuevo = !activo;
+      try {
+        if (nuevo) localStorage.setItem('spritedex_perf', '1');
+        else localStorage.removeItem('spritedex_perf');
+      } catch {
+        // Sin storage el medidor solo vive en esta sesion.
       }
-      if (activo) localStorage.setItem('spritedex_perf', '1');
-      else activo = localStorage.getItem('spritedex_perf') === '1';
-    } catch {
-      // Sin storage solo vale el parametro de la URL.
-    }
-    return activo;
+      return nuevo;
+    });
   }, []);
+  // Doble toque en el titulo: enciende o apaga el medidor sin tocar la URL.
+  const manejarTapTitulo = useCallback(() => {
+    const ahora = Date.now();
+    if (ahora - tapPerfRef.current < 600) {
+      tapPerfRef.current = 0;
+      alternarPerf();
+    } else {
+      tapPerfRef.current = ahora;
+    }
+  }, [alternarPerf]);
 
   const modalRef = useRef(null);
   const headerRef = useRef(null);
@@ -447,7 +471,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
               <Sparkles size={18} color="#00F0E8" />
             </div>
             <div>
-              <h2 className="sdm-share-pro__title">Exportar Colección</h2>
+              <h2 className="sdm-share-pro__title" onPointerUp={manejarTapTitulo}>Exportar Colección</h2>
               <p className="sdm-share-pro__subtitle">
                 {ownedInScope} de {spritesList.length} espíritus atrapados • {pctInScope}% completado
               </p>
