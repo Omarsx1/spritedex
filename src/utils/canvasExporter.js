@@ -87,7 +87,9 @@ export function getCanvasCacheKey(format = 'checklist', bgStyle = 'glitch_overri
       }
     }
   }
-  return `v11_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v12: el formato vertical grande bajo de 1280 a 1080 px de ancho, asi que las
+  // capturas guardadas con el layout viejo no se pueden reutilizar.
+  return `v12_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -600,7 +602,9 @@ function renderGlitchOverrideTemplate({
     } else {
       // Colecciones grandes en vertical (p.ej. 117 de Gen 1): 8 columnas
       cols = 8;
-      width = 1280;
+      // 1080 es el ancho estandar de las redes y 1:1 con la pantalla del movil:
+      // menos pixeles (rasterizado y PNG mas baratos) sin perder nitidez util.
+      width = 1080;
     }
   }
 
@@ -610,7 +614,10 @@ function renderGlitchOverrideTemplate({
 
   let cellH;
   if (!isSquare) {
-    const desiredCellH = totalSprites > 70 ? 175 : 190;
+    // La celda acompana la escala del ancho en las colecciones grandes
+    // (175 * 1080 / 1280) para que el cartel conserve la misma composicion
+    // y solo cambie la resolucion.
+    const desiredCellH = totalSprites > 70 ? 148 : 190;
     height = headerH + rows * desiredCellH + footerH;
     cellH = desiredCellH;
   } else {
