@@ -440,13 +440,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   return (
     <div className={`modal-overlay ${isClosing ? 'is-closing' : ''}`} onClick={handleBackdropClick}>
       <div className={`sdm-share-pro ${isClosing ? 'is-closing' : ''}`} ref={modalRef} onClick={(e) => e.stopPropagation()}>
-        {showPerf && (
-          <div className="sdm-share-perf">
-            {perf
-              ? `caché ${perf.cache || '—'}${perf.dibujoMs != null ? ` · dibujo ${perf.dibujoMs} ms` : ''}${perf.codificacionMs != null ? ` · archivo ${perf.codificacionMs} ms` : ''}${perf.totalMs != null ? ` · total ${perf.totalMs} ms` : ''}${perf.lienzo ? ` · ${perf.lienzo}` : ''}`
-              : 'midiendo…'}
-          </div>
-        )}
         {/* Header Elegante y Minimalista */}
         <div className="sdm-share-pro__header">
           <div className="sdm-share-pro__title-wrap">
@@ -563,6 +556,15 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         </div>
 
       </div>
+      {/* Va fuera del modal y anclado a la pantalla: el modal es mas alto que el
+          telefono y se recorta por arriba, asi que dentro se pierde. */}
+      {showPerf && (
+        <div className="sdm-share-perf">
+          {perf
+            ? `caché ${perf.cache || '—'}${perf.dibujoMs != null ? ` · dibujo ${perf.dibujoMs} ms` : ''}${perf.codificacionMs != null ? ` · archivo ${perf.codificacionMs} ms` : ''}${perf.totalMs != null ? ` · total ${perf.totalMs} ms` : ''}${perf.lienzo ? ` · ${perf.lienzo}` : ''}`
+            : 'midiendo…'}
+        </div>
+      )}
     </div>
   );
 }
