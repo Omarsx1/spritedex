@@ -25,7 +25,7 @@ import {
   CheckCircle,
   ShieldAlert
 } from 'lucide-react';
-import { supabase, isSupabaseConfigured } from '../../utils/supabase';
+import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
 import { resolveCountry, setIgnoreTelemetry } from '../../utils/telemetry';
 import { showConfirmDialog, showSuccessAlert } from '../../utils/alert';
 
@@ -149,7 +149,9 @@ export function AudienceInsightsView({ darkMode = false }) {
 
     // 1. WebSocket en tiempo real para eventos de audiencia
     let channel = null;
-    if (isSupabaseConfigured && supabase) {
+    (async () => {
+      const supabase = await getSupabase();
+      if (!supabase) return;
       channel = supabase
         .channel('realtime_audience_insights')
         .on(
@@ -160,15 +162,15 @@ export function AudienceInsightsView({ darkMode = false }) {
           }
         )
         .subscribe();
-    }
+    })();
 
     // 2. Intervalo de respaldo periódico cada 30 segundos
     const interval = setInterval(loadAudienceData, 30000);
 
     return () => {
       clearInterval(interval);
-      if (channel && supabase) {
-        supabase.removeChannel(channel);
+      if (channel) {
+        getSupabase().then((supabase) => supabase && supabase.removeChannel(channel));
       }
     };
   }, []);

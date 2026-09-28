@@ -14,7 +14,7 @@ import {
   CheckCircle2,
   ExternalLink
 } from 'lucide-react';
-import { supabase, isSupabaseConfigured } from '../../utils/supabase';
+import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
 import { fetchAnalyticsOverview } from '../../utils/telemetry';
 
 export function AnalyticsDashboard({ darkMode = false }) {
@@ -43,7 +43,9 @@ export function AnalyticsDashboard({ darkMode = false }) {
     let channel = null;
     let presenceChannel = null;
 
-    if (isSupabaseConfigured && supabase) {
+    (async () => {
+      const supabase = await getSupabase();
+      if (!supabase) return;
       // 1. WebSocket en tiempo real para nuevos eventos de telemetría (INSERTs)
       channel = supabase
         .channel('realtime_analytics_dashboard')
@@ -75,18 +77,18 @@ export function AnalyticsDashboard({ darkMode = false }) {
         .on('presence', { event: 'join' }, updateOnlineCount)
         .on('presence', { event: 'leave' }, updateOnlineCount)
         .subscribe();
-    }
+    })();
 
     // 3. Intervalo de respaldo periódico cada 30 segundos
     const interval = setInterval(loadData, 30000);
 
     return () => {
       clearInterval(interval);
-      if (channel && supabase) {
-        supabase.removeChannel(channel);
+      if (channel) {
+        getSupabase().then((supabase) => supabase && supabase.removeChannel(channel));
       }
-      if (presenceChannel && supabase) {
-        supabase.removeChannel(presenceChannel);
+      if (presenceChannel) {
+        getSupabase().then((supabase) => supabase && supabase.removeChannel(presenceChannel));
       }
     };
   }, []);

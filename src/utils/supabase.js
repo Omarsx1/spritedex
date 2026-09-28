@@ -1,5 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
-
 // Read env variables (set in Vercel or local .env)
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -58,12 +56,40 @@ export function shouldSkipAnonymousAuth() {
   return isLocalEnvironment() || isPreviewEnvironment() || isAutomatedClient() || isAdminPortalPath();
 }
 
-export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true
-      }
-    })
-  : null;
+// El SDK pesa ~52 KB gzip y no hace falta para el primer pintado: se importa
+// bajo demanda y se memoiza. warmSupabase() lo calienta cuando el navegador
+// queda libre, para que la primera accion lo encuentre listo.
+let clientPromise = null;
+
+export function getSupabase() {
+  if (!isSupabaseConfigured) return Promise.resolve(null);
+  if (!clientPromise) {
+    clientPromise = import('@supabase/supabase-js')
+      .then(({ createClient }) =>
+        createClient(supabaseUrl, supabaseAnonKey, {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
+        })
+      )
+      .catch((error) => {
+        clientPromise = null;
+        throw error;
+      });
+  }
+  return clientPromise;
+}
+
+export function warmSupabase() {
+  if (!isSupabaseConfigured || typeof window === 'undefined') return;
+  const run = () => {
+    getSupabase().catch(() => {});
+  };
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(run, { timeout: 2000 });
+  } else {
+    setTimeout(run, 1);
+  }
+}

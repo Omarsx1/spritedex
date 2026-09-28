@@ -30,7 +30,7 @@ import { FamilyManagerModal } from './FamilyManagerModal';
 import { UserManagementTable } from './UserManagementTable';
 import { AudienceInsightsView } from './AudienceInsightsView';
 import { clearAdminSession } from '../../utils/adminAuth';
-import { supabase, isSupabaseConfigured } from '../../utils/supabase';
+import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
 
 export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
   const [isMobile, setIsMobile] = useState(() => {
@@ -113,7 +113,10 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
   }, []);
 
   useEffect(() => {
-    if (isSupabaseConfigured && supabase) {
+    if (!isSupabaseConfigured) return undefined;
+    let cancelled = false;
+    getSupabase().then((supabase) => {
+      if (!supabase || cancelled) return;
       supabase
         .from('user_collections')
         .select('*', { count: 'exact', head: true })
@@ -122,7 +125,10 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
             setUsersCount(count);
           }
         });
-    }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const toggleDarkMode = () => {

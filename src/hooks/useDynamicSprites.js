@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES, SUMMON_COST_OVERRIDES, WEBP_MAP, getSpriteThumb } from '../data/spritesData';
-import { supabase, isSupabaseConfigured } from '../utils/supabase';
+import { getSupabase } from '../utils/supabase';
 
 export const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache_v2';
 
@@ -231,7 +231,8 @@ export function useDynamicSprites() {
       }
     } catch {}
 
-    if (!isSupabaseConfigured || !supabase) return;
+    const supabase = await getSupabase();
+    if (!supabase) return;
 
     try {
       setIsLoading(true);
@@ -303,10 +304,13 @@ export function useDynamicSprites() {
   useEffect(() => {
     refreshDynamicSprites();
 
-    // Setup Supabase Realtime subscription
     let subscription = null;
-    if (isSupabaseConfigured && supabase) {
-      const channel = supabase
+    let cancelled = false;
+
+    (async () => {
+      const supabase = await getSupabase();
+      if (!supabase || cancelled) return;
+      subscription = supabase
         .channel('sprites_catalog_changes')
         .on(
           'postgres_changes',
@@ -316,9 +320,7 @@ export function useDynamicSprites() {
           }
         )
         .subscribe();
-
-      subscription = channel;
-    }
+    })();
 
     // Interval to check automatic scheduled releases every 30 seconds
     const interval = setInterval(() => {
@@ -326,9 +328,10 @@ export function useDynamicSprites() {
     }, 30000);
 
     return () => {
+      cancelled = true;
       clearInterval(interval);
-      if (subscription && supabase) {
-        supabase.removeChannel(subscription);
+      if (subscription) {
+        getSupabase().then((sb) => sb && sb.removeChannel(subscription));
       }
     };
   }, [refreshDynamicSprites]);

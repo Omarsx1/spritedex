@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { X, Cloud, LogIn, LogOut, CheckCircle, Mail, Key, ShieldCheck } from 'lucide-react';
-import { supabase, isSupabaseConfigured } from '../utils/supabase';
+import { getSupabase, isSupabaseConfigured } from '../utils/supabase';
 import { trackEvent } from '../utils/telemetry';
 
 export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
@@ -47,6 +47,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
     setMessage(null);
 
     try {
+      const supabase = await getSupabase();
       if (isSignUp) {
         const { error: signUpError } = await supabase.auth.signUp({
           email,
@@ -76,6 +77,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
     try {
       setLoading(true);
       setError(null);
+      const supabase = await getSupabase();
       const { error: anonError } = await supabase.auth.signInAnonymously();
       if (anonError) throw anonError;
       trackEvent('login', { method: 'anonymous' });
@@ -92,6 +94,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
       setLoading(true);
       setError(null);
       trackEvent('login', { method: 'google' });
+      const supabase = await getSupabase();
       const { error: googleError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -121,6 +124,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
     setMessage(null);
 
     try {
+      const supabase = await getSupabase();
       const { error: updateError } = await supabase.auth.updateUser({
         email,
         password
@@ -136,7 +140,8 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
 
   const handleSignOut = async () => {
     setLoading(true);
-    await supabase.auth.signOut();
+    const supabase = await getSupabase();
+    if (supabase) await supabase.auth.signOut();
     if (onSignOut) onSignOut();
     setLoading(false);
     onClose();

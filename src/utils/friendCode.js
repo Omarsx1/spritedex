@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from './supabase';
+import { getSupabase, isSupabaseConfigured } from './supabase';
 import { safeStorage } from './safeStorage';
 
 const STORAGE_MY_CODE_KEY = 'spritedex_my_friend_code';
@@ -80,7 +80,9 @@ export function normalizeFriendCode(input) {
  * 4. Fallback by user_id if input was a UUID
  */
 export async function fetchCollectionByFriendCode(friendCode) {
-  if (!isSupabaseConfigured || !supabase || !friendCode) return null;
+  if (!isSupabaseConfigured || !friendCode) return null;
+  const supabase = await getSupabase();
+  if (!supabase) return null;
 
   const normalized = normalizeFriendCode(friendCode);
   const cleanSuffix = normalized.replace(/^SDEX-/, '').replace(/[^A-Z0-9]/g, '');
@@ -161,37 +163,46 @@ export async function fetchCollectionByFriendCode(friendCode) {
  * Returns an unsubscribe function
  */
 export function subscribeToFriendCollection(friendUserId, onUpdate) {
-  if (!isSupabaseConfigured || !supabase || !friendUserId) {
+  if (!isSupabaseConfigured || !friendUserId) {
     return () => {};
   }
 
-  try {
-    const channelId = `realtime-friend-${friendUserId.slice(0, 8)}-${Date.now()}`;
-    const channel = supabase
-      .channel(channelId)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'user_collections',
-          filter: `user_id=eq.${friendUserId}`
-        },
-        (payload) => {
-          if (payload.new && payload.new.user_state) {
-            onUpdate(payload.new.user_state, payload.new.friend_code);
+  let channel = null;
+  let cancelled = false;
+
+  (async () => {
+    try {
+      const supabase = await getSupabase();
+      if (!supabase || cancelled) return;
+      const channelId = 'realtime-friend-' + friendUserId.slice(0, 8) + '-' + Date.now();
+      channel = supabase
+        .channel(channelId)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'user_collections',
+            filter: 'user_id=eq.' + friendUserId
+          },
+          (payload) => {
+            if (payload.new && payload.new.user_state) {
+              onUpdate(payload.new.user_state, payload.new.friend_code);
+            }
           }
-        }
-      )
-      .subscribe();
+        )
+        .subscribe();
+    } catch (err) {
+      console.error('Failed to setup Realtime friend channel:', err);
+    }
+  })();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  } catch (err) {
-    console.error('Failed to setup Realtime friend channel:', err);
-    return () => {};
-  }
+  return () => {
+    cancelled = true;
+    if (channel) {
+      getSupabase().then((sb) => sb && sb.removeChannel(channel));
+    }
+  };
 }
 
 /**

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Lock, Key, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
-import { supabase, isSupabaseConfigured } from '../../utils/supabase';
+import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
 import { ADMIN_AUTH_KEY, isUserAdminAuthenticated, clearAdminSession } from '../../utils/adminAuth';
 const DEFAULT_PASSCODE = 'override2026';
 
@@ -32,6 +32,7 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
     try {
       setLoading(true);
       setErrorMsg('');
+      const supabase = await getSupabase();
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password

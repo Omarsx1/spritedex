@@ -16,7 +16,7 @@ import {
   Edit3
 } from 'lucide-react';
 import { RARITIES, THEME_NAMES_ES, FAMILY_NAMES_MAP, getSpriteCardStyle } from '../../data/spritesData';
-import { supabase, isSupabaseConfigured } from '../../utils/supabase';
+import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
 import { DYNAMIC_SPRITES_CACHE_KEY } from '../../hooks/useDynamicSprites';
 
 // Convierte una fecha ISO (UTC o local) en string YYYY-MM-DDTHH:mm local sin desplazamiento de zona horaria
@@ -210,7 +210,8 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
       setUploadingImage(true);
       setErrorMsg('');
 
-      if (isSupabaseConfigured && supabase) {
+      const supabase = await getSupabase();
+      if (supabase) {
         const fileExt = file.name.split('.').pop() || 'webp';
         const cleanName = (formData.id || 'sprite').replace(/[^a-z0-9_-]/gi, '');
         const fileName = `${cleanName}_${Date.now()}.${fileExt}`;
@@ -283,7 +284,8 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
         updated_at: new Date().toISOString()
       };
 
-      if (isSupabaseConfigured && supabase) {
+      const supabase = await getSupabase();
+      if (supabase) {
         let { error } = await supabase.from('sprites').upsert(payload);
         if (error && (error.message?.includes('is_new') || error.code === 'PGRST204')) {
           // Si la columna is_new no existe aún en la tabla de Supabase, reintentamos sin ella

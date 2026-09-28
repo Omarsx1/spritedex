@@ -23,7 +23,7 @@ import { useDynamicSprites } from './hooks/useDynamicSprites';
 import { trackEvent, resolveCountry } from './utils/telemetry';
 import { isUserAdminAuthenticated } from './utils/adminAuth';
 import { decodeCollectionState } from './utils/shareLink';
-import { supabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from './utils/supabase';
+import { getSupabase, warmSupabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from './utils/supabase';
 import { safeStorage } from './utils/safeStorage';
 import {
   getMyFriendCode,
@@ -72,25 +72,35 @@ export function App() {
   // Presencia en Vivo por WebSockets (Supabase Realtime Presence)
   // Permite saber instantáneamente cuándo un usuario entra y cuándo cierra la pestaña/sale (1 segundo)
   useEffect(() => {
-    if (!isSupabaseConfigured || !supabase || isAdminPortal || isAdminAuth || isUserAdminAuthenticated()) return;
+    if (!isSupabaseConfigured || isAdminPortal || isAdminAuth || isUserAdminAuthenticated()) return undefined;
 
-    const presenceChannel = supabase.channel('online_spritedex_users');
-    presenceChannel
-      .on('presence', { event: 'sync' }, () => {})
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          try {
-            await presenceChannel.track({
-              online_at: new Date().toISOString()
-            });
-          } catch (e) {}
-        }
-      });
+    let presenceChannel = null;
+    let cancelled = false;
+
+    (async () => {
+      const supabase = await getSupabase();
+      if (!supabase || cancelled) return;
+      presenceChannel = supabase.channel('online_spritedex_users');
+      presenceChannel
+        .on('presence', { event: 'sync' }, () => {})
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            try {
+              await presenceChannel.track({
+                online_at: new Date().toISOString()
+              });
+            } catch (e) {}
+          }
+        });
+    })();
 
     return () => {
+      cancelled = true;
       try {
-        presenceChannel.untrack();
-        supabase.removeChannel(presenceChannel);
+        if (presenceChannel) {
+          presenceChannel.untrack();
+          getSupabase().then((sb) => sb && sb.removeChannel(presenceChannel));
+        }
       } catch (e) {}
     };
   }, [isAdminPortal, isAdminAuth]);
@@ -205,14 +215,21 @@ export function App() {
 
   // Listen to Supabase Auth State & Sync Cloud Data
   useEffect(() => {
-    if (!isSupabaseConfigured || !supabase) return;
+    if (!isSupabaseConfigured) return undefined;
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    let subscription = null;
+    let cancelled = false;
+
+    (async () => {
+      const supabase = await getSupabase();
+      if (!supabase || cancelled) return;
+
+      const { data: { session } } = await supabase.auth.getSession();
       let currentUser = session?.user ?? null;
 
       // Inicialización silenciosa de sesión en segundo plano para que el código de amigo
       // y la colección del usuario queden respaldados y accesibles para sus amigos en Supabase.
-      if (!currentUser && isSupabaseConfigured && supabase && !shouldSkipAnonymousAuth()) {
+      if (!currentUser && !shouldSkipAnonymousAuth()) {
         try {
           const { data: anonData } = await supabase.auth.signInAnonymously();
           if (anonData?.user) {
@@ -223,30 +240,35 @@ export function App() {
         }
       }
 
+      if (cancelled) return;
       setUser(currentUser);
       if (currentUser) {
         setShowAuthModal(false);
         loadUserCollectionFromCloud(currentUser.id);
       }
-    });
 
-    const {
-      data: { subscription }
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
-      if (currentUser) {
-        setShowAuthModal(false);
-        loadUserCollectionFromCloud(currentUser.id);
-      } else if (_event === 'SIGNED_OUT') {
-        handleSignOutCleanup();
-      }
-    });
+      const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+        const nextUser = session?.user ?? null;
+        setUser(nextUser);
+        if (nextUser) {
+          setShowAuthModal(false);
+          loadUserCollectionFromCloud(nextUser.id);
+        } else if (_event === 'SIGNED_OUT') {
+          handleSignOutCleanup();
+        }
+      });
+      subscription = data.subscription;
+    })();
 
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      if (subscription) subscription.unsubscribe();
+    };
   }, []);
 
   const loadUserCollectionFromCloud = async (userId) => {
+    const supabase = await getSupabase();
+    if (!supabase) return;
     try {
       const { data, error } = await supabase
         .from('user_collections')
@@ -289,9 +311,11 @@ export function App() {
   useEffect(() => {
     safeStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userState));
 
-    if (isSupabaseConfigured && supabase && user) {
+    if (isSupabaseConfigured && user) {
       const timer = setTimeout(async () => {
         try {
+          const supabase = await getSupabase();
+          if (!supabase) return;
           const defaultAnonName = myFriendCode
             ? `Entrenador #${myFriendCode.replace('SDEX-', '')}`
             : `Entrenador #${user.id.slice(0, 4).toUpperCase()}`;
@@ -352,8 +376,10 @@ export function App() {
   }, [userState, user, myFriendCode]);
 
   const ensureCloudSessionForAction = useCallback(async () => {
-    if (user || !isSupabaseConfigured || !supabase || shouldSkipAnonymousAuth()) return;
+    if (user || !isSupabaseConfigured || shouldSkipAnonymousAuth()) return;
     try {
+      const supabase = await getSupabase();
+      if (!supabase) return;
       const { data } = await supabase.auth.signInAnonymously();
       if (data?.user) {
         setUser(data.user);

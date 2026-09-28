@@ -17,7 +17,7 @@ import {
   Layers,
   Crown
 } from 'lucide-react';
-import { supabase, isSupabaseConfigured } from '../../utils/supabase';
+import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
 import { getMyFriendCode } from '../../utils/friendCode';
 import { getClientCountry, resolveCountry } from '../../utils/telemetry';
 
@@ -71,11 +71,14 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
 
   // Fetch current authenticated user to accurately match "TÚ"
   useEffect(() => {
-    if (isSupabaseConfigured && supabase) {
+    if (isSupabaseConfigured) {
+      getSupabase().then((supabase) => {
+        if (!supabase) return;
       supabase.auth.getUser().then(({ data }) => {
         if (data?.user) {
           setCurrentAuthUser(data.user);
         }
+      });
       });
     }
 

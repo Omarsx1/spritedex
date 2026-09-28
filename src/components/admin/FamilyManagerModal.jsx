@@ -13,7 +13,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { FAMILY_NAMES_MAP, THEME_NAMES_ES } from '../../data/spritesData';
-import { supabase, isSupabaseConfigured } from '../../utils/supabase';
+import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
 
 export function FamilyManagerModal({ 
   sprites = [], 
@@ -141,7 +141,8 @@ export function FamilyManagerModal({
             updated_at: new Date().toISOString()
           };
 
-          await supabase.from('sprites').upsert(payload);
+          const supabase = await getSupabase();
+          if (supabase) await supabase.from('sprites').upsert(payload);
         }
       }
 
@@ -186,7 +187,8 @@ export function FamilyManagerModal({
           updated_at: new Date().toISOString()
         };
 
-        await supabase.from('sprites').upsert(payload);
+        const supabase = await getSupabase();
+        if (supabase) await supabase.from('sprites').upsert(payload);
       }
 
       setStatusMsg({ type: 'success', text: `¡Familia "${safeName}" creada con éxito!` });

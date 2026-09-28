@@ -13,7 +13,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { RARITIES } from '../../data/spritesData';
-import { supabase, isSupabaseConfigured } from '../../utils/supabase';
+import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
 import { showConfirmDialog, showSuccessAlert } from '../../utils/alert';
 
 export function SpiritCatalogTable({ 
@@ -146,7 +146,8 @@ export function SpiritCatalogTable({
 
     try {
       setDeletingId(sprite.id);
-      if (isSupabaseConfigured && supabase) {
+      const supabase = await getSupabase();
+      if (supabase) {
         const { error } = await supabase.from('sprites').delete().eq('id', sprite.id);
         if (error) throw error;
       }

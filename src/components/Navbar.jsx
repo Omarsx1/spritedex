@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Download, User, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone } from 'lucide-react';
-import { supabase } from '../utils/supabase';
+import { getSupabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
 import { safeStorage } from '../utils/safeStorage';
 
@@ -98,6 +98,7 @@ export function Navbar({
     e.stopPropagation();
     setIsUserMenuOpen(false);
     try {
+      const supabase = await getSupabase();
       if (supabase) {
         await supabase.auth.signOut();
       }

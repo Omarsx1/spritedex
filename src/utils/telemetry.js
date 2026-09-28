@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured, isLocalEnvironment, isPreviewEnvironment, isAutomatedClient, isAdminPortalPath } from './supabase';
+import { getSupabase, isLocalEnvironment, isPreviewEnvironment, isAutomatedClient, isAdminPortalPath } from './supabase';
 import { allSprites } from '../data/spritesData';
 import { safeStorage } from './safeStorage';
 
@@ -299,7 +299,8 @@ export async function trackEvent(eventType = 'pageview', meta = {}) {
     } catch {}
 
     // Send to Supabase if configured
-    if (isSupabaseConfigured && supabase) {
+    const supabase = await getSupabase();
+    if (supabase) {
       await supabase.from('analytics_events').insert({
         event_type: eventType,
         session_id: sessionId,
@@ -332,7 +333,8 @@ export async function fetchAnalyticsOverview() {
   };
 
   try {
-    if (isSupabaseConfigured && supabase) {
+    const supabase = await getSupabase();
+    if (supabase) {
       // 1. Fetch total count
       const { count: totalCount } = await supabase
         .from('analytics_events')
@@ -526,7 +528,8 @@ export async function fetchAnalyticsOverview() {
 // Purge historical test visits recorded prior to geolocation implementation
 export async function purgeHistoricalTestEvents() {
   try {
-    if (isSupabaseConfigured && supabase) {
+    const supabase = await getSupabase();
+    if (supabase) {
       const { data, error } = await supabase
         .from('analytics_events')
         .delete()
