@@ -3,7 +3,7 @@ import {
   X, Download, Share2, Copy, Check, Image as ImageIcon, Filter, Globe,
   CheckCircle, XCircle, Sparkles, Repeat, ShieldCheck, Flame
 } from 'lucide-react';
-import { generatePokedexCardImage, encodeCanvasToPng, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture } from '../utils/canvasExporter';
+import { generatePokedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 
@@ -42,7 +42,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     if (!canvasToEncode) return;
     const run = () => {
       if (onlyForJobId !== undefined && activeJobIdRef.current !== onlyForJobId) return;
-      encodeCanvasToPng(canvasToEncode).then((enc) => {
+      encodeCanvasToImage(canvasToEncode).then((enc) => {
         if (onlyForJobId !== undefined && activeJobIdRef.current !== onlyForJobId) return;
         const prev = globalTemplatePreviewCache.get(key) || {};
         globalTemplatePreviewCache.set(key, { ...prev, canvas: canvasToEncode, url: enc.dataUrl, blob: enc.blob, file: enc.file });
@@ -276,7 +276,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     const pad = (n) => String(n).padStart(2, '0');
     const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
     const timeStr = `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
-    return `spritedex_${dateStr}_${timeStr}.png`;
+    return `spritedex_${dateStr}_${timeStr}.jpg`;
   };
 
   const isIOS = typeof navigator !== 'undefined' && (
@@ -295,7 +295,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       if (!blobToUse && dataUrl) {
         const res = await fetch(dataUrl);
         blobToUse = await res.blob();
-        fileToUse = new File([blobToUse], getCaptureFilename(), { type: 'image/png' });
+        fileToUse = new File([blobToUse], getCaptureFilename(), { type: 'image/jpeg' });
       }
 
       // En iOS / iPhone Safari, la descarga sintética suele parpadear.
@@ -344,7 +344,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       if (!fileToShare && dataUrl) {
         const res = await fetch(dataUrl);
         const blob = await res.blob();
-        fileToShare = new File([blob], getCaptureFilename(), { type: 'image/png' });
+        fileToShare = new File([blob], getCaptureFilename(), { type: 'image/jpeg' });
       }
 
       // Invocación directa e instantánea sin perder el User Gesture en iOS Safari y Android Chrome
