@@ -1,5 +1,5 @@
 import officialSpritesJson from './official_sprites.json';
-import fortniteGgJson from './fortnite_gg_sprites_complete.json';
+import fortniteGgJson from './fortnite_gg_index.json';
 
 // Miniaturas WebP para tarjetas, generadas por scripts/generate_sprite_thumbs.js.
 import spriteThumbsJson from './sprite_thumbs.json';
