@@ -36,6 +36,9 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
   const [currentAuthUser, setCurrentAuthUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  // Filtro de solo vista: oculta los usuarios de prueba sin tocar la base de datos.
+  const [hideTestUsers, setHideTestUsers] = useState(() => sessionStorage.getItem('spritedex_hide_test_users') === 'true');
+  const [testUserIds, setTestUserIds] = useState(() => localStorage.getItem('spritedex_test_user_ids') || '');
   
   const [filterType, setFilterType] = useState(() => {
     try {
@@ -330,6 +333,13 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
   const filteredUsers = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return users.filter((u) => {
+      if (hideTestUsers) {
+        const ids = testUserIds.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+        if (ids.length > 0 && (ids.includes((u.userId || '').toLowerCase()) || ids.includes((u.friendCode || '').toLowerCase()))) {
+          return false;
+        }
+      }
+
       if (q) {
         const matchesCode = (u.friendCode || '').toLowerCase().includes(q);
         const matchesId = (u.userId || '').toLowerCase().includes(q);
@@ -341,7 +351,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
 
       return true;
     });
-  }, [users, searchQuery, filterType]);
+  }, [users, searchQuery, filterType, hideTestUsers, testUserIds]);
 
   const totalPages = Math.ceil(filteredUsers.length / pageSize) || 1;
 
@@ -656,6 +666,39 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
           >
             Exportar CSV
           </button>
+          <label
+            title="Oculta de la lista los usuarios de prueba. Solo afecta a esta vista: no modifica la base."
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: c.textMuted, cursor: 'pointer' }}
+          >
+            <input
+              type="checkbox"
+              checked={hideTestUsers}
+              onChange={(e) => {
+                setHideTestUsers(e.target.checked);
+                sessionStorage.setItem('spritedex_hide_test_users', e.target.checked ? 'true' : 'false');
+              }}
+            />
+            Ocultar pruebas
+          </label>
+          <input
+            type="text"
+            value={testUserIds}
+            onChange={(e) => {
+              setTestUserIds(e.target.value);
+              localStorage.setItem('spritedex_test_user_ids', e.target.value);
+            }}
+            placeholder="IDs de prueba (coma)"
+            title="Pega los user_id que quieras ocultar, separados por coma. Se guardan solo en este navegador."
+            style={{
+              padding: '8px 10px',
+              borderRadius: '8px',
+              border: '1px solid ' + c.borderInput,
+              background: c.bgInput,
+              color: c.textPrimary,
+              fontSize: '0.78rem',
+              width: '190px'
+            }}
+          />
           {/* Generation Scope Select */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Layers size={15} style={{ color: darkMode ? '#3ECF8E' : '#2563EB' }} />
