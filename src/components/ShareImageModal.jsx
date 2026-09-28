@@ -30,6 +30,10 @@ function leerPerfActivado() {
   }
 }
 
+// TEMPORAL: mientras afinamos la velocidad del modal, el medidor se muestra
+// siempre como badge flotante. Volver a false cuando ya no haga falta.
+const PERF_SIEMPRE_VISIBLE = true;
+
 export function ShareImageModal({ filteredSprites, allSprites, userState, activeFiltersLabel, onClose }) {
   const [format, setFormat] = useState('checklist'); // 'checklist', 'square'
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
@@ -49,7 +53,10 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const [isClosing, setIsClosing] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
   const [perf, setPerf] = useState(null);
-  const [showPerf, setShowPerf] = useState(leerPerfActivado);
+  const [showPerf, setShowPerf] = useState(() => {
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('perf') === '0') return false;
+    return PERF_SIEMPRE_VISIBLE || leerPerfActivado();
+  });
   const tapPerfRef = useRef(0);
   const alternarPerf = useCallback(() => {
     setShowPerf((activo) => {
