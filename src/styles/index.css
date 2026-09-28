@@ -4034,14 +4034,30 @@ body::after {
   background: rgba(0, 0, 0, 0.82);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  z-index: 1000;
+  /* Por encima del dock gooey (9999), el aviso de privacidad (9999) y el prompt de
+     instalacion (9998): estaban por delante de la modal y se comian los gestos. */
+  z-index: 10000;
   display: flex;
-  align-items: center;
+  /* Con overflow propio no se puede centrar sin recortar por arriba: 'safe center'
+     centra cuando cabe y alinea arriba cuando no. flex-start es el respaldo. */
+  align-items: flex-start;
+  align-items: safe center;
   justify-content: center;
   padding: 20px;
+  /* El scroll se queda dentro: la modal es mas alta que el telefono, y sin esto el
+     gesto se lo comia la pagina de detras (se veia hacer scroll por detras). */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   animation: fadeInModalBackdrop 0.28s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
   will-change: opacity, backdrop-filter;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Con una modal abierta, la pagina de detras no se mueve. Va con :has() para no
+   tener que tocar los diez componentes que comparten .modal-overlay. */
+body:has(.modal-overlay) {
+  overflow: hidden;
 }
 
 .modal-overlay.is-closing {
