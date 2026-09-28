@@ -21,5 +21,13 @@
   },
   "globals": {
     "__VERCEL_ENV__": "readonly"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["scripts/**", "tests/**", "vite.config.js"],
+      "env": {
+        "node": true
+      }
+    }
+  ]
 }
