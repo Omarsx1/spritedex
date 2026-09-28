@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { fireConfetti } from '../utils/confetti';
 import { Lock } from 'lucide-react';
 import { RARITIES, getSpriteCardStyle, getRarityInfo } from '../data/spritesData';
 import { sounds } from '../utils/audio';
 import { SonicRing } from './SonicRing';
 
-export function SpriteCard({
+function SpriteCardBase({
   sprite,
   index = 0,
   userState,
@@ -331,3 +331,20 @@ export function SpriteCard({
     </div>
   );
 }
+
+// Solo se re-renderiza si cambia su propia entrada de estado o sus props estables.
+// Las entradas de userState/friendState conservan su identidad salvo la que se edita,
+// asi que marcar un espiritu no re-renderiza el resto de las tarjetas.
+export const SpriteCard = memo(SpriteCardBase, (prev, next) => {
+  if (prev.sprite !== next.sprite) return false;
+  if (prev.index !== next.index) return false;
+  if (prev.viewMode !== next.viewMode) return false;
+  if (prev.isFriendView !== next.isFriendView) return false;
+  if (prev.onToggleOwned !== next.onToggleOwned) return false;
+  if (prev.onSetLevel !== next.onSetLevel) return false;
+  if (prev.onOpenDetail !== next.onOpenDetail) return false;
+  const id = next.sprite.id;
+  if (prev.userState && prev.userState[id] !== (next.userState && next.userState[id])) return false;
+  if (prev.friendState && prev.friendState[id] !== (next.friendState && next.friendState[id])) return false;
+  return true;
+});

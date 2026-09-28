@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useDeferredValue, lazy, Suspense } from 'react';
 import { VARIANT_ORDER } from './data/spritesData';
 
 const getVariantPriority = (v) => {
@@ -142,6 +142,8 @@ export function App() {
   // Filters matching fortnite.gg
   const [activeGen, setActiveGen] = useState(2); // 2 = 2ª Generación (GLITCH) by default!
   const [searchQuery, setSearchQuery] = useState('');
+  // La busqueda se difiere: teclear no bloquea el pintado de la grilla.
+  const deferredSearch = useDeferredValue(searchQuery);
   const [baseFilter, setBaseFilter] = useState('all'); // BASE = variant/theme
   const [spriteFilter, setSpriteFilter] = useState('all'); // SPRITE = family
   const [statusFilter, setStatusFilter] = useState('all'); // STATUS = all/owned/missing
@@ -434,6 +436,9 @@ export function App() {
     });
   }, [ensureCloudSessionForAction]);
 
+  const handleOpenDetail = useCallback((s) => setSelectedSprite(s), []);
+  const handleCloseDetail = useCallback(() => setSelectedSprite(null), []);
+
   const handleSetLevel = useCallback((spriteId, level) => {
     ensureCloudSessionForAction();
     setUserState((prev) => ({
@@ -473,8 +478,8 @@ export function App() {
       // Filter by Generation (activeGen: 2 = Gen 2, 1 = Gen 1, 0 = All)
       if (activeGen !== 0 && sprite.gen !== activeGen) return false;
 
-      if (searchQuery.trim() !== '') {
-        const query = searchQuery.toLowerCase();
+      if (deferredSearch.trim() !== '') {
+        const query = deferredSearch.toLowerCase();
         const nameMatch = sprite.fullName.toLowerCase().includes(query);
         const idMatch = sprite.id.toLowerCase().includes(query);
         const familyMatch = (sprite.familyName || '').toLowerCase().includes(query);
@@ -562,7 +567,7 @@ export function App() {
     dynamicSprites,
     showUnreleased,
     activeGen,
-    searchQuery,
+    deferredSearch,
     baseFilter,
     spriteFilter,
     statusFilter,
@@ -720,7 +725,7 @@ export function App() {
             isFriendView={activeProfile === 'friend'}
             onToggleOwned={handleToggleOwned}
             onSetLevel={handleSetLevel}
-            onOpenDetail={(s) => setSelectedSprite(s)}
+            onOpenDetail={handleOpenDetail}
           />
         ) : (
           <div className={`sprites-grid ${viewMode === 'list' ? 'list-view' : ''}`}>
@@ -735,7 +740,7 @@ export function App() {
                 viewMode={viewMode}
                 onToggleOwned={handleToggleOwned}
                 onSetLevel={handleSetLevel}
-                onOpenDetail={(s) => setSelectedSprite(s)}
+                onOpenDetail={handleOpenDetail}
               />
             ))}
           </div>
@@ -749,7 +754,7 @@ export function App() {
           userState={userState}
           onToggleOwned={handleToggleOwned}
           onSetLevel={handleSetLevel}
-          onClose={() => setSelectedSprite(null)}
+          onClose={handleCloseDetail}
         />
       )}
 
