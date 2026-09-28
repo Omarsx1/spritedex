@@ -24,8 +24,13 @@ al cerrar sesion, y que vea el camino para vincular su cuenta.
       restaura sola si no hay progreso local y la sesion es de invitado. Verificado: con
       copia valida restaura (2 espiritus marcados en la interfaz) y consume la copia; con
       copia de mas de 30 dias la descarta.
-- [ ] Paso 3. Vincular Google con linkIdentity (con mensaje claro si el proyecto no tiene
-      activado "Manual Linking", y sin prometer lo que no cumple).
+ - [x] Paso 3. Vincular Google con linkIdentity cuando la sesion es anonima, con mensaje
+      claro si el proyecto no tiene "Manual Linking" activado. Verificado con
+      instrumentacion temporal: la rama anonima llama a linkIdentity (no a signInWithOAuth).
+ - [x] Hallazgo del paso 3: la modal de acceso solo se renderizaba con `!user`, asi que un
+      invitado NO podia abrirla de ninguna forma (su boton en el menu habria quedado
+      muerto). Ahora se abre tambien con sesion anonima, que es la unica via para
+      vincular. Y se corrigio el texto que le prometia "seguro en la nube".
 - [ ] Paso 4. Recuperar los datos de la usuaria afectada (requiere autorizacion explicita:
       es una escritura en la base).
 

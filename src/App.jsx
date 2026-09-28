@@ -912,7 +912,8 @@ export function App() {
           />
         )}
 
-        {showAuthModal && !user && (
+        {/* Tambien con sesion anonima: es la unica via para vincular la cuenta. */}
+        {showAuthModal && (!user || user.is_anonymous) && (
           <AuthModal
             user={user}
             onClose={() => setShowAuthModal(false)}
