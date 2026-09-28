@@ -24,6 +24,7 @@ import { trackEvent, resolveCountry } from './utils/telemetry';
 import { isUserAdminAuthenticated } from './utils/adminAuth';
 import { decodeCollectionState } from './utils/shareLink';
 import { getSupabase, warmSupabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from './utils/supabase';
+import { setSyncSession, queueCloudSync, clearCloudSync, flushCloudSync } from './utils/pendingSync';
 import { safeStorage } from './utils/safeStorage';
 import {
   getMyFriendCode,
@@ -43,6 +44,7 @@ const AuthModal = lazy(() => import('./components/AuthModal').then(m => ({ defau
 const PrivacyPolicyModal = lazy(() => import('./components/PrivacyPolicyModal').then(m => ({ default: m.PrivacyPolicyModal })));
 
 const LOCAL_STORAGE_KEY = 'fortnite_sprites_pokedex_v3';
+const LOCAL_STATE_UPDATED_KEY = 'spritedex_state_updated_at_v1';
 
 export function App() {
   const isMobile = useIsMobile(600);
@@ -227,6 +229,7 @@ export function App() {
       if (!supabase || cancelled) return;
 
       const { data: { session } } = await supabase.auth.getSession();
+      setSyncSession(session);
       let currentUser = session?.user ?? null;
 
       // Inicialización silenciosa de sesión en segundo plano para que el código de amigo
@@ -250,6 +253,7 @@ export function App() {
       }
 
       const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+        setSyncSession(session);
         const nextUser = session?.user ?? null;
         setUser(nextUser);
         if (nextUser) {
@@ -288,7 +292,15 @@ export function App() {
         safeStorage.setItem('spritedex_my_friend_code', data.friend_code);
       }
 
-      if (data?.user_state && Object.keys(data.user_state).length > 0) {
+      const localUpdatedAt = Number(safeStorage.getItem(LOCAL_STATE_UPDATED_KEY) || 0);
+      const cloudUpdatedAt = data?.updated_at ? Date.parse(data.updated_at) : 0;
+      const localIsNewer = localUpdatedAt > 0 && localUpdatedAt > cloudUpdatedAt;
+
+      if (localIsNewer) {
+        // Lo local es mas nuevo que la nube: se conserva y se empuja, en vez de
+        // pisarlo con una copia vieja (capturas que no llegaron a sincronizarse).
+        setUserState((currentLocal) => ({ ...currentLocal }));
+      } else if (data?.user_state && Object.keys(data.user_state).length > 0) {
         const { _profile, ...pureState } = data.user_state;
         setUserState((currentLocal) => {
           const merged = { ...currentLocal, ...pureState };
@@ -312,6 +324,7 @@ export function App() {
   // Sync to localStorage & Supabase Cloud
   useEffect(() => {
     safeStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userState));
+    safeStorage.setItem(LOCAL_STATE_UPDATED_KEY, String(Date.now()));
 
     if (isSupabaseConfigured && user) {
       const timer = setTimeout(async () => {
@@ -357,18 +370,18 @@ export function App() {
             country_name: countryName,
           };
 
-          await supabase.from('user_collections').upsert(
-            {
-              user_id: user.id,
-              friend_code: myFriendCode,
-              user_state: {
-                ...userState,
-                _profile: profileMeta
-              },
-              updated_at: new Date().toISOString()
+          const payload = {
+            user_id: user.id,
+            friend_code: myFriendCode,
+            user_state: {
+              ...userState,
+              _profile: profileMeta
             },
-            { onConflict: 'user_id' }
-          );
+            updated_at: new Date().toISOString()
+          };
+          queueCloudSync(payload);
+          await supabase.from('user_collections').upsert(payload, { onConflict: 'user_id' });
+          clearCloudSync();
         } catch (err) {
           console.error('Failed to sync to Supabase:', err);
         }
@@ -376,6 +389,21 @@ export function App() {
       return () => clearTimeout(timer);
     }
   }, [userState, user, myFriendCode]);
+
+  // Salida garantizada: si la pestaña se cierra o pasa a segundo plano con un sync
+  // pendiente, se empuja con keepalive en vez de esperar el debounce de 600 ms.
+  useEffect(() => {
+    const flush = () => flushCloudSync();
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') flush();
+    };
+    window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, []);
 
   const ensureCloudSessionForAction = useCallback(async () => {
     if (user || !isSupabaseConfigured || shouldSkipAnonymousAuth()) return;
