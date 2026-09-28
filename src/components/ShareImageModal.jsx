@@ -90,7 +90,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
 
   // Codifica el PNG fuera del camino critico: primero se pinta la captura y despues,
   // en reposo, se prepara el archivo de Descargar/Compartir. Son 2-6 s menos de espera.
-  const queuePngEncode = useCallback((canvasToEncode, key, onlyForJobId) => {
+  const queuePngEncode = useCallback((canvasToEncode, key, onlyForJobId, inicioDibujo) => {
     if (!canvasToEncode) return;
     const run = () => {
       if (onlyForJobId !== undefined && activeJobIdRef.current !== onlyForJobId) return;
@@ -104,7 +104,13 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         setCachedFile(enc.file);
         // Persiste para que la proxima visita no tenga que dibujar ni codificar nada.
         if (enc.blob) writeCachedCapture(key, enc.blob);
-        setPerf((previo) => ({ ...(previo || {}), codificacionMs: Date.now() - inicioCodificacion, totalMs: Date.now() - openTimeRef.current }));
+        // El total de la generacion es dibujo + codificacion, no el tiempo desde
+        // que se abrio el modal: eso daba cifras falsas si la modal seguia abierta.
+        setPerf((previo) => {
+          const ultima = { ...(previo?.ultima || {}), codificacionMs: Date.now() - inicioCodificacion };
+          if (inicioDibujo) ultima.totalMs = Date.now() - inicioDibujo;
+          return { ...(previo || {}), ultima };
+        });
       }).catch((err) => {
         console.error('Error codificando la captura:', err);
       });
@@ -205,6 +211,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
 
   // Trigger canvas generation on setting changes with instant in-memory preview cache
   useEffect(() => {
+    const inicioPase = Date.now();
     if (spritesList.length === 0) {
       setDataUrl('');
       setCachedFile(null);
@@ -225,7 +232,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       setCachedBlob(cached?.blob || null);
       setIsGenerating(false);
       if (cachedCanvas && !url) queuePngEncode(cachedCanvas, currentKey);
-      if (showPerf) setPerf({ cache: 'memoria', totalMs: Date.now() - openTimeRef.current, lienzo: cachedCanvas ? cachedCanvas.width + 'x' + cachedCanvas.height : '' });
+      if (showPerf) setPerf((previo) => ({ ...(previo || {}), cache: 'memoria', pasadaMs: Date.now() - inicioPase, revisitas: (previo?.revisitas || 0) + 1 }));
       return;
     }
 
@@ -248,7 +255,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         setCachedBlob(guardada.blob);
         setCachedFile(guardada.file);
         setIsGenerating(false);
-        if (showPerf) setPerf({ cache: 'disco', totalMs: Date.now() - openTimeRef.current });
+        if (showPerf) setPerf((previo) => ({ ...(previo || {}), cache: 'disco', pasadaMs: Date.now() - inicioPase, revisitas: (previo?.revisitas || 0) + 1 }));
         return;
       }
 
@@ -265,8 +272,23 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           setPreviewCanvas(canvasListo);
           globalTemplatePreviewCache.set(currentKey, { canvas: canvasListo, url: '', file: null, blob: null });
           setIsGenerating(false);
-          if (showPerf) setPerf({ cache: 'no', dibujoMs: Date.now() - inicioDibujo, lienzo: canvasListo ? canvasListo.width + 'x' + canvasListo.height : '' });
-          queuePngEncode(canvasListo, currentKey, jobId);
+          if (showPerf) {
+            setPerf((previo) => ({
+              ...(previo || {}),
+              cache: 'no',
+              pasadaMs: Date.now() - inicioPase,
+              generaciones: (previo?.generaciones || 0) + 1,
+              ultima: {
+                dibujoMs: Date.now() - inicioDibujo,
+                // Se deja vacio a proposito: se rellena cuando termina la codificacion
+                // de ESTA generacion, para no mostrar el tiempo de la anterior.
+                codificacionMs: null,
+                totalMs: null,
+                lienzo: canvasListo ? canvasListo.width + 'x' + canvasListo.height : ''
+              }
+            }));
+          }
+          queuePngEncode(canvasListo, currentKey, jobId, inicioDibujo);
         }
       }).catch((err) => {
         if (activeJobIdRef.current === jobId) {
@@ -591,9 +613,15 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           telefono y se recorta por arriba, asi que dentro se pierde. */}
       {showPerf && (
         <div className="sdm-share-perf">
-          {perf
-            ? `caché ${perf.cache || '—'}${perf.dibujoMs != null ? ` · dibujo ${perf.dibujoMs} ms` : ''}${perf.codificacionMs != null ? ` · archivo ${perf.codificacionMs} ms` : ''}${perf.totalMs != null ? ` · total ${perf.totalMs} ms` : ''}${perf.lienzo ? ` · ${perf.lienzo}` : ''}`
-            : 'midiendo…'}
+          {perf?.ultima ? (
+            <div>
+              dibujo {perf.ultima.dibujoMs} ms · archivo {perf.ultima.codificacionMs ?? '—'} ms · total {perf.ultima.totalMs ?? '—'} ms
+              {perf.ultima.lienzo ? ` · ${perf.ultima.lienzo}` : ''}
+            </div>
+          ) : null}
+          <div>
+            caché {perf?.cache || '…'} · pasada {perf?.pasadaMs ?? '…'} ms · generaciones {perf?.generaciones || 0} · repasadas {perf?.revisitas || 0}
+          </div>
         </div>
       )}
     </div>
