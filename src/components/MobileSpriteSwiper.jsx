@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo, useCallback, useEffect, memo } from 'react';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from '../utils/confetti';
 import { Lock } from 'lucide-react';
 import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER } from '../data/spritesData';
 import { sounds } from '../utils/audio';
@@ -275,14 +275,14 @@ function FamilySpotlightRow({
           const nextOwned = !myOwned;
           onToggleOwned(sprite.id);
           sounds.playToggle(nextOwned, sprite.gen);
-          if (nextOwned) confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+          if (nextOwned) fireConfetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
         }
         return;
       }
       const nextOwned = !isOwned;
       onToggleOwned(sprite.id);
       sounds.playToggle(nextOwned, sprite.gen);
-      if (nextOwned) confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+      if (nextOwned) fireConfetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
     };
 
     const handleLevelClick = (e, newLevel) => {
@@ -294,15 +294,15 @@ function FamilySpotlightRow({
         onSetLevel(sprite.id, newLevel);
         sounds.playToggle(true, sprite.gen);
         sounds.playLevelUp(newLevel, sprite.gen);
-        if (newLevel === 5) confetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
-        else confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+        if (newLevel === 5) fireConfetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
+        else fireConfetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
       } else if (level === 1 && newLevel === 1) {
         onToggleOwned(sprite.id);
         sounds.playToggle(false, sprite.gen);
       } else {
         onSetLevel(sprite.id, newLevel);
         sounds.playLevelUp(newLevel, sprite.gen);
-        if (newLevel === 5) confetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
+        if (newLevel === 5) fireConfetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
       }
     };
 

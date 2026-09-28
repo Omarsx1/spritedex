@@ -1,5 +1,5 @@
 import React from 'react';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from '../utils/confetti';
 import { Lock } from 'lucide-react';
 import { RARITIES, getSpriteCardStyle, getRarityInfo } from '../data/spritesData';
 import { sounds } from '../utils/audio';
@@ -39,7 +39,7 @@ export function SpriteCard({
       onToggleOwned(sprite.id);
       sounds.playToggle(nextOwned, sprite.gen);
       if (nextOwned) {
-        confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+        fireConfetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
       }
       return;
     }
@@ -48,7 +48,7 @@ export function SpriteCard({
     onToggleOwned(sprite.id);
     sounds.playToggle(nextOwned, sprite.gen);
     if (nextOwned) {
-      confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+      fireConfetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
     }
   };
 
@@ -79,7 +79,7 @@ export function SpriteCard({
     onSetLevel(sprite.id, newLevel);
     sounds.playLevelUp(newLevel, sprite.gen);
     if (newLevel === 5) {
-      confetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
+      fireConfetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
     }
   };
 
