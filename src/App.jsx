@@ -625,23 +625,25 @@ export function App() {
     const timer = setTimeout(() => {
       const run = async () => {
         if (document.visibilityState !== 'visible') return;
-        const { getCanvasCacheKey, readCachedCapture, writeCachedCapture, generatePokedexCardImage } = await import('./utils/canvasExporter');
+        const { getCanvasCacheKey, readCachedCapture, writeCachedCapture, generatePokedexCardImage, getOrStartCapture } = await import('./utils/canvasExporter');
         const ownedInScope = scopedSprites.filter((s) => userState[s.id]?.owned).length;
         const key = getCanvasCacheKey('checklist', 'glitch_override', scopedSprites.length, ownedInScope, scopedSprites, userState);
         if (await readCachedCapture(key)) return;
-        const res = await generatePokedexCardImage({
+        // getOrStartCapture comparte el trabajo con la modal si esta pidio lo mismo.
+        const res = await getOrStartCapture(key, () => generatePokedexCardImage({
           spritesList: scopedSprites,
           userState,
           format: 'checklist',
           bgStyle: 'glitch_override'
-        });
+        }));
         const enc = await res.encode();
         if (enc?.blob) await writeCachedCapture(key, enc.blob);
       };
-      // En reposo y con margen: si el usuario sigue interactuando, no se dispara.
-      if (window.requestIdleCallback) window.requestIdleCallback(run, { timeout: 4000 });
-      else run();
-    }, 4000);
+      // Se dibuja en ~80 ms en el telefono y la codificacion no bloquea, asi que no
+      // hace falta esperar al reposo (que en un movil puede tardar muchisimo): basta
+      // con dar unos segundos para que el usuario termine de marcar.
+      run();
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, [scopedSprites, userState, isAdminPortal, showShareModal]);

@@ -1032,6 +1032,19 @@ export function encodeCanvasToImage(canvas) {
 const EXPORT_CACHE_NAME = 'spritedex-export-v1';
 const EXPORT_CACHE_MAX = 8;
 
+// Generaciones en vuelo, por clave. La precarga en reposo y la modal piden la misma
+// captura: sin esto cada una generaba la suya y las dos competian por la CPU del
+// telefono, que es justo lo que hacia que en produccion tardara mas que en local.
+const capturasEnVuelo = new Map();
+
+export function getOrStartCapture(key, crear) {
+  const enVuelo = capturasEnVuelo.get(key);
+  if (enVuelo) return enVuelo;
+  const trabajo = Promise.resolve().then(crear).finally(() => capturasEnVuelo.delete(key));
+  capturasEnVuelo.set(key, trabajo);
+  return trabajo;
+}
+
 function hasExportCache() {
   return typeof caches !== 'undefined' && typeof Response !== 'undefined' && typeof URL !== 'undefined';
 }

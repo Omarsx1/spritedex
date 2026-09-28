@@ -3,7 +3,7 @@ import {
   X, Download, Share2, Copy, Check, Image as ImageIcon, Filter, Globe,
   CheckCircle, XCircle, Sparkles, Repeat, ShieldCheck, Flame
 } from 'lucide-react';
-import { generatePokedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture } from '../utils/canvasExporter';
+import { generatePokedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 
@@ -231,7 +231,21 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       setCachedFile(cached?.file || null);
       setCachedBlob(cached?.blob || null);
       setIsGenerating(false);
-      if (cachedCanvas && !url) queuePngEncode(cachedCanvas, currentKey);
+      if (cachedCanvas && !url) {
+        // La precarga en reposo ya pudo dejar el archivo en disco: usarlo antes de
+        // recodificar evita pagar dos veces la misma codificacion.
+        const paseActual = activeJobIdRef.current;
+        readCachedCapture(currentKey).then((guardada) => {
+          if (activeJobIdRef.current !== paseActual) return;
+          if (guardada) {
+            setDataUrl(guardada.url);
+            setCachedBlob(guardada.blob);
+            setCachedFile(guardada.file);
+          } else {
+            queuePngEncode(cachedCanvas, currentKey);
+          }
+        });
+      }
       if (showPerf) setPerf((previo) => ({ ...(previo || {}), cache: 'memoria', pasadaMs: Date.now() - inicioPase, revisitas: (previo?.revisitas || 0) + 1 }));
       return;
     }
@@ -260,12 +274,12 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       }
 
       const inicioDibujo = Date.now();
-      generatePokedexCardImage({
+      getOrStartCapture(currentKey, () => generatePokedexCardImage({
         spritesList,
         userState,
         format,
         bgStyle
-      }).then((res) => {
+      })).then((res) => {
         if (activeJobIdRef.current === jobId) {
           const canvasListo = res?.canvas || null;
           // La captura se pinta ya; el archivo llega despues sin bloquear la vista previa.
