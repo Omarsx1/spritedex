@@ -34,20 +34,30 @@ No se toca Supabase, ni rutas, ni datos, ni el resto de componentes.
 - [x] T3 (ShareImageModal) Codifica el PNG en reposo (requestIdleCallback, timeout 1500 ms) y habilita Descargar/Compartir cuando el blob esta listo.
 - [x] T4 (ambos) La cache guarda el canvas; reabrir con la misma clave pinta al instante y solo re-codifica si falta el blob.
 - [x] T5 Verificacion: oxlint sin hallazgos nuevos, build correcto, medicion headless antes/despues.
-- [x] T6 (canvasExporter) Cartel vertical grande de 1280 a 1080 px de ancho, con la celda escalada en la misma proporcion (175 -> 148) para conservar la composicion, y clave de cache a v12.
+- [x] T6 (canvasExporter) Cartel vertical grande a 1080 px: probado y REVERTIDO a 1280. El PNG pesaba 25% menos, pero el tiempo no bajaba (subia 5-12%) y se prefiere velocidad a peso.
 - [x] T7 (canvasExporter + ShareImageModal) Cache en disco (Cache Storage) de la captura ya codificada, con poda a las ultimas 8, para que la segunda visita no redibuje ni recodifique.
 
-## Resultado de T6 (CPU 20x, dist local)
-| Metrica | 1280 | 1080 |
+## Resultado de T6 (CPU 20x, dist local) - revertido
+| Metrica | 1280 (se mantiene) | 1080 (descartado) |
 |---|---|---|
 | Pixeles | 3,22 MP | 2,34 MP (-27%) |
 | Peso del PNG | 1,94 MB | 1,46 MB (-25%) |
-| Vista previa | 3965 ms | 4295 / 4659 ms (2 corridas) |
+| Vista previa | 3965-4000 ms | 4295 / 4659 ms |
 
-El tiempo NO mejora: el encode baja con los pixeles, pero el dibujo sube un poco, muy
-probablemente por el bucle de ajuste de tamano de fuente de los nombres, que necesita
-mas iteraciones (y mas cambios de ctx.font) cuando la tarjeta es mas angosta. Se
-mantiene el cambio por el peso del archivo compartido, no por el tiempo.
+El tiempo no mejora: el encode baja con los pixeles, pero el dibujo sube, muy
+probablemente por el bucle de ajuste de tamano de fuente de los nombres (mas
+iteraciones y mas cambios de ctx.font con tarjetas mas angostas). Como el criterio
+es la velocidad, se vuelve a 1280 y la clave de cache vuelve a v11.
+
+## Verificacion de T7 contra el caso real (marcar un espiritu)
+| Escenario | Tiempo | Nodo | HUD | Lectura |
+|---|---|---|---|---|
+| Primera visita | 4000 ms | CANVAS 1280x2515 | 0/101 | Dibuja y codifica |
+| Recarga sin cambios | 909 ms | IMG (PNG guardado) | 0/101 | Sirve la cache en disco |
+| Tras marcar un espiritu | 1365 ms | CANVAS regenerado | 1/101 | La clave cambia y se redibuja |
+
+La cache NO muestra progreso viejo: la clave incluye atrapado y nivel de cada
+espiritu, el total y el conteo de atrapados. Se guardan las ultimas 8 variantes.
 
 ## Resultado de T7 (CPU 20x, dist local)
 | Metrica | Primera visita | Segunda visita (recarga) |
