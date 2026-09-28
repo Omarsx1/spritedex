@@ -488,7 +488,8 @@ body::after {
   -webkit-backdrop-filter: blur(28px) saturate(1.8);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 18px;
-  padding: 14px;
+  /* Mas aire arriba: el contenido quedaba pegado al borde de la tarjeta */
+  padding: 20px 14px 14px;
   box-shadow:
     0 16px 40px rgba(0, 0, 0, 0.65),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -561,6 +562,15 @@ body::after {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* El codigo de amigo del invitado va bajo su nombre, no en una franja aparte */
+.app-navbar__dropdown-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #00f0e8;
 }
 
 .app-navbar__dropdown-status {
