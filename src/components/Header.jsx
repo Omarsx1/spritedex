@@ -261,7 +261,7 @@ export function Header({
               return (
                 <div key={`orbit-${i}`} className={`hero__satellite hero__satellite--${i}`}>
                   <img
-                    src={sprite.image}
+                    src={sprite.thumb || sprite.image}
                     alt={sprite.fullName}
                     className="hero__satellite-img"
                     style={{
@@ -295,7 +295,7 @@ export function Header({
             {currentSprite && (
               <img
                 key={currentSprite.id || spriteIndex}
-                src={currentSprite.image}
+                src={currentSprite.thumb || currentSprite.image}
                 alt={currentSprite.fullName}
                 className="hero__hero-img"
                 style={{
