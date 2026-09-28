@@ -340,6 +340,14 @@ export function App() {
     safeStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userState));
     safeStorage.setItem(LOCAL_STATE_UPDATED_KEY, String(Date.now()));
 
+    // Con la modal de compartir abierta no se empuja a la nube: subir el JSON
+    // completo del progreso (y el trabajo del SDK) compite con la generacion de la
+    // captura en el telefono, y es justo el hueco donde se notaba mas lento en
+    // produccion que en el tunel (que no tiene Supabase). Al cerrar la modal este
+    // efecto vuelve a ejecutarse y sincroniza; si el usuario cierra la pestana antes,
+    // lo cubre el flush con keepalive de mas abajo.
+    if (showShareModal) return;
+
     if (isSupabaseConfigured && user) {
       const timer = setTimeout(async () => {
         try {
@@ -402,7 +410,7 @@ export function App() {
       }, 600);
       return () => clearTimeout(timer);
     }
-  }, [userState, user, myFriendCode]);
+  }, [userState, user, myFriendCode, showShareModal]);
 
   // Salida garantizada: si la pestaña se cierra o pasa a segundo plano con un sync
   // pendiente, se empuja con keepalive en vez de esperar el debounce de 600 ms.
@@ -589,7 +597,9 @@ export function App() {
     activeProfile
   ]);
 
-  // Counts scoped to current generation (excluding unreleased unless enabled)
+  // Counts scoped to current generation (excluding unreleased unless enabled).
+  // Se reutiliza como alcance del modal de compartir: al estar memoizada, el modal
+  // no se repasa en cada render de la app (en produccion eso pasa con el sync).
   const scopedSprites = useMemo(() => {
     return dynamicSprites.filter((s) => {
       if (!showUnreleased && s.unreleased) return false;
@@ -774,7 +784,7 @@ export function App() {
         {showShareModal && (
           <ShareImageModal
             filteredSprites={filteredSprites}
-            allSprites={dynamicSprites.filter((s) => (activeGen === 0 || s.gen === activeGen) && (showUnreleased || !s.unreleased))}
+            allSprites={scopedSprites}
             userState={userState}
             activeGen={activeGen}
             activeFiltersLabel={
