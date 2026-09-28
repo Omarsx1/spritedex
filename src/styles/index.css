@@ -5264,6 +5264,14 @@ body::after {
   animation: fadeInPreview 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Contenedor del canvas vivo: la captura se pinta antes de codificar el PNG */
+.sdm-share-pro__canvas-host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
 @keyframes fadeInPreview {
   from {
     opacity: 0;

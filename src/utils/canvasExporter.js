@@ -984,7 +984,14 @@ function renderGlitchOverrideTemplate({
   ctx.fillText('#FNGGOverride  •  spritedex.com', width / 2, height - 16);
   ctx.restore();
 
-  // Retornar promesa con dataUrl, blob y file listo para Web Share API
+  // Codificar el PNG de 1280x2515 es la parte mas cara del export (2-6 s en movil),
+  // asi que ya no se paga aqui: se entrega el canvas listo y la modal codifica
+  // solo cuando hace falta (descargar o compartir).
+  return { canvas, encode: () => encodeCanvasToPng(canvas) };
+}
+
+// Codifica el canvas a PNG y devuelve todo lo que necesitan Descargar y Compartir.
+export function encodeCanvasToPng(canvas) {
   return new Promise((resolve) => {
     canvas.toBlob((blob) => {
       const filename = `spritedex_${Date.now()}.png`;

@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import {
   X, Download, Share2, Copy, Check, Image as ImageIcon, Filter, Globe,
   CheckCircle, XCircle, Sparkles, Repeat, ShieldCheck, Flame
 } from 'lucide-react';
-import { generatePokedexCardImage, globalCanvasCache, getCanvasCacheKey } from '../utils/canvasExporter';
+import { generatePokedexCardImage, encodeCanvasToPng, globalCanvasCache, getCanvasCacheKey } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 
@@ -24,6 +24,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const [dataUrl, setDataUrl] = useState(() => initialCached?.url || initialCached?.dataUrl || (typeof initialCached === 'string' ? initialCached : ''));
   const [cachedFile, setCachedFile] = useState(() => initialCached?.file || null);
   const [cachedBlob, setCachedBlob] = useState(() => initialCached?.blob || null);
+  const [previewCanvas, setPreviewCanvas] = useState(() => initialCached?.canvas || null);
   const [isGenerating, setIsGenerating] = useState(() => !initialCached);
   const [isClosing, setIsClosing] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
@@ -33,6 +34,31 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const openTimeRef = useRef(Date.now());
   const hasEnteredRef = useRef(false);
   const activeJobIdRef = useRef(0);
+  const previewHostRef = useRef(null);
+
+  // Codifica el PNG fuera del camino critico: primero se pinta la captura y despues,
+  // en reposo, se prepara el archivo de Descargar/Compartir. Son 2-6 s menos de espera.
+  const queuePngEncode = useCallback((canvasToEncode, key, onlyForJobId) => {
+    if (!canvasToEncode) return;
+    const run = () => {
+      if (onlyForJobId !== undefined && activeJobIdRef.current !== onlyForJobId) return;
+      encodeCanvasToPng(canvasToEncode).then((enc) => {
+        if (onlyForJobId !== undefined && activeJobIdRef.current !== onlyForJobId) return;
+        const prev = globalTemplatePreviewCache.get(key) || {};
+        globalTemplatePreviewCache.set(key, { ...prev, canvas: canvasToEncode, url: enc.dataUrl, blob: enc.blob, file: enc.file });
+        setDataUrl(enc.dataUrl);
+        setCachedBlob(enc.blob);
+        setCachedFile(enc.file);
+      }).catch((err) => {
+        console.error('Error codificando la captura:', err);
+      });
+    };
+    if (typeof window !== 'undefined' && window.requestIdleCallback) {
+      window.requestIdleCallback(run, { timeout: 1500 });
+    } else {
+      setTimeout(run, 200);
+    }
+  }, []);
 
   const handleClose = () => {
     if (isClosing) return;
@@ -127,6 +153,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       setDataUrl('');
       setCachedFile(null);
       setCachedBlob(null);
+      setPreviewCanvas(null);
       setIsGenerating(false);
       return;
     }
@@ -134,11 +161,14 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     const currentKey = getCanvasCacheKey(format, bgStyle, spritesList.length, ownedInScope, spritesList, userState);
     const cached = globalTemplatePreviewCache.get(currentKey) || globalCanvasCache.get(currentKey);
     if (cached) {
-      const url = typeof cached === 'string' ? cached : (cached.url || cached.dataUrl);
+      const url = typeof cached === 'string' ? cached : (cached.url || cached.dataUrl || '');
+      const cachedCanvas = typeof cached === 'string' ? null : (cached.canvas || null);
+      setPreviewCanvas(cachedCanvas);
       setDataUrl(url);
       setCachedFile(cached?.file || null);
       setCachedBlob(cached?.blob || null);
       setIsGenerating(false);
+      if (cachedCanvas && !url) queuePngEncode(cachedCanvas, currentKey);
       return;
     }
 
@@ -159,14 +189,12 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         bgStyle
       }).then((res) => {
         if (activeJobIdRef.current === jobId) {
-          const url = typeof res === 'string' ? res : res.dataUrl;
-          const file = res?.file || null;
-          const blob = res?.blob || null;
-          globalTemplatePreviewCache.set(currentKey, { url, file, blob });
-          setDataUrl(url);
-          setCachedFile(file);
-          setCachedBlob(blob);
+          const canvasListo = res?.canvas || null;
+          // La captura se pinta ya; el PNG llega despues sin bloquear la vista previa.
+          setPreviewCanvas(canvasListo);
+          globalTemplatePreviewCache.set(currentKey, { canvas: canvasListo, url: '', file: null, blob: null });
           setIsGenerating(false);
+          queuePngEncode(canvasListo, currentKey, jobId);
         }
       }).catch((err) => {
         if (activeJobIdRef.current === jobId) {
@@ -180,6 +208,18 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       clearTimeout(timer);
     };
   }, [spritesList, userState, format, bgStyle, ownedInScope]);
+
+  // El canvas se inserta a mano para que React no lo recree en cada render.
+  useEffect(() => {
+    const host = previewHostRef.current;
+    if (!host) return;
+    if (previewCanvas) {
+      previewCanvas.className = 'sdm-share-pro__preview-img';
+      host.replaceChildren(previewCanvas);
+    } else {
+      host.replaceChildren();
+    }
+  }, [previewCanvas, isGenerating]);
 
   const getShareableText = () => {
     const total = spritesList.length;
@@ -429,6 +469,8 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
               <div className="sdm-share-pro__spinner" />
               <span>Generando captura HD...</span>
             </div>
+          ) : previewCanvas ? (
+            <div className="sdm-share-pro__canvas-host" ref={previewHostRef} />
           ) : (
             <img
               src={dataUrl}
@@ -475,4 +517,3 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     </div>
   );
 }
-
