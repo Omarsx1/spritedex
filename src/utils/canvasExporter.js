@@ -175,7 +175,8 @@ export function preloadCanvasAssets(spritesList = [], batchSize = 6) {
       const slice = spritesList.slice(index, index + batchSize);
       index += batchSize;
       slice.forEach(s => {
-        if (s && s.image) loadImage(s.image);
+        // Se precargan las mismas imagenes que usa el export: la miniatura.
+        if (s && s.image) loadImage(s.thumb || s.image);
       });
       if (index < spritesList.length) {
         if (window.requestIdleCallback) {
@@ -409,7 +410,11 @@ export async function generatePokedexCardImage({
       if (img) loadedImagesMap['__bg_override__'] = img;
     }),
     ...spritesList.slice(0, 250).map(async (s) => {
-      const targetSrc = (s.id === 'pond_gold') ? '/sprites/pond_gold.webp' : (s.image || (s.gen === 2 ? `/sprites/${s.id}.webp` : `/sprites/${s.id}.png`));
+      // La tarjeta dibuja el sprite a ~230 px como maximo, asi que la miniatura de
+      // 448 px sobra: usar el original multiplicaba por diez los datos del export.
+      const targetSrc = (s.id === 'pond_gold')
+        ? '/sprites/pond_gold.webp'
+        : (s.thumb || s.image || (s.gen === 2 ? `/sprites/${s.id}.webp` : `/sprites/${s.id}.png`));
       const img = await loadImage(targetSrc);
       if (img) loadedImagesMap[s.id] = img;
     })
@@ -994,4 +999,3 @@ function renderGlitchOverrideTemplate({
     }, 'image/png');
   });
 }
-
