@@ -10,6 +10,14 @@ export default defineConfig({
   define: {
     __VERCEL_ENV__: JSON.stringify(process.env.VERCEL_ENV || '')
   },
+  // Los tuneles de demo (cloudflare quick tunnel) cambian de subdominio en cada
+  // arranque, asi que se permite el dominio completo en vez de un host fijo.
+  server: {
+    allowedHosts: ['.trycloudflare.com']
+  },
+  preview: {
+    allowedHosts: ['.trycloudflare.com']
+  },
   build: {
     rollupOptions: {
       output: {
