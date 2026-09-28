@@ -10,29 +10,20 @@ import gsap from 'gsap';
 // Caché persistente global para previews de plantillas generadas (0ms instantáneo entre aperturas y formatos)
 const globalTemplatePreviewCache = new Map();
 
-// Estado del medidor de diagnostico. Se enciende con ?perf=1, con #perf o con un
-// doble toque en el titulo del modal, y queda recordado en el dispositivo.
+// Estado del medidor de diagnostico. Apagado por defecto (no aparece para nadie) y
+// se enciende solo cuando se pide: ?perf=1, #perf o doble toque en el titulo del
+// modal, y solo durante esa sesion. No se guarda en el dispositivo.
 function leerPerfActivado() {
   if (typeof window === 'undefined') return false;
   const params = new URLSearchParams(window.location.search);
   try {
-    if (params.get('perf') === '0') {
-      localStorage.removeItem('spritedex_perf');
-      return false;
-    }
-    if (params.has('perf') || window.location.hash.toLowerCase().includes('perf')) {
-      localStorage.setItem('spritedex_perf', '1');
-      return true;
-    }
-    return localStorage.getItem('spritedex_perf') === '1';
+    // Limpia el recordatorio que dejaban las versiones anteriores del medidor.
+    localStorage.removeItem('spritedex_perf');
   } catch {
-    return params.has('perf');
+    // Sin storage no hay nada que limpiar.
   }
+  return params.has('perf') || window.location.hash.toLowerCase().includes('perf');
 }
-
-// TEMPORAL: mientras afinamos la velocidad del modal, el medidor se muestra
-// siempre como badge flotante. Volver a false cuando ya no haga falta.
-const PERF_SIEMPRE_VISIBLE = true;
 
 export function ShareImageModal({ filteredSprites, allSprites, userState, activeFiltersLabel, onClose }) {
   const [format, setFormat] = useState('checklist'); // 'checklist', 'square'
@@ -55,20 +46,12 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const [perf, setPerf] = useState(null);
   const [showPerf, setShowPerf] = useState(() => {
     if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('perf') === '0') return false;
-    return PERF_SIEMPRE_VISIBLE || leerPerfActivado();
+    return leerPerfActivado();
   });
   const tapPerfRef = useRef(0);
   const alternarPerf = useCallback(() => {
-    setShowPerf((activo) => {
-      const nuevo = !activo;
-      try {
-        if (nuevo) localStorage.setItem('spritedex_perf', '1');
-        else localStorage.removeItem('spritedex_perf');
-      } catch {
-        // Sin storage el medidor solo vive en esta sesion.
-      }
-      return nuevo;
-    });
+    // Solo cambia el estado de esta sesion: el medidor no se recuerda.
+    setShowPerf((activo) => !activo);
   }, []);
   // Doble toque en el titulo: enciende o apaga el medidor sin tocar la URL.
   const manejarTapTitulo = useCallback(() => {
