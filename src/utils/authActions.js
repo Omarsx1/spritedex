@@ -2,6 +2,9 @@ import { getSupabase } from './supabase';
 import { trackEvent } from './telemetry';
 import { mensajeDeAuth } from './authMessages';
 
+// En desarrollo el mensaje incluye el error crudo de Supabase, para no adivinar la causa.
+const CON_DETALLE = Boolean(import.meta.env && import.meta.env.DEV);
+
 // Acciones de autenticacion compartidas por la modal de acceso y el menu del usuario.
 // Estaban dentro de la modal, pero el menu tambien necesita lanzar la vinculacion.
 
@@ -31,9 +34,9 @@ export async function conGoogle(esAnonimo) {
       // El error crudo queda en consola: el mensaje amigable puede dejar fuera la causa.
       console.warn('[auth] Google fallo', { code: error.code, message: error.message, esAnonimo });
     }
-    return { error: error ? new Error(mensajeDeAuth(error, esAnonimo)) : null };
+    return { error: error ? new Error(mensajeDeAuth(error, esAnonimo, CON_DETALLE)) : null };
   } catch (err) {
     console.warn('[auth] Google fallo', { message: err?.message, esAnonimo });
-    return { error: new Error(mensajeDeAuth(err, esAnonimo)) };
+    return { error: new Error(mensajeDeAuth(err, esAnonimo, CON_DETALLE)) };
   }
 }
