@@ -12,12 +12,18 @@ arriesgar la app en produccion.
 - 13 componentes pasan de 400 lineas; 5 pasan de 800 (hasta 1516).
 
 ## Plan por pasos (un commit y una verificacion por paso)
-- [ ] Paso 1. Red de seguridad barata: constantes del contrato de la captura, try/catch
-      en el precalculo y regla `no-use-before-define` en el linter.
-- [ ] Paso 2. Tests del contrato de la captura (clave determinista, marcar invalida,
-      el export produce JPEG del tamano esperado).
-- [ ] Paso 3. Crear `ui/Modal.jsx` con el mismo DOM que hay hoy y migrar UN modal
-      (el mas simple), verificando.
+- [x] Paso 1. Red de seguridad barata: constantes del contrato de la captura, try/catch
+      en el precalculo y regla `no-use-before-define` en el linter. Commits fdca908,
+      6ccdb0d, e4b4a3b.
+- [x] Paso 2. Red de pruebas. Commit bd1a9eb (6 pruebas con el runner de Node y smoke
+      test real). Verificado que el smoke SI detecta un TDZ: el build pasaba y el smoke
+      fallo con "ErrorBoundary" y salida 1.
+      De paso se arreglo que el lint del CI no aplicaba la configuracion (d936f41,
+      15949c1): daba 0 errores porque no leia `.oxlintrc.json`.
+- [x] Paso 3. `ui/Modal.jsx` con el mismo DOM y migracion de BackupModal (la mas simple).
+      Verificado en navegador: abre desde el menu, no se cierra sola (guard de 400 ms),
+      conserva las clases y el maxWidth, cierra con Escape (nuevo, como el resto) y con
+      el fondo, sin errores de pagina.
 - [ ] Paso 4. Migrar el resto en pares, verificando cada par.
 - [ ] Paso 5. Borrar el andamiaje que quede sin uso.
 
@@ -37,4 +43,3 @@ arriesgar la app en produccion.
 
 ## Ruta
 Delegada/inline por paso segun tamano. Paso 1 inline (3 cambios mecanicos ya entendidos).
-
