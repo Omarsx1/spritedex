@@ -3,7 +3,7 @@ import {
   X, Download, Share2, Copy, Check, Image as ImageIcon, Filter, Globe,
   CheckCircle, XCircle, Sparkles, Repeat, ShieldCheck, Flame
 } from 'lucide-react';
-import { generatePokedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture } from '../utils/canvasExporter';
+import { generatePokedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 
@@ -26,14 +26,14 @@ function leerPerfActivado() {
 }
 
 export function ShareImageModal({ filteredSprites, allSprites, userState, activeFiltersLabel, onClose }) {
-  const [format, setFormat] = useState('checklist'); // 'checklist', 'square'
+  const [format, setFormat] = useState(DEFAULT_EXPORT_FORMAT); // 'checklist', 'square'
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
-  const [bgStyle, setBgStyle] = useState('glitch_override'); // 'glitch_override', 'blueprint', 'dark_matrix'
+  const [bgStyle, setBgStyle] = useState(DEFAULT_EXPORT_BG_STYLE); // 'glitch_override', 'blueprint', 'dark_matrix'
 
   // Clave de preview canónica para mostrar la plantilla en 0ms si ya está en caché
   const initialCount = allSprites.length;
   const initialOwned = allSprites.filter(s => userState[s.id]?.owned).length;
-  const initialCacheKey = getCanvasCacheKey('checklist', 'glitch_override', initialCount, initialOwned, allSprites, userState);
+  const initialCacheKey = getCanvasCacheKey(DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE, initialCount, initialOwned, allSprites, userState);
   const initialCached = globalTemplatePreviewCache.get(initialCacheKey) || globalCanvasCache.get(initialCacheKey);
 
   const [dataUrl, setDataUrl] = useState(() => initialCached?.url || initialCached?.dataUrl || (typeof initialCached === 'string' ? initialCached : ''));

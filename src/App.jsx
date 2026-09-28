@@ -624,20 +624,25 @@ export function App() {
 
     const timer = setTimeout(() => {
       const run = async () => {
-        if (document.visibilityState !== 'visible') return;
-        const { getCanvasCacheKey, readCachedCapture, writeCachedCapture, generatePokedexCardImage, getOrStartCapture } = await import('./utils/canvasExporter');
-        const ownedInScope = scopedSprites.filter((s) => userState[s.id]?.owned).length;
-        const key = getCanvasCacheKey('checklist', 'glitch_override', scopedSprites.length, ownedInScope, scopedSprites, userState);
-        if (await readCachedCapture(key)) return;
-        // getOrStartCapture comparte el trabajo con la modal si esta pidio lo mismo.
-        const res = await getOrStartCapture(key, () => generatePokedexCardImage({
-          spritesList: scopedSprites,
-          userState,
-          format: 'checklist',
-          bgStyle: 'glitch_override'
-        }));
-        const enc = await res.encode();
-        if (enc?.blob) await writeCachedCapture(key, enc.blob);
+        try {
+          if (document.visibilityState !== 'visible') return;
+          const { getCanvasCacheKey, readCachedCapture, writeCachedCapture, generatePokedexCardImage, getOrStartCapture, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } = await import('./utils/canvasExporter');
+          const ownedInScope = scopedSprites.filter((s) => userState[s.id]?.owned).length;
+          const key = getCanvasCacheKey(DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE, scopedSprites.length, ownedInScope, scopedSprites, userState);
+          if (await readCachedCapture(key)) return;
+          // getOrStartCapture comparte el trabajo con la modal si esta pidio lo mismo.
+          const res = await getOrStartCapture(key, () => generatePokedexCardImage({
+            spritesList: scopedSprites,
+            userState,
+            format: DEFAULT_EXPORT_FORMAT,
+            bgStyle: DEFAULT_EXPORT_BG_STYLE
+          }));
+          const enc = await res.encode();
+          if (enc?.blob) await writeCachedCapture(key, enc.blob);
+        } catch (err) {
+          // Un fallo del precalculo no puede romper nada: la modal generara al abrirse.
+          console.warn('Precalculo de la captura fallido:', err);
+        }
       };
       // Se dibuja en ~80 ms en el telefono y la codificacion no bloquea, asi que no
       // hace falta esperar al reposo (que en un movil puede tardar muchisimo): basta

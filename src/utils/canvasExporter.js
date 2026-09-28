@@ -71,8 +71,14 @@ const globalImageCache = new Map();
 // Caché global persistente de plantillas renderizadas para carga 0ms instantánea
 export const globalCanvasCache = new Map();
 
+// Contrato del export por defecto. Lo comparten la modal y el precalculo en reposo de
+// App.jsx: si van como texto suelto en cada sitio, cambiar uno deja al otro sin acertar
+// la cache en silencio (no falla, solo vuelve a ir lento).
+export const DEFAULT_EXPORT_FORMAT = 'checklist';
+export const DEFAULT_EXPORT_BG_STYLE = 'glitch_override';
+
 // Clave canónica unificada para caché de plantillas de canvas (0ms instantáneo y sin colisiones entre filtros)
-export function getCanvasCacheKey(format = 'checklist', bgStyle = 'glitch_override', count = 0, ownedCount = 0, spritesList = [], userState = {}) {
+export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFAULT_EXPORT_BG_STYLE, count = 0, ownedCount = 0, spritesList = [], userState = {}) {
   let hash = 0;
   if (Array.isArray(spritesList) && spritesList.length > 0) {
     for (let i = 0; i < spritesList.length; i++) {
@@ -391,8 +397,8 @@ function getSpiritHue(sprite) {
 export async function generatePokedexCardImage({
   spritesList,
   userState,
-  format = 'checklist', // 'checklist', 'square'
-  bgStyle = 'glitch_override', // 'glitch_override', 'blueprint', 'dark_matrix'
+  format = DEFAULT_EXPORT_FORMAT, // 'checklist', 'square'
+  bgStyle = DEFAULT_EXPORT_BG_STYLE, // 'glitch_override', 'blueprint', 'dark_matrix'
   useBackgroundTemplate = true
 }) {
   const effectiveBgStyle = bgStyle || (useBackgroundTemplate ? 'glitch_override' : 'dark_matrix');
