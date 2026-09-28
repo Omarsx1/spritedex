@@ -24,7 +24,12 @@ arriesgar la app en produccion.
       Verificado en navegador: abre desde el menu, no se cierra sola (guard de 400 ms),
       conserva las clases y el maxWidth, cierra con Escape (nuevo, como el resto) y con
       el fondo, sin errores de pagina.
-- [ ] Paso 4. Migrar el resto en pares, verificando cada par.
+- [~] Paso 4. Migrar el resto, verificando cada uno.
+      - [x] PrivacyPolicyModal: conserva z-index 99999 y sus estilos propios (el
+            componente pasa `overlayStyle`), cierra con Escape y con el fondo.
+      - [ ] AuthModal (tiene DOS overlays en el mismo archivo, hay que separarlos).
+      - [ ] FriendCompareModal, SpriteDetailModal, ShareImageModal.
+      - [ ] admin/FamilyManagerModal, admin/SpiritEditorModal (1516 lineas, el ultimo).
 - [ ] Paso 5. Borrar el andamiaje que quede sin uso.
 
 ## Reglas de trabajo
