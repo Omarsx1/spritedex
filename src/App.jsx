@@ -206,7 +206,15 @@ export function App() {
       // 1. Precarga del chunk del modal en la caché del navegador
       import('./components/ShareImageModal');
 
-      // 2. Precarga de recursos gráficos (fondo y sprites) por lotes en reposo
+      // 2. Precarga de recursos gráficos (fondo y sprites) por lotes en reposo.
+      // Son ~16 MB de sprites a resolución completa: en móvil, con ahorro de datos
+      // o con conexión lenta no se hace. La exportación los carga bajo demanda
+      // igual, solo que la primera vez tarda un poco más.
+      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      const slowConnection = Boolean(connection && (connection.saveData || /(^|-)2g$/.test(connection.effectiveType || '')));
+      const smallScreen = window.matchMedia('(max-width: 768px)').matches;
+      if (slowConnection || smallScreen) return;
+
       import('./utils/canvasExporter').then(({ preloadCanvasAssets }) => {
         if (dynamicSprites && dynamicSprites.length > 0) {
           preloadCanvasAssets(dynamicSprites, 10);
