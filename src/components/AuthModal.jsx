@@ -85,9 +85,12 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
     try {
       setLoading(true);
       setError(null);
-      trackEvent('login', { method: 'google' });
       const supabase = await getSupabase();
-      const { error: googleError } = await supabase.auth.signInWithOAuth({
+      // Con sesion anonima hay que VINCULAR la identidad, no iniciar sesion: un login
+      // normal crea un usuario NUEVO y la coleccion se queda atras (asi se perdio el
+      // progreso de una usuaria). Vincular exige "Manual Linking" activado en Supabase.
+      const esAnonimo = Boolean(user?.is_anonymous);
+      const opciones = {
         provider: 'google',
         options: {
           redirectTo: window.location.origin,
@@ -96,9 +99,17 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
             access_type: 'offline'
           }
         }
-      });
+      };
+      trackEvent(esAnonimo ? 'link' : 'login', { method: 'google' });
+      const { error: googleError } = esAnonimo
+        ? await supabase.auth.linkIdentity(opciones)
+        : await supabase.auth.signInWithOAuth(opciones);
       if (googleError) {
-        if (googleError.message?.includes('provider is not enabled') || googleError.code === 'validation_failed') {
+        const mensaje = googleError.message || '';
+        if (esAnonimo && /manual linking|linking is disabled|not enabled/i.test(mensaje)) {
+          throw new Error('Vincular con Google todavia no esta activado en el proyecto. Usa "Vincular con correo": conserva todo tu progreso igual.');
+        }
+        if (mensaje.includes('provider is not enabled') || googleError.code === 'validation_failed') {
           throw new Error('Google Sign-In requiere activar Google en Supabase. Puedes usar "Acceso Rápido 1-Clic" arriba sin registrarte.');
         }
         throw googleError;
@@ -151,7 +162,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
             {user ? (user.is_anonymous ? 'Conectado como Invitado' : 'Sincronización en la Nube') : (isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión')}
           </h2>
           <p className="auth-modal__subtitle">
-            {user ? (user.is_anonymous ? 'Tu Pokédex está seguro en la nube' : `Conectado como ${user.email}`) : 'Guarda tu Pokédex en la nube y accede desde cualquier dispositivo'}
+            {user ? (user.is_anonymous ? 'Tu Pokédex está guardado solo en este dispositivo' : `Conectado como ${user.email}`) : 'Guarda tu Pokédex en la nube y accede desde cualquier dispositivo'}
           </p>
         </div>
 
