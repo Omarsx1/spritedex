@@ -7904,8 +7904,8 @@ body:has(.modal-overlay) {
   /* Las tres etiquetas arrancan a la misma altura: el total, al no llevar barra,
      se descentraba unos pixeles y se notaba. */
   align-items: start;
-  /* Pegada al buscador (8px) y con aire de sobra antes de la tarjeta (12px). */
-  margin: 8px 16px 12px;
+  /* Pegada al buscador (8px) y con aire de sobra antes de la tarjeta (24px). */
+  margin: 8px 16px 24px;
 }
 
 .stats-bar__col {
