@@ -135,7 +135,7 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
               <span className="sdm-friends__label">TE FALTAN ({listas.teFaltan.length})</span>
               {listas.teFaltan.length === 0 ? (
                 <p className="sdm-friends__hint">Los tienes todos. No te falta nada de lo suyo.</p>
-              ) : (
+              ) : (<>
                 <div className="fpage__chips">
                   {(verTodos.teFaltan ? listas.teFaltan : listas.teFaltan.slice(0, 12)).map((s) => <span key={s.id} className="fpage__chip">{s.name}</span>)}
                 </div>
@@ -144,11 +144,12 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
                     {verTodos.teFaltan ? 'Ver menos' : 'Ver los ' + listas.teFaltan.length}
                   </button>
                 )}
+                </>
               )}
               <span className="sdm-friends__label">LE FALTAN ({listas.leFaltan.length})</span>
               {listas.leFaltan.length === 0 ? (
                 <p className="sdm-friends__hint">No necesita nada de lo tuyo.</p>
-              ) : (
+              ) : (<>
                 <div className="fpage__chips">
                   {(verTodos.leFaltan ? listas.leFaltan : listas.leFaltan.slice(0, 12)).map((s) => <span key={s.id} className="fpage__chip fpage__chip--suyo">{s.name}</span>)}
                 </div>
@@ -157,6 +158,7 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
                     {verTodos.leFaltan ? 'Ver menos' : 'Ver los ' + listas.leFaltan.length}
                   </button>
                 )}
+                </>
               )}
               <p className="sdm-friends__hint">Te faltan: lo que él tiene y tú no. Le faltan: lo que tú tienes y él no. Perfecto para intercambiar.</p>
             </div>
