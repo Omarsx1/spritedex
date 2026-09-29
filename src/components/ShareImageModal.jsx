@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { X, Download, Share2, Copy, Check, Sparkles } from 'lucide-react';
-import { generateSpritedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
+import { generateSpritedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, marcarEsperaActiva, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import { Modal } from './ui/Modal';
 import gsap from 'gsap';
@@ -66,6 +66,13 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const hasEnteredRef = useRef(false);
   const activeJobIdRef = useRef(0);
   const previewHostRef = useRef(null);
+
+  // Mientras la modal esta abierta hay alguien esperando: el dibujo deja de ceder
+  // turno buscando reposo y termina cuanto antes (medido: menos espera sin bloquear).
+  useEffect(() => {
+    marcarEsperaActiva(true);
+    return () => marcarEsperaActiva(false);
+  }, []);
 
   // Codifica el PNG fuera del camino critico: primero se pinta la captura y despues,
   // en reposo, se prepara el archivo de Descargar/Compartir. Son 2-6 s menos de espera.

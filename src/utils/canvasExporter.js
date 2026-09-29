@@ -551,7 +551,23 @@ const TARJETAS_POR_TANDA = 6;
 // Ceder con setTimeout evita el bloqueo, pero no deja pintar: las tareas se
 // encadenan y el frame se retrasa. Con requestIdleCallback decide el navegador
 // cuando hay hueco real, y el timeout impide que el precálculo se quede parado.
+//
+// Pero esperar reposo solo tiene sentido si nadie esta mirando: con la modal de
+// compartir abierta, esperar hueco es justo lo contrario de lo que quiere quien
+// esta delante. Ahi se cede con un temporizador corto y el dibujo acaba antes.
+let esperasActivas = 0;
+
+export function marcarEsperaActiva(activo) {
+  esperasActivas += activo ? 1 : -1;
+  if (esperasActivas < 0) esperasActivas = 0;
+}
+
 const cederTurno = () => new Promise((resolve) => {
+  // Con alguien esperando no se cede en absoluto: cada cesion cuesta un frame y
+  // sumadas ~17 tandas se nota en la espera (medido: 1.25 s frente a 0.7 s).
+  // La modal ya muestra su indicador, asi que lo que quiere el usuario es la
+  // imagen cuanto antes; el troceado queda para el precálculo de fondo.
+  if (esperasActivas > 0) { resolve(); return; }
   if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
     window.requestIdleCallback(() => resolve(), { timeout: 120 });
     return;
