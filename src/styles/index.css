@@ -1605,7 +1605,9 @@ html::after {
     height: 130px !important;
     max-width: 130px !important;
     max-height: 130px !important;
-    margin: 12px auto 0;
+    /* Centrado entre el titulo y la barra de busqueda: el bloque baja 58px y el
+       bloque de filtros sube los mismos 58px, para que nada mas se mueva. */
+    margin: 70px auto 0;
   }
 
   .hero__hero-sprite {
@@ -2204,9 +2206,9 @@ html::after {
 .mobile-liquid-wrapper {
   width: 100%;
   max-width: 440px;
-  /* 65px arriba: aire de sobra respecto al hero (el resto de la tira baja con el
-     flujo, asi que la separacion con los contadores no cambia). */
-  margin: 65px auto 50px auto; /* Espacio amplio y comodo debajo de la barra de busqueda */
+  /* 7px + los 58px que crece el hero al centrar el bloque de espiritus: la barra
+     se queda exactamente donde estaba. */
+  margin: 7px auto 50px auto; /* Espacio amplio y comodo debajo de la barra de busqueda */
   padding: 0 16px;
   display: flex;
   flex-direction: column;
