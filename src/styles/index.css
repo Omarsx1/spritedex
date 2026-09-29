@@ -1060,159 +1060,65 @@ html::after {
   -webkit-text-fill-color: #ffffff;
   position: relative;
   display: inline-block;
-  animation: glitch-text-anim var(--tg-rgb-duration, 2.8s) steps(100) infinite;
+  /* El parpadeo RGB ya no anima text-shadow ni filter: eso repintaba el texto
+     completo en cada frame (medido: 133 ms de CPU cada 5 s). Las franjas de color
+     las ponen dos copias de abajo, que saltan con transform por pasos. */
 }
 
 .hero__title-line--glitch::before,
 .hero__title-line--glitch::after {
-  display: none !important;
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: inherit;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: -1;
+  /* El padre fija -webkit-text-fill-color en blanco y se hereda: sin esto las
+     copias salian blancas y no se veia ninguna franja de color. */
+  -webkit-text-fill-color: currentColor;
 }
 
-@keyframes glitch-text-anim {
-  0%, 1%, 2%, 3%, 4% {
-    text-shadow: 0.25rem 0 0 var(--tg-rgb-r), -0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  5%, 6%, 7%, 8%, 9%, 10% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  11%, 12%, 13% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  14%, 15% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  16%, 17%, 18%, 19%, 20% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  21%, 22%, 23%, 24%, 25% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  26%, 27% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  28%, 29%, 30% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  31%, 32%, 33%, 34% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  35%, 36%, 37% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  38%, 39%, 40% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  41% {
-    text-shadow: 0.8rem 0 0 var(--tg-rgb-b), -0.8rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  42% {
-    text-shadow: 0 0 0 var(--tg-rgb-b), 0 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  43%, 44%, 45% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  46% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  47% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  48%, 49%, 50% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  51%, 52%, 53%, 54% {
-    text-shadow: 0.25rem 0 0 var(--tg-rgb-r), -0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  55%, 56%, 57% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  58%, 59%, 60% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  61% {
-    text-shadow: 0.6rem 0 0 var(--tg-rgb-r), -0.6rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  62% {
-    text-shadow: 0 0 0 var(--tg-rgb-r), 0 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  63%, 64%, 65% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  66%, 67% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  68%, 69%, 70% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  71% {
-    text-shadow: 0.8rem 0 0 var(--tg-rgb-r), -0.8rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  72% {
-    text-shadow: 0 0 0 var(--tg-rgb-r), 0 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  73%, 74%, 75%, 76% {
-    text-shadow: 0.25rem 0 0 var(--tg-rgb-r), -0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  77%, 78%, 79%, 80% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  81%, 82% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  83%, 84%, 85% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-r), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  86%, 87% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(var(--tg-rgb-blur));
-  }
-  88%, 89%, 90% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-r), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  91% {
-    text-shadow: 0.6rem 0 0 var(--tg-rgb-g), -0.6rem 0 0 var(--tg-rgb-b);
-    filter: blur(0);
-  }
-  92%, 93%, 94%, 95% {
-    text-shadow: 0.15rem 0 0 var(--tg-rgb-b), -0.15rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
-  96%, 97%, 98%, 99%, 100% {
-    text-shadow: -0.25rem 0 0 var(--tg-rgb-b), 0.25rem 0 0 var(--tg-rgb-g);
-    filter: blur(0);
-  }
+/* Las dos copias cromaticas: saltan de sitio por pasos, como el glitch original,
+   pero solo moviendo transform (lo hace el compositor). */
+.hero__title-line--glitch::before {
+  color: var(--tg-rgb-r, #ff0055);
+  animation: hero-glitch-r var(--tg-rgb-duration, 2.8s) linear infinite;
+}
+
+.hero__title-line--glitch::after {
+  color: var(--tg-rgb-b, #8b5cf6);
+  animation: hero-glitch-b var(--tg-rgb-duration, 2.8s) linear infinite;
+}
+
+@keyframes hero-glitch-r {
+  0%, 4%     { transform: translateX(-0.25rem); }
+  6%, 10%    { transform: translateX(0.25rem); }
+  11%, 13%   { transform: translateX(0.15rem); }
+  14%, 20%   { transform: translateX(-0.25rem); }
+  21%, 26%   { transform: translateX(0.15rem); }
+  28%, 34%   { transform: translateX(-0.25rem); }
+  35%, 41%   { transform: translateX(0.4rem) translateY(-0.04rem); }
+  43%, 55%   { transform: translateX(0.15rem); }
+  56%, 70%   { transform: translateX(-0.2rem); }
+  72%, 100%  { transform: translateX(0.12rem); }
+}
+
+@keyframes hero-glitch-b {
+  0%, 4%     { transform: translateX(0.25rem); }
+  6%, 10%    { transform: translateX(-0.25rem); }
+  11%, 13%   { transform: translateX(-0.15rem); }
+  14%, 20%   { transform: translateX(0.25rem); }
+  21%, 26%   { transform: translateX(-0.15rem); }
+  28%, 34%   { transform: translateX(0.25rem); }
+  35%, 41%   { transform: translateX(-0.4rem) translateY(0.04rem); }
+  43%, 55%   { transform: translateX(-0.15rem); }
+  56%, 70%   { transform: translateX(0.2rem); }
+  72%, 100%  { transform: translateX(-0.12rem); }
 }
 
 .hero__title-line--accent {
