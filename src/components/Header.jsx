@@ -249,13 +249,6 @@ export function Header({
 
   return (
     <header className="hero">
-      {/* Animated background layers */}
-      <div className="hero__bg">
-        <div className="hero__grid" />
-        <div className="hero__scanline" />
-        <div className="hero__particles" />
-      </div>
-
       <div className="hero__content">
         {/* Title */}
         <div className="hero__title-block" ref={titleRef} style={{ position: 'relative', zIndex: 10 }}>
