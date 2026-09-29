@@ -8183,3 +8183,30 @@ body:has(.modal-overlay) {
 .fpage__mini--suyo { border-color: rgba(52, 211, 153, 0.28); }
 .fpage__mini img { width: 44px; height: 44px; object-fit: contain; }
 .fpage__miniNombre { font-size: 0.63rem; font-weight: 700; color: #dbe3ee; text-align: center; line-height: 1.2; }
+
+/* Contraste de los botones del radar y de la ficha. El texto estaba bien, pero el cuerpo
+   del boton era una superficie al 6% con borde al 12%: se confundia con el fondo y no se
+   leia como control. Sube la superficie al 14% y el borde al 34%, y Quitar y Enviar pasan
+   a tener fondo propio. Texto sobre su propio fondo por encima de 4,5:1 en los tres. */
+.sdm-friends__btn {
+  color: #e6ecf5;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.34);
+}
+.sdm-friends__btn:hover { background: rgba(255, 255, 255, 0.2); }
+.sdm-friends__btn--ok {
+  color: #05291c;
+  background: linear-gradient(135deg, #4ade80, #10b981);
+  border-color: transparent;
+}
+.sdm-friends__btn--danger {
+  color: #ffd6d6;
+  background: rgba(248, 113, 113, 0.22);
+  border-color: rgba(248, 113, 113, 0.62);
+}
+.sdm-friends__send {
+  color: #04262b;
+  background: linear-gradient(135deg, #22d3ee, #00e0d8);
+}
+.sdm-friends__input { border-color: rgba(255, 255, 255, 0.28); }
+.sdm-friends__refresh { color: #eef3fa; }
