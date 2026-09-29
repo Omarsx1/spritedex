@@ -104,8 +104,9 @@ export function FriendCompareModal({
       setErrorMessage('No se pudo cargar esa colección. Prueba otra vez en un momento.');
       return;
     }
-    if (onSetActiveProfile) onSetActiveProfile('friend');
-    onClose();
+    // Se queda dentro del radar a proposito: al conectar aparecen abajo las listas de
+    // comparacion, que es lo que el usuario viene a ver. Sacarlo a la pantalla
+    // principal era perder el contexto que acaba de pedir.
   };
 
   const handleConnectFriend = async () => {

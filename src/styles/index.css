@@ -8069,3 +8069,25 @@ body:has(.modal-overlay) {
 .sdm-friends__btn--danger { color: #fca5a5; border-color: rgba(248, 113, 113, 0.35); }
 .sdm-friends__pendiente { font-size: 0.66rem; color: rgba(226, 232, 240, 0.5); }
 .sdm-friends__hint { margin: 0; font-size: 0.7rem; color: rgba(226, 232, 240, 0.5); line-height: 1.45; }
+
+/* Radar compacto para iPhone: menos aire, tipografias mas ajustadas y respeto por la
+   barra inferior del sistema. Los campos se quedan en los esenciales. */
+.sdm-friends {
+  gap: 8px;
+  margin: 10px 0 12px;
+  padding: 11px;
+}
+.sdm-friends__row { padding: 7px 9px; }
+.sdm-friends__title { font-size: 0.7rem; letter-spacing: 1.2px; }
+.sdm-friends__code { font-size: 0.88rem; letter-spacing: 2px; }
+.sdm-friends__input { padding: 7px 10px; font-size: 0.78rem; }
+.sdm-friends__send { padding: 7px 12px; font-size: 0.68rem; }
+.sdm-friends__btn { padding: 5px 10px; font-size: 0.65rem; }
+.sdm-friends__hint { font-size: 0.67rem; }
+
+@media (max-width: 480px) {
+  .sdm-compare__body {
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+  }
+  .sdm-friends__plate { gap: 5px; }
+}
