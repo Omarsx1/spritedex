@@ -574,10 +574,9 @@ const cederTurno = () => new Promise((resolve) => {
     setTimeout(resolve, 0);
     return;
   }
-  if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
-    window.requestIdleCallback(() => resolve(), { timeout: 120 });
-    return;
-  }
+  // Tambien el precálculo de fondo cede con un frame y no esperando reposo: esperar
+  // hueco lo alargaba (medido: 1,2 s de trabajo repartidos en casi 2 s) y la captura
+  // llegaba tarde a la modal. Las tandas ya son cortas, asi que el hilo respira igual.
   if (typeof requestAnimationFrame === 'function') {
     requestAnimationFrame(() => setTimeout(resolve, 0));
     return;

@@ -662,9 +662,13 @@ useEffect(() => {
     const run = async () => {
         try {
           if (document.visibilityState !== 'visible') return;
-          const { getCanvasCacheKey, readCachedCapture, writeCachedCapture, generateSpritedexCardImage, getOrStartCapture, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } = await import('./utils/canvasExporter');
+          const { getCanvasCacheKey, readCachedCapture, writeCachedCapture, generateSpritedexCardImage, getOrStartCapture, globalCanvasCache, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } = await import('./utils/canvasExporter');
           const ownedInScope = scopedSprites.filter((s) => userState[s.id]?.owned).length;
           const key = getCanvasCacheKey(DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE, scopedSprites.length, ownedInScope, scopedSprites, userState);
+          // Si esta clave ya esta dibujada en memoria, no hay nada que hacer. Sin esta
+          // salida, cada cambio de estado lanzaba otro precálculo y la clave vigente se
+          // quedaba a medias: la modal abria con espera en vez de al instante.
+          if (globalCanvasCache.has(key)) return;
           if (await readCachedCapture(key)) return;
           // getOrStartCapture comparte el trabajo con la modal si esta pidio lo mismo.
           const res = await getOrStartCapture(key, () => generateSpritedexCardImage({
@@ -681,10 +685,11 @@ useEffect(() => {
         }
     };
 
-    // El dibujo SI ocupa el hilo principal (medido: 556 ms con CPU de movil, y eso se
-    // nota como un tiron). Por eso no se lanza hasta que no haya interaccion reciente:
-    // si cae justo al arrancar, cuando llega la sesion, o mientras se hace scroll, se
-    // siente el bloqueo.
+    // Antes esto esperaba 4 s y luego 2 s sin que el usuario tocara nada, porque el
+    // dibujo iba de una pieza y se sentia el bloqueo. Ya no: el dibujo va en tandas
+    // cortas que sueltan el hilo entre medias, asi que se puede adelantar y dejar la
+    // captura lista antes de que la pidan. Solo se pospone si el usuario esta
+    // interactuando en ese momento (scroll o toques), y por poco tiempo.
     let ultimaActividad = Date.now();
     const marcarActividad = () => { ultimaActividad = Date.now(); };
     const EVENTOS = ['pointerdown', 'keydown', 'wheel', 'touchstart'];
@@ -693,13 +698,13 @@ useEffect(() => {
     let cancelado = false;
     const intentar = () => {
       if (cancelado) return;
-      if (Date.now() - ultimaActividad < 2000) {
-        setTimeout(intentar, 1500);
+      if (Date.now() - ultimaActividad < 500) {
+        setTimeout(intentar, 400);
         return;
       }
       run();
     };
-    const timer = setTimeout(intentar, 4000);
+    const timer = setTimeout(intentar, 1200);
 
     return () => {
       cancelado = true;
