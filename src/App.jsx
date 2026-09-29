@@ -37,6 +37,12 @@ import {
 } from './utils/friendCode';
 
 // Carga diferida (code splitting) para modales secundarios y suite administrativa
+// El precalculo de la captura no arranca antes de este margen desde que se abre la app,
+// ni mientras el usuario lleve menos de PRECALCULO_CALMA_MS sin tocar nada.
+const ARRANQUE_APP = Date.now();
+const PRECALCULO_MIN_MS = 4000;
+const PRECALCULO_CALMA_MS = 2000;
+
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
 const AdminAuthGate = lazy(() => import('./components/admin/AdminAuthGate').then(m => ({ default: m.AdminAuthGate })));
 const ShareImageModal = lazy(() => import('./components/ShareImageModal').then(m => ({ default: m.ShareImageModal })));
@@ -687,11 +693,11 @@ useEffect(() => {
         }
     };
 
-    // Antes esto esperaba 4 s y luego 2 s sin que el usuario tocara nada, porque el
-    // dibujo iba de una pieza y se sentia el bloqueo. Ya no: el dibujo va en tandas
-    // cortas que sueltan el hilo entre medias, asi que se puede adelantar y dejar la
-    // captura lista antes de que la pidan. Solo se pospone si el usuario esta
-    // interactuando en ese momento (scroll o toques), y por poco tiempo.
+    // La captura se prepara cuando la app lleva unos segundos quieta. Durante los
+    // primeros segundos la conexion y el hilo son del primer pintado, del hero y de
+    // las tarjetas: arrancar el precalculo a los 1,2 s ponia ~700 KB de miniaturas a
+    // competir con eso (medido: el sprite del hero tardaba 6 s en aparecer con Slow 4G).
+    // Si el usuario esta tocando o haciendo scroll, se pospone hasta que pare.
     let ultimaActividad = Date.now();
     const marcarActividad = () => { ultimaActividad = Date.now(); };
     const EVENTOS = ['pointerdown', 'keydown', 'wheel', 'touchstart'];
@@ -700,13 +706,15 @@ useEffect(() => {
     let cancelado = false;
     const intentar = () => {
       if (cancelado) return;
-      if (Date.now() - ultimaActividad < 500) {
-        setTimeout(intentar, 400);
+      const demasiadoPronto = Date.now() - ARRANQUE_APP < PRECALCULO_MIN_MS;
+      const sigueTocando = Date.now() - ultimaActividad < PRECALCULO_CALMA_MS;
+      if (demasiadoPronto || sigueTocando) {
+        setTimeout(intentar, 600);
         return;
       }
       run();
     };
-    const timer = setTimeout(intentar, 1200);
+    const timer = setTimeout(intentar, 1500);
 
     return () => {
       cancelado = true;
