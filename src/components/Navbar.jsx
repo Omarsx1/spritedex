@@ -288,7 +288,7 @@ export function Navbar({
                     onClick={() => { if (onGenChange) onGenChange(2); setIsNavMenuOpen(false); }}
                   >
                     <div className="gen-option-content">
-                      <span className="gen-option-title">2da Gen</span>
+                      <span className="gen-option-title">2da Gen · Override</span>
                     </div>
                     {activeGen === 2 && <span className="gen-option-check">✓</span>}
                   </button>
@@ -298,7 +298,7 @@ export function Navbar({
                     onClick={() => { if (onGenChange) onGenChange(1); setIsNavMenuOpen(false); }}
                   >
                     <div className="gen-option-content">
-                      <span className="gen-option-title">1ra Gen</span>
+                      <span className="gen-option-title">1ra Gen · Runners</span>
                     </div>
                     {activeGen === 1 && <span className="gen-option-check">✓</span>}
                   </button>
