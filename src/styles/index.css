@@ -1695,13 +1695,16 @@ html::after {
   }
 
   .hero__title-line {
-    font-size: 3.4rem;
+    /* 3.4rem x 1.25: los dos titulos crecen en la misma proporcion (FORTNITE
+       200px -> 250px de ancho, con 347px disponibles en un telefono de 375). */
+    font-size: 4.25rem;
   }
 
   .hero__title-line--accent {
-    font-size: 1.35rem;
+    font-size: 1.7rem;
     letter-spacing: 3px;
-    margin-top: -9px;
+    /* El encaje sobre FORTNITE crece con el mismo factor. */
+    margin-top: -11px;
   }
 
   .hero__bar {
