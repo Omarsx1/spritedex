@@ -115,69 +115,167 @@ html::after {
   height: 100vh;
   height: 100dvh;
   background-image:
-    /* puntos cian */
-    radial-gradient(circle, rgba(0, 240, 232, 0.60) 0 1.4px, transparent 1.6px),
-    radial-gradient(circle, rgba(0, 240, 232, 0.42) 0 1.1px, transparent 1.3px),
-    /* lineas cortas arriba */
-    repeating-linear-gradient(90deg, rgba(0, 240, 232, 0.45) 0 26px, transparent 26px 118px),
-    repeating-linear-gradient(90deg, rgba(236, 72, 153, 0.50) 0 12px, transparent 12px 71px),
-    repeating-linear-gradient(90deg, rgba(232, 246, 255, 0.28) 0 54px, transparent 54px 232px),
-    /* lineas cortas abajo */
-    repeating-linear-gradient(90deg, rgba(124, 255, 79, 0.42) 0 20px, transparent 20px 96px),
-    repeating-linear-gradient(90deg, rgba(236, 72, 153, 0.45) 0 34px, transparent 34px 143px),
-    /* recortes sueltos */
-    linear-gradient(rgba(236, 72, 153, 0.85), rgba(236, 72, 153, 0.85)),
-    linear-gradient(rgba(124, 255, 79, 0.75), rgba(124, 255, 79, 0.75)),
+    /* En pantalla ancha se colocan a mano, uno a uno y todos distintos: filas
+       repetidas se ven mecanicas en cuanto hay sitio de sobra. Los tamanos van de
+       la linea larga al cuadrito, y el centro queda vacio para el contenido. */
+    linear-gradient(rgba(236, 72, 153, 0.88), rgba(236, 72, 153, 0.88)),
+    linear-gradient(rgba(124, 255, 79, 0.80), rgba(124, 255, 79, 0.80)),
     linear-gradient(rgba(0, 240, 232, 0.65), rgba(0, 240, 232, 0.65)),
-    linear-gradient(rgba(232, 246, 255, 0.45), rgba(232, 246, 255, 0.45)),
+    linear-gradient(rgba(236, 72, 153, 0.78), rgba(236, 72, 153, 0.78)),
+    linear-gradient(rgba(232, 246, 255, 0.40), rgba(232, 246, 255, 0.40)),
+    linear-gradient(rgba(236, 72, 153, 0.85), rgba(236, 72, 153, 0.85)),
+    linear-gradient(rgba(0, 240, 232, 0.60), rgba(0, 240, 232, 0.60)),
+    linear-gradient(rgba(124, 255, 79, 0.72), rgba(124, 255, 79, 0.72)),
+    linear-gradient(rgba(217, 70, 239, 0.75), rgba(217, 70, 239, 0.75)),
     linear-gradient(rgba(79, 124, 255, 0.60), rgba(79, 124, 255, 0.60)),
-    linear-gradient(rgba(217, 70, 239, 0.70), rgba(217, 70, 239, 0.70));
-  background-repeat:
-    repeat-x,
-    repeat-x,
-    repeat-x,
-    repeat-x,
-    repeat-x,
-    repeat-x,
-    repeat-x,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat;
+    linear-gradient(rgba(232, 246, 255, 0.35), rgba(232, 246, 255, 0.35)),
+    linear-gradient(rgba(236, 72, 153, 0.50), rgba(236, 72, 153, 0.50)),
+    linear-gradient(rgba(236, 72, 153, 0.80), rgba(236, 72, 153, 0.80)),
+    linear-gradient(rgba(0, 240, 232, 0.60), rgba(0, 240, 232, 0.60)),
+    linear-gradient(rgba(124, 255, 79, 0.70), rgba(124, 255, 79, 0.70)),
+    linear-gradient(rgba(236, 72, 153, 0.85), rgba(236, 72, 153, 0.85)),
+    linear-gradient(rgba(232, 246, 255, 0.40), rgba(232, 246, 255, 0.40)),
+    linear-gradient(rgba(79, 124, 255, 0.55), rgba(79, 124, 255, 0.55)),
+    linear-gradient(rgba(217, 70, 239, 0.75), rgba(217, 70, 239, 0.75)),
+    linear-gradient(rgba(0, 240, 232, 0.50), rgba(0, 240, 232, 0.50)),
+    linear-gradient(rgba(236, 72, 153, 0.70), rgba(236, 72, 153, 0.70)),
+    linear-gradient(rgba(124, 255, 79, 0.70), rgba(124, 255, 79, 0.70)),
+    linear-gradient(rgba(232, 246, 255, 0.35), rgba(232, 246, 255, 0.35)),
+    linear-gradient(rgba(0, 240, 232, 0.55), rgba(0, 240, 232, 0.55)),
+    linear-gradient(rgba(236, 72, 153, 0.78), rgba(236, 72, 153, 0.78)),
+    linear-gradient(rgba(124, 255, 79, 0.65), rgba(124, 255, 79, 0.65)),
+    linear-gradient(rgba(217, 70, 239, 0.65), rgba(217, 70, 239, 0.65)),
+    linear-gradient(rgba(0, 240, 232, 0.45), rgba(0, 240, 232, 0.45));
+  background-repeat: no-repeat;
   background-size:
-    84px 84px,
-    132px 132px,
-    100% 2px,
-    100% 3px,
-    100% 1px,
-    100% 3px,
-    100% 2px,
-    18px 6px,
+    220px 6px,
+    40px 9px,
+    24px 5px,
+    78px 8px,
+    54px 4px,
+    14px 14px,
     10px 10px,
-    24px 4px,
-    16px 4px,
+    30px 6px,
+    96px 7px,
+    26px 18px,
+    64px 4px,
+    90px 5px,
+    180px 7px,
+    26px 5px,
+    44px 6px,
+    16px 16px,
+    58px 4px,
+    30px 7px,
+    70px 6px,
+    22px 5px,
+    28px 8px,
     12px 12px,
-    7px 22px;
+    30px 4px,
+    8px 8px,
+    46px 6px,
+    7px 7px,
+    34px 5px,
+    18px 6px;
   background-position:
-    0 14px,
-    36px 74px,
-    0 30px,
-    0 52px,
-    0 68px,
-    0 95%,
-    0 91%,
-    4% 9%,
-    95% 16%,
-    1% 86%,
-    96% 72%,
-    92% 6%,
-    3% 62%;
+    3% 5%,
+    9% 1.5%,
+    2% 11%,
+    27% 3.5%,
+    40% 1.5%,
+    51% 6.5%,
+    62% 3%,
+    68% 8%,
+    76% 2%,
+    88% 1.5%,
+    92% 9%,
+    97% 12%,
+    4% 92%,
+    15% 88%,
+    30% 96%,
+    92% 89%,
+    63% 97%,
+    47% 93%,
+    84% 96%,
+    98% 45%,
+    16% 8.5%,
+    24% 1%,
+    57% 10.5%,
+    81% 5.5%,
+    94% 4%,
+    44% 7%,
+    12% 13.5%,
+    71% 11%;
   z-index: -1;
   pointer-events: none;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
+}
+
+/* En movil la pantalla es estrecha y esas filas cortas si funcionan: es la
+   version aprobada, asi que se conserva tal cual. */
+@media (max-width: 600px) {
+  html::after {
+    background-image:
+      /* puntos cian */
+      radial-gradient(circle, rgba(0, 240, 232, 0.60) 0 1.4px, transparent 1.6px),
+      radial-gradient(circle, rgba(0, 240, 232, 0.42) 0 1.1px, transparent 1.3px),
+      /* lineas cortas arriba */
+      repeating-linear-gradient(90deg, rgba(0, 240, 232, 0.45) 0 26px, transparent 26px 118px),
+      repeating-linear-gradient(90deg, rgba(236, 72, 153, 0.50) 0 12px, transparent 12px 71px),
+      repeating-linear-gradient(90deg, rgba(232, 246, 255, 0.28) 0 54px, transparent 54px 232px),
+      /* lineas cortas abajo */
+      repeating-linear-gradient(90deg, rgba(124, 255, 79, 0.42) 0 20px, transparent 20px 96px),
+      repeating-linear-gradient(90deg, rgba(236, 72, 153, 0.45) 0 34px, transparent 34px 143px),
+      /* recortes sueltos */
+      linear-gradient(rgba(236, 72, 153, 0.85), rgba(236, 72, 153, 0.85)),
+      linear-gradient(rgba(124, 255, 79, 0.75), rgba(124, 255, 79, 0.75)),
+      linear-gradient(rgba(0, 240, 232, 0.65), rgba(0, 240, 232, 0.65)),
+      linear-gradient(rgba(232, 246, 255, 0.45), rgba(232, 246, 255, 0.45)),
+      linear-gradient(rgba(79, 124, 255, 0.60), rgba(79, 124, 255, 0.60)),
+      linear-gradient(rgba(217, 70, 239, 0.70), rgba(217, 70, 239, 0.70));
+    background-repeat:
+      repeat-x,
+      repeat-x,
+      repeat-x,
+      repeat-x,
+      repeat-x,
+      repeat-x,
+      repeat-x,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat;
+    background-size:
+      84px 84px,
+      132px 132px,
+      100% 2px,
+      100% 3px,
+      100% 1px,
+      100% 3px,
+      100% 2px,
+      18px 6px,
+      10px 10px,
+      24px 4px,
+      16px 4px,
+      12px 12px,
+      7px 22px;
+    background-position:
+      0 14px,
+      36px 74px,
+      0 30px,
+      0 52px,
+      0 68px,
+      0 95%,
+      0 91%,
+      4% 9%,
+      95% 16%,
+      1% 86%,
+      96% 72%,
+      92% 6%,
+      3% 62%;
+  }
 }
 
 /* En movil la aurora queda mucho mas cerca del ojo (la pantalla es alta y
