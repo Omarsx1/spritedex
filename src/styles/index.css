@@ -1154,7 +1154,8 @@ html::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
+  /* 12px mas abajo: los espiritus orbitando quedaban altos respecto al titulo. */
+  margin: 12px auto 0;
 }
 
 .hero__hero-sprite {
@@ -1604,7 +1605,7 @@ html::after {
     height: 130px !important;
     max-width: 130px !important;
     max-height: 130px !important;
-    margin: 0 auto;
+    margin: 12px auto 0;
   }
 
   .hero__hero-sprite {

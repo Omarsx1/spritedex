@@ -270,8 +270,7 @@ export function Header({
             zIndex: 2,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto'
+            justifyContent: 'center'
           }}
         >
           <div className="hero__orbit-ring" ref={orbitContainerRef}>
