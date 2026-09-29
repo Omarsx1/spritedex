@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { X, Users, Copy, Check, ArrowDownLeft, ArrowUpRight, Handshake, Radio, Zap, RefreshCw, MessageSquare } from 'lucide-react';
+import { X, Users, Copy, Check, ArrowDownLeft, ArrowUpRight, Handshake, Radio, Zap, MessageSquare } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { ALL_SPRITES, getSpriteCardStyle } from '../data/spritesData';
 import { decodeCollectionState } from '../utils/shareLink';

@@ -793,6 +793,7 @@ useEffect(() => {
               irA('/');
             }
           }}
+          onAbrirModal={() => setShowCompareModal(true)}
         />
       </div>
     );
