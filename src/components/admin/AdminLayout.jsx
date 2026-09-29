@@ -28,6 +28,7 @@ import { SpiritCatalogTable } from './SpiritCatalogTable';
 import { SpiritEditorModal } from './SpiritEditorModal';
 import { FamilyManagerModal } from './FamilyManagerModal';
 import { UserManagementTable } from './UserManagementTable';
+import { UserMetricsPanel } from './UserMetricsPanel';
 import { AudienceInsightsView } from './AudienceInsightsView';
 import { clearAdminSession } from '../../utils/adminAuth';
 import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
@@ -50,11 +51,11 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
     try {
       const urlParams = new URLSearchParams(window.location.search);
       const paramTab = urlParams.get('tab');
-      if (paramTab && ['analytics', 'audience', 'catalog', 'users'].includes(paramTab)) {
+      if (paramTab && ['analytics', 'audience', 'catalog', 'users', 'metrics'].includes(paramTab)) {
         return paramTab;
       }
       const hashTab = window.location.hash.replace('#', '');
-      if (hashTab && ['analytics', 'audience', 'catalog', 'users'].includes(hashTab)) {
+      if (hashTab && ['analytics', 'audience', 'catalog', 'users', 'metrics'].includes(hashTab)) {
         return hashTab;
       }
       const stored = localStorage.getItem('spritedex_studio_active_tab');
@@ -399,6 +400,32 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
                   {usersCount || 0}
                 </span>
               )}
+            </button>
+
+            <button
+              onClick={() => setActiveTab('metrics')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: (sidebarOpen || isMobile) ? 'space-between' : 'center',
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: '10px',
+                border: 'none',
+                background: activeTab === 'metrics' ? (darkMode ? '#232323' : 'rgba(60, 80, 224, 0.08)') : 'transparent',
+                color: activeTab === 'metrics' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'),
+                fontSize: '0.86rem',
+                fontWeight: activeTab === 'metrics' ? 800 : 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                whiteSpace: 'nowrap'
+              }}
+              title="Usuarios reales: invitados, cuentas y colecciones"
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                <BarChart3 size={18} style={{ color: activeTab === 'metrics' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'), flexShrink: 0 }} />
+                {(sidebarOpen || isMobile) && <span style={{ whiteSpace: 'nowrap' }}>Usuarios reales</span>}
+              </div>
             </button>
 
             {/* Quick Add Spirit */}
@@ -810,6 +837,10 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
               sprites={sprites}
               darkMode={darkMode}
             />
+          )}
+
+          {activeTab === 'metrics' && (
+            <UserMetricsPanel darkMode={darkMode} />
           )}
         </main>
       </div>
