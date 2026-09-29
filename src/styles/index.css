@@ -8229,3 +8229,11 @@ body:has(.modal-overlay) {
 .sdm-friends[data-vista='amigos'] .fpage__bloqueFicha { display: none; }
 .sdm-friends[data-vista='comparacion'] > .sdm-friends__group { display: none; }
 .sdm-friends[data-vista='comparacion'] .fpage__bloqueFicha .sdm-friends__group { display: flex; }
+
+/* Aire en la comparación de la ficha: la etiqueta LE FALTAN caía pegada al botón
+   "Ver los N" de la lista anterior. Cada etiqueta gana separación arriba (la primera no,
+   para no despegar el bloque del borde) y el botón de desplegar respira debajo. */
+.fpage__bloqueFicha .sdm-friends__label { margin-top: 14px; }
+.fpage__bloqueFicha .sdm-friends__label:first-child { margin-top: 0; }
+.sdm-friends__btn--ver { margin-top: 6px; }
+.fpage__minis { margin-bottom: 2px; }
