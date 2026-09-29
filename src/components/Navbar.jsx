@@ -22,8 +22,7 @@ export function Navbar({
   onOpenAuthModal,
   onLinkGoogle,
   onOpenBackupModal,
-  onSignOut,
-  progresoGeneraciones = {}
+  onSignOut
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
@@ -306,8 +305,6 @@ export function Navbar({
 
                 <div className="app-navbar__menu-options">
                   {opcionesGen.map((op) => {
-                    const progreso = progresoGeneraciones[op.id] || { owned: 0, total: 0 };
-                    const pct = progreso.total > 0 ? Math.round((progreso.owned / progreso.total) * 100) : 0;
                     const activa = activeGen === op.id;
                     return (
                       <button
@@ -319,8 +316,6 @@ export function Navbar({
                         <span className="gen-option-badge">{op.badge}</span>
                         <span className="gen-option-content">
                           <span className="gen-option-title">{op.nombre}</span>
-                          <span className="gen-option-meta">{op.detalle} · {progreso.owned}/{progreso.total}</span>
-                          <span className="gen-option-bar"><span style={{ width: `${pct}%` }} /></span>
                         </span>
                         {activa && <span className="gen-option-check">✓</span>}
                       </button>
@@ -333,6 +328,7 @@ export function Navbar({
 
               {/* Sección Herramientas */}
               <div className="app-navbar__menu-section">
+                <div className="app-navbar__menu-actions-row">
                 <button
                   className="app-navbar__menu-action-btn"
                   onClick={() => {
@@ -342,9 +338,8 @@ export function Navbar({
                 >
                   <div className="action-btn-left">
                     <Smartphone size={15} color="#00F0E8" />
-                    <span>Instalar Aplicación</span>
+                    <span>Instalar</span>
                   </div>
-                  <span className="action-btn-sub" style={{ color: '#00F0E8', fontWeight: 700 }}>App PWA</span>
                 </button>
 
                 <button
@@ -353,10 +348,10 @@ export function Navbar({
                 >
                   <div className="action-btn-left">
                     <Download size={15} />
-                    <span>Copia de Seguridad</span>
+                    <span>Respaldo</span>
                   </div>
-                  <span className="action-btn-sub">Respaldo</span>
                 </button>
+                </div>
               </div>
             </div>
           )}
