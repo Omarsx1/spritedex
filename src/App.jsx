@@ -717,6 +717,12 @@ useEffect(() => {
   const totalCount = scopedSprites.length;
   const ownedCount = scopedSprites.filter((s) => activeState[s.id]?.owned).length;
   const masteredCount = scopedSprites.filter((s) => activeState[s.id]?.owned && activeState[s.id]?.level === 5).length;
+  // Porcentajes para la barra de progreso. Un valor bajo se ve igual que cero, asi
+  // que el relleno nunca baja del 2,5% cuando hay algo (eso es solo visual).
+  const pctDe = (valor) => (totalCount > 0 ? Math.round((valor / totalCount) * 100) : 0);
+  const rellenoDe = (valor) => (valor > 0 ? Math.max(pctDe(valor), 2.5) : 0);
+  const ownedPct = pctDe(ownedCount);
+  const masteredPct = pctDe(masteredCount);
 
   const friendLendableCount = friendState ? scopedSprites.filter((s) => friendState[s.id]?.owned && !userState[s.id]?.owned).length : 0;
 
@@ -839,6 +845,49 @@ useEffect(() => {
           viewMode={viewMode}
           setViewMode={setViewMode}
         />
+
+        {isMobile && (
+          <section className="stats-bar" aria-label="Progreso de la colección">
+            <div className="stats-bar__col">
+              <span className="stats-bar__label">Total</span>
+              <span className="stats-bar__value">{totalCount}</span>
+            </div>
+            <div className="stats-bar__col">
+              <span className="stats-bar__label">Atrapados</span>
+              <span className="stats-bar__row">
+                <span className="stats-bar__value">{ownedCount}</span>
+                <span className="stats-bar__pct">{ownedPct}%</span>
+              </span>
+              <span
+                className="stats-bar__track"
+                role="progressbar"
+                aria-label="Espíritus atrapados"
+                aria-valuemin={0}
+                aria-valuemax={totalCount}
+                aria-valuenow={ownedCount}
+              >
+                <span className="stats-bar__fill stats-bar__fill--caught" style={{ width: rellenoDe(ownedCount) + '%' }} />
+              </span>
+            </div>
+            <div className="stats-bar__col">
+              <span className="stats-bar__label">Maxeados</span>
+              <span className="stats-bar__row">
+                <span className="stats-bar__value">{masteredCount}</span>
+                <span className="stats-bar__pct">{masteredPct}%</span>
+              </span>
+              <span
+                className="stats-bar__track"
+                role="progressbar"
+                aria-label="Espíritus maxeados"
+                aria-valuemin={0}
+                aria-valuemax={totalCount}
+                aria-valuenow={masteredCount}
+              >
+                <span className="stats-bar__fill stats-bar__fill--mastered" style={{ width: rellenoDe(masteredCount) + '%' }} />
+              </span>
+            </div>
+          </section>
+        )}
 
         {filteredSprites.length === 0 ? (
           <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8', gridColumn: '1 / -1' }}>

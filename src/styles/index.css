@@ -7856,3 +7856,94 @@ body:has(.modal-overlay) {
 .motion-disabled .mobile-new-coachmark {
   animation: none !important;
 }
+
+/* ===== INDICADORES DE PROGRESO (Móvil) =====
+   Tres lecturas en una tarjeta de cristal, al estilo de los ajustes modernos:
+   etiqueta fina arriba, numero tabular en grande y barra de 4 px debajo. En movil
+   sustituye a los dos anillos del hero, que se ocultan. */
+.stats-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: stretch;
+  margin: 14px 16px 2px;
+  padding: 12px 2px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.stats-bar__col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  padding: 0 10px;
+  min-width: 0;
+}
+
+.stats-bar__col + .stats-bar__col {
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stats-bar__label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(226, 232, 240, 0.55);
+  white-space: nowrap;
+}
+
+.stats-bar__row {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.stats-bar__value {
+  font-size: 1.34rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-bar__pct {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(226, 232, 240, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-bar__track {
+  display: block;
+  width: 100%;
+  height: 4px;
+  margin-top: 1px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.stats-bar__fill {
+  display: block;
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stats-bar__fill--caught {
+  background: #6366f1;
+}
+
+.stats-bar__fill--mastered {
+  background: #ec4899;
+}
+
+/* En movil los anillos del hero ya no hacen falta: el progreso vive bajo el buscador. */
+@media (max-width: 600px) {
+  .hero__stat-ring {
+    display: none;
+  }
+}
