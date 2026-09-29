@@ -7,7 +7,7 @@ import { generatePermanentFriendUrl } from '../utils/friendCode';
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
 // gestionan personas y en la ficha del amigo se compara la coleccion (fase 2).
 // Reutiliza los estilos .sdm-friends que ya estaban aprobados.
-export function FriendsPage({ myFriendCode, onBack, onVerColeccion }) {
+export function FriendsPage({ myFriendCode, codigoFicha, onBack, onVerColeccion }) {
   const radar = useFriendRequests();
   const [codigo, setCodigo] = useState('');
   const [aviso, setAviso] = useState('');
@@ -92,6 +92,22 @@ export function FriendsPage({ myFriendCode, onBack, onVerColeccion }) {
           )}
         </div>
 
+          {codigoFicha && (
+            <div className="sdm-friends__group">
+              <span className="sdm-friends__label">FICHA COMPARTIDA</span>
+              <div className="sdm-friends__row">
+                <span className="sdm-friends__plate">
+                  <span className="sdm-friends__prefix">SDEX</span>
+                  <span className="sdm-friends__code">{String(codigoFicha).replace(/^SDEX-/i, '')}</span>
+                </span>
+                <div className="sdm-friends__actions">
+                  <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => onVerColeccion(codigoFicha)}>Ver su colección</button>
+                </div>
+              </div>
+              <p className="sdm-friends__hint">Te compartieron este código. Puedes ver su colección o enviarle una solicitud para que quede en tus amigos.</p>
+            </div>
+          )}
+
         {radar.recibidas.length > 0 && (
           <div className="sdm-friends__group">
             <span className="sdm-friends__label">SOLICITUDES ({radar.recibidas.length})</span>
@@ -152,4 +168,3 @@ export function FriendsPage({ myFriendCode, onBack, onVerColeccion }) {
     </div>
   );
 }
-

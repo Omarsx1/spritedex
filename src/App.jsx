@@ -755,11 +755,18 @@ useEffect(() => {
     setEnAmigos(ruta.indexOf('/amigos') === 0);
   }, []);
 
+  // Codigo de amigo que venga en la ruta (/amigos/SDEX-XXXX): la ficha se abre con el.
+  const rutaActual = typeof window !== 'undefined' ? window.location.pathname : '';
+  const codigoEnRuta = rutaActual.indexOf('/amigos/') === 0
+    ? decodeURIComponent(rutaActual.slice(8)).replace(/\/+$/, '').toUpperCase()
+    : '';
+
   if (enAmigos) {
     return (
       <div className="app-container">
         <FriendsPage
           myFriendCode={myFriendCode}
+          codigoFicha={codigoEnRuta}
           onBack={() => irA('/')}
           onVerColeccion={async (codigo) => {
             const ok = await handleConnectFriendCode(codigo);
