@@ -174,6 +174,7 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
             <div className="sdm-friends__group">
               <span className="sdm-friends__label">COMPARACIÓN CON SDEX {String(codigoFicha).replace(/^SDEX-/i, '')}</span>
               <span className="sdm-friends__label">TE FALTAN ({listas.teFaltan.length})</span>
+              <p className="sdm-friends__hint">Estos los tiene tu amigo y a ti te faltan.</p>
               {listas.teFaltan.length === 0 ? (
                 <p className="sdm-friends__hint">Los tienes todos. No te falta nada de lo suyo.</p>
               ) : (<>
@@ -193,6 +194,7 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
                 </>
               )}
               <span className="sdm-friends__label">LE FALTAN ({listas.leFaltan.length})</span>
+              <p className="sdm-friends__hint">Estos le faltan a tu amigo: son tuyos y puedes compartírselos.</p>
               {listas.leFaltan.length === 0 ? (
                 <p className="sdm-friends__hint">No necesita nada de lo tuyo.</p>
               ) : (<>
@@ -211,7 +213,6 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
                 )}
                 </>
               )}
-              <p className="sdm-friends__hint">Te faltan: lo que él tiene y tú no. Le faltan: lo que tú tienes y él no. Perfecto para intercambiar.</p>
             </div>
           )}
 
