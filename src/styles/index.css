@@ -1088,65 +1088,39 @@ html::after {
    pero solo moviendo transform (lo hace el compositor). */
 .hero__title-line--glitch::before {
   color: var(--tg-rgb-r, #ff0055);
-  /* steps(1, end): salto duro entre estados. Con 'linear' las copias se deslizaban
-     y pasaban por cero (desaparecian un instante), y eso se lee como lentitud. */
+  /* La franja esta SIEMPRE puesta (como el text-shadow del original) y el glitch
+     es un evento: tres saltos cortos en medio segundo y vuelta a la calma. Antes
+     habia movimiento todo el rato y eso cansa la vista: parece nervioso. */
   animation: hero-glitch-r steps(1, end) infinite;
-  animation-duration: var(--tg-rgb-duration, 2.8s);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 1.8);
 }
 
 .hero__title-line--glitch::after {
   color: var(--tg-rgb-b, #00FFFB);
   animation: hero-glitch-b steps(1, end) infinite;
-  animation-duration: var(--tg-rgb-duration, 2.8s);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 1.8);
+  /* Un pelo desfasada de la roja: los hipos no caen clavados a la vez. */
+  animation-delay: 0.07s;
 }
 
-/* Los saltos van desiguales a proposito: rafagas de 2% (56 ms) mezcladas con
-   pausas de 8-10% (220-280 ms). Es el ritmo del original, que alternaba golpes
-   rapidos con calma; a paso fijo se ve lento si es largo y nervioso si es corto. */
+/* ~5 s de calma y, en el ultimo 12% del ciclo, un hipo: tres golpes y vuelta.
+   Dentro del hipo los saltos son duros (steps) para que se lea digital. */
 @keyframes hero-glitch-r {
-  0%   { transform: translateX(-0.25rem); }
-  2%   { transform: translateX(0.3rem); }
-  3.5% { transform: translateX(-0.15rem); }
-  9%   { transform: translateX(0.2rem) translateY(-0.03rem); }
-  10.5% { transform: translateX(-0.25rem); }
-  16%  { transform: translateX(0.85rem); }
-  17.5% { transform: translateX(-0.25rem); }
-  26%  { transform: translateX(0.15rem); }
-  28%  { transform: translateX(-0.1rem); }
-  38%  { transform: translateX(0.25rem); }
-  39.5% { transform: translateX(-0.2rem); }
-  46%  { transform: translateX(0.15rem); }
-  54%  { transform: translateX(-0.3rem); }
-  56%  { transform: translateX(0.2rem); }
-  63%  { transform: translateX(-0.15rem); }
-  71%  { transform: translateX(0.25rem); }
-  72.5% { transform: translateX(-0.25rem); }
-  84%  { transform: translateX(0.15rem); }
-  85%  { transform: translateX(-0.2rem); }
-  100% { transform: translateX(0.12rem); }
+  0%, 88%     { transform: translateX(-0.25rem); }
+  89%         { transform: translateX(-0.65rem); }
+  90.5%       { transform: translateX(0.2rem) translateY(-0.02rem); }
+  92%         { transform: translateX(-0.15rem); }
+  93%         { transform: translateX(-0.85rem); }
+  94.5%, 100% { transform: translateX(-0.25rem); }
 }
 
 @keyframes hero-glitch-b {
-  0%   { transform: translateX(0.25rem); }
-  2%   { transform: translateX(-0.3rem); }
-  3.5% { transform: translateX(0.15rem); }
-  9%   { transform: translateX(-0.2rem) translateY(0.03rem); }
-  10.5% { transform: translateX(0.25rem); }
-  16%  { transform: translateX(-0.85rem); }
-  17.5% { transform: translateX(0.25rem); }
-  26%  { transform: translateX(-0.15rem); }
-  28%  { transform: translateX(0.1rem); }
-  38%  { transform: translateX(-0.25rem); }
-  39.5% { transform: translateX(0.2rem); }
-  46%  { transform: translateX(-0.15rem); }
-  54%  { transform: translateX(0.3rem); }
-  56%  { transform: translateX(-0.2rem); }
-  63%  { transform: translateX(0.15rem); }
-  71%  { transform: translateX(-0.25rem); }
-  72.5% { transform: translateX(0.25rem); }
-  84%  { transform: translateX(-0.15rem); }
-  85%  { transform: translateX(0.2rem); }
-  100% { transform: translateX(-0.12rem); }
+  0%, 88%     { transform: translateX(0.25rem); }
+  89%         { transform: translateX(0.65rem); }
+  90.5%       { transform: translateX(-0.2rem) translateY(0.02rem); }
+  92%         { transform: translateX(0.15rem); }
+  93%         { transform: translateX(0.85rem); }
+  94.5%, 100% { transform: translateX(0.25rem); }
 }
 
 .hero__title-line--accent {
