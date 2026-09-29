@@ -17,6 +17,7 @@ import { SpriteDetailModal } from './components/SpriteDetailModal';
 import { PrivacyNotice } from './components/PrivacyNotice';
 import { InstallPrompt } from './components/InstallPrompt';
 import { Footer } from './components/Footer';
+import { FriendsPage } from './components/FriendsPage';
 import { MobileSpriteSwiper } from './components/MobileSpriteSwiper';
 import { useIsMobile } from './hooks/useIsMobile';
 import { useDynamicSprites } from './hooks/useDynamicSprites';
@@ -737,6 +738,41 @@ useEffect(() => {
 
   const friendLendableCount = friendState ? scopedSprites.filter((s) => friendState[s.id]?.owned && !userState[s.id]?.owned).length : 0;
 
+  // Página de amigos (fase 1): ruta propia para tener espacio de verdad. La modal sigue
+  // viva en paralelo, así nadie pierde el radar mientras migramos.
+  const [enAmigos, setEnAmigos] = useState(() => typeof window !== 'undefined' && window.location.pathname.indexOf('/amigos') === 0);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const alVolver = () => setEnAmigos(window.location.pathname.indexOf('/amigos') === 0);
+    window.addEventListener('popstate', alVolver);
+    return () => window.removeEventListener('popstate', alVolver);
+  }, []);
+
+  const irA = useCallback((ruta) => {
+    if (typeof window === 'undefined') return;
+    window.history.pushState({}, '', ruta);
+    setEnAmigos(ruta.indexOf('/amigos') === 0);
+  }, []);
+
+  if (enAmigos) {
+    return (
+      <div className="app-container">
+        <FriendsPage
+          myFriendCode={myFriendCode}
+          onBack={() => irA('/')}
+          onVerColeccion={async (codigo) => {
+            const ok = await handleConnectFriendCode(codigo);
+            if (ok !== false) {
+              setActiveProfile('friend');
+              irA('/');
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
   // Render Admin Portal if secret path or query parameter is active
   if (isAdminPortal) {
     if (!isAdminAuth) {
@@ -977,6 +1013,7 @@ useEffect(() => {
             isLiveConnected={isLiveConnected}
             connectedFriendCode={connectedFriendCode}
             myFriendCode={myFriendCode}
+            onOpenFriendsPage={() => irA('/amigos')}
             activeProfile={activeProfile}
             onSetActiveProfile={setActiveProfile}
             onConnectFriendCode={handleConnectFriendCode}

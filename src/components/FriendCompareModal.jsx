@@ -21,6 +21,7 @@ export function FriendCompareModal({
   onDisconnectFriend,
   onLoadFriendState,
   onToggleOwned,
+  onOpenFriendsPage,
   onClose
 }) {
   const [activeTab, setActiveTab] = useState('friendAll'); // 'friendAll' | 'friendToMe' | 'meToFriend' | 'common'
@@ -408,6 +409,11 @@ export function FriendCompareModal({
           <div className="sdm-friends">
             <div className="sdm-friends__head">
               <span className="sdm-friends__title"><Users size={14} /> RADAR DE AMIGOS</span>
+              {onOpenFriendsPage && (
+                <button type="button" className="sdm-friends__refresh" onClick={onOpenFriendsPage}>
+                  Página completa
+                </button>
+              )}
             </div>
 
             <div className="sdm-friends__add">
