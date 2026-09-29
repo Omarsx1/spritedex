@@ -8,7 +8,7 @@ import { generatePermanentFriendUrl } from '../utils/friendCode';
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
 // gestionan personas y en la ficha del amigo se compara la coleccion (fase 2).
 // Reutiliza los estilos .sdm-friends que ya estaban aprobados.
-export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion }) {
+export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp }) {
   // Comparación rápida para la ficha: lo que él tiene y yo no, y al revés. Es la misma
   // idea que las listas de la modal, aquí resumida para tenerla en la página.
   const listas = useMemo(() => {
@@ -131,6 +131,11 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
                 </span>
                 <div className="sdm-friends__actions">
                   <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => onVerColeccion(codigoFicha)}>Ver su colección</button>
+                  {onVerEnApp && (
+                    <button type="button" className="sdm-friends__btn" onClick={() => onVerEnApp(codigoFicha)}>
+                      Vista de amigo
+                    </button>
+                  )}
                 </div>
               </div>
               <p className="sdm-friends__hint">Te compartieron este código. Puedes ver su colección o enviarle una solicitud para que quede en tus amigos.</p>

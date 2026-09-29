@@ -779,10 +779,18 @@ useEffect(() => {
           onVerColeccion={async (codigo) => {
             const ok = await handleConnectFriendCode(codigo);
             if (ok !== false) {
-              setActiveProfile('friend');
-              // La comparacion vive en la ficha: al cargar su coleccion nos quedamos ahi
-              // y aparecen las dos listas (lo que me falta y lo que le falta).
+              // Se carga su coleccion para comparar en la FICHA, pero sin cambiar tu vista:
+              // si dejaramos el perfil en modo amigo, al volver atras aparecia el cartel de
+              // MODO AMIGO sin que nadie lo pidiera. Para eso esta el boton Vista de amigo.
+              setActiveProfile('mine');
               irA('/amigos/' + encodeURIComponent(codigo));
+            }
+          }}
+          onVerEnApp={async (codigo) => {
+            const ok = await handleConnectFriendCode(codigo);
+            if (ok !== false) {
+              setActiveProfile('friend');
+              irA('/');
             }
           }}
         />
