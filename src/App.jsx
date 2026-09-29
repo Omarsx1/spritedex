@@ -770,6 +770,11 @@ useEffect(() => {
           userState={userState}
           friendState={friendState}
           spritesScope={scopedSprites}
+          onAmigoQuitado={(codigoQuitado) => {
+            const limpio = String(codigoQuitado || '').replace(/^SDEX-/i, '');
+            const conectado = String(connectedFriendCode || '').replace(/^SDEX-/i, '');
+            if (limpio && conectado && limpio === conectado) handleDisconnectFriend();
+          }}
           onBack={() => irA('/')}
           onVerColeccion={async (codigo) => {
             const ok = await handleConnectFriendCode(codigo);

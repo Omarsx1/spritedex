@@ -8,7 +8,7 @@ import { generatePermanentFriendUrl } from '../utils/friendCode';
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
 // gestionan personas y en la ficha del amigo se compara la coleccion (fase 2).
 // Reutiliza los estilos .sdm-friends que ya estaban aprobados.
-export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState, spritesScope, onBack, onVerColeccion }) {
+export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion }) {
   // Comparación rápida para la ficha: lo que él tiene y yo no, y al revés. Es la misma
   // idea que las listas de la modal, aquí resumida para tenerla en la página.
   const listas = useMemo(() => {
@@ -220,7 +220,19 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
                 </span>
                 <div className="sdm-friends__actions">
                   <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => onVerColeccion(suyo)}>Ver colección</button>
-                  <button type="button" className="sdm-friends__btn sdm-friends__btn--danger" onClick={() => radar.borrar(a.id)}>Quitar</button>
+                  <button
+                    type="button"
+                    className="sdm-friends__btn sdm-friends__btn--danger"
+                    onClick={() => {
+                      radar.borrar(a.id);
+                      // Si estabas viendo SU coleccion, hay que salir de esa vista: si no,
+                      // al volver a la app queda el cartel de MODO AMIGO con datos de
+                      // alguien que ya no es tu amigo.
+                      if (onAmigoQuitado) onAmigoQuitado(suyo);
+                    }}
+                  >
+                    Quitar
+                  </button>
                 </div>
               </div>
             );
