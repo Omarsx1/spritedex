@@ -102,6 +102,93 @@ body::after {
   -webkit-transform: translateZ(0);
 }
 
+/* Ruido digital de la temporada: recortes, lineas cortas y puntos que solo viven
+   en los bordes, como la key art de OVERRIDE. Cada capa se confina a su banda con
+   background-size, asi el centro queda libre para el contenido. Va en html::after
+   para no mezclarlo con la luz de body::after (que cambia en movil). */
+html::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background-image:
+    /* puntos cian */
+    radial-gradient(circle, rgba(0, 240, 232, 0.60) 0 1.4px, transparent 1.6px),
+    radial-gradient(circle, rgba(0, 240, 232, 0.42) 0 1.1px, transparent 1.3px),
+    /* lineas cortas arriba */
+    repeating-linear-gradient(90deg, rgba(0, 240, 232, 0.45) 0 26px, transparent 26px 118px),
+    repeating-linear-gradient(90deg, rgba(236, 72, 153, 0.50) 0 12px, transparent 12px 71px),
+    repeating-linear-gradient(90deg, rgba(232, 246, 255, 0.28) 0 54px, transparent 54px 232px),
+    /* lineas cortas abajo */
+    repeating-linear-gradient(90deg, rgba(124, 255, 79, 0.42) 0 20px, transparent 20px 96px),
+    repeating-linear-gradient(90deg, rgba(236, 72, 153, 0.45) 0 34px, transparent 34px 143px),
+    /* columnas laterales */
+    repeating-linear-gradient(180deg, rgba(79, 124, 255, 0.38) 0 18px, transparent 18px 96px),
+    repeating-linear-gradient(180deg, rgba(217, 70, 239, 0.36) 0 12px, transparent 12px 118px),
+    /* recortes sueltos */
+    linear-gradient(rgba(236, 72, 153, 0.85), rgba(236, 72, 153, 0.85)),
+    linear-gradient(rgba(124, 255, 79, 0.75), rgba(124, 255, 79, 0.75)),
+    linear-gradient(rgba(0, 240, 232, 0.65), rgba(0, 240, 232, 0.65)),
+    linear-gradient(rgba(232, 246, 255, 0.45), rgba(232, 246, 255, 0.45)),
+    linear-gradient(rgba(79, 124, 255, 0.60), rgba(79, 124, 255, 0.60)),
+    linear-gradient(rgba(217, 70, 239, 0.70), rgba(217, 70, 239, 0.70));
+  background-repeat:
+    repeat-x,
+    repeat-x,
+    repeat-x,
+    repeat-x,
+    repeat-x,
+    repeat-x,
+    repeat-x,
+    repeat-y,
+    repeat-y,
+    no-repeat,
+    no-repeat,
+    no-repeat,
+    no-repeat,
+    no-repeat,
+    no-repeat;
+  background-size:
+    84px 84px,
+    132px 132px,
+    100% 2px,
+    100% 3px,
+    100% 1px,
+    100% 3px,
+    100% 2px,
+    3px 100%,
+    2px 100%,
+    18px 6px,
+    10px 10px,
+    24px 4px,
+    16px 4px,
+    12px 12px,
+    7px 22px;
+  background-position:
+    0 14px,
+    36px 74px,
+    0 30px,
+    0 52px,
+    0 68px,
+    0 95%,
+    0 91%,
+    0 0,
+    100% 0,
+    4% 9%,
+    95% 16%,
+    1% 86%,
+    96% 72%,
+    92% 6%,
+    3% 62%;
+  z-index: -1;
+  pointer-events: none;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
 /* En movil la aurora queda mucho mas cerca del ojo (la pantalla es alta y
    estrecha), asi que la bajamos de intensidad: misma composicion, menos peso,
    y la rejilla vuelve a leerse. Solo cambian las capas de luz. */
