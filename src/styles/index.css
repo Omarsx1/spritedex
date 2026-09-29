@@ -1044,7 +1044,8 @@ html::after {
 :root {
   --tg-rgb-r: #ff0055;
   --tg-rgb-g: #00f0ff;
-  --tg-rgb-b: #8b5cf6;
+  /* Segunda copia del glitch del titulo: cian de la temporada, no violeta. */
+  --tg-rgb-b: #00FFFB;
   --tg-rgb-blur: 2px;
   --tg-rgb-duration: 2.8s;
 }
@@ -1091,7 +1092,7 @@ html::after {
 }
 
 .hero__title-line--glitch::after {
-  color: var(--tg-rgb-b, #8b5cf6);
+  color: var(--tg-rgb-b, #00FFFB);
   animation: hero-glitch-b var(--tg-rgb-duration, 2.8s) linear infinite;
 }
 
