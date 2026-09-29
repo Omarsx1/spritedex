@@ -34,6 +34,9 @@ export function FriendCompareModal({
   const modalRef = useRef(null);
 
   const permanentFriendUrl = generatePermanentFriendUrl(myFriendCode || 'SDEX-0000');
+  // SDEX es el prefijo de todos los codigos: se muestra fijo y la casilla lleva solo
+  // el codigo, que es lo que la gente comparte.
+  const codigoCorto = (myFriendCode || '').replace(/^SDEX-/i, '');
 
   const handleClose = () => {
     if (isClosing) return;
@@ -256,8 +259,11 @@ export function FriendCompareModal({
                 <span>⭐ TU CÓDIGO DE AMIGO</span>
               </div>
               <div className="sdm-compare__code-row">
-                <span className="sdm-compare__code-badge">
-                  {myFriendCode || 'SDEX-????'}
+                <span className="sdm-compare__code-plate">
+                  <span className="sdm-compare__code-prefix">SDEX</span>
+                  <span className="sdm-compare__code-badge" title="Tu codigo de amigo">
+                    {codigoCorto || '????'}
+                  </span>
                 </span>
                 <div className="sdm-compare__code-actions">
                   <button

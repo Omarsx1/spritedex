@@ -5869,16 +5869,36 @@ body:has(.modal-overlay) {
 
 .sdm-compare__code-badge {
   font-family: monospace;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 900;
   color: #00F0E8;
   background: rgba(0, 0, 0, 0.55);
-  padding: 6px 10px;
+  padding: 6px 14px;
   border-radius: 7px;
   border: 1px solid rgba(0, 240, 232, 0.35);
-  letter-spacing: 0.5px;
+  letter-spacing: 3px;
+  min-width: 84px;
+  text-align: center;
   text-shadow: 0 0 8px rgba(0, 240, 232, 0.35);
   white-space: nowrap !important;
+  flex-shrink: 0;
+}
+
+/* Matricula del codigo: SDEX fijo a la izquierda y la casilla con el codigo al lado. */
+.sdm-compare__code-plate {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sdm-compare__code-prefix {
+  font-family: monospace;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: rgba(226, 232, 240, 0.5);
+  text-transform: uppercase;
   flex-shrink: 0;
 }
 
