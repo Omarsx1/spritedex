@@ -228,7 +228,9 @@ export function App() {
           ? dynamicSprites
           : dynamicSprites.filter((s) => s.gen === activeGen);
         if (preloadList && preloadList.length > 0) {
-          preloadCanvasAssets(preloadList, 30);
+          // Tandas de 4 (antes 30): el objetivo es que la captura este lista cuando el
+          // usuario la abra, no bajar 1,8 MB de golpe mientras se pinta la app.
+          preloadCanvasAssets(preloadList, 4);
         }
       });
     }, 1500);

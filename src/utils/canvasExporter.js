@@ -100,7 +100,22 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
-export function loadImage(src) {
+// Derivada de 256 px para el collage: el export dibuja cada espiritu a ~90-110 px,
+// asi que la miniatura de 448 px que usan las tarjetas sobra y multiplica por cuatro
+// los datos que se bajan al entrar. Si la derivada no existe se cae a la miniatura.
+const COLLAGE_DIR = '/sprites/thumbs/';
+const COLLAGE_DIR_ALT = '/sprites/collage/';
+
+export function srcParaCollage(sprite) {
+  if (!sprite) return null;
+  // pond_gold se dibuja con el original a proposito (su miniatura recorta mal).
+  if (sprite.id === 'pond_gold') return '/sprites/pond_gold.webp';
+  const base = sprite.thumb || sprite.image;
+  if (base && base.indexOf(COLLAGE_DIR) !== -1) return base.replace(COLLAGE_DIR, COLLAGE_DIR_ALT);
+  return base || (sprite.gen === 2 ? `/sprites/${sprite.id}.webp` : `/sprites/${sprite.id}.png`);
+}
+
+export function loadImage(src, bajaPrioridad = false) {
   if (!src) return Promise.resolve(null);
 
   // 1. Verificación instantánea en memoria
@@ -141,6 +156,8 @@ export function loadImage(src) {
     if (isExternal) {
       img.crossOrigin = 'Anonymous';
     }
+    // La precarga de fondo no debe competir con lo que el usuario esta viendo.
+    if (bajaPrioridad) img.fetchPriority = 'low';
 
     let settled = false;
     const finish = (result) => {
@@ -172,32 +189,44 @@ export function loadImage(src) {
   });
 }
 
-// Precarga anticipada de recursos por lotes en reposo (idle) sin saturar la red ni bloquear el hilo
-export function preloadCanvasAssets(spritesList = [], batchSize = 6) {
+// Precarga anticipada de recursos por lotes en reposo (idle) sin saturar la red ni bloquear el hilo.
+let turnoPrecarga = 0;
+// Las tandas son pequenas y espaciadas a proposito: antes eran de 30 imagenes cada 16 ms,
+// o sea ~1,8 MB de miniaturas saliendo de golpe mientras la app pintaba la primera pantalla.
+export function preloadCanvasAssets(spritesList = [], batchSize = 4) {
   if (typeof window === 'undefined') return;
-  loadImage('/background.webp');
+  loadImage('/background.webp', true);
 
   if (Array.isArray(spritesList) && spritesList.length > 0) {
+    // El efecto de App se dispara varias veces al arrancar (catalogo de cache y luego
+    // de la red). Sin esto se solapaban varias precargas y las tandas de 4 se
+    // multiplicaban, que es justo lo que se queria evitar.
+    const miTurno = ++turnoPrecarga;
     let index = 0;
     const processBatch = () => {
+      if (miTurno !== turnoPrecarga) return;
       if (index >= spritesList.length) return;
       const slice = spritesList.slice(index, index + batchSize);
       index += batchSize;
       slice.forEach(s => {
-        // Se precargan las mismas imagenes que usa el export: la miniatura.
-        if (s && s.image) loadImage(s.thumb || s.image);
+        // Las mismas imagenes que usa el export: la derivada del collage.
+        const src = srcParaCollage(s);
+        if (src) loadImage(src, true);
       });
       if (index < spritesList.length) {
-        // En conexion rapida no se espera al reposo: cada tanda cede el hilo con un
-        // temporizador corto. Asi el catalogo completo queda caliente en segundos.
+        // Con la modal de compartir abierta hay alguien esperando: se acelera para
+        // terminar de calentar. En reposo se va dejando caer, tanda a tanda, para no
+        // competir ni con el primer pintado ni con el scroll.
         const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
         const fastConnection = !connection || connection.effectiveType === '4g' || connection.effectiveType === undefined;
-        if (fastConnection) {
-          setTimeout(processBatch, 16);
+        if (esperasActivas > 0) {
+          setTimeout(processBatch, 32);
+        } else if (fastConnection) {
+          setTimeout(processBatch, 300);
         } else if (window.requestIdleCallback) {
-          window.requestIdleCallback(processBatch, { timeout: 1500 });
+          window.requestIdleCallback(processBatch, { timeout: 2500 });
         } else {
-          setTimeout(processBatch, 120);
+          setTimeout(processBatch, 900);
         }
       }
     };
@@ -205,11 +234,11 @@ export function preloadCanvasAssets(spritesList = [], batchSize = 6) {
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     const fast = !connection || connection.effectiveType === '4g' || connection.effectiveType === undefined;
     if (fast) {
-      setTimeout(processBatch, 16);
+      setTimeout(processBatch, 250);
     } else if (window.requestIdleCallback) {
-      window.requestIdleCallback(processBatch, { timeout: 2000 });
+      window.requestIdleCallback(processBatch, { timeout: 3000 });
     } else {
-      setTimeout(processBatch, 150);
+      setTimeout(processBatch, 1200);
     }
   }
 }
@@ -424,19 +453,29 @@ export async function generateSpritedexCardImage({
   // Load official glitch wallpaper
   const bgImgPromise = loadImage('/background.webp');
 
+  // Con alguien esperando (modal abierto) se piden todas de golpe porque el objetivo
+  // es que la captura salga ya. En segundo plano se piden de a pocas: el precálculo
+  // pedia 90 y pico imagenes de una sola vez apenas se entraba a la app, y eso se
+  // comia la conexion justo mientras se pintaba la primera pantalla.
+  const concurrencia = esperasActivas > 0 ? 12 : 4;
+  const lista = spritesList.slice(0, 250);
+  let siguiente = 0;
+  const cargarSprite = async () => {
+    while (siguiente < lista.length) {
+      const s = lista[siguiente++];
+      // El collage dibuja el sprite a ~90-110 px: se usa la derivada de 256 px y, si
+      // no existe, se cae a la miniatura de las tarjetas para no dejar el hueco.
+      let img = await loadImage(srcParaCollage(s));
+      if (!img && s.thumb) img = await loadImage(s.thumb);
+      if (img) loadedImagesMap[s.id] = img;
+    }
+  };
+
   await Promise.all([
     bgImgPromise.then((img) => {
       if (img) loadedImagesMap['__bg_override__'] = img;
     }),
-    ...spritesList.slice(0, 250).map(async (s) => {
-      // La tarjeta dibuja el sprite a ~230 px como maximo, asi que la miniatura de
-      // 448 px sobra: usar el original multiplicaba por diez los datos del export.
-      const targetSrc = (s.id === 'pond_gold')
-        ? '/sprites/pond_gold.webp'
-        : (s.thumb || s.image || (s.gen === 2 ? `/sprites/${s.id}.webp` : `/sprites/${s.id}.png`));
-      const img = await loadImage(targetSrc);
-      if (img) loadedImagesMap[s.id] = img;
-    })
+    ...Array.from({ length: Math.min(concurrencia, lista.length) }, cargarSprite)
   ]);
 
   const result = await renderGlitchOverrideTemplate({
