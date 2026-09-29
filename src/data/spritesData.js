@@ -1011,6 +1011,6 @@ export const SPRITE_FAMILIES = Object.values(
 }));
 
 export const GENERATIONS = [
-  { id: 1, name: '1ª Generación', title: 'Espíritus Clásicos', badgeColor: '#3b82f6' },
-  { id: 2, name: '2ª Generación', title: 'Temporada GLITCH', badgeColor: '#ec4899' }
+  { id: 1, name: '1ª Generación', title: 'Runners', badgeColor: '#3b82f6' },
+  { id: 2, name: '2ª Generación', title: 'Override', badgeColor: '#ec4899' }
 ];

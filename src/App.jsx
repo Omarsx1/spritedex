@@ -643,7 +643,19 @@ export function App() {
       if (activeGen !== 0 && s.gen !== activeGen) return false;
       return true;
     });
-  }, [dynamicSprites, activeGen, showUnreleased]);
+ }, [dynamicSprites, activeGen, showUnreleased]);
+
+  // Progreso por generacion para el menu hamburguesa. Se calcula aqui, donde ya viven
+  // los filtros, y el menu solo pinta los numeros.
+  const progresoGeneraciones = useMemo(() => {
+    const base = dynamicSprites.filter((s) => showUnreleased || !s.unreleased);
+    const cuenta = (lista) => ({ total: lista.length, owned: lista.filter((s) => userState[s.id]?.owned).length });
+    return {
+      0: cuenta(base),
+      1: cuenta(base.filter((s) => s.gen === 1)),
+      2: cuenta(base.filter((s) => s.gen === 2))
+    };
+  }, [dynamicSprites, showUnreleased, userState]);
 
   // Precalcula en segundo plano la captura de la modal de compartir. Es lo que hace
   // que la app local se sienta inmediata: alli la modal sale de cache. Sin esto, cada
@@ -769,6 +781,7 @@ useEffect(() => {
       <Navbar
         user={user}
         activeGen={activeGen}
+        progresoGeneraciones={progresoGeneraciones}
         onGenChange={(newGen) => {
           setActiveGen(newGen);
           setBaseFilter('all');

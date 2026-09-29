@@ -4,6 +4,16 @@ import { Google } from './ui/Google';
 import { getSupabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
 import { safeStorage } from '../utils/safeStorage';
+import { GENERATIONS } from '../data/spritesData';
+
+// #rrggbb -> "r,g,b", para poder usar el color de cada generacion con transparencia
+// (rgba) sin depender de color-mix, que aun no esta en todos los navegadores.
+const rgbDe = (hex) => {
+  const limpio = String(hex || '').replace('#', '');
+  if (limpio.length !== 6) return '0, 240, 232';
+  const n = parseInt(limpio, 16);
+  return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
+};
 
 export function Navbar({
   user,
@@ -12,13 +22,25 @@ export function Navbar({
   onOpenAuthModal,
   onLinkGoogle,
   onOpenBackupModal,
-  onSignOut
+  onSignOut,
+  progresoGeneraciones = {}
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
   // Sesion anonima (acceso rapido 1-clic): su progreso solo vive en este dispositivo.
   // Debe verlo claro y tener a mano el camino para vincular su cuenta.
   const esAnonimo = Boolean(user?.is_anonymous);
+
+  // Las tres opciones del menu, con el nombre del tema y el color de cada generacion.
+  const opcionesGen = useMemo(() => {
+    const gen1 = GENERATIONS.find((g) => g.id === 1);
+    const gen2 = GENERATIONS.find((g) => g.id === 2);
+    return [
+      { id: 2, badge: '2', nombre: gen2?.title || 'Override', detalle: '2ª Generación', color: gen2?.badgeColor || '#ec4899' },
+      { id: 1, badge: '1', nombre: gen1?.title || 'Runners', detalle: '1ª Generación', color: gen1?.badgeColor || '#3b82f6' },
+      { id: 0, badge: '🌐', nombre: 'Todas', detalle: 'Catálogo completo', color: '#00f0e8' }
+    ];
+  }, []);
   const myFriendCode = useMemo(() => getMyFriendCode(user?.id), [user]);
   const [animationsEnabled, setAnimationsEnabled] = useState(() => {
     if (typeof window === 'undefined') return true;
@@ -283,35 +305,27 @@ export function Navbar({
                 </div>
 
                 <div className="app-navbar__menu-options">
-                  <button
-                    className={`app-navbar__gen-option ${activeGen === 2 ? 'selected' : ''}`}
-                    onClick={() => { if (onGenChange) onGenChange(2); setIsNavMenuOpen(false); }}
-                  >
-                    <div className="gen-option-content">
-                      <span className="gen-option-title">2da Gen · Override</span>
-                    </div>
-                    {activeGen === 2 && <span className="gen-option-check">✓</span>}
-                  </button>
-
-                  <button
-                    className={`app-navbar__gen-option ${activeGen === 1 ? 'selected' : ''}`}
-                    onClick={() => { if (onGenChange) onGenChange(1); setIsNavMenuOpen(false); }}
-                  >
-                    <div className="gen-option-content">
-                      <span className="gen-option-title">1ra Gen · Runners</span>
-                    </div>
-                    {activeGen === 1 && <span className="gen-option-check">✓</span>}
-                  </button>
-
-                  <button
-                    className={`app-navbar__gen-option ${activeGen === 0 ? 'selected' : ''}`}
-                    onClick={() => { if (onGenChange) onGenChange(0); setIsNavMenuOpen(false); }}
-                  >
-                    <div className="gen-option-content">
-                      <span className="gen-option-title">Todas</span>
-                    </div>
-                    {activeGen === 0 && <span className="gen-option-check">✓</span>}
-                  </button>
+                  {opcionesGen.map((op) => {
+                    const progreso = progresoGeneraciones[op.id] || { owned: 0, total: 0 };
+                    const pct = progreso.total > 0 ? Math.round((progreso.owned / progreso.total) * 100) : 0;
+                    const activa = activeGen === op.id;
+                    return (
+                      <button
+                        key={op.id}
+                        className={`app-navbar__gen-option ${activa ? 'selected' : ''}`}
+                        style={{ '--gen-rgb': rgbDe(op.color) }}
+                        onClick={() => { if (onGenChange) onGenChange(op.id); setIsNavMenuOpen(false); }}
+                      >
+                        <span className="gen-option-badge">{op.badge}</span>
+                        <span className="gen-option-content">
+                          <span className="gen-option-title">{op.nombre}</span>
+                          <span className="gen-option-meta">{op.detalle} · {progreso.owned}/{progreso.total}</span>
+                          <span className="gen-option-bar"><span style={{ width: `${pct}%` }} /></span>
+                        </span>
+                        {activa && <span className="gen-option-check">✓</span>}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
