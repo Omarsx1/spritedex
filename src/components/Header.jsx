@@ -252,9 +252,6 @@ export function Header({
       {/* Animated background layers */}
       <div className="hero__bg">
         <div className="hero__grid" />
-        <div className="hero__glow hero__glow--1" />
-        <div className="hero__glow hero__glow--2" />
-        <div className="hero__glow hero__glow--3" />
         <div className="hero__scanline" />
         <div className="hero__particles" />
       </div>
