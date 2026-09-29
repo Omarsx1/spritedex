@@ -12,6 +12,10 @@ const ROOT = path.resolve(__dirname, '..');
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const SOURCE_DIRS = [path.join(PUBLIC_DIR, 'sprites'), path.join(PUBLIC_DIR, 'sprites 2gen')];
 const THUMB_DIR = path.join(PUBLIC_DIR, 'sprites', 'thumbs');
+// Derivada que usa la captura de compartir: el collage dibuja cada espiritu a ~90-110 px,
+// asi que 448 px sobraba y multiplicaba por cuatro los datos que la app baja al entrar.
+// Misma ruta que la miniatura, cambiando 'thumbs' por 'collage'.
+const COLLAGE_DIR = path.join(PUBLIC_DIR, 'sprites', 'collage');
 const MANIFEST_PATH = path.join(ROOT, 'src', 'data', 'sprite_thumbs.json');
 
 const MIN_SOURCE_BYTES = 24 * 1024;
@@ -19,6 +23,7 @@ const WEBP_QUALITY = '80';
 // Lado mayor de la miniatura. La tarjeta mide 205x284 CSS px, asi que 448 cubre
 // pantallas retina 2x sin acercarse al peso del origen de 512.
 const MAX_SIZE = 448;
+const COLLAGE_SIZE = 256;
 const force = process.argv.includes('--force');
 const includeAll = process.argv.includes('--all');
 
@@ -47,29 +52,41 @@ function listSources() {
 function main() {
   ensureCwebp();
   fs.mkdirSync(THUMB_DIR, { recursive: true });
+  fs.mkdirSync(COLLAGE_DIR, { recursive: true });
 
-  const stats = { created: 0, current: 0, small: 0, failed: 0, sourceBytes: 0, thumbBytes: 0 };
+  const stats = {
+    created: 0, current: 0, small: 0, failed: 0, sourceBytes: 0, thumbBytes: 0,
+    collageCreated: 0, collageCurrent: 0, collageBytes: 0
+  };
 
   for (const source of listSources()) {
     const id = path.basename(source).replace(/\.(png|webp)$/i, '');
     const sourceStat = fs.statSync(source);
     const target = path.join(THUMB_DIR, id + '.webp');
+    const collage = path.join(COLLAGE_DIR, id + '.webp');
 
     if (!includeAll && sourceStat.size <= MIN_SOURCE_BYTES) {
       stats.small += 1;
       continue;
     }
-    if (!force && fs.existsSync(target) && fs.statSync(target).mtimeMs >= sourceStat.mtimeMs) {
-      stats.current += 1;
-      stats.sourceBytes += sourceStat.size;
-      stats.thumbBytes += fs.statSync(target).size;
-      continue;
-    }
     try {
-      execFileSync('cwebp', ['-quiet', '-q', WEBP_QUALITY, '-resize', String(MAX_SIZE), '0', '-alpha_q', '100', source, '-o', target], { stdio: 'ignore' });
-      stats.created += 1;
+      if (force || !fs.existsSync(target) || fs.statSync(target).mtimeMs < sourceStat.mtimeMs) {
+        execFileSync('cwebp', ['-quiet', '-q', WEBP_QUALITY, '-resize', String(MAX_SIZE), '0', '-alpha_q', '100', source, '-o', target], { stdio: 'ignore' });
+        stats.created += 1;
+      } else {
+        stats.current += 1;
+      }
+
+      if (force || !fs.existsSync(collage) || fs.statSync(collage).mtimeMs < sourceStat.mtimeMs) {
+        execFileSync('cwebp', ['-quiet', '-q', WEBP_QUALITY, '-resize', String(COLLAGE_SIZE), '0', '-alpha_q', '100', source, '-o', collage], { stdio: 'ignore' });
+        stats.collageCreated += 1;
+      } else {
+        stats.collageCurrent += 1;
+      }
+
       stats.sourceBytes += sourceStat.size;
       stats.thumbBytes += fs.statSync(target).size;
+      stats.collageBytes += fs.statSync(collage).size;
     } catch (error) {
       stats.failed += 1;
       console.warn('No se pudo convertir ' + path.basename(source) + ': ' + error.message);
@@ -90,6 +107,7 @@ function main() {
   console.log('Omitidas por pequenas: ' + stats.small);
   console.log('Errores: ' + stats.failed);
   console.log('Origen: ' + mb(stats.sourceBytes) + ' -> Miniaturas: ' + mb(stats.thumbBytes));
+  console.log('Collage 256px creados: ' + stats.collageCreated + ' (al dia: ' + stats.collageCurrent + ') -> ' + mb(stats.collageBytes));
   console.log('Manifiesto: ' + path.relative(ROOT, MANIFEST_PATH) + ' (' + Object.keys(manifest).length + ' entradas)');
 }
 
