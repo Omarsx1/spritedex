@@ -125,9 +125,6 @@ html::after {
     /* lineas cortas abajo */
     repeating-linear-gradient(90deg, rgba(124, 255, 79, 0.42) 0 20px, transparent 20px 96px),
     repeating-linear-gradient(90deg, rgba(236, 72, 153, 0.45) 0 34px, transparent 34px 143px),
-    /* columnas laterales */
-    repeating-linear-gradient(180deg, rgba(79, 124, 255, 0.38) 0 18px, transparent 18px 96px),
-    repeating-linear-gradient(180deg, rgba(217, 70, 239, 0.36) 0 12px, transparent 12px 118px),
     /* recortes sueltos */
     linear-gradient(rgba(236, 72, 153, 0.85), rgba(236, 72, 153, 0.85)),
     linear-gradient(rgba(124, 255, 79, 0.75), rgba(124, 255, 79, 0.75)),
@@ -143,8 +140,6 @@ html::after {
     repeat-x,
     repeat-x,
     repeat-x,
-    repeat-y,
-    repeat-y,
     no-repeat,
     no-repeat,
     no-repeat,
@@ -159,8 +154,6 @@ html::after {
     100% 1px,
     100% 3px,
     100% 2px,
-    3px 100%,
-    2px 100%,
     18px 6px,
     10px 10px,
     24px 4px,
@@ -175,8 +168,6 @@ html::after {
     0 68px,
     0 95%,
     0 91%,
-    0 0,
-    100% 0,
     4% 9%,
     95% 16%,
     1% 86%,
