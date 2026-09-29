@@ -8141,3 +8141,24 @@ body:has(.modal-overlay) {
 .fpage__title { font-size: 1.6rem; }
 .fpage__sub { font-size: 0.8rem; color: rgba(226, 232, 240, 0.7); }
 .fpage__chip { font-size: 0.74rem; padding: 5px 10px; }
+
+/* Accesibilidad: el problema no era el tamano sino el contraste. Los grises estaban
+   con opacidades del 45-72% sobre un fondo oscuro con rejilla, asi que quedaban en
+   4:1 o menos (WCAG AA pide 4,5:1 para texto normal). Se cambian por grises SOLIDOS
+   con contraste comprobado sobre #0a0f1e: etiquetas #b9c2d0 (9,5:1), ayudas #9aa5b6
+   (6,6:1), prefijo #8f9aab (5,4:1). Los tamanos vuelven a los de antes: el contenido
+   no se agranda, se lee por contraste. */
+.sdm-friends__label { font-size: 0.62rem; letter-spacing: 1.1px; color: #b9c2d0; }
+.sdm-friends__hint { font-size: 0.7rem; line-height: 1.5; color: #9aa5b6; }
+.sdm-friends__prefix { font-size: 0.66rem; color: #8f9aab; }
+.sdm-friends__code { font-size: 0.95rem; color: #22e6dc; }
+.sdm-friends__pendiente { font-size: 0.66rem; color: #9aa5b6; }
+.sdm-friends__btn { font-size: 0.65rem; color: #d6dde8; }
+.sdm-friends__input { font-size: 0.78rem; color: #eef2f8; }
+.sdm-friends__send { font-size: 0.68rem; }
+.sdm-friends__aviso { font-size: 0.7rem; color: #5eead4; }
+.sdm-friends__title { color: #2ee9e0; }
+.fpage__title { font-size: 1.45rem; }
+.fpage__sub { font-size: 0.72rem; color: #9aa5b6; }
+.fpage__chip { font-size: 0.68rem; padding: 4px 9px; color: #a5e4ff; }
+.fpage__chip--suyo { color: #9df3c0; }
