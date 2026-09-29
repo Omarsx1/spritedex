@@ -671,12 +671,12 @@ export function App() {
       const run = async () => {
         try {
           if (document.visibilityState !== 'visible') return;
-          const { getCanvasCacheKey, readCachedCapture, writeCachedCapture, generatePokedexCardImage, getOrStartCapture, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } = await import('./utils/canvasExporter');
+          const { getCanvasCacheKey, readCachedCapture, writeCachedCapture, generateSpritedexCardImage, getOrStartCapture, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } = await import('./utils/canvasExporter');
           const ownedInScope = scopedSprites.filter((s) => userState[s.id]?.owned).length;
           const key = getCanvasCacheKey(DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE, scopedSprites.length, ownedInScope, scopedSprites, userState);
           if (await readCachedCapture(key)) return;
           // getOrStartCapture comparte el trabajo con la modal si esta pidio lo mismo.
-          const res = await getOrStartCapture(key, () => generatePokedexCardImage({
+          const res = await getOrStartCapture(key, () => generateSpritedexCardImage({
             spritesList: scopedSprites,
             userState,
             format: DEFAULT_EXPORT_FORMAT,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { X, Download, Share2, Copy, Check, Sparkles } from 'lucide-react';
-import { generatePokedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
+import { generateSpritedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import { Modal } from './ui/Modal';
 import gsap from 'gsap';
@@ -236,7 +236,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       }
 
       const inicioDibujo = Date.now();
-      getOrStartCapture(currentKey, () => generatePokedexCardImage({
+      getOrStartCapture(currentKey, () => generateSpritedexCardImage({
         spritesList,
         userState,
         format,

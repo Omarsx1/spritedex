@@ -396,7 +396,7 @@ function getSpiritHue(sprite) {
   return '#00F0E8';
 }
 
-export async function generatePokedexCardImage({
+export async function generateSpritedexCardImage({
   spritesList,
   userState,
   format = DEFAULT_EXPORT_FORMAT, // 'checklist', 'square'
