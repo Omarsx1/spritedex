@@ -7857,55 +7857,51 @@ body:has(.modal-overlay) {
   animation: none !important;
 }
 
+
 /* ===== INDICADORES DE PROGRESO (Móvil) =====
-   Tres lecturas en una tarjeta de cristal, al estilo de los ajustes modernos:
-   etiqueta fina arriba, numero tabular en grande y barra de 4 px debajo. En movil
-   sustituye a los dos anillos del hero, que se ocultan. */
+   Tres lecturas en una tira compacta y SIN caja: se ve el fondo de la app por
+   detras y eso es lo que da aire. Etiqueta fina, numero tabular y barra de 3 px.
+   En movil sustituye a los dos anillos del hero, que se ocultan. */
 .stats-bar {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  align-items: stretch;
-  margin: 12px 16px 2px;
-  padding: 11px 0;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: 0 10px 30px rgba(3, 4, 14, 0.35);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  /* Las tres etiquetas arrancan a la misma altura: el total, al no llevar barra,
+     se descentraba unos pixeles y se notaba. */
+  align-items: start;
+  margin: 8px 16px 0;
 }
 
 .stats-bar__col {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: 5px;
-  padding: 0 8px;
+  gap: 4px;
+  padding: 0 6px;
   min-width: 0;
 }
 
-/* Linea de un pixel a toda la altura de la tarjeta, como en un panel de ajustes. */
-.stats-bar__col + .stats-bar__col {
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
+/* Separador corto y centrado, como en una barra de pestanas. */
+.stats-bar__col + .stats-bar__col::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .stats-bar__label {
-  font-size: 0.66rem;
+  font-size: 0.6rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
-  color: rgba(226, 232, 240, 0.5);
+  color: rgba(226, 232, 240, 0.45);
   white-space: nowrap;
 }
 
-.stats-bar__row {
-  display: flex;
-  align-items: baseline;
-  gap: 5px;
-}
-
 .stats-bar__value {
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   font-weight: 700;
   line-height: 1;
   color: #ffffff;
@@ -7915,26 +7911,19 @@ body:has(.modal-overlay) {
 
 /* El total es referencia, no metrica viva: pesa menos. */
 .stats-bar__value--total {
-  font-size: 1.16rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.stats-bar__pct {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: rgba(226, 232, 240, 0.45);
-  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .stats-bar__track {
   display: block;
   width: 100%;
-  height: 5px;
-  margin-top: 2px;
+  max-width: 70px;
+  height: 3px;
+  margin-top: -1px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.09);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.1);
   overflow: hidden;
 }
 

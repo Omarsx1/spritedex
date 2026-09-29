@@ -719,10 +719,11 @@ useEffect(() => {
   const masteredCount = scopedSprites.filter((s) => activeState[s.id]?.owned && activeState[s.id]?.level === 5).length;
   // Porcentajes para la barra de progreso. Un valor bajo se ve igual que cero, asi
   // que el relleno nunca baja del 2,5% cuando hay algo (eso es solo visual).
-  const pctDe = (valor) => (totalCount > 0 ? Math.round((valor / totalCount) * 100) : 0);
-  const rellenoDe = (valor) => (valor > 0 ? Math.max(pctDe(valor), 2.5) : 0);
-  const ownedPct = pctDe(ownedCount);
-  const masteredPct = pctDe(masteredCount);
+  const rellenoDe = (valor) => {
+    if (totalCount <= 0 || valor <= 0) return 0;
+    // Un valor bajo se veria igual que cero, asi que el relleno nunca baja del 2,5%.
+    return Math.max((valor / totalCount) * 100, 2.5);
+  };
 
   const friendLendableCount = friendState ? scopedSprites.filter((s) => friendState[s.id]?.owned && !userState[s.id]?.owned).length : 0;
 
@@ -849,15 +850,12 @@ useEffect(() => {
         {isMobile && (
           <section className="stats-bar" aria-label="Progreso de la colección">
             <div className="stats-bar__col">
-              <span className="stats-bar__label">Total</span>
               <span className="stats-bar__value stats-bar__value--total">{totalCount}</span>
+              <span className="stats-bar__label">Total</span>
             </div>
             <div className="stats-bar__col">
+              <span className="stats-bar__value">{ownedCount}</span>
               <span className="stats-bar__label">Atrapados</span>
-              <span className="stats-bar__row">
-                <span className="stats-bar__value">{ownedCount}</span>
-                {ownedCount > 0 && <span className="stats-bar__pct">{ownedPct}%</span>}
-              </span>
               <span
                 className="stats-bar__track"
                 role="progressbar"
@@ -870,11 +868,8 @@ useEffect(() => {
               </span>
             </div>
             <div className="stats-bar__col">
+              <span className="stats-bar__value">{masteredCount}</span>
               <span className="stats-bar__label">Maxeados</span>
-              <span className="stats-bar__row">
-                <span className="stats-bar__value">{masteredCount}</span>
-                {masteredCount > 0 && <span className="stats-bar__pct">{masteredPct}%</span>}
-              </span>
               <span
                 className="stats-bar__track"
                 role="progressbar"
