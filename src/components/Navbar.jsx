@@ -62,6 +62,13 @@ export function Navbar({
     return 'Mi Cuenta';
   }, [user]);
 
+  // Solo el primer nombre y el primer apellido: el nombre completo puede traer dos
+  // apellidos o nombres compuestos y desbordar el menu. El correo no se muestra.
+  const nombreCorto = useMemo(() => {
+    if (!fullName) return null;
+    return fullName.trim().split(/\s+/).slice(0, 2).join(' ');
+  }, [fullName]);
+
   const initialLetter = useMemo(() => {
     if (!user) return '';
     const raw = user.user_metadata?.given_name ||
@@ -164,7 +171,7 @@ export function Navbar({
           <button
             className={`app-navbar__avatar ${user ? 'is-logged' : ''} ${isUserMenuOpen ? 'is-active' : ''}`}
             onClick={handleAvatarClick}
-            title={user ? `Conectado como ${user.email || fullName}` : 'Iniciar Sesión'}
+            title={user ? `Conectado como ${nombreCorto}` : 'Iniciar Sesión'}
             aria-label={user ? 'Cuenta de usuario' : 'Iniciar sesión'}
             aria-expanded={user ? isUserMenuOpen : undefined}
           >
@@ -194,8 +201,8 @@ export function Navbar({
                     </div>
                   )}
                   <div className="app-navbar__dropdown-meta">
-                    <span className="app-navbar__dropdown-name">{fullName}</span>
-                    <span className={esAnonimo && !user.email ? 'app-navbar__dropdown-code' : 'app-navbar__dropdown-email'}>{user.email || (esAnonimo ? myFriendCode : 'Sesión Activa')}</span>
+                    <span className="app-navbar__dropdown-name">{nombreCorto}</span>
+                    <span className="app-navbar__dropdown-code">{myFriendCode}</span>
                   </div>
                 </div>
 
