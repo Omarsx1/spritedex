@@ -8210,3 +8210,22 @@ body:has(.modal-overlay) {
 }
 .sdm-friends__input { border-color: rgba(255, 255, 255, 0.28); }
 .sdm-friends__refresh { color: #eef3fa; }
+
+/* Segmentado de la pagina de amigos: un bloque a la vez. */
+.fpage__tabs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  padding: 5px; border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.fpage__tab {
+  padding: 9px 10px; border-radius: 10px; border: 1px solid transparent;
+  font-size: 0.8rem; font-weight: 800; letter-spacing: 0.3px;
+  color: #c6cfdb; background: transparent; cursor: pointer;
+}
+.fpage__tab.is-active { color: #04262b; background: linear-gradient(135deg, #22d3ee, #00e0d8); }
+.fpage__tab:disabled { opacity: 0.45; cursor: default; }
+/* Amigos: se oculta el bloque de la ficha. Comparación: se ocultan los bloques de la
+   pagina y se vuelven a mostrar los que estan dentro del bloque de la ficha. */
+.sdm-friends[data-vista='amigos'] .fpage__bloqueFicha { display: none; }
+.sdm-friends[data-vista='comparacion'] > .sdm-friends__group { display: none; }
+.sdm-friends[data-vista='comparacion'] .fpage__bloqueFicha .sdm-friends__group { display: flex; }

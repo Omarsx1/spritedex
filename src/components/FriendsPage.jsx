@@ -41,6 +41,9 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
   const [aviso, setAviso] = useState('');
   const [copiado, setCopiado] = useState('');
   const [verTodos, setVerTodos] = useState({ teFaltan: false, leFaltan: false });
+  // Amigos por defecto. Si se entra por un enlace con codigo (/amigos/SDEX-XXXX) abre en
+  // Comparación, porque ese enlace existe justo para ver la comparación con esa persona.
+  const [vista, setVista] = useState(codigoFicha ? 'comparacion' : 'amigos');
 
   const codigoCorto = (myFriendCode || '').replace(/^SDEX-/i, '');
   const enlace = generatePermanentFriendUrl(myFriendCode || 'SDEX-0000');
@@ -78,7 +81,31 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
         </button>
       </div>
 
-      <div className="sdm-friends">
+      {/* Un bloque a la vez: la pagina deja de apilar siete secciones y de repetir la
+          lista de amigos despues de la comparacion. */}
+      <div className="fpage__tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={vista === 'amigos'}
+          className={'fpage__tab' + (vista === 'amigos' ? ' is-active' : '')}
+          onClick={() => setVista('amigos')}
+        >
+          Amigos
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={vista === 'comparacion'}
+          className={'fpage__tab' + (vista === 'comparacion' ? ' is-active' : '')}
+          onClick={() => setVista('comparacion')}
+          disabled={!codigoFicha}
+        >
+          Comparación
+        </button>
+      </div>
+
+      <div className="sdm-friends" data-vista={vista}>
         <div className="sdm-friends__group">
           <span className="sdm-friends__label">TU CÓDIGO DE AMIGO</span>
           <div className="sdm-friends__row">
@@ -121,6 +148,7 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
           )}
         </div>
 
+          <div className="fpage__bloqueFicha">
           {codigoFicha && (
             <div className="sdm-friends__group">
               <span className="sdm-friends__label">FICHA COMPARTIDA</span>
@@ -192,6 +220,7 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
               <p className="sdm-friends__hint">Pulsa Ver su colección para cargar la comparación: verás lo que te falta y lo que a él le falta.</p>
             </div>
           )}
+          </div>
 
         {radar.recibidas.length > 0 && (
           <div className="sdm-friends__group">
