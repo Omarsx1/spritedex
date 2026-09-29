@@ -2202,7 +2202,9 @@ html::after {
 .mobile-liquid-wrapper {
   width: 100%;
   max-width: 440px;
-  margin: 10px auto 50px auto; /* Espacio amplio y comodo debajo de la barra de busqueda */
+  /* 25px arriba: 15px mas de aire respecto al hero (el resto de la tira baja con
+     el flujo, asi que la separacion con los contadores no cambia). */
+  margin: 25px auto 50px auto; /* Espacio amplio y comodo debajo de la barra de busqueda */
   padding: 0 16px;
   display: flex;
   flex-direction: column;
