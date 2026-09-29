@@ -19,7 +19,13 @@ export function generateRandomFriendCode() {
 /**
  * Gets or creates the local user's permanent Friend Code
  */
-export function getMyFriendCode(userId = null) {
+export function getMyFriendCode(userId = null, esAnonimo = false) {
+  // Cuenta con sesion (no invitado): el codigo se DERIVA de su id y no se reutiliza el
+  // del dispositivo. El del dispositivo puede ser el de una sesion invitada anterior, y
+  // reutilizarlo dejaba dos filas con el mismo codigo (y el radar de ese codigo, roto).
+  if (userId && !esAnonimo) {
+    return `SDEX-${userId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 4)}`;
+  }
   let code = safeStorage.getItem(STORAGE_MY_CODE_KEY);
   if (!code) {
     if (userId) {
@@ -82,6 +88,17 @@ export function normalizeFriendCode(input) {
 export async function fetchCollectionByFriendCode(friendCode) {
   if (!isSupabaseConfigured || !friendCode) return null;
   const supabase = await getSupabase();
+
+  // Supabase falla con maybeSingle() si hay dos filas con el mismo codigo. El codigo
+  // pudo duplicarse (es de dispositivo), asi que se piden dos y se toma la mas
+  // reciente, en vez de dejar el radar sin respuesta.
+  const primeraFila = (filas) => {
+    if (!Array.isArray(filas) || filas.length === 0) return null;
+    if (filas.length > 1) {
+      console.warn('[amigos] codigo duplicado; se usa la fila mas reciente', filas.map((f) => f && f.user_id));
+    }
+    return [...filas].sort((a, b) => new Date(b?.updated_at || 0) - new Date(a?.updated_at || 0))[0] || null;
+  };
   if (!supabase) return null;
 
   const normalized = normalizeFriendCode(friendCode);
@@ -93,7 +110,9 @@ export async function fetchCollectionByFriendCode(friendCode) {
       .from('user_collections')
       .select('user_id, friend_code, user_state, updated_at')
       .eq('friend_code', normalized)
-      .maybeSingle();
+      .limit(2);
+
+    data = primeraFila(data);
 
     // 2. Case-insensitive ilike query fallback
     if (!data) {
@@ -101,8 +120,8 @@ export async function fetchCollectionByFriendCode(friendCode) {
         .from('user_collections')
         .select('user_id, friend_code, user_state, updated_at')
         .ilike('friend_code', normalized)
-        .maybeSingle();
-      data = res.data;
+        .limit(2);
+      data = primeraFila(res.data);
       if (res.error && !error) error = res.error;
     }
 
@@ -112,19 +131,20 @@ export async function fetchCollectionByFriendCode(friendCode) {
         .from('user_collections')
         .select('user_id, friend_code, user_state, updated_at')
         .ilike('friend_code', '%' + cleanSuffix)
-        .maybeSingle();
-      data = res.data;
+        .limit(2);
+      data = primeraFila(res.data);
     }
 
     // 4. Fallback: query by user_id if input was a UUID
     if (!data && (normalized.length >= 30 || cleanSuffix.length >= 30)) {
       const targetId = friendCode.trim();
-      const { data: byId } = await supabase
+      const { data: porId } = await supabase
         .from('user_collections')
         .select('user_id, friend_code, user_state, updated_at')
         .eq('user_id', targetId)
-        .maybeSingle();
+        .limit(2);
 
+      const byId = primeraFila(porId);
       if (byId) {
         data = byId;
       }
