@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { ALL_SPRITES } from '../data/spritesData';
 import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw } from 'lucide-react';
 import { useFriendRequests } from '../hooks/useFriendRequests';
 import { generatePermanentFriendUrl } from '../utils/friendCode';
@@ -7,7 +8,20 @@ import { generatePermanentFriendUrl } from '../utils/friendCode';
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
 // gestionan personas y en la ficha del amigo se compara la coleccion (fase 2).
 // Reutiliza los estilos .sdm-friends que ya estaban aprobados.
-export function FriendsPage({ myFriendCode, codigoFicha, onBack, onVerColeccion }) {
+export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState, onBack, onVerColeccion }) {
+  // Comparación rápida para la ficha: lo que él tiene y yo no, y al revés. Es la misma
+  // idea que las listas de la modal, aquí resumida para tenerla en la página.
+  const listas = useMemo(() => {
+    const suyos = Object.keys(friendState || {}).filter((k) => k !== '_profile' && friendState[k]?.owned);
+    const mios = Object.keys(userState || {}).filter((k) => k !== '_profile' && userState[k]?.owned);
+    const setMios = new Set(mios);
+    const setSuyos = new Set(suyos);
+    const conNombre = (id) => ({ id, name: (ALL_SPRITES.find((s) => s.id === id) || {}).name || id });
+    return {
+      teFaltan: suyos.filter((id) => !setMios.has(id)).map(conNombre),
+      leFaltan: mios.filter((id) => !setSuyos.has(id)).map(conNombre)
+    };
+  }, [userState, friendState]);
   const radar = useFriendRequests();
   const [codigo, setCodigo] = useState('');
   const [aviso, setAviso] = useState('');
@@ -105,6 +119,35 @@ export function FriendsPage({ myFriendCode, codigoFicha, onBack, onVerColeccion 
                 </div>
               </div>
               <p className="sdm-friends__hint">Te compartieron este código. Puedes ver su colección o enviarle una solicitud para que quede en tus amigos.</p>
+            </div>
+          )}
+
+          {codigoFicha && friendState && (
+            <div className="sdm-friends__group">
+              <span className="sdm-friends__label">COMPARACIÓN CON SDEX {String(codigoFicha).replace(/^SDEX-/i, '')}</span>
+              <span className="sdm-friends__label">TE FALTAN ({listas.teFaltan.length})</span>
+              {listas.teFaltan.length === 0 ? (
+                <p className="sdm-friends__hint">Los tienes todos. No te falta nada de lo suyo.</p>
+              ) : (
+                <div className="fpage__chips">
+                  {listas.teFaltan.map((s) => <span key={s.id} className="fpage__chip">{s.name}</span>)}
+                </div>
+              )}
+              <span className="sdm-friends__label">LE FALTAN ({listas.leFaltan.length})</span>
+              {listas.leFaltan.length === 0 ? (
+                <p className="sdm-friends__hint">No necesita nada de lo tuyo.</p>
+              ) : (
+                <div className="fpage__chips">
+                  {listas.leFaltan.map((s) => <span key={s.id} className="fpage__chip fpage__chip--suyo">{s.name}</span>)}
+                </div>
+              )}
+              <p className="sdm-friends__hint">Te faltan: lo que él tiene y tú no. Le faltan: lo que tú tienes y él no. Perfecto para intercambiar.</p>
+            </div>
+          )}
+
+          {codigoFicha && !friendState && (
+            <div className="sdm-friends__group">
+              <p className="sdm-friends__hint">Pulsa Ver su colección para cargar la comparación: verás lo que te falta y lo que a él le falta.</p>
             </div>
           )}
 

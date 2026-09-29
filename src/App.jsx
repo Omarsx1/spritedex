@@ -767,6 +767,8 @@ useEffect(() => {
         <FriendsPage
           myFriendCode={myFriendCode}
           codigoFicha={codigoEnRuta}
+          userState={userState}
+          friendState={friendState}
           onBack={() => irA('/')}
           onVerColeccion={async (codigo) => {
             const ok = await handleConnectFriendCode(codigo);
