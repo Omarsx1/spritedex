@@ -543,7 +543,14 @@ function getSpriteNameLines(ctx, fullName, maxW, baseFontSize, familyName) {
 // Renders the GLITCH / OVERRIDE style template
 // Adaptación geométrica matemática simétrica para cualquier cantidad de espíritus (Gen 1, Gen 2, etc.)
 // -------------------------------------------------------------
-function renderGlitchOverrideTemplate({
+// El dibujo corre en el hilo principal. Medido con CPU 4x sobre 101 tarjetas: una
+// sola tarea de 677 ms, que en un telefono se siente como un tiron de casi un
+// segundo. Ceder el turno cada pocas tarjetas reparte ese trabajo en tareas cortas
+// sin cambiar ni un pixel del resultado.
+const TARJETAS_POR_TANDA = 6;
+const cederTurno = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+async function renderGlitchOverrideTemplate({
   spritesList,
   userState,
   format,
@@ -766,7 +773,10 @@ function renderGlitchOverrideTemplate({
   const isCompact = cols >= 8;
   const isUltraCompact = cols >= 10;
 
-  spritesList.forEach((sprite, idx) => {
+  for (let idx = 0; idx < spritesList.length; idx++) {
+    if (idx > 0 && idx % TARJETAS_POR_TANDA === 0) await cederTurno();
+    const sprite = spritesList[idx];
+
     const colIdx = idx % cols;
     const rowIdx = Math.floor(idx / cols);
 
@@ -962,7 +972,10 @@ function renderGlitchOverrideTemplate({
       ctx.fillText('FALTANTE', badgeCenterX, badgeCenterY);
     }
     ctx.restore();
-  });
+  }
+
+  // Un respiro antes del bloque del QR y la marca de agua.
+  await cederTurno();
 
   // 3.B. CÓDIGO QR DE PUNTOS MODERNO (Centrado en el último slot)
   const qrColIdx = cols - 1;
