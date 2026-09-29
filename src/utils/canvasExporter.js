@@ -548,6 +548,9 @@ function getSpriteNameLines(ctx, fullName, maxW, baseFontSize, familyName) {
 // segundo. Ceder el turno cada pocas tarjetas reparte ese trabajo en tareas cortas
 // sin cambiar ni un pixel del resultado.
 const TARJETAS_POR_TANDA = 6;
+// Cuando hay alguien esperando la captura, tandas mas grandes: menos cesiones,
+// menos frames regalados, y aun asi el hilo respira de sobra para pintar el spinner.
+const TARJETAS_POR_TANDA_ESPERANDO = 25;
 // Ceder con setTimeout evita el bloqueo, pero no deja pintar: las tareas se
 // encadenan y el frame se retrasa. Con requestIdleCallback decide el navegador
 // cuando hay hueco real, y el timeout impide que el precálculo se quede parado.
@@ -563,11 +566,14 @@ export function marcarEsperaActiva(activo) {
 }
 
 const cederTurno = () => new Promise((resolve) => {
-  // Con alguien esperando no se cede en absoluto: cada cesion cuesta un frame y
-  // sumadas ~17 tandas se nota en la espera (medido: 1.25 s frente a 0.7 s).
-  // La modal ya muestra su indicador, asi que lo que quiere el usuario es la
-  // imagen cuanto antes; el troceado queda para el precálculo de fondo.
-  if (esperasActivas > 0) { resolve(); return; }
+  // Con alguien esperando se cede poco y rapido: lo justo para que el indicador de
+  // la modal siga girando y la app no se congele, sin sumar espera apreciable.
+  // El troceado fino (y la espera de reposo) es para el precálculo de fondo.
+  if (esperasActivas > 0) {
+    if (typeof requestAnimationFrame === 'function') { requestAnimationFrame(() => resolve()); return; }
+    setTimeout(resolve, 0);
+    return;
+  }
   if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
     window.requestIdleCallback(() => resolve(), { timeout: 120 });
     return;
@@ -810,7 +816,8 @@ async function renderGlitchOverrideTemplate({
   const isUltraCompact = cols >= 10;
 
   for (let idx = 0; idx < spritesList.length; idx++) {
-    if (idx > 0 && idx % TARJETAS_POR_TANDA === 0) await cederTurno();
+    const tanda = esperasActivas > 0 ? TARJETAS_POR_TANDA_ESPERANDO : TARJETAS_POR_TANDA;
+    if (idx > 0 && idx % tanda === 0) await cederTurno();
     const sprite = spritesList[idx];
 
     const colIdx = idx % cols;
