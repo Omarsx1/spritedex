@@ -25,6 +25,7 @@ import { isUserAdminAuthenticated } from './utils/adminAuth';
 import { decodeCollectionState } from './utils/shareLink';
 import { getSupabase, warmSupabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from './utils/supabase';
 import { conGoogle } from './utils/authActions';
+import { mergeCollections, sinPerfil } from './utils/mergeCollections';
 import { setSyncSession, queueCloudSync, clearCloudSync, flushCloudSync } from './utils/pendingSync';
 import { safeStorage } from './utils/safeStorage';
 import {
@@ -167,7 +168,7 @@ export function App() {
   // Update myFriendCode when user logs in
   useEffect(() => {
     if (user?.id) {
-      const code = getMyFriendCode(user.id);
+      const code = getMyFriendCode(user.id, Boolean(user.is_anonymous));
       setMyFriendCode(code);
     }
   }, [user]);
@@ -312,25 +313,16 @@ export function App() {
         safeStorage.setItem('spritedex_my_friend_code', data.friend_code);
       }
 
-      const localUpdatedAt = Number(safeStorage.getItem(LOCAL_STATE_UPDATED_KEY) || 0);
-      const cloudUpdatedAt = data?.updated_at ? Date.parse(data.updated_at) : 0;
-      const localIsNewer = localUpdatedAt > 0 && localUpdatedAt > cloudUpdatedAt;
+      const estadoNube = sinPerfil(data?.user_state);
+      const hayNube = Object.keys(estadoNube).length > 0;
 
-      if (localIsNewer) {
-        // Lo local es mas nuevo que la nube: se conserva y se empuja, en vez de
-        // pisarlo con una copia vieja (capturas que no llegaron a sincronizarse).
-        setUserState((currentLocal) => ({ ...currentLocal }));
-      } else if (data?.user_state && Object.keys(data.user_state).length > 0) {
-        const { _profile, ...pureState } = data.user_state;
-        setUserState((currentLocal) => {
-          const merged = { ...currentLocal, ...pureState };
-          return merged;
-        });
-      } else {
-        setUserState((currentLocal) => {
-          return currentLocal;
-        });
-      }
+      // Fusion, no "gana el mas nuevo": se conserva todo lo que este en cualquiera de
+      // los dos lados. Elegir uno solo borraba en silencio lo marcado en otro
+      // dispositivo, o lo que quedaba en la nube si el local estaba vacio.
+      setUserState((currentLocal) => {
+        if (!hayNube) return currentLocal;
+        return mergeCollections(currentLocal, estadoNube);
+      });
     } catch (err) {
       console.error('Failed to load collection from cloud:', err);
     }
