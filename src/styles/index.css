@@ -8237,3 +8237,7 @@ body:has(.modal-overlay) {
 .fpage__bloqueFicha .sdm-friends__label:first-child { margin-top: 0; }
 .sdm-friends__btn--ver { margin-top: 6px; }
 .fpage__minis { margin-bottom: 2px; }
+
+/* Sin el titulo de la comparacion, la etiqueta TE FALTAN es la primera del bloque: se le
+   devuelve el aire de arriba para que no quede pegada a la tarjeta de la ficha. */
+.fpage__bloqueFicha .sdm-friends__label:first-child { margin-top: 14px; }

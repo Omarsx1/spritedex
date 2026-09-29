@@ -166,13 +166,11 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
                   )}
                 </div>
               </div>
-              <p className="sdm-friends__hint">Te compartieron este código. Puedes ver su colección o enviarle una solicitud para que quede en tus amigos.</p>
             </div>
           )}
 
           {codigoFicha && friendState && (
             <div className="sdm-friends__group">
-              <span className="sdm-friends__label">COMPARACIÓN CON SDEX {String(codigoFicha).replace(/^SDEX-/i, '')}</span>
               <span className="sdm-friends__label">TE FALTAN ({listas.teFaltan.length})</span>
               <p className="sdm-friends__hint">Estos los tiene tu amigo y a ti te faltan.</p>
               {listas.teFaltan.length === 0 ? (
