@@ -8016,3 +8016,56 @@ body:has(.modal-overlay) {
     display: none;
   }
 }
+
+/* ===== RADAR DE AMIGOS: solicitudes con aprobación y lista ===== */
+.sdm-friends {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0 18px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(8, 12, 24, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.sdm-friends__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sdm-friends__title { display: inline-flex; align-items: center; gap: 7px; font-size: 0.74rem; font-weight: 800; letter-spacing: 1.4px; color: #00F0E8; }
+.sdm-friends__refresh {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 9px;
+  font-size: 0.68rem; font-weight: 700; color: rgba(226, 232, 240, 0.75);
+  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); cursor: pointer;
+}
+.sdm-friends__refresh:disabled { opacity: 0.55; cursor: default; }
+.sdm-friends__add { display: flex; gap: 8px; }
+.sdm-friends__input {
+  flex: 1; min-width: 0; padding: 8px 11px; border-radius: 10px;
+  font-family: monospace; font-size: 0.82rem; letter-spacing: 1.5px; color: #e2e8f0;
+  background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.sdm-friends__input:focus { outline: none; border-color: rgba(0, 240, 232, 0.55); }
+.sdm-friends__send {
+  padding: 8px 14px; border-radius: 10px; font-size: 0.72rem; font-weight: 800;
+  color: #04121a; background: linear-gradient(135deg, #00F0E8, #22d3ee); border: none; cursor: pointer;
+}
+.sdm-friends__send:disabled { opacity: 0.5; cursor: default; }
+.sdm-friends__aviso { margin: 0; font-size: 0.7rem; color: rgba(0, 240, 232, 0.85); }
+.sdm-friends__group { display: flex; flex-direction: column; gap: 7px; }
+.sdm-friends__label { font-size: 0.62rem; font-weight: 800; letter-spacing: 1.3px; color: rgba(226, 232, 240, 0.45); }
+.sdm-friends__row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 8px 10px; border-radius: 11px;
+  background: rgba(255, 255, 255, 0.035); border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.sdm-friends__plate { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.sdm-friends__prefix { font-family: monospace; font-size: 0.66rem; font-weight: 800; letter-spacing: 1.4px; color: rgba(226, 232, 240, 0.45); }
+.sdm-friends__code { font-family: monospace; font-size: 0.95rem; font-weight: 900; letter-spacing: 2.5px; color: #00F0E8; }
+.sdm-friends__actions { display: inline-flex; align-items: center; gap: 6px; }
+.sdm-friends__btn {
+  padding: 6px 11px; border-radius: 9px; font-size: 0.68rem; font-weight: 700;
+  color: rgba(226, 232, 240, 0.8); background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12); cursor: pointer; white-space: nowrap;
+}
+.sdm-friends__btn--ok { color: #04121a; background: linear-gradient(135deg, #34d399, #10b981); border-color: transparent; }
+.sdm-friends__btn--danger { color: #fca5a5; border-color: rgba(248, 113, 113, 0.35); }
+.sdm-friends__pendiente { font-size: 0.66rem; color: rgba(226, 232, 240, 0.5); }
+.sdm-friends__hint { margin: 0; font-size: 0.7rem; color: rgba(226, 232, 240, 0.5); line-height: 1.45; }

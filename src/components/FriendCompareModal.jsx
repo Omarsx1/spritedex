@@ -7,6 +7,7 @@ import { generatePermanentFriendUrl, normalizeFriendCode } from '../utils/friend
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 import { Modal } from './ui/Modal';
+import { useFriendRequests } from '../hooks/useFriendRequests';
 
 export function FriendCompareModal({
   userState,
@@ -31,6 +32,9 @@ export function FriendCompareModal({
   const [isConnecting, setIsConnecting] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [codigoSolicitud, setCodigoSolicitud] = useState('');
+  const [avisoSolicitud, setAvisoSolicitud] = useState('');
+  const radar = useFriendRequests();
   const modalRef = useRef(null);
 
   const permanentFriendUrl = generatePermanentFriendUrl(myFriendCode || 'SDEX-0000');
@@ -75,7 +79,37 @@ export function FriendCompareModal({
     return Object.keys(currentFriendState).some(k => k !== '_profile' && currentFriendState[k]?.owned);
   }, [currentFriendState]);
 
+  // Enviar una solicitud por código. La base resuelve el código a su dueño y aplica
+  // sus propias reglas (nadie puede crear solicitudes en nombre de otro).
+  const handleEnviarSolicitud = async () => {
+    const codigo = codigoSolicitud.trim();
+    if (!codigo) return;
+    setAvisoSolicitud('Enviando…');
+    const res = await radar.enviar(codigo, myFriendCode);
+    if (res.error) {
+      setAvisoSolicitud(res.error);
+      return;
+    }
+    sounds.playBeep();
+    setCodigoSolicitud('');
+    setAvisoSolicitud('Solicitud enviada a SDEX ' + String(res.codigo || '').replace(/^SDEX-/i, '') + '. Le llegará cuando abra el radar.');
+  };
+
+  // Ver la colección de un amigo aceptado: reusa el mismo camino que conectar por
+  // código, así no hay dos formas distintas de cargar una colección.
+  const handleVerColeccion = async (codigo) => {
+    if (!codigo || !onConnectFriendCode) return;
+    const ok = await onConnectFriendCode(codigo);
+    if (ok === false) {
+      setErrorMessage('No se pudo cargar esa colección. Prueba otra vez en un momento.');
+      return;
+    }
+    if (onSetActiveProfile) onSetActiveProfile('friend');
+    onClose();
+  };
+
   const handleConnectFriend = async () => {
+    if (!friendInput.trim()) return;
     if (!friendInput.trim()) return;
     setErrorMessage('');
     const raw = friendInput.trim();
@@ -368,6 +402,101 @@ export function FriendCompareModal({
               ⚠️ {errorMessage}
             </div>
           )}
+
+          {/* ═══ RADAR DE AMIGOS: solicitudes con aprobación y lista de amigos ═══ */}
+          <div className="sdm-friends">
+            <div className="sdm-friends__head">
+              <span className="sdm-friends__title"><Users size={14} /> RADAR DE AMIGOS</span>
+              <button
+                type="button"
+                className="sdm-friends__refresh"
+                onClick={() => { sounds.playBeep(); radar.cargar(); }}
+                disabled={radar.cargando}
+              >
+                <RefreshCw size={13} /> {radar.cargando ? 'Actualizando…' : 'Actualizar'}
+              </button>
+            </div>
+
+            <div className="sdm-friends__add">
+              <input
+                type="text"
+                className="sdm-friends__input"
+                placeholder="Código de tu amigo (ej: 2KD4)"
+                value={codigoSolicitud}
+                onChange={(e) => setCodigoSolicitud(e.target.value.toUpperCase())}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleEnviarSolicitud(); }}
+              />
+              <button
+                type="button"
+                className="sdm-friends__send"
+                onClick={handleEnviarSolicitud}
+                disabled={!codigoSolicitud.trim()}
+              >
+                Enviar solicitud
+              </button>
+            </div>
+            {avisoSolicitud && <p className="sdm-friends__aviso">{avisoSolicitud}</p>}
+            {!radar.haySesion && (
+              <p className="sdm-friends__aviso">Las solicitudes necesitan una sesión: vincula tu cuenta para usarlas.</p>
+            )}
+
+            {radar.recibidas.length > 0 && (
+              <div className="sdm-friends__group">
+                <span className="sdm-friends__label">SOLICITUDES ({radar.recibidas.length})</span>
+                {radar.recibidas.map((s) => (
+                  <div key={s.id} className="sdm-friends__row">
+                    <span className="sdm-friends__plate">
+                      <span className="sdm-friends__prefix">SDEX</span>
+                      <span className="sdm-friends__code">{String(s.from_code || '').replace(/^SDEX-/i, '')}</span>
+                    </span>
+                    <div className="sdm-friends__actions">
+                      <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => { sounds.playBeep(); radar.aceptar(s.id); }}>Aceptar</button>
+                      <button type="button" className="sdm-friends__btn" onClick={() => radar.rechazar(s.id)}>Rechazar</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="sdm-friends__group">
+              <span className="sdm-friends__label">AMIGOS ({radar.amigos.length})</span>
+              {radar.amigos.length === 0 ? (
+                <p className="sdm-friends__hint">Todavía no tienes amigos aceptados. Envía una solicitud con el código de alguien y aparecerá aquí cuando la acepte.</p>
+              ) : radar.amigos.map((a) => {
+                const codigoAmigo = radar.codigoDeAmigo(a);
+                return (
+                  <div key={a.id} className="sdm-friends__row">
+                    <span className="sdm-friends__plate">
+                      <span className="sdm-friends__prefix">SDEX</span>
+                      <span className="sdm-friends__code">{String(codigoAmigo || '').replace(/^SDEX-/i, '')}</span>
+                    </span>
+                    <div className="sdm-friends__actions">
+                      <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => handleVerColeccion(codigoAmigo)}>Ver colección</button>
+                      <button type="button" className="sdm-friends__btn sdm-friends__btn--danger" onClick={() => radar.borrar(a.id)}>Quitar</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {radar.enviadas.length > 0 && (
+              <div className="sdm-friends__group">
+                <span className="sdm-friends__label">ENVIADAS ({radar.enviadas.length})</span>
+                {radar.enviadas.map((s) => (
+                  <div key={s.id} className="sdm-friends__row">
+                    <span className="sdm-friends__plate">
+                      <span className="sdm-friends__prefix">SDEX</span>
+                      <span className="sdm-friends__code">{String(s.to_code || '').replace(/^SDEX-/i, '')}</span>
+                    </span>
+                    <div className="sdm-friends__actions">
+                      <span className="sdm-friends__pendiente">Esperando aprobación</span>
+                      <button type="button" className="sdm-friends__btn" onClick={() => radar.borrar(s.id)}>Cancelar</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Trade Comparison Results */}
           {!hasFriendData ? (
