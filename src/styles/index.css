@@ -3596,12 +3596,6 @@ html::after {
   z-index: 1;
 }
 
-@keyframes sprite-rarity-special-anim {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
 /* ===== Sprite Rarity Pills (Fortnite.gg Specs) ===== */
 .sprite-pill,
 .rarity-badge,
@@ -3654,10 +3648,15 @@ html::after {
 .sprite-rarity-special,
 .rarity-badge.special,
 .rarity-badge-sm.special {
+  /* El arcoiris queda FIJO a proposito. Antes se animaba (background-position en
+     cada pastilla visible): medido, 260 ms de CPU y 265 ms de recalculo de estilo
+     cada 5 s con ~20 pastillas a la vista. Pasar la banda a un ::before con
+     transform NO sirve: dentro de las tarjetas un ancestro con filtro impide
+     compositarla y el coste era identico (medido, will-change incluido). Asi que
+     mismo arcoiris, cero coste por frame. */
   background: linear-gradient(15deg, #5dffe4 0, #8dff9a 8%, #fff36a 16%, #60dfff 24%, #7b7cff 32%, #ff77d8 40%, #ffc45f 48%, #5dffe4 56%, #8dff9a 64%, #fff36a 72%, #60dfff 80%, #7b7cff 88%, #ff77d8 96%, #ffc45f 100%) !important;
+  background-size: 200% 100% !important;
   color: #000 !important;
-  background-size: 430% 100% !important;
-  animation: sprite-rarity-special-anim 12s linear infinite !important;
 }
 
 .sprite-rarity-uncommon,
