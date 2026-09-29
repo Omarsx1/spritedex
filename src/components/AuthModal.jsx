@@ -3,7 +3,7 @@ import { Modal } from './ui/Modal';
 import { Google } from './ui/Google';
 import { conGoogle } from '../utils/authActions';
 import { X, Cloud, LogIn, LogOut, CheckCircle, Mail, Key, ShieldCheck } from 'lucide-react';
-import { getSupabase, isSupabaseConfigured } from '../utils/supabase';
+import { getSupabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from '../utils/supabase';
 import { trackEvent } from '../utils/telemetry';
 
 export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
@@ -69,6 +69,13 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
 
   const handleAnonymousAuth = async () => {
     try {
+      // En local, preview y tuneles no se crean usuarios reales: el acceso rapido es la
+      // unica puerta que no respetaba los guardias de entorno y ensuciaba la base de
+      // produccion con cuentas de prueba. Para probarlo a proposito: VITE_ALLOW_ANON_AUTH=true.
+      if (shouldSkipAnonymousAuth()) {
+        setError('En este entorno no se crean cuentas de prueba. Pruebalo en el sitio de produccion, o activa VITE_ALLOW_ANON_AUTH para hacerlo a proposito.');
+        return;
+      }
       setLoading(true);
       setError(null);
       const supabase = await getSupabase();
