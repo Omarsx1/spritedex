@@ -8125,3 +8125,19 @@ body:has(.modal-overlay) {
   color: #86efac; background: rgba(16, 185, 129, 0.12);
   border-color: rgba(52, 211, 153, 0.3);
 }
+
+/* Legibilidad: las etiquetas y ayudas del radar y de la pagina estaban en 0.62-0.7rem
+   con opacidades del 45-50%, que en un iPhone al sol no se leen. Suben de tamano y de
+   contraste manteniendo la jerarquia (etiqueta tenue, dato fuerte). */
+.sdm-friends__label { font-size: 0.72rem; letter-spacing: 1.1px; color: rgba(226, 232, 240, 0.72); }
+.sdm-friends__hint { font-size: 0.78rem; color: rgba(226, 232, 240, 0.72); line-height: 1.55; }
+.sdm-friends__prefix { font-size: 0.72rem; color: rgba(226, 232, 240, 0.62); }
+.sdm-friends__code { font-size: 1rem; }
+.sdm-friends__pendiente { font-size: 0.72rem; color: rgba(226, 232, 240, 0.68); }
+.sdm-friends__btn { font-size: 0.72rem; }
+.sdm-friends__input { font-size: 0.84rem; }
+.sdm-friends__send { font-size: 0.75rem; }
+.sdm-friends__aviso { color: #67e8f9; font-size: 0.76rem; }
+.fpage__title { font-size: 1.6rem; }
+.fpage__sub { font-size: 0.8rem; color: rgba(226, 232, 240, 0.7); }
+.fpage__chip { font-size: 0.74rem; padding: 5px 10px; }
