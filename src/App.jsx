@@ -769,6 +769,7 @@ useEffect(() => {
           codigoFicha={codigoEnRuta}
           userState={userState}
           friendState={friendState}
+          spritesScope={scopedSprites}
           onBack={() => irA('/')}
           onVerColeccion={async (codigo) => {
             const ok = await handleConnectFriendCode(codigo);

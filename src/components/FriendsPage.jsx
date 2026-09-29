@@ -8,12 +8,16 @@ import { generatePermanentFriendUrl } from '../utils/friendCode';
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
 // gestionan personas y en la ficha del amigo se compara la coleccion (fase 2).
 // Reutiliza los estilos .sdm-friends que ya estaban aprobados.
-export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState, onBack, onVerColeccion }) {
+export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState, spritesScope, onBack, onVerColeccion }) {
   // Comparación rápida para la ficha: lo que él tiene y yo no, y al revés. Es la misma
   // idea que las listas de la modal, aquí resumida para tenerla en la página.
   const listas = useMemo(() => {
-    const suyos = Object.keys(friendState || {}).filter((k) => k !== '_profile' && friendState[k]?.owned);
-    const mios = Object.keys(userState || {}).filter((k) => k !== '_profile' && userState[k]?.owned);
+    // Solo la generacion activa: comparar contra las dos generaciones inflaba la lista
+    // (137 elementos) y mezclaba temporadas. Es el mismo alcance que ve la app.
+    const alcance = new Set((spritesScope || ALL_SPRITES).map((s) => s.id));
+    const dentro = (k) => k !== '_profile' && alcance.has(k);
+    const suyos = Object.keys(friendState || {}).filter((k) => dentro(k) && friendState[k]?.owned);
+    const mios = Object.keys(userState || {}).filter((k) => dentro(k) && userState[k]?.owned);
     const setMios = new Set(mios);
     const setSuyos = new Set(suyos);
     // El estado guarda ids (air_gold); el nombre de las cartas vive en name y, si falta,
@@ -27,7 +31,7 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
       teFaltan: suyos.filter((id) => !setMios.has(id)).map(conNombre),
       leFaltan: mios.filter((id) => !setSuyos.has(id)).map(conNombre)
     };
-  }, [userState, friendState]);
+  }, [userState, friendState, spritesScope]);
   const radar = useFriendRequests();
   const [codigo, setCodigo] = useState('');
   const [aviso, setAviso] = useState('');
