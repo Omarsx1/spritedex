@@ -25,7 +25,11 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
     const porId = new Map(ALL_SPRITES.map((s) => [s.id, s]));
     const conNombre = (id) => {
       const s = porId.get(id);
-      return { id, name: (s && (s.name || s.fullName || s.familyName)) || id };
+      return {
+        id,
+        name: (s && (s.name || s.fullName || s.familyName)) || id,
+        img: (s && (s.thumb || s.image)) || null
+      };
     };
     return {
       teFaltan: suyos.filter((id) => !setMios.has(id)).map(conNombre),
@@ -140,8 +144,13 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
               {listas.teFaltan.length === 0 ? (
                 <p className="sdm-friends__hint">Los tienes todos. No te falta nada de lo suyo.</p>
               ) : (<>
-                <div className="fpage__chips">
-                  {(verTodos.teFaltan ? listas.teFaltan : listas.teFaltan.slice(0, 12)).map((s) => <span key={s.id} className="fpage__chip">{s.name}</span>)}
+                <div className="fpage__minis">
+                  {(verTodos.teFaltan ? listas.teFaltan : listas.teFaltan.slice(0, 12)).map((s) => (
+                    <div key={s.id} className="fpage__mini">
+                      {s.img ? <img src={s.img} alt={s.name} loading="lazy" decoding="async" width={44} height={44} /> : <span className="fpage__miniNombre">?</span>}
+                      <span className="fpage__miniNombre">{s.name}</span>
+                    </div>
+                  ))}
                 </div>
                 {listas.teFaltan.length > 12 && (
                   <button type="button" className="sdm-friends__btn sdm-friends__btn--ver" onClick={() => setVerTodos((v) => ({ ...v, teFaltan: !v.teFaltan }))}>
@@ -154,8 +163,13 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
               {listas.leFaltan.length === 0 ? (
                 <p className="sdm-friends__hint">No necesita nada de lo tuyo.</p>
               ) : (<>
-                <div className="fpage__chips">
-                  {(verTodos.leFaltan ? listas.leFaltan : listas.leFaltan.slice(0, 12)).map((s) => <span key={s.id} className="fpage__chip fpage__chip--suyo">{s.name}</span>)}
+                <div className="fpage__minis">
+                  {(verTodos.leFaltan ? listas.leFaltan : listas.leFaltan.slice(0, 12)).map((s) => (
+                    <div key={s.id} className="fpage__mini fpage__mini--suyo">
+                      {s.img ? <img src={s.img} alt={s.name} loading="lazy" decoding="async" width={44} height={44} /> : <span className="fpage__miniNombre">?</span>}
+                      <span className="fpage__miniNombre">{s.name}</span>
+                    </div>
+                  ))}
                 </div>
                 {listas.leFaltan.length > 12 && (
                   <button type="button" className="sdm-friends__btn sdm-friends__btn--ver" onClick={() => setVerTodos((v) => ({ ...v, leFaltan: !v.leFaltan }))}>

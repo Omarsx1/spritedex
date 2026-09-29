@@ -8172,3 +8172,14 @@ body:has(.modal-overlay) {
   border: 1px solid rgba(255, 255, 255, 0.28);
 }
 .fpage__back:hover, .fpage__refresh:hover { background: rgba(255, 255, 255, 0.18); }
+
+/* Minicards de la comparacion: miniatura del espiritu con su nombre, como en el grid. */
+.fpage__minis { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 7px; }
+.fpage__mini {
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px;
+  padding: 7px 5px; border-radius: 12px;
+  background: rgba(255, 255, 255, 0.045); border: 1px solid rgba(56, 189, 248, 0.28);
+}
+.fpage__mini--suyo { border-color: rgba(52, 211, 153, 0.28); }
+.fpage__mini img { width: 44px; height: 44px; object-fit: contain; }
+.fpage__miniNombre { font-size: 0.63rem; font-weight: 700; color: #dbe3ee; text-align: center; line-height: 1.2; }
