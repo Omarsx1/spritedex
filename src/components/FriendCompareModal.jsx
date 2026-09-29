@@ -37,7 +37,6 @@ export function FriendCompareModal({
 
   const handleClose = () => {
     if (isClosing) return;
-    sounds.playBeep();
     setIsClosing(true);
     setTimeout(() => {
       onClose();

@@ -110,7 +110,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
 
   const handleClose = () => {
     if (isClosing) return;
-    sounds.playBeep();
     setIsClosing(true);
     setTimeout(() => {
       onClose();
