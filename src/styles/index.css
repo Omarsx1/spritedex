@@ -1608,6 +1608,10 @@ html::after {
     /* Centrado entre el titulo y la barra de busqueda: el bloque baja 58px y el
        bloque de filtros sube los mismos 58px, para que nada mas se mueva. */
     margin: 70px auto 0;
+    /* Los espiritus se quedaban con poca presencia: el grupo entero (sprite
+       central, anillo y satelites) crece un 20% alrededor del mismo centro, asi
+       que sigue centrado y el layout no cambia. */
+    transform: scale(1.2);
   }
 
   .hero__hero-sprite {
@@ -1627,6 +1631,29 @@ html::after {
   .hero__satellite {
     width: 28px;
     height: 28px;
+  }
+
+  /* Los tres satelites repartidos a 120 grados y al mismo radio (70px del centro
+     de la caja de 130). Antes el de arriba estaba a 67px y los de abajo a 86px, y
+     ese triangulo descentrado hacia que el grupo se viera alto o bajo segun el
+     punto de giro: medido, el centro oscilaba entre -30px y +20px. Asi queda
+     siempre en el centro. */
+  .hero__satellite--0 {
+    top: -19px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .hero__satellite--1 {
+    top: 86px;
+    bottom: auto;
+    left: -10px;
+  }
+
+  .hero__satellite--2 {
+    top: 86px;
+    bottom: auto;
+    right: -10px;
   }
 
   .hero__bar {
