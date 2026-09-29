@@ -850,13 +850,13 @@ useEffect(() => {
           <section className="stats-bar" aria-label="Progreso de la colección">
             <div className="stats-bar__col">
               <span className="stats-bar__label">Total</span>
-              <span className="stats-bar__value">{totalCount}</span>
+              <span className="stats-bar__value stats-bar__value--total">{totalCount}</span>
             </div>
             <div className="stats-bar__col">
               <span className="stats-bar__label">Atrapados</span>
               <span className="stats-bar__row">
                 <span className="stats-bar__value">{ownedCount}</span>
-                <span className="stats-bar__pct">{ownedPct}%</span>
+                {ownedCount > 0 && <span className="stats-bar__pct">{ownedPct}%</span>}
               </span>
               <span
                 className="stats-bar__track"
@@ -873,7 +873,7 @@ useEffect(() => {
               <span className="stats-bar__label">Maxeados</span>
               <span className="stats-bar__row">
                 <span className="stats-bar__value">{masteredCount}</span>
-                <span className="stats-bar__pct">{masteredPct}%</span>
+                {masteredCount > 0 && <span className="stats-bar__pct">{masteredPct}%</span>}
               </span>
               <span
                 className="stats-bar__track"
