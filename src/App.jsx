@@ -772,7 +772,10 @@ useEffect(() => {
             const ok = await handleConnectFriendCode(codigo);
             if (ok !== false) {
               setActiveProfile('friend');
+              // La comparacion (las 4 listas) sigue viviendo en la modal hasta la fase 2,
+              // asi que se abre sola al ver la coleccion: la funcion no queda sin camino.
               irA('/');
+              setShowCompareModal(true);
             }
           }}
         />
@@ -855,7 +858,7 @@ useEffect(() => {
         connectedFriendCode={connectedFriendCode}
         onOpenShareModal={() => setShowShareModal(true)}
         onOpenBackupModal={() => setShowBackupModal(true)}
-        onOpenCompareModal={() => setShowCompareModal(true)}
+        onOpenCompareModal={() => irA('/amigos')}
         onOpenAuthModal={() => setShowAuthModal(true)}
       />
 
