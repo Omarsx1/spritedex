@@ -408,14 +408,6 @@ export function FriendCompareModal({
           <div className="sdm-friends">
             <div className="sdm-friends__head">
               <span className="sdm-friends__title"><Users size={14} /> RADAR DE AMIGOS</span>
-              <button
-                type="button"
-                className="sdm-friends__refresh"
-                onClick={() => { sounds.playBeep(); radar.cargar(); }}
-                disabled={radar.cargando}
-              >
-                <RefreshCw size={13} /> {radar.cargando ? 'Actualizando…' : 'Actualizar'}
-              </button>
             </div>
 
             <div className="sdm-friends__add">
@@ -542,7 +534,7 @@ export function FriendCompareModal({
                   >
                     <Users size={16} color="#a855f7" />
                     <span>
-                      🚀 Explorar toda la colección de <strong>{connectedFriendCode || 'tu amigo'}</strong> en la Pantalla Principal
+                      Ver su colección completa en la app
                     </span>
                   </button>
                 </div>
@@ -555,13 +547,13 @@ export function FriendCompareModal({
                     className={`sdm-compare__season-pill ${seasonFilter === 'active' ? 'sdm-compare__season-pill--active' : ''}`}
                     onClick={() => setSeasonFilter('active')}
                   >
-                    ⚡ Gen 2 / Glitch ({ALL_SPRITES.filter(s => s.gen === 2).length})
+                    ⚡ Gen 2 ({ALL_SPRITES.filter(s => s.gen === 2).length})
                   </button>
                   <button
                     className={`sdm-compare__season-pill ${seasonFilter === 'all' ? 'sdm-compare__season-pill--active' : ''}`}
                     onClick={() => setSeasonFilter('all')}
                   >
-                    🌐 Toda la Colección ({ALL_SPRITES.length})
+                    🌐 Todas ({ALL_SPRITES.length})
                   </button>
                 </div>
 
@@ -570,7 +562,7 @@ export function FriendCompareModal({
                   className="sdm-compare__btn-trade-plan"
                 >
                   {copiedTradePlan ? <Check size={14} color="#4ade80" /> : <MessageSquare size={14} />}
-                  <span>{copiedTradePlan ? '¡Resumen Copiado!' : 'Copiar Resumen para Amigo'}</span>
+                  <span>{copiedTradePlan ? '¡Copiado!' : 'Resumen'}</span>
                 </button>
               </div>
 
