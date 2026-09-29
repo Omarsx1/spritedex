@@ -30,6 +30,10 @@ const W_ACTIVE = 205;
 const CARD_HEIGHT = 284;
 const W_INACTIVE = 56;
 const GAP = 8;
+// Filas que se montan de entrada. Montar las 21 familias de golpe (101 tarjetas) era
+// el atasco al abrir la app; el resto entra en el primer hueco libre y, como se agrega
+// al final, nada de lo que el usuario ya esta viendo se mueve de sitio.
+const FILAS_PRIMERA_TANDA = 4;
 
 // Cache de estilos por sprite: evita recalcular gradientes, rareza y colores
 // en cada render de la fila.
@@ -586,13 +590,42 @@ export function MobileSpriteSwiper({
     if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
   }, []);
 
+  // Montaje en dos tandas. Una sola vez por visita: despues de la primera tanda el
+  // resto entra entero, asi que filtrar o buscar no vuelve a dejar huecos. El segundo
+  // tramo espera solo a que el navegador haya pintado el primero (dos frames), asi que
+  // el usuario nunca ve la lista cortada: ve contenido antes y el resto un frame despues.
+  const [montajeCompleto, setMontajeCompleto] = useState(false);
+  useEffect(() => {
+    if (montajeCompleto || families.length <= FILAS_PRIMERA_TANDA) return undefined;
+    let cancelado = false;
+    const completar = () => { if (!cancelado) setMontajeCompleto(true); };
+    let temporizador = 0;
+    let frame1 = 0;
+    let frame2 = 0;
+    if (typeof window.requestAnimationFrame === 'function') {
+      frame1 = window.requestAnimationFrame(() => { frame2 = window.requestAnimationFrame(completar); });
+    } else {
+      temporizador = setTimeout(completar, 32);
+    }
+    return () => {
+      cancelado = true;
+      if (temporizador) clearTimeout(temporizador);
+      if (frame1) window.cancelAnimationFrame(frame1);
+      if (frame2) window.cancelAnimationFrame(frame2);
+    };
+  }, [families.length, montajeCompleto]);
+
   if (!families || families.length === 0) return null;
+
+  const familiasMontadas = montajeCompleto || families.length <= FILAS_PRIMERA_TANDA
+    ? families
+    : families.slice(0, FILAS_PRIMERA_TANDA);
 
   return (
     <div className="mobile-swiper">
 
       <div className="mobile-swiper__content">
-        {families.map((family) => (
+        {familiasMontadas.map((family) => (
           <MemoizedFamilySpotlightRow
             key={family.familyId}
             familyName={family.familyName}
