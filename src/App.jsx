@@ -851,11 +851,12 @@ useEffect(() => {
           <section className="stats-bar" aria-label="Progreso de la colección">
             <div className="stats-bar__col">
               <span className="stats-bar__value stats-bar__value--total">{totalCount}</span>
+              {/* Reserva el alto de la barra: asi las tres etiquetas quedan a la misma altura. */}
+              <span className="stats-bar__spacer" aria-hidden="true" />
               <span className="stats-bar__label">Total</span>
             </div>
             <div className="stats-bar__col">
               <span className="stats-bar__value">{ownedCount}</span>
-              <span className="stats-bar__label">Atrapados</span>
               <span
                 className="stats-bar__track"
                 role="progressbar"
@@ -866,10 +867,10 @@ useEffect(() => {
               >
                 <span className="stats-bar__fill stats-bar__fill--caught" style={{ width: rellenoDe(ownedCount) + '%' }} />
               </span>
+              <span className="stats-bar__label">Atrapados</span>
             </div>
             <div className="stats-bar__col">
               <span className="stats-bar__value">{masteredCount}</span>
-              <span className="stats-bar__label">Maxeados</span>
               <span
                 className="stats-bar__track"
                 role="progressbar"
@@ -880,6 +881,7 @@ useEffect(() => {
               >
                 <span className="stats-bar__fill stats-bar__fill--mastered" style={{ width: rellenoDe(masteredCount) + '%' }} />
               </span>
+              <span className="stats-bar__label">Maxeados</span>
             </div>
           </section>
         )}

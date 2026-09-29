@@ -7901,7 +7901,12 @@ body:has(.modal-overlay) {
 }
 
 .stats-bar__value {
-  font-size: 1.15rem;
+  /* Fila de cifras con alto fijo: el total lleva un numero mas grande y sin esto
+     empujaria su etiqueta por debajo de las otras dos. */
+  display: flex;
+  align-items: flex-end;
+  height: 1.35rem;
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1;
   color: #ffffff;
@@ -7909,11 +7914,9 @@ body:has(.modal-overlay) {
   letter-spacing: -0.02em;
 }
 
-/* El total es referencia, no metrica viva: pesa menos. */
+/* El total es la referencia de la tira: cifra mayor, misma jerarquia que las metricas. */
 .stats-bar__value--total {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.75);
+  font-size: 1.15rem;
 }
 
 .stats-bar__track {
@@ -7921,10 +7924,18 @@ body:has(.modal-overlay) {
   width: 100%;
   max-width: 70px;
   height: 3px;
-  margin-top: -1px;
   border-radius: 9999px;
   background: rgba(255, 255, 255, 0.1);
   overflow: hidden;
+}
+
+/* Hueco del total: ocupa el alto de la barra para que su etiqueta caiga en la
+   misma linea que las de Atrapados y Maxeados. No pinta nada. */
+.stats-bar__spacer {
+  display: block;
+  width: 100%;
+  max-width: 70px;
+  height: 3px;
 }
 
 .stats-bar__fill {
