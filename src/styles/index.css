@@ -1193,7 +1193,8 @@ html::after {
   inset: 0;
   border-radius: 50%;
   border: 1px solid rgba(99, 102, 241, 0.12);
-  animation: orbitSpin 24s linear infinite;
+  /* 34s por vuelta: un giro pausado, sin llamar la atencion. */
+  animation: orbitSpin 34s linear infinite;
   z-index: 1;
 }
 
@@ -1227,7 +1228,7 @@ html::after {
   object-fit: contain;
   filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.4));
   /* Counter-rotate so images stay upright while the ring spins */
-  animation: counterSpin 24s linear infinite;
+  animation: counterSpin 34s linear infinite;
   opacity: 0.7;
   transition: opacity 0.4s ease;
 }
