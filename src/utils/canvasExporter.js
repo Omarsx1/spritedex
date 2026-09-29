@@ -548,7 +548,20 @@ function getSpriteNameLines(ctx, fullName, maxW, baseFontSize, familyName) {
 // segundo. Ceder el turno cada pocas tarjetas reparte ese trabajo en tareas cortas
 // sin cambiar ni un pixel del resultado.
 const TARJETAS_POR_TANDA = 6;
-const cederTurno = () => new Promise((resolve) => setTimeout(resolve, 0));
+// Ceder con setTimeout evita el bloqueo, pero no deja pintar: las tareas se
+// encadenan y el frame se retrasa. Con requestIdleCallback decide el navegador
+// cuando hay hueco real, y el timeout impide que el precálculo se quede parado.
+const cederTurno = () => new Promise((resolve) => {
+  if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
+    window.requestIdleCallback(() => resolve(), { timeout: 120 });
+    return;
+  }
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(() => setTimeout(resolve, 0));
+    return;
+  }
+  setTimeout(resolve, 0);
+});
 
 async function renderGlitchOverrideTemplate({
   spritesList,
@@ -640,9 +653,14 @@ async function renderGlitchOverrideTemplate({
   canvas.height = height;
   const ctx = canvas.getContext('2d');
 
+  // Crear el lienzo de 1280x2515 ya se nota: respiro antes de empezar a pintar.
+  await cederTurno();
+
   // 1. Draw Background (Glitch / Matrix / Blueprint)
   const bgImg = loadedImagesMap['__bg_override__'];
   drawCyberMatrixBackground(ctx, width, height, bgStyle, bgImg);
+
+  await cederTurno();
 
   // 2. HEADER SECTION (GLITCH OVERRIDE STYLE)
   ctx.save();
@@ -763,6 +781,8 @@ async function renderGlitchOverrideTemplate({
   }
 
   ctx.restore();
+
+  await cederTurno();
 
   // 3. SPRITE GRID SECTION (Centrada Vertical y Horizontalmente)
   const gridW = cols * cellW;
