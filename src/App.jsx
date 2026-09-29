@@ -651,7 +651,7 @@ export function App() {
   // paga con la modal abierta. Aqui se paga mientras el usuario navega, en reposo y
   // una sola vez por cambio de progreso.
   // OJO: va despues de scopedSprites a proposito; usarlo antes seria un TDZ.
-  useEffect(() => {
+useEffect(() => {
     if (typeof window === 'undefined' || isAdminPortal || showShareModal) return;
     if (!Array.isArray(scopedSprites) || scopedSprites.length === 0) return;
 
@@ -659,8 +659,7 @@ export function App() {
     const slowConnection = Boolean(connection && (connection.saveData || /(^|-)2g$/.test(connection.effectiveType || '')));
     if (slowConnection || document.visibilityState !== 'visible') return;
 
-    const timer = setTimeout(() => {
-      const run = async () => {
+    const run = async () => {
         try {
           if (document.visibilityState !== 'visible') return;
           const { getCanvasCacheKey, readCachedCapture, writeCachedCapture, generateSpritedexCardImage, getOrStartCapture, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } = await import('./utils/canvasExporter');
@@ -680,14 +679,33 @@ export function App() {
           // Un fallo del precalculo no puede romper nada: la modal generara al abrirse.
           console.warn('Precalculo de la captura fallido:', err);
         }
-      };
-      // Se dibuja en ~80 ms en el telefono y la codificacion no bloquea, asi que no
-      // hace falta esperar al reposo (que en un movil puede tardar muchisimo): basta
-      // con dar unos segundos para que el usuario termine de marcar.
-      run();
-    }, 2500);
+    };
 
-    return () => clearTimeout(timer);
+    // El dibujo SI ocupa el hilo principal (medido: 556 ms con CPU de movil, y eso se
+    // nota como un tiron). Por eso no se lanza hasta que no haya interaccion reciente:
+    // si cae justo al arrancar, cuando llega la sesion, o mientras se hace scroll, se
+    // siente el bloqueo.
+    let ultimaActividad = Date.now();
+    const marcarActividad = () => { ultimaActividad = Date.now(); };
+    const EVENTOS = ['pointerdown', 'keydown', 'wheel', 'touchstart'];
+    EVENTOS.forEach((ev) => window.addEventListener(ev, marcarActividad, { passive: true }));
+
+    let cancelado = false;
+    const intentar = () => {
+      if (cancelado) return;
+      if (Date.now() - ultimaActividad < 2000) {
+        setTimeout(intentar, 1500);
+        return;
+      }
+      run();
+    };
+    const timer = setTimeout(intentar, 4000);
+
+    return () => {
+      cancelado = true;
+      clearTimeout(timer);
+      EVENTOS.forEach((ev) => window.removeEventListener(ev, marcarActividad));
+    };
   }, [scopedSprites, userState, isAdminPortal, showShareModal]);
 
   const activeState = activeProfile === 'friend' && friendState ? friendState : userState;
