@@ -1106,21 +1106,21 @@ html::after {
 /* ~5 s de calma y, en el ultimo 12% del ciclo, un hipo: tres golpes y vuelta.
    Dentro del hipo los saltos son duros (steps) para que se lea digital. */
 @keyframes hero-glitch-r {
-  0%, 88%     { transform: translateX(-0.25rem); }
-  89%         { transform: translateX(-0.65rem); }
-  90.5%       { transform: translateX(0.2rem) translateY(-0.02rem); }
-  92%         { transform: translateX(-0.15rem); }
-  93%         { transform: translateX(-0.85rem); }
-  94.5%, 100% { transform: translateX(-0.25rem); }
+  0%, 88%     { transform: translateX(-0.1rem); opacity: 0.85; }
+  89%         { transform: translateX(-0.65rem); opacity: 1; }
+  90.5%       { transform: translateX(0.2rem) translateY(-0.02rem); opacity: 1; }
+  92%         { transform: translateX(-0.15rem); opacity: 1; }
+  93%         { transform: translateX(-0.85rem); opacity: 1; }
+  94.5%, 100% { transform: translateX(-0.1rem); opacity: 0.85; }
 }
 
 @keyframes hero-glitch-b {
-  0%, 88%     { transform: translateX(0.25rem); }
-  89%         { transform: translateX(0.65rem); }
-  90.5%       { transform: translateX(-0.2rem) translateY(0.02rem); }
-  92%         { transform: translateX(0.15rem); }
-  93%         { transform: translateX(0.85rem); }
-  94.5%, 100% { transform: translateX(0.25rem); }
+  0%, 88%     { transform: translateX(0.1rem); opacity: 0.85; }
+  89%         { transform: translateX(0.65rem); opacity: 1; }
+  90.5%       { transform: translateX(-0.2rem) translateY(0.02rem); opacity: 1; }
+  92%         { transform: translateX(0.15rem); opacity: 1; }
+  93%         { transform: translateX(0.85rem); opacity: 1; }
+  94.5%, 100% { transform: translateX(0.1rem); opacity: 0.85; }
 }
 
 .hero__title-line--accent {
