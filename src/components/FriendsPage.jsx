@@ -16,7 +16,13 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
     const mios = Object.keys(userState || {}).filter((k) => k !== '_profile' && userState[k]?.owned);
     const setMios = new Set(mios);
     const setSuyos = new Set(suyos);
-    const conNombre = (id) => ({ id, name: (ALL_SPRITES.find((s) => s.id === id) || {}).name || id });
+    // El estado guarda ids (air_gold); el nombre de las cartas vive en name y, si falta,
+    // en fullName. Sin este respaldo se veia el id crudo, que es ilegible.
+    const porId = new Map(ALL_SPRITES.map((s) => [s.id, s]));
+    const conNombre = (id) => {
+      const s = porId.get(id);
+      return { id, name: (s && (s.name || s.fullName || s.familyName)) || id };
+    };
     return {
       teFaltan: suyos.filter((id) => !setMios.has(id)).map(conNombre),
       leFaltan: mios.filter((id) => !setSuyos.has(id)).map(conNombre)
@@ -26,6 +32,7 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
   const [codigo, setCodigo] = useState('');
   const [aviso, setAviso] = useState('');
   const [copiado, setCopiado] = useState('');
+  const [verTodos, setVerTodos] = useState({ teFaltan: false, leFaltan: false });
 
   const codigoCorto = (myFriendCode || '').replace(/^SDEX-/i, '');
   const enlace = generatePermanentFriendUrl(myFriendCode || 'SDEX-0000');
@@ -130,16 +137,26 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
                 <p className="sdm-friends__hint">Los tienes todos. No te falta nada de lo suyo.</p>
               ) : (
                 <div className="fpage__chips">
-                  {listas.teFaltan.map((s) => <span key={s.id} className="fpage__chip">{s.name}</span>)}
+                  {(verTodos.teFaltan ? listas.teFaltan : listas.teFaltan.slice(0, 12)).map((s) => <span key={s.id} className="fpage__chip">{s.name}</span>)}
                 </div>
+                {listas.teFaltan.length > 12 && (
+                  <button type="button" className="sdm-friends__btn sdm-friends__btn--ver" onClick={() => setVerTodos((v) => ({ ...v, teFaltan: !v.teFaltan }))}>
+                    {verTodos.teFaltan ? 'Ver menos' : 'Ver los ' + listas.teFaltan.length}
+                  </button>
+                )}
               )}
               <span className="sdm-friends__label">LE FALTAN ({listas.leFaltan.length})</span>
               {listas.leFaltan.length === 0 ? (
                 <p className="sdm-friends__hint">No necesita nada de lo tuyo.</p>
               ) : (
                 <div className="fpage__chips">
-                  {listas.leFaltan.map((s) => <span key={s.id} className="fpage__chip fpage__chip--suyo">{s.name}</span>)}
+                  {(verTodos.leFaltan ? listas.leFaltan : listas.leFaltan.slice(0, 12)).map((s) => <span key={s.id} className="fpage__chip fpage__chip--suyo">{s.name}</span>)}
                 </div>
+                {listas.leFaltan.length > 12 && (
+                  <button type="button" className="sdm-friends__btn sdm-friends__btn--ver" onClick={() => setVerTodos((v) => ({ ...v, leFaltan: !v.leFaltan }))}>
+                    {verTodos.leFaltan ? 'Ver menos' : 'Ver los ' + listas.leFaltan.length}
+                  </button>
+                )}
               )}
               <p className="sdm-friends__hint">Te faltan: lo que él tiene y tú no. Le faltan: lo que tú tienes y él no. Perfecto para intercambiar.</p>
             </div>
