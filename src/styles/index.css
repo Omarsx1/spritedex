@@ -8162,3 +8162,13 @@ body:has(.modal-overlay) {
 .fpage__sub { font-size: 0.72rem; color: #9aa5b6; }
 .fpage__chip { font-size: 0.68rem; padding: 4px 9px; color: #a5e4ff; }
 .fpage__chip--suyo { color: #9df3c0; }
+
+/* Botones de la cabecera de la pagina (atras y recargar): eran casi invisibles, icono
+   al 80% con borde al 14% y fondo al 6%. Ahora el icono es solido y el boton tiene
+   forma visible, que es lo que se espera de un control. */
+.fpage__back, .fpage__refresh {
+  color: #e8eef7;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+.fpage__back:hover, .fpage__refresh:hover { background: rgba(255, 255, 255, 0.18); }

@@ -774,10 +774,9 @@ useEffect(() => {
             const ok = await handleConnectFriendCode(codigo);
             if (ok !== false) {
               setActiveProfile('friend');
-              // La comparacion (las 4 listas) sigue viviendo en la modal hasta la fase 2,
-              // asi que se abre sola al ver la coleccion: la funcion no queda sin camino.
-              irA('/');
-              setShowCompareModal(true);
+              // La comparacion vive en la ficha: al cargar su coleccion nos quedamos ahi
+              // y aparecen las dos listas (lo que me falta y lo que le falta).
+              irA('/amigos/' + encodeURIComponent(codigo));
             }
           }}
         />
