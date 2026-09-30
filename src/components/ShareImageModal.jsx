@@ -330,7 +330,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       text += t('compartir.textoCompleto') + '\n';
     }
 
-    text += `#FNGGOverride #FortniteSprites #FortniteGlitch`;
+    text += `#SpritedexOverride #FortniteSprites #FortniteGlitch`;
 
     return text;
   };

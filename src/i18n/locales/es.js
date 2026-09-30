@@ -45,7 +45,7 @@ export default {
   "lona.progreso": "PROGRESO {pct}%",
   "lona.hackeado": "HACKEADO",
   "lona.faltante": "FALTANTE",
-  "lona.marca": "#FNGGOverride  •  spritedex.gg",
+  "lona.marca": "#SpritedexOverride  •  spritedex.gg",
   "app.progresoAria": "Progreso de la colección",
   "app.total": "Total",
   "app.atrapados": "Atrapados",
