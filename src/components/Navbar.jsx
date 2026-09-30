@@ -318,6 +318,20 @@ export function Navbar({
 
               {/* Sección Herramientas */}
               <div className="app-navbar__menu-section">
+                {/* Animaciones arriba y sola: es un interruptor, no una accion, y metida en
+                    la fila de tres se comia el ancho de las otras dos. No cierra el menu a
+                    proposito, para que se vea el cambio de estado en la propia fila. */}
+                <button
+                  className="app-navbar__menu-action-btn"
+                  onClick={handleToggleAnimations}
+                  aria-pressed={animationsEnabled}
+                >
+                  <div className="action-btn-left">
+                    {animationsEnabled ? <Zap size={15} color="#00F0E8" /> : <ZapOff size={15} />}
+                    <span>{animationsEnabled ? t('nav.desactivarAnimaciones') : t('nav.activarAnimaciones')}</span>
+                  </div>
+                </button>
+
                 <div className="app-navbar__menu-actions-row">
                 <button
                   className="app-navbar__menu-action-btn"
@@ -342,18 +356,6 @@ export function Navbar({
                   </div>
                 </button>
 
-                {/* Animaciones: antes era un boton suelto en la barra. No cierra el menu a
-                    proposito, para que se vea el cambio de estado en la propia fila. */}
-                <button
-                  className="app-navbar__menu-action-btn"
-                  onClick={handleToggleAnimations}
-                  aria-pressed={animationsEnabled}
-                >
-                  <div className="action-btn-left">
-                    {animationsEnabled ? <Zap size={15} color="#00F0E8" /> : <ZapOff size={15} />}
-                    <span>{animationsEnabled ? t('nav.desactivarAnimaciones') : t('nav.activarAnimaciones')}</span>
-                  </div>
-                </button>
                 </div>
               </div>
             </div>
