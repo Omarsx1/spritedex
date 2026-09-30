@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ShieldCheck, ArrowRight, AlertCircle } from 'lucide-react';
 import { Google } from '../ui/Google';
 import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
@@ -33,12 +33,11 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
   const [loading, setLoading] = useState(false);
   const [comprobandoSesion, setComprobandoSesion] = useState(true);
   const [sesionInvitada, setSesionInvitada] = useState(false);
+  const [sesionAdmin, setSesionAdmin] = useState(null);
 
-  // Si ya hay sesión (por ejemplo, acabas de entrar con Google y volviste aquí), no tiene
-  // sentido pedir nada: se comprueba la lista y se entra. Es el caso normal del dueño, que
-  // entra a la app con Google y no tiene contraseña que teclear.
-  const onAuthRef = useRef(onAuthenticated);
-  onAuthRef.current = onAuthenticated;
+  // Si ya hay sesión de administrador (el caso del dueño, que entra a la app con Google), no
+  // se pide nada: se enseña quién eres y se entra con un clic. El clic no aporta seguridad
+  // —la credencial es la sesión— pero evita el salto seco al panel sin saber con qué cuenta.
 
   useEffect(() => {
     let cancelado = false;
@@ -56,7 +55,7 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
           return;
         }
         if (await cuentaEsAdmin(supabase, usuario.id)) {
-          onAuthRef.current();
+          setSesionAdmin({ email: usuario.email || '' });
           return;
         }
         setEmail(usuario.email || '');
@@ -70,6 +69,15 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
     })();
     return () => { cancelado = true; };
   }, []);
+
+  // Cambiar de cuenta: se cierra la sesión abierta y se deja la puerta delante.
+  const usarOtraCuenta = async () => {
+    const supabase = await getSupabase();
+    if (supabase) await supabase.auth.signOut();
+    setSesionAdmin(null);
+    setSesionInvitada(false);
+    setErrorMsg('');
+  };
 
   // Entrar con Google: es la vía del dueño. Se usa un inicio de sesión real (no vinculación)
   // porque el acceso depende de la cuenta, no del invitado del navegador.
@@ -226,6 +234,71 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
           <div style={{ padding: '20px', textAlign: 'center', color: '#94a3b8', fontSize: '0.86rem' }}>
             Comprobando tu sesión…
           </div>
+        ) : sesionAdmin ? (
+          <div>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '9px',
+              padding: '12px 14px',
+              borderRadius: '10px',
+              background: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.35)',
+              color: '#6EE7B7',
+              fontSize: '0.82rem',
+              lineHeight: 1.55,
+              marginBottom: '16px'
+            }}>
+              <ShieldCheck size={18} style={{ flexShrink: 0 }} />
+              <span>
+                Sesión abierta{sesionAdmin.email ? <strong> ({sesionAdmin.email})</strong> : null}, y esa
+                cuenta está en la lista de administradores.
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={onAuthenticated}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #00F0E8, #0284c7)',
+                color: '#060714',
+                border: 'none',
+                fontSize: '0.88rem',
+                fontWeight: 900,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 18px rgba(0, 240, 255, 0.4)'
+              }}
+            >
+              <span>Entrar al CMS</span>
+              <ArrowRight size={16} />
+            </button>
+
+            <button
+              type="button"
+              onClick={usarOtraCuenta}
+              style={{
+                width: '100%',
+                marginTop: '10px',
+                padding: '10px',
+                borderRadius: '10px',
+                background: 'transparent',
+                color: '#94a3b8',
+                border: '1px solid rgba(255, 255, 255, 0.14)',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              Usar otra cuenta
+            </button>
+          </div>
         ) : (
           <>
             <button
@@ -249,7 +322,7 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
                 opacity: loading ? 0.7 : 1
               }}
             >
-              <Google size={18} />
+              <Google width="18" height="18" style={{ flexShrink: 0 }} />
               <span>Continuar con Google</span>
             </button>
 
