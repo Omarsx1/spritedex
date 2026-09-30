@@ -1,5 +1,6 @@
 import { getSupabase, isSupabaseConfigured } from './supabase';
 import { safeStorage } from './safeStorage';
+import { sinPerfil } from './mergeCollections';
 
 const STORAGE_MY_CODE_KEY = 'spritedex_my_friend_code';
 const STORAGE_CONNECTED_FRIEND_CODE_KEY = 'spritedex_connected_friend_code';
@@ -151,18 +152,12 @@ export async function fetchCollectionByFriendCode(friendCode) {
     }
 
     if (data && data.user_state) {
-      const profile = data.user_state._profile || {
-        name: `Entrenador #${(data.friend_code || normalized).replace('SDEX-', '')}`,
-        country_flag: '🌐',
-        country_name: '',
-        is_anonymous: true
-      };
-
+      // Solo viaja la coleccion. El perfil (_profile) guarda el correo y el nombre del
+      // otro usuario y la interfaz no lo muestra: enviarlo era regalar datos personales.
       return {
         userId: data.user_id,
         friendCode: data.friend_code || normalized,
-        userState: data.user_state,
-        profile,
+        userState: sinPerfil(data.user_state),
         updatedAt: data.updated_at
       };
     }
@@ -207,7 +202,7 @@ export function subscribeToFriendCollection(friendUserId, onUpdate) {
           },
           (payload) => {
             if (payload.new && payload.new.user_state) {
-              onUpdate(payload.new.user_state, payload.new.friend_code);
+              onUpdate(sinPerfil(payload.new.user_state), payload.new.friend_code);
             }
           }
         )
