@@ -39,6 +39,7 @@ import {
   getLastConnectedFriendCode
 } from './utils/friendCode';
 import { getLang, conIdioma, rutaSinIdioma } from './i18n';
+import { codigoFichaEnRuta } from './utils/visitaEnlace';
 
 // Carga diferida (code splitting) para modales secundarios y suite administrativa
 // El precalculo de la captura no arranca antes de este margen desde que se abre la app,
@@ -159,7 +160,11 @@ export function App() {
 
   const [activeProfile, setActiveProfile] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.has('friend') || params.has('code') || params.has('share') ? 'friend' : 'mine';
+    // Un enlace por token (?share=) es una VISITA, no un modo: te deja en la pagina de
+    // amigos, que es donde se ve la coleccion compartida. Por eso no enciende MODO AMIGO;
+    // si lo encendiera, al volver a la app aparecia el cartel sin que nadie lo pidiera.
+    // ?code= y ?friend= si son "conectar con alguien": esos mantienen el modo amigo.
+    return params.has('friend') || params.has('code') ? 'friend' : 'mine';
   });
 
   // Supabase Auth & Cloud Sync State
@@ -238,11 +243,9 @@ export function App() {
         return;
       }
       setFriendState(data.userState);
-      setConnectedFriendCode(data.friendCode || '');
       // La ficha de la pagina de amigos se dibuja con el codigo en la ruta; con un enlace
       // por token hay que darselo desde aqui o la pagina queda en blanco.
       setCodigoDeToken(data.friendCode || '');
-      setActiveProfile('friend');
     });
     return () => { cancelado = true; };
   }, [shareToken]);
@@ -805,10 +808,11 @@ useEffect(() => {
     setEnAmigos(ruta.indexOf('/amigos') === 0);
   }, []);
 
-  // Codigo de amigo que venga en la ruta (/amigos/SDEX-XXXX): la ficha se abre con el.
-  const codigoEnRuta = rutaApp.indexOf('/amigos/') === 0
-    ? decodeURIComponent(rutaApp.slice(8)).replace(/\/+$/, '').toUpperCase()
-    : String(codigoDeToken || '').toUpperCase();
+  // Codigo de amigo que venga en la ruta (/amigos/SDEX-XXXX) o en el enlace actual
+  // (?share=): la ficha se abre con el. La regla vive en utils/visitaEnlace para poder
+  // probarla: un codigo de una visita anterior, con la ruta ya limpia, no cuenta.
+  const busquedaActual = typeof window !== 'undefined' ? window.location.search : '';
+  const codigoEnRuta = codigoFichaEnRuta(rutaApp, busquedaActual, codigoDeToken);
 
   if (enAmigos) {
     return (
