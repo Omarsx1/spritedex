@@ -1,8 +1,8 @@
 # Panel de administradores y cierre de la puerta del CMS
 
-Estado: **implementado, pendiente de publicar**. El código está commiteado pero NO se
-empuja hasta que el SQL esté ejecutado: la puerta nueva necesita la tabla `admins`, y
-publicar antes dejaría el CMS sin acceso para todos (también para Omar).
+Estado: **publicado y verificado en producción** (commit `b9589f3`, en `dev` y `main`).
+El SQL se ejecutó ANTES de publicar a propósito: la puerta nueva necesita la tabla
+`admins`, y publicar antes habría dejado el CMS sin acceso para todos.
 
 ## Objetivo
 
@@ -29,9 +29,9 @@ el código, y poder otorgar y quitar accesos desde el propio panel.
       "Clave Maestra". La única puerta es correo + contraseña, y después se comprueba en la
       base que la cuenta esté en la lista; si no, se cierra la sesión que se acaba de abrir.
       Si la nube no está configurada, se dice en vez de ofrecer un formulario inútil.
-- [ ] SQL en Supabase (lo ejecuta el dueño): tabla `admins`, función `es_admin()`, políticas
+- [x] SQL en Supabase (lo ejecutó el dueño): tabla `admins`, función `es_admin()`, políticas
       de `admins`/`user_collections`/`analytics_events` y las tres RPC del panel.
-- [ ] Publicar (dev + main) y comprobar la puerta en producción.
+- [x] Publicar (dev + main) y comprobar la puerta en producción.
 - [ ] Comprobar en el panel: la tabla muestra todas las filas, y "Administradores" permite
       otorgar y quitar.
 
@@ -50,3 +50,21 @@ el código, y poder otorgar y quitar accesos desde el propio panel.
   única entrada es correo + contraseña. Sin errores de página.
 - Pendiente de verificación real: la sección Administradores necesita sesión de admin, así
   que solo se puede comprobar desde su navegador.
+
+## Verificación en producción (medida, no supuesta)
+
+Con la clave pública y sin sesión, las mismas peticiones que hace la app:
+
+| tabla | antes | después |
+|---|---|---|
+| `user_collections` | 0 filas | 0 filas |
+| `analytics_events` | **467 filas** | **0 filas** |
+| `friend_requests` | 0 filas | 0 filas |
+| `admin_metricas_usuarios` | 401 | 401 |
+| `sprites` | 20 filas | 20 filas (el catálogo es público a propósito) |
+
+Puerta del CMS en `spritedex.gg/studio-override` con Chrome real: se dibuja, no hay campo
+de clave, no hay selector "Clave Maestra" y la única entrada es correo + contraseña.
+
+Queda en manos del dueño: entrar al CMS y comprobar que la tabla lista todas las filas y que
+la sección Administradores otorga y quita accesos (requiere su sesión).
