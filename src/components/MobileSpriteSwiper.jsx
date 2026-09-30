@@ -8,16 +8,6 @@ import { SonicRing } from './SonicRing';
 import { safeStorage } from '../utils/safeStorage';
 import { trackEvent } from '../utils/telemetry';
 
-// Las claves son la rareza del dato (sprite.rarity), no su etiqueta visible.
-const RARITY_GLOWS = {
-  Mythic: '0 12px 28px rgba(245, 182, 66, 0.45), 0 0 16px rgba(245, 182, 66, 0.25)',
-  Legendary: '0 12px 26px rgba(249, 115, 22, 0.4), 0 0 14px rgba(249, 115, 22, 0.22)',
-  Epic: '0 12px 24px rgba(168, 85, 247, 0.4), 0 0 14px rgba(168, 85, 247, 0.22)',
-  Rare: '0 12px 22px rgba(0, 240, 232, 0.35), 0 0 12px rgba(0, 240, 232, 0.2)',
-  Uncommon: '0 12px 20px rgba(34, 197, 94, 0.35), 0 0 10px rgba(34, 197, 94, 0.2)',
-  Common: '0 8px 18px rgba(0, 0, 0, 0.55)'
-};
-
 const getVariantPriority = (v) => {
   if (v === 'Base' || v === 'Basic') return 0;
   if (v === 'Gold') return 1;
@@ -321,9 +311,10 @@ function FamilySpotlightRow({
           height: `${CARD_HEIGHT}px`,
           background: styleInfo.background,
           borderColor: styleInfo.borderColor,
-          boxShadow: isActive && !isMastered
-            ? (RARITY_GLOWS[sprite.rarity] || '0 10px 24px rgba(0, 0, 0, 0.55)')
-            : undefined
+          // Sin resplandor de color: el halo por rareza se veia como un aro de luz alrededor
+          // de la carta. La card activa ya se distingue por tamaño, opacidad y z-index
+          // (.ms-spotlight-card.is-active), asi que basta una sombra neutra de apoyo.
+          boxShadow: isActive && !isMastered ? '0 10px 24px rgba(0, 0, 0, 0.55)' : undefined
         }}
         onClick={() => {
           if (!isActive) {
