@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { ALL_SPRITES } from '../data/spritesData';
-import { pickName } from '../data/spritesData';
+import { ALL_SPRITES, pickName } from '../data/spritesData';
 import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw } from 'lucide-react';
 import { useFriendRequests } from '../hooks/useFriendRequests';
 import { generatePermanentFriendUrl } from '../utils/friendCode';
 import { t } from '../i18n';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 // Pagina de amigos (fase 1): tu codigo, agregar, solicitudes y la lista de amigos.
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
@@ -81,6 +81,7 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
         <button className="fpage__refresh" onClick={() => radar.cargar()} disabled={radar.cargando} aria-label={t('amigos.actualizar')}>
           <RefreshCw size={15} />
         </button>
+        <LanguageSwitcher className="fpage__lang" />
       </div>
 
       {/* Un bloque a la vez: la pagina deja de apilar siete secciones y de repetir la

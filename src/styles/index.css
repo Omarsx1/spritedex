@@ -8284,3 +8284,12 @@ body:has(.modal-overlay) {
 @media (max-width: 420px) {
   .lang-switch__btn { min-width: 26px; font-size: 0.62rem; }
 }
+
+/* Selector de idioma en la cabecera de la pagina de amigos */
+.fpage__lang {
+  margin-left: 4px;
+}
+
+.fpage__lang .lang-switch__btn {
+  min-width: 28px;
+}
