@@ -8,6 +8,7 @@ import spriteThumbsJson from './sprite_thumbs.json';
 // cruda de fortnite.gg. En ingles el juego invierte el orden: "Gold Jonesy Sprite".
 import catalogEn from './i18n/catalog.en.json';
 import familiasEn from './i18n/familias.en.json';
+import textosJuego from './i18n/textos.juego.json';
 import { getLang, t } from '../i18n/texto.js';
 
 export const SPRITE_THUMBS = spriteThumbsJson;
@@ -1000,6 +1001,15 @@ export function pickFamilyName(familyId, lang = getLang()) {
   if (!familyId) return '';
   if (lang === 'en') return FAMILY_NAMES_EN[familyId] || FAMILY_NAMES_MAP[familyId] || familyId;
   return FAMILY_NAMES_MAP[familyId] || familyId;
+}
+
+// Texto que viene de los DATOS del juego (habilidad, perk, ubicacion y coste). Se traduce
+// por catalogo, con el texto en español como clave; si falta una traduccion se muestra el
+// original en lugar de una clave rota.
+export function pickTexto(valor, lang = getLang()) {
+  if (!valor) return valor;
+  if (lang !== 'en') return valor;
+  return textosJuego[valor] || valor;
 }
 
 export function pickThemeName(theme, lang = getLang()) {

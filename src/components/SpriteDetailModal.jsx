@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Zap, Sparkles } from 'lucide-react';
-import { SPRITE_FAMILIES, getSpriteCardStyle, getRarityInfo, pickName, pickThemeName } from '../data/spritesData';
+import { SPRITE_FAMILIES, getSpriteCardStyle, getRarityInfo, pickName, pickThemeName, pickTexto } from '../data/spritesData';
 import { t } from '../i18n';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
@@ -146,14 +146,14 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                   boxShadow: '0 3px 12px rgba(158, 255, 239, 0.28)'
                 }}
               >
-                <span>{activeSprite.specialPerk}</span>
+                <span>{pickTexto(activeSprite.specialPerk)}</span>
               </div>
             )}
             <div className="sdm__card-row">
               <Zap size={16} className="sdm__icon sdm__icon--yellow" />
               <div>
                 <span className="sdm__card-label">{t('detalle.habilidadOficial')}</span>
-                <p className="sdm__card-text">{activeSprite.ability}</p>
+                <p className="sdm__card-text">{pickTexto(activeSprite.ability)}</p>
               </div>
             </div>
             <div className="sdm__card-footer">
@@ -170,7 +170,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                   }}
                 />
                 <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)' }}>
-                  {activeSprite.summonCost || t('detalle.costePorDefecto')}
+                  {activeSprite.summonCost ? pickTexto(activeSprite.summonCost) : t('detalle.costePorDefecto')}
                 </span>
               </div>
             </div>
