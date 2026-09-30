@@ -8241,3 +8241,46 @@ body:has(.modal-overlay) {
 /* Sin el titulo de la comparacion, la etiqueta TE FALTAN es la primera del bloque: se le
    devuelve el aire de arriba para que no quede pegada a la tarjeta de la ficha. */
 .fpage__bloqueFicha .sdm-friends__label:first-child { margin-top: 14px; }
+
+/* Selector de idioma de la barra superior */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.lang-switch__btn {
+  min-width: 30px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #b9c2d0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.lang-switch__btn:hover {
+  color: #e8edf5;
+}
+
+.lang-switch__btn.is-active {
+  background: #22e6dc;
+  color: #07131a;
+}
+
+.lang-switch__btn:focus-visible {
+  outline: 2px solid #22e6dc;
+  outline-offset: 1px;
+}
+
+@media (max-width: 420px) {
+  .lang-switch__btn { min-width: 26px; font-size: 0.62rem; }
+}

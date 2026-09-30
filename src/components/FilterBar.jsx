@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Grid, List, ChevronDown, X, GalleryHorizontal } from 'lucide-react';
-import { THEMES_LIST, THEME_NAMES_ES, ALL_SPRITES, FAMILY_NAMES_MAP } from '../data/spritesData';
+import { THEMES_LIST, ALL_SPRITES, pickFamilyName, pickThemeName } from '../data/spritesData';
+import { t } from '../i18n';
 import { MobileLiquidFilterBar } from './MobileLiquidFilterBar';
 import { safeStorage } from '../utils/safeStorage';
 
@@ -17,10 +18,10 @@ const VARIANT_COLORS = {
 };
 
 const STATUS_OPTIONS = [
-  { value: 'all', label: 'Todos' },
-  { value: 'new', label: 'Nuevos' },
-  { value: 'owned', label: 'Atrapados' },
-  { value: 'missing', label: 'Faltantes' },
+  { value: 'all', labelKey: 'filtros.todos' },
+  { value: 'new', labelKey: 'filtros.nuevos' },
+  { value: 'owned', labelKey: 'filtros.atrapados' },
+  { value: 'missing', labelKey: 'filtros.faltantes' },
 ];
 
 export function FilterBar({
@@ -90,7 +91,7 @@ export function FilterBar({
     return uniqueFamilyIds.map(familyId => {
       const sprite = scopedSprites.find(s => s.familyId === familyId && s.variant === 'Basic')
         || scopedSprites.find(s => s.familyId === familyId);
-      const name = FAMILY_NAMES_MAP[familyId] || (familyId.charAt(0).toUpperCase() + familyId.slice(1));
+      const name = pickFamilyName(familyId);
       return {
         name,
         familyId,
@@ -103,7 +104,7 @@ export function FilterBar({
   const availableThemes = useMemo(() => {
     const scopedSprites = ALL_SPRITES.filter(s => (activeGen === 0 || s.gen === activeGen) && (showUnreleased || !s.unreleased));
     const uniqueThemes = [...new Set(scopedSprites.map(s => s.variant))];
-    return THEMES_LIST.filter(t => uniqueThemes.includes(t));
+    return THEMES_LIST.filter(theme => uniqueThemes.includes(theme));
   }, [activeGen, showUnreleased]);
 
   // Auto-reset baseFilter if the selected variant becomes unavailable without showUnreleased
@@ -181,7 +182,7 @@ export function FilterBar({
             onClick={handleExploreNew}
             role="button"
             tabIndex={0}
-            title="Haz clic para ver los nuevos espíritus"
+            title={t('filtros.clicVerNuevos')}
             style={{
               position: 'absolute',
               bottom: 'calc(100% + 8px)',
@@ -192,13 +193,13 @@ export function FilterBar({
           >
             <div className="mobile-new-coachmark__content">
               <span className="mobile-new-coachmark__sparkle">✨</span>
-              <span className="mobile-new-coachmark__text">¡{newSpiritsCount} Nuevos espíritus!</span>
-              <span className="mobile-new-coachmark__action">Ver</span>
+              <span className="mobile-new-coachmark__text">{t('filtros.nuevosEspiritus', { n: newSpiritsCount })}</span>
+              <span className="mobile-new-coachmark__action">{t('filtros.ver')}</span>
               <button
                 type="button"
                 className="mobile-new-coachmark__close"
                 onClick={handleDismissTooltip}
-                aria-label="Cerrar aviso"
+                aria-label={t('filtros.cerrarAviso')}
               >
                 <X size={12} />
               </button>
@@ -212,7 +213,7 @@ export function FilterBar({
             className={`status-pill-btn ${statusFilter === opt.value ? 'is-active' : ''}`}
             onClick={() => setStatusFilter(statusFilter === opt.value ? 'all' : opt.value)}
           >
-            <span>{opt.label}</span>
+            <span>{t(opt.labelKey)}</span>
             {opt.value === 'new' && newSpiritsCount > 0 && (
               <span className="status-pill-count-badge">{newSpiritsCount}</span>
             )}
@@ -227,7 +228,7 @@ export function FilterBar({
           <Search size={14} className="search-icon" />
           <input
             type="text"
-            placeholder="BUSCAR"
+            placeholder={t('filtros.buscar')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="search-input-field"
@@ -245,7 +246,7 @@ export function FilterBar({
               color: '#ffffff'
             } : {}}
           >
-            <span>{baseFilter === 'all' ? 'VARIANTE' : (THEME_NAMES_ES[baseFilter] || baseFilter)}</span>
+            <span>{baseFilter === 'all' ? t('filtros.variante') : pickThemeName(baseFilter)}</span>
             <ChevronDown size={13} className={`trigger-chevron ${variantOpen ? 'rotated' : ''}`} />
           </button>
 
@@ -257,7 +258,7 @@ export function FilterBar({
                   className={`variant-grid-chip variant-chip--all ${baseFilter === 'all' ? 'is-active' : ''}`}
                   onClick={() => handleVariantSelect('all')}
                 >
-                  Todas
+                  {t('filtros.todas')}
                 </button>
                 {availableThemes.map(theme => {
                   const colors = VARIANT_COLORS[theme] || { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' };
@@ -269,7 +270,7 @@ export function FilterBar({
                       onClick={() => handleVariantSelect(theme)}
                       style={{ background: colors.gradient, borderColor: isActive ? '#fff' : colors.border }}
                     >
-                      {THEME_NAMES_ES[theme] || theme}
+                      {pickThemeName(theme)}
                     </button>
                   );
                 })}
@@ -300,7 +301,7 @@ export function FilterBar({
                   className={`sprite-grid-chip ${spriteFilter === 'all' ? 'is-active' : ''}`}
                   onClick={() => handleSpriteSelect('all')}
                 >
-                  <span className="sprite-chip-name">Todos</span>
+                  <span className="sprite-chip-name">{t('filtros.todos')}</span>
                 </button>
                 {availableFamiliesWithImages.map(family => (
                   <button
@@ -320,7 +321,7 @@ export function FilterBar({
 
         {/* No Lanzados Checkbox */}
         <label className="filter-pill-checkbox">
-          <span>NO LANZADOS</span>
+          <span>{t('filtros.noLanzados')}</span>
           <input
             type="checkbox"
             checked={showUnreleased}
@@ -334,21 +335,21 @@ export function FilterBar({
             <button
               className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
               onClick={() => setViewMode('grid')}
-              title="Vista cuadrícula"
+              title={t('filtros.vistaCuadricula')}
             >
               <Grid size={15} />
             </button>
             <button
               className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
               onClick={() => setViewMode('list')}
-              title="Vista lista"
+              title={t('filtros.vistaLista')}
             >
               <List size={15} />
             </button>
             <button
               className={`view-toggle-btn ${viewMode === 'spotlight' ? 'active' : ''}`}
               onClick={() => setViewMode('spotlight')}
-              title="Vista Spotlight (Carrusel fluido estilo Apple)"
+              title={t('filtros.vistaSpotlight')}
             >
               <GalleryHorizontal size={15} />
             </button>

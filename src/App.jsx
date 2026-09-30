@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useDeferredValue, lazy, Suspense } from 'react';
-import { VARIANT_ORDER } from './data/spritesData';
+import { VARIANT_ORDER, FAMILY_NAMES_MAP, pickFamilyName } from './data/spritesData';
+import { t } from './i18n';
 
 const getVariantPriority = (v) => {
   if (v === 'Base' || v === 'Basic') return 0;
@@ -36,6 +37,7 @@ import {
   saveLastConnectedFriendCode,
   getLastConnectedFriendCode
 } from './utils/friendCode';
+import { getLang, conIdioma, rutaSinIdioma } from './i18n';
 
 // Carga diferida (code splitting) para modales secundarios y suite administrativa
 // El precalculo de la captura no arranca antes de este margen desde que se abre la app,
@@ -736,29 +738,38 @@ useEffect(() => {
     return Math.max((valor / totalCount) * 100, 2.5);
   };
 
+  // La etiqueta de familia se guarda como texto; para el ingles hay que volver al id.
+  const familiaVisible = (() => {
+    if (spriteFilter === 'all') return '';
+    const id = Object.keys(FAMILY_NAMES_MAP).find((k) => FAMILY_NAMES_MAP[k] === spriteFilter);
+    return id ? pickFamilyName(id) : spriteFilter;
+  })();
   const friendLendableCount = friendState ? scopedSprites.filter((s) => friendState[s.id]?.owned && !userState[s.id]?.owned).length : 0;
 
   // Página de amigos (fase 1): ruta propia para tener espacio de verdad. La modal sigue
   // viva en paralelo, así nadie pierde el radar mientras migramos.
-  const [enAmigos, setEnAmigos] = useState(() => typeof window !== 'undefined' && window.location.pathname.indexOf('/amigos') === 0);
+  // La ruta de la app se lee SIN el prefijo de idioma: /en/amigos y /amigos son la misma pantalla.
+  const rutaActual = typeof window !== 'undefined' ? window.location.pathname : '';
+  const rutaApp = rutaSinIdioma(rutaActual);
+  const [enAmigos, setEnAmigos] = useState(() => rutaApp.indexOf('/amigos') === 0);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
-    const alVolver = () => setEnAmigos(window.location.pathname.indexOf('/amigos') === 0);
+    const alVolver = () => setEnAmigos(rutaSinIdioma(window.location.pathname).indexOf('/amigos') === 0);
     window.addEventListener('popstate', alVolver);
     return () => window.removeEventListener('popstate', alVolver);
   }, []);
 
+  // Toda navegacion interna conserva el idioma activo.
   const irA = useCallback((ruta) => {
     if (typeof window === 'undefined') return;
-    window.history.pushState({}, '', ruta);
+    window.history.pushState({}, '', conIdioma(ruta, getLang()));
     setEnAmigos(ruta.indexOf('/amigos') === 0);
   }, []);
 
   // Codigo de amigo que venga en la ruta (/amigos/SDEX-XXXX): la ficha se abre con el.
-  const rutaActual = typeof window !== 'undefined' ? window.location.pathname : '';
-  const codigoEnRuta = rutaActual.indexOf('/amigos/') === 0
-    ? decodeURIComponent(rutaActual.slice(8)).replace(/\/+$/, '').toUpperCase()
+  const codigoEnRuta = rutaApp.indexOf('/amigos/') === 0
+    ? decodeURIComponent(rutaApp.slice(8)).replace(/\/+$/, '').toUpperCase()
     : '';
 
   if (enAmigos) {
@@ -890,7 +901,7 @@ useEffect(() => {
           <button
             onClick={() => setActiveProfile('mine')}
             className="sdm-friend-pill__exit"
-            title="Volver a mi colección"
+            title={t('app.volverColeccion')}
           >
             ✕ Salir a mi colección
           </button>
@@ -920,48 +931,48 @@ useEffect(() => {
         />
 
         {isMobile && (
-          <section className="stats-bar" aria-label="Progreso de la colección">
+          <section className="stats-bar" aria-label={t('app.progresoAria')}>
             <div className="stats-bar__col">
               <span className="stats-bar__value stats-bar__value--total">{totalCount}</span>
               {/* Reserva el alto de la barra: asi las tres etiquetas quedan a la misma altura. */}
               <span className="stats-bar__spacer" aria-hidden="true" />
-              <span className="stats-bar__label">Total</span>
+              <span className="stats-bar__label">{t('app.total')}</span>
             </div>
             <div className="stats-bar__col">
               <span className="stats-bar__value">{ownedCount}</span>
               <span
                 className="stats-bar__track"
                 role="progressbar"
-                aria-label="Espíritus atrapados"
+                aria-label={t('app.atrapadosAria')}
                 aria-valuemin={0}
                 aria-valuemax={totalCount}
                 aria-valuenow={ownedCount}
               >
                 <span className="stats-bar__fill stats-bar__fill--caught" style={{ width: rellenoDe(ownedCount) + '%' }} />
               </span>
-              <span className="stats-bar__label">Atrapados</span>
+              <span className="stats-bar__label">{t('app.atrapados')}</span>
             </div>
             <div className="stats-bar__col">
               <span className="stats-bar__value">{masteredCount}</span>
               <span
                 className="stats-bar__track"
                 role="progressbar"
-                aria-label="Espíritus maxeados"
+                aria-label={t('app.maxeadosAria')}
                 aria-valuemin={0}
                 aria-valuemax={totalCount}
                 aria-valuenow={masteredCount}
               >
                 <span className="stats-bar__fill stats-bar__fill--mastered" style={{ width: rellenoDe(masteredCount) + '%' }} />
               </span>
-              <span className="stats-bar__label">Maxeados</span>
+              <span className="stats-bar__label">{t('app.maxeados')}</span>
             </div>
           </section>
         )}
 
         {filteredSprites.length === 0 ? (
           <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8', gridColumn: '1 / -1' }}>
-            <h2 style={{ fontSize: '1.4rem', marginBottom: '8px' }}>No se encontraron Sprites</h2>
-            <p>Prueba ajustando la búsqueda o los filtros.</p>
+            <h2 style={{ fontSize: '1.4rem', marginBottom: '8px' }}>{t('app.sinResultados')}</h2>
+            <p>{t('app.ajustaFiltros')}</p>
           </div>
         ) : (isMobile || viewMode === 'spotlight') ? (
           <MobileSpriteSwiper
@@ -1013,12 +1024,12 @@ useEffect(() => {
             activeGen={activeGen}
             activeFiltersLabel={
               [
-                baseFilter !== 'all' ? `Variante: ${baseFilter}` : '',
-                spriteFilter !== 'all' ? `Familia: ${spriteFilter}` : '',
-                searchQuery ? `Búsqueda: "${searchQuery}"` : ''
+                baseFilter !== 'all' ? t('app.filtroVariante', { valor: baseFilter }) : '',
+                spriteFilter !== 'all' ? t('app.filtroFamilia', { valor: familiaVisible }) : '',
+                searchQuery ? t('app.filtroBusqueda', { valor: searchQuery }) : ''
               ]
                 .filter(Boolean)
-                .join(' · ') || 'Ningún filtro activo'
+                .join(' · ') || t('app.sinFiltros')
             }
             onClose={() => setShowShareModal(false)}
           />

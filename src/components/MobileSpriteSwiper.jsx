@@ -1,19 +1,21 @@
 import React, { useState, useRef, useMemo, useCallback, useEffect, memo } from 'react';
 import { fireConfetti } from '../utils/confetti';
 import { Lock } from 'lucide-react';
-import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER } from '../data/spritesData';
+import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER, pickName } from '../data/spritesData';
+import { t } from '../i18n';
 import { sounds } from '../utils/audio';
 import { SonicRing } from './SonicRing';
 import { safeStorage } from '../utils/safeStorage';
 import { trackEvent } from '../utils/telemetry';
 
+// Las claves son la rareza del dato (sprite.rarity), no su etiqueta visible.
 const RARITY_GLOWS = {
-  'Mítico': '0 12px 28px rgba(245, 182, 66, 0.45), 0 0 16px rgba(245, 182, 66, 0.25)',
-  'Legendario': '0 12px 26px rgba(249, 115, 22, 0.4), 0 0 14px rgba(249, 115, 22, 0.22)',
-  'Épico': '0 12px 24px rgba(168, 85, 247, 0.4), 0 0 14px rgba(168, 85, 247, 0.22)',
-  'Raro': '0 12px 22px rgba(0, 240, 232, 0.35), 0 0 12px rgba(0, 240, 232, 0.2)',
-  'Poco Común': '0 12px 20px rgba(34, 197, 94, 0.35), 0 0 10px rgba(34, 197, 94, 0.2)',
-  'Común': '0 8px 18px rgba(0, 0, 0, 0.55)'
+  Mythic: '0 12px 28px rgba(245, 182, 66, 0.45), 0 0 16px rgba(245, 182, 66, 0.25)',
+  Legendary: '0 12px 26px rgba(249, 115, 22, 0.4), 0 0 14px rgba(249, 115, 22, 0.22)',
+  Epic: '0 12px 24px rgba(168, 85, 247, 0.4), 0 0 14px rgba(168, 85, 247, 0.22)',
+  Rare: '0 12px 22px rgba(0, 240, 232, 0.35), 0 0 12px rgba(0, 240, 232, 0.2)',
+  Uncommon: '0 12px 20px rgba(34, 197, 94, 0.35), 0 0 10px rgba(34, 197, 94, 0.2)',
+  Common: '0 8px 18px rgba(0, 0, 0, 0.55)'
 };
 
 const getVariantPriority = (v) => {
@@ -330,7 +332,7 @@ function FamilySpotlightRow({
         }}
         role="button"
         tabIndex={0}
-        aria-label={`Ver ${sprite.fullName}`}
+        aria-label={t('swiper.verEspiritu', { nombre: pickName(sprite) })}
       >
         {/* Contenedor interior fijo (205px x 284px) para re-encuadre perfecto sin deformación */}
         <div
@@ -360,18 +362,18 @@ function FamilySpotlightRow({
             isFriendView ? (
               friendCanLend ? (
                 <div className="ms-level-tag ms-level-tag--lend ms-spotlight-fade" onClick={handleToggleBadgeClick}>
-                  {myOwned ? '✓ REGISTRADO' : '🎁 PRESTA'}
+                  {myOwned ? t('swiper.registradoMayus') : t('swiper.presta')}
                 </div>
               ) : isOwned ? (
                 <div className="ms-level-tag ms-level-tag--friend ms-spotlight-fade">
-                  ✓ AMIGO
+                  {t('swiper.amigo')}
                 </div>
               ) : null
             ) : isOwned ? (
               <div
                 className={`ms-level-tag ${isMastered ? 'ms-level-tag--mastered' : ''} ms-spotlight-fade`}
                 onClick={handleToggleBadgeClick}
-                title="Toca para desmarcar o cambiar"
+                title={t('swiper.tocaDesmarcarCambiar')}
               >
                 {isMastered ? 'MAX' : `LVL.${level}`}
               </div>
@@ -391,7 +393,7 @@ function FamilySpotlightRow({
             {isMastered && (
               <img
                 src="/img/x/sprites/crown.webp"
-                alt="Corona"
+                alt={t('swiper.corona')}
                 className="ms-card__crown ms-spotlight-fade"
                 decoding="async"
                 loading="lazy"
@@ -401,7 +403,7 @@ function FamilySpotlightRow({
             )}
             <img
               src={sprite.thumb || sprite.image}
-              alt={sprite.fullName}
+              alt={pickName(sprite)}
               loading="lazy"
               decoding="async"
               width={W_ACTIVE}
@@ -434,8 +436,8 @@ function FamilySpotlightRow({
           {/* Footer: Nombre + Acción */}
           <div className="ms-card__footer ms-spotlight-fade">
             <div className="ms-card__info">
-              <div className={`card-name ${sprite.fullName && sprite.fullName.length > 18 ? 'card-name--long' : ''}`}>
-                {sprite.fullName}
+              <div className={`card-name ${pickName(sprite) && pickName(sprite).length > 18 ? 'card-name--long' : ''}`}>
+                {pickName(sprite)}
               </div>
             </div>
 
@@ -443,7 +445,7 @@ function FamilySpotlightRow({
               {sprite.unreleased ? (
                 <div className="card-unreleased-pill" onClick={(e) => e.stopPropagation()}>
                   <Lock size={13} />
-                  <span>No lanzado</span>
+                  <span>{t('swiper.noLanzado')}</span>
                 </div>
               ) : isOwned ? (
                 <div
@@ -456,7 +458,7 @@ function FamilySpotlightRow({
                       className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''} ${sprite.gen === 2 ? 'is-sonic-ring-btn' : ''}`}
                       onClick={(e) => handleLevelClick(e, num)}
                       style={isFriendView ? { pointerEvents: 'none' } : {}}
-                      title={level === 1 && num === 1 ? 'Toca para desmarcar' : `Nivel ${num}`}
+                      title={level === 1 && num === 1 ? t('swiper.tocaDesmarcar') : t('swiper.nivel', { n: num })}
                     >
                       {sprite.gen === 2 ? (
                         <SonicRing active={level >= num} mastered={isMastered && num === 5} size={20} />
@@ -474,8 +476,8 @@ function FamilySpotlightRow({
                 >
                   <span className="btn-text">
                     {isFriendView
-                      ? (friendCanLend ? '+ Registrar en mi Dex' : 'No lo tiene')
-                      : 'Sin atrapar'}
+                      ? (friendCanLend ? t('swiper.registrarEnMiDex') : t('swiper.noLoTiene'))
+                      : t('swiper.sinAtrapar')}
                   </span>
                 </button>
               )}
@@ -492,7 +494,7 @@ function FamilySpotlightRow({
       {count > 1 && showHint && (
         <div className="ms-family-header">
           <span className={'ms-family-hint' + (isDismissing ? ' is-dismissing' : '')}>
-            Desliza para ver {count} variantes →
+            {t('swiper.deslizaVariantes', { n: count })}
           </span>
         </div>
       )}

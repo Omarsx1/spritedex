@@ -5,6 +5,7 @@ import { conGoogle, origenActual } from '../utils/authActions';
 import { X, Cloud, LogIn, LogOut, CheckCircle, Mail, Key, ShieldCheck } from 'lucide-react';
 import { getSupabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from '../utils/supabase';
 import { trackEvent } from '../utils/telemetry';
+import { t } from '../i18n';
 
 export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
   const [email, setEmail] = useState('');
@@ -22,12 +23,12 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
           </button>
           <div className="auth-modal__header">
             <Cloud size={48} color="#a855f7" className="auth-modal__header-icon" />
-            <h2 className="auth-modal__title">Configuración de Nube</h2>
+            <h2 className="auth-modal__title">{t('auth.tituloNube')}</h2>
             <p className="auth-modal__subtitle">
-              Para activar el guardado automático en la nube con Supabase, agrega tus variables de entorno <code className="auth-modal__code">VITE_SUPABASE_URL</code> y <code className="auth-modal__code">VITE_SUPABASE_ANON_KEY</code> en Vercel.
+              {t('auth.nubeTextoA')}<code className="auth-modal__code">VITE_SUPABASE_URL</code>{t('auth.nubeTextoB')}<code className="auth-modal__code">VITE_SUPABASE_ANON_KEY</code>{t('auth.nubeTextoC')}
             </p>
             <p className="auth-modal__local-notice">
-              ✓ Mientras tanto, tus datos están 100% seguros guardados localmente en tu dispositivo.
+              {t('auth.avisoLocal')}
             </p>
           </div>
       </Modal>
@@ -53,7 +54,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
         });
         if (signUpError) throw signUpError;
         trackEvent('signup', { method: 'email' });
-        setMessage('¡Cuenta creada! Revisa tu correo o inicia sesión.');
+        setMessage(t('auth.cuentaCreada'));
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
@@ -65,7 +66,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
         onClose();
       }
     } catch (err) {
-      setError(err.message || 'Error al autenticar');
+      setError(err.message || t('auth.errorAutenticar'));
     } finally {
       setLoading(false);
     }
@@ -77,7 +78,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
       // unica puerta que no respetaba los guardias de entorno y ensuciaba la base de
       // produccion con cuentas de prueba. Para probarlo a proposito: VITE_ALLOW_ANON_AUTH=true.
       if (shouldSkipAnonymousAuth()) {
-        setError('En este entorno no se crean cuentas de prueba. Pruebalo en el sitio de produccion, o activa VITE_ALLOW_ANON_AUTH para hacerlo a proposito.');
+        setError(t('auth.entornoSinCuentas'));
         return;
       }
       setLoading(true);
@@ -89,7 +90,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
       if (onAuthSuccess) onAuthSuccess();
       onClose();
     } catch (err) {
-      setError(err.message || 'Error al iniciar sesión rápida');
+      setError(err.message || t('auth.errorSesionRapida'));
       setLoading(false);
     }
   };
@@ -101,7 +102,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
       const { error: errorGoogle } = await conGoogle(Boolean(user?.is_anonymous));
       if (errorGoogle) throw errorGoogle;
     } catch (err) {
-      setError(err.message || 'Error con Google Sign-In');
+      setError(err.message || t('auth.errorGoogle'));
       setLoading(false);
     }
   };
@@ -119,9 +120,9 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
         password
       });
       if (updateError) throw updateError;
-      setMessage('¡Excelente! Tu cuenta ahora está vinculada a tu correo. Puedes usarla en cualquier dispositivo.');
+      setMessage(t('auth.cuentaVinculada'));
     } catch (err) {
-      setError(err.message || 'Error al vincular la cuenta');
+      setError(err.message || t('auth.errorVincular'));
     } finally {
       setLoading(false);
     }
@@ -145,10 +146,10 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
         <div className="auth-modal__header">
           <ShieldCheck size={44} color="#10b981" className="auth-modal__header-icon" />
           <h2 className="auth-modal__title">
-            {user ? (user.is_anonymous ? 'Conectado como Invitado' : 'Sincronización en la Nube') : (isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión')}
+            {user ? (user.is_anonymous ? t('auth.conectadoComoInvitado') : t('auth.sincronizacionNube')) : (isSignUp ? t('auth.crearCuenta') : t('auth.iniciarSesion'))}
           </h2>
           <p className="auth-modal__subtitle">
-            {user ? (user.is_anonymous ? 'Tu Spritedex está guardado solo en este dispositivo' : `Conectado como ${user.email}`) : 'Guarda tu Spritedex en la nube y accede desde cualquier dispositivo'}
+            {user ? (user.is_anonymous ? t('auth.guardadoLocal') : t('auth.conectadoComo', { email: user.email })) : t('auth.subtituloInvitado')}
           </p>
         </div>
 
@@ -156,19 +157,19 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
           <div className="auth-modal__body">
             <div className="auth-modal__status-card">
               <CheckCircle size={24} color="#10b981" className="auth-modal__status-icon" />
-              <div className="auth-modal__status-title">Tu Spritedex está sincronizado en la nube</div>
+              <div className="auth-modal__status-title">{t('auth.sincronizadoNube')}</div>
               <div className="auth-modal__status-text">
-                {user.is_anonymous ? 'Conectado mediante Acceso Rápido 1-Clic' : 'Cualquier cambio se guarda automáticamente'}
+                {user.is_anonymous ? t('auth.accesoRapidoConectado') : t('auth.cambioAutomatico')}
               </div>
             </div>
 
             {user.is_anonymous && (
               <div className="auth-modal__link-section">
                 <div className="auth-modal__link-title">
-                  🔗 Convierte tu cuenta para acceder desde otros celulares
+                  {t('auth.convierteCuenta')}
                 </div>
                 <p className="auth-modal__link-desc">
-                  Vincula tu correo o Google a esta colección. Conservarás todos los Sprites que ya has marcado.
+                  {t('auth.linkDesc')}
                 </p>
 
                 {error && (
@@ -190,7 +191,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                   disabled={loading}
                 >
                   <Google width="16" height="16" />
-                  <span>Vincular con Google</span>
+                  <span>{t('auth.vincularGoogle')}</span>
                 </button>
 
                 {/* Link Email Form */}
@@ -199,7 +200,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                     <Mail size={14} className="auth-modal__input-icon" />
                     <input
                       type="email"
-                      placeholder="Tu correo electrónico"
+                      placeholder={t('auth.placeholderCorreo')}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -211,7 +212,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                     <Key size={14} className="auth-modal__input-icon" />
                     <input
                       type="password"
-                      placeholder="Nueva contraseña"
+                      placeholder={t('auth.placeholderNuevaContrasena')}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -225,7 +226,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                     className="btn-primary auth-modal__btn-submit auth-modal__btn-submit--sm"
                     disabled={loading}
                   >
-                    <span>Vincular Correo</span>
+                    <span>{t('auth.vincularCorreo')}</span>
                   </button>
                 </form>
               </div>
@@ -237,7 +238,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
               disabled={loading}
             >
               <LogOut size={16} />
-              <span>Cerrar Sesión</span>
+              <span>{t('auth.cerrarSesion')}</span>
             </button>
           </div>
         ) : (
@@ -248,7 +249,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
               className="auth-modal__btn-quick"
               disabled={loading}
             >
-              <span>⚡ Acceso Rápido 1-Clic (Sin Registro)</span>
+              <span>{t('auth.accesoRapido')}</span>
             </button>
 
             {/* Google Sign In */}
@@ -258,11 +259,11 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
               disabled={loading}
             >
               <Google width="18" height="18" />
-              <span>Continuar con Google</span>
+              <span>{t('auth.continuarGoogle')}</span>
             </button>
 
             <div className="auth-modal__divider">
-              <span>O con Correo</span>
+              <span>{t('auth.oConCorreo')}</span>
             </div>
 
             {error && (
@@ -282,7 +283,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                 <Mail size={16} className="auth-modal__input-icon" />
                 <input
                   type="email"
-                  placeholder="Tu correo electrónico"
+                  placeholder={t('auth.placeholderCorreo')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -294,7 +295,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                 <Key size={16} className="auth-modal__input-icon" />
                 <input
                   type="password"
-                  placeholder="Tu contraseña"
+                  placeholder={t('auth.placeholderContrasena')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -309,7 +310,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                 disabled={loading}
               >
                 <LogIn size={16} />
-                <span>{isSignUp ? 'Registrarse' : 'Iniciar Sesión'}</span>
+                <span>{isSignUp ? t('auth.registrarse') : t('auth.iniciarSesion')}</span>
               </button>
             </form>
 
@@ -318,7 +319,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                 onClick={() => { setIsSignUp(!isSignUp); setError(null); setMessage(null); }}
                 className="auth-modal__toggle"
               >
-                {isSignUp ? '¿Ya tienes cuenta? Inicia Sesión' : '¿No tienes cuenta? Regístrate gratis'}
+                {isSignUp ? t('auth.yaTienesCuenta') : t('auth.noTienesCuenta')}
               </button>
             </div>
           </div>

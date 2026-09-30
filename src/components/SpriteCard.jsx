@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
 import { fireConfetti } from '../utils/confetti';
 import { Lock } from 'lucide-react';
-import { RARITIES, getSpriteCardStyle, getRarityInfo } from '../data/spritesData';
+import { RARITIES, getSpriteCardStyle, getRarityInfo, pickName } from '../data/spritesData';
+import { t } from '../i18n';
 import { sounds } from '../utils/audio';
 import { SonicRing } from './SonicRing';
 
@@ -95,7 +96,7 @@ function SpriteCardBase({
           {isMastered && (
             <img
               src="/img/x/sprites/crown.webp"
-              alt="Corona"
+              alt={t('carta.corona')}
               className="list-item-image__crown"
               decoding="async"
               loading="lazy"
@@ -105,12 +106,12 @@ function SpriteCardBase({
           )}
           <img
             src={sprite.thumb || sprite.image}
-            alt={sprite.fullName}
+            alt={pickName(sprite)}
             loading={index < 8 ? "eager" : "lazy"}
             fetchPriority={index < 4 ? "high" : "auto"}
             decoding="async"
             onClick={handleImageClick}
-            title="Haz clic exclusivamente en la figura del espíritu para ver detalles y variantes"
+            title={t('carta.clicFigura')}
             style={{ filter: !isOwned ? 'grayscale(80%) opacity(0.5)' : 'none', cursor: 'pointer' }}
             onError={(e) => {
               if (!e.target.dataset.triedBase) {
@@ -130,7 +131,7 @@ function SpriteCardBase({
           />
         </div>
         <div className="list-item-info">
-          <span className="list-item-name">{sprite.fullName}</span>
+          <span className="list-item-name">{pickName(sprite)}</span>
           <div className="list-item-meta">
             <span
               className={`sprite-pill rarity-badge-sm ${rarityInfo.classKey ? `sprite-rarity-${rarityInfo.classKey}` : ''}`}
@@ -139,7 +140,7 @@ function SpriteCardBase({
             </span>
             {friendCanLend && (
               <span style={{ fontSize: '0.68rem', background: '#10b981', color: '#fff', padding: '1px 6px', borderRadius: '4px', fontWeight: 800 }}>
-                🎁 Te lo presta
+                {t('carta.teLoPresta')}
               </span>
             )}
           </div>
@@ -148,7 +149,7 @@ function SpriteCardBase({
           {sprite.unreleased ? (
             <div className="card-unreleased-pill list-unreleased-pill" onClick={(e) => e.stopPropagation()}>
               <Lock size={12} />
-              <span>No lanzado</span>
+              <span>{t('carta.noLanzado')}</span>
             </div>
           ) : (
             <>
@@ -175,8 +176,12 @@ function SpriteCardBase({
                 style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff' } : {}}
               >
                 {isFriendView
-                  ? (friendCanLend ? (myOwned ? '✓ Registrado' : '+ Registrar en mi Dex') : isOwned ? '✓ Tu amigo lo tiene' : 'No lo tiene')
-                  : (isMastered ? '⭐ Maxeado' : isOwned ? `✓ Atrapado (Niv.${level})` : 'Sin atrapar')}
+                  ? (friendCanLend
+                    ? (myOwned ? t('carta.registrado') : t('carta.registrarEnMiDex'))
+                    : isOwned ? t('carta.tuAmigoLoTiene') : t('carta.noLoTiene'))
+                  : (isMastered
+                    ? t('carta.maxeado')
+                    : isOwned ? t('carta.atrapadoNivel', { n: level }) : t('carta.sinAtrapar'))}
               </button>
             </>
           )}
@@ -228,18 +233,18 @@ function SpriteCardBase({
       {!sprite.unreleased && (isFriendView ? (
         friendCanLend ? (
           <div className="ms-level-tag ms-level-tag--lend" onClick={handleToggleClick}>
-            {myOwned ? '✓ REGISTRADO' : '🎁 PRESTA'}
+            {myOwned ? t('carta.registradoMayus') : t('carta.presta')}
           </div>
         ) : isOwned ? (
           <div className="ms-level-tag ms-level-tag--friend">
-            ✓ AMIGO
+            {t('carta.amigo')}
           </div>
         ) : null
       ) : isOwned ? (
         <div
           className={`ms-level-tag ${isMastered ? 'ms-level-tag--mastered' : ''}`}
           onClick={handleToggleClick}
-          title="Toca para desmarcar o cambiar"
+          title={t('carta.tocaDesmarcarCambiar')}
         >
           {isMastered ? 'MAX' : `LVL.${level}`}
         </div>
@@ -250,7 +255,7 @@ function SpriteCardBase({
         {isMastered && (
           <img
             src="/img/x/sprites/crown.webp"
-            alt="Corona"
+            alt={t('carta.corona')}
             className="card-image__crown"
             decoding="async"
             loading="lazy"
@@ -260,12 +265,12 @@ function SpriteCardBase({
         )}
         <img
           src={sprite.thumb || sprite.image}
-          alt={sprite.fullName}
+          alt={pickName(sprite)}
           loading={index < 8 ? "eager" : "lazy"}
           fetchPriority={index < 4 ? "high" : "auto"}
           decoding="async"
           onClick={handleImageClick}
-          title="Haz clic exclusivamente en la figura del espíritu para ver detalles y variantes"
+          title={t('carta.clicFigura')}
           style={{
             filter: !isOwned ? 'grayscale(55%) opacity(0.68) brightness(1.2) contrast(1.15)' : 'drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
             cursor: 'pointer'
@@ -289,13 +294,13 @@ function SpriteCardBase({
       </div>
 
       {/* Nombre */}
-      <div className={`card-name ${sprite.fullName && sprite.fullName.length > 20 ? 'card-name--long' : ''}`}>{sprite.fullName}</div>
+      <div className={`card-name ${pickName(sprite) && pickName(sprite).length > 20 ? 'card-name--long' : ''}`}>{pickName(sprite)}</div>
 
       {/* Control inferior: Pill No lanzado si unreleased, Anillos de Sonic para Gen 2 o Estrellas para Gen 1 si está atrapado */}
       {sprite.unreleased ? (
         <div className="card-unreleased-pill" onClick={(e) => e.stopPropagation()}>
           <Lock size={13} />
-          <span>No lanzado</span>
+          <span>{t('carta.noLanzado')}</span>
         </div>
       ) : isOwned ? (
         <div className="card-level-stars" onClick={(e) => e.stopPropagation()}>
@@ -305,7 +310,7 @@ function SpriteCardBase({
               className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''} ${sprite.gen === 2 ? 'is-sonic-ring-btn' : ''}`}
               onClick={(e) => handleLevelClick(e, num)}
               style={isFriendView ? { pointerEvents: 'none' } : {}}
-              title={level === 1 && num === 1 ? 'Toca para desmarcar' : `Nivel ${num}`}
+              title={level === 1 && num === 1 ? t('carta.tocaDesmarcar') : t('carta.nivel', { n: num })}
             >
               {sprite.gen === 2 ? (
                 <SonicRing active={level >= num} mastered={isMastered && num === 5} size={19} />
@@ -323,8 +328,8 @@ function SpriteCardBase({
         >
           <span className="btn-text">
             {isFriendView
-              ? (friendCanLend ? '+ Registrar en mi Dex' : 'No lo tiene')
-              : 'Sin atrapar'}
+              ? (friendCanLend ? t('carta.registrarEnMiDex') : t('carta.noLoTiene'))
+              : t('carta.sinAtrapar')}
           </span>
         </button>
       )}

@@ -4,6 +4,12 @@ import fortniteGgJson from './fortnite_gg_index.json';
 // Miniaturas WebP para tarjetas, generadas por scripts/generate_sprite_thumbs.js.
 import spriteThumbsJson from './sprite_thumbs.json';
 
+// Nombres en INGLES generados por scripts/build_locale_catalog.mjs a partir de la captura
+// cruda de fortnite.gg. En ingles el juego invierte el orden: "Gold Jonesy Sprite".
+import catalogEn from './i18n/catalog.en.json';
+import familiasEn from './i18n/familias.en.json';
+import { getLang, t } from '../i18n/texto.js';
+
 export const SPRITE_THUMBS = spriteThumbsJson;
 
 export function getSpriteThumb(id) {
@@ -65,7 +71,7 @@ export const RARITIES = {
   Slurp: { name: 'SORBETE', label: 'Sorbete', color: '#6ee7b7', bg: '#064e3b', border: '#10b981', classKey: 'slurp', cardGradient: 'linear-gradient(180deg, #064e3b 0%, #1b1c23 100%)' }
 };
 
-export function getRarityInfo(rarity) {
+function resolverRareza(rarity) {
   if (!rarity) return RARITIES.Rare;
   if (RARITIES[rarity]) return RARITIES[rarity];
   const foundKey = Object.keys(RARITIES).find(
@@ -75,6 +81,7 @@ export function getRarityInfo(rarity) {
 
   const cleanName = String(rarity).trim();
   return {
+    sinTraducir: true,
     name: cleanName.toUpperCase(),
     label: cleanName.charAt(0).toUpperCase() + cleanName.slice(1).toLowerCase(),
     color: '#5dffe4',
@@ -82,6 +89,19 @@ export function getRarityInfo(rarity) {
     border: '#14b8a6',
     classKey: cleanName.toLowerCase().replace(/[^a-z0-9]/g, ''),
     cardGradient: 'linear-gradient(180deg, #134e4a 0%, #1b1c23 100%)'
+  };
+}
+
+// Los nombres de rareza viven en los locales; aqui solo quedan color, borde y degradado.
+// Una rareza que no este en el catalogo se muestra tal como venga en los datos.
+export function getRarityInfo(rarity) {
+  const base = resolverRareza(rarity);
+  if (base.sinTraducir) return base;
+  const clase = base.classKey || 'rare';
+  return {
+    ...base,
+    name: t('rareza.' + clase + '.nombre'),
+    label: t('rareza.' + clase + '.etiqueta')
   };
 }
 
@@ -203,6 +223,25 @@ export const THEME_NAMES_ES = {
   Cube: 'Cúbico',
   Gem: 'Gema',
   Quack: 'Patito'
+};
+
+export const THEME_NAMES_EN = {
+  Basic: 'Basic',
+  Gold: 'Gold',
+  Cheatmaster: 'Hack',
+  'Cheat Master': 'Hack',
+  'Loot Hacker': 'Loot Hacker',
+  'LootHacker': 'Loot Hacker',
+  'Bounty Hunter': 'Bounty Hunter',
+  'BountyHunter': 'Bounty Hunter',
+  reaper: 'Bounty Hunter',
+  Candy: 'Gummy',
+  Gummy: 'Gummy',
+  Galaxy: 'Galaxy',
+  Holofoil: 'Holofoil',
+  Cube: 'Cube',
+  Gem: 'Gem',
+  Quack: 'Quack'
 };
 
 export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
@@ -923,8 +962,10 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   return {
     id: item.id,
     fullName: fullName,
+    fullNameEn: catalogEn[item.id] || fullName,
     variant: item.theme,
     variantDisplay: spanishTheme,
+    variantDisplayEn: THEME_NAMES_EN[item.theme] || item.theme,
     rarity: finalRarity,
     gen: gen,
     dropChance: item.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
@@ -938,6 +979,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     thumb: getSpriteThumb(item.id),
     familyId: familyId,
     familyName: spanishFamilyName,
+    familyNameEn: familiasEn[familyId] || spanishFamilyName,
     location: official?.location || 'Cofres de Sprite & Zonas de Extracción',
     summonCost: SUMMON_COST_OVERRIDES[item.id] || officialCost || '5,000 Polvo Estelar',
     ability: SPIRIT_DATA_OVERRIDES[item.id]?.ability || official?.ability || 'Concede bonificaciones pasivas de combate, velocidad y recolección de botín.',
@@ -946,6 +988,25 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
 });
 
 export const allSprites = ALL_SPRITES;
+
+export const FAMILY_NAMES_EN = familiasEn;
+
+// Nombre visible del espiritu. En español es "Jonesy Dorado"; en ingles el juego lo
+// invierte y agrega "Sprite": "Gold Jonesy Sprite". Por eso el catalogo ingles es generado.
+// Se reexporta desde utils para que el canvas lo use sin cargar este modulo (que trae JSON).
+export { pickName } from '../utils/spriteName.js';
+
+export function pickFamilyName(familyId, lang = getLang()) {
+  if (!familyId) return '';
+  if (lang === 'en') return FAMILY_NAMES_EN[familyId] || FAMILY_NAMES_MAP[familyId] || familyId;
+  return FAMILY_NAMES_MAP[familyId] || familyId;
+}
+
+export function pickThemeName(theme, lang = getLang()) {
+  if (!theme) return '';
+  const mapa = lang === 'en' ? THEME_NAMES_EN : THEME_NAMES_ES;
+  return mapa[theme] || theme;
+}
 
 // Orden oficial de familias de 2ª Generación idéntico a la secuencia de Fortnite
 export const FORTNITE_GEN2_FAMILY_ORDER = [

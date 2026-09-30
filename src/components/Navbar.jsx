@@ -5,6 +5,8 @@ import { getSupabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
 import { safeStorage } from '../utils/safeStorage';
 import { GENERATIONS } from '../data/spritesData';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { t } from '../i18n';
 
 // #rrggbb -> "r,g,b", para poder usar el color de cada generacion con transparencia
 // (rgba) sin depender de color-mix, que aun no esta en todos los navegadores.
@@ -37,7 +39,7 @@ export function Navbar({
     return [
       { id: 2, badge: '2', nombre: gen2?.title || 'Override', detalle: '2ª Generación', color: gen2?.badgeColor || '#ec4899' },
       { id: 1, badge: '1', nombre: gen1?.title || 'Runners', detalle: '1ª Generación', color: gen1?.badgeColor || '#3b82f6' },
-      { id: 0, badge: '🌐', nombre: 'Todas', detalle: 'Catálogo completo', color: '#00f0e8' }
+      { id: 0, badge: '🌐', nombre: t('nav.todas'), detalle: 'Catálogo completo', color: '#00f0e8' }
     ];
   }, []);
   const myFriendCode = useMemo(() => getMyFriendCode(user?.id), [user]);
@@ -79,8 +81,8 @@ export function Navbar({
     if (user.user_metadata?.full_name) return user.user_metadata.full_name;
     if (user.user_metadata?.name) return user.user_metadata.name;
     if (user.email) return user.email.split('@')[0];
-    if (user.is_anonymous) return 'Invitado';
-    return 'Mi Cuenta';
+    if (user.is_anonymous) return t('nav.invitado');
+    return t('nav.miCuenta');
   }, [user]);
 
   // Solo el primer nombre y el primer apellido: el nombre completo puede traer dos
@@ -163,8 +165,8 @@ export function Navbar({
           type="button"
           className="app-navbar__logo-mark"
           onClick={handleLogoClick}
-          title="Toca para actualizar la aplicación a la última versión"
-          aria-label="Actualizar aplicación"
+          title={t('nav.actualizarAyuda')}
+          aria-label={t('nav.actualizarApp')}
         >
           F
         </button>
@@ -177,8 +179,8 @@ export function Navbar({
           type="button"
           className={`app-navbar__motion-btn ${animationsEnabled ? 'is-active' : 'is-disabled'}`}
           onClick={handleToggleAnimations}
-          title={animationsEnabled ? 'Animaciones activadas (Toca para pausar)' : 'Animaciones desactivadas (Toca para activar)'}
-          aria-label={animationsEnabled ? 'Desactivar animaciones' : 'Activar animaciones'}
+          title={animationsEnabled ? t('nav.animacionesActivas') : t('nav.animacionesInactivas')}
+          aria-label={animationsEnabled ? t('nav.desactivarAnimaciones') : t('nav.activarAnimaciones')}
         >
           {animationsEnabled ? (
             <Zap size={15} strokeWidth={2.4} />
@@ -187,13 +189,16 @@ export function Navbar({
           )}
         </button>
 
+        {/* Selector de idioma: siempre visible, porque la deteccion del navegador es solo una apuesta */}
+        <LanguageSwitcher />
+
         {/* Avatar / Usuario (Solo Foto o Inicial Circular) */}
         <div ref={userDropdownRef} style={{ position: 'relative' }}>
           <button
             className={`app-navbar__avatar ${user ? 'is-logged' : ''} ${isUserMenuOpen ? 'is-active' : ''}`}
             onClick={handleAvatarClick}
-            title={user ? `Conectado como ${nombreCorto}` : 'Iniciar Sesión'}
-            aria-label={user ? 'Cuenta de usuario' : 'Iniciar sesión'}
+            title={user ? t('nav.conectadoComo', { nombre: nombreCorto }) : t('nav.iniciarSesionTitulo')}
+            aria-label={user ? t('nav.cuentaUsuario') : t('nav.iniciarSesion')}
             aria-expanded={user ? isUserMenuOpen : undefined}
           >
             {user ? (
@@ -230,12 +235,12 @@ export function Navbar({
                 {esAnonimo ? (
                   <div className="app-navbar__dropdown-status app-navbar__dropdown-status--aviso">
                     <AlertTriangle size={13} color="#fbbf24" />
-                    <span>Solo en este dispositivo</span>
+                    <span>{t('nav.soloEnEsteDispositivo')}</span>
                   </div>
                 ) : (
                   <div className="app-navbar__dropdown-status">
                     <ShieldCheck size={13} color="#10b981" />
-                    <span>Sincronizado en la nube</span>
+                    <span>{t('nav.sincronizadoEnLaNube')}</span>
                   </div>
                 )}
 
@@ -246,23 +251,22 @@ export function Navbar({
               {esAnonimo && (
                 <>
                   <p className="app-navbar__dropdown-nota">
-                    Tu progreso está guardado solo aquí. Si cierras sesión o cambias de
-                    dispositivo, no podrías recuperarlo. Vincula tu cuenta para conservarlo.
+                    {t('nav.notaAnonimo')}
                   </p>
                   <div className="app-navbar__vincular-row">
                   <button
                     onClick={() => { setIsUserMenuOpen(false); onLinkGoogle(); }}
                     className="app-navbar__vincular-btn"
-                    title="Vincular con Google"
-                    aria-label="Vincular con Google"
+                    title={t('nav.vincularGoogle')}
+                    aria-label={t('nav.vincularGoogle')}
                   >
                     <Google width={18} height={18} />
                   </button>
                   <button
                     onClick={() => { setIsUserMenuOpen(false); onOpenAuthModal(); }}
                     className="app-navbar__vincular-btn"
-                    title="Vincular con correo"
-                    aria-label="Vincular con correo"
+                    title={t('nav.vincularCorreo')}
+                    aria-label={t('nav.vincularCorreo')}
                   >
                     <Mail size={18} />
                   </button>
@@ -275,7 +279,7 @@ export function Navbar({
                 className="app-navbar__dropdown-item app-navbar__dropdown-item--danger"
               >
                 <LogOut size={15} />
-                <span>Cerrar Sesión</span>
+                <span>{t('nav.cerrarSesion')}</span>
               </button>
             </div>
           )}
@@ -286,8 +290,8 @@ export function Navbar({
           <button
             className={`app-navbar__menu-btn ${isNavMenuOpen ? 'is-active' : ''}`}
             onClick={() => { setIsNavMenuOpen((prev) => !prev); setIsUserMenuOpen(false); }}
-            title="Menú"
-            aria-label="Menú de navegación"
+            title={t('nav.menu')}
+            aria-label={t('nav.menuNavegacion')}
             aria-expanded={isNavMenuOpen}
           >
             {isNavMenuOpen ? <X size={17} strokeWidth={2.4} /> : <Menu size={17} strokeWidth={2.4} />}
@@ -300,7 +304,7 @@ export function Navbar({
               <div className="app-navbar__menu-section">
                 <div className="app-navbar__menu-section-label">
                   <Layers size={13} />
-                  <span>Generaciones</span>
+                  <span>{t('nav.generaciones')}</span>
                 </div>
 
                 <div className="app-navbar__menu-options">
@@ -338,7 +342,7 @@ export function Navbar({
                 >
                   <div className="action-btn-left">
                     <Smartphone size={15} color="#00F0E8" />
-                    <span>Instalar</span>
+                    <span>{t('nav.instalar')}</span>
                   </div>
                 </button>
 
@@ -348,7 +352,7 @@ export function Navbar({
                 >
                   <div className="action-btn-left">
                     <Download size={15} />
-                    <span>Respaldo</span>
+                    <span>{t('nav.respaldo')}</span>
                   </div>
                 </button>
                 </div>

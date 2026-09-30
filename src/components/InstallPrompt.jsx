@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Download, X, Share, PlusSquare, Smartphone, Check } from 'lucide-react';
 import { sounds } from '../utils/audio';
 import { safeStorage } from '../utils/safeStorage';
+import { t } from '../i18n';
 
 const STORAGE_KEY = 'spritedex_install_dismissed_v1';
 
@@ -92,7 +93,7 @@ export function InstallPrompt() {
         <button
           className="install-prompt-close"
           onClick={handleDismiss}
-          aria-label="Cerrar"
+          aria-label={t('instalar.cerrar')}
         >
           <X size={16} />
         </button>
@@ -102,13 +103,13 @@ export function InstallPrompt() {
             <Smartphone size={22} color="#00F0E8" />
           </div>
           <div>
-            <div className="install-prompt-badge">⚡ APP OFICIAL SPRITEDEX</div>
-            <h3 className="install-prompt-title">Instalar como Aplicación</h3>
+            <div className="install-prompt-badge">{t('instalar.badge')}</div>
+            <h3 className="install-prompt-title">{t('instalar.titulo')}</h3>
           </div>
         </div>
 
         <p className="install-prompt-desc">
-          Disfruta de la mejor experiencia a pantalla completa, carga instantánea y sin barras de navegador.
+          {t('instalar.descripcion')}
         </p>
 
         {isIOS ? (
@@ -116,45 +117,45 @@ export function InstallPrompt() {
             <div className="install-prompt-step">
               <span className="install-prompt-step-num">1</span>
               <span>
-                Toca el botón <strong>Compartir</strong> <Share size={14} className="inline-icon" /> en la barra de Safari.
+                {t('instalar.ios1Prefijo')} <strong>{t('instalar.ios1Boton')}</strong> <Share size={14} className="inline-icon" /> {t('instalar.ios1Sufijo')}
               </span>
             </div>
             <div className="install-prompt-step">
               <span className="install-prompt-step-num">2</span>
               <span>
-                Baja y selecciona <strong>"Agregar al inicio"</strong> <PlusSquare size={14} className="inline-icon" />.
+                {t('instalar.ios2Prefijo')} <strong>{t('instalar.ios2Boton')}</strong> <PlusSquare size={14} className="inline-icon" />.
               </span>
             </div>
             <div className="install-prompt-step">
               <span className="install-prompt-step-num">3</span>
-              <span>¡Listo! Ábrelo desde tu pantalla de inicio como una App.</span>
+              <span>{t('instalar.ios3')}</span>
             </div>
 
             <button className="install-prompt-btn-done" onClick={handleDismiss}>
               <Check size={16} />
-              <span>¡Entendido!</span>
+              <span>{t('instalar.entendido')}</span>
             </button>
           </div>
         ) : manualChromeGuide ? (
           <div className="install-prompt-ios-guide">
             <div className="install-prompt-step">
               <span className="install-prompt-step-num">1</span>
-              <span>Toca el menú de opciones <strong>(tres puntos ⋮)</strong> de tu navegador.</span>
+              <span>{t('instalar.chrome1Prefijo')} <strong>{t('instalar.chrome1Negrita')}</strong> {t('instalar.chrome1Sufijo')}</span>
             </div>
             <div className="install-prompt-step">
               <span className="install-prompt-step-num">2</span>
-              <span>Selecciona <strong>"Instalar aplicación"</strong> o <strong>"Agregar a pantalla principal"</strong>.</span>
+              <span>{t('instalar.chrome2Prefijo')} <strong>{t('instalar.chrome2A')}</strong> {t('instalar.chrome2O')} <strong>{t('instalar.chrome2B')}</strong>.</span>
             </div>
             <button className="install-prompt-btn-done" onClick={handleDismiss}>
               <Check size={16} />
-              <span>¡Entendido!</span>
+              <span>{t('instalar.entendido')}</span>
             </button>
           </div>
         ) : (
           <div className="install-prompt-android-actions">
             <button className="install-prompt-btn-install" onClick={handleInstallClick}>
               <Download size={16} />
-              <span>Instalar en mi Dispositivo</span>
+              <span>{t('instalar.instalarDispositivo')}</span>
             </button>
           </div>
         )}

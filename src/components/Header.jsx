@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { Liquid } from 'liquid-gooey';
 import { allSprites as defaultAllSprites } from '../data/spritesData';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { t } from '../i18n';
 
 export function Header({
   spritesPool,
@@ -349,7 +350,7 @@ export function Header({
                 <span className="hero__stat-of">/ {totalCount}</span>
               </div>
             </div>
-            <span className="hero__stat-label">ATRAPADOS</span>
+            <span className="hero__stat-label">{t('header.atrapados')}</span>
           </div>
 
           <div className="hero__actions" ref={actionsRef}>
@@ -358,13 +359,13 @@ export function Header({
                 <button
                   className="hero__btn hero__btn--primary"
                   onClick={onOpenCompareModal}
-                  title={isLiveConnected ? `Radar de Amigos conectado (${connectedFriendCode})` : "Radar de Amigos"}
+                  title={isLiveConnected ? t('header.radarConectado', { codigo: connectedFriendCode }) : t('header.radarAmigos')}
                   style={{ position: 'relative' }}
                 >
                   <Users size={16} className="hero__btn-icon" />
-                  <span className="hero__btn-text">Amigos</span>
+                  <span className="hero__btn-text">{t('header.amigos')}</span>
                   {isLiveConnected && (
-                    <span className="hero__live-indicator" title={`Conectado en vivo (${connectedFriendCode})`} />
+                    <span className="hero__live-indicator" title={t('header.conectadoEnVivo', { codigo: connectedFriendCode })} />
                   )}
                 </button>
                 <button
@@ -376,10 +377,10 @@ export function Header({
                   onTouchStart={() => {
                     import('../components/ShareImageModal');
                   }}
-                  title="Compartir Imagen"
+                  title={t('header.compartirImagenTitulo')}
                 >
                   <Share2 size={16} className="hero__btn-icon" />
-                  <span className="hero__btn-text">Compartir</span>
+                  <span className="hero__btn-text">{t('header.compartir')}</span>
                 </button>
               </>
             )}
@@ -401,7 +402,7 @@ export function Header({
                 <span className="hero__stat-of">/ {totalCount}</span>
               </div>
             </div>
-            <span className="hero__stat-label">MAXEADOS</span>
+            <span className="hero__stat-label">{t('header.maxeados')}</span>
           </div>
         </div>
       </div>
@@ -426,7 +427,7 @@ export function Header({
               <button
                 type="button"
                 className="pm-btn pm-sat"
-                aria-label="Radar de Amigos"
+                aria-label={t('header.radarAmigos')}
                 tabIndex={actionsOpen ? 0 : -1}
                 onClick={() => {
                   toggleActions();
@@ -454,7 +455,7 @@ export function Header({
               <button
                 type="button"
                 className="pm-btn pm-sat"
-                aria-label="Compartir imagen"
+                aria-label={t('header.compartirImagen')}
                 tabIndex={actionsOpen ? 0 : -1}
                 onClick={() => {
                   toggleActions();
@@ -483,7 +484,7 @@ export function Header({
                 type="button"
                 className="pm-btn pm-main"
                 aria-expanded={actionsOpen}
-                aria-label={actionsOpen ? 'Cerrar acciones' : 'Abrir acciones'}
+                aria-label={actionsOpen ? t('header.cerrarAcciones') : t('header.abrirAcciones')}
                 onClick={toggleActions}
               >
                 <span className="pm-main-icon-wrap">

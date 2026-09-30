@@ -1,14 +1,15 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, SlidersHorizontal, X, RotateCcw } from 'lucide-react';
-import { THEMES_LIST, THEME_NAMES_ES, ALL_SPRITES, FAMILY_NAMES_MAP } from '../data/spritesData';
+import { THEMES_LIST, ALL_SPRITES, pickFamilyName, pickThemeName } from '../data/spritesData';
+import { t } from '../i18n';
 import { safeStorage } from '../utils/safeStorage';
 
 const STATUS_OPTIONS = [
-  { value: 'all', label: 'Todos' },
-  { value: 'new', label: 'Nuevos' },
-  { value: 'owned', label: 'Atrapados' },
-  { value: 'missing', label: 'Faltantes' },
+  { value: 'all', labelKey: 'filtrosMovil.todos' },
+  { value: 'new', labelKey: 'filtrosMovil.nuevos' },
+  { value: 'owned', labelKey: 'filtrosMovil.atrapados' },
+  { value: 'missing', labelKey: 'filtrosMovil.faltantes' },
 ];
 
 export function MobileLiquidFilterBar({
@@ -166,7 +167,7 @@ export function MobileLiquidFilterBar({
     return uniqueFamilyIds.map(familyId => {
       const sprite = scopedSprites.find(s => s.familyId === familyId && s.variant === 'Basic')
         || scopedSprites.find(s => s.familyId === familyId);
-      const name = FAMILY_NAMES_MAP[familyId] || (familyId.charAt(0).toUpperCase() + familyId.slice(1));
+      const name = pickFamilyName(familyId);
       return {
         name,
         familyId,
@@ -179,7 +180,7 @@ export function MobileLiquidFilterBar({
   const availableThemes = useMemo(() => {
     const scopedSprites = ALL_SPRITES.filter(s => (activeGen === 0 || s.gen === activeGen) && (showUnreleased || !s.unreleased));
     const uniqueThemes = [...new Set(scopedSprites.map(s => s.variant))];
-    return THEMES_LIST.filter(t => uniqueThemes.includes(t));
+    return THEMES_LIST.filter(theme => uniqueThemes.includes(theme));
   }, [activeGen, showUnreleased]);
 
   // Auto-reset baseFilter if the selected variant becomes unavailable without showUnreleased
@@ -241,17 +242,17 @@ export function MobileLiquidFilterBar({
             onClick={handleExploreNew}
             role="button"
             tabIndex={0}
-            title="Toca para ver los nuevos espíritus"
+            title={t('filtrosMovil.tocaVerNuevos')}
           >
             <div className="mobile-new-coachmark__content">
               <span className="mobile-new-coachmark__sparkle">✨</span>
-              <span className="mobile-new-coachmark__text">¡{newSpiritsCount} Nuevos espíritus!</span>
-              <span className="mobile-new-coachmark__action">Ver</span>
+              <span className="mobile-new-coachmark__text">{t('filtrosMovil.nuevosEspiritus', { n: newSpiritsCount })}</span>
+              <span className="mobile-new-coachmark__action">{t('filtrosMovil.ver')}</span>
               <button
                 type="button"
                 className="mobile-new-coachmark__close"
                 onClick={handleDismissTooltip}
-                aria-label="Cerrar aviso"
+                aria-label={t('filtrosMovil.cerrarAviso')}
               >
                 <X size={12} />
               </button>
@@ -271,7 +272,7 @@ export function MobileLiquidFilterBar({
           <input
             ref={inputRef}
             type="text"
-            placeholder="Buscar espíritu..."
+            placeholder={t('filtrosMovil.buscarEspiritu')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsFocused(true)}
@@ -288,7 +289,7 @@ export function MobileLiquidFilterBar({
                 setSearchQuery('');
                 inputRef.current?.focus();
               }}
-              aria-label="Borrar búsqueda"
+              aria-label={t('filtrosMovil.borrarBusqueda')}
             >
               <X size={13} />
             </button>
@@ -303,7 +304,7 @@ export function MobileLiquidFilterBar({
             className={`mobile-glass-filter-btn ${activeFiltersCount > 0 ? 'is-active' : ''}`}
             onClick={handleOpen}
             aria-expanded={isOpen}
-            aria-label="Abrir filtros"
+            aria-label={t('filtrosMovil.abrirFiltros')}
           >
             <SlidersHorizontal size={16} className="mobile-glass-filter-icon" />
             {activeFiltersCount > 0 && (
@@ -324,7 +325,7 @@ export function MobileLiquidFilterBar({
               className="mobile-active-chip"
               onClick={() => setStatusFilter('all')}
             >
-              <span>{STATUS_OPTIONS.find(o => o.value === statusFilter)?.label}</span>
+              <span>{t(STATUS_OPTIONS.find(o => o.value === statusFilter)?.labelKey)}</span>
               <X size={11} />
             </button>
           )}
@@ -335,7 +336,7 @@ export function MobileLiquidFilterBar({
               className="mobile-active-chip"
               onClick={() => setBaseFilter('all')}
             >
-              <span>{THEME_NAMES_ES[baseFilter] || baseFilter}</span>
+              <span>{pickThemeName(baseFilter)}</span>
               <X size={11} />
             </button>
           )}
@@ -357,7 +358,7 @@ export function MobileLiquidFilterBar({
               className="mobile-active-chip"
               onClick={() => setShowUnreleased(false)}
             >
-              <span>No lanzados</span>
+              <span>{t('filtrosMovil.noLanzados')}</span>
               <X size={11} />
             </button>
           )}
@@ -367,7 +368,7 @@ export function MobileLiquidFilterBar({
             onClick={handleResetFilters}
           >
             <RotateCcw size={10} />
-            <span>Limpiar</span>
+            <span>{t('filtrosMovil.limpiar')}</span>
           </button>
         </div>
       )}
@@ -385,7 +386,7 @@ export function MobileLiquidFilterBar({
             style={{ pointerEvents: 'auto' }}
             role="dialog"
             aria-modal="true"
-            aria-label="Filtros de Espíritus"
+            aria-label={t('filtrosMovil.filtrosDeEspiritus')}
           >
             {/* Sheet Handle Bar */}
             <div className="mobile-liquid-sheet-handle-wrap" onClick={handleClose}>
@@ -396,16 +397,16 @@ export function MobileLiquidFilterBar({
             <div className="mobile-liquid-sheet-header">
               <div className="mobile-sheet-title-wrap">
                 <SlidersHorizontal size={18} className="mobile-sheet-icon" />
-                <h3 className="mobile-sheet-title">Filtros de Colección</h3>
+                <h3 className="mobile-sheet-title">{t('filtrosMovil.filtrosDeColeccion')}</h3>
                 {activeFiltersCount > 0 && (
-                  <span className="mobile-sheet-count-badge">{activeFiltersCount} activo{activeFiltersCount > 1 ? 's' : ''}</span>
+                  <span className="mobile-sheet-count-badge">{activeFiltersCount === 1 ? t('filtrosMovil.activo', { n: activeFiltersCount }) : t('filtrosMovil.activos', { n: activeFiltersCount })}</span>
                 )}
               </div>
               <button
                 type="button"
                 className="mobile-sheet-close-btn"
                 onClick={handleClose}
-                aria-label="Cerrar filtros"
+                aria-label={t('filtrosMovil.cerrarFiltros')}
               >
                 <X size={16} />
               </button>
@@ -415,7 +416,7 @@ export function MobileLiquidFilterBar({
             <div className="mobile-liquid-sheet-body">
               {/* Section 1: Estado de Colección */}
               <div className="mobile-sheet-section">
-                <label className="mobile-section-label">Estado</label>
+                <label className="mobile-section-label">{t('filtrosMovil.estado')}</label>
                 <div className="mobile-status-grid">
                   {STATUS_OPTIONS.map(opt => (
                     <button
@@ -424,7 +425,7 @@ export function MobileLiquidFilterBar({
                       className={`mobile-status-pill ${statusFilter === opt.value ? 'is-active' : ''}`}
                       onClick={() => handleStatusFilterSelect(opt.value)}
                     >
-                      {opt.label}
+                      {t(opt.labelKey)}
                     </button>
                   ))}
                 </div>
@@ -432,14 +433,14 @@ export function MobileLiquidFilterBar({
 
               {/* Section 2: Variantes y Temas */}
               <div className="mobile-sheet-section">
-                <label className="mobile-section-label">Variante / Tema</label>
+                <label className="mobile-section-label">{t('filtrosMovil.varianteTema')}</label>
                 <div className="mobile-variants-chip-grid">
                   <button
                     type="button"
                     className={`mobile-variant-chip ${baseFilter === 'all' ? 'is-active' : ''}`}
                     onClick={() => handleBaseFilterSelect('all')}
                   >
-                    Todas
+                    {t('filtrosMovil.todas')}
                   </button>
                   {availableThemes.map(theme => {
                     const isActive = baseFilter === theme;
@@ -450,7 +451,7 @@ export function MobileLiquidFilterBar({
                         className={`mobile-variant-chip ${isActive ? 'is-active' : ''}`}
                         onClick={() => handleBaseFilterSelect(theme)}
                       >
-                        {THEME_NAMES_ES[theme] || theme}
+                        {pickThemeName(theme)}
                       </button>
                     );
                   })}
@@ -459,14 +460,14 @@ export function MobileLiquidFilterBar({
 
               {/* Section 3: Familia / Sprite */}
               <div className="mobile-sheet-section">
-                <label className="mobile-section-label">Familia de Espíritu</label>
+                <label className="mobile-section-label">{t('filtrosMovil.familiaDeEspiritu')}</label>
                 <div className="mobile-sprites-chip-grid">
                   <button
                     type="button"
                     className={`mobile-sprite-chip ${spriteFilter === 'all' ? 'is-active' : ''}`}
                     onClick={() => handleSpriteFilterSelect('all')}
                   >
-                    <span className="mobile-sprite-chip-text">Todos</span>
+                    <span className="mobile-sprite-chip-text">{t('filtrosMovil.todos')}</span>
                   </button>
                   {availableFamiliesWithImages.map(family => {
                     const isActive = spriteFilter === family.name;
@@ -493,7 +494,7 @@ export function MobileLiquidFilterBar({
               {/* Section 4: Compact Subtle No Lanzados Toggle */}
               <div className="mobile-sheet-compact-toggle-row">
                 <label className="mobile-compact-toggle-label-wrap">
-                  <span className="mobile-compact-toggle-title">Mostrar No Lanzados</span>
+                  <span className="mobile-compact-toggle-title">{t('filtrosMovil.mostrarNoLanzados')}</span>
                   <input
                     type="checkbox"
                     checked={showUnreleased}
@@ -516,16 +517,16 @@ export function MobileLiquidFilterBar({
                   onClick={handleResetFilters}
                 >
                   <RotateCcw size={14} />
-                  <span>Limpiar</span>
+                  <span>{t('filtrosMovil.limpiar')}</span>
                 </button>
               )}
               <button
                 type="button"
                 className="mobile-sheet-btn-apply sdm-share__glitch-btn"
-                data-text="APLICAR FILTROS"
+                data-text={t('filtrosMovil.aplicarFiltrosMayus')}
                 onClick={handleClose}
               >
-                <span className="sdm-share__btn-text">Aplicar Filtros</span>
+                <span className="sdm-share__btn-text">{t('filtrosMovil.aplicarFiltros')}</span>
               </button>
             </div>
           </div>

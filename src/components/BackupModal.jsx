@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { X, Download, Upload, Trash2 } from 'lucide-react';
 import { sounds } from '../utils/audio';
 import { Modal } from './ui/Modal';
+import { t } from '../i18n';
 
 export function BackupModal({ userState, setUserState, onClose }) {
   const fileInputRef = useRef(null);
@@ -26,18 +27,18 @@ export function BackupModal({ userState, setUserState, onClose }) {
         if (typeof imported === 'object') {
           setUserState(imported);
           sounds.playLevelUp(5);
-          alert('¡Copia de seguridad importada con éxito!');
+          alert(t('backup.importada'));
           onClose();
         }
       } catch {
-        alert('El archivo no tiene un formato JSON válido.');
+        alert(t('backup.jsonInvalido'));
       }
     };
     reader.readAsText(file);
   };
 
   const handleReset = () => {
-    if (window.confirm('¿Estás seguro de reiniciar toda tu colección? Esta acción borrará todos tus Sprites marcados.')) {
+    if (window.confirm(t('backup.confirmarReinicio'))) {
       setUserState({});
       sounds.playBeep();
       onClose();
@@ -51,21 +52,21 @@ export function BackupModal({ userState, setUserState, onClose }) {
         </button>
 
         <h2 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '10px' }}>
-          Copia de Seguridad & Gestión
+          {t('backup.titulo')}
         </h2>
         <p style={{ color: '#94a3b8', fontSize: '0.88rem', marginBottom: '24px' }}>
-          Exporta un archivo JSON de respaldo para guardar tus datos o transfírelos a otro dispositivo.
+          {t('backup.descripcion')}
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
           <button className="btn-primary" onClick={handleExportJSON}>
             <Download size={18} />
-            <span>Exportar Copia de Seguridad (.json)</span>
+            <span>{t('backup.exportar')}</span>
           </button>
 
           <button className="btn-secondary" onClick={() => fileInputRef.current?.click()}>
             <Upload size={18} />
-            <span>Importar Archivo de Respaldo</span>
+            <span>{t('backup.importar')}</span>
           </button>
           <input
             type="file"
@@ -83,7 +84,7 @@ export function BackupModal({ userState, setUserState, onClose }) {
             style={{ width: '100%', color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.1)' }}
           >
             <Trash2 size={18} />
-            <span>Reiniciar Toda la Colección</span>
+            <span>{t('backup.reiniciar')}</span>
           </button>
         </div>
     </Modal>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, ShieldCheck, Cookie, Key, Globe, Check, Sliders, CheckCircle2 } from 'lucide-react';
 import { Modal } from './ui/Modal';
+import { t } from '../i18n';
 
 const LOCAL_STORAGE_PRIVACY_KEY = 'fortnite_sprites_privacy_notice_v1';
 
@@ -133,10 +134,10 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
         <div className="privacy-policy-modal__header" style={{ textAlign: 'center', paddingBottom: '12px' }}>
           <ShieldCheck size={40} color="#00F0E8" className="privacy-policy-modal__icon" />
           <h2 className="privacy-policy-modal__title" style={{ margin: '8px 0 4px', fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF' }}>
-            Centro de Privacidad & Cookies
+            {t('privacidad.politica.titulo')}
           </h2>
           <p className="privacy-policy-modal__subtitle" style={{ margin: 0, fontSize: '0.82rem', color: '#94A3B8' }}>
-            Controla y personaliza las tecnologías de almacenamiento en tu navegador.
+            {t('privacidad.politica.subtitulo')}
           </p>
 
           {/* Tab Navigation */}
@@ -169,7 +170,7 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
               }}
             >
               <Sliders size={14} />
-              <span>Configurar Preferencias</span>
+              <span>{t('privacidad.politica.tabPreferencias')}</span>
             </button>
 
             <button
@@ -193,7 +194,7 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
               }}
             >
               <Cookie size={14} />
-              <span>Guía de Transparencia</span>
+              <span>{t('privacidad.politica.tabTransparencia')}</span>
             </button>
           </div>
         </div>
@@ -215,13 +216,13 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
               }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <strong style={{ fontSize: '0.9rem', color: '#FFFFFF' }}>Cookies Esenciales & Sesión</strong>
+                    <strong style={{ fontSize: '0.9rem', color: '#FFFFFF' }}>{t('privacidad.politica.esencialesTitulo')}</strong>
                     <span style={{ fontSize: '0.68rem', fontWeight: 800, padding: '2px 6px', borderRadius: '6px', background: 'rgba(16, 185, 129, 0.15)', color: '#10B981' }}>
-                      Requeridas
+                      {t('privacidad.politica.esencialesBadge')}
                     </span>
                   </div>
                   <p style={{ margin: 0, fontSize: '0.78rem', color: '#94A3B8', lineHeight: 1.4 }}>
-                    Permiten el inicio de sesión con Google / Supabase y la sincronización segura de tu colección en la nube.
+                    {t('privacidad.politica.esencialesDesc')}
                   </p>
                 </div>
                 <div style={{
@@ -233,7 +234,7 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
                   fontWeight: 800,
                   flexShrink: 0
                 }}>
-                  Siempre Activo
+                  {t('privacidad.politica.siempreActivo')}
                 </div>
               </div>
 
@@ -250,13 +251,13 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
               }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <strong style={{ fontSize: '0.9rem', color: '#FFFFFF' }}>Análisis y Telemetría Anónima</strong>
+                    <strong style={{ fontSize: '0.9rem', color: '#FFFFFF' }}>{t('privacidad.politica.analiticaTitulo')}</strong>
                     <span style={{ fontSize: '0.68rem', fontWeight: 800, padding: '2px 6px', borderRadius: '6px', background: 'rgba(2, 132, 199, 0.15)', color: '#38BDF8' }}>
-                      Rendimiento
+                      {t('privacidad.politica.analiticaBadge')}
                     </span>
                   </div>
                   <p style={{ margin: 0, fontSize: '0.78rem', color: '#94A3B8', lineHeight: 1.4 }}>
-                    Registra datos anónimos de tráfico, tipo de dispositivo (iPhone/Android/PC) y visitas para mejorar la aplicación.
+                    {t('privacidad.politica.analiticaDesc')}
                   </p>
                 </div>
                 <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', flexShrink: 0, cursor: 'pointer' }}>
@@ -301,13 +302,13 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
               }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <strong style={{ fontSize: '0.9rem', color: '#FFFFFF' }}>Personalización Local</strong>
+                    <strong style={{ fontSize: '0.9rem', color: '#FFFFFF' }}>{t('privacidad.politica.personalizacionTitulo')}</strong>
                     <span style={{ fontSize: '0.68rem', fontWeight: 800, padding: '2px 6px', borderRadius: '6px', background: 'rgba(168, 85, 247, 0.15)', color: '#C084FC' }}>
-                      Experiencia
+                      {t('privacidad.politica.personalizacionBadge')}
                     </span>
                   </div>
                   <p style={{ margin: 0, fontSize: '0.78rem', color: '#94A3B8', lineHeight: 1.4 }}>
-                    Recuerda tu última pestaña seleccionada, filtros de búsqueda, modo de vista móvil y ajustes visuales.
+                    {t('privacidad.politica.personalizacionDesc')}
                   </p>
                 </div>
                 <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', flexShrink: 0, cursor: 'pointer' }}>
@@ -345,25 +346,25 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
               <div className="privacy-policy-section">
                 <h3 className="privacy-policy-section__title">
                   <Cookie size={16} color="#00F0E8" />
-                  <span>1. ¿Qué es el almacenamiento local (localStorage)?</span>
+                  <span>{t('privacidad.politica.seccion1Titulo')}</span>
                 </h3>
                 <p className="privacy-policy-section__text">
-                  El almacenamiento local (<code className="auth-modal__code">localStorage</code>) guarda de forma segura en tu propio dispositivo tus espíritus marcados y favoritos para que puedas jugar aun sin conexión a internet.
+                  {t('privacidad.politica.seccion1TextoA')}<code className="auth-modal__code">localStorage</code>{t('privacidad.politica.seccion1TextoB')}
                 </p>
               </div>
 
               <div className="privacy-policy-section">
                 <h3 className="privacy-policy-section__title">
                   <Key size={16} color="#34d399" />
-                  <span>2. Servicios y Tecnologías en la Nube</span>
+                  <span>{t('privacidad.politica.seccion2Titulo')}</span>
                 </h3>
                 <div className="privacy-policy-card">
                   <div className="privacy-policy-card__header">
-                    <strong>Autenticación de Google (OAuth) & Supabase</strong>
-                    <span className="privacy-policy-badge privacy-policy-badge--blue">Esencial</span>
+                    <strong>{t('privacidad.politica.seccion2CardTitulo')}</strong>
+                    <span className="privacy-policy-badge privacy-policy-badge--blue">{t('privacidad.politica.seccion2Badge')}</span>
                   </div>
                   <p className="privacy-policy-card__desc">
-                    Si inicias sesión, se utiliza una cookie de sesión encriptada para sincronizar tu colección entre tu móvil y PC sin acceder a tus contraseñas.
+                    {t('privacidad.politica.seccion2CardDesc')}
                   </p>
                 </div>
               </div>
@@ -371,12 +372,12 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
               <div className="privacy-policy-section">
                 <h3 className="privacy-policy-section__title">
                   <Globe size={16} color="#facc15" />
-                  <span>3. Cómo gestionar cookies en tu navegador</span>
+                  <span>{t('privacidad.politica.seccion3Titulo')}</span>
                 </h3>
                 <ul className="privacy-policy-list">
-                  <li><strong>Google Chrome:</strong> Configuración → Privacidad y seguridad → Cookies.</li>
-                  <li><strong>Safari (iOS / macOS):</strong> Ajustes → Safari → Privacidad y seguridad.</li>
-                  <li><strong>Firefox:</strong> Ajustes → Privacidad y seguridad → Cookies y datos.</li>
+                  <li><strong>Google Chrome:</strong> {t('privacidad.politica.navegadorChrome')}</li>
+                  <li><strong>Safari (iOS / macOS):</strong> {t('privacidad.politica.navegadorSafari')}</li>
+                  <li><strong>Firefox:</strong> {t('privacidad.politica.navegadorFirefox')}</li>
                 </ul>
               </div>
             </div>
@@ -402,7 +403,7 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
                   cursor: 'pointer'
                 }}
               >
-                Aceptar Todo
+                {t('privacidad.politica.aceptarTodo')}
               </button>
 
               <button
@@ -428,12 +429,12 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
                 {savedSuccess ? (
                   <>
                     <CheckCircle2 size={16} color="#060714" />
-                    <span>¡Guardado!</span>
+                    <span>{t('privacidad.politica.guardado')}</span>
                   </>
                 ) : (
                   <>
                     <Check size={16} />
-                    <span>Guardar Preferencias</span>
+                    <span>{t('privacidad.politica.guardarPreferencias')}</span>
                   </>
                 )}
               </button>
@@ -454,7 +455,7 @@ export function PrivacyPolicyModal({ onClose, initialTab = 'preferences' }) {
                 cursor: 'pointer'
               }}
             >
-              Configurar Mis Preferencias
+              {t('privacidad.politica.configurarPreferencias')}
             </button>
           )}
         </div>

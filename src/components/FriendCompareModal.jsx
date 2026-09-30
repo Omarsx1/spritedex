@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { X, Users, Copy, Check, ArrowDownLeft, ArrowUpRight, Handshake, Radio, Zap, MessageSquare } from 'lucide-react';
+import { X, Users, Copy, Check, ArrowDownLeft, ArrowUpRight, Handshake, Radio, Zap, MessageSquare, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { ALL_SPRITES, getSpriteCardStyle } from '../data/spritesData';
+import { ALL_SPRITES, getSpriteCardStyle, pickName } from '../data/spritesData';
 import { decodeCollectionState } from '../utils/shareLink';
 import { generatePermanentFriendUrl, normalizeFriendCode } from '../utils/friendCode';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 import { Modal } from './ui/Modal';
 import { useFriendRequests } from '../hooks/useFriendRequests';
+import { t } from '../i18n';
+import { dominioParaCompartir } from '../utils/canvasExporter';
 
 export function FriendCompareModal({
   userState,
@@ -85,7 +87,7 @@ export function FriendCompareModal({
   const handleEnviarSolicitud = async () => {
     const codigo = codigoSolicitud.trim();
     if (!codigo) return;
-    setAvisoSolicitud('Enviando…');
+    setAvisoSolicitud(t('comparar.enviando'));
     const res = await radar.enviar(codigo, myFriendCode);
     if (res.error) {
       setAvisoSolicitud(res.error);
@@ -93,7 +95,7 @@ export function FriendCompareModal({
     }
     sounds.playBeep();
     setCodigoSolicitud('');
-    setAvisoSolicitud('Solicitud enviada a SDEX ' + String(res.codigo || '').replace(/^SDEX-/i, '') + '. Le llegará cuando abra el radar.');
+    setAvisoSolicitud(t('comparar.solicitudEnviada', { codigo: String(res.codigo || '').replace(/^SDEX-/i, '') }));
   };
 
   // Ver la colección de un amigo aceptado: reusa el mismo camino que conectar por
@@ -102,7 +104,7 @@ export function FriendCompareModal({
     if (!codigo || !onConnectFriendCode) return;
     const ok = await onConnectFriendCode(codigo);
     if (ok === false) {
-      setErrorMessage('No se pudo cargar esa colección. Prueba otra vez en un momento.');
+      setErrorMessage(t('comparar.errorCargarColeccion'));
       return;
     }
     // Se queda dentro del radar a proposito: al conectar aparecen abajo las listas de
@@ -118,7 +120,7 @@ export function FriendCompareModal({
     const code = normalizeFriendCode(raw);
 
     if (myFriendCode && code.toUpperCase() === myFriendCode.toUpperCase()) {
-      setErrorMessage('¡Ese es tu propio código de amigo! Ingresa el código de un amigo para ver o comparar su colección.');
+      setErrorMessage(t('comparar.errorCodigoPropio'));
       return;
     }
 
@@ -151,7 +153,7 @@ export function FriendCompareModal({
       const decoded = decodeCollectionState(legacyCode);
       if (Object.keys(decoded).length > 0) {
         found = true;
-        if (onLoadFriendState) onLoadFriendState(decoded, 'ENLACE');
+        if (onLoadFriendState) onLoadFriendState(decoded, t('comparar.etiquetaEnlace'));
         setFriendInput('');
         setActiveTab('friendAll');
         sounds.playToggle(true, 2);
@@ -161,7 +163,7 @@ export function FriendCompareModal({
     setIsConnecting(false);
 
     if (!found) {
-      setErrorMessage(`No se encontró ninguna colección con el código "${code}". Asegúrate de que tu amigo tenga su Spritedex abierto.`);
+      setErrorMessage(t('comparar.errorNoEncontrado', { codigo: code }));
     }
   };
 
@@ -224,32 +226,32 @@ export function FriendCompareModal({
 
   const handleCopyTradePlan = () => {
     sounds.playBeep();
-    let text = `🎮 ¡RADAR DE AMIGOS - FORTNITE SPRITEDEX! ⚡\n`;
-    text += `👥 Sincronizados: Mi Código (${myFriendCode}) ⇄ Amigo (${connectedFriendCode || 'Amigo'})\n\n`;
+    let text = t('comparar.planTitulo') + '\n';
+    text += t('comparar.planSincronizados', { mio: myFriendCode, suyo: connectedFriendCode || t('comparar.amigo') }) + '\n\n';
 
     if (friendOwnedList.length > 0) {
-      text += `🌟 TU AMIGO TIENE ATAPADOS ${friendOwnedList.length} ESPÍRITUS EN TOTAL.\n\n`;
+      text += t('comparar.planAmigoTiene', { n: friendOwnedList.length }) + '\n\n';
     }
 
     if (friendToMeList.length > 0) {
-      text += `🟢 TE FALTAN Y TU AMIGO TIENE (${friendToMeList.length}):\n`;
+      text += t('comparar.planTeFaltan', { n: friendToMeList.length }) + '\n';
       friendToMeList.slice(0, 8).forEach(s => {
-        text += `• ${s.fullName}\n`;
+        text += `• ${pickName(s)}\n`;
       });
-      if (friendToMeList.length > 8) text += `... y ${friendToMeList.length - 8} más.\n`;
+      if (friendToMeList.length > 8) text += t('comparar.planMas', { n: friendToMeList.length - 8 }) + '\n';
       text += `\n`;
     }
 
     if (meToFriendList.length > 0) {
-      text += `🟣 TU AMIGO NECESITA Y TÚ TIENES (${meToFriendList.length}):\n`;
+      text += t('comparar.planLeFaltan', { n: meToFriendList.length }) + '\n';
       meToFriendList.slice(0, 8).forEach(s => {
-        text += `• ${s.fullName}\n`;
+        text += `• ${pickName(s)}\n`;
       });
-      if (meToFriendList.length > 8) text += `... y ${meToFriendList.length - 8} más.\n`;
+      if (meToFriendList.length > 8) text += t('comparar.planMas', { n: meToFriendList.length - 8 }) + '\n';
       text += `\n`;
     }
 
-    text += `¡Juguemos en Fortnite para completar la colección! 🏆\nhttps://spritedex.com/?code=${myFriendCode}`;
+    text += t('comparar.planCierre', { enlace: dominioParaCompartir() + '?code=' + myFriendCode });
 
     navigator.clipboard.writeText(text);
     setCopiedTradePlan(true);
@@ -272,13 +274,13 @@ export function FriendCompareModal({
               <Users size={18} color="#00F0E8" />
             </div>
             <div>
-              <h2 className="sdm-share-pro__title">Radar de Amigos</h2>
+              <h2 className="sdm-share-pro__title">{t('comparar.titulo')}</h2>
               <p className="sdm-share-pro__subtitle">
-                {isLiveConnected ? `Conectado en vivo con ${connectedFriendCode}` : 'Sincroniza y compara en tiempo real con amigos'}
+                {isLiveConnected ? t('comparar.conectadoEnVivo', { nombre: connectedFriendCode }) : t('comparar.subtitulo')}
               </p>
             </div>
           </div>
-          <button className="sdm-share-pro__close" onClick={handleClose} aria-label="Cerrar modal">
+          <button className="sdm-share-pro__close" onClick={handleClose} aria-label={t('comparar.cerrarModal')}>
             <X size={18} />
           </button>
         </div>
@@ -292,12 +294,12 @@ export function FriendCompareModal({
             {/* 1. Tu Código de Amigo Permanente */}
             <div className="sdm-compare__card sdm-compare__card--my-code">
               <div className="sdm-compare__card-title">
-                <span>⭐ TU CÓDIGO DE AMIGO</span>
+                <span>{t('comparar.tuCodigoDeAmigo')}</span>
               </div>
               <div className="sdm-compare__code-row">
                 <span className="sdm-compare__code-plate">
                   <span className="sdm-compare__code-prefix">SDEX</span>
-                  <span className="sdm-compare__code-badge" title="Tu codigo de amigo">
+                  <span className="sdm-compare__code-badge" title={t('comparar.titleTuCodigo')}>
                     {codigoCorto || '????'}
                   </span>
                 </span>
@@ -305,18 +307,18 @@ export function FriendCompareModal({
                   <button
                     onClick={handleCopyCode}
                     className={`sdm-compare__btn-copy ${copiedCode ? 'sdm-compare__btn-copy--done' : ''}`}
-                    title="Copiar solo el código"
+                    title={t('comparar.titleCopiarCodigo')}
                   >
                     {copiedCode ? <Check size={13} /> : <Copy size={13} />}
-                    <span>{copiedCode ? '¡Copiado!' : 'Código'}</span>
+                    <span>{copiedCode ? t('comparar.copiado') : t('comparar.codigo')}</span>
                   </button>
                   <button
                     onClick={handleCopyPermanentLink}
                     className={`sdm-compare__btn-copy sdm-compare__btn-copy--link ${copiedLink ? 'sdm-compare__btn-copy--done' : ''}`}
-                    title="Copiar enlace directo permanente"
+                    title={t('comparar.titleCopiarEnlace')}
                   >
                     {copiedLink ? <Check size={13} color="#10b981" /> : <Zap size={13} color="#00F0E8" />}
-                    <span>{copiedLink ? '¡Enlace!' : 'Enlace'}</span>
+                    <span>{copiedLink ? t('comparar.enlaceCopiado') : t('comparar.enlace')}</span>
                   </button>
                 </div>
               </div>
@@ -327,9 +329,9 @@ export function FriendCompareModal({
               <div className="sdm-compare__card-header-row">
                 <div className="sdm-compare__card-title">
                   {isLiveConnected ? (
-                    <span style={{ color: '#10b981' }}>🟢 CONECTADO EN VIVO</span>
+                    <span style={{ color: '#10b981' }}>{t('comparar.conectadoEnVivoLabel')}</span>
                   ) : (
-                    <span>🔗 CONECTAR ENLACE O AMIGO</span>
+                    <span>{t('comparar.conectarEnlaceOAmigo')}</span>
                   )}
                 </div>
                 {isLiveConnected && onDisconnectFriend && (
@@ -337,7 +339,7 @@ export function FriendCompareModal({
                     onClick={onDisconnectFriend}
                     className="sdm-compare__btn-disconnect"
                   >
-                    Desconectar
+                    {t('comparar.desconectar')}
                   </button>
                 )}
               </div>
@@ -345,7 +347,7 @@ export function FriendCompareModal({
               {isLiveConnected ? (
                 <div className="sdm-compare__connected-info">
                   <div className="sdm-compare__connected-target">
-                    <span>Amigo: <strong>{connectedFriendCode}</strong></span>
+                    <span>{t('comparar.amigo')}: <strong>{connectedFriendCode}</strong></span>
                     <span style={{
                       marginLeft: '8px',
                       background: 'rgba(0, 240, 232, 0.15)',
@@ -356,18 +358,18 @@ export function FriendCompareModal({
                       fontSize: '0.72rem',
                       fontWeight: 800
                     }}>
-                      {friendOwnedList.length} espíritus
+                      {t('comparar.espiritusContados', { n: friendOwnedList.length })}
                     </span>
                   </div>
                   <span className="sdm-compare__connected-hint">
-                    ⚡ Las capturas y niveles de tu amigo se actualizan al instante.
+                    {t('comparar.hintActualizacion')}
                   </span>
                 </div>
               ) : (
                 <div className="sdm-compare__input-row">
                   <input
                     type="text"
-                    placeholder="Código (ej: SDEX-XXXX o XXXX)..."
+                    placeholder={t('comparar.placeholderCodigo')}
                     value={friendInput}
                     onChange={(e) => {
                       setFriendInput(e.target.value);
@@ -381,7 +383,7 @@ export function FriendCompareModal({
                     disabled={isConnecting}
                     className="sdm-compare__btn-connect"
                   >
-                    {isConnecting ? <RefreshCw size={14} className="animate-spin" /> : 'Ver Lista'}
+                    {isConnecting ? <RefreshCw size={14} className="animate-spin" /> : t('comparar.verLista')}
                   </button>
                 </div>
               )}
@@ -408,10 +410,10 @@ export function FriendCompareModal({
           {/* ═══ RADAR DE AMIGOS: solicitudes con aprobación y lista de amigos ═══ */}
           <div className="sdm-friends">
             <div className="sdm-friends__head">
-              <span className="sdm-friends__title"><Users size={14} /> RADAR DE AMIGOS</span>
+              <span className="sdm-friends__title"><Users size={14} /> {t('comparar.radarDeAmigos')}</span>
               {onOpenFriendsPage && (
                 <button type="button" className="sdm-friends__refresh" onClick={onOpenFriendsPage}>
-                  Página completa
+                  {t('comparar.paginaCompleta')}
                 </button>
               )}
             </div>
@@ -420,7 +422,7 @@ export function FriendCompareModal({
               <input
                 type="text"
                 className="sdm-friends__input"
-                placeholder="Código de tu amigo (ej: 2KD4)"
+                placeholder={t('comparar.placeholderCodigoAmigo')}
                 value={codigoSolicitud}
                 onChange={(e) => setCodigoSolicitud(e.target.value.toUpperCase())}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleEnviarSolicitud(); }}
@@ -431,17 +433,17 @@ export function FriendCompareModal({
                 onClick={handleEnviarSolicitud}
                 disabled={!codigoSolicitud.trim()}
               >
-                Enviar solicitud
+                {t('comparar.enviarSolicitud')}
               </button>
             </div>
             {avisoSolicitud && <p className="sdm-friends__aviso">{avisoSolicitud}</p>}
             {!radar.haySesion && (
-              <p className="sdm-friends__aviso">Las solicitudes necesitan una sesión: vincula tu cuenta para usarlas.</p>
+              <p className="sdm-friends__aviso">{t('comparar.necesitaSesion')}</p>
             )}
 
             {radar.recibidas.length > 0 && (
               <div className="sdm-friends__group">
-                <span className="sdm-friends__label">SOLICITUDES ({radar.recibidas.length})</span>
+                <span className="sdm-friends__label">{t('comparar.solicitudesConteo', { n: radar.recibidas.length })}</span>
                 {radar.recibidas.map((s) => (
                   <div key={s.id} className="sdm-friends__row">
                     <span className="sdm-friends__plate">
@@ -449,8 +451,8 @@ export function FriendCompareModal({
                       <span className="sdm-friends__code">{String(s.from_code || '').replace(/^SDEX-/i, '')}</span>
                     </span>
                     <div className="sdm-friends__actions">
-                      <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => { sounds.playBeep(); radar.aceptar(s.id); }}>Aceptar</button>
-                      <button type="button" className="sdm-friends__btn" onClick={() => radar.rechazar(s.id)}>Rechazar</button>
+                      <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => { sounds.playBeep(); radar.aceptar(s.id); }}>{t('comparar.aceptar')}</button>
+                      <button type="button" className="sdm-friends__btn" onClick={() => radar.rechazar(s.id)}>{t('comparar.rechazar')}</button>
                     </div>
                   </div>
                 ))}
@@ -458,9 +460,9 @@ export function FriendCompareModal({
             )}
 
             <div className="sdm-friends__group">
-              <span className="sdm-friends__label">AMIGOS ({radar.amigos.length})</span>
+              <span className="sdm-friends__label">{t('comparar.amigosConteo', { n: radar.amigos.length })}</span>
               {radar.amigos.length === 0 ? (
-                <p className="sdm-friends__hint">Todavía no tienes amigos aceptados. Envía una solicitud con el código de alguien y aparecerá aquí cuando la acepte.</p>
+                <p className="sdm-friends__hint">{t('comparar.sinAmigos')}</p>
               ) : radar.amigos.map((a) => {
                 const codigoAmigo = radar.codigoDeAmigo(a);
                 return (
@@ -470,8 +472,8 @@ export function FriendCompareModal({
                       <span className="sdm-friends__code">{String(codigoAmigo || '').replace(/^SDEX-/i, '')}</span>
                     </span>
                     <div className="sdm-friends__actions">
-                      <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => handleVerColeccion(codigoAmigo)}>Ver colección</button>
-                      <button type="button" className="sdm-friends__btn sdm-friends__btn--danger" onClick={() => radar.borrar(a.id)}>Quitar</button>
+                      <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => handleVerColeccion(codigoAmigo)}>{t('comparar.verColeccion')}</button>
+                      <button type="button" className="sdm-friends__btn sdm-friends__btn--danger" onClick={() => radar.borrar(a.id)}>{t('comparar.quitar')}</button>
                     </div>
                   </div>
                 );
@@ -480,7 +482,7 @@ export function FriendCompareModal({
 
             {radar.enviadas.length > 0 && (
               <div className="sdm-friends__group">
-                <span className="sdm-friends__label">ENVIADAS ({radar.enviadas.length})</span>
+                <span className="sdm-friends__label">{t('comparar.enviadasConteo', { n: radar.enviadas.length })}</span>
                 {radar.enviadas.map((s) => (
                   <div key={s.id} className="sdm-friends__row">
                     <span className="sdm-friends__plate">
@@ -488,8 +490,8 @@ export function FriendCompareModal({
                       <span className="sdm-friends__code">{String(s.to_code || '').replace(/^SDEX-/i, '')}</span>
                     </span>
                     <div className="sdm-friends__actions">
-                      <span className="sdm-friends__pendiente">Esperando aprobación</span>
-                      <button type="button" className="sdm-friends__btn" onClick={() => radar.borrar(s.id)}>Cancelar</button>
+                      <span className="sdm-friends__pendiente">{t('comparar.esperandoAprobacion')}</span>
+                      <button type="button" className="sdm-friends__btn" onClick={() => radar.borrar(s.id)}>{t('comparar.cancelar')}</button>
                     </div>
                   </div>
                 ))}
@@ -503,9 +505,9 @@ export function FriendCompareModal({
               <div className="sdm-compare__radar-icon">
                 <Radio size={32} color="#00F0E8" />
               </div>
-              <h3 className="sdm-compare__waiting-title">Esperando Conexión con un Amigo</h3>
+              <h3 className="sdm-compare__waiting-title">{t('comparar.esperandoConexion')}</h3>
               <p className="sdm-compare__waiting-text">
-                Ingresa el <strong>Código de Amigo</strong> (ej: <code>SDEX-XXXX</code> o <code>XXXX</code>) para ver su lista y sincronizar en tiempo real.
+                {t('comparar.esperandoEntrada')}<strong>{t('comparar.codigoDeAmigo')}</strong>{t('comparar.esperandoEjemploA')}<code>SDEX-XXXX</code>{t('comparar.esperandoEjemploB')}<code>XXXX</code>{t('comparar.esperandoFinal')}
               </p>
             </div>
           ) : (
@@ -540,7 +542,7 @@ export function FriendCompareModal({
                   >
                     <Users size={16} color="#a855f7" />
                     <span>
-                      Ver su colección completa en la app
+                      {t('comparar.verColeccionCompleta')}
                     </span>
                   </button>
                 </div>
@@ -553,13 +555,13 @@ export function FriendCompareModal({
                     className={`sdm-compare__season-pill ${seasonFilter === 'active' ? 'sdm-compare__season-pill--active' : ''}`}
                     onClick={() => setSeasonFilter('active')}
                   >
-                    ⚡ Gen 2 ({ALL_SPRITES.filter(s => s.gen === 2).length})
+                    {t('comparar.gen2', { n: ALL_SPRITES.filter(s => s.gen === 2).length })}
                   </button>
                   <button
                     className={`sdm-compare__season-pill ${seasonFilter === 'all' ? 'sdm-compare__season-pill--active' : ''}`}
                     onClick={() => setSeasonFilter('all')}
                   >
-                    🌐 Todas ({ALL_SPRITES.length})
+                    {t('comparar.todas', { n: ALL_SPRITES.length })}
                   </button>
                 </div>
 
@@ -568,7 +570,7 @@ export function FriendCompareModal({
                   className="sdm-compare__btn-trade-plan"
                 >
                   {copiedTradePlan ? <Check size={14} color="#4ade80" /> : <MessageSquare size={14} />}
-                  <span>{copiedTradePlan ? '¡Copiado!' : 'Resumen'}</span>
+                  <span>{copiedTradePlan ? t('comparar.copiado') : t('comparar.resumen')}</span>
                 </button>
               </div>
 
@@ -579,7 +581,7 @@ export function FriendCompareModal({
                   className={`sdm-compare__tab ${activeTab === 'friendAll' ? 'sdm-compare__tab--active-purple' : ''}`}
                 >
                   <Users size={15} />
-                  <span>Lista Amigo ({friendOwnedList.length})</span>
+                  <span>{t('comparar.listaAmigo', { n: friendOwnedList.length })}</span>
                 </button>
 
                 <button
@@ -587,7 +589,7 @@ export function FriendCompareModal({
                   className={`sdm-compare__tab ${activeTab === 'friendToMe' ? 'sdm-compare__tab--active-green' : ''}`}
                 >
                   <ArrowDownLeft size={15} />
-                  <span>Te Faltan ({friendToMeList.length})</span>
+                  <span>{t('comparar.tabTeFaltan', { n: friendToMeList.length })}</span>
                 </button>
 
                 <button
@@ -595,7 +597,7 @@ export function FriendCompareModal({
                   className={`sdm-compare__tab ${activeTab === 'meToFriend' ? 'sdm-compare__tab--active-blue' : ''}`}
                 >
                   <ArrowUpRight size={15} />
-                  <span>Le Faltan ({meToFriendList.length})</span>
+                  <span>{t('comparar.tabLeFaltan', { n: meToFriendList.length })}</span>
                 </button>
 
                 <button
@@ -603,17 +605,17 @@ export function FriendCompareModal({
                   className={`sdm-compare__tab ${activeTab === 'common' ? 'sdm-compare__tab--active-gold' : ''}`}
                 >
                   <Handshake size={15} />
-                  <span>En Común ({commonList.length})</span>
+                  <span>{t('comparar.tabEnComun', { n: commonList.length })}</span>
                 </button>
               </div>
 
               {/* Sprites Grid */}
               {activeList.length === 0 ? (
                 <div className="sdm-compare__empty">
-                  {activeTab === 'friendAll' && 'Tu amigo aún no tiene espíritus registrados en esta categoría.'}
-                  {activeTab === 'friendToMe' && '🎉 ¡Genial! Tu amigo no tiene ningún espíritu que te falte en esta categoría. ¡Tienes todos los que él tiene!'}
-                  {activeTab === 'meToFriend' && '🤝 Tu amigo ya tiene todos los espíritus que tú posees en esta categoría.'}
-                  {activeTab === 'common' && 'Aún no tienen espíritus en común en esta categoría.'}
+                  {activeTab === 'friendAll' && t('comparar.vacioFriendAll')}
+                  {activeTab === 'friendToMe' && t('comparar.vacioFriendToMe')}
+                  {activeTab === 'meToFriend' && t('comparar.vacioMeToFriend')}
+                  {activeTab === 'common' && t('comparar.vacioComun')}
                 </div>
               ) : (
                 <div className="sdm-compare__grid">
@@ -636,38 +638,38 @@ export function FriendCompareModal({
                       >
                         <img
                           src={sprite.image}
-                          alt={sprite.fullName}
+                          alt={pickName(sprite)}
                           className="sdm-compare__sprite-img"
                         />
-                        <div className="sdm-compare__sprite-name" title={sprite.fullName}>
-                          {sprite.fullName}
+                        <div className="sdm-compare__sprite-name" title={pickName(sprite)}>
+                          {pickName(sprite)}
                         </div>
 
                         <div className="sdm-compare__sprite-levels">
                           {activeTab === 'friendAll' && (
                             <>
                               <div style={{ color: '#00F0E8', fontWeight: 800 }}>
-                                Amigo: {isFriendMastered ? 'MAX ★5' : `Niv.${friendLvl}`}
+                                {t('comparar.amigo')}: {isFriendMastered ? 'MAX ★5' : t('comparar.niv', { n: friendLvl })}
                               </div>
                               <div style={{ color: isMine ? '#4ade80' : '#f87171', fontSize: '0.62rem', fontWeight: 700 }}>
-                                {isMine ? `✓ En tu Dex (${isMyMastered ? 'MAX' : `Niv.${myLvl}`})` : '✕ Te falta'}
+                                {isMine ? t('comparar.enTuDex', { nivel: isMyMastered ? 'MAX' : t('comparar.niv', { n: myLvl }) }) : t('comparar.teFalta')}
                               </div>
                             </>
                           )}
                           {activeTab === 'friendToMe' && (
                             <>
-                              <div style={{ color: '#00F0E8', fontWeight: 700 }}>Amigo: Niv.{friendLvl}</div>
-                              <div style={{ color: '#f87171', fontSize: '0.62rem' }}>✕ Te falta</div>
+                              <div style={{ color: '#00F0E8', fontWeight: 700 }}>{t('comparar.amigo')}: {t('comparar.niv', { n: friendLvl })}</div>
+                              <div style={{ color: '#f87171', fontSize: '0.62rem' }}>{t('comparar.teFalta')}</div>
                             </>
                           )}
                           {activeTab === 'meToFriend' && (
                             <>
-                              <div style={{ color: '#38bdf8', fontWeight: 700 }}>Tú: Niv.{myLvl}</div>
-                              <div style={{ color: '#94a3b8', fontSize: '0.62rem' }}>Amigo lo necesita</div>
+                              <div style={{ color: '#38bdf8', fontWeight: 700 }}>{t('comparar.tu')}: {t('comparar.niv', { n: myLvl })}</div>
+                              <div style={{ color: '#94a3b8', fontSize: '0.62rem' }}>{t('comparar.amigoLoNecesita')}</div>
                             </>
                           )}
                           {activeTab === 'common' && (
-                            <div>Tú: N.{myLvl} · Amigo: N.{friendLvl}</div>
+                            <div>{t('comparar.tuYAmigo', { mio: myLvl, suyo: friendLvl })}</div>
                           )}
                         </div>
 
@@ -681,7 +683,7 @@ export function FriendCompareModal({
                             }}
                             className="sdm-compare__sprite-mark-btn"
                           >
-                            + Marcar en mi Dex
+                            {t('comparar.marcarEnMiDex')}
                           </button>
                         )}
                         {isMine && activeTab === 'friendAll' && (
@@ -695,7 +697,7 @@ export function FriendCompareModal({
                             fontWeight: 800,
                             border: '1px solid rgba(34, 197, 94, 0.3)'
                           }}>
-                            ✓ Registrado
+                            {t('comparar.registrado')}
                           </div>
                         )}
                       </div>

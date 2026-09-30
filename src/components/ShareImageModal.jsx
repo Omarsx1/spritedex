@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { X, Download, Share2, Copy, Check, Sparkles } from 'lucide-react';
+import { pickName } from '../data/spritesData';
 import { generateSpritedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, marcarEsperaActiva, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import { Modal } from './ui/Modal';
 import gsap from 'gsap';
+import { t } from '../i18n';
 
 // Caché persistente global para previews de plantillas generadas (0ms instantáneo entre aperturas y formatos)
 const globalTemplatePreviewCache = new Map();
@@ -214,7 +216,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           }
         });
       }
-      if (showPerf) setPerf((previo) => ({ ...(previo || {}), cache: 'memoria', pasadaMs: Date.now() - inicioPase, revisitas: (previo?.revisitas || 0) + 1 }));
+      if (showPerf) setPerf((previo) => ({ ...(previo || {}), cache: t('compartir.cacheMemoria'), pasadaMs: Date.now() - inicioPase, revisitas: (previo?.revisitas || 0) + 1 }));
       return;
     }
 
@@ -237,7 +239,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         setCachedBlob(guardada.blob);
         setCachedFile(guardada.file);
         setIsGenerating(false);
-        if (showPerf) setPerf((previo) => ({ ...(previo || {}), cache: 'disco', pasadaMs: Date.now() - inicioPase, revisitas: (previo?.revisitas || 0) + 1 }));
+        if (showPerf) setPerf((previo) => ({ ...(previo || {}), cache: t('compartir.cacheDisco'), pasadaMs: Date.now() - inicioPase, revisitas: (previo?.revisitas || 0) + 1 }));
         return;
       }
 
@@ -257,7 +259,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           if (showPerf) {
             setPerf((previo) => ({
               ...(previo || {}),
-              cache: 'no',
+              cache: t('compartir.cacheNo'),
               pasadaMs: Date.now() - inicioPase,
               generaciones: (previo?.generaciones || 0) + 1,
               ultima: {
@@ -304,28 +306,28 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     const missing = spritesList.filter(s => !userState[s.id]?.owned);
 
     const scopeLabels = {
-      all: '🌐 Colección Completa Override',
-      new: '✨ Nuevos Espíritus',
-      filtered: `🔍 Filtrado (${activeFiltersLabel})`,
-      owned: '✔️ Solo Desencriptados',
-      missing: '❌ Solo Faltantes / Bloqueados',
-      mastered: '⭐ Solo Maxeados'
+      all: t('compartir.scopeCompleta'),
+      new: t('compartir.scopeNuevos'),
+      filtered: t('compartir.scopeFiltrado', { filtro: activeFiltersLabel }),
+      owned: t('compartir.scopeDesencriptados'),
+      missing: t('compartir.scopeFaltantes'),
+      mastered: t('compartir.scopeMaxeados')
     };
 
-    let text = `🎮 ¡MI COLECCIÓN SPRITEDEX OVERRIDE / GLITCH! 🏆\n`;
-    text += `📋 Vista: ${scopeLabels[scope] || 'Plantilla'}\n`;
-    text += `📊 Desencriptados: ${owned}/${total} (${total > 0 ? Math.round((owned / total) * 100) : 0}%)\n`;
-    text += `⭐ Maxeados: ${mastered}\n\n`;
+    let text = t('compartir.textoTitulo') + '\n';
+    text += t('compartir.textoVista', { vista: scopeLabels[scope] || t('compartir.plantilla') }) + '\n';
+    text += t('compartir.textoDesencriptados', { owned, total, pct: total > 0 ? Math.round((owned / total) * 100) : 0 }) + '\n';
+    text += t('compartir.textoMaxeados', { n: mastered }) + '\n\n';
 
     if (missing.length > 0) {
-      text += `❌ BUSCO PARA INTERCAMBIAR (${missing.length} faltantes):\n`;
+      text += t('compartir.textoBusco', { n: missing.length }) + '\n';
       missing.slice(0, 10).forEach(m => {
-        text += `- ${m.fullName} (${m.dropChanceDisplay || m.dropChance})\n`;
+        text += `- ${pickName(m)} (${m.dropChanceDisplay || m.dropChance})\n`;
       });
-      if (missing.length > 10) text += `... y ${missing.length - 10} más.\n`;
-      text += `\n📩 ¿Tienes alguno para cambiar? ¡Escríbeme!\n`;
+      if (missing.length > 10) text += t('compartir.textoMas', { n: missing.length - 10 }) + '\n';
+      text += '\n' + t('compartir.textoIntercambio') + '\n';
     } else {
-      text += `🎉 ¡Todos los espíritus de esta plantilla han sido hackeados al 100%!\n`;
+      text += t('compartir.textoCompleto') + '\n';
     }
 
     text += `#FNGGOverride #FortniteSprites #FortniteGlitch`;
@@ -418,7 +420,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         });
       } else if (navigator.share) {
         await navigator.share({
-          title: 'Plantilla de Espíritus Fortnite',
+          title: t('compartir.tituloCompartir'),
           text: getShareableText()
         });
       } else {
@@ -445,12 +447,12 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     <div className="sdm-share-perf">
       {perf?.ultima ? (
         <div>
-          dibujo {perf.ultima.dibujoMs} ms · archivo {perf.ultima.codificacionMs ?? '—'} ms · total {perf.ultima.totalMs ?? '—'} ms
+          {t('compartir.perfLinea', { dibujo: perf.ultima.dibujoMs, archivo: perf.ultima.codificacionMs ?? '—', total: perf.ultima.totalMs ?? '—' })}
           {perf.ultima.lienzo ? ` · ${perf.ultima.lienzo}` : ''}
         </div>
       ) : null}
       <div>
-        caché {perf?.cache || '…'} · pasada {perf?.pasadaMs ?? '…'} ms · generaciones {perf?.generaciones || 0} · repasadas {perf?.revisitas || 0}
+        {t('compartir.perfResumen', { cache: perf?.cache || '…', pasada: perf?.pasadaMs ?? '…', generaciones: perf?.generaciones || 0, repasadas: perf?.revisitas || 0 })}
       </div>
     </div>
   ) : null;
@@ -471,13 +473,13 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
               <Sparkles size={18} color="#00F0E8" />
             </div>
             <div>
-              <h2 className="sdm-share-pro__title" onPointerUp={manejarTapTitulo}>Exportar Colección</h2>
+              <h2 className="sdm-share-pro__title" onPointerUp={manejarTapTitulo}>{t('compartir.titulo')}</h2>
               <p className="sdm-share-pro__subtitle">
-                {ownedInScope} de {spritesList.length} espíritus atrapados • {pctInScope}% completado
+                {t('compartir.subtitulo', { owned: ownedInScope, total: spritesList.length, pct: pctInScope })}
               </p>
             </div>
           </div>
-          <button className="sdm-share-pro__close" onClick={handleClose} aria-label="Cerrar modal">
+          <button className="sdm-share-pro__close" onClick={handleClose} aria-label={t('compartir.cerrarModal')}>
             <X size={18} />
           </button>
         </div>
@@ -485,13 +487,13 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         {/* Toolbar de Configuración Compacta */}
         <div className="sdm-share-pro__controls">
           <div className="sdm-share-pro__seg-group">
-            <span className="sdm-share-pro__seg-label">MOSTRAR:</span>
+            <span className="sdm-share-pro__seg-label">{t('compartir.mostrar')}</span>
             <div className="sdm-share-pro__segmented">
               {[
-                { id: 'all', label: 'Todos' },
-                { id: 'new', label: 'Nuevos' },
-                { id: 'owned', label: 'Atrapados' },
-                { id: 'missing', label: 'Faltantes' }
+                { id: 'all', label: t('compartir.todos') },
+                { id: 'new', label: t('compartir.nuevos') },
+                { id: 'owned', label: t('compartir.atrapados') },
+                { id: 'missing', label: t('compartir.faltantes') }
               ].map(opt => (
                 <button
                   key={opt.id}
@@ -505,10 +507,10 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           </div>
 
           <div className="sdm-share-pro__seg-group">
-            <span className="sdm-share-pro__seg-label">FORMATO:</span>
+            <span className="sdm-share-pro__seg-label">{t('compartir.formato')}</span>
             <div className="sdm-share-pro__segmented">
               {[
-                { id: 'checklist', label: '📱 Vertical' },
+                { id: 'checklist', label: t('compartir.vertical') },
                 { id: 'square', label: '🔳 1:1' }
               ].map(f => (
                 <button
@@ -527,19 +529,19 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         <div className="sdm-share-pro__preview-wrap">
           {spritesList.length === 0 ? (
             <div className="sdm-share-pro__empty">
-              No hay espíritus para mostrar en esta categoría.
+              {t('compartir.vacio')}
             </div>
           ) : isGenerating ? (
             <div className="sdm-share-pro__loading">
               <div className="sdm-share-pro__spinner" />
-              <span>Generando captura HD...</span>
+              <span>{t('compartir.generando')}</span>
             </div>
           ) : previewCanvas ? (
             <div className="sdm-share-pro__canvas-host" ref={previewHostRef} />
           ) : (
             <img
               src={dataUrl}
-              alt="Vista previa de la colección"
+              alt={t('compartir.altPreview')}
               className="sdm-share-pro__preview-img"
             />
           )}
@@ -551,31 +553,31 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
             className="sdm-share-pro__btn sdm-share-pro__btn--copy"
             onClick={handleCopyText}
             disabled={spritesList.length === 0}
-            title="Copiar resumen de texto para redes"
+            title={t('compartir.titleCopiarResumen')}
           >
             {copiedText ? <Check size={15} color="#4ade80" /> : <Copy size={15} />}
-            <span>{copiedText ? '¡Texto Copiado!' : 'Copiar Texto'}</span>
+            <span>{copiedText ? t('compartir.textoCopiado') : t('compartir.copiarTexto')}</span>
           </button>
 
           <button
             className="sdm-share-pro__btn sdm-share-pro__btn--share"
             onClick={handleNativeShare}
             disabled={!dataUrl}
-            title="Compartir captura"
+            title={t('compartir.titleCompartir')}
           >
             <Share2 size={15} />
-            <span>Compartir</span>
+            <span>{t('compartir.compartir')}</span>
           </button>
 
           <button
             className="sdm-share-pro__btn sdm-share-pro__btn--download sdm-share__glitch-btn"
             onClick={handleDownload}
             disabled={!dataUrl}
-            title="Descargar imagen en alta resolución"
-            data-text="DESCARGAR"
+            title={t('compartir.titleDescargar')}
+            data-text={t('compartir.descargarMayus')}
           >
             <Download size={15} className="sdm-share__btn-icon" />
-            <span className="sdm-share__btn-text">Descargar</span>
+            <span className="sdm-share__btn-text">{t('compartir.descargar')}</span>
           </button>
         </div>
 

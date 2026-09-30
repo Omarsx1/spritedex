@@ -246,7 +246,7 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="colaborador@spritedex.com"
+                placeholder="colaborador@spritedex.gg"
                 required
                 style={{
                   width: '100%',

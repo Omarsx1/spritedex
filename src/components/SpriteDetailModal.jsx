@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Zap, Sparkles } from 'lucide-react';
-import { SPRITE_FAMILIES, getSpriteCardStyle, getRarityInfo } from '../data/spritesData';
+import { SPRITE_FAMILIES, getSpriteCardStyle, getRarityInfo, pickName, pickThemeName } from '../data/spritesData';
+import { t } from '../i18n';
 import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 import { Modal } from './ui/Modal';
@@ -99,7 +100,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
             )}
             <img
               src={activeSprite.image}
-              alt={activeSprite.fullName}
+              alt={pickName(activeSprite)}
               className={`sdm__hero-img ${!currentState.owned ? 'sdm__hero-img--locked' : ''}`}
               onError={handleImgError}
             />
@@ -110,14 +111,14 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
               <span className={`sprite-pill rarity-badge ${rarityInfo.classKey ? `sprite-rarity-${rarityInfo.classKey}` : ''}`}>
                 {rarityInfo.name}
               </span>
-              <span className="sdm__drop">{activeSprite.unreleased ? 'NO LANZADO' : activeSprite.dropChance}</span>
+              <span className="sdm__drop">{activeSprite.unreleased ? t('detalle.noLanzadoMayus') : activeSprite.dropChance}</span>
             </div>
-            <h2 className="sdm__name">{activeSprite.fullName}</h2>
+            <h2 className="sdm__name">{pickName(activeSprite)}</h2>
             <div className="sdm__meta">
-              <span>{activeSprite.variantDisplay || activeSprite.variant} · Gen {activeSprite.gen}</span>
+              <span>{pickThemeName(activeSprite.variant)} · Gen {activeSprite.gen}</span>
               {currentState.owned && !activeSprite.unreleased && (
                 <span className={`sdm__meta-lvl ${isMastered ? 'sdm__meta-lvl--mastered' : ''}`}>
-                  {' · '}{isMastered ? '⭐ MAXEADO' : `Nivel ${currentState.level}/5`}
+                  {' · '}{isMastered ? t('detalle.maxeadoMayus') : t('detalle.nivelDe5', { n: currentState.level })}
                 </span>
               )}
             </div>
@@ -151,15 +152,15 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
             <div className="sdm__card-row">
               <Zap size={16} className="sdm__icon sdm__icon--yellow" />
               <div>
-                <span className="sdm__card-label">HABILIDAD OFICIAL</span>
+                <span className="sdm__card-label">{t('detalle.habilidadOficial')}</span>
                 <p className="sdm__card-text">{activeSprite.ability}</p>
               </div>
             </div>
             <div className="sdm__card-footer">
-              <div className="sdm__card-detail" title="Coste de invocación" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="sdm__card-detail" title={t('detalle.costeInvocacion')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <img
                   src="/img/stelar.webp"
-                  alt="Polvo Estelar"
+                  alt={t('detalle.polvoEstelar')}
                   className="sdm__stelar-img"
                   style={{
                     width: '26px',
@@ -169,7 +170,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                   }}
                 />
                 <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)' }}>
-                  {activeSprite.summonCost || '5,000 Polvo Estelar'}
+                  {activeSprite.summonCost || t('detalle.costePorDefecto')}
                 </span>
               </div>
             </div>
@@ -180,7 +181,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
             <div className="sdm__progress-header">
               <Sparkles size={14} className="sdm__icon sdm__icon--pink" />
               <span className="sdm__progress-title">
-                {familySprites.length > 1 ? 'VARIANTES' : 'COLECCIÓN'}
+                {familySprites.length > 1 ? t('detalle.variantes') : t('detalle.coleccion')}
               </span>
               <span className="sdm__progress-count">{ownedInFamily}/{familySprites.length}</span>
             </div>
@@ -217,14 +218,14 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                   )}
                   <img
                     src={v.image}
-                    alt={v.fullName}
+                    alt={pickName(v)}
                     className={`sdm__variant-img ${!vOwned ? 'sdm__variant-img--locked' : ''}`}
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
                 </div>
 
-                <span className="sdm__variant-name">{v.variantDisplay || v.variant}</span>
-                <span className="sdm__variant-drop">{v.unreleased ? 'NO LANZADO' : v.dropChance}</span>
+                <span className="sdm__variant-name">{pickThemeName(v.variant)}</span>
+                <span className="sdm__variant-drop">{v.unreleased ? t('detalle.noLanzadoMayus') : v.dropChance}</span>
 
                 {/* Status pill */}
                 <div
@@ -238,7 +239,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                   style={{ cursor: v.unreleased ? 'not-allowed' : 'pointer' }}
                 >
                   <span className={`sdm__pill ${v.unreleased ? 'sdm__pill--unreleased' : vMastered ? 'sdm__pill--gold' : vOwned ? 'sdm__pill--green' : ''}`}>
-                    {v.unreleased ? '🔒 No lanzado' : vMastered ? '⭐ MAX' : vOwned ? '✔ Atrapado' : 'Faltante'}
+                    {v.unreleased ? t('detalle.noLanzadoCandado') : vMastered ? '⭐ MAX' : vOwned ? t('detalle.atrapado') : t('detalle.faltante')}
                   </span>
                 </div>
 

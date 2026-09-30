@@ -1,5 +1,6 @@
 import React from 'react';
 import { RefreshCw, AlertTriangle } from 'lucide-react';
+import { t } from '../i18n';
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -68,10 +69,10 @@ export class ErrorBoundary extends React.Component {
             </div>
 
             <h2 style={{ fontSize: '1.25rem', fontWeight: 900, margin: '0 0 8px', color: '#f8fafc' }}>
-              Reanudando Spritedex
+              {t('error.titulo')}
             </h2>
             <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: '0 0 20px', lineHeight: 1.5 }}>
-              Ocurrió un error al sincronizar con el navegador. Toca el botón para recargar la aplicación sin perder tu progreso.
+              {t('error.mensaje')}
             </p>
 
             <button
@@ -94,7 +95,7 @@ export class ErrorBoundary extends React.Component {
               }}
             >
               <RefreshCw size={16} />
-              <span>Recargar Aplicación</span>
+              <span>{t('error.recargar')}</span>
             </button>
           </div>
         </div>

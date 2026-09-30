@@ -3,6 +3,8 @@
 // Extension explicita: Vite resuelve igual, y asi el modulo tambien carga en Node
 // (el runner de pruebas nativo no completa extensiones).
 import { generateQRMatrix } from './qrGenerator.js';
+import { t } from '../i18n/texto.js';
+import { pickName } from './spriteName.js';
 
 // Caché en memoria de matriz QR para evitar recalcular polinomios en cada exportación
 let cachedQRMatrix = null;
@@ -23,7 +25,7 @@ const ORIGENES_PUBLICOS = [
   'https://www.spritedex.gg',
   'https://spritedex-two.vercel.app'
 ];
-function dominioParaCompartir() {
+export function dominioParaCompartir() {
   try {
     const origen = window.location.origin;
     if (ORIGENES_PUBLICOS.includes(origen)) return origen + '/';
@@ -752,10 +754,10 @@ async function renderGlitchOverrideTemplate({
   ctx.shadowColor = 'rgba(0, 240, 232, 0.7)';
   ctx.shadowBlur = 8;
   const topTextY = Math.round(34 * Math.min(1.15, scale));
-  ctx.fillText('FORTNITE , NUEVOS', width / 2, topTextY);
+  ctx.fillText(t('lona.arriba'), width / 2, topTextY);
 
   // Main Big Title: "SPRITEDEX OVERRIDE"
-  const titleText = 'SPRITEDEX OVERRIDE';
+  const titleText = t('lona.titulo');
   const baseTitleFontSize = isSquare ? (cols >= 8 ? 44 : 48) : 52;
   const titleFontSize = Math.round(baseTitleFontSize * Math.min(1.22, Math.max(0.9, scale)));
   ctx.font = `900 ${titleFontSize}px "Burbank Big Condensed", "Impact", "Arial Black", sans-serif`;
@@ -776,7 +778,7 @@ async function renderGlitchOverrideTemplate({
   ctx.shadowBlur = 0;
 
   // Tagline Pill Capsule: "ROMPE LAS REGLAS • CAMBIA EL JUEGO"
-  const capsuleText = 'ROMPE LAS REGLAS • CAMBIA EL JUEGO';
+  const capsuleText = t('lona.lema');
   const capsuleFontSize = Math.round(10.5 * Math.min(1.15, scale));
   ctx.font = `900 ${capsuleFontSize}px "Outfit", "Inter", "Arial Black", sans-serif`;
   ctx.letterSpacing = '1px';
@@ -827,12 +829,12 @@ async function renderGlitchOverrideTemplate({
   ctx.fillText(`${ownedCount} / ${totalSprites}`, hudX + 14, hudTextY);
   ctx.font = `700 ${Math.round(10 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
   ctx.fillStyle = '#94a3b8';
-  ctx.fillText(' espíritus atrapados', hudX + 14 + ctx.measureText(`${ownedCount} / ${totalSprites} `).width + 4, hudTextY);
+  ctx.fillText(t('lona.atrapados'), hudX + 14 + ctx.measureText(`${ownedCount} / ${totalSprites} `).width + 4, hudTextY);
 
   ctx.textAlign = 'right';
   ctx.font = `900 ${Math.round(11 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
   ctx.fillStyle = '#00F0E8';
-  ctx.fillText(`PROGRESO ${pctOwned}%`, hudX + hudW - 14, hudTextY);
+  ctx.fillText(t('lona.progreso', { pct: pctOwned }), hudX + hudW - 14, hudTextY);
 
   // Neon Progress Bar inside HUD
   const barX = hudX + 14;
@@ -1025,10 +1027,10 @@ async function renderGlitchOverrideTemplate({
     const maxTextW = cardW - 8;
     const nameFit = getSpriteNameLines(
       ctx,
-      sprite.fullName || sprite.name,
+      pickName(sprite),
       maxTextW,
       baseNameFontSize,
-      sprite.familyName || sprite.family_name
+      sprite.familyNameEn || sprite.familyName || sprite.family_name
     );
     ctx.font = `800 ${nameFit.fontSize}px "Outfit", "Inter", sans-serif`;
 
@@ -1061,14 +1063,14 @@ async function renderGlitchOverrideTemplate({
       ctx.fill();
 
       ctx.fillStyle = '#060714';
-      ctx.fillText('HACKEADO', badgeCenterX, badgeCenterY);
+      ctx.fillText(t('lona.hackeado'), badgeCenterX, badgeCenterY);
     } else {
       roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeCornerR);
       ctx.fillStyle = '#EF4444';
       ctx.fill();
 
       ctx.fillStyle = '#FFFFFF';
-      ctx.fillText('FALTANTE', badgeCenterX, badgeCenterY);
+      ctx.fillText(t('lona.faltante'), badgeCenterX, badgeCenterY);
     }
     ctx.restore();
   }
@@ -1102,7 +1104,7 @@ async function renderGlitchOverrideTemplate({
   ctx.fillStyle = '#38bdf8';
   ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
   ctx.shadowBlur = 6;
-  ctx.fillText('#FNGGOverride  •  spritedex.com', width / 2, height - 16);
+  ctx.fillText(t('lona.marca'), width / 2, height - 16);
   ctx.restore();
 
   // Codificar el PNG de 1280x2515 es la parte mas cara del export (2-6 s en movil),

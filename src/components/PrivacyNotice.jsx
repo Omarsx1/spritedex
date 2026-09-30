@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { ShieldCheck, X, Check, Cookie, Settings } from 'lucide-react';
+import { t } from '../i18n';
 
 const PrivacyPolicyModal = lazy(() => import('./PrivacyPolicyModal').then(m => ({ default: m.PrivacyPolicyModal })));
 
@@ -77,29 +78,29 @@ export function PrivacyNotice() {
             <button
               className="privacy-panel__close"
               onClick={handleRejectAll}
-              title="Cerrar"
-              aria-label="Cerrar aviso de privacidad"
+              title={t('privacidad.aviso.cerrar')}
+              aria-label={t('privacidad.aviso.cerrarAria')}
             >
               <X size={18} />
             </button>
 
             <div className="privacy-panel__header">
               <ShieldCheck size={22} className="privacy-panel__icon" />
-              <h3 className="privacy-panel__title">Uso de Cookies y Privacidad</h3>
+              <h3 className="privacy-panel__title">{t('privacidad.aviso.titulo')}</h3>
             </div>
 
             <p className="privacy-panel__text">
-              Utilizamos cookies, incluidas cookies de terceros (como Google Sign-In y Supabase), para fines operativos, mantener tu sesión activa, guardar tu progreso en la nube, análisis estadísticos y personalizar tu experiencia.
+              {t('privacidad.aviso.texto')}
             </p>
 
             <p className="privacy-panel__subtext">
-              Para más información sobre los tipos de cookies y cómo se gestionan en nuestro sitio web, consulta nuestra guía dedicada a la{' '}
+              {t('privacidad.aviso.subtextoA')}{' '}
               <span
                 className="privacy-panel__link"
                 onClick={() => setShowPolicyModal(true)}
-                title="Abrir guía de gestión de cookies"
+                title={t('privacidad.aviso.abrirGuia')}
               >
-                gestión de cookies
+                {t('privacidad.aviso.enlace')}
               </span>.
             </p>
 
@@ -108,16 +109,16 @@ export function PrivacyNotice() {
               <div className="privacy-panel__personalize">
                 <div className="privacy-option">
                   <div className="privacy-option__info">
-                    <span className="privacy-option__name">Esenciales (Google / Supabase)</span>
-                    <span className="privacy-option__desc">Requeridas para el inicio de sesión y sincronización en la nube.</span>
+                    <span className="privacy-option__name">{t('privacidad.aviso.esencialesNombre')}</span>
+                    <span className="privacy-option__desc">{t('privacidad.aviso.esencialesDesc')}</span>
                   </div>
                   <input type="checkbox" checked disabled className="privacy-checkbox" />
                 </div>
 
                 <div className="privacy-option">
                   <div className="privacy-option__info">
-                    <span className="privacy-option__name">Análisis y Rendimiento</span>
-                    <span className="privacy-option__desc">Permite analizar el rendimiento del sitio y optimizar la app.</span>
+                    <span className="privacy-option__name">{t('privacidad.aviso.analiticaNombre')}</span>
+                    <span className="privacy-option__desc">{t('privacidad.aviso.analiticaDesc')}</span>
                   </div>
                   <input
                     type="checkbox"
@@ -129,8 +130,8 @@ export function PrivacyNotice() {
 
                 <div className="privacy-option">
                   <div className="privacy-option__info">
-                    <span className="privacy-option__name">Personalización de Experiencia</span>
-                    <span className="privacy-option__desc">Guarda tus preferencias de interfaz y filtros personalizados.</span>
+                    <span className="privacy-option__name">{t('privacidad.aviso.personalizacionNombre')}</span>
+                    <span className="privacy-option__desc">{t('privacidad.aviso.personalizacionDesc')}</span>
                   </div>
                   <input
                     type="checkbox"
@@ -144,7 +145,7 @@ export function PrivacyNotice() {
                   onClick={handleSaveCustom}
                   className="privacy-btn privacy-btn--save"
                 >
-                  Guardar mis preferencias
+                  {t('privacidad.aviso.guardarPreferencias')}
                 </button>
               </div>
             )}
@@ -155,7 +156,7 @@ export function PrivacyNotice() {
                 onClick={() => setShowPersonalize(!showPersonalize)}
                 className="privacy-btn privacy-btn--secondary"
               >
-                {showPersonalize ? 'Ocultar opciones' : 'Personalizar opciones'}
+                {showPersonalize ? t('privacidad.aviso.ocultarOpciones') : t('privacidad.aviso.personalizarOpciones')}
               </button>
 
               <div className="privacy-panel__btn-group">
@@ -163,14 +164,14 @@ export function PrivacyNotice() {
                   onClick={handleRejectAll}
                   className="privacy-btn privacy-btn--reject"
                 >
-                  Rechazar todo
+                  {t('privacidad.aviso.rechazarTodo')}
                 </button>
 
                 <button
                   onClick={handleAcceptAll}
                   className="privacy-btn privacy-btn--accept"
                 >
-                  Aceptar todo
+                  {t('privacidad.aviso.aceptarTodo')}
                 </button>
               </div>
             </div>
