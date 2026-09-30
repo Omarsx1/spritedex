@@ -50,6 +50,13 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
   const codigoCorto = (myFriendCode || '').replace(/^SDEX-/i, '');
   const enlace = generatePermanentFriendUrl(myFriendCode || 'SDEX-0000');
 
+  // Sin amistad aceptada la coleccion ya no se puede leer: se avisa en vez de no hacer nada.
+  const verColeccion = async (codigo) => {
+    const ok = await onVerColeccion(codigo);
+    if (ok === false) setAviso(t('amigos.noSePudoVer'));
+    return ok;
+  };
+
   const copiar = async (texto, cual) => {
     try {
       await navigator.clipboard.writeText(texto);
@@ -162,7 +169,7 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
                   <span className="sdm-friends__code">{String(codigoFicha).replace(/^SDEX-/i, '')}</span>
                 </span>
                 <div className="sdm-friends__actions">
-                  <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => onVerColeccion(codigoFicha)}>{t('amigos.verSuColeccion')}</button>
+                  <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => verColeccion(codigoFicha)}>{t('amigos.verSuColeccion')}</button>
                   {onVerEnApp && (
                     <button type="button" className="sdm-friends__btn" onClick={() => onAbrirModal && onAbrirModal()}>
                       {t('amigos.comparacionCompleta')}
@@ -259,7 +266,7 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
                   <span className="sdm-friends__code">{String(suyo || '').replace(/^SDEX-/i, '')}</span>
                 </span>
                 <div className="sdm-friends__actions">
-                  <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => onVerColeccion(suyo)}>{t('amigos.verColeccion')}</button>
+                  <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => verColeccion(suyo)}>{t('amigos.verColeccion')}</button>
                   <button
                     type="button"
                     className="sdm-friends__btn sdm-friends__btn--danger"

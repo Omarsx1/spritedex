@@ -64,13 +64,20 @@ export function useFriendRequests() {
     const supabase = await getSupabase();
     if (!supabase) return null;
     const normalizado = normalizeFriendCode(codigo);
-    const { data } = await supabase
+    // El codigo se resuelve con una funcion del servidor que solo devuelve el id: asi la
+    // tabla de colecciones puede dejar de ser publica. Mientras la funcion no exista (o si
+    // falla), se usa la consulta de siempre para no dejar a nadie sin poder enviar solicitudes.
+    const { data, error } = await supabase.rpc('user_id_by_friend_code', { codigo: normalizado });
+    if (!error) return data ? { userId: data, codigo: normalizado } : null;
+
+    console.warn('[amigos] funcion no disponible, se usa la consulta directa:', error.message);
+    const { data: filas } = await supabase
       .from('user_collections')
       .select('user_id')
       .eq('friend_code', normalizado)
       .order('updated_at', { ascending: false })
       .limit(1);
-    return data && data[0] ? { userId: data[0].user_id, codigo: normalizado } : null;
+    return filas && filas[0] ? { userId: filas[0].user_id, codigo: normalizado } : null;
   }, []);
 
   const enviar = useCallback(async (codigo, miCodigo) => {
