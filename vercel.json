@@ -38,6 +38,7 @@
     }
   ],
   "rewrites": [
+    { "source": "/privacidad", "destination": "/privacidad.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
