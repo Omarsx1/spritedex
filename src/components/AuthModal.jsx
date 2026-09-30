@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal } from './ui/Modal';
 import { Google } from './ui/Google';
-import { conGoogle } from '../utils/authActions';
+import { conGoogle, origenActual } from '../utils/authActions';
 import { X, Cloud, LogIn, LogOut, CheckCircle, Mail, Key, ShieldCheck } from 'lucide-react';
 import { getSupabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from '../utils/supabase';
 import { trackEvent } from '../utils/telemetry';
@@ -45,7 +45,11 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
       if (isSignUp) {
         const { error: signUpError } = await supabase.auth.signUp({
           email,
-          password
+          password,
+          // Sin emailRedirectTo, Supabase usa el Site URL y el correo de confirmacion
+          // puede devolver al usuario a OTRO dominio, donde su copia local no existe.
+          // Fijandolo al origen actual, la confirmacion siempre vuelve donde se registro.
+          options: { emailRedirectTo: origenActual() }
         });
         if (signUpError) throw signUpError;
         trackEvent('signup', { method: 'email' });
