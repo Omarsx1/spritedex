@@ -148,6 +148,9 @@ export function App() {
     const params = new URLSearchParams(window.location.search);
     return params.get('share') || '';
   });
+  // Codigo del dueño, resuelto desde el token, y aviso si el enlace no sirve.
+  const [codigoDeToken, setCodigoDeToken] = useState('');
+  const [tokenSinResultado, setTokenSinResultado] = useState(false);
 
   const [friendState, setFriendState] = useState(() => {
     const friendParam = new URLSearchParams(window.location.search).get('friend');
@@ -228,9 +231,17 @@ export function App() {
     if (!shareToken) return undefined;
     let cancelado = false;
     fetchCollectionByShareToken(shareToken).then((data) => {
-      if (cancelado || !data || !data.userState) return;
+      if (cancelado) return;
+      if (!data || !data.userState) {
+        // El enlace caduco o se roto: se dice, en vez de dejar la pagina vacia.
+        setTokenSinResultado(true);
+        return;
+      }
       setFriendState(data.userState);
       setConnectedFriendCode(data.friendCode || '');
+      // La ficha de la pagina de amigos se dibuja con el codigo en la ruta; con un enlace
+      // por token hay que darselo desde aqui o la pagina queda en blanco.
+      setCodigoDeToken(data.friendCode || '');
       setActiveProfile('friend');
     });
     return () => { cancelado = true; };
@@ -797,7 +808,7 @@ useEffect(() => {
   // Codigo de amigo que venga en la ruta (/amigos/SDEX-XXXX): la ficha se abre con el.
   const codigoEnRuta = rutaApp.indexOf('/amigos/') === 0
     ? decodeURIComponent(rutaApp.slice(8)).replace(/\/+$/, '').toUpperCase()
-    : '';
+    : String(codigoDeToken || '').toUpperCase();
 
   if (enAmigos) {
     return (
@@ -805,6 +816,7 @@ useEffect(() => {
         <FriendsPage
           myFriendCode={myFriendCode}
           myShareToken={myShareToken}
+          avisoExterno={tokenSinResultado ? t('amigos.enlaceSinResultado') : ''}
           codigoFicha={codigoEnRuta}
           userState={userState}
           friendState={friendState}

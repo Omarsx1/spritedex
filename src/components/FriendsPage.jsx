@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ALL_SPRITES, pickName } from '../data/spritesData';
 import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw } from 'lucide-react';
 import { useFriendRequests } from '../hooks/useFriendRequests';
@@ -10,7 +10,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
 // gestionan personas y en la ficha del amigo se compara la coleccion (fase 2).
 // Reutiliza los estilos .sdm-friends que ya estaban aprobados.
-export function FriendsPage({ myFriendCode, myShareToken, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, onAbrirModal }) {
+export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, onAbrirModal }) {
   // Comparación rápida para la ficha: lo que él tiene y yo no, y al revés. Es la misma
   // idea que las listas de la modal, aquí resumida para tenerla en la página.
   const listas = useMemo(() => {
@@ -41,11 +41,18 @@ export function FriendsPage({ myFriendCode, myShareToken, codigoFicha, userState
   const radar = useFriendRequests();
   const [codigo, setCodigo] = useState('');
   const [aviso, setAviso] = useState('');
+  const avisoVisible = aviso || avisoExterno || '';
   const [copiado, setCopiado] = useState('');
   const [verTodos, setVerTodos] = useState({ teFaltan: false, leFaltan: false });
   // Amigos por defecto. Si se entra por un enlace con codigo (/amigos/SDEX-XXXX) abre en
   // Comparación, porque ese enlace existe justo para ver la comparación con esa persona.
   const [vista, setVista] = useState(codigoFicha ? 'comparacion' : 'amigos');
+
+  // Con un enlace por token el codigo llega DESPUES del montaje, asi que la pestaña se
+  // corrige sola en cuanto aparece; si no, el enlace abriria la pestaña de amigos vacia.
+  useEffect(() => {
+    if (codigoFicha) setVista('comparacion');
+  }, [codigoFicha]);
 
   const codigoCorto = (myFriendCode || '').replace(/^SDEX-/i, '');
   const enlace = generateShareUrl(myShareToken, myFriendCode || 'SDEX-0000');
@@ -153,7 +160,7 @@ export function FriendsPage({ myFriendCode, myShareToken, codigoFicha, userState
               {t('amigos.enviarSolicitud')}
             </button>
           </div>
-          {aviso && <p className="sdm-friends__aviso">{aviso}</p>}
+          {avisoVisible && <p className="sdm-friends__aviso">{avisoVisible}</p>}
           {!radar.haySesion && (
             <p className="sdm-friends__aviso">{t('amigos.necesitasSesion')}</p>
           )}

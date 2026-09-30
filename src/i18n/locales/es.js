@@ -76,6 +76,7 @@ export default {
   "amigos.enviarSolicitud": "Enviar solicitud",
   "amigos.esperando": "Esperando",
   "amigos.fichaCompartida": "FICHA COMPARTIDA",
+  "amigos.enlaceSinResultado": "Este enlace de compartir ya no sirve. Pídele uno nuevo a tu amigo.",
   "amigos.avisoEnlace": "⚠️ Cualquiera con este enlace verá tu colección completa.",
   "amigos.noSePudoVer": "No pudimos ver esa colección. Puede que todavía no sean amigos: envíale una solicitud y la verás cuando la acepte.",
   "amigos.hintCodigo": "Quien tenga tu código puede enviarte una solicitud. Tú decides si la aceptas.",

@@ -75,6 +75,7 @@ export default {
   "amigos.enviarSolicitud": "Send request",
   "amigos.esperando": "Waiting",
   "amigos.fichaCompartida": "SHARED PROFILE",
+  "amigos.enlaceSinResultado": "This share link no longer works. Ask your friend for a new one.",
   "amigos.avisoEnlace": "⚠️ Anyone with this link will see your full collection.",
   "amigos.noSePudoVer": "We could not load that collection. You may not be friends yet: send a request and you will see it once they accept.",
   "amigos.hintCodigo": "Anyone with your code can send you a request. You decide whether to accept it.",
