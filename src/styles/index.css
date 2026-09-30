@@ -581,6 +581,10 @@ html::after {
 
 .app-navbar__menu-actions-row .app-navbar__menu-action-btn {
   flex: 1;
+  /* Anchos iguales: con width:100% heredado, cada boton se encogia segun su texto y la
+     fila quedaba desigual (89/101/123 px). Con basis 0 los tres reparten a partes iguales. */
+  width: auto;
+  min-width: 0;
   justify-content: center;
   gap: 7px;
   padding: 10px 8px;
@@ -674,47 +678,6 @@ html::after {
   background: #10b981;
   border: 1.5px solid #060714;
   box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
-}
-
-/* --- Motion Toggle Button (separado y a la izquierda de la foto) --- */
-.app-navbar__motion-btn {
-  width: 32px;
-  height: 32px;
-  margin-right: 4px;
-  border-radius: 9999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  color: rgba(255, 255, 255, 0.45);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  padding: 0;
-}
-
-.app-navbar__motion-btn.is-active {
-  color: #00F0E8;
-  filter: drop-shadow(0 0 6px rgba(0, 240, 232, 0.8));
-}
-
-.app-navbar__motion-btn.is-disabled {
-  color: rgba(255, 255, 255, 0.28);
-  filter: none;
-}
-
-.app-navbar__motion-btn:hover {
-  transform: scale(1.12);
-  color: #ffffff;
-  filter: drop-shadow(0 0 10px rgba(0, 240, 232, 0.95));
-}
-
-.app-navbar__motion-btn:active {
-  transform: scale(0.92);
 }
 
 .app-navbar__chevron.open {

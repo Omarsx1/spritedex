@@ -172,23 +172,9 @@ export function Navbar({
         </button>
       </div>
 
-      {/* Acciones derechas: Botón de Animaciones (izq) + Avatar (centro) + Menú Hamburguesa (der) */}
+      {/* Acciones derechas: Idioma + Avatar + Menú Hamburguesa. El interruptor de
+          animaciones vive DENTRO del menú: la barra tenia demasiados botones sueltos. */}
       <div className="app-navbar__right">
-        {/* Botón de Alternar Animaciones (Persistente, lado izquierdo del avatar) */}
-        <button
-          type="button"
-          className={`app-navbar__motion-btn ${animationsEnabled ? 'is-active' : 'is-disabled'}`}
-          onClick={handleToggleAnimations}
-          title={animationsEnabled ? t('nav.animacionesActivas') : t('nav.animacionesInactivas')}
-          aria-label={animationsEnabled ? t('nav.desactivarAnimaciones') : t('nav.activarAnimaciones')}
-        >
-          {animationsEnabled ? (
-            <Zap size={15} strokeWidth={2.4} />
-          ) : (
-            <ZapOff size={15} strokeWidth={2.4} />
-          )}
-        </button>
-
         {/* Selector de idioma: siempre visible, porque la deteccion del navegador es solo una apuesta */}
         <LanguageSwitcher />
 
@@ -353,6 +339,19 @@ export function Navbar({
                   <div className="action-btn-left">
                     <Download size={15} />
                     <span>{t('nav.respaldo')}</span>
+                  </div>
+                </button>
+
+                {/* Animaciones: antes era un boton suelto en la barra. No cierra el menu a
+                    proposito, para que se vea el cambio de estado en la propia fila. */}
+                <button
+                  className="app-navbar__menu-action-btn"
+                  onClick={handleToggleAnimations}
+                  aria-pressed={animationsEnabled}
+                >
+                  <div className="action-btn-left">
+                    {animationsEnabled ? <Zap size={15} color="#00F0E8" /> : <ZapOff size={15} />}
+                    <span>{animationsEnabled ? t('nav.desactivarAnimaciones') : t('nav.activarAnimaciones')}</span>
                   </div>
                 </button>
                 </div>
