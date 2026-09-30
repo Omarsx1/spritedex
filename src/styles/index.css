@@ -8248,13 +8248,13 @@ body:has(.modal-overlay) {
 
 /* Ficha compartida: la matricula del codigo sale del recuadro y pasa a su propia fila de
    cabecera, a la derecha de la etiqueta. El recuadro se queda solo con los botones. */
-.fpage__bloqueFicha .sdm-friends__head {
+.fpage__bloqueFicha .sdm-friends__fichaHead {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   flex-wrap: wrap;
   margin-top: 14px;
 }
-.fpage__bloqueFicha .sdm-friends__head .sdm-friends__label { margin-top: 0; }
-.fpage__bloqueFicha .sdm-friends__head .sdm-friends__plate { margin-left: auto; }
+.fpage__bloqueFicha .sdm-friends__fichaHead .sdm-friends__label { margin-top: 0; }
+.fpage__bloqueFicha .sdm-friends__fichaHead .sdm-friends__plate { margin-left: auto; }
 
 /* Selector de idioma de la barra superior */
 .lang-switch {

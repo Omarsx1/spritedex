@@ -169,7 +169,7 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
           <div className="fpage__bloqueFicha">
           {codigoFicha && (
             <div className="sdm-friends__group">
-              <div className="sdm-friends__head">
+              <div className="sdm-friends__fichaHead">
                 <span className="sdm-friends__label">{t('amigos.fichaCompartida')}</span>
                 <span className="sdm-friends__plate">
                   <span className="sdm-friends__prefix">SDEX</span>
