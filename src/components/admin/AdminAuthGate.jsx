@@ -1,26 +1,21 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Lock, Key, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
+import { ShieldCheck, ArrowRight, AlertCircle } from 'lucide-react';
 import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
-import { ADMIN_AUTH_KEY, isUserAdminAuthenticated, clearAdminSession } from '../../utils/adminAuth';
-const DEFAULT_PASSCODE = 'override2026';
+import { ADMIN_AUTH_KEY } from '../../utils/adminAuth';
+
+// La puerta del CMS.
+//
+// Antes se entraba con una clave escrita aquí mismo ('override2026'), que viajaba en el
+// bundle público: cualquiera podía leerla y abrir el panel. Esa clave no protegía datos
+// (RLS ya limitaba lo que se veía), pero sí daba por buena una puerta que no lo era.
+// Ahora la única entrada es una cuenta real, y además tiene que estar en la lista de
+// administradores de la base: el permiso lo comprueba el servidor, no esta pantalla.
 
 export function AdminAuthGate({ onAuthenticated, onExit }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [passcode, setPasscode] = useState('');
-  const [authMode, setAuthMode] = useState(isSupabaseConfigured ? 'supabase' : 'passcode');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const handlePasscodeLogin = (e) => {
-    e.preventDefault();
-    if (passcode.trim() === DEFAULT_PASSCODE || passcode.trim().toLowerCase() === 'adminoverride') {
-      sessionStorage.setItem(ADMIN_AUTH_KEY, JSON.stringify({ mode: 'passcode', authenticatedAt: Date.now() }));
-      onAuthenticated();
-    } else {
-      setErrorMsg('Código de acceso no autorizado. Verifica la clave.');
-    }
-  };
 
   const handleSupabaseLogin = async (e) => {
     e.preventDefault();
@@ -41,6 +36,23 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
       if (error) throw error;
 
       if (data?.user) {
+        // Tener sesión no basta: hace falta estar en la lista de administradores. Se lee
+        // la tabla de la base (RLS solo deja ver tu propia fila) para que el permiso lo
+        // decida el servidor. Si no estás, se cierra la sesión que se acaba de abrir.
+        const { data: fila, error: errAdmins } = await supabase
+          .from('admins')
+          .select('user_id')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
+
+        if (errAdmins) throw errAdmins;
+
+        if (!fila) {
+          await supabase.auth.signOut();
+          setErrorMsg('Esta cuenta no tiene acceso al CMS. Un administrador tiene que añadirla en la sección Administradores.');
+          return;
+        }
+
         sessionStorage.setItem(ADMIN_AUTH_KEY, JSON.stringify({
           mode: 'supabase',
           email: data.user.email,
@@ -49,7 +61,12 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
         onAuthenticated();
       }
     } catch (err) {
-      setErrorMsg(err.message || 'Error al iniciar sesión.');
+      // Si la tabla todavía no existe, el mensaje de PostgREST no dice nada útil: se
+      // explica que falta ejecutar el SQL del panel.
+      const sinTabla = err?.code === 'PGRST205' || /could not find the table/i.test(String(err?.message || ''));
+      setErrorMsg(sinTabla
+        ? 'Falta ejecutar el SQL del panel: la tabla admins todavía no existe en la base.'
+        : (err.message || 'Error al iniciar sesión.'));
     } finally {
       setLoading(false);
     }
@@ -115,55 +132,6 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
           </p>
         </div>
 
-        {/* Mode Selector */}
-        <div style={{
-          display: 'flex',
-          background: 'rgba(2, 6, 23, 0.7)',
-          padding: '4px',
-          borderRadius: '10px',
-          marginBottom: '20px',
-          border: '1px solid rgba(255, 255, 255, 0.08)'
-        }}>
-          <button
-            type="button"
-            onClick={() => setAuthMode('passcode')}
-            style={{
-              flex: 1,
-              padding: '8px 12px',
-              borderRadius: '7px',
-              border: 'none',
-              background: authMode === 'passcode' ? 'rgba(0, 240, 255, 0.2)' : 'transparent',
-              color: authMode === 'passcode' ? '#00F0E8' : '#94a3b8',
-              fontSize: '0.78rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            Clave Maestra
-          </button>
-          {isSupabaseConfigured && (
-            <button
-              type="button"
-              onClick={() => setAuthMode('supabase')}
-              style={{
-                flex: 1,
-                padding: '8px 12px',
-                borderRadius: '7px',
-                border: 'none',
-                background: authMode === 'supabase' ? 'rgba(0, 240, 255, 0.2)' : 'transparent',
-                color: authMode === 'supabase' ? '#00F0E8' : '#94a3b8',
-                fontSize: '0.78rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              Cuenta Supabase
-            </button>
-          )}
-        </div>
-
         {errorMsg && (
           <div style={{
             display: 'flex',
@@ -183,59 +151,19 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
         )}
 
         {/* Forms */}
-        {authMode === 'passcode' ? (
-          <form onSubmit={handlePasscodeLogin}>
-            <div style={{ marginBottom: '18px' }}>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', marginBottom: '6px' }}>
-                CLAVE DE ACCESO DEL EQUIPO
-              </label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="password"
-                  value={passcode}
-                  onChange={(e) => setPasscode(e.target.value)}
-                  placeholder="Introduce la clave de acceso..."
-                  autoFocus
-                  style={{
-                    width: '100%',
-                    padding: '12px 14px 12px 38px',
-                    background: 'rgba(2, 6, 23, 0.8)',
-                    border: '1px solid rgba(0, 240, 255, 0.3)',
-                    borderRadius: '10px',
-                    color: '#fff',
-                    fontSize: '0.88rem',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
-                <Key size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#00F0E8' }} />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: '10px',
-                background: 'linear-gradient(135deg, #00F0E8, #0284c7)',
-                color: '#060714',
-                border: 'none',
-                fontSize: '0.88rem',
-                fontWeight: 900,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                boxShadow: '0 4px 18px rgba(0, 240, 255, 0.4)',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <span>Acceder al Studio</span>
-              <ArrowRight size={16} />
-            </button>
-          </form>
+        {!isSupabaseConfigured ? (
+          <div style={{
+            padding: '14px',
+            borderRadius: '10px',
+            background: 'rgba(239, 68, 68, 0.15)',
+            border: '1px solid rgba(239, 68, 68, 0.35)',
+            color: '#f87171',
+            fontSize: '0.8rem',
+            lineHeight: 1.6
+          }}>
+            El CMS necesita la nube configurada: sin ella no hay cuentas ni lista de
+            administradores con la que comprobar tu acceso.
+          </div>
         ) : (
           <form onSubmit={handleSupabaseLogin}>
             <div style={{ marginBottom: '14px' }}>

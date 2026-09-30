@@ -29,6 +29,7 @@ import { SpiritEditorModal } from './SpiritEditorModal';
 import { FamilyManagerModal } from './FamilyManagerModal';
 import { UserManagementTable } from './UserManagementTable';
 import { UserMetricsPanel } from './UserMetricsPanel';
+import { AdminsView } from './AdminsView';
 import { AudienceInsightsView } from './AudienceInsightsView';
 import { clearAdminSession } from '../../utils/adminAuth';
 import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
@@ -425,6 +426,33 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
                 <BarChart3 size={18} style={{ color: activeTab === 'metrics' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'), flexShrink: 0 }} />
                 {(sidebarOpen || isMobile) && <span style={{ whiteSpace: 'nowrap' }}>Usuarios reales</span>}
+              </div>
+            </button>
+
+            {/* Quién puede ver todo: la lista vive en la base, no en el navegador */}
+            <button
+              onClick={() => setActiveTab('admins')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: (sidebarOpen || isMobile) ? 'space-between' : 'center',
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: '10px',
+                border: 'none',
+                background: activeTab === 'admins' ? (darkMode ? '#232323' : 'rgba(60, 80, 224, 0.08)') : 'transparent',
+                color: activeTab === 'admins' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'),
+                fontSize: '0.86rem',
+                fontWeight: activeTab === 'admins' ? 800 : 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                whiteSpace: 'nowrap'
+              }}
+              title="Administradores: quién puede ver todas las colecciones"
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                <ShieldCheck size={18} style={{ color: activeTab === 'admins' ? (darkMode ? '#3ECF8E' : '#3C50E0') : (darkMode ? '#A1A1A1' : '#64748B'), flexShrink: 0 }} />
+                {(sidebarOpen || isMobile) && <span style={{ whiteSpace: 'nowrap' }}>Administradores</span>}
               </div>
             </button>
 
@@ -841,6 +869,10 @@ export function AdminLayout({ sprites = [], onRefreshSprites, onExitAdmin }) {
 
           {activeTab === 'metrics' && (
             <UserMetricsPanel darkMode={darkMode} />
+          )}
+
+          {activeTab === 'admins' && (
+            <AdminsView darkMode={darkMode} />
           )}
         </main>
       </div>
