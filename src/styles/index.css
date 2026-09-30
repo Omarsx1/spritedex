@@ -7959,11 +7959,12 @@ body:has(.modal-overlay) {
 
 .stats-bar__value {
   /* Fila de cifras con alto fijo: el total lleva un numero mas grande y sin esto
-     empujaria su etiqueta por debajo de las otras dos. */
+     empujaria su etiqueta por debajo de las otras dos. El alto acompana al tamaño de
+     la cifra para que las tres etiquetas sigan cayendo en la misma linea. */
   display: flex;
   align-items: flex-end;
-  height: 1.35rem;
-  font-size: 1rem;
+  height: 1.75rem;
+  font-size: 1.3rem;
   font-weight: 700;
   line-height: 1;
   color: #ffffff;
@@ -7973,7 +7974,7 @@ body:has(.modal-overlay) {
 
 /* El total es la referencia de la tira: cifra mayor, misma jerarquia que las metricas. */
 .stats-bar__value--total {
-  font-size: 1.15rem;
+  font-size: 1.5rem;
 }
 
 .stats-bar__track {
