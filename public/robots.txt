@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /studio
+Disallow: /override
+Disallow: /nexus
+
+Sitemap: https://spritedex.gg/sitemap.xml

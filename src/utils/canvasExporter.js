@@ -13,8 +13,26 @@ function getCachedQR(url) {
   return cachedQRMatrix;
 }
 
+// Dominio del QR de la captura. Se usa el dominio donde esta el usuario para que el QR
+// apunte siempre a algo vivo (hoy el viejo, mañana spritedex.gg, sin romper nada durante
+// la migracion) y solo se cae al canonico cuando el origen no es publico: local, tunel de
+// desarrollo o preview de Vercel.
+const DOMINIO_CANONICO = 'https://spritedex.gg/';
+const ORIGENES_PUBLICOS = [
+  'https://spritedex.gg',
+  'https://www.spritedex.gg',
+  'https://spritedex-two.vercel.app'
+];
+function dominioParaCompartir() {
+  try {
+    const origen = window.location.origin;
+    if (ORIGENES_PUBLICOS.includes(origen)) return origen + '/';
+  } catch {}
+  return DOMINIO_CANONICO;
+}
+
 // Renderiza un código QR moderno con estilo de puntos/círculos y acentos cibernéticos (100% escaneable)
-function drawModernDotQR(ctx, qrX, qrY, qrSize, url = 'https://spritedex-two.vercel.app/') {
+function drawModernDotQR(ctx, qrX, qrY, qrSize, url = dominioParaCompartir()) {
   try {
     const qr = getCachedQR(url);
     const count = qr.getModuleCount();
@@ -1073,7 +1091,7 @@ async function renderGlitchOverrideTemplate({
   const qrInnerY = qrCardY + (qrCardH - qrSize) / 2;
 
   ctx.save();
-  const targetUrl = 'https://spritedex-two.vercel.app/';
+  const targetUrl = dominioParaCompartir();
   drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, targetUrl);
   ctx.restore();
 
