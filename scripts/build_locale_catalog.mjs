@@ -3,10 +3,11 @@
 //   src/data/i18n/catalog.en.json  -> id de espiritu -> nombre en ingles
 //   src/data/i18n/familias.en.json -> id de familia  -> etiqueta de familia en ingles
 //
-// La fuente trae el nombre real del juego con el orden del ingles: variante primero
-// ("Bounty Hunter 8-Bit Sprite", "Gold Jonesy Sprite"). Los combos que no estan en esa
-// captura (variantes nuevas) se componen con la MISMA regla del juego:
-// "<Variante> <Familia> Sprite".
+// La fuente trae DOS nombres por espiritu y hay que elegir bien: "name" es el nombre del
+// juego ("Loot Hacker Jonesy", "Gold Jonesy") y "fullName" es el mismo con " Sprite"
+// detras. Se usa "name": es lo que muestra la web de origen y lo que confirma el juego.
+// Los combos que no estan en la captura (variantes nuevas) se componen con la misma regla:
+// "<Variante> <Familia>".
 //
 // Uso: node scripts/build_locale_catalog.mjs          (escribe los JSON)
 //      node scripts/build_locale_catalog.mjs --check  (falla si quedaron desfasados)
@@ -70,11 +71,14 @@ export function construirCatalogo() {
     if (!porClave.has(clave)) porClave.set(clave, item);
   });
 
-  // Etiqueta de familia en ingles: la entrada Basic de esa familia, sin el sufijo " Sprite".
+  // Nombre del juego: se prefiere "name" y, si algun dia faltara, el "fullName" sin sufijo.
+  const sinSufijo = (item) => String(item.name || item.fullName || '').replace(/\s*Sprite\s*$/i, '').trim();
+
+  // Etiqueta de familia en ingles: la entrada Basic de esa familia.
   const etiquetasFuente = {};
   crudo.forEach((item) => {
     if (norm(item.variant) !== 'basic' || !item.fullName) return;
-    const etiqueta = String(item.fullName).replace(/\s*Sprite\s*$/i, '').trim();
+    const etiqueta = sinSufijo(item);
     const clave = norm(item.parent);
     if (etiqueta && !etiquetasFuente[clave]) etiquetasFuente[clave] = etiqueta;
   });
@@ -105,12 +109,12 @@ export function construirCatalogo() {
     familias[base] = etiquetaFamilia;
 
     const encontrado = porClave.get(norm(familia) + '_' + norm(variante.fuente));
-    if (encontrado && encontrado.fullName) {
-      salida[espiritu.id] = encontrado.fullName;
+    if (encontrado && (encontrado.name || encontrado.fullName)) {
+      salida[espiritu.id] = sinSufijo(encontrado);
       return;
     }
 
-    const nombre = (variante.etiqueta ? variante.etiqueta + ' ' : '') + etiquetaFamilia + ' Sprite';
+    const nombre = (variante.etiqueta ? variante.etiqueta + ' ' : '') + etiquetaFamilia;
     salida[espiritu.id] = nombre;
     compuestos.push(espiritu.id + ' -> ' + nombre);
   });

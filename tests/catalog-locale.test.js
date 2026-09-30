@@ -31,18 +31,19 @@ test('218 nombres vienen del juego y 16 se componen', () => {
   assert.deepEqual(ids, COMPUESTOS);
 });
 
-test('los nombres conservan el formato del juego (variante primero, con Sprite)', () => {
-  assert.equal(generado.water_basic, 'Water Sprite');
-  assert.equal(generado.jonesy_gold, 'Gold Jonesy Sprite');
-  assert.equal(generado.jonesy_bountyhunter, 'Bounty Hunter Jonesy Sprite');
-  assert.equal(generado.crash_basic, 'Crash Bandicoot Sprite');
-  assert.equal(generado.striker_rift, 'Cube Striker Sprite');
-  assert.equal(generado.ghost_gem, 'Gem Ghost Sprite');
+test('los nombres son los del juego: variante primero y sin el sufijo " Sprite"', () => {
+  assert.equal(generado.water_basic, 'Water');
+  assert.equal(generado.jonesy_gold, 'Gold Jonesy');
+  assert.equal(generado.jonesy_loothacker, 'Loot Hacker Jonesy');
+  assert.equal(generado.jonesy_bountyhunter, 'Bounty Hunter Jonesy');
+  assert.equal(generado.crash_basic, 'Crash Bandicoot');
+  assert.equal(generado.striker_rift, 'Cube Striker');
+  assert.equal(generado.ghost_gem, 'Gem Ghost');
 });
 
-test('ningun nombre repite "Sprite" ni arrastra el id tecnico', () => {
+test('ningun nombre arrastra el sufijo " Sprite" ni el id tecnico', () => {
   const raros = Object.entries(generado)
-    .filter(([id, nombre]) => nombre.split('Sprite').length !== 2 || nombre.includes(id) || nombre.includes('_'))
+    .filter(([id, nombre]) => /Sprite/i.test(nombre) || nombre.includes(id) || nombre.includes('_'))
     .map(([id]) => id);
   assert.deepEqual(raros, []);
 });
