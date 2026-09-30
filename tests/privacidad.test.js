@@ -21,5 +21,7 @@ test('el canal en tiempo real tambien limpia el perfil', () => {
 test('lo unico que se devuelve del otro es su coleccion', () => {
   const retorno = fuente.slice(fuente.indexOf('if (data && data.user_state)'), fuente.indexOf('if (error)'));
   assert.ok(retorno.includes('sinPerfil(data.user_state)'), 'userState debe ir limpio');
-  assert.ok(!retorno.includes('profile'), 'no se devuelve ningun objeto profile');
+  // Se busca la CLAVE del objeto devuelto, no la palabra suelta: el comentario de al lado
+  // explica justamente que _profile se descarta, y con includes() eso daba un falso fallo.
+  assert.ok(!/\bprofile\b\s*[,:]/m.test(retorno), 'no se devuelve ningun objeto profile');
 });
