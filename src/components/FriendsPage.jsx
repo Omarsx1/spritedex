@@ -169,12 +169,14 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
           <div className="fpage__bloqueFicha">
           {codigoFicha && (
             <div className="sdm-friends__group">
-              <span className="sdm-friends__label">{t('amigos.fichaCompartida')}</span>
-              <div className="sdm-friends__row">
+              <div className="sdm-friends__head">
+                <span className="sdm-friends__label">{t('amigos.fichaCompartida')}</span>
                 <span className="sdm-friends__plate">
                   <span className="sdm-friends__prefix">SDEX</span>
                   <span className="sdm-friends__code">{String(codigoFicha).replace(/^SDEX-/i, '')}</span>
                 </span>
+              </div>
+              <div className="sdm-friends__row">
                 <div className="sdm-friends__actions">
                   <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => verColeccion(codigoFicha)}>{t('amigos.verSuColeccion')}</button>
                   {onVerEnApp && (

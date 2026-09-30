@@ -8246,6 +8246,16 @@ body:has(.modal-overlay) {
    devuelve el aire de arriba para que no quede pegada a la tarjeta de la ficha. */
 .fpage__bloqueFicha .sdm-friends__label:first-child { margin-top: 14px; }
 
+/* Ficha compartida: la matricula del codigo sale del recuadro y pasa a su propia fila de
+   cabecera, a la derecha de la etiqueta. El recuadro se queda solo con los botones. */
+.fpage__bloqueFicha .sdm-friends__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.fpage__bloqueFicha .sdm-friends__head .sdm-friends__label { margin-top: 0; }
+.fpage__bloqueFicha .sdm-friends__head .sdm-friends__plate { margin-left: auto; }
+
 /* Selector de idioma de la barra superior */
 .lang-switch {
   display: inline-flex;
