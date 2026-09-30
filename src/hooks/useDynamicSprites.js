@@ -1,8 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES, SUMMON_COST_OVERRIDES, WEBP_MAP, getSpriteThumb } from '../data/spritesData';
+import catalogEn from '../data/i18n/catalog.en.json';
 import { getSupabase } from '../utils/supabase';
 
 export const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache_v2';
+
+// La tabla del CMS solo guarda el nombre en español. Los estaticos por id sirven para
+// heredar lo que la base no tiene (hoy, el nombre en ingles).
+const ESTATICOS_POR_ID = new Map(ALL_SPRITES.map((s) => [s.id, s]));
+
+// Nombre en INGLES de un espiritu que viene de la base. Sin esto, una carta editada en el
+// CMS se mostraba en español dentro de /en: la app la pisa sobre el catalogo estatico y se
+// quedaba sin fullNameEn, asi que pickName caia al español.
+function nombreEn(item, espanol) {
+  const estatico = ESTATICOS_POR_ID.get(item.id);
+  return item.full_name_en || item.fullNameEn || catalogEn[item.id] || (estatico && estatico.fullNameEn) || espanol;
+}
 
 function sanitizeDynamicItem(item) {
   if (!item) return item;
@@ -30,6 +43,7 @@ function sanitizeDynamicItem(item) {
     ...item,
     name: cleanName,
     fullName: cleanFullName,
+    fullNameEn: nombreEn(item, cleanFullName),
     familyName: cleanFamilyName,
     family_name: cleanFamilyName,
     summonCost: rawSummonCost,
@@ -263,6 +277,10 @@ export function useDynamicSprites() {
               id: sanitized.id,
               name: sanitized.name,
               fullName: sanitized.fullName || sanitized.name,
+              // El nombre en ingles se resuelve aqui: la base solo guarda el español y este
+              // objeto se arma campo a campo, asi que sin esta linea la carta del CMS se
+              // quedaba sin fullNameEn y en /en salia en español.
+              fullNameEn: nombreEn(sanitized, sanitized.fullName || sanitized.name),
               familyId: sanitized.family_id || baseStatic?.familyId,
               familyName: sanitized.familyName || sanitized.family_name || baseStatic?.familyName,
               rarity: sanitized.rarity || SPIRIT_DATA_OVERRIDES[sanitized.id]?.rarity || baseStatic?.rarity,
