@@ -251,7 +251,7 @@ const THEME_NAMES_ES = {
   Gold: 'Dorado',
   Cheatmaster: 'Hacker',
   'Loot Hacker': 'Hacker de Botín',
-  'Bounty Hunter': 'Cazador de Recompensas',
+  'Bounty Hunter': 'Cazarrecompensas',
   Candy: 'Gomita',
   Galaxy: 'Galáctico',
   Holofoil: 'Holográfico',
@@ -587,7 +587,7 @@ async function syncSprites() {
       const isBase = resolvedTheme === 'Basic' || resolvedTheme === 'Base';
       const resolvedName = c.name || (isBase ? (c.parentName || c.parent) : `${resolvedTheme} ${c.parentName || c.parent}`);
 
-      // Respetar estado de no lanzado de Fortnite.gg (Victorioso Cazador de Recompensas se mantiene activo)
+      // Respetar estado de no lanzado de Fortnite.gg (Victorioso Cazarrecompensas se mantiene activo)
       let isUnreleased = c.unreleased;
       if (resolvedTheme === 'Bounty Hunter' && (c.parent?.toLowerCase() === 'crown' || c.name?.toLowerCase().includes('crown') || c.name?.toLowerCase().includes('victorioso'))) {
         isUnreleased = false;
