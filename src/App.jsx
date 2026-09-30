@@ -977,7 +977,7 @@ useEffect(() => {
         {isMobile && (
           <section className="stats-bar" aria-label={t('app.progresoAria')}>
             <div className="stats-bar__col">
-              <span className="stats-bar__value stats-bar__value--total">{totalCount}</span>
+              <span className="stats-bar__value">{totalCount}</span>
               {/* Reserva el alto de la barra: asi las tres etiquetas quedan a la misma altura. */}
               <span className="stats-bar__spacer" aria-hidden="true" />
               <span className="stats-bar__label">{t('app.total')}</span>
