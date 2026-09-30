@@ -25,6 +25,7 @@ import { useDynamicSprites } from './hooks/useDynamicSprites';
 import { trackEvent, resolveCountry } from './utils/telemetry';
 import { isUserAdminAuthenticated } from './utils/adminAuth';
 import { decodeCollectionState } from './utils/shareLink';
+import { fetchCollectionByShareToken } from './utils/friendCode';
 import { getSupabase, warmSupabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from './utils/supabase';
 import { conGoogle } from './utils/authActions';
 import { mergeCollections, sinPerfil } from './utils/mergeCollections';
@@ -135,11 +136,18 @@ export function App() {
 
   // Friend State & Realtime Connection
   const [myFriendCode, setMyFriendCode] = useState(() => getMyFriendCode());
+  // Token de compartir: se lee de la nube al arrancar y se cachea para poder montar el
+  // enlace al instante. Es lo que permite revocar (rotandolo) sin cambiar tu identidad.
+  const [myShareToken, setMyShareToken] = useState(() => safeStorage.getItem('spritedex_share_token') || '');
   const [connectedFriendCode, setConnectedFriendCode] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('code') || getLastConnectedFriendCode() || '';
   });
   const [isLiveConnected, setIsLiveConnected] = useState(false);
+  const [shareToken] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('share') || '';
+  });
 
   const [friendState, setFriendState] = useState(() => {
     const friendParam = new URLSearchParams(window.location.search).get('friend');
@@ -148,7 +156,7 @@ export function App() {
 
   const [activeProfile, setActiveProfile] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.has('friend') || params.has('code') ? 'friend' : 'mine';
+    return params.has('friend') || params.has('code') || params.has('share') ? 'friend' : 'mine';
   });
 
   // Supabase Auth & Cloud Sync State
@@ -213,6 +221,20 @@ export function App() {
       if (unsubscribe) unsubscribe();
     };
   }, [connectedFriendCode]);
+
+  // Enlace por token: se lee la coleccion compartida. No abre tiempo real (es una foto y
+  // el visitante no tiene por que ser amigo), asi que la etiqueta no dice "en vivo".
+  useEffect(() => {
+    if (!shareToken) return undefined;
+    let cancelado = false;
+    fetchCollectionByShareToken(shareToken).then((data) => {
+      if (cancelado || !data || !data.userState) return;
+      setFriendState(data.userState);
+      setConnectedFriendCode(data.friendCode || '');
+      setActiveProfile('friend');
+    });
+    return () => { cancelado = true; };
+  }, [shareToken]);
 
   // Precarga silenciosa no bloqueante en reposo (idle) para que la exportación sea instantánea
   useEffect(() => {
@@ -310,7 +332,7 @@ export function App() {
     try {
       const { data, error } = await supabase
         .from('user_collections')
-        .select('user_state, friend_code')
+        .select('user_state, friend_code, share_token')
         .eq('user_id', userId)
         .maybeSingle();
 
@@ -322,6 +344,11 @@ export function App() {
       if (data?.friend_code) {
         setMyFriendCode(data.friend_code);
         safeStorage.setItem('spritedex_my_friend_code', data.friend_code);
+      }
+
+      if (data?.share_token) {
+        setMyShareToken(data.share_token);
+        safeStorage.setItem('spritedex_share_token', data.share_token);
       }
 
       const estadoNube = sinPerfil(data?.user_state);
@@ -777,6 +804,7 @@ useEffect(() => {
       <div className="app-container">
         <FriendsPage
           myFriendCode={myFriendCode}
+          myShareToken={myShareToken}
           codigoFicha={codigoEnRuta}
           userState={userState}
           friendState={friendState}

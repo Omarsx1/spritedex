@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ALL_SPRITES, pickName } from '../data/spritesData';
 import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw } from 'lucide-react';
 import { useFriendRequests } from '../hooks/useFriendRequests';
-import { generatePermanentFriendUrl } from '../utils/friendCode';
+import { generateShareUrl } from '../utils/friendCode';
 import { t } from '../i18n';
 import { LanguageSwitcher } from './LanguageSwitcher';
 
@@ -10,7 +10,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
 // gestionan personas y en la ficha del amigo se compara la coleccion (fase 2).
 // Reutiliza los estilos .sdm-friends que ya estaban aprobados.
-export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, onAbrirModal }) {
+export function FriendsPage({ myFriendCode, myShareToken, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, onAbrirModal }) {
   // Comparación rápida para la ficha: lo que él tiene y yo no, y al revés. Es la misma
   // idea que las listas de la modal, aquí resumida para tenerla en la página.
   const listas = useMemo(() => {
@@ -48,7 +48,7 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
   const [vista, setVista] = useState(codigoFicha ? 'comparacion' : 'amigos');
 
   const codigoCorto = (myFriendCode || '').replace(/^SDEX-/i, '');
-  const enlace = generatePermanentFriendUrl(myFriendCode || 'SDEX-0000');
+  const enlace = generateShareUrl(myShareToken, myFriendCode || 'SDEX-0000');
 
   // Sin amistad aceptada la coleccion ya no se puede leer: se avisa en vez de no hacer nada.
   const verColeccion = async (codigo) => {

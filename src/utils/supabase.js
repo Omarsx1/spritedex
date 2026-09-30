@@ -1,6 +1,9 @@
 // Read env variables (set in Vercel or local .env)
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+// El respaldo es para Node (pruebas): ahi import.meta.env no existe y sin esto el modulo
+// ni siquiera se podia cargar fuera del navegador.
+const entorno = (import.meta && import.meta.env) || {};
+const supabaseUrl = entorno.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = entorno.VITE_SUPABASE_ANON_KEY || '';
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
@@ -61,9 +64,9 @@ export function isDevTunnelHost() {
 export function shouldSkipAnonymousAuth() {
   if (typeof window === 'undefined') return true;
   // Modo demo (tuneles, presentaciones): nunca crea usuarios reales.
-  if (import.meta.env.VITE_DEMO_MODE === 'true') return true;
+  if (entorno.VITE_DEMO_MODE === 'true') return true;
   // El override solo relaja la proteccion local, nunca la de preview o bots.
-  if (import.meta.env.VITE_ALLOW_ANON_AUTH === 'true' && isLocalEnvironment()) return false;
+  if (entorno.VITE_ALLOW_ANON_AUTH === 'true' && isLocalEnvironment()) return false;
   return isLocalEnvironment() || isPreviewEnvironment() || isAutomatedClient() || isAdminPortalPath() || isDevTunnelHost();
 }
 

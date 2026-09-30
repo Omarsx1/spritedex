@@ -1,6 +1,10 @@
 import { getSupabase, isSupabaseConfigured } from './supabase';
 import { safeStorage } from './safeStorage';
 import { sinPerfil } from './mergeCollections';
+import { buildShareUrl, normalizeFriendCode } from './shareUrl.js';
+
+// Se reexportan para no cambiar los sitios que ya las importaban desde aqui.
+export { buildShareUrl, normalizeFriendCode };
 
 const STORAGE_MY_CODE_KEY = 'spritedex_my_friend_code';
 const STORAGE_CONNECTED_FRIEND_CODE_KEY = 'spritedex_connected_friend_code';
@@ -41,42 +45,6 @@ export function getMyFriendCode(userId = null, esAnonimo = false) {
   return code;
 }
 
-/**
- * Normalizes friend code input:
- * - Extracts code from full URLs (?code=... or ?friend=...)
- * - Strips leading '#', spaces, symbols
- * - Handles 4-character short codes (e.g. 'XXXX' -> 'SDEX-XXXX')
- * - Fixes missing hyphens (e.g. 'SDEXXXXX' or 'sdex xxxx' -> 'SDEX-XXXX')
- */
-export function normalizeFriendCode(input) {
-  if (!input) return '';
-  let str = input.trim();
-
-  // If user pasted a full URL
-  if (str.includes('code=') || str.includes('CODE=')) {
-    const match = str.match(/[?&]code=([^&#\s]+)/i);
-    if (match) str = decodeURIComponent(match[1]);
-  } else if (str.includes('friend=') || str.includes('FRIEND=')) {
-    const match = str.match(/[?&]friend=([^&#\s]+)/i);
-    if (match) str = decodeURIComponent(match[1]);
-  }
-
-  // Remove leading #, symbols, clean spaces and uppercase
-  str = str.replace(/^[#@]+/, '').trim().toUpperCase();
-  str = str.replace(/\s+/g, '-');
-
-  // Handle 'SDEXXXXX' without hyphen
-  if (/^SDEX[A-Z0-9]{4}$/.test(str)) {
-    str = 'SDEX-' + str.slice(4);
-  }
-
-  // Handle 4-alphanumeric character code (e.g. 'XXXX' -> 'SDEX-XXXX')
-  if (/^[A-Z0-9]{4}$/.test(str)) {
-    str = 'SDEX-' + str;
-  }
-
-  return str;
-}
 
 /**
  * Fetches friend collection from Supabase by Friend Code
@@ -220,14 +188,42 @@ export function subscribeToFriendCollection(friendUserId, onUpdate) {
   };
 }
 
-/**
- * Generates permanent shareable friend URL with friend code
- */
+
+export function generateShareUrl(token, friendCode) {
+  return buildShareUrl(window.location.origin + window.location.pathname, token, friendCode);
+}
+
+// Enlace por codigo: se mantiene para quien todavia no tiene token.
 export function generatePermanentFriendUrl(friendCode) {
-  const code = normalizeFriendCode(friendCode);
-  const url = new URL(window.location.origin + window.location.pathname);
-  url.searchParams.set('code', code);
-  return url.toString();
+  return buildShareUrl(window.location.origin + window.location.pathname, null, friendCode);
+}
+
+/**
+ * Lee una coleccion a partir de su token de compartir.
+ * Va por funcion del servidor: la tabla ya no es publica y esa funcion solo devuelve
+ * la coleccion, sin el perfil ni el correo del dueño.
+ */
+export async function fetchCollectionByShareToken(token) {
+  if (!isSupabaseConfigured || !token) return null;
+  const supabase = await getSupabase();
+  if (!supabase) return null;
+  try {
+    const { data, error } = await supabase.rpc('collection_by_share_token', { token: String(token).trim() });
+    if (error) {
+      console.warn('[amigos] token de compartir no resuelto:', error.message);
+      return null;
+    }
+    const fila = Array.isArray(data) ? data[0] : data;
+    if (!fila || !fila.user_state) return null;
+    return {
+      friendCode: fila.friend_code || '',
+      userState: sinPerfil(fila.user_state),
+      updatedAt: fila.updated_at
+    };
+  } catch (err) {
+    console.error('Failed to fetch shared collection:', err);
+    return null;
+  }
 }
 
 export function saveLastConnectedFriendCode(friendCode) {
