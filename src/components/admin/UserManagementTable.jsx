@@ -15,7 +15,8 @@ import {
   ShieldCheck,
   Star,
   Layers,
-  Crown
+  Crown,
+  AlertTriangle
 } from 'lucide-react';
 import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
 import { getMyFriendCode } from '../../utils/friendCode';
@@ -352,6 +353,20 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
       return true;
     });
   }, [users, searchQuery, filterType, hideTestUsers, testUserIds]);
+
+  // Salud de los codigos de amigo. La base deberia garantizarlos (NOT NULL + UNIQUE), pero
+  // si alguna vez deja de hacerlo, esto lo ensena ANTES de que lo note un usuario: se calcula
+  // sobre los datos crudos que ya cargamos, sin RPC y sin SQL.
+  const saludCodigos = useMemo(() => {
+    const codigos = (rawCollections || []).map((col) => String(col.friend_code || '').trim());
+    const cuenta = new Map();
+    codigos.filter(Boolean).forEach((codigo) => cuenta.set(codigo, (cuenta.get(codigo) || 0) + 1));
+    return {
+      vacios: codigos.filter((codigo) => !codigo).length,
+      repetidos: [...cuenta.entries()].filter(([, n]) => n > 1),
+      total: codigos.length
+    };
+  }, [rawCollections]);
 
   const totalPages = Math.ceil(filteredUsers.length / pageSize) || 1;
 
@@ -766,6 +781,29 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
           </button>
         </div>
       </div>
+
+      {/* Aviso de codigos insanos: si aparece, la garantia de la base se rompio y hay que
+          revisar antes de que un usuario lo sufra (su codigo deja de identificarle). */}
+      {(saludCodigos.vacios > 0 || saludCodigos.repetidos.length > 0) && (
+        <div style={{
+          display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'baseline',
+          marginBottom: '12px', padding: '10px 14px', borderRadius: '10px',
+          background: c.pillDangerBg || 'rgba(239, 68, 68, 0.12)',
+          border: '1px solid rgba(239, 68, 68, 0.35)',
+          color: c.textPrimary,
+          fontSize: '0.8rem'
+        }}>
+          <AlertTriangle size={15} style={{ color: '#EF4444', flexShrink: 0 }} />
+          <strong>Los códigos de amigo no están sanos.</strong>
+          {saludCodigos.vacios > 0 && <span>{saludCodigos.vacios} cuenta(s) sin código.</span>}
+          {saludCodigos.repetidos.length > 0 && (
+            <span>
+              {saludCodigos.repetidos.length} código(s) repetido(s):{' '}
+              {saludCodigos.repetidos.map(([codigo, n]) => codigo + ' ×' + n).join(', ')}.
+            </span>
+          )}
+        </div>
+      )}
 
       {/* ═══ TABLE DATA CONTAINER ═══ */}
       <div style={{

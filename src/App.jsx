@@ -483,7 +483,6 @@ export function App() {
 
           const payload = {
             user_id: user.id,
-            friend_code: myFriendCode,
             user_state: {
               ...userState,
               _profile: profileMeta
