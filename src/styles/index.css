@@ -8302,3 +8302,25 @@ body:has(.modal-overlay) {
 .sdm-friends__hint--aviso {
   color: #ffd166;
 }
+
+/* En la ficha compartida los botones son tres y largos: cuando la fila parte, el grupo se
+   encogia a su contenido y quedaban huecos a la derecha. Aqui ocupan el ancho completo y se
+   reparten en dos columnas; el que queda suelto se estira. La lista de amigos no se toca. */
+@media (max-width: 520px) {
+  .fpage__bloqueFicha .sdm-friends__actions {
+    flex: 1 1 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .fpage__bloqueFicha .sdm-friends__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: normal;
+    text-align: center;
+  }
+  .fpage__bloqueFicha .sdm-friends__btn:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
