@@ -39,12 +39,27 @@ decide por el **idioma del navegador**, nunca por país: un hispanohablante en E
   la rareza, así que el brillo nunca se aplicaba.
 - El placeholder del acceso de admin sugería `@spritedex.com`.
 
-## Pendiente conocido
+## Pendiente que ya se cerró (esta nota estaba vieja)
 
-El texto que viene de los **datos del juego** sigue en español en modo inglés: habilidad,
-coste de invocación y ubicación en la ficha del espíritu. Son solo **68 cadenas distintas**
-(39 habilidades, 9 perks, 11 ubicaciones, 9 costes; ~5.850 caracteres), así que se puede
-cerrar con una pasada de traducción acotada.
+El texto que viene de los **datos del juego** (habilidad, perk, coste de invocación y
+ubicación) ya se traduce: commit `9897603`, en `dev` y en producción.
+
+- Se resuelve por catálogo con el texto en español como clave (`src/data/i18n/textos.juego.json`,
+  83 entradas) y `pickTexto()`; si falta una traducción se muestra el original, nunca una clave rota.
+- Cobertura medida contra el volcado real: **74 de 75** cadenas distintas traducidas. La única
+  que no está es el literal `"0"` (un coste de invocación), que no necesita traducción.
+- Comprobado que la causa que originó esta nota (el espíritu de botín mostrando español en modo
+  inglés) es la misma que cubre `pickTexto`: no hay nombres de espíritu sin inglés, el catálogo
+  cubre los 234 ids.
+
+## Decisiones abiertas
+
+- **Hashtag de la lona.** El de la competencia (`#FNGGOverride`) se sustituyó por
+  `#SpritedexOverride` en el commit `64ff38f`. Queda la duda de si "Override" sigue siendo
+  vocabulario ajeno; `#Spritedex` o `#SpritedexGG` serían más propios.
+- **Selector de idioma en la página de amigos.** Se mantiene a propósito: quien llega por un
+  enlace aterriza directamente ahí, sin pasar por la portada, así que ese selector es el único
+  sitio donde puede cambiar de idioma sin salir.
 
 ## Verificación en producción (medida, no supuesta)
 
