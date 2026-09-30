@@ -8054,13 +8054,16 @@ body:has(.modal-overlay) {
 .sdm-friends__label { font-size: 0.62rem; font-weight: 800; letter-spacing: 1.3px; color: rgba(226, 232, 240, 0.45); }
 .sdm-friends__row {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  /* Sin wrap, en un iPhone los botones (que no pueden encogerse) se salian del recuadro
+     y aplastaban la placa del codigo hasta dejarla en ancho cero. */
+  flex-wrap: wrap;
   padding: 8px 10px; border-radius: 11px;
   background: rgba(255, 255, 255, 0.035); border: 1px solid rgba(255, 255, 255, 0.07);
 }
-.sdm-friends__plate { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.sdm-friends__plate { display: inline-flex; align-items: center; gap: 6px; min-width: 0; flex: 0 0 auto; }
 .sdm-friends__prefix { font-family: monospace; font-size: 0.66rem; font-weight: 800; letter-spacing: 1.4px; color: rgba(226, 232, 240, 0.45); }
 .sdm-friends__code { font-family: monospace; font-size: 0.95rem; font-weight: 900; letter-spacing: 2.5px; color: #00F0E8; }
-.sdm-friends__actions { display: inline-flex; align-items: center; gap: 6px; }
+.sdm-friends__actions { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-left: auto; }
 .sdm-friends__btn {
   padding: 6px 11px; border-radius: 9px; font-size: 0.68rem; font-weight: 700;
   color: rgba(226, 232, 240, 0.8); background: rgba(255, 255, 255, 0.06);
