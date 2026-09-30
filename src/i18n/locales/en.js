@@ -75,6 +75,7 @@ export default {
   "amigos.enviarSolicitud": "Send request",
   "amigos.esperando": "Waiting",
   "amigos.fichaCompartida": "SHARED PROFILE",
+  "amigos.avisoEnlace": "⚠️ Anyone with this link will see your full collection.",
   "amigos.hintCodigo": "Anyone with your code can send you a request. You decide whether to accept it.",
   "amigos.leFaltanConteo": "THEY'RE MISSING ({n})",
   "amigos.leFaltanHint": "Your friend is missing these: they're yours and you can share them.",

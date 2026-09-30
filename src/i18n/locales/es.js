@@ -76,6 +76,7 @@ export default {
   "amigos.enviarSolicitud": "Enviar solicitud",
   "amigos.esperando": "Esperando",
   "amigos.fichaCompartida": "FICHA COMPARTIDA",
+  "amigos.avisoEnlace": "⚠️ Cualquiera con este enlace verá tu colección completa.",
   "amigos.hintCodigo": "Quien tenga tu código puede enviarte una solicitud. Tú decides si la aceptas.",
   "amigos.leFaltanConteo": "LE FALTAN ({n})",
   "amigos.leFaltanHint": "Estos le faltan a tu amigo: son tuyos y puedes compartírselos.",

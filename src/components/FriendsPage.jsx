@@ -127,6 +127,7 @@ export function FriendsPage({ myFriendCode, codigoFicha, userState, friendState,
               </button>
             </div>
           </div>
+          <p className="sdm-friends__hint sdm-friends__hint--aviso">{t('amigos.avisoEnlace')}</p>
           <p className="sdm-friends__hint">{t('amigos.hintCodigo')}</p>
         </div>
 

@@ -8294,3 +8294,8 @@ body:has(.modal-overlay) {
 .fpage__lang .lang-switch__btn {
   min-width: 28px;
 }
+
+/* Aviso de lo que implica compartir el enlace: mismo sitio que el resto de la ficha */
+.sdm-friends__hint--aviso {
+  color: #ffd166;
+}
