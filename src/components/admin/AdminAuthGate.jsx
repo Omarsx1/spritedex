@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ShieldCheck, ArrowRight, AlertCircle } from 'lucide-react';
+import { Google } from '../ui/Google';
 import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
+import { conGoogle } from '../../utils/authActions';
 import { ADMIN_AUTH_KEY } from '../../utils/adminAuth';
 
 // La puerta del CMS.
@@ -11,11 +13,75 @@ import { ADMIN_AUTH_KEY } from '../../utils/adminAuth';
 // Ahora la única entrada es una cuenta real, y además tiene que estar en la lista de
 // administradores de la base: el permiso lo comprueba el servidor, no esta pantalla.
 
+// ¿Esta cuenta está en la lista de administradores? Se pregunta a la base y no al
+// navegador: la tabla tiene RLS, así que solo deja leer tu propia fila y la respuesta no
+// revela quién más es admin.
+async function cuentaEsAdmin(supabase, userId) {
+  const { data, error } = await supabase
+    .from('admins')
+    .select('user_id')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) throw error;
+  return Boolean(data);
+}
+
 export function AdminAuthGate({ onAuthenticated, onExit }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [comprobandoSesion, setComprobandoSesion] = useState(true);
+  const [sesionInvitada, setSesionInvitada] = useState(false);
+
+  // Si ya hay sesión (por ejemplo, acabas de entrar con Google y volviste aquí), no tiene
+  // sentido pedir nada: se comprueba la lista y se entra. Es el caso normal del dueño, que
+  // entra a la app con Google y no tiene contraseña que teclear.
+  const onAuthRef = useRef(onAuthenticated);
+  onAuthRef.current = onAuthenticated;
+
+  useEffect(() => {
+    let cancelado = false;
+    (async () => {
+      try {
+        const supabase = await getSupabase();
+        if (!supabase) return;
+        const { data } = await supabase.auth.getSession();
+        const usuario = data?.session?.user;
+        if (cancelado || !usuario) return;
+
+        // La app crea una sesión de invitado sola: esa no sirve para el CMS.
+        if (usuario.is_anonymous) {
+          setSesionInvitada(true);
+          return;
+        }
+        if (await cuentaEsAdmin(supabase, usuario.id)) {
+          onAuthRef.current();
+          return;
+        }
+        setEmail(usuario.email || '');
+        setErrorMsg('La cuenta ' + (usuario.email || 'con la que entraste') + ' no tiene acceso al CMS.');
+      } catch {
+        // Si algo falla (por ejemplo, la tabla todavía no existe), se deja la puerta a la
+        // vista y el propio formulario contará el problema al intentar entrar.
+      } finally {
+        if (!cancelado) setComprobandoSesion(false);
+      }
+    })();
+    return () => { cancelado = true; };
+  }, []);
+
+  // Entrar con Google: es la vía del dueño. Se usa un inicio de sesión real (no vinculación)
+  // porque el acceso depende de la cuenta, no del invitado del navegador.
+  const handleGoogle = async () => {
+    setLoading(true);
+    setErrorMsg('');
+    const { error } = await conGoogle(false, typeof window !== 'undefined' ? window.location.href : undefined);
+    if (error) {
+      setErrorMsg(error.message);
+      setLoading(false);
+    }
+  };
 
   const handleSupabaseLogin = async (e) => {
     e.preventDefault();
@@ -39,15 +105,7 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
         // Tener sesión no basta: hace falta estar en la lista de administradores. Se lee
         // la tabla de la base (RLS solo deja ver tu propia fila) para que el permiso lo
         // decida el servidor. Si no estás, se cierra la sesión que se acaba de abrir.
-        const { data: fila, error: errAdmins } = await supabase
-          .from('admins')
-          .select('user_id')
-          .eq('user_id', data.user.id)
-          .maybeSingle();
-
-        if (errAdmins) throw errAdmins;
-
-        if (!fila) {
+        if (!(await cuentaEsAdmin(supabase, data.user.id))) {
           await supabase.auth.signOut();
           setErrorMsg('Esta cuenta no tiene acceso al CMS. Un administrador tiene que añadirla en la sección Administradores.');
           return;
@@ -164,8 +222,51 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
             El CMS necesita la nube configurada: sin ella no hay cuentas ni lista de
             administradores con la que comprobar tu acceso.
           </div>
+        ) : comprobandoSesion ? (
+          <div style={{ padding: '20px', textAlign: 'center', color: '#94a3b8', fontSize: '0.86rem' }}>
+            Comprobando tu sesión…
+          </div>
         ) : (
-          <form onSubmit={handleSupabaseLogin}>
+          <>
+            <button
+              type="button"
+              onClick={handleGoogle}
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '10px',
+                background: '#FFFFFF',
+                color: '#1F1F1F',
+                border: 'none',
+                fontSize: '0.88rem',
+                fontWeight: 800,
+                cursor: loading ? 'wait' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                opacity: loading ? 0.7 : 1
+              }}
+            >
+              <Google size={18} />
+              <span>Continuar con Google</span>
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '18px 0', color: '#475569', fontSize: '0.72rem' }}>
+              <span style={{ flex: 1, height: '1px', background: 'rgba(255, 255, 255, 0.12)' }} />
+              <span>o con correo y contraseña</span>
+              <span style={{ flex: 1, height: '1px', background: 'rgba(255, 255, 255, 0.12)' }} />
+            </div>
+
+            {sesionInvitada ? (
+              <p style={{ margin: '0 0 14px', fontSize: '0.76rem', color: '#fbbf24', lineHeight: 1.55 }}>
+                Ahora mismo estás navegando como invitado. Entrar aquí te identifica con tu
+                cuenta de Google, que es la que tiene el acceso.
+              </p>
+            ) : null}
+
+            <form onSubmit={handleSupabaseLogin}>
             <div style={{ marginBottom: '14px' }}>
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', marginBottom: '6px' }}>
                 CORREO DE ADMINISTRADOR
@@ -239,6 +340,7 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
               <ArrowRight size={16} />
             </button>
           </form>
+          </>
         )}
 
         {/* Exit link */}

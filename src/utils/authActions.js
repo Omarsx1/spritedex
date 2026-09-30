@@ -15,7 +15,9 @@ export function origenActual() {
 // Con sesion anonima hay que VINCULAR la identidad (linkIdentity), no iniciar sesion:
 // un login normal crea un usuario NUEVO y la coleccion se queda atras. Vincular exige
 // "Manual Linking" activado en Supabase.
-export async function conGoogle(esAnonimo) {
+// `redirectTo` se puede cambiar para volver a un sitio concreto (el CMS lo usa); por
+// defecto se vuelve al origen, que es lo que necesita la app pública.
+export async function conGoogle(esAnonimo, redirectTo = origenActual()) {
   try {
     const supabase = await getSupabase();
     if (!supabase) return { error: new Error('La nube no esta configurada.') };
@@ -23,7 +25,7 @@ export async function conGoogle(esAnonimo) {
     const opciones = {
       provider: 'google',
       options: {
-        redirectTo: origenActual(),
+        redirectTo,
         queryParams: { prompt: 'select_account', access_type: 'offline' }
       }
     };

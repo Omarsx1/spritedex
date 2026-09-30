@@ -32,6 +32,12 @@ el código, y poder otorgar y quitar accesos desde el propio panel.
 - [x] SQL en Supabase (lo ejecutó el dueño): tabla `admins`, función `es_admin()`, políticas
       de `admins`/`user_collections`/`analytics_events` y las tres RPC del panel.
 - [x] Publicar (dev + main) y comprobar la puerta en producción.
+- [x] **Corrección**: el dueño entra a la app con Google, no con contraseña, así que la
+      puerta se quedó sin entrada para él (fallo detectado por él, no por las pruebas). Se
+      añadió "Continuar con Google" (`conGoogle`, con vuelta a la propia ruta del CMS) y,
+      sobre todo, la puerta **detecta la sesión que ya existe** y comprueba la lista: si eres
+      admin, entra sin pedir nada. También avisa cuando la sesión abierta es la de invitado,
+      porque esa no sirve para el CMS.
 - [ ] Comprobar en el panel: la tabla muestra todas las filas, y "Administradores" permite
       otorgar y quitar.
 
