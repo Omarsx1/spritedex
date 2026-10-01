@@ -267,20 +267,18 @@ export function Header({
       <div className="hero__content">
         {/* Title */}
         <div className="hero__title-block" ref={titleRef} style={{ position: 'relative', zIndex: 10 }}>
-          <h1 className="hero__title">
-            {isFortnitemares ? (
-              <div className="hero__title-fnm-wrap">
-                <img
-                  src="/fortnitemares.svg"
-                  alt="FORTNITEMARES"
-                  className="hero__title-fnm-svg"
-                />
-              </div>
-            ) : (
+          <h1 className="hero__title" data-fnm-logo={isFortnitemares ? 'themed' : 'normal'}>
+            <span className="hero__title-line-wrap">
               <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">
                 FORTNITE
               </span>
-            )}
+              <img
+                src="/fortnitemares.svg"
+                alt="FORTNITEMARES"
+                className="hero__title-fnm-svg"
+                aria-hidden={!isFortnitemares}
+              />
+            </span>
             <span className={`hero__title-line hero__title-line--accent ${isFortnitemares ? 'hero__title-line--accent-fnm' : ''}`}>
               SPRITEDEX
             </span>

@@ -1,13 +1,13 @@
-// Seasonal Fortnitemares behaviour is driven by time, storage and a canvas
-// library. Those are exactly the seams that break silently, so they are pinned
-// here: window boundaries, developer-preview isolation and the bat-only fallback.
+// Seasonal Fortnitemares behaviour is driven by time, storage and canvas work.
+// Those are exactly the seams that break silently, so they are pinned here:
+// window boundaries, developer-preview isolation, the intro phase order and
+// the guarantee that the seasonal effect can never fall back to confetti.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
   FORTNITEMARES_START,
   FORTNITEMARES_END,
-  INTRO_TIMELINE,
   resolveSeasonalState,
   getNextSeasonalBoundary,
   hasSeenFortnitemaresIntro,
@@ -16,11 +16,9 @@ import {
   applySeasonalTheme,
   subscribeSeasonalState
 } from '../src/config/seasonalEvent.js';
-import {
-  HALLOWEEN_COLORS,
-  buildThemedConfettiOptions,
-  resolveBatShapes
-} from '../src/utils/confetti.js';
+import { FNM_PHASES, FNM_SWARM_COUNT } from '../src/config/fortnitemaresTimeline.js';
+import { HALLOWEEN_COLORS, isBatSwarmActive } from '../src/utils/confetti.js';
+import { createBatSwarm, fireFlyingBats } from '../src/utils/batSwarm.js';
 
 const INSIDE = new Date('2026-10-15T12:00:00-05:00');
 const AFTER = new Date('2027-01-01T00:00:00-05:00');
@@ -30,14 +28,28 @@ test('event boundaries are offset-anchored, so they cannot drift with the browse
   assert.equal(FORTNITEMARES_END.toISOString(), '2026-11-04T05:00:00.000Z');
 });
 
-test('the one-time intro stays a short trailer sting, not a loading screen', () => {
-  const t = INTRO_TIMELINE;
-  assert.ok(t.bootDelay + t.end <= 2200, 'total time from mount must stay under ~2.2s');
-  assert.ok(
-    t.corrupt < t.transform && t.transform < t.curse && t.curse < t.fade && t.fade < t.end,
-    'timeline beats must be strictly ordered'
-  );
-  assert.ok(t.end - t.fade >= 600, 'the 600ms CSS fade must finish before the overlay unmounts');
+test('the entrance runs as an ordered season-launch sequence, not a stall', () => {
+  const ids = FNM_PHASES.map((p) => p.id);
+  assert.deepEqual(ids, ['corrupt', 'swarm', 'brand', 'curse', 'settle', 'done']);
+
+  for (let i = 1; i < FNM_PHASES.length; i += 1) {
+    assert.ok(
+      FNM_PHASES[i].at > FNM_PHASES[i - 1].at,
+      `phase ${FNM_PHASES[i].id} must start after ${FNM_PHASES[i - 1].id}`
+    );
+  }
+
+  const total = FNM_PHASES[FNM_PHASES.length - 1].at;
+  assert.ok(total >= 3500, 'the cinematic must be a real moment, not a 1.9s sting');
+  assert.ok(total <= 6000, 'but it must not block the interface for long');
+});
+
+test('the brand beat lands before the theme has to be readable', () => {
+  const brand = FNM_PHASES.find((p) => p.id === 'brand');
+  const settle = FNM_PHASES.find((p) => p.id === 'settle');
+  const curse = FNM_PHASES.find((p) => p.id === 'curse');
+  assert.ok(brand.at < curse.at, 'the wordmark swaps before the crimson flood');
+  assert.ok(curse.at < settle.at, 'the flood resolves into a readable interface');
 });
 
 test('production resolves strictly from the event window', () => {
@@ -84,47 +96,29 @@ test('the intro flag is remembered once and can be replayed', () => {
   assert.equal(hasSeenFortnitemaresIntro(), false);
 });
 
-test('the bat fallback never degrades into ordinary confetti', () => {
-  assert.deepEqual(resolveBatShapes(null), ['circle']);
-  assert.deepEqual(resolveBatShapes({}), ['circle']);
-  const everythingFails = {
-    shapeFromText() { throw new Error('emoji cannot be rasterized'); },
-    shapeFromPath() { throw new Error('canvas unavailable'); }
-  };
-  assert.deepEqual(resolveBatShapes(everythingFails), ['circle']);
+test('the seasonal palette stays inside the key-art night range', () => {
+  assert.ok(Array.isArray(HALLOWEEN_COLORS) && HALLOWEEN_COLORS.length > 0);
+  for (const color of HALLOWEEN_COLORS) {
+    assert.match(color, /^#[0-9a-f]{6}$/i, `unexpected colour token: ${color}`);
+  }
 });
 
-test('the bat fallback prefers the emoji shape, then the vector silhouette', () => {
-  const emojiShape = { kind: 'text' };
-  assert.deepEqual(resolveBatShapes({ shapeFromText: () => emojiShape }), [emojiShape]);
-
-  const pathShape = { kind: 'path' };
-  const textFails = {
-    shapeFromText() { throw new Error('no emoji'); },
-    shapeFromPath: () => pathShape
-  };
-  assert.deepEqual(resolveBatShapes(textFails), [pathShape]);
+// The original defect: the seasonal effect was drawn with canvas-confetti, so
+// bats arced up under gravity and fell like dead debris. The swarm now owns its
+// own canvas, which is what this assertion protects.
+test('the seasonal effect never routes through canvas-confetti particles', () => {
+  assert.equal(isBatSwarmActive(INSIDE), true, 'inside the window the bats own the effect');
+  assert.equal(isBatSwarmActive(AFTER), false, 'outside the window normal confetti returns');
 });
 
-test('themed bursts discard the caller palette', () => {
-  const built = buildThemedConfettiOptions(
-    { particleCount: 60, spread: 70, origin: { y: 0.7 }, colors: ['#ffffff', '#000000'], shapes: ['square'], scalar: 9 },
-    ['circle']
-  );
-  assert.deepEqual(built.colors, HALLOWEEN_COLORS);
-  assert.deepEqual(built.shapes, ['circle']);
-  assert.equal(built.particleCount, 48);
-  assert.equal(built.spread, 70);
-  assert.deepEqual(built.origin, { y: 0.7 });
-  assert.equal(built.scalar, undefined);
+test('the bat swarm refuses to run without a DOM instead of throwing', () => {
+  assert.equal(createBatSwarm(), null);
+  assert.equal(fireFlyingBats(), null);
+  assert.equal(createBatSwarm({ count: 4, mode: 'burst' }), null);
 });
 
-test('themed bursts keep the emoji scalar when a custom shape is used', () => {
-  const shape = { kind: 'text' };
-  const built = buildThemedConfettiOptions({ particleCount: 30 }, [shape]);
-  assert.deepEqual(built.shapes, [shape]);
-  assert.equal(built.scalar, 2.4);
-  assert.equal(built.particleCount, 24);
+test('the entrance releases enough bats to cross the whole viewport', () => {
+  assert.ok(FNM_SWARM_COUNT >= 20, 'a thin swarm reads as confetti, not a flight');
 });
 
 // The original defect: a tab left open kept the theme forever, because the

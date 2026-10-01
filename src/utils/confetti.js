@@ -1,8 +1,21 @@
 // canvas-confetti is imported on demand so the initial bundle stays small.
-import { isFortnitemaresActive } from '../config/seasonalEvent.js';
+import { isFortnitemaresActive, resolveSeasonalState } from '../config/seasonalEvent.js';
+import { createBatSwarm, fireFlyingBats } from './batSwarm.js';
 
 /** Seasonal palette: deep violets, pumpkin orange and near-black. */
 export const HALLOWEEN_COLORS = ['#0f051d', '#581c87', '#9333ea', '#ff6b00', '#18181b', '#d946ef'];
+
+/**
+ * Whether the themed effect is the flying-bat swarm rather than confetti.
+ * The swarm lives in its own canvas (src/utils/batSwarm.js) because
+ * canvas-confetti cannot express a bat that keeps flying across the screen.
+ *
+ * Uses the pure resolver rather than isFortnitemaresActive() so the decision
+ * stays testable without a DOM.
+ */
+export function isBatSwarmActive(now = new Date()) {
+  return resolveSeasonalState({ now, isDev: false });
+}
 
 /** Bat silhouette used when the emoji glyph cannot be rasterized. */
 export const BAT_SILHOUETTE_PATH =
@@ -76,38 +89,29 @@ export function buildThemedConfettiOptions(options = {}, shapes) {
 }
 
 /**
- * Fires confetti or flying bats depending on the active season.
+ * Fires confetti during the normal season, and flying bats during Fortnitemares.
+ *
+ * The seasonal branch deliberately bypasses canvas-confetti entirely: passing
+ * an emoji bat to confetti produces a particle that arcs and falls, which is
+ * exactly the dead-bat-confetti effect the seasonal design rejects.
  */
 export function fireConfetti(options = {}) {
+  if (isFortnitemaresActive()) {
+    fireFlyingBats({ count: 10, duration: 2600, mode: 'burst' });
+    return;
+  }
+
   getConfetti()
     .then((confetti) => {
-      if (isFortnitemaresActive()) {
-        confetti(buildThemedConfettiOptions(options, resolveBatShapes(confetti)));
-      } else {
-        confetti(options);
-      }
+      confetti(options);
     })
     .catch(() => {});
 }
 
 /**
- * Large bat swarm used by the entrance cinematic and special moments.
+ * Entrance cinematic swarm: bats flying across the whole viewport in every
+ * direction, wrapping at the edges instead of falling.
  */
 export function fireBatSwarm() {
-  getConfetti()
-    .then((confetti) => {
-      const shapes = resolveBatShapes(confetti);
-      const base = {
-        gravity: 0.45,
-        ticks: 200,
-        colors: HALLOWEEN_COLORS,
-        shapes,
-        ...(typeof shapes[0] !== 'string' ? { scalar: 3.0 } : {})
-      };
-
-      confetti({ ...base, particleCount: 20, angle: 65, spread: 60, origin: { x: 0.05, y: 0.95 }, startVelocity: 42 });
-      confetti({ ...base, particleCount: 20, angle: 115, spread: 60, origin: { x: 0.95, y: 0.95 }, startVelocity: 42 });
-      confetti({ ...base, particleCount: 28, angle: 90, spread: 85, origin: { x: 0.5, y: 0.98 }, startVelocity: 50 });
-    })
-    .catch(() => {});
+  return createBatSwarm({ count: 26, mode: 'burst' });
 }

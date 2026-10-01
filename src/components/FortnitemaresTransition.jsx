@@ -1,25 +1,34 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   IS_DEV_BUILD,
-  INTRO_TIMELINE,
   applySeasonalTheme,
   hasSeenFortnitemaresIntro,
   isFortnitemaresActive,
-  markFortnitemaresIntroSeen
+  markFortnitemaresIntroSeen,
+  windowDispatchSeasonChange
 } from '../config/seasonalEvent';
 import { prefersReducedMotion } from '../utils/motion';
-import { fireBatSwarm } from '../utils/confetti';
+import { createBatSwarm } from '../utils/batSwarm';
+import {
+  FNM_BOOT_DELAY,
+  FNM_PHASES,
+  FNM_SWARM_COUNT
+} from '../config/fortnitemaresTimeline';
 
 /**
- * One-time Fortnitemares entrance cinematic.
- * Plays once per browser during the event, can be dismissed with mouse or
- * keyboard, and is skipped completely for reduced-motion visitors.
+ * One-time Fortnitemares entrance.
+ *
+ * Unlike a full-screen curtain, this drives the *real* interface: it applies
+ * a `data-fnm-phase` attribute to <html> and lets CSS transform the existing
+ * logo, background and dock in place. The only elements this component renders
+ * are non-interactive atmospheric layers (scanlines, vignette) plus a skip
+ * button, so nothing covers or duplicates the live UI.
  */
 export function FortnitemaresTransition({ onComplete }) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [step, setStep] = useState(0); // 0 idle, 1 glitch, 2 lightning + bats, 3 fog, 4 fade out
-  const [glitchText, setGlitchText] = useState('FORTNITE');
-  const timeoutRefs = useRef([]);
+  const [phase, setPhase] = useState(null);
+  const [armed, setArmed] = useState(false);
+  const timersRef = useRef([]);
+  const swarmRef = useRef(null);
   const skipButtonRef = useRef(null);
   const previousFocusRef = useRef(null);
   const onCompleteRef = useRef(onComplete);
@@ -29,58 +38,70 @@ export function FortnitemaresTransition({ onComplete }) {
   }, [onComplete]);
 
   const clearTimers = useCallback(() => {
-    timeoutRefs.current.forEach(clearTimeout);
-    timeoutRefs.current = [];
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
   }, []);
 
-  const startTransition = useCallback(() => {
+  const teardown = useCallback(() => {
+    clearTimers();
+    if (swarmRef.current) {
+      swarmRef.current.stop();
+      swarmRef.current = null;
+    }
+  }, [clearTimers]);
+
+  const finish = useCallback(() => {
+    teardown();
+    setPhase(null);
+    setArmed(false);
+    if (typeof document !== 'undefined') {
+      document.documentElement.removeAttribute('data-fnm-phase');
+    }
+    // The themed interface stays on; the intro simply stops driving it.
+    applySeasonalTheme(true);
+    markFortnitemaresIntroSeen();
+    if (onCompleteRef.current) onCompleteRef.current();
+  }, [teardown]);
+
+  const start = useCallback(() => {
     clearTimers();
     previousFocusRef.current = typeof document !== 'undefined' ? document.activeElement : null;
-    setIsPlaying(true);
-    setStep(1);
 
-    const push = (delay, fn) => {
-      timeoutRefs.current.push(setTimeout(fn, delay));
-    };
-
-    // 120ms: the logo and the scanlines start corrupting.
-    push(INTRO_TIMELINE.corrupt, () => {
-      setGlitchText('F̸O̸R̸T̸N̸I̸T̸E̸');
-      setStep(1);
-    });
-
-    // 320ms: purple lightning and the bat swarm.
-    push(INTRO_TIMELINE.transform, () => {
-      setStep(2);
-      setGlitchText('FORTNITEMARES');
-      applySeasonalTheme(true);
-      fireBatSwarm();
-    });
-
-    // 780ms: spectral fog and the warning line.
-    push(INTRO_TIMELINE.curse, () => setStep(3));
-
-    // 1300ms: the curtain fades out (600ms CSS transition).
-    push(INTRO_TIMELINE.fade, () => setStep(4));
-
-    // 1900ms: the cinematic is over.
-    push(INTRO_TIMELINE.end, () => {
-      clearTimers();
-      markFortnitemaresIntroSeen();
-      setIsPlaying(false);
-      if (onCompleteRef.current) onCompleteRef.current();
-    });
-  }, [clearTimers]);
+    for (const step of FNM_PHASES) {
+      timersRef.current.push(
+        setTimeout(() => {
+          if (step.id === 'swarm') {
+            swarmRef.current = createBatSwarm({ count: FNM_SWARM_COUNT, mode: 'burst' });
+          }
+          if (step.id === 'brand') {
+            applySeasonalTheme(true);
+            windowDispatchSeasonChange(true);
+          }
+          if (step.id === 'done') {
+            finish();
+            return;
+          }
+          setPhase(step.id);
+        }, step.at)
+      );
+    }
+  }, [clearTimers, finish]);
 
   const dismiss = useCallback(() => {
-    clearTimers();
+    teardown();
+    setPhase(null);
+    setArmed(false);
+    if (typeof document !== 'undefined') {
+      document.documentElement.removeAttribute('data-fnm-phase');
+    }
+    // Dismissing mid-corruption still lands on the themed interface.
     applySeasonalTheme(isFortnitemaresActive());
+    if (isFortnitemaresActive()) windowDispatchSeasonChange(true);
     markFortnitemaresIntroSeen();
-    setIsPlaying(false);
     if (onCompleteRef.current) onCompleteRef.current();
-  }, [clearTimers]);
+  }, [teardown]);
 
-  // Boot: decide whether this visit sees the cinematic.
+  // Boot: decide whether this visit sees the cinematic at all.
   useEffect(() => {
     if (!isFortnitemaresActive()) {
       applySeasonalTheme(false);
@@ -93,109 +114,87 @@ export function FortnitemaresTransition({ onComplete }) {
     }
 
     if (prefersReducedMotion()) {
-      // The visitor asked for less motion: no cinematic, straight to the theme.
+      // No cinematic: theme on, immediately, and never replayed.
       applySeasonalTheme(true);
       markFortnitemaresIntroSeen();
       if (onCompleteRef.current) onCompleteRef.current();
       return undefined;
     }
 
-    const initialDelay = setTimeout(() => startTransition(), INTRO_TIMELINE.bootDelay);
-    return () => clearTimeout(initialDelay);
-  }, [startTransition]);
-
-  // Move focus into the dialog while it plays.
-  useEffect(() => {
-    if (!isPlaying) return undefined;
-    if (skipButtonRef.current) skipButtonRef.current.focus();
+    setArmed(true);
     return undefined;
-  }, [isPlaying]);
+  }, []);
 
-  // Restore the previous focus once the dialog closes.
+  // Run the cinematic one tick after mount so the first frame is still the
+  // normal interface; the corruption then happens in front of the user.
   useEffect(() => {
-    if (isPlaying) return undefined;
+    if (!armed) return undefined;
+    const kick = setTimeout(() => start(), FNM_BOOT_DELAY);
+    return () => clearTimeout(kick);
+  }, [armed, start]);
+
+  useEffect(() => () => teardown(), [teardown]);
+
+  // Publish the phase to CSS so the real interface animates in place.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+    if (phase) root.setAttribute('data-fnm-phase', phase);
+    else root.removeAttribute('data-fnm-phase');
+  }, [phase]);
+
+  // Focus handling for the skip control.
+  useEffect(() => {
+    if (armed && skipButtonRef.current) skipButtonRef.current.focus();
+  }, [armed]);
+
+  useEffect(() => {
+    if (armed) return undefined;
     const previous = previousFocusRef.current;
-    if (previous && typeof previous.focus === 'function' && previous.isConnected) {
-      previous.focus();
-    }
+    if (previous && typeof previous.focus === 'function' && previous.isConnected) previous.focus();
     previousFocusRef.current = null;
     return undefined;
-  }, [isPlaying]);
+  }, [armed]);
 
-  // Keyboard: Escape/Enter/Space dismiss; Tab stays inside the single-control dialog.
   useEffect(() => {
-    if (!isPlaying) return undefined;
+    if (!armed) return undefined;
 
     const onKeyDown = (event) => {
       if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar') {
         event.preventDefault();
         dismiss();
-        return;
-      }
-      if (event.key === 'Tab') {
-        event.preventDefault();
-        if (skipButtonRef.current) skipButtonRef.current.focus();
       }
     };
 
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [isPlaying, dismiss]);
+  }, [armed, dismiss]);
 
-  // Development/testing replay hook. Registered in development builds only so
-  // a stray dispatch cannot force the theme outside the event window in production.
+  // Development replay hook: development builds only, so a stray dispatch can
+  // never force the theme outside the event window in production.
   useEffect(() => {
     if (!IS_DEV_BUILD) return undefined;
 
     const handleReplay = () => {
       applySeasonalTheme(false);
-      setTimeout(() => startTransition(), 100);
+      windowDispatchSeasonChange(false);
+      setPhase(null);
+      setArmed(true);
     };
 
     window.addEventListener('spritedex:replay-fortnitemares', handleReplay);
     return () => window.removeEventListener('spritedex:replay-fortnitemares', handleReplay);
-  }, [startTransition]);
+  }, []);
 
-  if (!isPlaying) return null;
+  if (!armed) return null;
 
   return (
-    <div
-      className={'fnm-transition-overlay fnm-step-' + step}
-      onMouseDown={(event) => {
-        // Pointer shortcut: clicking the backdrop also skips the cinematic.
-        if (event.target === event.currentTarget) dismiss();
-      }}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Fortnitemares intro"
-    >
-      {/* Corrupted CRT scanlines and cursed-TV static */}
-      <div className="fnm-crt-scanlines" />
-      <div className="fnm-crt-flicker" />
-
-      {/* Purple and crimson energy flash */}
-      {step >= 2 && <div className="fnm-lightning-flash" />}
-
-      {/* Visual core of the transformation */}
-      <div className="fnm-center-content">
-        <div className="fnm-spooky-aura" />
-
-        <div className="fnm-glitch-title-wrap">
-          <span className="fnm-glitch-badge">⚠️ SIGNAL CORRUPTED</span>
-          <h2 className="fnm-glitch-title" data-text={glitchText}>
-            {glitchText}
-          </h2>
-          <span className="fnm-glitch-sub">
-            {step >= 2 ? 'THE GAME IS CURSED' : 'SYNCING EVENT...'}
-          </span>
-        </div>
-
-        {/* Silhouetted ambient bats */}
-        <div className="fnm-bat-ambient fnm-bat-1">🦇</div>
-        <div className="fnm-bat-ambient fnm-bat-2">🦇</div>
-        <div className="fnm-bat-ambient fnm-bat-3">🦇</div>
-        <div className="fnm-bat-ambient fnm-bat-4">🦇</div>
-      </div>
+    <div className="fnm-cinematic" data-phase={phase || 'boot'}>
+      {/* Atmospheric layers only: they tint and distort the live UI behind them */}
+      <div className="fnm-crt-scanlines" aria-hidden="true" />
+      <div className="fnm-crt-flicker" aria-hidden="true" />
+      <div className="fnm-corrupt-vignette" aria-hidden="true" />
+      <div className="fnm-glitch-bars" aria-hidden="true" />
 
       <button
         type="button"
@@ -203,7 +202,7 @@ export function FortnitemaresTransition({ onComplete }) {
         ref={skipButtonRef}
         onClick={dismiss}
       >
-        Skip intro
+        Skip
       </button>
     </div>
   );

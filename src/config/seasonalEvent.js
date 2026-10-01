@@ -144,6 +144,15 @@ export function applySeasonalTheme(active = isFortnitemaresActive()) {
 }
 
 /**
+ * Announces a seasonal change to listeners (Header listens for this so the
+ * pumpkin and the wordmark swap without a full re-render).
+ */
+export function windowDispatchSeasonChange(active) {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent('spritedex:season-change', { detail: { active: Boolean(active) } }));
+}
+
+/**
  * Keeps the theme correct while a tab stays open: re-checks at the next window
  * boundary, when the tab becomes visible again, and when it regains focus.
  * Returns an unsubscribe function.
