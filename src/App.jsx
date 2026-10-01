@@ -31,6 +31,7 @@ import { fetchCollectionByShareToken } from './utils/friendCode';
 import { getSupabase, warmSupabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from './utils/supabase';
 import { conGoogle } from './utils/authActions';
 import { mergeCollections, sinPerfil } from './utils/mergeCollections';
+import { estadoAlTocarNivel } from './utils/niveles';
 import { setSyncSession, queueCloudSync, clearCloudSync, flushCloudSync } from './utils/pendingSync';
 import { safeStorage } from './utils/safeStorage';
 import {
@@ -563,10 +564,7 @@ export function App() {
     ensureCloudSessionForAction();
     setUserState((prev) => ({
       ...prev,
-      [spriteId]: {
-        owned: true,
-        level: Math.min(Math.max(level, 1), 5)
-      }
+      [spriteId]: estadoAlTocarNivel(prev[spriteId], level)
     }));
   }, [ensureCloudSessionForAction]);
 
