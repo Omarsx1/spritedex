@@ -121,13 +121,21 @@ export function FortnitemaresTransition({ onComplete }) {
       return undefined;
     }
 
-    if (hasSeenFortnitemaresIntro()) {
+    /* Replay de desarrollo: ?intro=1 fuerza la cinematica aunque la bandera ya
+       este puesta o el visitante tenga el movimiento reducido. Vive detras de
+       IS_DEV_BUILD, asi que no existe en produccion: un visitante no repite la
+       cinematica por recargar. */
+    const forceReplay = IS_DEV_BUILD
+      && typeof window !== 'undefined'
+      && new URLSearchParams(window.location.search).has('intro');
+
+    if (hasSeenFortnitemaresIntro() && !forceReplay) {
       applySeasonalTheme(true);
       windowDispatchSeasonChange(true);
       return undefined;
     }
 
-    if (prefersReducedMotion()) {
+    if (prefersReducedMotion() && !forceReplay) {
       // No cinematic: theme on, immediately, and never replayed. The dispatch
       // syncs the Header, whose initial read predates this effect.
       applySeasonalTheme(true);

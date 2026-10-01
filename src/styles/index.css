@@ -8650,6 +8650,12 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
   text-shadow: 0 0 18px rgba(217, 70, 239, 0.5) !important;
+  /* Sombra oscura por detras. Va en filter y no en text-shadow: con
+     background-clip el rotulo es un degradado recortado a las letras, y un
+     text-shadow se pinta encima del relleno, ensuciandolo. drop-shadow usa el
+     alfa ya recortado, asi que dibuja el borde por detras y deja la letra
+     limpia. */
+  filter: drop-shadow(0 3px 7px rgba(6, 2, 14, 0.8)) !important;
   margin-top: -6px !important;
 }
 
@@ -9198,6 +9204,160 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   border-left-color: #cfe6ff;
   border-color: rgba(198, 226, 255, 0.4);
   box-shadow: 0 0 12px rgba(150, 205, 255, 0.25);
+}
+
+/* ==========================================================================
+   PAGINA DE AMIGOS Y EXPORTAR COLECCION EN TEMPORADA
+   Las dos seguian con el cian de fuera de temporada. Misma receta que el
+   resto: violeta de noche en las superficies, fucsia en los acentos y brasa
+   en la accion principal. Lo semantico NO se toca: el rojo de peligro sigue
+   rojo y el verde de exito sigue verde, porque ahi el color significa algo.
+   ========================================================================== */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage {
+  background: radial-gradient(120% 90% at 50% 0%, rgba(28, 14, 46, 0.9) 0%, rgba(10, 5, 18, 0.94) 100%);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends {
+  background: rgba(22, 11, 36, 0.72);
+  border-color: rgba(168, 85, 247, 0.26);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__title {
+  color: #e879f9;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__code {
+  color: #e879f9;
+  text-shadow: 0 0 10px rgba(217, 70, 239, 0.5);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__aviso {
+  color: rgba(232, 121, 249, 0.9);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__input {
+  background: rgba(30, 16, 50, 0.85);
+  border-color: rgba(168, 85, 247, 0.28);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__input:focus {
+  border-color: #d946ef;
+  box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.22);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__btn {
+  /* Las secundarias en violeta tenue, como el boton de limpiar de la hoja: la
+     brasa se reserva a la accion principal, o compiten todas por la mirada. */
+  background: rgba(168, 85, 247, 0.08);
+  border-color: rgba(168, 85, 247, 0.24);
+  color: rgba(196, 181, 253, 0.85);
+}
+
+/* La accion principal y el conmutador de vistas: brasa, igual que la hoja. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__send {
+  color: #1a0b02;
+  background: linear-gradient(135deg, #ff922b, #f76707);
+  box-shadow: 0 0 12px rgba(255, 146, 43, 0.35);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tabs {
+  background: rgba(26, 13, 42, 0.75);
+  border-color: rgba(168, 85, 247, 0.24);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tab {
+  color: rgba(196, 181, 253, 0.75);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tab.is-active {
+  color: #1a0b02;
+  background: linear-gradient(135deg, #ff922b, #f76707);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__chip {
+  color: #e879f9;
+  border-color: rgba(217, 70, 239, 0.35);
+}
+
+/* El foco del teclado tambien vira: la senal debe seguir siendo evidente. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__refresh:focus-visible,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__send:focus-visible,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tab:focus-visible,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__btn:focus-visible,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__chip:focus-visible {
+  outline: 2px solid #e879f9;
+  outline-offset: 2px;
+}
+
+/* ── Exportar Coleccion ─────────────────────────────────────────────── */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro {
+  background: rgba(13, 7, 24, 0.96);
+  border-color: rgba(168, 85, 247, 0.32);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__icon-badge {
+  background: rgba(217, 70, 239, 0.14);
+  border-color: rgba(217, 70, 239, 0.38);
+  box-shadow: 0 0 14px rgba(217, 70, 239, 0.28);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__subtitle {
+  color: rgba(196, 181, 253, 0.62);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__segmented {
+  background: rgba(26, 13, 42, 0.8);
+  border-color: rgba(168, 85, 247, 0.24);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__seg-btn--active {
+  background: #ff922b;
+  color: #1a0b02;
+  box-shadow: 0 0 12px rgba(255, 146, 43, 0.45);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__preview-wrap {
+  border-color: rgba(168, 85, 247, 0.24);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__close {
+  border-color: rgba(168, 85, 247, 0.26);
+  color: rgba(196, 181, 253, 0.9);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__close:hover {
+  border-color: rgba(217, 70, 239, 0.5);
+  color: #ffffff;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn {
+  background: rgba(255, 146, 43, 0.12);
+  border-color: #ff922b;
+  color: #ff922b;
+  box-shadow: 0 0 12px rgba(255, 146, 43, 0.25);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn:hover:not(:disabled),
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn:focus:not(:disabled) {
+  background-color: #ff922b;
+  color: #1a0b02;
+  border-color: #ff922b;
+  box-shadow: 0 0 25px rgba(255, 146, 43, 0.55);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn::before,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn::after {
+  background-color: #ff922b;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn:hover:not(:disabled)::before,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn:focus:not(:disabled)::before {
+  color: #3b0764;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn:hover:not(:disabled)::after,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn:focus:not(:disabled)::after {
+  color: #1a0b02;
 }
 
 /* Seasonal animations must respect the visitor's motion preference. */
