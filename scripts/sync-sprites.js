@@ -676,9 +676,12 @@ async function syncSprites() {
       if (theme === 'Bounty Hunter' && (familyId === 'crown' || parentNorm === 'crown')) {
         isCardUnreleased = false;
       }
-      if (theme === 'Trick or Treat') {
-        isCardUnreleased = false;
-      }
+      // Antes habia aqui una regla que forzaba "Dulce o Truco" a lanzado pasara
+      // lo que pasara. El efecto era que la app enseñaba como publicados 23
+      // variantes que Fortnite.gg da por NO lanzadas, y el sync no podia
+      // corregirlo porque el propio scraper mentia sobre el dato. Ahora se
+      // respeta la fuente; quien quiera verlas tiene el interruptor de no
+      // lanzados en la app.
 
       // Buscar en el catálogo oficial tanto por ID exacto, como por ID alternativo de rift, como por familia + tema
       const themeNorm = theme.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -704,12 +707,23 @@ async function syncSprites() {
       if (existingKey) {
         const { item } = officialMap.get(existingKey);
 
+        // El catalogo obedece al sitio en las DOS direcciones. Antes solo se
+        // manejaba "no lanzado -> lanzado", asi que cualquier marca puesta a mano
+        // se quedaba pegada para siempre y la app enseñaba como publicados
+        // espiritus que la fuente da por no lanzados.
         // Caso: espíritu antes no lanzado que acaba de publicarse oficialmente
         if (item.unreleased === true && isCardUnreleased === false) {
           console.log(`✨ ¡Nuevo lanzamiento detectado!: ${item.id} (${item.name}) ya está disponible en Fortnite.`);
           item.unreleased = false;
           item.isNew = true;
           item.releaseDate = today;
+          catalogChanges++;
+        } else if (item.unreleased === false && isCardUnreleased === true) {
+          // La fuente lo da por no lanzado: se corrige la marca en vez de
+          // mantener una publicacion que el juego todavia no ha hecho.
+          console.log(`↩️ ${item.id} (${item.name}) vuelve a marcarse como no lanzado: Fortnite.gg no lo da por publicado.`);
+          item.unreleased = true;
+          item.isNew = false;
           catalogChanges++;
         }
       } else {
