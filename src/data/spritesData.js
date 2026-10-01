@@ -116,6 +116,8 @@ export const THEME_STYLES = {
   'Bounty Hunter': { bg: 'linear-gradient(180deg, #C26CC8 0%, #2D0D4A 100%)', border: '#C26CC8' },
   BountyHunter: { bg: 'linear-gradient(180deg, #C26CC8 0%, #2D0D4A 100%)', border: '#C26CC8' },
   reaper: { bg: 'linear-gradient(180deg, #C26CC8 0%, #2D0D4A 100%)', border: '#C26CC8' },
+  'Trick or Treat': { bg: 'linear-gradient(180deg, #c2410c 0%, #431407 100%)', border: '#f97316' },
+  tricktreat: { bg: 'linear-gradient(180deg, #c2410c 0%, #431407 100%)', border: '#f97316' },
   Candy: { bg: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)', border: '#f16f68' },
   Gummy: { bg: 'linear-gradient(180deg, #9f4540 0%, #1b1c23 100%)', border: '#f16f68' },
   Galaxy: { bg: 'linear-gradient(180deg, #4a31bc 0%, #1b1c23 100%)', border: '#4a35fa' },
@@ -152,7 +154,11 @@ export const ELEMENTAL_STYLES = {
   overshield: { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' },
   onigiri: { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' },
   xray: { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' },
-  megaman: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#3b82f6' }
+  megaman: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#3b82f6' },
+  spookydash: { background: 'linear-gradient(180deg, #581c87 0%, #1e112a 100%)', borderColor: '#a855f7' },
+  vampire: { background: 'linear-gradient(180deg, #7f1d1d 0%, #1a0808 100%)', borderColor: '#ef4444' },
+  deer: { background: 'linear-gradient(180deg, #78350f 0%, #1c1106 100%)', borderColor: '#f59e0b' },
+  dumpsterdive: { background: 'linear-gradient(180deg, #374151 0%, #111827 100%)', borderColor: '#9ca3af' }
 };
 
 // Deja el contorno de las tarjetas en un tono sutil en lugar de un borde
@@ -217,6 +223,8 @@ export const THEME_NAMES_ES = {
   'Bounty Hunter': 'Cazarrecompensas',
   'BountyHunter': 'Cazarrecompensas',
   reaper: 'Cazarrecompensas',
+  'Trick or Treat': 'Dulce o Truco',
+  tricktreat: 'Dulce o Truco',
   Candy: 'Gomita',
   Gummy: 'Gomita',
   Galaxy: 'Galáctico',
@@ -236,6 +244,8 @@ export const THEME_NAMES_EN = {
   'Bounty Hunter': 'Bounty Hunter',
   'BountyHunter': 'Bounty Hunter',
   reaper: 'Bounty Hunter',
+  'Trick or Treat': 'Trick or Treat',
+  tricktreat: 'Trick or Treat',
   Candy: 'Gummy',
   Gummy: 'Gummy',
   Galaxy: 'Galaxy',
@@ -245,8 +255,8 @@ export const THEME_NAMES_EN = {
   Quack: 'Quack'
 };
 
-export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
-export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
+export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
+export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
 
 export const FAMILY_NAMES_MAP = {
   water: 'Agua',
@@ -295,7 +305,11 @@ export const FAMILY_NAMES_MAP = {
   morgana: 'Morgana',
   blinky: 'Blinky',
   birthday: 'Pastel de Cumpleaños',
-  pond: 'Estanque'
+  pond: 'Estanque',
+  spookydash: 'Spooky Dash',
+  vampire: 'Vampiro',
+  deer: 'El Ciervo',
+  dumpsterdive: 'Dumpster Dive'
 };
 
 const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails', 'megaman', 'crash', 'morgana', 'blinky'];
@@ -910,7 +924,11 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     'morgana': ['morgana', 'increaseheals'],
     'blinky': ['blinky', 'ghostdamage'],
     'birthday': ['birthday'],
-    'pond': ['pond', 'winnera']
+    'pond': ['pond', 'winnera'],
+    'spookydash': ['spookydash', 'phasedash'],
+    'vampire': ['vampire', 'healthsiphon'],
+    'deer': ['deer', 'increasedmelee'],
+    'dumpsterdive': ['dumpsterdive', 'winnerd']
   };
 
   const keysToTry = [
@@ -1040,7 +1058,11 @@ export const FORTNITE_GEN2_FAMILY_ORDER = [
   'blinky',
   'birthday',
   'crash',
-  'morgana'
+  'morgana',
+  'spookydash',
+  'vampire',
+  'deer',
+  'dumpsterdive'
 ];
 
 // All unique sprite families for the SPRITE filter dropdown (preserva orden oficial del Dex)
