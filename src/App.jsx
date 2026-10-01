@@ -20,6 +20,8 @@ import { InstallPrompt } from './components/InstallPrompt';
 import { Footer } from './components/Footer';
 import { FriendsPage } from './components/FriendsPage';
 import { MobileSpriteSwiper } from './components/MobileSpriteSwiper';
+import { FortnitemaresTransition } from './components/FortnitemaresTransition';
+import { applySeasonalTheme, isFortnitemaresActive, subscribeSeasonalState } from './config/seasonalEvent';
 import { useIsMobile } from './hooks/useIsMobile';
 import { useDynamicSprites } from './hooks/useDynamicSprites';
 import { trackEvent, resolveCountry } from './utils/telemetry';
@@ -124,6 +126,16 @@ export function App() {
       } catch (e) {}
     };
   }, [isAdminPortal, isAdminAuth]);
+
+  // Seasonal theme: apply on boot, then keep it in sync while the tab stays
+  // open (boundary timer plus visibility/focus re-checks).
+  useEffect(() => {
+    applySeasonalTheme(isFortnitemaresActive());
+    const unsubscribe = subscribeSeasonalState((active) => {
+      window.dispatchEvent(new CustomEvent('spritedex:season-change', { detail: { active } }));
+    });
+    return unsubscribe;
+  }, []);
 
 
   const [userState, setUserState] = useState(() => {
@@ -901,6 +913,7 @@ useEffect(() => {
 
   return (
     <div className="app-container">
+      <FortnitemaresTransition />
       <PrivacyNotice />
       <InstallPrompt />
 

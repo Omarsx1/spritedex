@@ -6,6 +6,8 @@ import { Liquid } from 'liquid-gooey';
 import { allSprites as defaultAllSprites } from '../data/spritesData';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { t } from '../i18n';
+import { isFortnitemaresActive } from '../config/seasonalEvent';
+import { PumpkinIcon } from './icons/PumpkinIcon';
 
 export function Header({
   spritesPool,
@@ -57,11 +59,20 @@ export function Header({
   // Menú gooey de acciones (solo móvil): réplica 1:1 de libraries.dev/gooey
   const isMobile = useIsMobile(768);
   const [actionsOpen, setActionsOpen] = useState(false);
+  const [isFortnitemares, setIsFortnitemares] = useState(() => isFortnitemaresActive());
+
+  useEffect(() => {
+    const handleSeasonChange = (e) => {
+      setIsFortnitemares(e?.detail?.active !== undefined ? Boolean(e.detail.active) : isFortnitemaresActive());
+    };
+    window.addEventListener('spritedex:season-change', handleSeasonChange);
+    return () => window.removeEventListener('spritedex:season-change', handleSeasonChange);
+  }, []);
 
   // Evita que el modo Ahorro de Batería de Android active prefers-reduced-motion
   // y apague la física líquida de liquid-gooey salvo que el usuario lo desactive en el menú
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
     const isMotionDisabled = () => document.documentElement.classList.contains('motion-disabled') || document.body?.classList.contains('motion-disabled');
     const origMatchMedia = window.matchMedia;
     window.matchMedia = function (query) {
@@ -79,6 +90,9 @@ export function Header({
         };
       }
       return origMatchMedia.call(window, query);
+    };
+    return () => {
+      window.matchMedia = origMatchMedia;
     };
   }, []);
 
@@ -254,8 +268,22 @@ export function Header({
         {/* Title */}
         <div className="hero__title-block" ref={titleRef} style={{ position: 'relative', zIndex: 10 }}>
           <h1 className="hero__title">
-            <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">FORTNITE</span>
-            <span className="hero__title-line hero__title-line--accent">SPRITEDEX</span>
+            {isFortnitemares ? (
+              <div className="hero__title-fnm-wrap">
+                <img
+                  src="/fortnitemares.svg"
+                  alt="FORTNITEMARES"
+                  className="hero__title-fnm-svg"
+                />
+              </div>
+            ) : (
+              <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">
+                FORTNITE
+              </span>
+            )}
+            <span className={`hero__title-line hero__title-line--accent ${isFortnitemares ? 'hero__title-line--accent-fnm' : ''}`}>
+              SPRITEDEX
+            </span>
           </h1>
         </div>
 
@@ -409,91 +437,163 @@ export function Header({
 
       {isMobile && typeof document !== 'undefined' && createPortal(
         <div className="hero__dock" ref={dockRef}>
-          <Liquid
-            blur={7}
-            contrast={19}
-            fill="#0c152d"
-            filterPadding={80}
-            shadow="0 4px 18px rgba(0, 0, 0, 0.55), 0 0 12px rgba(0, 240, 232, 0.18)"
-            className={`pm ${actionsOpen ? 'pm-open' : ''}`}
-          >
-            <Liquid.Item
-              className="pm-slot"
-              x={actionsOpen ? -56 : 0}
-              y={actionsOpen ? -34 : 0}
-              transition={gooeyTransition}
-              delay={0}
-            >
-              <button
-                type="button"
-                className="pm-btn pm-sat"
-                aria-label={t('header.radarAmigos')}
-                tabIndex={actionsOpen ? 0 : -1}
-                onClick={() => {
-                  toggleActions();
-                  onOpenCompareModal();
+          {isFortnitemares ? (
+            <div className={`fnm-dock ${actionsOpen ? 'is-open' : ''}`}>
+              {/* Satélite Amigos */}
+              <div
+                className={`fnm-sat fnm-sat--friends ${actionsOpen ? 'is-visible' : ''}`}
+                style={{
+                  transform: actionsOpen ? 'translate(-56px, -34px) scale(1)' : 'translate(0, 0) scale(0.3)',
+                  opacity: actionsOpen ? 1 : 0,
+                  pointerEvents: actionsOpen ? 'auto' : 'none',
+                  transition: 'transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 200ms ease'
                 }}
               >
-                <span
-                  className="pm-sat-icon"
-                  style={{
-                    transitionDelay: actionsOpen ? '110ms' : '0ms'
+                <button
+                  type="button"
+                  className="fnm-sat-btn"
+                  aria-label={t('header.radarAmigos')}
+                  tabIndex={actionsOpen ? 0 : -1}
+                  onClick={() => {
+                    toggleActions();
+                    onOpenCompareModal();
                   }}
                 >
                   <Users size={19} strokeWidth={2.2} />
-                </span>
-              </button>
-            </Liquid.Item>
+                </button>
+              </div>
 
-            <Liquid.Item
-              className="pm-slot"
-              x={0}
-              y={actionsOpen ? -66 : 0}
-              transition={gooeyTransition}
-              delay={actionsOpen ? 35 : 0}
-            >
-              <button
-                type="button"
-                className="pm-btn pm-sat"
-                aria-label={t('header.compartirImagen')}
-                tabIndex={actionsOpen ? 0 : -1}
-                onClick={() => {
-                  toggleActions();
-                  onOpenShareModal();
-                }}
-                onMouseEnter={() => {
-                  import('../components/ShareImageModal');
-                }}
-                onTouchStart={() => {
-                  import('../components/ShareImageModal');
+              {/* Satélite Compartir */}
+              <div
+                className={`fnm-sat fnm-sat--share ${actionsOpen ? 'is-visible' : ''}`}
+                style={{
+                  transform: actionsOpen ? 'translate(0px, -66px) scale(1)' : 'translate(0, 0) scale(0.3)',
+                  opacity: actionsOpen ? 1 : 0,
+                  pointerEvents: actionsOpen ? 'auto' : 'none',
+                  transition: 'transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1) 30ms, opacity 200ms ease'
                 }}
               >
-                <span
-                  className="pm-sat-icon"
-                  style={{
-                    transitionDelay: actionsOpen ? '150ms' : '0ms'
+                <button
+                  type="button"
+                  className="fnm-sat-btn"
+                  aria-label={t('header.compartirImagen')}
+                  tabIndex={actionsOpen ? 0 : -1}
+                  onClick={() => {
+                    toggleActions();
+                    onOpenShareModal();
+                  }}
+                  onMouseEnter={() => {
+                    import('../components/ShareImageModal');
+                  }}
+                  onTouchStart={() => {
+                    import('../components/ShareImageModal');
                   }}
                 >
                   <Share2 size={19} strokeWidth={2.2} />
-                </span>
-              </button>
-            </Liquid.Item>
+                </button>
+              </div>
 
-            <Liquid.Item className="pm-slot">
+              {/* Botón Principal: Solo la calabaza, SIN fondo alguno */}
               <button
                 type="button"
-                className="pm-btn pm-main"
+                className="fnm-pumpkin-btn"
                 aria-expanded={actionsOpen}
                 aria-label={actionsOpen ? t('header.cerrarAcciones') : t('header.abrirAcciones')}
                 onClick={toggleActions}
               >
-                <span className="pm-main-icon-wrap">
-                  <Gamepad2 size={22} strokeWidth={2.2} className={`pm-icon-pad ${actionsOpen ? 'is-hidden' : ''}`} />
-                  <X size={20} strokeWidth={2.4} className={`pm-icon-close ${actionsOpen ? 'is-visible' : ''}`} />
-                </span>
+                <PumpkinIcon
+                  size={50}
+                  className={`fnm-pumpkin-svg ${actionsOpen ? 'is-open' : ''}`}
+                />
               </button>
-            </Liquid.Item>
-          </Liquid>
+            </div>
+          ) : (
+            <Liquid
+              blur={7}
+              contrast={19}
+              fill="#0c152d"
+              filterPadding={80}
+              shadow="0 4px 18px rgba(0, 0, 0, 0.55), 0 0 12px rgba(0, 240, 232, 0.18)"
+              className={`pm ${actionsOpen ? 'pm-open' : ''}`}
+            >
+              <Liquid.Item
+                className="pm-slot"
+                x={actionsOpen ? -56 : 0}
+                y={actionsOpen ? -34 : 0}
+                transition={gooeyTransition}
+                delay={0}
+              >
+                <button
+                  type="button"
+                  className="pm-btn pm-sat"
+                  aria-label={t('header.radarAmigos')}
+                  tabIndex={actionsOpen ? 0 : -1}
+                  onClick={() => {
+                    toggleActions();
+                    onOpenCompareModal();
+                  }}
+                >
+                  <span
+                    className="pm-sat-icon"
+                    style={{
+                      transitionDelay: actionsOpen ? '110ms' : '0ms'
+                    }}
+                  >
+                    <Users size={19} strokeWidth={2.2} />
+                  </span>
+                </button>
+              </Liquid.Item>
+
+              <Liquid.Item
+                className="pm-slot"
+                x={0}
+                y={actionsOpen ? -66 : 0}
+                transition={gooeyTransition}
+                delay={actionsOpen ? 35 : 0}
+              >
+                <button
+                  type="button"
+                  className="pm-btn pm-sat"
+                  aria-label={t('header.compartirImagen')}
+                  tabIndex={actionsOpen ? 0 : -1}
+                  onClick={() => {
+                    toggleActions();
+                    onOpenShareModal();
+                  }}
+                  onMouseEnter={() => {
+                    import('../components/ShareImageModal');
+                  }}
+                  onTouchStart={() => {
+                    import('../components/ShareImageModal');
+                  }}
+                >
+                  <span
+                    className="pm-sat-icon"
+                    style={{
+                      transitionDelay: actionsOpen ? '150ms' : '0ms'
+                    }}
+                  >
+                    <Share2 size={19} strokeWidth={2.2} />
+                  </span>
+                </button>
+              </Liquid.Item>
+
+              <Liquid.Item className="pm-slot">
+                <button
+                  type="button"
+                  className="pm-btn pm-main"
+                  aria-expanded={actionsOpen}
+                  aria-label={actionsOpen ? t('header.cerrarAcciones') : t('header.abrirAcciones')}
+                  onClick={toggleActions}
+                >
+                  <span className="pm-main-icon-wrap">
+                    <Gamepad2 size={22} strokeWidth={2.2} className={`pm-icon-pad ${actionsOpen ? 'is-hidden' : ''}`} />
+                    <X size={20} strokeWidth={2.4} className={`pm-icon-close ${actionsOpen ? 'is-visible' : ''}`} />
+                  </span>
+                </button>
+              </Liquid.Item>
+            </Liquid>
+          )}
         </div>,
         document.body
       )}

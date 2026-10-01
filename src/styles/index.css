@@ -8298,3 +8298,475 @@ body:has(.modal-overlay) {
     grid-column: 1 / -1;
   }
 }
+
+/* ==========================================================================
+   EVENTO ESTACIONAL: FORTNITEMARES / HALLOWEEN
+   ========================================================================== */
+
+/* Fondo de Pesadilla Global */
+body.theme-fortnitemares {
+  background-color: #05020a;
+}
+
+body.theme-fortnitemares::before {
+  background-image:
+    linear-gradient(rgba(168, 85, 247, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(168, 85, 247, 0.12) 1px, transparent 1px),
+    linear-gradient(rgba(225, 29, 72, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(225, 29, 72, 0.07) 1px, transparent 1px);
+}
+
+body.theme-fortnitemares::after {
+  background:
+    radial-gradient(130% 75% at 50% -20%, rgba(147, 51, 234, 0.55) 0%, rgba(88, 28, 135, 0.25) 38%, transparent 68%),
+    radial-gradient(80% 50% at 88% -5%, rgba(225, 29, 72, 0.32) 0%, transparent 65%),
+    radial-gradient(80% 50% at 12% -5%, rgba(192, 38, 211, 0.28) 0%, transparent 65%),
+    radial-gradient(120% 65% at 50% 112%, rgba(59, 7, 100, 0.55) 0%, transparent 70%),
+    radial-gradient(120% 85% at 50% 45%, transparent 30%, rgba(3, 1, 8, 0.82) 100%);
+}
+
+html.theme-fortnitemares::after {
+  background-image:
+    linear-gradient(rgba(208, 22, 141, 0.88), rgba(208, 22, 141, 0.88)),
+    linear-gradient(rgba(249, 115, 22, 0.82), rgba(249, 115, 22, 0.82)),
+    linear-gradient(rgba(168, 85, 247, 0.75), rgba(168, 85, 247, 0.75)),
+    linear-gradient(rgba(225, 29, 72, 0.78), rgba(225, 29, 72, 0.78)),
+    linear-gradient(rgba(255, 146, 43, 0.65), rgba(255, 146, 43, 0.65)),
+    linear-gradient(rgba(147, 51, 234, 0.85), rgba(147, 51, 234, 0.85)),
+    linear-gradient(rgba(208, 22, 141, 0.70), rgba(208, 22, 141, 0.70)),
+    linear-gradient(rgba(249, 115, 22, 0.72), rgba(249, 115, 22, 0.72));
+}
+
+/* Logo Oficial Fortnitemares en el Hero */
+.hero__title-fnm-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0.1rem 0.5rem 0 0.5rem;
+}
+
+.hero__title-fnm-svg {
+  width: 100%;
+  height: auto;
+  max-height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 16px rgba(208, 22, 141, 0.7))
+          drop-shadow(0 0 32px rgba(147, 51, 234, 0.45));
+  animation: fnm-logo-pulse 3.5s ease-in-out infinite alternate;
+  transform: translateZ(0);
+}
+
+@media (max-width: 768px) {
+  .hero__title-fnm-wrap {
+    max-width: 340px;
+  }
+  .hero__title-fnm-svg {
+    max-height: 85px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero__title-fnm-wrap {
+    max-width: 290px;
+  }
+  .hero__title-fnm-svg {
+    max-height: 72px;
+  }
+}
+
+@keyframes fnm-logo-pulse {
+  0% {
+    filter: drop-shadow(0 0 14px rgba(208, 22, 141, 0.65))
+            drop-shadow(0 0 28px rgba(147, 51, 234, 0.4));
+    transform: scale(1);
+  }
+  100% {
+    filter: drop-shadow(0 0 22px rgba(208, 22, 141, 0.9))
+            drop-shadow(0 0 45px rgba(168, 85, 247, 0.6));
+    transform: scale(1.02);
+  }
+}
+
+/* Subtítulo SPRITEDEX con brillo de Halloween */
+.hero__title-line--accent-fnm {
+  background: linear-gradient(135deg, #ff922b 0%, #f76707 35%, #d946ef 70%, #a855f7 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-shadow: 0 0 18px rgba(247, 103, 7, 0.45) !important;
+  margin-top: -6px !important;
+}
+
+/* ==========================================================================
+   BOTÓN FLOTANTE MÓVIL: CALABAZA PURA (SIN FONDO)
+   ========================================================================== */
+.fnm-dock {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  pointer-events: none;
+}
+
+/* El botón principal ES la calabaza flotando libremente */
+.fnm-pumpkin-btn {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 54px;
+  height: 54px;
+  background: transparent !important;
+  border: none !important;
+  outline: none;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  cursor: pointer;
+  pointer-events: auto;
+  display: grid;
+  place-items: center;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.75))
+          drop-shadow(0 0 14px rgba(247, 103, 7, 0.65));
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), filter 200ms ease;
+  will-change: transform;
+}
+
+.fnm-pumpkin-btn:active {
+  transform: scale(0.88) rotate(-4deg);
+}
+
+.fnm-pumpkin-svg {
+  width: 52px;
+  height: 52px;
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), filter 300ms ease;
+}
+
+.fnm-pumpkin-svg.is-open {
+  transform: scale(1.1) rotate(12deg);
+  filter: drop-shadow(0 0 18px #ff922b) drop-shadow(0 0 28px #f76707);
+}
+
+/* Satélites de Fortnitemares (Amigos y Compartir) */
+.fnm-sat {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  width: 44px;
+  height: 44px;
+  will-change: transform, opacity;
+}
+
+.fnm-sat-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(30, 10, 50, 0.95), rgba(15, 5, 28, 0.95)) !important;
+  border: 1.5px solid rgba(168, 85, 247, 0.55) !important;
+  color: #f3e8ff !important;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.65), 0 0 12px rgba(168, 85, 247, 0.35) !important;
+  transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fnm-sat-btn:hover {
+  border-color: #ff922b !important;
+  color: #ffb703 !important;
+  transform: scale(1.08);
+}
+
+.fnm-sat-btn:active {
+  transform: scale(0.92);
+}
+
+/* ==========================================================================
+   CINEMÁTICA DE ENTRADA ÚNICA (FORTNITEMARES TRANSITION)
+   ========================================================================== */
+.fnm-transition-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: radial-gradient(circle at center, rgba(30, 8, 48, 0.95) 0%, rgba(5, 2, 10, 0.98) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+  transition: opacity 600ms ease;
+}
+
+.fnm-transition-overlay.fnm-step-4 {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fnm-crt-scanlines {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.45) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.fnm-crt-flicker {
+  position: absolute;
+  inset: 0;
+  background: rgba(147, 51, 234, 0.08);
+  opacity: 0.2;
+  animation: fnm-flicker 0.15s infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+
+@keyframes fnm-flicker {
+  0% { opacity: 0.1; }
+  50% { opacity: 0.28; }
+  100% { opacity: 0.1; }
+}
+
+.fnm-lightning-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(217, 70, 239, 0.7) 0%, rgba(88, 28, 135, 0.85) 100%);
+  z-index: 4;
+  pointer-events: none;
+  animation: fnm-lightning 450ms ease-out forwards;
+}
+
+@keyframes fnm-lightning {
+  0% { opacity: 0.95; }
+  30% { opacity: 0.2; }
+  50% { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+
+.fnm-center-content {
+  position: relative;
+  z-index: 5;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  /* Let a tap anywhere on the cinematic reach the backdrop dismiss handler. */
+  pointer-events: none;
+}
+
+.fnm-spooky-aura {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(225, 29, 72, 0.2) 50%, transparent 70%);
+  filter: blur(40px);
+  z-index: -1;
+  animation: fnm-aura-pulse 2s infinite alternate;
+}
+
+@keyframes fnm-aura-pulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1.3); opacity: 1; }
+}
+
+.fnm-glitch-badge {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ff922b;
+  background: rgba(247, 103, 7, 0.15);
+  border: 1px solid rgba(247, 103, 7, 0.4);
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+
+.fnm-glitch-title {
+  font-family: var(--font-fortnite);
+  font-size: clamp(3rem, 10vw, 6.5rem);
+  letter-spacing: 4px;
+  color: #ffffff;
+  text-shadow: 0 0 20px #c026d3, 0 0 45px #7c3aed;
+  margin: 0;
+  line-height: 1;
+}
+
+.fnm-glitch-sub {
+  display: block;
+  margin-top: 1rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1rem, 3.5vw, 1.4rem);
+  letter-spacing: 6px;
+  color: #d946ef;
+  text-shadow: 0 0 12px rgba(217, 70, 239, 0.6);
+}
+
+/* Skip control for the intro cinematic: real button, 44px minimum target. */
+.fnm-skip-btn {
+  position: absolute;
+  bottom: 2rem;
+  min-height: 44px;
+  padding: 0.6rem 1.4rem;
+  border-radius: 999px;
+  background: rgba(12, 4, 24, 0.75);
+  border: 1.5px solid rgba(255, 146, 43, 0.65);
+  color: #ffe8cc;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  z-index: 10;
+  animation: fnm-pulse 1.5s infinite;
+}
+
+.fnm-skip-btn:hover {
+  border-color: #ffb703;
+  color: #ffffff;
+}
+
+.fnm-skip-btn:focus-visible {
+  outline: 3px solid #ffb703;
+  outline-offset: 3px;
+}
+
+/* Keyboard focus must stay visible on the seasonal mobile controls. */
+.fnm-pumpkin-btn:focus-visible {
+  outline: 3px solid #ffb703;
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+
+.fnm-sat-btn:focus-visible {
+  outline: 3px solid #ffb703;
+  outline-offset: 3px;
+}
+
+@keyframes fnm-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.fnm-bat-ambient {
+  position: absolute;
+  font-size: 2rem;
+  pointer-events: none;
+}
+
+.fnm-bat-1 {
+  top: -40px;
+  left: -60px;
+  animation: fnm-bat-fly-1 3s infinite ease-in-out;
+}
+
+.fnm-bat-2 {
+  top: -20px;
+  right: -70px;
+  animation: fnm-bat-fly-2 3.5s infinite ease-in-out;
+}
+
+.fnm-bat-3 {
+  bottom: -30px;
+  left: -40px;
+  animation: fnm-bat-fly-3 2.8s infinite ease-in-out;
+}
+
+.fnm-bat-4 {
+  bottom: -20px;
+  right: -50px;
+  animation: fnm-bat-fly-4 3.2s infinite ease-in-out;
+}
+
+@keyframes fnm-bat-fly-1 {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-30px, -25px) rotate(-15deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes fnm-bat-fly-2 {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(35px, -30px) rotate(18deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes fnm-bat-fly-3 {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-25px, 20px) rotate(-12deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes fnm-bat-fly-4 {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(25px, 25px) rotate(15deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* Seasonal animations must respect the visitor's motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  .hero__title-fnm-svg,
+  .fnm-crt-flicker,
+  .fnm-spooky-aura,
+  .fnm-skip-btn {
+    animation: none;
+  }
+
+  .fnm-lightning-flash {
+    animation: none;
+    opacity: 0;
+  }
+
+  .fnm-bat-ambient {
+    animation: none;
+    display: none;
+  }
+
+  .fnm-transition-overlay,
+  .fnm-pumpkin-btn,
+  .fnm-pumpkin-svg,
+  .fnm-sat,
+  .fnm-sat-btn {
+    transition: none;
+  }
+}
+
+/* The in-app "motion disabled" preference covers the seasonal layers too. */
+.motion-disabled .hero__title-fnm-svg,
+.motion-disabled .fnm-crt-flicker,
+.motion-disabled .fnm-spooky-aura,
+.motion-disabled .fnm-skip-btn {
+  animation: none;
+}
+
+.motion-disabled .fnm-lightning-flash {
+  animation: none;
+  opacity: 0;
+}
+
+.motion-disabled .fnm-bat-ambient {
+  animation: none;
+  display: none;
+}
+
+.motion-disabled .fnm-pumpkin-btn,
+.motion-disabled .fnm-pumpkin-svg,
+.motion-disabled .fnm-sat,
+.motion-disabled .fnm-sat-btn,
+.motion-disabled .fnm-transition-overlay {
+  transition: none;
+}
