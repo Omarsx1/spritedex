@@ -155,10 +155,14 @@ export const ELEMENTAL_STYLES = {
   onigiri: { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' },
   xray: { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: '#00afff' },
   megaman: { background: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)', borderColor: '#3b82f6' },
-  spookydash: { background: 'linear-gradient(180deg, #581c87 0%, #1e112a 100%)', borderColor: '#a855f7' },
+  /* Spooky Dash es una calabaza: el color sale del CUERPO del sprite. El violeta
+     anterior lo saque del brillo de su cara tallada (los ojos y la boca son
+     violetas), pero una carta se lee por su silueta, no por su luz interior. */
+  spookydash: { background: 'linear-gradient(180deg, #a3541a 0%, #1e1208 100%)', borderColor: '#e08a3c' },
   vampire: { background: 'linear-gradient(180deg, #7f1d1d 0%, #1a0808 100%)', borderColor: '#ef4444' },
   deer: { background: 'linear-gradient(180deg, #78350f 0%, #1c1106 100%)', borderColor: '#f59e0b' },
-  dumpsterdive: { background: 'linear-gradient(180deg, #374151 0%, #111827 100%)', borderColor: '#9ca3af' }
+  /* El mapache es gris calido: el gris azulado anterior lo enfriaba. */
+  dumpsterdive: { background: 'linear-gradient(180deg, #4a443c 0%, #17140f 100%)', borderColor: '#b8ada0' }
 };
 
 // Deja el contorno de las tarjetas en un tono sutil en lugar de un borde
