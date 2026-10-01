@@ -38,7 +38,8 @@ const FAMILIAS = {
   adventure: 'Dwarf', jonesy: 'Jonesy', '8bit': '8BitBlaster', stormscout: 'StormScout',
   overshield: 'Overshield', onigiri: 'WinnerC', xray: 'WinnerB', megaman: 'ImprovedSlide',
   crash: 'BodySlam', morgana: 'IncreaseHeals', blinky: 'GhostDamage', birthday: 'Birthday',
-  pond: 'WinnerA'
+  pond: 'WinnerA', spookydash: 'PhaseDash', vampire: 'HealthSiphon', deer: 'IncreasedMelee',
+  dumpsterdive: 'WinnerD'
 };
 
 // tema de nuestro catalogo -> variante de la captura cruda, y su etiqueta en ingles
@@ -49,6 +50,7 @@ const VARIANTES = {
   Cheatmaster: { fuente: 'Cheatmaster', etiqueta: 'Cheat Master' },
   'Loot Hacker': { fuente: 'Loot hacker', etiqueta: 'Loot Hacker' },
   'Bounty Hunter': { fuente: 'Bounty hunter', etiqueta: 'Bounty Hunter' },
+  'Trick or Treat': { fuente: 'Tricktreat', etiqueta: 'Trick or Treat' },
   Candy: { fuente: 'Candy', etiqueta: 'Gummy' },
   Galaxy: { fuente: 'Galaxy', etiqueta: 'Galaxy' },
   Holofoil: { fuente: 'Holofoil', etiqueta: 'Holofoil' },

@@ -55,6 +55,9 @@ jobs:
           sudo apt-get install -y webp
           node scripts/generate_sprite_thumbs.js
 
+      - name: Actualizar catálogo de idiomas
+        run: node scripts/build_locale_catalog.mjs
+
       - name: Validar integridad con OxLint
         # La configuracion se fija a mano: sin esto, en el runner el lint no aplicaba
         # las reglas del proyecto y el gate pasaba con 0 errores aunque hubiera fallos.

@@ -173,7 +173,11 @@ const PARENT_TO_FAMILY = {
   pedicureantacid: 'wick',
   llama: 'llama',
   peely: 'peely',
-  increaseheals: 'morgana'
+  increaseheals: 'morgana',
+  phasedash: 'spookydash',
+  healthsiphon: 'vampire',
+  increasedmelee: 'deer',
+  winnerd: 'dumpsterdive'
 };
 
 const VARIANT_TO_THEME = {
@@ -188,6 +192,9 @@ const VARIANT_TO_THEME = {
   'bounty hunter': 'Bounty Hunter',
   bountyhunter: 'Bounty Hunter',
   reaper: 'Bounty Hunter',
+  tricktreat: 'Trick or Treat',
+  'trick or treat': 'Trick or Treat',
+  trickortreat: 'Trick or Treat',
   candy: 'Candy',
   gummy: 'Candy',
   galaxy: 'Galaxy',
@@ -243,7 +250,11 @@ const FAMILY_NAMES_ES = {
   morgana: 'Morgana',
   blinky: 'Blinky',
   birthday: 'Pastel de Cumpleaños',
-  pond: 'Estanque'
+  pond: 'Estanque',
+  spookydash: 'Spooky Dash',
+  vampire: 'Vampiro',
+  deer: 'El Ciervo',
+  dumpsterdive: 'Dumpster Dive'
 };
 
 const THEME_NAMES_ES = {
@@ -252,6 +263,7 @@ const THEME_NAMES_ES = {
   Cheatmaster: 'Hacker',
   'Loot Hacker': 'Hacker de Botín',
   'Bounty Hunter': 'Cazarrecompensas',
+  'Trick or Treat': 'Dulce o Truco',
   Candy: 'Gomita',
   Galaxy: 'Galáctico',
   Holofoil: 'Holográfico',
@@ -266,6 +278,7 @@ const VARIANT_ORDER = [
   'Cheatmaster',
   'Loot Hacker',
   'Bounty Hunter',
+  'Trick or Treat',
   'Candy',
   'Galaxy',
   'Cube',
@@ -636,12 +649,15 @@ async function syncSprites() {
       const parentNorm = normalizeKey(card.parent);
       const familyId = PARENT_TO_FAMILY[parentNorm] || parentNorm || normalizeKey(card.name);
       const theme = VARIANT_TO_THEME[(card.variant || '').toLowerCase()] || card.variant || 'Basic';
-      const themeKey = normalizeKey(theme);
+      const themeKey = (theme === 'Trick or Treat' || theme === 'tricktreat') ? 'tricktreat' : normalizeKey(theme);
       const expectedId = `${familyId}_${themeKey}`;
 
       // Determinar si es no lanzado respetando el estado directo de Fortnite.gg (Victorioso siempre activo)
       let isCardUnreleased = card.unreleased;
       if (theme === 'Bounty Hunter' && (familyId === 'crown' || parentNorm === 'crown')) {
+        isCardUnreleased = false;
+      }
+      if (theme === 'Trick or Treat') {
         isCardUnreleased = false;
       }
 
