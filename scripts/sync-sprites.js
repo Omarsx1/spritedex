@@ -254,7 +254,7 @@ const FAMILY_NAMES_ES = {
   spookydash: 'Spooky Dash',
   vampire: 'Vampiro',
   deer: 'El Ciervo',
-  dumpsterdive: 'Dumpster Dive'
+  dumpsterdive: 'Mapache'
 };
 
 const THEME_NAMES_ES = {

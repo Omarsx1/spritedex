@@ -309,7 +309,7 @@ export const FAMILY_NAMES_MAP = {
   spookydash: 'Spooky Dash',
   vampire: 'Vampiro',
   deer: 'El Ciervo',
-  dumpsterdive: 'Dumpster Dive'
+  dumpsterdive: 'Mapache'
 };
 
 const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails', 'megaman', 'crash', 'morgana', 'blinky'];

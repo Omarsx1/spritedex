@@ -2422,7 +2422,7 @@
   },
   {
     "id": "dumpsterdive_basic",
-    "name": "Dumpster Dive",
+    "name": "Mapache",
     "theme": "Basic",
     "rarity": "Epic",
     "unreleased": false,
@@ -2432,7 +2432,7 @@
   },
   {
     "id": "dumpsterdive_gold",
-    "name": "Dumpster Dive Dorado",
+    "name": "Mapache Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
@@ -2442,7 +2442,7 @@
   },
   {
     "id": "dumpsterdive_cheatmaster",
-    "name": "Dumpster Dive Hacker",
+    "name": "Mapache Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
@@ -2452,7 +2452,7 @@
   },
   {
     "id": "dumpsterdive_loothacker",
-    "name": "Dumpster Dive Hacker de Botín",
+    "name": "Mapache Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
@@ -2462,7 +2462,7 @@
   },
   {
     "id": "dumpsterdive_bountyhunter",
-    "name": "Dumpster Dive Cazarrecompensas",
+    "name": "Mapache Cazarrecompensas",
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
@@ -2472,7 +2472,7 @@
   },
   {
     "id": "dumpsterdive_tricktreat",
-    "name": "Dumpster Dive Dulce o Truco",
+    "name": "Mapache Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
     "unreleased": true,
