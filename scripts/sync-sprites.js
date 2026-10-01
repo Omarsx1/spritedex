@@ -388,15 +388,34 @@ async function syncSprites() {
     await page.setViewport({ width: 1920, height: 1080 });
 
     console.log(`🌐 Navegando a ${BASE_URL}/sprites...`);
-    await page.goto(`${BASE_URL}/sprites`, { waitUntil: 'networkidle2', timeout: 45000 });
 
-    // Esperar a que el DOM o Cloudflare se resuelva
-    try {
-      await page.waitForSelector('.sprite-card', { timeout: 15000 });
-    } catch {
-      console.log('⏳ Esperando verificación de Cloudflare / carga de cartas...');
-      await page.waitForSelector('.sprite-card', { timeout: 30000 }).catch(() => {});
+    /* A veces fortnite.gg responde con un chequeo anti-bots ("One More Step") y la
+       pagina se queda sin ninguna tarjeta. Antes eso NO era un error: el script
+       seguia, encontraba "sin cambios" y terminaba diciendo que todo estaba al
+       dia, asi que el catalogo se congelaba en silencio y nadie se enteraba.
+       Ahora se reintenta y, si sigue bloqueado, se falla sin tocar el catalogo. */
+    let tarjetasEnLaPagina = 0;
+    for (let intento = 1; intento <= 3 && tarjetasEnLaPagina === 0; intento += 1) {
+      await page.goto(`${BASE_URL}/sprites`, { waitUntil: 'networkidle2', timeout: 45000 });
+      try {
+        await page.waitForSelector('.sprite-card', { timeout: intento === 1 ? 15000 : 30000 });
+      } catch {
+        console.log(`⏳ Intento ${intento}: esperando verificacion de Cloudflare / carga de cartas...`);
+      }
+      tarjetasEnLaPagina = await page.$$eval('.sprite-card', (nodos) => nodos.length).catch(() => 0);
+      if (tarjetasEnLaPagina === 0 && intento < 3) {
+        await new Promise((resolve) => setTimeout(resolve, 8000));
+      }
     }
+
+    if (tarjetasEnLaPagina === 0) {
+      console.error('❌ La pagina no devolvio ninguna tarjeta: fortnite.gg esta bloqueando el scrapeo.');
+      console.error('   Se aborta SIN tocar el catalogo para no dar por bueno un vacio. Revisa el aviso del workflow.');
+      process.exitCode = 1;
+      return;
+    }
+
+    console.log(`✅ ${tarjetasEnLaPagina} tarjetas encontradas.`);
 
     // Activar checkbox de no lanzados si existe
     try {
