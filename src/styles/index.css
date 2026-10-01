@@ -69,6 +69,8 @@ body::before {
   pointer-events: none;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
+  /* En temporada la rejilla no desaparece de golpe: cruza al bosque. */
+  transition: opacity 1700ms ease;
 }
 
 body::after {
@@ -1121,34 +1123,34 @@ html::after {
 .hero__showcase {
   position: relative;
   z-index: 2;
-  width: 180px;
-  height: 180px;
-  max-width: 180px;
-  max-height: 180px;
+  width: 216px;
+  height: 216px;
+  max-width: 216px;
+  max-height: 216px;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* 12px mas abajo: los espiritus orbitando quedaban altos respecto al titulo. */
+  /* 12px mas abajo: el espiritu quedaba alto respecto al titulo. */
   margin: 12px auto 0;
 }
 
 .hero__hero-sprite {
   position: relative;
   z-index: 3;
-  width: 120px;
-  height: 120px;
-  max-width: 120px;
-  max-height: 120px;
+  width: 152px;
+  height: 152px;
+  max-width: 152px;
+  max-height: 152px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .hero__hero-img {
-  width: 120px !important;
-  height: 120px !important;
-  max-width: 120px !important;
-  max-height: 120px !important;
+  width: 152px !important;
+  height: 152px !important;
+  max-width: 152px !important;
+  max-height: 152px !important;
   object-fit: contain;
   filter:
     drop-shadow(0 0 24px rgba(99, 102, 241, 0.5))
@@ -1162,55 +1164,82 @@ html::after {
   50%      { transform: translateY(-8px); }
 }
 
-/* Orbit ring container */
-.hero__orbit-ring {
+/* ==========================================================================
+   APARICION MAGICA DEL ESPIRITU (estilo Animales Fantasticos)
+   Al rotar, el espiritu central se disuelve en volutas de humo y el
+   siguiente se materializa desde ellas. Sin destellos: solo vapor alargado,
+   sobrio. Solo anima transform/opacity: compositado, sin repintados.
+   ========================================================================== */
+.hero__apparate {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
-  border: 1px solid rgba(99, 102, 241, 0.12);
-  /* 34s por vuelta: un giro pausado, sin llamar la atencion. */
-  animation: orbitSpin 34s linear infinite;
+  pointer-events: none;
   z-index: 1;
+  opacity: 0;
 }
 
-@keyframes orbitSpin {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Satellite sprites positioned around the orbit ring */
-.hero__satellite {
+/* Volutas: estelas de vapor alargadas, difuminadas, que giran alrededor del
+   espiritu. Nada de puntos brillantes. */
+.hero__smoke {
   position: absolute;
-  width: 40px;
-  height: 40px;
-  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 116px;
+  height: 14px;
+  margin: -7px 0 0 -58px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(126, 96, 235, 0.38) 30%,
+    rgba(160, 130, 240, 0.46) 50%,
+    rgba(126, 96, 235, 0.38) 70%,
+    transparent 100%
+  );
+  filter: blur(10px);
+  opacity: 0;
+  transform: rotate(var(--a)) translateX(54px) scale(0.35);
 }
 
-.hero__satellite--0 {
-  top: -16px; left: 50%;
-  transform: translateX(-50%);
-}
-.hero__satellite--1 {
-  bottom: -8px; left: -12px;
-}
-.hero__satellite--2 {
-  bottom: -8px; right: -12px;
+.hero__smoke--1 { --a: 0deg; }
+.hero__smoke--2 { --a: 135deg; width: 96px; }
+.hero__smoke--3 { --a: 258deg; width: 104px; }
+
+/* En temporada el vapor se oscurece: violeta profundo casi bruma maldita.
+   La forma y el movimiento no cambian. */
+html.theme-fortnitemares .hero__smoke {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(74, 22, 128, 0.4) 30%,
+    rgba(112, 40, 190, 0.5) 50%,
+    rgba(74, 22, 128, 0.4) 70%,
+    transparent 100%
+  );
 }
 
-.hero__satellite-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.4));
-  /* Counter-rotate so images stay upright while the ring spins */
-  animation: counterSpin 34s linear infinite;
-  opacity: 0.7;
-  transition: opacity 0.4s ease;
+/* Salida: el vapor se arremolina hacia afuera y se apaga. */
+.hero__showcase.is-leaving .hero__apparate { opacity: 1; }
+.hero__showcase.is-leaving .hero__smoke {
+  animation: hero-smoke-out 0.55s ease-in forwards;
 }
 
-@keyframes counterSpin {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(-360deg); }
+@keyframes hero-smoke-out {
+  0%   { opacity: 0;    transform: rotate(var(--a)) translateX(18px) scale(0.5); }
+  40%  { opacity: 0.45; transform: rotate(calc(var(--a) + 36deg)) translateX(48px) scale(0.85); }
+  100% { opacity: 0;    transform: rotate(calc(var(--a) + 68deg)) translateX(78px) scale(1.25); }
+}
+
+/* Entrada: el vapor converge en espiral y el espiritu condensa. */
+.hero__showcase.is-arriving .hero__apparate { opacity: 1; }
+.hero__showcase.is-arriving .hero__smoke {
+  animation: hero-smoke-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes hero-smoke-in {
+  0%   { opacity: 0;    transform: rotate(calc(var(--a) - 75deg)) translateX(86px) scale(1.2); }
+  40%  { opacity: 0.45; transform: rotate(calc(var(--a) - 38deg)) translateX(60px) scale(0.85); }
+  100% { opacity: 0;    transform: rotate(var(--a)) translateX(32px) scale(0.3); }
 }
 
 /* Hex badge showing total count */
@@ -1265,7 +1294,10 @@ html::after {
   fill: none;
   stroke-width: 6;
   stroke-linecap: round;
-  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    stroke 1200ms ease,
+    filter 1200ms ease;
 }
 
 .hero__ring-fill--caught {
@@ -1277,6 +1309,18 @@ html::after {
 .hero__ring-fill--mastered {
   stroke: #ec4899;
   filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.5));
+}
+
+/* Parte 3 de la cinematica (glow): hasta los detalles cambian de temporada.
+   Los anillos viran de indigo/rosa a violeta/naranja calabaza. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-fill--caught {
+  stroke: #a855f7;
+  filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.55));
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-fill--mastered {
+  stroke: #ff922b;
+  filter: drop-shadow(0 0 6px rgba(255, 146, 43, 0.55));
 }
 
 .hero__stat-inner {
@@ -1575,59 +1619,35 @@ html::after {
   }
 
   .hero__showcase {
-    width: 130px !important;
-    height: 130px !important;
-    max-width: 130px !important;
-    max-height: 130px !important;
+    width: 182px !important;
+    height: 182px !important;
+    max-width: 182px !important;
+    max-height: 182px !important;
     /* Centrado entre el titulo y la barra de busqueda: el bloque baja 58px y el
        bloque de filtros sube los mismos 58px, para que nada mas se mueva. */
     margin: 70px auto 0;
-    /* Los espiritus se quedaban con poca presencia: el grupo entero (sprite
-       central, anillo y satelites) crece un 20% alrededor del mismo centro, asi
-       que sigue centrado y el layout no cambia. */
     transform: scale(1.2);
   }
 
   .hero__hero-sprite {
-    width: 85px !important;
-    height: 85px !important;
-    max-width: 85px !important;
-    max-height: 85px !important;
+    width: 140px !important;
+    height: 140px !important;
+    max-width: 140px !important;
+    max-height: 140px !important;
   }
 
   .hero__hero-img {
-    width: 85px !important;
-    height: 85px !important;
-    max-width: 85px !important;
-    max-height: 85px !important;
+    width: 140px !important;
+    height: 140px !important;
+    max-width: 140px !important;
+    max-height: 140px !important;
   }
 
-  .hero__satellite {
-    width: 28px;
-    height: 28px;
-  }
-
-  /* Los tres satelites repartidos a 120 grados y al mismo radio (70px del centro
-     de la caja de 130). Antes el de arriba estaba a 67px y los de abajo a 86px, y
-     ese triangulo descentrado hacia que el grupo se viera alto o bajo segun el
-     punto de giro: medido, el centro oscilaba entre -30px y +20px. Asi queda
-     siempre en el centro. */
-  .hero__satellite--0 {
-    top: -19px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .hero__satellite--1 {
-    top: 86px;
-    bottom: auto;
-    left: -10px;
-  }
-
-  .hero__satellite--2 {
-    top: 86px;
-    bottom: auto;
-    right: -10px;
+  /* El humo acompana al espiritu: en movil escala con el escaparate. */
+  .hero__smoke {
+    width: 88px;
+    height: 18px;
+    margin: -9px 0 0 -44px;
   }
 
   .hero__bar {
@@ -3252,9 +3272,34 @@ html::after {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  border-radius: 14px;
+  border-radius: inherit;
   overflow: hidden;
-  z-index: 1;
+  z-index: 0;
+}
+
+/* Capa de primer plano para la carta: el espíritu, el nombre y las monedas/botones
+   siempre flotan al frente por encima de fondos y overlays cibernéticos */
+.sprite-card .card-image,
+.sprite-card .ms-card__image {
+  position: relative;
+  z-index: 2;
+}
+
+.sprite-card .card-name,
+.sprite-card .ms-card__info {
+  position: relative;
+  z-index: 2;
+}
+
+.sprite-card .card-footer,
+.sprite-card .ms-card__footer,
+.sprite-card .card-level-stars,
+.sprite-card .card-level-circles,
+.sprite-card .ms-card__action,
+.sprite-card .card-owned-btn,
+.sprite-card .card-unreleased-pill {
+  position: relative;
+  z-index: 2;
 }
 
 /* 1. Corner elements */
@@ -6539,10 +6584,9 @@ body:has(.modal-overlay) {
   .hero-ambient-glow,
   .hero-floating-particles,
   .hero-sprite-orbit-container,
-  .hero__orbit,
-  .hero__satellite,
-  .hero__satellite-img {
+  .hero__apparate {
     animation: none !important;
+    display: none !important;
   }
 
   .ms-card:not(.ms-card--active) .cyber-fx-overlay * {
@@ -7218,6 +7262,7 @@ body:has(.modal-overlay) {
   align-items: center;
   justify-content: flex-start;
   pointer-events: auto;
+  z-index: 2;
 }
 
 /* Transición suave de contenidos auxiliares (badges, nombre, botones) */
@@ -7875,9 +7920,7 @@ body:has(.modal-overlay) {
 .motion-disabled .hero-ambient-glow,
 .motion-disabled .hero-floating-particles,
 .motion-disabled .hero-sprite-orbit-container,
-.motion-disabled .hero__orbit,
-.motion-disabled .hero__satellite,
-.motion-disabled .hero__satellite-img,
+.motion-disabled .hero__apparate,
 .motion-disabled .scan-line,
 .motion-disabled .cyber-lines,
 .motion-disabled .card-particles,
@@ -8318,25 +8361,62 @@ body.theme-fortnitemares {
   background-color: #07030d;
 }
 
-body.theme-fortnitemares::before {
-  content: '';
+/* En temporada la rejilla se apaga (cruza al bosque, no desaparece de golpe). */
+html.theme-fortnitemares body::before {
+  opacity: 0;
+}
+
+/* Fases boot y title: el wordmark todavia no ha mutado (o esta mutando) sobre
+   la rejilla; el suelo no ha cambiado. La clase del tema ya esta puesta, pero
+   la rejilla sigue ahi. */
+html.theme-fortnitemares[data-fnm-phase='boot'] body::before,
+html.theme-fortnitemares[data-fnm-phase='title'] body::before {
+  opacity: 1;
+}
+
+/* El bosque persistente de la temporada: una capa propia (la monta
+   FortnitemaresTransition) para poder CRUZARLO con la rejilla, algo que un
+   solo pseudo-elemento no puede hacer. Vive debajo del contenido y encima de
+   la rejilla (mismo z-index, despues en el DOM). */
+.fnm-forest {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
   background-image: url('/fortnitemares-forest.svg');
   background-size: cover;
   background-position: center bottom;
   background-repeat: no-repeat;
-  z-index: -2;
-  pointer-events: none;
   transform: translateZ(0);
-  will-change: transform;
-  /* Respiracion lenta. Se anima transform, no background-position: mover el
-     fondo repinta la capa entera en cada frame y eso se nota en el movil. */
+  will-change: transform, opacity;
+  /* Respiracion lenta: se anima transform, no background-position (mover el
+     fondo repinta la capa entera en cada frame y eso se nota en el movil). */
   animation: fnm-forest-breathe 18s ease-in-out infinite alternate;
+  opacity: 1;
+  transition: opacity 1700ms ease;
+}
+
+/* El pulso de luz solo corre fuera de la cinematica: una animacion de opacity
+   pisaria el fundido dirigido por fases. */
+html:not([data-fnm-phase]) .fnm-forest {
+  animation:
+    fnm-forest-breathe 18s ease-in-out infinite alternate,
+    fnm-forest-light 9s ease-in-out infinite alternate;
+}
+
+/* Parte 1 (boot/title): el bosque todavia no existe para el visitante. */
+html[data-fnm-phase='boot'] .fnm-forest,
+html[data-fnm-phase='title'] .fnm-forest {
+  opacity: 0;
+}
+
+/* Direccion de arte por encuadre: en vertical el telefono no ve un recorte
+   de la escena apaisada, ve su propia composicion (luna entera, casa
+   encantada visible, calabazas protagonistas). Mismos simbolos y paleta. */
+@media (max-width: 768px) {
+  .fnm-forest {
+    background-image: url('/fortnitemares-forest-mobile.svg');
+  }
 }
 
 @keyframes fnm-forest-breathe {
@@ -8344,18 +8424,31 @@ body.theme-fortnitemares::before {
   100% { transform: translate3d(0, -12px, 0) scale(1.03); }
 }
 
-/* Niebla carmesi-magenta: atmosphere, not a veil. The forest silhouette is the
-   subject now, so the fog only thickens toward the horizon and bottom, leaving
-   the top clear for the title. */
+@keyframes fnm-forest-light {
+  0%   { opacity: 1; }
+  100% { opacity: 0.93; }
+}
+
+/* Niebla carmesi-magenta: atmosphere, not a veil. La banda baja se afina para
+   que la luz calida del parche de calabazas (horneada en el bosque) llegue
+   hasta el usuario sin que el violeta se la coma. */
 body.theme-fortnitemares::after {
   background:
-    radial-gradient(115% 40% at 50% 0%, rgba(190, 24, 93, 0.16) 0%, transparent 66%),
-    radial-gradient(60% 28% at 8% 32%, rgba(168, 85, 247, 0.07) 0%, transparent 70%),
-    radial-gradient(60% 28% at 92% 28%, rgba(217, 70, 239, 0.06) 0%, transparent 70%),
-    radial-gradient(100% 26% at 50% 78%, rgba(76, 5, 149, 0.18) 0%, transparent 78%),
-    radial-gradient(125% 34% at 50% 100%, rgba(59, 7, 100, 0.26) 0%, transparent 76%),
-    radial-gradient(150% 105% at 50% 46%, transparent 52%, rgba(4, 1, 8, 0.58) 100%);
+    radial-gradient(115% 40% at 50% 0%, rgba(190, 24, 93, 0.14) 0%, transparent 66%),
+    radial-gradient(60% 28% at 8% 32%, rgba(168, 85, 247, 0.06) 0%, transparent 70%),
+    radial-gradient(60% 28% at 92% 28%, rgba(217, 70, 239, 0.05) 0%, transparent 70%),
+    radial-gradient(100% 26% at 50% 78%, rgba(76, 5, 149, 0.12) 0%, transparent 78%),
+    radial-gradient(125% 34% at 50% 100%, rgba(59, 7, 100, 0.20) 0%, transparent 76%),
+    radial-gradient(150% 105% at 50% 46%, transparent 52%, rgba(4, 1, 8, 0.62) 100%);
   animation: fnm-fog-drift 26s ease-in-out infinite alternate;
+  /* La niebla llega con la parte 2 (ground): cruza junto con el bosque. */
+  opacity: 1;
+  transition: opacity 1700ms ease;
+}
+
+html[data-fnm-phase='boot'] body.theme-fortnitemares::after,
+html[data-fnm-phase='title'] body.theme-fortnitemares::after {
+  opacity: 0;
 }
 
 /* Slow lateral sway: the mist creeps across the trunks. */
@@ -8364,13 +8457,38 @@ body.theme-fortnitemares::after {
   100% { background-position: 26px -12px, -18px 8px, 22px -6px, -12px 10px, 16px -8px, 0 0; }
 }
 
-/* Las barras de interferencia CRT tambien se van durante la temporada. Sobre el
-   bosque se leen como rayas sueltas, no como una senal de television, y ensucian
-   el arte. La corrupcion de senal no se pierde: sigue existiendo dentro de la
-   cinematica de entrada, que es donde aporta (capa .fnm-glitch-bars). Al terminar
-   el evento la regla base las repone. */
+/* Fuego de calabazas: html::after queda libre en temporada (la capa de ruido
+   normal se apaga abajo). Lleva el resplandor calido que sube desde el parche.
+   Durante la cinematica su opacidad la marcan las fases; el latido lento solo
+   se engancha cuando la cinematica termino, arrancando desde 1 para que no
+   haya salto. */
 html.theme-fortnitemares::after {
-  background-image: none;
+  background-image:
+    radial-gradient(46% 20% at 48% 98%, rgba(255, 130, 40, 0.20) 0%, transparent 72%),
+    radial-gradient(30% 13% at 26% 100%, rgba(255, 160, 70, 0.10) 0%, transparent 74%),
+    radial-gradient(28% 12% at 74% 100%, rgba(255, 110, 30, 0.11) 0%, transparent 74%);
+  opacity: 1;
+  transition: opacity 1200ms ease;
+}
+
+html.theme-fortnitemares[data-fnm-phase='boot']::after,
+html.theme-fortnitemares[data-fnm-phase='title']::after,
+html.theme-fortnitemares[data-fnm-phase='ground']::after {
+  opacity: 0;
+}
+
+/* Parte 3 (glow): el fuego de las calabazas despierta. */
+html.theme-fortnitemares[data-fnm-phase='glow']::after {
+  opacity: 1;
+}
+
+html.theme-fortnitemares:not([data-fnm-phase])::after {
+  animation: fnm-firelight 7s ease-in-out infinite alternate;
+}
+
+@keyframes fnm-firelight {
+  0%   { opacity: 1; }
+  100% { opacity: 0.55; }
 }
 
 /* ==========================================================================
@@ -8411,7 +8529,7 @@ html.theme-fortnitemares::after {
   filter: drop-shadow(0 0 14px rgba(192, 38, 211, 0.85))
           drop-shadow(0 0 30px rgba(236, 72, 153, 0.6))
           drop-shadow(0 0 54px rgba(168, 85, 247, 0.45));
-  transition: opacity 420ms ease, transform 620ms cubic-bezier(0.16, 1, 0.3, 1), filter 420ms ease;
+  transition: opacity 900ms ease, transform 1100ms cubic-bezier(0.34, 1.3, 0.5, 1), filter 900ms ease;
   pointer-events: none;
 }
 
@@ -8447,20 +8565,69 @@ html.theme-fortnitemares::after {
   transform: translateY(-50%);
 }
 
-/* Estado tematico: el wordmark Fortnitemares toma el lugar del texto. El texto
-   sale del flujo y se desvanece con un leve empuje: al estar absoluto, su
-   transform se combina con el centrado vertical. */
+/* Estado tematico: el wordmark Fortnitemares toma el lugar del texto. La
+   salida del texto tambien es un momento: se hincha y se disuelve despacio,
+   mientras el SVG entra por debajo con su micro-rebote. */
 .hero__title[data-fnm-logo='themed'] .hero__title-line--glitch {
   opacity: 0;
-  transform: translateY(-50%) scale(1.06);
-  filter: blur(6px);
-  transition: opacity 260ms ease, transform 420ms ease, filter 260ms ease;
+  transform: translateY(-50%) scale(1.12);
+  filter: blur(10px);
+  transition: opacity 620ms ease, transform 760ms cubic-bezier(0.16, 1, 0.3, 1), filter 620ms ease;
 }
 
 .hero__title[data-fnm-logo='themed'] .hero__title-fnm-svg {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
   animation: fnm-logo-pulse 3.5s ease-in-out infinite alternate;
+}
+
+/* Fantasmas RGB del wordmark: dos siluetas de Fortnitemares recortadas con el
+   propio SVG como mascara, en el mismo rojo/cian del glitch de FORTNITE. El
+   contenedor apila y centra (grid 1x1); los fantasmas solo saltan con
+   transform en pasos: el mismo truco barato del titulo, sin animar filters. */
+.hero__title-fnm-ghosts {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.hero__title-fnm-ghost {
+  grid-area: 1 / 1;
+  width: var(--fnm-logo-w);
+  max-width: 100%;
+  aspect-ratio: 3 / 1;
+  opacity: 0;
+  pointer-events: none;
+  -webkit-mask-image: url('/fortnitemares.svg');
+  mask-image: url('/fortnitemares.svg');
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.hero__title-fnm-ghost--r { background: var(--tg-rgb-r, #ff0055); }
+.hero__title-fnm-ghost--b { background: var(--tg-rgb-b, #00FFFB); }
+
+.hero__title[data-fnm-logo='themed'] .hero__title-fnm-ghost--r {
+  opacity: 0.75;
+  /* Emergen cuando el wordmark ya esta asentandose: el split RGB aterriza
+     despues del bloom, no de golpe. */
+  transition: opacity 600ms ease 380ms;
+  animation: hero-glitch-r steps(1, end) infinite;
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 1.8);
+}
+
+.hero__title[data-fnm-logo='themed'] .hero__title-fnm-ghost--b {
+  opacity: 0.75;
+  transition: opacity 600ms ease 460ms;
+  animation: hero-glitch-b steps(1, end) infinite;
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 1.8);
+  animation-delay: 0.07s;
 }
 
 @keyframes fnm-logo-pulse {
@@ -8476,19 +8643,6 @@ html.theme-fortnitemares::after {
   }
 }
 
-/* Titulo glitcheando durante la fase de corrupcion. */
-html[data-fnm-phase='corrupt'] .hero__title-line--glitch,
-html[data-fnm-phase='swarm'] .hero__title-line--glitch {
-  animation: fnm-title-tear 0.16s steps(2, end) infinite;
-}
-
-@keyframes fnm-title-tear {
-  0%   { transform: translate(0, 0) skewX(0deg); filter: none; }
-  33%  { transform: translate(-4px, 2px) skewX(-6deg); filter: hue-rotate(60deg) saturate(2.4); }
-  66%  { transform: translate(5px, -3px) skewX(5deg); filter: hue-rotate(-40deg) saturate(3); }
-  100% { transform: translate(-2px, 1px) skewX(2deg); filter: saturate(1.6); }
-}
-
 /* Subtítulo SPRITEDEX: violeta -> magenta, el neon de la key art. */
 .hero__title-line--accent-fnm {
   background: linear-gradient(135deg, #e879f9 0%, #d946ef 38%, #ec4899 72%, #c026d3 100%) !important;
@@ -8502,8 +8656,12 @@ html[data-fnm-phase='swarm'] .hero__title-line--glitch {
 /* ==========================================================================
    CINEMATICA DE ENTRADA (una vez por navegador)
    El componente no monta una cortina con su propio titulo: publica
-   data-fnm-phase en <html> y estas reglas transforman la interfaz real.
-   Las capas de aqui son atmosfericas (scanlines, vineta) y no interactuan.
+   data-fnm-phase en <html> y estas reglas transforman las piezas reales de la
+   interfaz, UNA POR UNA. Parte 1 (title): muta el wordmark y cruza el
+   enjambre. Parte 2 (ground): la rejilla cruza al bosque y llega la niebla.
+   Parte 3 (glow): el fuego de las calabazas y los acentos de temporada.
+   Nada cubre la pantalla: el visitante ve la web volverse Fortnitemares pieza
+   a pieza, siempre visible y con transiciones suaves de opacity.
    ========================================================================== */
 
 .fnm-cinematic {
@@ -8515,132 +8673,6 @@ html[data-fnm-phase='swarm'] .hero__title-line--glitch {
 
 .fnm-cinematic .fnm-skip-btn {
   pointer-events: auto;
-}
-
-.fnm-crt-scanlines,
-.fnm-crt-flicker,
-.fnm-corrupt-vignette,
-.fnm-glitch-bars {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-/* Lineas de barrido CRT permanentes durante la cinematica. */
-.fnm-crt-scanlines {
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.28) 0px,
-    rgba(0, 0, 0, 0.28) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  opacity: 0;
-  mix-blend-mode: multiply;
-}
-
-.fnm-crt-flicker {
-  background: linear-gradient(
-    180deg,
-    rgba(236, 72, 153, 0.10) 0%,
-    transparent 22%,
-    rgba(168, 85, 247, 0.12) 58%,
-    transparent 78%,
-    rgba(190, 24, 93, 0.10) 100%
-  );
-  opacity: 0;
-  mix-blend-mode: screen;
-}
-
-.fnm-corrupt-vignette {
-  background: radial-gradient(
-    118% 88% at 50% 50%,
-    transparent 24%,
-    rgba(10, 2, 18, 0.55) 72%,
-    rgba(3, 0, 6, 0.96) 100%
-  );
-  opacity: 0;
-}
-
-/* Bandas horizontales de corrupcion de senal, estilo "THE GAME IS CURSED". */
-.fnm-glitch-bars {
-  background:
-    linear-gradient(transparent 0 12%, rgba(236, 72, 153, 0.30) 12% 14%, transparent 14% 46%,
-                    rgba(168, 85, 247, 0.26) 46% 49%, transparent 49% 78%,
-                    rgba(217, 70, 239, 0.22) 78% 81%, transparent 81% 100%);
-  background-size: 100% 260px;
-  opacity: 0;
-  mix-blend-mode: screen;
-}
-
-/* ---- Fase: corrupt -------------------------------------------------- */
-.fnm-cinematic[data-phase='corrupt'] .fnm-crt-scanlines { opacity: 0.55; }
-.fnm-cinematic[data-phase='corrupt'] .fnm-crt-flicker   { opacity: 0.35; animation: fnm-flicker 0.24s steps(3, end) infinite; }
-.fnm-cinematic[data-phase='corrupt'] .fnm-glitch-bars   { opacity: 0.45; animation: fnm-bars-drift 0.5s linear infinite; }
-.fnm-cinematic[data-phase='corrupt'] .fnm-corrupt-vignette { opacity: 0.5; }
-
-/* ---- Fase: swarm ---------------------------------------------------- */
-.fnm-cinematic[data-phase='swarm'] .fnm-crt-scanlines { opacity: 0.7; }
-.fnm-cinematic[data-phase='swarm'] .fnm-crt-flicker   { opacity: 0.55; animation: fnm-flicker 0.16s steps(2, end) infinite; }
-.fnm-cinematic[data-phase='swarm'] .fnm-glitch-bars   { opacity: 0.7; animation: fnm-bars-drift 0.28s linear infinite; }
-.fnm-cinematic[data-phase='swarm'] .fnm-corrupt-vignette { opacity: 0.72; }
-
-/* ---- Fase: brand (el wordmark ya es Fortnitemares) ------------------ */
-.fnm-cinematic[data-phase='brand'] .fnm-crt-scanlines { opacity: 0.5; }
-.fnm-cinematic[data-phase='brand'] .fnm-crt-flicker   { opacity: 0.45; animation: fnm-flicker 0.3s steps(3, end) infinite; }
-.fnm-cinematic[data-phase='brand'] .fnm-glitch-bars   { opacity: 0.4; animation: fnm-bars-drift 0.8s linear infinite; }
-.fnm-cinematic[data-phase='brand'] .fnm-corrupt-vignette { opacity: 0.45; }
-
-/* ---- Fase: curse (inundacion carmesi maxima) ------------------------ */
-.fnm-cinematic[data-phase='curse'] .fnm-crt-scanlines { opacity: 0.6; }
-.fnm-cinematic[data-phase='curse'] .fnm-crt-flicker   { opacity: 0.75; }
-.fnm-cinematic[data-phase='curse'] .fnm-glitch-bars   { opacity: 0.5; }
-.fnm-cinematic[data-phase='curse'] .fnm-corrupt-vignette { opacity: 0.35; }
-
-/* ---- Fase: settle (la interfaz debe poder leerse) ------------------- */
-.fnm-cinematic[data-phase='settle'] .fnm-crt-scanlines { opacity: 0.28; }
-.fnm-cinematic[data-phase='settle'] .fnm-corrupt-vignette { opacity: 0.16; }
-.fnm-cinematic[data-phase='settle'] .fnm-glitch-bars { opacity: 0.12; }
-
-@keyframes fnm-flicker {
-  0%   { opacity: 0.28; }
-  40%  { opacity: 0.72; }
-  55%  { opacity: 0.18; }
-  100% { opacity: 0.6; }
-}
-
-@keyframes fnm-bars-drift {
-  from { background-position: 0 0; }
-  to   { background-position: 0 260px; }
-}
-
-/* Latido del sitio mientras se uncontamina. */
-html[data-fnm-phase='corrupt'] body,
-html[data-fnm-phase='swarm'] body {
-  animation: fnm-site-shudder 0.18s steps(2, end) infinite;
-}
-
-html[data-fnm-phase='curse'] body {
-  animation: fnm-site-shudder 0.5s ease-out 1;
-}
-
-@keyframes fnm-site-shudder {
-  0%   { transform: translate3d(0, 0, 0); }
-  25%  { transform: translate3d(-2px, 1px, 0); }
-  50%  { transform: translate3d(2px, -1px, 0); }
-  75%  { transform: translate3d(-1px, -1px, 0); }
-  100% { transform: translate3d(0, 0, 0); }
-}
-
-/* Inundacion carmesi que barre la pantalla en la fase curse. */
-html[data-fnm-phase='curse'] body.theme-fortnitemares::after {
-  animation: fnm-curse-flood 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes fnm-curse-flood {
-  0%   { opacity: 0.2; filter: saturate(0.6) brightness(0.7); }
-  35%  { opacity: 1;   filter: saturate(2.2) brightness(1.5); }
-  100% { opacity: 1;   filter: saturate(1.15) brightness(1); }
 }
 
 /* ---- Boton saltar --------------------------------------------------- */
@@ -8672,6 +8704,17 @@ html[data-fnm-phase='curse'] body.theme-fortnitemares::after {
   outline-offset: 2px;
 }
 
+/* En movil el dock de la calabaza vive abajo a la derecha (z-index 9999) y
+   taparia el Skip: se sube junto a la barra superior, donde hay aire, para
+   que siga siendo visible y pulsable durante la cinematica. */
+@media (max-width: 768px) {
+  .fnm-skip-btn {
+    top: 68px;
+    right: 12px;
+    bottom: auto;
+  }
+}
+
 /* ==========================================================================
    BOTÓN FLOTANTE MÓVIL: CALABAZA PURA (SIN FONDO)
    ========================================================================== */
@@ -8682,41 +8725,66 @@ html[data-fnm-phase='curse'] body.theme-fortnitemares::after {
   pointer-events: none;
 }
 
-/* El botón principal ES la calabaza flotando libremente */
+/* El botón principal ES la calabaza: nada de aros ni discos duros. Una poza
+   de sombra suave la separa del arte y su propia luz cálida — como una
+   linterna de verdad en la oscuridad — anuncia que es un botón. */
 .fnm-pumpkin-btn {
   position: absolute;
-  right: 14px;
-  bottom: 14px;
-  width: 54px;
-  height: 54px;
-  background: transparent !important;
-  border: none !important;
-  outline: none;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
+  right: 10px;
+  bottom: 10px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 44%, rgba(22, 9, 38, 0.85) 0%, rgba(14, 6, 26, 0.5) 52%, rgba(10, 4, 20, 0) 74%);
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
   cursor: pointer;
   pointer-events: auto;
   display: grid;
   place-items: center;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+  outline: none;
   /* El flip 3D: el mando gira en Y hasta convertirse en calabaza. */
   perspective: 520px;
   transform-style: preserve-3d;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.75))
-          drop-shadow(0 0 16px rgba(217, 70, 239, 0.5));
-  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), filter 200ms ease;
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
   will-change: transform;
 }
 
+/* Luz de la linterna: un halo cálido sin borde que respira despacio
+   (opacity compositado, sin repintar la caja). Intensidad contenida: la
+   calabaza debe leerse como linterna, no como foco. */
+.fnm-pumpkin-btn::after {
+  content: '';
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 46%, rgba(255, 130, 40, 0.03) 58%, rgba(255, 130, 40, 0.01) 72%, transparent 82%);
+  animation: fnm-dock-halo 3.6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes fnm-dock-halo {
+  0%   { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
 .fnm-pumpkin-btn:active {
-  transform: scale(0.88) rotate(-4deg);
+  transform: scale(0.9) rotate(-3deg);
+}
+
+/* Abierto: la llama sube — la calabaza se enciende de verdad. */
+.fnm-pumpkin-btn[aria-expanded='true']::after {
+  animation: none;
+  opacity: 1;
+  background: radial-gradient(circle, transparent 40%, rgba(255, 146, 43, 0.09) 54%, rgba(255, 146, 43, 0.025) 70%, transparent 82%);
 }
 
 /* Durante la marca, la calabaza entra girando en el eje Y. */
-html[data-fnm-phase='brand'] .fnm-pumpkin-btn,
-html[data-fnm-phase='curse'] .fnm-pumpkin-btn {
+html[data-fnm-phase='title'] .fnm-pumpkin-btn {
   animation: fnm-pumpkin-flip 900ms cubic-bezier(0.34, 1.4, 0.5, 1) both;
 }
 
@@ -8727,14 +8795,17 @@ html[data-fnm-phase='curse'] .fnm-pumpkin-btn {
 }
 
 .fnm-pumpkin-svg {
-  width: 52px;
-  height: 52px;
+  width: 62px;
+  height: 62px;
+  filter:
+    drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 8px rgba(255, 146, 43, 0.10));
   transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), filter 300ms ease;
 }
 
 .fnm-pumpkin-svg.is-open {
-  transform: scale(1.1) rotate(12deg);
-  filter: drop-shadow(0 0 18px #ff922b) drop-shadow(0 0 28px #f76707);
+  transform: scale(1.08) rotate(12deg);
+  filter: drop-shadow(0 0 10px rgba(255, 146, 43, 0.26)) drop-shadow(0 0 16px rgba(247, 103, 7, 0.14));
 }
 
 /* Satélites de Fortnitemares (Amigos y Compartir) */
@@ -8774,170 +8845,12 @@ html[data-fnm-phase='curse'] .fnm-pumpkin-btn {
   transform: scale(0.92);
 }
 
-/* ==========================================================================
-   CINEMÁTICA DE ENTRADA ÚNICA (FORTNITEMARES TRANSITION)
-   ========================================================================== */
-.fnm-transition-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100000;
-  background: radial-gradient(circle at center, rgba(30, 8, 48, 0.95) 0%, rgba(5, 2, 10, 0.98) 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto;
-  cursor: pointer;
-  user-select: none;
-  overflow: hidden;
-  transition: opacity 600ms ease;
-}
-
-.fnm-transition-overlay.fnm-step-4 {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.fnm-crt-scanlines {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.45) 50%
-  );
-  background-size: 100% 4px;
-  z-index: 2;
-  pointer-events: none;
-  opacity: 0.8;
-}
-
-.fnm-crt-flicker {
-  position: absolute;
-  inset: 0;
-  background: rgba(147, 51, 234, 0.08);
-  opacity: 0.2;
-  animation: fnm-flicker 0.15s infinite;
-  pointer-events: none;
-  z-index: 3;
-}
-
-@keyframes fnm-flicker {
-  0% { opacity: 0.1; }
-  50% { opacity: 0.28; }
-  100% { opacity: 0.1; }
-}
-
-.fnm-lightning-flash {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(217, 70, 239, 0.7) 0%, rgba(88, 28, 135, 0.85) 100%);
-  z-index: 4;
-  pointer-events: none;
-  animation: fnm-lightning 450ms ease-out forwards;
-}
-
-@keyframes fnm-lightning {
-  0% { opacity: 0.95; }
-  30% { opacity: 0.2; }
-  50% { opacity: 0.85; }
-  100% { opacity: 0; }
-}
-
-.fnm-center-content {
-  position: relative;
-  z-index: 5;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  /* Let a tap anywhere on the cinematic reach the backdrop dismiss handler. */
-  pointer-events: none;
-}
-
-.fnm-spooky-aura {
-  position: absolute;
-  width: 320px;
-  height: 320px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(225, 29, 72, 0.2) 50%, transparent 70%);
-  filter: blur(40px);
-  z-index: -1;
-  animation: fnm-aura-pulse 2s infinite alternate;
-}
-
-@keyframes fnm-aura-pulse {
-  0% { transform: scale(0.9); opacity: 0.6; }
-  100% { transform: scale(1.3); opacity: 1; }
-}
-
-.fnm-glitch-badge {
-  display: inline-block;
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: #ff922b;
-  background: rgba(247, 103, 7, 0.15);
-  border: 1px solid rgba(247, 103, 7, 0.4);
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
-  margin-bottom: 1rem;
-}
-
-.fnm-glitch-title {
-  font-family: var(--font-fortnite);
-  font-size: clamp(3rem, 10vw, 6.5rem);
-  letter-spacing: 4px;
-  color: #ffffff;
-  text-shadow: 0 0 20px #c026d3, 0 0 45px #7c3aed;
-  margin: 0;
-  line-height: 1;
-}
-
-.fnm-glitch-sub {
-  display: block;
-  margin-top: 1rem;
-  font-family: var(--font-heading);
-  font-size: clamp(1rem, 3.5vw, 1.4rem);
-  letter-spacing: 6px;
-  color: #d946ef;
-  text-shadow: 0 0 12px rgba(217, 70, 239, 0.6);
-}
-
-/* Skip control for the intro cinematic: real button, 44px minimum target. */
-.fnm-skip-btn {
-  position: absolute;
-  bottom: 2rem;
-  min-height: 44px;
-  padding: 0.6rem 1.4rem;
-  border-radius: 999px;
-  background: rgba(12, 4, 24, 0.75);
-  border: 1.5px solid rgba(255, 146, 43, 0.65);
-  color: #ffe8cc;
-  font-family: var(--font-sans);
-  font-size: 0.9rem;
-  letter-spacing: 1px;
-  cursor: pointer;
-  z-index: 10;
-  animation: fnm-pulse 1.5s infinite;
-}
-
-.fnm-skip-btn:hover {
-  border-color: #ffb703;
-  color: #ffffff;
-}
-
-.fnm-skip-btn:focus-visible {
-  outline: 3px solid #ffb703;
-  outline-offset: 3px;
-}
-
-/* Keyboard focus must stay visible on the seasonal mobile controls. */
+/* El foco del teclado debe verse en los controles estacionales del movil.
+   Sin aro: el circulo se leia como un borde pegado al arte. La calabaza se
+   levanta y crece — senal de foco visible sin dibujar contorno. */
 .fnm-pumpkin-btn:focus-visible {
-  outline: 3px solid #ffb703;
-  outline-offset: 4px;
-  border-radius: 50%;
+  outline: none;
+  transform: translateY(-2px) scale(1.07);
 }
 
 .fnm-sat-btn:focus-visible {
@@ -8945,85 +8858,370 @@ html[data-fnm-phase='curse'] .fnm-pumpkin-btn {
   outline-offset: 3px;
 }
 
-@keyframes fnm-pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
+/* ==========================================================================
+   BARRA DE BUSQUEDA Y FILTROS EN TEMPORADA
+   La capsula de cristal conserva su forma: cambian los acentos. Reposo
+   violeta apagado, foco magenta (antes cian), badge y VIEW naranja calabaza.
+   ========================================================================== */
+
+/* Movil: capsula de busqueda */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-pill {
+  background: #0d0718;
+  border-color: rgba(168, 85, 247, 0.3);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.6),
+    0 0 14px rgba(168, 85, 247, 0.14),
+    inset 0 1px 0 rgba(233, 213, 255, 0.08);
 }
 
-.fnm-bat-ambient {
-  position: absolute;
-  font-size: 2rem;
-  pointer-events: none;
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-pill.is-focused {
+  background: #150a26;
+  border-color: rgba(217, 70, 239, 0.65);
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(217, 70, 239, 0.3),
+    inset 0 1px 0 rgba(233, 213, 255, 0.12);
 }
 
-.fnm-bat-1 {
-  top: -40px;
-  left: -60px;
-  animation: fnm-bat-fly-1 3s infinite ease-in-out;
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-pill.is-focused .mobile-glass-search-icon {
+  color: #e879f9;
 }
 
-.fnm-bat-2 {
-  top: -20px;
-  right: -70px;
-  animation: fnm-bat-fly-2 3.5s infinite ease-in-out;
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-filter-btn.is-active {
+  color: #e879f9;
+  background: rgba(217, 70, 239, 0.16);
+  border: 1px solid rgba(217, 70, 239, 0.4);
 }
 
-.fnm-bat-3 {
-  bottom: -30px;
-  left: -40px;
-  animation: fnm-bat-fly-3 2.8s infinite ease-in-out;
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-badge {
+  background: #ff922b;
+  color: #1a0b02;
+  box-shadow: 0 0 8px rgba(255, 146, 43, 0.55);
 }
 
-.fnm-bat-4 {
-  bottom: -20px;
-  right: -50px;
-  animation: fnm-bat-fly-4 3.2s infinite ease-in-out;
+/* El VIEW del coachmark "N nuevos espiritus" pasa de cian a brasa. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-new-coachmark__action {
+  background: #ff922b;
+  color: #1a0b02;
+  box-shadow: 0 0 10px rgba(255, 146, 43, 0.5);
 }
 
-@keyframes fnm-bat-fly-1 {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(-30px, -25px) rotate(-15deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
+/* Escritorio: la misma capsula en la barra de filtros. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .search-input-field {
+  background: rgba(20, 10, 34, 0.72);
+  border-color: rgba(168, 85, 247, 0.3);
 }
 
-@keyframes fnm-bat-fly-2 {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(35px, -30px) rotate(18deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .search-input-field::placeholder {
+  color: rgba(196, 181, 253, 0.6);
 }
 
-@keyframes fnm-bat-fly-3 {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(-25px, 20px) rotate(-12deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .search-input-field:hover {
+  background: rgba(30, 16, 50, 0.85);
+  border-color: rgba(168, 85, 247, 0.5);
 }
 
-@keyframes fnm-bat-fly-4 {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(25px, 25px) rotate(15deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .search-input-field:focus {
+  border-color: #d946ef;
+  box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.22);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-search-box .search-icon {
+  color: rgba(196, 181, 253, 0.75);
+}
+
+/* El badge del pill "Nuevos" en escritorio pasa de cian a naranja calabaza. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .status-pill-count-badge {
+  background: #ff922b;
+  color: #1a0b02;
+  box-shadow: 0 0 10px rgba(255, 146, 43, 0.5);
+}
+
+/* ==========================================================================
+   HOJA DE FILTROS DE COLECCION EN TEMPORADA
+   La capsula de cristal ya vira a violeta y brasa; la hoja que abre no puede
+   quedarse en cian. Misma receta que la capsula: superficie noche-violeta,
+   seleccion fucsia y la accion principal en fuego de calabaza.
+   OJO: las reglas base de los chips .is-active usan !important, asi que el
+   override estacional tambien lo lleva. Sin el, la hoja se queda en cian.
+   ========================================================================== */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet {
+  background: #0d0718;
+  border-color: rgba(168, 85, 247, 0.28);
+  box-shadow:
+    0 -16px 40px rgba(0, 0, 0, 0.9),
+    0 0 30px rgba(168, 85, 247, 0.14),
+    inset 0 1px 0 rgba(233, 213, 255, 0.08);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet-handle {
+  background: rgba(233, 213, 255, 0.22);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet-header {
+  border-bottom-color: rgba(168, 85, 247, 0.18);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet-footer {
+  border-top-color: rgba(168, 85, 247, 0.18);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-icon {
+  color: #e879f9;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-title {
+  color: #f5f0ff;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-count-badge {
+  background: #ff922b;
+  border-color: transparent;
+  color: #1a0b02;
+  box-shadow: 0 0 8px rgba(255, 146, 43, 0.55);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-close-btn {
+  background: rgba(168, 85, 247, 0.1);
+  border-color: rgba(168, 85, 247, 0.26);
+  color: rgba(196, 181, 253, 0.9);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-close-btn:hover {
+  background: rgba(217, 70, 239, 0.2);
+  border-color: rgba(217, 70, 239, 0.45);
+  color: #ffffff;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-section-label {
+  color: rgba(196, 181, 253, 0.55);
+}
+
+/* Reposo: las tres familias de chips comparten el mismo violeta apagado. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-status-pill,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-variant-chip,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sprite-chip {
+  background: rgba(168, 85, 247, 0.07);
+  border-color: rgba(168, 85, 247, 0.18);
+  color: rgba(196, 181, 253, 0.78);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-status-pill:hover:not(.is-active),
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-variant-chip:hover:not(.is-active),
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sprite-chip:hover:not(.is-active) {
+  background: rgba(168, 85, 247, 0.14);
+  border-color: rgba(168, 85, 247, 0.34);
+  color: #f5f0ff;
+}
+
+/* Seleccionado: fucsia, igual que el boton de filtros de la capsula. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-status-pill.is-active,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-variant-chip.is-active,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-variant-chip:first-child.is-active,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sprite-chip.is-active {
+  background: rgba(217, 70, 239, 0.16) !important;
+  border: 1px solid rgba(217, 70, 239, 0.45) !important;
+  color: #ffffff !important;
+}
+
+/* La tarjeta del interruptor "Mostrar No Lanzados". */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-compact-toggle-label-wrap {
+  background: rgba(168, 85, 247, 0.07);
+  border-color: rgba(168, 85, 247, 0.18);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-compact-toggle-label-wrap:hover {
+  background: rgba(168, 85, 247, 0.14);
+  border-color: rgba(168, 85, 247, 0.34);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-toggle-switch.is-on {
+  background: #ff922b;
+  box-shadow: 0 0 10px rgba(255, 146, 43, 0.5);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-toggle-switch.is-on .mobile-toggle-thumb {
+  background: #1a0b02;
+}
+
+/* Limpiar: accion secundaria, violeta tenue. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-clear {
+  background: rgba(168, 85, 247, 0.08);
+  border-color: rgba(168, 85, 247, 0.24);
+  color: rgba(196, 181, 253, 0.85);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-clear:hover {
+  background: rgba(217, 70, 239, 0.16);
+  border-color: rgba(217, 70, 239, 0.4);
+  color: #ffffff;
+}
+
+/* Aplicar Filtros: la accion principal, en fuego de calabaza. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply {
+  background: rgba(255, 146, 43, 0.12);
+  border-color: #ff922b;
+  color: #ff922b;
+  box-shadow: 0 0 12px rgba(255, 146, 43, 0.25);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:hover:not(:disabled),
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:focus:not(:disabled) {
+  background-color: #ff922b;
+  color: #1a0b02;
+  border-color: #ff922b;
+  box-shadow: 0 0 25px rgba(255, 146, 43, 0.55);
+}
+
+/* El glitch del hover deja de destellar cian. Se ancla al boton de la hoja
+   para no tocar el boton de compartir, que usa la misma .sdm-share__glitch-btn. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply::before,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply::after {
+  background-color: #ff922b;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:hover:not(:disabled)::before,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:focus:not(:disabled)::before {
+  color: #3b0764;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:hover:not(:disabled)::after,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:focus:not(:disabled)::after {
+  color: #1a0b02;
+}
+
+/* ==========================================================================
+   CARTA MAXEADA EN TEMPORADA — ACABADO ESCARCHA
+   La capa cyber de la gen 2 vira a escarcha: frio, cristal, iridiscente.
+   No se anade marcado. Del overlay que ya existe se conservan las esquinas,
+   los halos y las particulas; el barrido y las lineas tecnicas se retiran,
+   porque sumarlos era lo que ensuciaba la carta. El velo y el vinetado van
+   en los pseudos de la propia carta: el overlay es un contexto de
+   apilamiento, y nada de lo que vive dentro puede pintar sobre el sprite.
+   ========================================================================== */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-mastered.is-glitch-mastered {
+  isolation: isolate;
+  /* Sin pulso y sin resplandor exterior: medido con muchas cartas maxeadas,
+     animar el box-shadow dejaba la grilla a 17 fps de 60. El brillo se
+     queda dentro de la carta, que ademas es lo que pide el diseno. */
+  animation: none;
+  border-color: rgba(206, 232, 255, 0.42) !important;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.6),
+    inset 0 0 22px rgba(150, 205, 255, 0.14);
+}
+
+/* La noche de la propuesta, pero translucida y sobre el overlay, no sobre la
+   carta: asi el degradado propio del espiritu queda debajo y su color se
+   sigue notando —una carta azul se lee azul— sin perder la escarcha. Opaca
+   borraria la identidad de cada espiritu. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .cyber-fx-overlay {
+  /* El vinetado vive DETRAS del arte (z-index: 0): el degradado base del espíritu
+     se preserva con viveza y el velo nocturno de escarcha enmarca la silueta. */
+  z-index: 0;
+  background-image:
+    radial-gradient(124% 94% at 50% 30%, transparent 45%, rgba(4, 8, 16, 0.45) 100%),
+    linear-gradient(180deg, rgba(22, 32, 58, 0.35) 0%, rgba(8, 11, 20, 0.50) 66%, rgba(4, 6, 11, 0.65) 100%);
+}
+
+/* Vinetado frio (overlay) y velo iridiscente (screen), encima del arte. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-mastered .card-image img:not(.card-image__crown),
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-mastered .ms-card__image img:not(.ms-card__crown),
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-list-item.is-mastered .list-item-image img {
+  /* El espiritu maxeado se enciende: resplandor calido sobre el propio
+     sprite. Va con !important porque el filtro del sprite llega en linea
+     desde el componente, y un estilo en linea gana sobre la hoja. */
+  filter:
+    drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 0 12px rgba(255, 146, 43, 0.55))
+    drop-shadow(0 0 26px rgba(255, 122, 0, 0.3)) !important;
+}
+
+/* Ningún pseudo-elemento puede cubrir por encima al espíritu, al nombre o a las monedas */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-mastered.is-glitch-mastered::before,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-mastered.is-glitch-mastered::after {
+  display: none !important;
+}
+
+/* Ni las puntas de las esquinas ni los granos flotantes forman parte de
+   Escarcha: son del efecto tecnico anterior. Se retiran, no se recolorean. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .corner-elements,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .card-particles {
+  display: none !important;
+}
+
+/* El hielo se acumula donde el frio agarra: los tres halos ambientales. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-1,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-2,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-3 {
+  background: radial-gradient(circle, rgba(226, 242, 255, 0.46) 0%, rgba(180, 214, 255, 0.14) 44%, transparent 72%);
+  filter: blur(8px);
+  opacity: 0.65;
+}
+
+/* Los halos se anclan a las esquinas perimetrales para iluminar los bordes sin invadir las monedas ni el texto */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-1 { top: -4px; left: -4px; }
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-2 { top: 28%; right: -10px; }
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-3 { bottom: -10px; right: -10px; }
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered:hover .glowing-elements div {
+  opacity: 0.95;
+}
+
+/* En movil la carta es mas alta (284px frente a 245px), los halos se distribuyen en las esquinas */
+@media (max-width: 768px) {
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements div {
+    width: 62px;
+    height: 62px;
+  }
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-1 { top: -14px; left: -14px; }
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-2 { top: -10px; right: -18px; }
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-3 { bottom: -12px; right: -12px; }
+}
+
+/* El barrido y las lineas tecnicas no son escarcha: se retiran en vez de
+   recolorearse. Sumar capas sobre el efecto que ya existia era justo lo que
+   dejaba la carta sucia. Escarcha reemplaza, no acumula. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .scan-line,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .cyber-lines {
+  display: none !important;
+}
+
+/* Las particulas dejan de ser datos: son polvo de hielo. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .card-particles span {
+  background: #d6ecff;
+  box-shadow: 0 0 6px #d6ecff;
+}
+
+/* La vista lista llevaba el mismo cian: se alinea con la carta. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-list-item.is-mastered.is-glitch-mastered {
+  border-left-color: #cfe6ff;
+  border-color: rgba(198, 226, 255, 0.4);
+  box-shadow: 0 0 12px rgba(150, 205, 255, 0.25);
 }
 
 /* Seasonal animations must respect the visitor's motion preference. */
 @media (prefers-reduced-motion: reduce) {
   .hero__title-fnm-svg,
-  .fnm-crt-flicker,
-  .fnm-spooky-aura,
+  .hero__title-fnm-ghost,
   .fnm-skip-btn {
     animation: none;
   }
 
-  .fnm-lightning-flash {
+  /* El fuego de las calabazas y el pulso de luz se quedan fijos; el bosque
+     conserva solo su respiracion de transform. */
+  html.theme-fortnitemares::after {
     animation: none;
-    opacity: 0;
   }
 
-  .fnm-bat-ambient {
-    animation: none;
-    display: none;
+  .fnm-forest {
+    animation: fnm-forest-breathe 18s ease-in-out infinite alternate;
   }
 
-  .fnm-transition-overlay,
+  .fnm-pumpkin-btn::after {
+    animation: none;
+  }
+
   .fnm-pumpkin-btn,
   .fnm-pumpkin-svg,
   .fnm-sat,
@@ -9034,26 +9232,14 @@ html[data-fnm-phase='curse'] .fnm-pumpkin-btn {
 
 /* The in-app "motion disabled" preference covers the seasonal layers too. */
 .motion-disabled .hero__title-fnm-svg,
-.motion-disabled .fnm-crt-flicker,
-.motion-disabled .fnm-spooky-aura,
+.motion-disabled .hero__title-fnm-ghost,
 .motion-disabled .fnm-skip-btn {
   animation: none;
-}
-
-.motion-disabled .fnm-lightning-flash {
-  animation: none;
-  opacity: 0;
-}
-
-.motion-disabled .fnm-bat-ambient {
-  animation: none;
-  display: none;
 }
 
 .motion-disabled .fnm-pumpkin-btn,
 .motion-disabled .fnm-pumpkin-svg,
 .motion-disabled .fnm-sat,
-.motion-disabled .fnm-sat-btn,
-.motion-disabled .fnm-transition-overlay {
+.motion-disabled .fnm-sat-btn {
   transition: none;
 }

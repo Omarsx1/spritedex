@@ -42,8 +42,13 @@ export function PumpkinIcon({ size = 22, className = '', style = {}, ...props })
           <stop offset="100%" stopColor="#2b8a3e" />
         </linearGradient>
 
+        {/* La luz vive dentro: el tallado (pumpkinGlowGrad) es lo que brilla.
+            Este halo solo separa la silueta del fondo, asi que va contenido —
+            con stdDeviation 1.5 y opacity 0.8 se leia como aura alrededor de
+            la calabaza entera, y ademas el glow se recortaba en el borde de
+            la region del filtro. */}
         <filter id="pumpkinFireGlow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="0" stdDeviation="1.5" floodColor="#ff922b" floodOpacity="0.8" />
+          <feDropShadow dx="0" dy="0" stdDeviation="1.1" floodColor="#ff922b" floodOpacity="0.35" />
         </filter>
       </defs>
 

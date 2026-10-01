@@ -27,18 +27,8 @@ export const IS_DEV_BUILD = Boolean(import.meta.env && import.meta.env.DEV);
 // Idle re-check ceiling: setTimeout overflows past ~24.8 days.
 const MAX_SCHEDULER_DELAY_MS = 6 * 60 * 60 * 1000;
 
-// One-time cinematic pacing, in milliseconds from the transition start.
-// Tuned as a trailer sting (about 1.9 s) instead of a loading screen. `end`
-// must stay at least 600 ms after `fade` so the overlay's CSS opacity
-// transition (see .fnm-transition-overlay in styles/index.css) can finish.
-export const INTRO_TIMELINE = {
-  bootDelay: 180,
-  corrupt: 120,
-  transform: 320,
-  curse: 780,
-  fade: 1300,
-  end: 1900
-};
+// One-time cinematic pacing lives in fortnitemaresTimeline.js (FNM_PHASES),
+// which is what the component and the tests consume.
 
 /**
  * Pure seasonal resolver: no globals, so it can be unit tested directly.

@@ -30,7 +30,7 @@ test('event boundaries are offset-anchored, so they cannot drift with the browse
 
 test('the entrance runs as an ordered season-launch sequence, not a stall', () => {
   const ids = FNM_PHASES.map((p) => p.id);
-  assert.deepEqual(ids, ['corrupt', 'swarm', 'brand', 'curse', 'settle', 'done']);
+  assert.deepEqual(ids, ['title', 'ground', 'glow', 'settle', 'done']);
 
   for (let i = 1; i < FNM_PHASES.length; i += 1) {
     assert.ok(
@@ -41,15 +41,17 @@ test('the entrance runs as an ordered season-launch sequence, not a stall', () =
 
   const total = FNM_PHASES[FNM_PHASES.length - 1].at;
   assert.ok(total >= 3500, 'the cinematic must be a real moment, not a 1.9s sting');
-  assert.ok(total <= 6000, 'but it must not block the interface for long');
+  assert.ok(total <= 7000, 'but it must not overstay its welcome');
 });
 
-test('the brand beat lands before the theme has to be readable', () => {
-  const brand = FNM_PHASES.find((p) => p.id === 'brand');
+test('the entrance transforms the interface by parts, in order', () => {
+  const title = FNM_PHASES.find((p) => p.id === 'title');
+  const ground = FNM_PHASES.find((p) => p.id === 'ground');
+  const glow = FNM_PHASES.find((p) => p.id === 'glow');
   const settle = FNM_PHASES.find((p) => p.id === 'settle');
-  const curse = FNM_PHASES.find((p) => p.id === 'curse');
-  assert.ok(brand.at < curse.at, 'the wordmark swaps before the crimson flood');
-  assert.ok(curse.at < settle.at, 'the flood resolves into a readable interface');
+  assert.ok(title.at < ground.at, 'part 1: the wordmark mutates before the ground');
+  assert.ok(ground.at < glow.at, 'part 2: the ground crossfades before the firelight');
+  assert.ok(glow.at < settle.at, 'part 3: the details wake before the interface settles');
 });
 
 test('production resolves strictly from the event window', () => {

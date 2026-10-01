@@ -14,19 +14,21 @@ import {
   FNM_PHASES,
   FNM_SWARM_COUNT
 } from '../config/fortnitemaresTimeline';
-
 /**
- * One-time Fortnitemares entrance.
+ * One-time Fortnitemares entrance, built in PARTS.
  *
- * Unlike a full-screen curtain, this drives the *real* interface: it applies
- * a `data-fnm-phase` attribute to <html> and lets CSS transform the existing
- * logo, background and dock in place. The only elements this component renders
- * are non-interactive atmospheric layers (scanlines, vignette) plus a skip
- * button, so nothing covers or duplicates the live UI.
+ * Nothing covers the interface: the component publishes a `data-fnm-phase`
+ * attribute to <html> and CSS transforms the real UI piece by piece — first
+ * the wordmark (with the swarm), then the ground (grid crossfades to forest),
+ * then the seasonal glow. The only elements this component renders are the
+ * persistent haunted-forest layer and, while the cinematic runs, a skip
+ * button.
  */
 export function FortnitemaresTransition({ onComplete }) {
   const [phase, setPhase] = useState(null);
   const [armed, setArmed] = useState(false);
+  // Whether the seasonal theme is on right now: owns the persistent forest.
+  const [themed, setThemed] = useState(() => isFortnitemaresActive());
   const timersRef = useRef([]);
   const swarmRef = useRef(null);
   const skipButtonRef = useRef(null);
@@ -36,6 +38,14 @@ export function FortnitemaresTransition({ onComplete }) {
   useEffect(() => {
     onCompleteRef.current = onComplete;
   }, [onComplete]);
+
+  // Keep the forest layer honest while the tab stays open: dev toggles and
+  // the season ending both broadcast on this channel.
+  useEffect(() => {
+    const sync = (e) => setThemed(e?.detail?.active !== undefined ? Boolean(e.detail.active) : isFortnitemaresActive());
+    window.addEventListener('spritedex:season-change', sync);
+    return () => window.removeEventListener('spritedex:season-change', sync);
+  }, []);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
@@ -70,12 +80,12 @@ export function FortnitemaresTransition({ onComplete }) {
     for (const step of FNM_PHASES) {
       timersRef.current.push(
         setTimeout(() => {
-          if (step.id === 'swarm') {
-            swarmRef.current = createBatSwarm({ count: FNM_SWARM_COUNT, mode: 'burst' });
-          }
-          if (step.id === 'brand') {
+          if (step.id === 'title') {
+            // Parte 1: la marca. La clase enciende el tema (con cada capa
+            // gateada a su fase) y el Header muta el wordmark y la calabaza.
             applySeasonalTheme(true);
             windowDispatchSeasonChange(true);
+            swarmRef.current = createBatSwarm({ count: FNM_SWARM_COUNT, mode: 'burst' });
           }
           if (step.id === 'done') {
             finish();
@@ -94,9 +104,12 @@ export function FortnitemaresTransition({ onComplete }) {
     if (typeof document !== 'undefined') {
       document.documentElement.removeAttribute('data-fnm-phase');
     }
-    // Dismissing mid-corruption still lands on the themed interface.
+    // Dismissing mid-sequence still lands on the themed interface.
     applySeasonalTheme(isFortnitemaresActive());
-    if (isFortnitemaresActive()) windowDispatchSeasonChange(true);
+    if (isFortnitemaresActive()) {
+      windowDispatchSeasonChange(true);
+      setThemed(true);
+    }
     markFortnitemaresIntroSeen();
     if (onCompleteRef.current) onCompleteRef.current();
   }, [teardown]);
@@ -110,12 +123,15 @@ export function FortnitemaresTransition({ onComplete }) {
 
     if (hasSeenFortnitemaresIntro()) {
       applySeasonalTheme(true);
+      windowDispatchSeasonChange(true);
       return undefined;
     }
 
     if (prefersReducedMotion()) {
-      // No cinematic: theme on, immediately, and never replayed.
+      // No cinematic: theme on, immediately, and never replayed. The dispatch
+      // syncs the Header, whose initial read predates this effect.
       applySeasonalTheme(true);
+      windowDispatchSeasonChange(true);
       markFortnitemaresIntroSeen();
       if (onCompleteRef.current) onCompleteRef.current();
       return undefined;
@@ -126,7 +142,7 @@ export function FortnitemaresTransition({ onComplete }) {
   }, []);
 
   // Run the cinematic one tick after mount so the first frame is still the
-  // normal interface; the corruption then happens in front of the user.
+  // normal interface; the first part then begins in front of the user.
   useEffect(() => {
     if (!armed) return undefined;
     const kick = setTimeout(() => start(), FNM_BOOT_DELAY);
@@ -135,13 +151,17 @@ export function FortnitemaresTransition({ onComplete }) {
 
   useEffect(() => () => teardown(), [teardown]);
 
-  // Publish the phase to CSS so the real interface animates in place.
+  // Publish the phase to CSS so the real interface animates in place. While
+  // the cinematic is armed but the first part has not fired yet, hold the
+  // 'boot' phase: the theme class is on, but every themed layer stays gated
+  // so the visitor still sees the normal web.
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
     if (phase) root.setAttribute('data-fnm-phase', phase);
+    else if (armed) root.setAttribute('data-fnm-phase', 'boot');
     else root.removeAttribute('data-fnm-phase');
-  }, [phase]);
+  }, [phase, armed]);
 
   // Focus handling for the skip control.
   useEffect(() => {
@@ -179,6 +199,7 @@ export function FortnitemaresTransition({ onComplete }) {
       applySeasonalTheme(false);
       windowDispatchSeasonChange(false);
       setPhase(null);
+      setThemed(false);
       setArmed(true);
     };
 
@@ -186,25 +207,28 @@ export function FortnitemaresTransition({ onComplete }) {
     return () => window.removeEventListener('spritedex:replay-fortnitemares', handleReplay);
   }, []);
 
-  if (!armed) return null;
+  if (!themed && !armed) return null;
 
   return (
-    <div className="fnm-cinematic" data-phase={phase || 'boot'}>
-      {/* Atmospheric layers only: they tint and distort the live UI behind them */}
-      <div className="fnm-crt-scanlines" aria-hidden="true" />
-      <div className="fnm-crt-flicker" aria-hidden="true" />
-      <div className="fnm-corrupt-vignette" aria-hidden="true" />
-      <div className="fnm-glitch-bars" aria-hidden="true" />
+    <>
+      {/* El bosque persistente de la temporada: vive debajo del contenido y
+          cruza desde la rejilla en la parte "ground" de la cinematica. */}
+      {themed && <div className="fnm-forest" aria-hidden="true" />}
 
-      <button
-        type="button"
-        className="fnm-skip-btn"
-        ref={skipButtonRef}
-        onClick={dismiss}
-      >
-        Skip
-      </button>
-    </div>
+      {armed && (
+        <div className="fnm-cinematic" data-phase={phase || 'boot'}>
+          {/* Nada tapa la interfaz: las piezas reales se transforman solas. */}
+          <button
+            type="button"
+            className="fnm-skip-btn"
+            ref={skipButtonRef}
+            onClick={dismiss}
+          >
+            Skip
+          </button>
+        </div>
+      )}
+    </>
   );
 }
 

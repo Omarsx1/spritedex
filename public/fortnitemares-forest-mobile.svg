@@ -1,129 +1,130 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Bosque tenebroso de Fortnitemares (version pintada).
+  Bosque tenebroso de Fortnitemares — COMPOSICION VERTICAL (movil).
 
-  Capa de atmosfera para body.theme-fortnitemares::before. SVG vectorial en vez
-  de un bitmap: pesa poco, se ve nitido en cualquier densidad y no cuesta GPU
-  por frame (el telefono lo pinta una vez; solo animamos opacity/transform).
+  La escena apaisada (fortnitemares-forest.svg) esta compuesta para monitores;
+  en un telefono el recorte "cover" la dejaba sin luna entera, sin casa
+  encantada y con el parche de calabazas medio escondido. Esta version tiene
+  la misma paleta y simbolos pero compuesta para 740x1600 (proporcion de un
+  telefono en vertical): la luna vive dentro del encuadre, la casa encantada
+  asoma a la izquierda, los arboles enmarcan los dos bordes y el parche de
+  calabazas es el protagonista del suelo.
 
-  Escena, de atras hacia adelante: cielo con estrellas, luna carmesi con
-  crateres y nubes, rayos de luz, murcielagos, tres planos de arboles (lejanos
-  de trazo, medios y marco de silueta solida), cerca rota, lapida, y el parche
-  de calabazas iluminadas con su luz vertida en el suelo.
-
-  Coordenadas 0 0 1600 900 con preserveAspectRatio="xMidYMax slice". En un
-  movil en vertical el recorte central deja visible x ~592-1008: por eso la
-  cerca, las calabazas y la lapida viven en esa banda.
+  Se sirve via CSS (.fnm-forest, media query <=768px). Todo es estatico: el
+  telefono lo pinta una vez y solo animamos opacity/transform.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" role="presentation" aria-hidden="true">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 1600" preserveAspectRatio="xMidYMax slice" role="presentation" aria-hidden="true">
   <defs>
-    <!-- Niebla violeta: se desplaza con CSS (drift) para dar arrastre lento -->
-    <linearGradient id="fnm-fog" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="m-fog" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#3b0764" stop-opacity="0"/>
       <stop offset="55%" stop-color="#4c1d95" stop-opacity="0.35"/>
       <stop offset="100%" stop-color="#2e1065" stop-opacity="0"/>
     </linearGradient>
 
-    <!-- Halo de la luna: luz carmesi amplia y lejisima -->
-    <radialGradient id="fnm-moon-halo" cx="50%" cy="50%" r="50%">
+    <radialGradient id="m-moon-halo" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#ffe4e6" stop-opacity="0.42"/>
       <stop offset="30%" stop-color="#fda4af" stop-opacity="0.20"/>
       <stop offset="62%" stop-color="#e11d48" stop-opacity="0.08"/>
       <stop offset="100%" stop-color="#e11d48" stop-opacity="0"/>
     </radialGradient>
 
-    <!-- Disco lunar: casi blanco rosado, mas lleno que antes -->
-    <radialGradient id="fnm-moon-disc" cx="42%" cy="38%" r="72%">
+    <radialGradient id="m-moon-disc" cx="42%" cy="38%" r="72%">
       <stop offset="0%" stop-color="#fff7f5"/>
       <stop offset="70%" stop-color="#f6d4dc"/>
       <stop offset="100%" stop-color="#e8b7c4"/>
     </radialGradient>
 
-    <!-- Cielo: carmesi sangre apagandose hacia arriba -->
-    <radialGradient id="fnm-sky" cx="72%" cy="16%" r="86%">
-      <stop offset="0%" stop-color="#7f1d3a" stop-opacity="0.62"/>
-      <stop offset="34%" stop-color="#4c1d95" stop-opacity="0.34"/>
-      <stop offset="68%" stop-color="#2e1065" stop-opacity="0.16"/>
+    <radialGradient id="m-sky" cx="68%" cy="20%" r="90%">
+      <stop offset="0%" stop-color="#7f1d3a" stop-opacity="0.60"/>
+      <stop offset="36%" stop-color="#4c1d95" stop-opacity="0.34"/>
+      <stop offset="70%" stop-color="#2e1065" stop-opacity="0.16"/>
       <stop offset="100%" stop-color="#0a0410" stop-opacity="0"/>
     </radialGradient>
 
-    <radialGradient id="fnm-ray" cx="50%" cy="50%" r="50%">
+    <linearGradient id="m-horizon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#db2777" stop-opacity="0"/>
+      <stop offset="46%" stop-color="#db2777" stop-opacity="0.44"/>
+      <stop offset="78%" stop-color="#7e22ce" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="#4c1d95" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="m-ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#05020a" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#020008" stop-opacity="0.95"/>
+    </linearGradient>
+
+    <radialGradient id="m-ray" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#ffe4e6" stop-opacity="0.55"/>
       <stop offset="55%" stop-color="#ffe4e6" stop-opacity="0.16"/>
       <stop offset="100%" stop-color="#ffe4e6" stop-opacity="0"/>
     </radialGradient>
 
-    <!-- Resplandor de horizonte: la luz que convierte las siluetas en siluetas -->
-    <linearGradient id="fnm-horizon" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#db2777" stop-opacity="0"/>
-      <stop offset="46%" stop-color="#db2777" stop-opacity="0.42"/>
-      <stop offset="78%" stop-color="#7e22ce" stop-opacity="0.30"/>
-      <stop offset="100%" stop-color="#4c1d95" stop-opacity="0"/>
-    </linearGradient>
-
-    <!-- Suelo: apaga la base para que las tarjetas queden por encima -->
-    <linearGradient id="fnm-ground" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#05020a" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#020008" stop-opacity="0.95"/>
-    </linearGradient>
-
-    <!-- Calabaza: cuerpo en silueta con la cara encendida desde dentro -->
-    <radialGradient id="fnm-pumpkin-body" cx="50%" cy="28%" r="85%">
+    <radialGradient id="m-pumpkin-body" cx="50%" cy="28%" r="85%">
       <stop offset="0%" stop-color="#9c3d0e"/>
       <stop offset="55%" stop-color="#652204"/>
       <stop offset="100%" stop-color="#280c02"/>
     </radialGradient>
-    <radialGradient id="fnm-pumpkin-halo" cx="50%" cy="50%" r="50%">
+    <radialGradient id="m-pumpkin-halo" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#ff922b" stop-opacity="0.30"/>
       <stop offset="55%" stop-color="#ff7a00" stop-opacity="0.11"/>
       <stop offset="100%" stop-color="#ff7a00" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="fnm-face" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="m-face" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#fff3c4"/>
       <stop offset="60%" stop-color="#ffc24d"/>
       <stop offset="100%" stop-color="#ff8a00"/>
     </linearGradient>
-    <radialGradient id="fnm-pool" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#ff8c2b" stop-opacity="0.20"/>
-      <stop offset="60%" stop-color="#ff7a1a" stop-opacity="0.07"/>
-      <stop offset="100%" stop-color="#ff7a1a" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="fnm-face-violet" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="m-face-violet" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#fae8ff"/>
       <stop offset="60%" stop-color="#e879f9"/>
       <stop offset="100%" stop-color="#c026d3"/>
     </linearGradient>
-    <radialGradient id="fnm-pumpkin-halo-violet" cx="50%" cy="50%" r="50%">
+    <radialGradient id="m-pumpkin-halo-violet" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#e879f9" stop-opacity="0.30"/>
       <stop offset="55%" stop-color="#d946ef" stop-opacity="0.11"/>
       <stop offset="100%" stop-color="#d946ef" stop-opacity="0"/>
     </radialGradient>
+    <radialGradient id="m-pool" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff8c2b" stop-opacity="0.20"/>
+      <stop offset="60%" stop-color="#ff7a1a" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#ff7a1a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="m-house-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c084fc" stop-opacity="0.16"/>
+      <stop offset="60%" stop-color="#a855f7" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+    </radialGradient>
 
-    <!-- Arbol retorcido de silueta solida (tronco mas ramas en hoz). Base en
-         (0,0), crece hacia arriba ~320 unidades. -->
-    <g id="fnm-treeA">
+    <g id="m-treeA">
       <path d="M-3.0 -5.7 L-12.5 -1.1 L-22.4 3.1 L-32.7 9.4 L-24.4 9.8 L-16.2 9.9 L-8.0 9.7ZM4.4 -1.4 L-3.0 4.7 L-10.0 11.5 L-17.1 21.6 L-15.2 15.4 L-11.7 10.9 L-8.9 5.4ZM9.0 4.6 L10.3 11.3 L11.3 17.7 L12.7 25.4 L4.8 15.5 L-0.4 7.2 L-6.1 -0.6ZM9.4 7.5 L17.2 12.9 L23.9 19.2 L30.5 26.4 L19.1 15.4 L9.8 6.0 L0.4 -3.5ZM15.4 3.5 L6.4 -34.8 L-4.1 -74.9 L-19.9 -111.8 L-47.5 -152.7 L-35.4 -106.7 L-25.1 -70.1 L-16.9 -34.5 L-15.4 4.5ZM-35.5 -141.3 L-56.3 -159.4 L-78.0 -178.1 L-97.6 -195.4 L-123.3 -215.9 L-104.5 -189.9 L-84.0 -168.9 L-64.5 -150.7 L-45.0 -130.9ZM-116.3 -211.8 L-132.6 -216.3 L-150.8 -222.5 L-167.7 -228.6 L-190.1 -237.3 L-171.6 -226.3 L-152.7 -218.4 L-135.1 -211.0 L-114.9 -203.9ZM-184.2 -235.6 L-196.1 -235.7 L-211.3 -236.4 L-224.3 -235.0 L-240.5 -227.0 L-227.3 -232.6 L-211.6 -233.7 L-198.2 -232.4 L-181.4 -231.7ZM-236.2 -230.9 L-241.8 -221.9 L-248.8 -212.6 L-252.1 -202.6 L-249.3 -190.8 L-249.0 -190.9 L-249.3 -190.9 L-248.9 -191.0 L-251.6 -200.1 L-248.1 -210.8 L-241.8 -218.6 L-235.3 -227.5ZM-235.1 -230.8 L-246.0 -226.1 L-254.6 -222.0 L-265.1 -214.0 L-269.1 -204.8 L-268.8 -204.6 L-269.1 -204.7 L-268.7 -204.6 L-262.8 -214.4 L-256.4 -219.7 L-245.3 -224.0 L-236.4 -227.7ZM-236.8 -230.4 L-244.5 -231.3 L-254.4 -232.8 L-262.9 -233.1 L-272.5 -230.0 L-264.8 -232.1 L-254.4 -231.3 L-245.6 -229.8 L-234.7 -228.0ZM-181.1 -234.2 L-191.5 -246.1 L-200.3 -256.6 L-209.6 -263.4 L-224.0 -267.2 L-224.1 -266.6 L-224.0 -267.1 L-224.2 -266.5 L-212.2 -263.1 L-200.4 -252.5 L-191.9 -241.9 L-184.5 -233.1ZM-221.8 -266.9 L-228.6 -267.4 L-239.2 -269.2 L-246.7 -269.8 L-255.9 -269.2 L-247.5 -268.8 L-237.5 -267.5 L-230.8 -266.0 L-220.1 -264.7ZM-219.9 -266.3 L-227.2 -272.0 L-236.4 -279.6 L-247.5 -283.2 L-257.8 -279.3 L-245.6 -281.4 L-237.2 -278.4 L-230.6 -272.7 L-222.0 -265.3ZM-111.3 -207.4 L-114.7 -224.2 L-117.8 -239.9 L-121.1 -256.0 L-127.8 -274.3 L-125.5 -255.1 L-124.1 -239.3 L-121.6 -223.3 L-119.9 -208.2ZM-122.6 -267.6 L-128.6 -278.0 L-134.5 -288.9 L-143.0 -296.8 L-156.6 -298.9 L-145.1 -295.1 L-137.2 -287.0 L-132.5 -277.6 L-128.1 -267.7ZM-153.7 -299.3 L-160.4 -298.1 L-167.1 -297.0 L-177.5 -293.9 L-182.3 -287.4 L-174.6 -293.2 L-169.6 -294.9 L-160.5 -295.9 L-151.2 -296.6ZM-152.4 -299.6 L-158.4 -304.6 L-164.5 -310.1 L-172.8 -315.1 L-183.7 -316.2 L-173.1 -314.0 L-166.3 -309.8 L-159.6 -303.1 L-152.5 -296.3ZM-123.5 -265.4 L-120.4 -273.6 L-116.0 -283.5 L-109.7 -288.9 L-103.0 -287.6 L-102.9 -288.4 L-103.0 -287.7 L-102.9 -288.6 L-113.4 -289.1 L-120.4 -283.3 L-123.3 -277.5 L-127.2 -269.9ZM-105.9 -286.6 L-100.7 -288.1 L-96.4 -289.0 L-92.3 -288.6 L-88.6 -285.3 L-88.3 -285.7 L-88.6 -285.4 L-88.2 -285.7 L-90.3 -289.9 L-95.3 -291.5 L-100.2 -290.9 L-104.1 -290.6ZM-106.4 -287.6 L-101.2 -286.5 L-95.4 -285.4 L-90.2 -282.5 L-89.2 -279.2 L-88.9 -279.4 L-89.2 -279.2 L-88.8 -279.4 L-91.9 -285.1 L-95.3 -287.3 L-99.2 -288.1 L-103.6 -289.6ZM-32.3 -135.6 L-30.6 -159.5 L-29.0 -184.8 L-27.8 -207.6 L-30.3 -238.6 L-35.8 -211.5 L-40.6 -185.4 L-45.4 -161.8 L-48.1 -136.6ZM-25.7 -228.5 L-30.8 -246.8 L-36.7 -266.2 L-43.4 -283.5 L-53.0 -302.7 L-46.9 -279.2 L-42.4 -261.4 L-37.9 -245.5 L-34.5 -228.0ZM-48.1 -295.5 L-56.4 -302.1 L-64.9 -307.8 L-73.5 -310.1 L-84.0 -308.4 L-83.9 -307.6 L-84.0 -308.2 L-83.8 -307.4 L-75.3 -308.2 L-65.7 -304.4 L-58.7 -298.9 L-52.0 -293.4ZM-82.4 -308.9 L-88.8 -303.8 L-94.1 -299.5 L-96.5 -294.5 L-96.0 -285.7 L-95.6 -285.8 L-95.9 -285.7 L-95.5 -285.8 L-96.9 -291.3 L-92.0 -298.7 L-85.8 -303.3 L-80.8 -307.0ZM-79.7 -308.6 L-87.8 -311.5 L-93.3 -313.2 L-100.6 -313.4 L-107.8 -309.1 L-103.3 -312.1 L-96.5 -312.4 L-88.6 -309.4 L-83.5 -307.3ZM-47.6 -294.8 L-48.3 -305.6 L-48.7 -318.5 L-46.1 -328.8 L-36.2 -338.0 L-47.9 -330.8 L-51.8 -318.1 L-52.1 -307.2 L-52.5 -294.1ZM-38.6 -336.2 L-35.4 -342.5 L-31.2 -350.2 L-23.6 -355.9 L-15.3 -353.9 L-15.2 -354.2 L-15.3 -353.9 L-15.2 -354.3 L-24.4 -356.8 L-31.8 -352.7 L-36.4 -344.7 L-41.5 -335.1ZM-40.9 -333.8 L-32.6 -337.6 L-25.9 -340.9 L-19.6 -342.3 L-8.8 -342.5 L-16.8 -344.6 L-25.7 -343.0 L-33.3 -340.0 L-39.2 -337.6ZM-26.0 -225.8 L-18.5 -241.3 L-12.3 -256.7 L-5.8 -273.8 L-0.9 -295.1 L-10.5 -277.2 L-16.8 -262.0 L-25.6 -246.0 L-34.2 -230.7ZM-0.2 -286.2 L0.7 -300.9 L2.0 -311.2 L9.4 -321.9 L22.1 -324.5 L7.4 -323.7 L-1.1 -314.6 L-4.0 -299.8 L-5.8 -289.3ZM19.7 -324.6 L22.7 -328.3 L27.2 -334.7 L32.6 -338.5 L42.0 -337.9 L33.2 -340.4 L26.5 -336.5 L22.4 -331.5 L16.1 -324.1ZM17.0 -322.6 L27.5 -324.8 L33.7 -326.4 L44.2 -327.0 L50.5 -324.7 L50.6 -325.1 L50.5 -324.8 L50.6 -325.2 L41.2 -328.5 L34.9 -328.6 L24.8 -326.8 L18.8 -326.1ZM17.2 -323.1 L24.7 -320.2 L28.5 -318.4 L34.3 -312.6 L36.0 -305.5 L34.8 -314.6 L31.7 -318.9 L23.6 -323.6 L18.6 -325.7ZM-1.8 -285.6 L6.7 -294.9 L13.6 -301.7 L24.1 -307.9 L37.0 -311.9 L23.5 -310.4 L13.6 -305.7 L3.5 -296.9 L-4.2 -289.8ZM31.9 -308.3 L38.9 -313.4 L45.9 -319.2 L51.1 -320.5 L59.5 -318.9 L51.8 -321.8 L42.8 -318.8 L38.2 -315.4 L33.2 -311.8ZM31.2 -309.5 L39.5 -304.3 L43.5 -301.2 L49.0 -293.4 L49.4 -287.6 L48.5 -296.5 L45.8 -301.2 L38.1 -307.4 L33.8 -310.6Z"/>
     </g>
 
-    <!-- Arbol mas corto y recio, para variar el ritmo del bosque -->
-    <g id="fnm-treeB">
+    <g id="m-treeB">
       <path d="M-0.4 -6.7 L-12.9 1.0 L-26.0 8.3 L-39.5 19.1 L-30.0 15.9 L-19.9 13.3 L-9.6 10.7ZM4.5 -2.4 L-2.7 5.2 L-11.5 11.7 L-21.6 21.1 L-17.0 16.6 L-13.1 11.7 L-10.1 6.4ZM10.2 5.8 L12.3 12.3 L12.9 19.0 L12.9 28.0 L5.6 17.1 L0.9 7.3 L-5.4 -1.8ZM8.6 10.4 L18.7 11.7 L28.5 12.5 L38.2 14.1 L26.0 5.0 L13.5 -0.2 L2.1 -6.4ZM16.1 7.3 L19.5 -28.0 L21.5 -60.6 L23.0 -97.0 L18.4 -142.9 L5.3 -97.3 L-2.1 -66.2 L-10.3 -31.5 L-16.1 0.7ZM25.3 -125.6 L19.8 -143.4 L14.1 -165.6 L7.0 -185.6 L-3.2 -209.3 L-1.5 -180.5 L2.2 -160.8 L5.4 -142.6 L9.1 -120.2ZM2.5 -201.9 L-8.5 -212.1 L-19.7 -223.5 L-33.5 -233.0 L-55.1 -234.0 L-38.5 -229.1 L-26.3 -220.1 L-16.1 -207.8 L-5.5 -194.4ZM-48.9 -235.0 L-58.9 -231.3 L-67.6 -228.2 L-77.0 -222.4 L-82.9 -210.4 L-75.3 -220.1 L-67.3 -224.7 L-56.5 -227.0 L-47.2 -229.7ZM-46.1 -234.3 L-56.6 -240.5 L-65.6 -247.3 L-76.7 -254.9 L-88.5 -259.0 L-76.3 -251.4 L-68.3 -245.3 L-59.2 -237.0 L-50.0 -230.4ZM3.4 -199.7 L-0.2 -209.0 L-4.6 -220.6 L-12.7 -230.5 L-29.0 -233.4 L-16.8 -226.6 L-11.8 -218.5 L-9.8 -208.6 L-6.4 -196.7ZM-22.7 -233.8 L-31.4 -231.0 L-37.8 -227.9 L-46.8 -221.8 L-50.2 -214.8 L-49.5 -214.4 L-50.1 -214.8 L-49.3 -214.3 L-43.3 -220.7 L-38.8 -223.6 L-29.8 -226.3 L-23.0 -228.5ZM-20.1 -232.3 L-28.3 -239.2 L-34.3 -243.6 L-44.8 -245.5 L-52.3 -239.7 L-51.8 -239.0 L-52.2 -239.6 L-51.7 -238.8 L-44.3 -242.1 L-37.8 -241.2 L-30.1 -234.9 L-25.6 -230.0ZM2.6 -198.7 L2.7 -210.7 L2.6 -220.8 L4.7 -233.6 L9.8 -245.7 L0.3 -232.3 L-3.0 -222.3 L-4.6 -209.0 L-5.6 -197.7ZM9.9 -241.9 L9.8 -249.3 L10.6 -256.0 L14.4 -263.0 L20.8 -270.3 L12.0 -264.1 L7.8 -257.1 L5.8 -247.9 L4.5 -239.1ZM8.1 -238.4 L15.8 -243.3 L23.3 -247.8 L32.1 -250.5 L38.8 -249.3 L38.9 -250.0 L38.8 -249.4 L38.9 -250.2 L28.8 -252.2 L21.1 -250.2 L13.3 -246.5 L6.2 -242.7ZM23.4 -118.0 L34.7 -136.4 L49.1 -152.8 L62.0 -167.3 L79.3 -187.7 L58.0 -174.7 L39.7 -159.6 L25.2 -144.2 L11.1 -127.7ZM77.0 -180.1 L80.1 -193.3 L82.3 -203.6 L88.1 -212.2 L99.2 -218.2 L84.8 -216.2 L76.6 -205.3 L72.2 -192.5 L68.2 -182.8ZM96.1 -214.7 L102.0 -223.2 L106.9 -228.9 L115.5 -232.2 L120.8 -228.4 L121.1 -229.1 L120.9 -228.6 L121.2 -229.2 L111.7 -233.3 L104.7 -230.9 L98.1 -224.4 L94.0 -219.6ZM93.6 -214.8 L105.1 -215.2 L113.1 -216.4 L121.0 -214.7 L125.5 -209.3 L126.1 -209.9 L125.6 -209.4 L126.3 -210.0 L119.8 -217.8 L111.1 -220.0 L102.1 -219.2 L96.6 -219.6ZM73.5 -176.6 L86.5 -183.7 L98.7 -189.6 L108.5 -188.5 L122.0 -178.3 L111.3 -192.6 L94.8 -194.2 L82.5 -190.4 L71.7 -186.3ZM116.6 -180.2 L124.8 -176.6 L131.4 -174.0 L138.1 -166.5 L136.8 -159.8 L137.7 -159.7 L137.0 -159.8 L137.9 -159.7 L138.4 -170.7 L133.9 -176.9 L124.5 -182.2 L116.6 -186.0ZM113.7 -183.2 L118.4 -174.0 L122.2 -167.6 L123.7 -160.4 L125.1 -151.4 L126.7 -160.6 L125.1 -169.4 L122.1 -177.8 L119.5 -183.0Z"/>
     </g>
-    <g id="fnm-treeC">
+    <g id="m-treeC">
       <path d="M-2.6 -3.1 L-11.7 2.4 L-20.5 8.3 L-29.8 16.9 L-23.3 12.5 L-16.0 9.6 L-8.3 7.1ZM4.0 -0.4 L-1.4 9.8 L-5.3 20.2 L-10.7 32.2 L-11.1 21.3 L-10.7 12.7 L-8.8 4.4ZM8.5 3.3 L8.7 10.5 L9.3 17.3 L7.5 25.9 L3.3 15.6 L-1.3 8.1 L-5.5 0.7ZM8.0 9.1 L15.8 9.8 L22.9 10.5 L30.2 11.4 L20.6 4.4 L11.2 0.1 L3.0 -5.1ZM12.0 2.9 L9.9 -36.5 L-0.0 -79.9 L-14.0 -120.9 L-41.2 -162.9 L-27.7 -114.5 L-18.0 -76.2 L-14.3 -38.1 L-12.0 5.1ZM-29.0 -151.7 L-48.8 -164.1 L-65.9 -173.7 L-88.2 -184.0 L-111.0 -193.1 L-88.9 -177.5 L-72.4 -168.0 L-53.0 -154.0 L-37.2 -141.5ZM-104.3 -191.9 L-119.4 -192.2 L-134.1 -192.5 L-148.8 -192.9 L-168.2 -190.8 L-150.9 -189.5 L-134.7 -187.8 L-118.3 -186.3 L-102.5 -184.0ZM-161.1 -193.9 L-171.0 -188.0 L-181.4 -180.5 L-188.1 -171.6 L-191.3 -161.0 L-190.8 -160.8 L-191.2 -161.0 L-190.7 -160.8 L-186.2 -170.9 L-179.2 -179.3 L-171.4 -184.3 L-162.2 -189.5ZM-190.3 -164.7 L-192.9 -159.9 L-196.3 -154.1 L-198.3 -146.6 L-196.5 -140.6 L-196.6 -148.9 L-195.6 -152.6 L-192.8 -156.7 L-189.5 -161.9ZM-189.6 -164.5 L-196.6 -160.1 L-202.9 -155.7 L-210.0 -147.6 L-209.8 -138.8 L-207.9 -148.5 L-204.5 -153.1 L-197.3 -158.0 L-190.2 -162.1ZM-161.9 -193.7 L-170.7 -198.4 L-180.8 -203.3 L-191.3 -205.2 L-203.2 -202.0 L-203.0 -201.5 L-203.2 -201.9 L-203.0 -201.4 L-193.2 -203.5 L-181.8 -201.0 L-172.1 -195.6 L-161.4 -189.7ZM-201.2 -202.6 L-206.0 -195.1 L-208.8 -190.5 L-211.4 -180.6 L-208.7 -174.0 L-208.4 -174.1 L-208.6 -174.0 L-208.3 -174.1 L-210.0 -182.4 L-209.1 -187.7 L-203.4 -196.1 L-199.7 -201.7ZM-199.6 -203.4 L-208.3 -200.8 L-213.2 -198.9 L-220.5 -193.7 L-222.8 -188.2 L-222.5 -188.0 L-222.7 -188.2 L-222.4 -188.0 L-217.8 -194.4 L-213.9 -197.1 L-205.8 -199.8 L-201.3 -200.9ZM-199.7 -203.1 L-208.2 -205.1 L-216.2 -207.7 L-224.8 -208.7 L-233.1 -205.1 L-224.8 -207.5 L-216.8 -206.3 L-208.9 -203.4 L-201.2 -201.2ZM-100.8 -190.2 L-110.8 -203.6 L-121.2 -215.8 L-130.1 -227.1 L-142.3 -241.9 L-133.5 -225.3 L-123.5 -211.2 L-114.2 -198.4 L-106.0 -185.7ZM-137.2 -236.7 L-147.3 -242.4 L-156.4 -247.4 L-166.7 -249.7 L-176.6 -247.1 L-176.5 -246.5 L-176.6 -247.0 L-176.5 -246.3 L-166.4 -247.2 L-157.2 -244.3 L-148.6 -239.4 L-141.3 -234.7ZM-175.1 -247.9 L-180.0 -243.7 L-186.6 -238.2 L-190.5 -230.5 L-189.1 -223.8 L-188.7 -223.9 L-189.0 -223.8 L-188.6 -223.9 L-188.0 -232.1 L-184.9 -237.3 L-179.9 -241.2 L-173.1 -246.0ZM-173.7 -247.9 L-178.5 -250.3 L-184.4 -253.7 L-191.8 -255.1 L-197.0 -251.9 L-191.8 -254.0 L-186.3 -253.3 L-181.1 -249.7 L-174.5 -246.0ZM-137.3 -235.2 L-137.2 -245.8 L-136.5 -259.5 L-132.6 -270.6 L-124.1 -280.0 L-135.7 -268.4 L-139.8 -257.9 L-140.8 -248.6 L-141.2 -236.2ZM-127.2 -275.4 L-127.2 -283.2 L-127.1 -289.8 L-125.7 -298.4 L-120.6 -304.8 L-126.7 -298.8 L-128.4 -292.5 L-128.9 -283.9 L-129.2 -276.4ZM-126.6 -275.3 L-121.1 -276.9 L-114.1 -278.8 L-107.6 -278.7 L-101.2 -276.1 L-101.1 -276.4 L-101.2 -276.2 L-101.1 -276.5 L-107.6 -279.8 L-115.1 -280.1 L-121.7 -278.7 L-129.8 -276.5ZM-25.7 -145.1 L-30.6 -172.9 L-35.7 -198.8 L-43.6 -223.8 L-58.9 -250.8 L-51.5 -223.1 L-45.9 -197.6 L-41.6 -172.2 L-40.6 -148.1ZM-52.6 -244.4 L-69.3 -252.9 L-87.2 -260.3 L-102.7 -265.5 L-123.2 -270.1 L-104.2 -262.5 L-86.4 -255.2 L-71.6 -248.1 L-57.1 -239.3ZM-116.1 -270.0 L-127.2 -265.5 L-139.3 -259.2 L-148.3 -249.0 L-150.6 -234.9 L-145.9 -248.6 L-138.7 -257.0 L-128.8 -261.9 L-116.8 -266.2ZM-149.0 -240.9 L-152.7 -232.2 L-154.2 -226.2 L-153.0 -221.6 L-146.5 -216.9 L-151.3 -218.8 L-152.4 -227.5 L-149.8 -234.4 L-148.2 -238.1ZM-149.5 -240.2 L-151.5 -234.6 L-153.9 -225.6 L-152.5 -219.0 L-146.3 -213.9 L-146.1 -214.2 L-146.2 -214.0 L-146.0 -214.3 L-151.2 -218.2 L-152.3 -225.9 L-151.1 -231.0 L-147.7 -238.8ZM-150.0 -239.1 L-153.9 -233.9 L-160.3 -224.8 L-161.2 -218.7 L-158.0 -208.2 L-161.0 -215.7 L-157.6 -226.4 L-153.9 -231.4 L-147.2 -239.9ZM-116.8 -269.9 L-128.4 -272.6 L-140.8 -275.5 L-152.2 -273.2 L-160.3 -262.9 L-159.9 -262.6 L-160.3 -262.9 L-159.8 -262.5 L-152.4 -271.3 L-139.6 -273.0 L-128.2 -269.8 L-116.1 -266.3ZM-158.2 -266.7 L-162.6 -257.9 L-166.7 -249.5 L-169.3 -239.3 L-167.2 -230.8 L-166.9 -230.9 L-167.1 -230.8 L-166.8 -230.9 L-167.9 -240.4 L-166.0 -247.9 L-161.7 -255.7 L-158.0 -263.1ZM-157.9 -266.0 L-166.3 -264.8 L-172.6 -263.8 L-179.7 -259.9 L-182.6 -252.9 L-177.6 -259.8 L-171.9 -262.5 L-164.1 -263.4 L-158.3 -263.9ZM-115.0 -269.4 L-126.9 -277.8 L-137.7 -285.3 L-149.7 -288.6 L-166.7 -282.7 L-152.9 -287.4 L-138.9 -283.2 L-127.8 -274.5 L-117.8 -266.8ZM-162.7 -284.6 L-165.0 -280.0 L-168.5 -271.4 L-169.0 -264.1 L-165.9 -257.3 L-165.6 -257.4 L-165.9 -257.3 L-165.6 -257.5 L-167.8 -264.6 L-166.8 -272.1 L-164.5 -277.2 L-159.8 -285.8ZM-159.8 -286.5 L-172.8 -284.6 L-182.1 -283.5 L-192.5 -278.4 L-196.1 -269.3 L-189.8 -278.5 L-181.4 -282.2 L-170.2 -283.3 L-162.7 -283.9ZM-159.5 -286.0 L-171.2 -287.1 L-181.2 -287.9 L-189.1 -286.3 L-197.9 -280.9 L-189.7 -285.0 L-178.9 -286.3 L-170.1 -285.3 L-163.0 -284.3ZM-51.2 -241.0 L-53.1 -259.8 L-54.5 -279.4 L-56.3 -298.1 L-59.9 -318.5 L-59.9 -299.6 L-59.5 -280.2 L-59.1 -262.0 L-58.4 -242.8ZM-58.0 -313.0 L-61.8 -323.5 L-65.5 -334.2 L-73.4 -345.1 L-85.4 -348.1 L-73.5 -342.5 L-67.9 -335.3 L-64.6 -324.4 L-61.3 -313.3ZM-80.6 -348.5 L-88.6 -348.1 L-94.2 -347.6 L-101.5 -344.5 L-102.7 -337.4 L-99.0 -344.7 L-94.2 -346.6 L-86.8 -346.7 L-81.8 -346.8ZM-80.4 -347.9 L-84.3 -355.2 L-88.9 -363.6 L-94.2 -367.4 L-104.0 -367.7 L-96.6 -368.3 L-89.0 -361.3 L-85.6 -355.0 L-82.0 -347.4ZM-58.2 -311.5 L-54.8 -322.4 L-51.9 -332.9 L-45.2 -341.0 L-34.8 -342.7 L-46.6 -342.4 L-54.2 -334.5 L-57.7 -324.5 L-61.0 -314.9ZM-36.4 -343.7 L-34.1 -347.7 L-29.2 -356.0 L-23.4 -360.8 L-17.3 -360.8 L-26.3 -359.6 L-31.3 -354.9 L-33.9 -351.0 L-39.2 -342.7ZM-38.2 -342.2 L-30.1 -344.0 L-23.4 -345.5 L-18.0 -344.8 L-11.5 -341.0 L-17.7 -345.8 L-25.7 -346.4 L-32.3 -345.3 L-37.4 -344.2ZM-37.8 -342.4 L-32.8 -341.2 L-26.2 -339.6 L-21.0 -335.7 L-19.3 -328.8 L-18.9 -335.1 L-23.6 -340.1 L-29.9 -342.0 L-37.8 -344.1Z"/>
     </g>
 
-    <!-- Version sin tronco, solo ramas finas: para el plano lejano -->
-    <g id="fnm-farA">
+    <g id="m-farA">
       <path d="M-4.3 -2.5 L-16.3 2.9 L-28.2 9.0 L-40.4 18.1 L-30.1 12.6 L-18.9 9.2 L-6.9 6.5ZM0.5 0.3 L-5.8 9.9 L-11.1 19.9 L-16.1 32.1 L-14.3 21.0 L-10.9 12.3 L-6.5 3.7ZM6.2 3.8 L10.7 11.9 L14.1 19.7 L17.2 29.4 L10.3 18.1 L4.8 8.4 L-2.6 0.2ZM6.7 5.2 L15.9 6.9 L25.3 7.2 L34.9 9.7 L24.9 4.3 L14.4 2.2 L4.4 -1.2ZM8.4 2.4 L1.4 -15.4 L-7.1 -34.9 L-18.0 -52.1 L-34.3 -71.9 L-25.1 -48.2 L-18.0 -30.8 L-11.9 -14.2 L-8.4 5.6ZM-27.9 -67.6 L-38.8 -70.8 L-52.6 -75.2 L-66.0 -78.7 L-81.7 -79.4 L-66.6 -73.9 L-54.7 -69.8 L-43.6 -65.2 L-30.2 -58.3ZM-75.8 -81.0 L-84.7 -80.4 L-91.3 -79.7 L-97.8 -78.0 L-104.5 -73.9 L-97.5 -75.6 L-89.7 -76.5 L-81.8 -76.2 L-76.2 -76.5ZM-103.2 -76.4 L-105.7 -70.9 L-108.3 -64.8 L-107.7 -60.9 L-103.7 -56.2 L-103.4 -56.5 L-103.7 -56.3 L-103.4 -56.6 L-106.4 -59.3 L-106.0 -65.6 L-104.4 -68.9 L-102.1 -72.4ZM-103.4 -75.4 L-107.5 -73.0 L-110.7 -70.9 L-112.5 -68.8 L-115.1 -64.1 L-114.8 -63.9 L-115.0 -64.1 L-114.7 -63.9 L-113.2 -66.3 L-109.0 -69.9 L-105.2 -72.0 L-101.8 -73.4ZM-102.2 -75.5 L-108.7 -76.2 L-111.9 -76.5 L-117.9 -75.2 L-119.5 -71.7 L-115.3 -74.3 L-112.0 -74.7 L-105.9 -73.8 L-103.0 -73.3ZM-75.3 -81.1 L-81.6 -86.0 L-87.3 -88.9 L-95.6 -89.5 L-102.6 -84.8 L-102.2 -84.2 L-102.5 -84.7 L-102.1 -84.0 L-96.1 -87.2 L-89.3 -86.2 L-82.1 -81.0 L-76.7 -76.4ZM-101.6 -86.3 L-103.3 -83.2 L-105.1 -79.3 L-105.8 -75.2 L-103.2 -70.1 L-102.8 -70.4 L-103.1 -70.2 L-102.7 -70.4 L-104.5 -72.4 L-104.7 -76.6 L-102.4 -80.0 L-99.7 -84.0ZM-102.1 -86.3 L-107.0 -85.8 L-113.1 -84.6 L-117.7 -81.7 L-120.1 -75.5 L-116.0 -81.1 L-110.6 -83.4 L-105.5 -83.7 L-99.2 -84.0ZM-25.3 -64.6 L-27.2 -72.0 L-29.7 -83.9 L-31.6 -95.0 L-36.3 -106.2 L-35.2 -92.0 L-34.6 -82.7 L-34.0 -74.2 L-32.8 -61.3ZM-33.8 -103.8 L-38.6 -107.6 L-43.8 -111.7 L-50.2 -113.2 L-57.8 -110.8 L-48.8 -110.1 L-43.7 -107.2 L-39.6 -103.1 L-35.4 -98.6ZM-55.8 -111.3 L-59.4 -109.7 L-62.9 -108.3 L-64.3 -106.7 L-66.8 -100.2 L-65.5 -103.9 L-60.6 -107.5 L-56.3 -108.8 L-52.4 -110.4ZM-53.2 -111.7 L-57.5 -112.4 L-62.5 -112.8 L-67.1 -111.3 L-70.7 -106.8 L-66.4 -110.2 L-62.8 -111.4 L-59.3 -111.0 L-55.0 -110.1ZM-32.3 -100.6 L-31.2 -109.1 L-31.0 -113.0 L-28.0 -119.8 L-22.1 -122.6 L-22.4 -123.2 L-22.2 -122.7 L-22.5 -123.4 L-29.7 -121.8 L-33.6 -116.6 L-35.6 -106.9 L-36.9 -101.8ZM-23.2 -121.8 L-21.5 -124.8 L-19.2 -128.3 L-16.1 -131.7 L-11.5 -133.1 L-11.6 -133.4 L-11.6 -133.2 L-11.6 -133.5 L-15.6 -133.5 L-19.1 -131.4 L-21.6 -127.7 L-24.7 -123.6ZM-24.8 -121.4 L-20.4 -122.0 L-15.1 -122.7 L-14.3 -122.0 L-10.6 -119.1 L-11.7 -122.7 L-18.0 -124.3 L-20.1 -124.2 L-23.2 -124.0Z"/>
     </g>
-    <g id="fnm-farB">
+    <g id="m-farB">
       <path d="M-2.8 -1.4 L-12.9 3.0 L-22.5 7.7 L-32.4 15.1 L-24.2 10.9 L-15.6 8.4 L-7.5 5.4ZM2.4 0.3 L-0.9 8.5 L-5.9 15.4 L-10.0 25.5 L-9.7 17.0 L-7.6 10.1 L-6.6 3.7ZM5.9 3.5 L7.4 12.4 L8.1 21.9 L6.3 33.6 L4.2 21.3 L1.0 11.0 L-2.8 0.5ZM7.4 5.7 L16.3 9.6 L24.1 14.5 L31.4 20.9 L21.7 11.8 L12.9 4.8 L3.6 -1.7ZM8.3 4.5 L11.9 -11.6 L13.7 -27.8 L16.5 -45.3 L14.5 -68.1 L6.5 -47.0 L2.7 -30.9 L-4.0 -13.8 L-8.3 3.5ZM19.1 -60.7 L14.5 -73.3 L11.1 -85.9 L8.2 -95.4 L3.0 -113.2 L1.8 -97.0 L4.3 -81.7 L5.8 -69.5 L7.5 -57.5ZM3.7 -108.7 L-2.2 -110.6 L-7.2 -112.8 L-17.8 -112.6 L-22.7 -105.1 L-14.9 -110.0 L-11.7 -110.4 L-4.2 -106.8 L2.3 -102.6ZM-22.0 -107.8 L-22.6 -105.5 L-24.2 -101.0 L-24.0 -97.5 L-21.6 -93.9 L-21.2 -94.2 L-21.6 -94.0 L-21.1 -94.3 L-22.2 -97.1 L-21.9 -100.8 L-20.6 -103.0 L-18.0 -107.3ZM-21.7 -107.8 L-22.9 -105.6 L-25.1 -101.4 L-25.0 -96.9 L-22.1 -93.4 L-23.5 -98.9 L-22.9 -101.5 L-21.3 -103.6 L-18.4 -107.3ZM-20.2 -109.4 L-24.4 -108.6 L-29.6 -107.8 L-32.6 -105.4 L-34.4 -101.0 L-31.3 -103.9 L-27.0 -105.7 L-23.9 -105.6 L-19.8 -105.7ZM6.2 -106.6 L3.7 -114.5 L1.6 -122.4 L-5.4 -128.8 L-15.4 -126.8 L-5.8 -124.4 L-2.4 -119.3 L-0.8 -112.1 L-0.2 -104.7ZM-13.4 -127.7 L-15.7 -125.4 L-22.4 -120.8 L-27.0 -116.4 L-27.8 -110.7 L-23.8 -117.0 L-19.8 -120.2 L-16.8 -121.8 L-9.7 -126.1ZM-11.4 -128.9 L-16.3 -129.2 L-23.1 -129.4 L-27.2 -127.1 L-29.9 -122.0 L-29.3 -121.7 L-29.8 -122.0 L-29.2 -121.6 L-26.1 -125.1 L-20.5 -126.4 L-17.0 -126.0 L-11.7 -124.9ZM-9.8 -128.4 L-15.0 -130.1 L-20.1 -131.2 L-27.0 -130.9 L-31.2 -126.7 L-30.8 -126.2 L-31.1 -126.6 L-30.6 -126.1 L-26.6 -128.6 L-23.0 -129.3 L-18.0 -127.4 L-13.3 -125.4ZM5.7 -104.9 L6.3 -115.5 L7.4 -125.6 L10.8 -133.1 L17.3 -139.1 L16.7 -139.8 L17.2 -139.2 L16.6 -140.0 L7.6 -134.3 L2.7 -124.3 L1.2 -115.1 L0.4 -106.4ZM16.6 -136.9 L16.5 -145.0 L17.2 -149.5 L19.0 -152.5 L22.9 -155.8 L17.7 -153.6 L14.5 -147.6 L13.7 -142.1 L13.2 -140.0ZM15.0 -136.1 L19.5 -140.9 L22.1 -144.0 L27.8 -147.4 L32.1 -146.4 L32.2 -147.0 L32.1 -146.5 L32.2 -147.1 L26.3 -148.8 L22.3 -148.0 L17.7 -143.4 L14.7 -140.7ZM15.2 -136.8 L20.4 -138.0 L29.3 -139.9 L36.1 -139.3 L43.1 -137.2 L34.4 -141.3 L27.5 -141.9 L22.8 -141.4 L14.5 -140.0ZM16.6 -55.9 L22.2 -63.4 L27.9 -70.8 L33.6 -78.4 L40.8 -87.7 L30.3 -81.3 L23.6 -75.0 L16.8 -68.6 L10.0 -62.3ZM39.5 -85.0 L38.6 -91.0 L38.4 -95.0 L36.7 -99.4 L28.8 -104.4 L33.5 -100.2 L34.8 -95.2 L34.3 -89.3 L33.7 -85.4ZM33.4 -103.6 L30.3 -103.8 L28.1 -104.1 L25.0 -104.1 L21.0 -102.8 L21.2 -102.3 L21.0 -102.7 L21.2 -102.2 L22.7 -102.4 L25.2 -102.3 L28.5 -101.6 L31.0 -100.7ZM33.6 -103.1 L33.4 -104.3 L32.9 -109.0 L31.9 -111.4 L28.5 -115.6 L29.3 -113.8 L30.6 -109.5 L30.4 -107.1 L30.8 -101.2ZM39.2 -84.3 L42.8 -90.0 L44.9 -94.2 L49.8 -99.0 L55.7 -100.7 L47.7 -101.2 L42.6 -97.8 L37.7 -91.0 L34.0 -86.1ZM54.9 -100.1 L58.0 -102.6 L60.0 -104.4 L63.9 -106.3 L67.7 -107.4 L62.7 -107.2 L59.5 -106.2 L55.4 -103.3 L52.3 -101.4ZM55.0 -99.4 L56.8 -99.4 L63.8 -99.2 L66.4 -97.7 L69.3 -92.1 L68.1 -98.4 L62.2 -101.0 L59.8 -101.3 L52.2 -102.1ZM36.2 -82.4 L43.8 -85.6 L47.2 -86.9 L53.5 -87.3 L58.6 -84.3 L54.2 -89.5 L48.7 -90.9 L40.7 -88.7 L37.0 -88.0ZM57.3 -84.3 L61.6 -85.0 L65.4 -85.3 L67.7 -84.2 L69.1 -82.4 L67.3 -85.8 L63.3 -87.2 L60.2 -87.3 L57.8 -87.3ZM55.6 -85.1 L59.1 -83.7 L61.4 -82.9 L65.9 -79.2 L67.7 -77.1 L64.9 -82.4 L65.0 -83.1 L61.7 -85.3 L59.4 -86.4ZM57.0 -84.1 L58.6 -81.8 L59.5 -80.5 L60.3 -77.7 L60.0 -73.9 L62.1 -76.9 L61.8 -80.2 L59.6 -84.4 L58.1 -87.4Z"/>
     </g>
 
-    <!-- Casa encantada lejana: silueta con torre y ventanas que rezuman luz
-         violeta, como las casas del fondo en la key art del evento -->
-    <g id="fnm-house">
+    <g id="m-bat">
+      <path d="M0 -2 Q -12 -16 -32 -15 Q -50 -14 -58 -3 Q -46 -8 -38 -2 Q -32 -10 -24 -5 Q -18 -12 -10 -6 L -4 0 Q 0 3 4 0 L 10 -6 Q 18 -12 24 -5 Q 32 -10 38 -2 Q 46 -8 58 -3 Q 50 -14 32 -15 Q 12 -16 0 -2 Z"/>
+      <path d="M-4 -6 L -2 -15 L 0 -9 L 2 -15 L 4 -6 Q 0 -9 -4 -6 Z"/>
+    </g>
+
+    <g id="m-grass" fill="none" stroke-linecap="round">
+      <path d="M0 0 C -1 -8 -4 -14 -8 -18" stroke-width="2.5"/>
+      <path d="M2 0 C 2 -9 1 -16 3 -22" stroke-width="2.5"/>
+      <path d="M4 0 C 6 -7 9 -12 13 -15" stroke-width="2.5"/>
+    </g>
+
+    <g id="m-house">
       <g fill="#0e051c">
         <path d="M-95 0 L -95 -96 L -51 -96 L -51 0 Z"/>
         <path d="M-101 -96 L -73 -150 L -45 -96 Z"/>
@@ -138,52 +139,31 @@
         <path d="M18 -52 L 34 -52 L 34 -32 L 18 -32 Z" opacity="0.7"/>
         <path d="M40 -20 L 52 -20 L 52 -6 L 40 -6 Z" opacity="0.8"/>
       </g>
-      <ellipse cx="-24" cy="-42" rx="92" ry="46" fill="url(#fnm-house-glow)"/>
-    </g>
-    <radialGradient id="fnm-house-glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#c084fc" stop-opacity="0.16"/>
-      <stop offset="60%" stop-color="#a855f7" stop-opacity="0.06"/>
-      <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
-    </radialGradient>
-
-    <!-- Murcielago de silueta negra: alas festoneadas, cabeza con orejas -->
-    <g id="fnm-bat">
-      <path d="M0 -2 Q -12 -16 -32 -15 Q -50 -14 -58 -3 Q -46 -8 -38 -2 Q -32 -10 -24 -5 Q -18 -12 -10 -6 L -4 0 Q 0 3 4 0 L 10 -6 Q 18 -12 24 -5 Q 32 -10 38 -2 Q 46 -8 58 -3 Q 50 -14 32 -15 Q 12 -16 0 -2 Z"/>
-      <path d="M-4 -6 L -2 -15 L 0 -9 L 2 -15 L 4 -6 Q 0 -9 -4 -6 Z"/>
+      <ellipse cx="-24" cy="-42" rx="92" ry="46" fill="url(#m-house-glow)"/>
     </g>
 
-    <!-- Matojo de pasto muerto -->
-    <g id="fnm-grass" fill="none" stroke-linecap="round">
-      <path d="M0 0 C -1 -8 -4 -14 -8 -18" stroke-width="2.5"/>
-      <path d="M2 0 C 2 -9 1 -16 3 -22" stroke-width="2.5"/>
-      <path d="M4 0 C 6 -7 9 -12 13 -15" stroke-width="2.5"/>
-    </g>
-
-    <!-- Calabaza jack-o'-lantern, centro en (0,4), radio ~40. La cara encendida
-         y el halo van horneados: la pulsacion la pone el CSS encima. Hay dos
-         variantes de luz, ambar y violeta, como en la key art del evento. -->
-    <g id="fnm-pumpkin-base">
-      <path d="M0 -36 C 24 -36 42 -18 42 4 C 42 26 24 40 0 40 C -24 40 -42 26 -42 4 C -42 -18 -24 -36 0 -36 Z" fill="url(#fnm-pumpkin-body)"/>
+    <g id="m-pumpkin-base">
+      <path d="M0 -36 C 24 -36 42 -18 42 4 C 42 26 24 40 0 40 C -24 40 -42 26 -42 4 C -42 -18 -24 -36 0 -36 Z" fill="url(#m-pumpkin-body)"/>
       <path d="M-16 -33 C -24 -12 -24 20 -15 37" stroke="#210a02" stroke-width="3" fill="none" opacity="0.7"/>
       <path d="M16 -33 C 24 -12 24 20 15 37" stroke="#210a02" stroke-width="3" fill="none" opacity="0.7"/>
       <path d="M0 -36 C -3 -12 -3 18 0 40" stroke="#210a02" stroke-width="2.5" fill="none" opacity="0.5"/>
       <path d="M-30 -16 C -18 -30 18 -30 30 -16" stroke="#e2593a" stroke-width="2.5" fill="none" opacity="0.4"/>
       <path d="M-5 -34 C -5 -42 -2 -48 4 -51 C 8 -53 12 -51 10 -47 C 7 -43 6 -38 6 -33 Z" fill="#120716"/>
     </g>
-    <g id="fnm-pumpkin-amber">
-      <ellipse cx="0" cy="6" rx="76" ry="58" fill="url(#fnm-pumpkin-halo)"/>
-      <use href="#fnm-pumpkin-base"/>
-      <g fill="url(#fnm-face)">
+    <g id="m-pumpkin-amber">
+      <ellipse cx="0" cy="6" rx="76" ry="58" fill="url(#m-pumpkin-halo)"/>
+      <use href="#m-pumpkin-base"/>
+      <g fill="url(#m-face)">
         <polygon points="-21,-9 -7,-3 -19,4"/>
         <polygon points="21,-9 7,-3 19,4"/>
         <polygon points="0,4 -6,13 6,13"/>
         <path d="M-22 18 Q -14 24 -7 19 L -4 25 L 0 19 L 4 25 L 7 19 Q 14 24 22 18 Q 16 32 0 32 Q -16 32 -22 18 Z"/>
       </g>
     </g>
-    <g id="fnm-pumpkin-violet">
-      <ellipse cx="0" cy="6" rx="76" ry="58" fill="url(#fnm-pumpkin-halo-violet)"/>
-      <use href="#fnm-pumpkin-base"/>
-      <g fill="url(#fnm-face-violet)">
+    <g id="m-pumpkin-violet">
+      <ellipse cx="0" cy="6" rx="76" ry="58" fill="url(#m-pumpkin-halo-violet)"/>
+      <use href="#m-pumpkin-base"/>
+      <g fill="url(#m-face-violet)">
         <polygon points="-21,-9 -7,-3 -19,4"/>
         <polygon points="21,-9 7,-3 19,4"/>
         <polygon points="0,4 -6,13 6,13"/>
@@ -193,167 +173,143 @@
   </defs>
 
   <!-- ============================ CIELO ============================ -->
-  <rect width="1600" height="900" fill="#0a0410"/>
-  <rect width="1600" height="900" fill="url(#fnm-sky)"/>
+  <rect width="740" height="1600" fill="#0a0410"/>
+  <rect width="740" height="1600" fill="url(#m-sky)"/>
 
-  <!-- Estrellas escasas: la noche esta despejada arriba, la tormenta vive abajo -->
-  <g fill="#ffe8f0">
-    <circle cx="150" cy="84" r="1.6" opacity="0.45"/>
-    <circle cx="320" cy="150" r="1.2" opacity="0.35"/>
-    <circle cx="452" cy="66" r="1.8" opacity="0.5"/>
-    <circle cx="560" cy="190" r="1.1" opacity="0.3"/>
-    <circle cx="688" cy="104" r="1.5" opacity="0.42"/>
-    <circle cx="842" cy="58" r="1.2" opacity="0.34"/>
-    <circle cx="905" cy="176" r="1.6" opacity="0.4"/>
-    <circle cx="1010" cy="84" r="1.3" opacity="0.36"/>
-    <circle cx="1345" cy="70" r="1.7" opacity="0.5"/>
-    <circle cx="1432" cy="160" r="1.2" opacity="0.35"/>
-    <circle cx="1502" cy="96" r="1.5" opacity="0.44"/>
-    <circle cx="1560" cy="220" r="1.1" opacity="0.3"/>
-    <circle cx="240" cy="250" r="1.2" opacity="0.28"/>
-    <circle cx="380" cy="320" r="1" opacity="0.22"/>
-  </g>
-
-  <!-- Tormenta carmesi: nubes en llamas cruzando el cielo, como la key art -->
+  <!-- Tormenta carmesi: nubes en llamas, como la key art -->
   <g>
-    <path d="M0 96 C 220 60 460 84 700 66 C 900 52 1140 76 1600 44 L 1600 0 L 0 0 Z" fill="#4c0519" opacity="0.6"/>
-    <path d="M0 178 C 260 150 520 168 780 148 C 1040 130 1320 156 1600 128 L 1600 84 C 1300 116 1000 92 720 112 C 440 132 200 108 0 132 Z" fill="#7f1d3a" opacity="0.42"/>
-    <path d="M880 236 C 1080 214 1280 232 1600 200 L 1600 150 C 1320 186 1100 168 900 192 Z" fill="#9f1239" opacity="0.30"/>
-    <path d="M0 250 C 200 232 380 244 560 228 C 380 226 180 236 0 252 Z" fill="#881337" opacity="0.35"/>
+    <path d="M0 150 C 180 110 380 140 560 116 C 660 104 740 122 740 122 L 740 0 L 0 0 Z" fill="#4c0519" opacity="0.6"/>
+    <path d="M0 268 C 200 234 420 258 620 230 C 680 222 740 236 740 236 L 740 170 C 620 200 460 180 300 202 C 160 220 60 202 0 218 Z" fill="#7f1d3a" opacity="0.42"/>
+    <path d="M0 386 C 160 366 340 382 520 360 C 620 348 740 366 740 366 L 740 310 C 600 340 440 322 280 344 C 150 360 60 350 0 360 Z" fill="#9f1239" opacity="0.30"/>
   </g>
 
-  <!-- Resplandor de horizonte detras de la linea de arboles -->
-  <rect y="430" width="1600" height="330" fill="url(#fnm-horizon)"/>
+  <!-- Estrellas escasas -->
+  <g fill="#ffe8f0">
+    <circle cx="96" cy="560" r="1.5" opacity="0.42"/>
+    <circle cx="210" cy="620" r="1.2" opacity="0.32"/>
+    <circle cx="330" cy="540" r="1.6" opacity="0.45"/>
+    <circle cx="452" cy="600" r="1.1" opacity="0.3"/>
+    <circle cx="600" cy="640" r="1.4" opacity="0.38"/>
+    <circle cx="680" cy="540" r="1.2" opacity="0.32"/>
+    <circle cx="140" cy="720" r="1.3" opacity="0.3"/>
+    <circle cx="560" cy="740" r="1.2" opacity="0.28"/>
+  </g>
 
   <!-- ============================ LUNA ============================= -->
-  <circle cx="1030" cy="200" r="292" fill="url(#fnm-moon-halo)"/>
-  <circle cx="1030" cy="200" r="90" fill="url(#fnm-moon-disc)"/>
-  <!-- crateres -->
+  <!-- Entera dentro del encuadre, tercio superior, a la derecha del centro -->
+  <circle cx="512" cy="345" r="300" fill="url(#m-moon-halo)"/>
+  <circle cx="512" cy="345" r="102" fill="url(#m-moon-disc)"/>
   <g fill="#ddb8c6" opacity="0.5">
-    <ellipse cx="1002" cy="176" rx="15" ry="13"/>
-    <ellipse cx="1060" cy="214" rx="10" ry="8"/>
-    <ellipse cx="1020" cy="240" rx="7" ry="6"/>
-    <ellipse cx="1066" cy="166" rx="6" ry="5"/>
+    <ellipse cx="478" cy="316" rx="17" ry="15"/>
+    <ellipse cx="550" cy="362" rx="11" ry="9"/>
+    <ellipse cx="500" cy="396" rx="8" ry="7"/>
+    <ellipse cx="556" cy="308" rx="7" ry="6"/>
   </g>
-  <!-- nubes rotas cruzando el disco: wisps finos y quebrados, no barras -->
   <g fill="#0a0414">
-    <path d="M934 178 C 1082 170 1120 172 1148 178 C 1160 181 1150 184 1128 184 C 1096 185 1062 183 1044 178 Z" opacity="0.55"/>
-    <path d="M1040 232 C 1186 225 1226 228 1252 235 C 1262 238 1250 241 1226 241 C 1198 242 1168 238 1150 232 Z" opacity="0.45"/>
-    <path d="M978 138 C 1112 132 1142 134 1160 139 C 1168 142 1158 144 1140 144 C 1120 145 1100 142 1088 138 Z" opacity="0.4"/>
-    <path d="M994 258 C 1126 253 1152 255 1168 260 C 1174 262 1166 264 1152 264 C 1136 265 1116 262 1104 258 Z" opacity="0.35"/>
+    <path d="M400 318 C 444 308 492 310 526 318 C 540 322 528 326 500 326 C 462 327 422 324 400 318 Z" opacity="0.55"/>
+    <path d="M520 398 C 562 388 610 392 640 402 C 652 406 638 410 610 410 C 576 411 542 406 520 398 Z" opacity="0.45"/>
+    <path d="M452 266 C 480 258 518 260 540 268 C 548 271 536 274 514 274 C 490 275 466 271 452 266 Z" opacity="0.4"/>
   </g>
 
-  <!-- Luz de luna volumetrica: haces suaves, sin borde, de anchos y angulos
-       distintos para que no se lea como focos de escenario -->
-  <g opacity="0.16">
-    <ellipse cx="1000" cy="565" rx="150" ry="335" transform="rotate(-14 1000 565)" fill="url(#fnm-ray)"/>
-    <ellipse cx="1058" cy="600" rx="58" ry="300" transform="rotate(-6 1058 600)" fill="url(#fnm-ray)"/>
-    <ellipse cx="1128" cy="580" rx="96" ry="315" transform="rotate(4 1128 580)" fill="url(#fnm-ray)"/>
+  <!-- Luz de luna volumetrica hacia el bosque -->
+  <g opacity="0.15">
+    <ellipse cx="380" cy="760" rx="140" ry="330" transform="rotate(-16 380 760)" fill="url(#m-ray)"/>
+    <ellipse cx="452" cy="810" rx="56" ry="300" transform="rotate(-6 452 810)" fill="url(#m-ray)"/>
+    <ellipse cx="530" cy="790" rx="92" ry="315" transform="rotate(5 530 790)" fill="url(#m-ray)"/>
   </g>
 
-  <!-- Murcielagos negros cruzando el cielo -->
+  <!-- Murcielagos negros -->
   <g fill="#02010a">
-    <use href="#fnm-bat" transform="translate(964 128) scale(0.42)"/>
-    <use href="#fnm-bat" transform="translate(1290 260) scale(0.30) rotate(14)"/>
-    <use href="#fnm-bat" transform="translate(1064 316) scale(0.24) rotate(-10)"/>
-    <use href="#fnm-bat" transform="translate(352 148) scale(0.34) rotate(-6)"/>
-    <use href="#fnm-bat" transform="translate(520 262) scale(0.22) rotate(10)"/>
-    <use href="#fnm-bat" transform="translate(1470 320) scale(0.27) rotate(-16)"/>
+    <use href="#m-bat" transform="translate(350 470) scale(0.40)"/>
+    <use href="#m-bat" transform="translate(150 520) scale(0.30) rotate(-10)"/>
+    <use href="#m-bat" transform="translate(620 480) scale(0.26) rotate(12)"/>
+    <use href="#m-bat" transform="translate(560 700) scale(0.22) rotate(-8)"/>
+    <use href="#m-bat" transform="translate(240 780) scale(0.26) rotate(8)"/>
+    <use href="#m-bat" transform="translate(420 900) scale(0.20) rotate(-14)"/>
   </g>
 
   <!-- Niebla alta -->
-  <rect y="230" width="1600" height="330" fill="url(#fnm-fog)" opacity="0.45"/>
+  <rect y="430" width="740" height="380" fill="url(#m-fog)" opacity="0.45"/>
 
-  <!-- PLANO LEJANO: ramas casi fundidas con la niebla -->
-  <g fill="#2c1049" opacity="0.55">
-    <use href="#fnm-farA" transform="translate(120 612) scale(0.62)"/>
-    <use href="#fnm-farB" transform="translate(330 628) scale(0.5) scale(-1,1)"/>
-    <use href="#fnm-farA" transform="translate(505 618) scale(0.7) scale(-1,1)"/>
-    <use href="#fnm-farB" transform="translate(700 632) scale(0.55)"/>
-    <use href="#fnm-farA" transform="translate(858 616) scale(0.66)"/>
-    <use href="#fnm-farB" transform="translate(1035 630) scale(0.52) scale(-1,1)"/>
-    <use href="#fnm-farA" transform="translate(1180 620) scale(0.68) scale(-1,1)"/>
-    <use href="#fnm-farB" transform="translate(1395 628) scale(0.58)"/>
-    <use href="#fnm-farA" transform="translate(1530 618) scale(0.64)"/>
+  <!-- Resplandor de horizonte -->
+  <rect y="780" width="740" height="330" fill="url(#m-horizon)"/>
+
+  <!-- PLANO LEJANO -->
+  <g stroke="#2c1049" opacity="0.62">
+    <use href="#m-farA" transform="translate(70 1032) scale(0.62)"/>
+    <use href="#m-farB" transform="translate(240 1046) scale(0.5) scale(-1,1)"/>
+    <use href="#m-farA" transform="translate(420 1036) scale(0.68) scale(-1,1)"/>
+    <use href="#m-farB" transform="translate(590 1044) scale(0.55)"/>
+    <use href="#m-farA" transform="translate(700 1034) scale(0.6)"/>
   </g>
 
   <!-- Niebla media -->
-  <rect y="380" width="1600" height="300" fill="url(#fnm-fog)" opacity="0.5"/>
+  <rect y="700" width="740" height="320" fill="url(#m-fog)" opacity="0.5"/>
 
-  <!-- Casa encantada en el horizonte derecho, medio hundida en la niebla -->
-  <use href="#fnm-house" transform="translate(1398 660) rotate(-2) scale(1.05)"/>
+  <!-- Casa encantada a la izquierda: en el recorte apaisado nunca se veia -->
+  <use href="#m-house" transform="translate(196 1120) rotate(-2) scale(0.95)"/>
 
-  <!-- PLANO MEDIO: arboles retorcidos de silueta solida -->
+  <!-- PLANO MEDIO: arboles que enmarcan los dos bordes del telefono -->
   <g fill="#150726">
-    <use href="#fnm-treeA" transform="translate(240 762) scale(0.95)"/>
-    <use href="#fnm-treeB" transform="translate(470 772) scale(0.78)"/>
-    <use href="#fnm-treeC" transform="translate(806 756) scale(1.0) scale(-1,1)"/>
-    <use href="#fnm-treeB" transform="translate(1064 768) scale(0.82)"/>
-    <use href="#fnm-treeC" transform="translate(1330 754) scale(0.88)"/>
-    <!-- relleno del centro: el recorte vertical del movil nunca ve un hueco -->
-    <use href="#fnm-treeB" transform="translate(690 770) scale(0.55)"/>
-    <use href="#fnm-treeA" transform="translate(936 762) scale(0.6) scale(-1,1)"/>
+    <use href="#m-treeA" transform="translate(96 1240) scale(1.02)"/>
+    <use href="#m-treeB" transform="translate(378 1252) scale(0.86)"/>
+    <use href="#m-treeC" transform="translate(664 1244) scale(0.94) scale(-1,1)"/>
   </g>
 
-  <!-- Niebla baja, la que envuelve los troncos -->
-  <rect y="530" width="1600" height="270" fill="url(#fnm-fog)" opacity="0.58"/>
+  <!-- Niebla baja -->
+  <rect y="960" width="740" height="340" fill="url(#m-fog)" opacity="0.58"/>
 
-  <!-- PLANO DELANTERO: el marco, casi negro -->
+  <!-- PLANO DELANTERO: el marco casi negro, ambos lados -->
   <g fill="#030109">
-    <use href="#fnm-treeA" transform="translate(64 904) scale(1.58)"/>
-    <use href="#fnm-treeA" transform="translate(1546 906) scale(-1.5,1.5)"/>
+    <use href="#m-treeA" transform="translate(28 1560) scale(1.72)"/>
+    <use href="#m-treeA" transform="translate(716 1564) scale(-1.66,1.66)"/>
   </g>
 
   <!-- Suelo -->
-  <rect y="700" width="1600" height="200" fill="url(#fnm-ground)"/>
+  <rect y="1250" width="740" height="350" fill="url(#m-ground)"/>
 
-  <!-- Cerca rota: la granja abandonada de la key art -->
+  <!-- Cerca rota a la derecha -->
   <g fill="#04020c">
-    <path d="M624 860 L 627 812 L 634 805 L 641 812 L 645 860 Z"/>
-    <path d="M700 864 L 701 818 L 708 811 L 715 818 L 717 864 Z"/>
-    <path d="M776 868 L 772 824 L 779 817 L 786 823 L 789 868 Z" transform="rotate(5 780 842)"/>
-    <path d="M616 828 L 792 844 L 791 851 L 615 835 Z"/>
-    <path d="M618 848 L 726 852 L 726 859 L 617 855 Z"/>
+    <path d="M470 1382 L 473 1334 L 480 1327 L 487 1334 L 491 1382 Z"/>
+    <path d="M546 1386 L 547 1340 L 554 1333 L 561 1340 L 563 1386 Z"/>
+    <path d="M622 1390 L 618 1346 L 625 1339 L 632 1345 L 635 1390 Z" transform="rotate(5 626 1364)"/>
+    <path d="M462 1350 L 638 1366 L 637 1373 L 461 1357 Z"/>
+    <path d="M464 1370 L 572 1374 L 572 1381 L 463 1377 Z"/>
   </g>
 
-  <!-- Lapida torcida a la derecha del parche -->
-  <g transform="translate(968 858) rotate(-6)">
+  <!-- Lapida a la izquierda y cruz a la derecha -->
+  <g transform="translate(148 1360) rotate(-6)">
     <path d="M-28 4 L -28 -46 C -28 -66 28 -66 28 -46 L 28 4 Z" fill="#0d0518"/>
     <path d="M-28 -46 C -28 -62 28 -62 28 -46" stroke="#43206a" stroke-width="2.5" fill="none" opacity="0.7"/>
     <path d="M0 -52 L 0 -36 M -8 -44 L 8 -44" stroke="#04010c" stroke-width="4.5" fill="none"/>
   </g>
-
-  <!-- ==================== PARCHE DE CALABAZAS ====================== -->
-  <!-- Luz vertida en el suelo, luego las calabazas encima. La banda vive alta
-       en el suelo (y ~820-860): abajo del todo la taparian la barra de filtros
-       y el dock en pantallas cortas. -->
-  <ellipse cx="662" cy="852" rx="98" ry="17" fill="url(#fnm-pool)"/>
-  <ellipse cx="772" cy="860" rx="120" ry="20" fill="url(#fnm-pool)"/>
-  <ellipse cx="894" cy="850" rx="90" ry="16" fill="url(#fnm-pool)"/>
-
-  <use href="#fnm-pumpkin-amber" transform="translate(662 828) scale(0.78) rotate(-3)"/>
-  <use href="#fnm-pumpkin-amber" transform="translate(774 818) scale(1.14)"/>
-  <use href="#fnm-pumpkin-violet" transform="translate(720 838) scale(0.52) rotate(4)"/>
-  <use href="#fnm-pumpkin-violet" transform="translate(896 824) scale(0.86) rotate(2) scale(-1,1)"/>
-  <use href="#fnm-pumpkin-amber" transform="translate(948 840) scale(0.55) rotate(-5)"/>
-
-  <!-- Cruz humilde medio hundida, a la izquierda del parche -->
-  <g transform="translate(598 846) rotate(7)">
+  <g transform="translate(648 1372) rotate(7)">
     <path d="M-5 6 L -5 -18 L -16 -18 L -16 -25 L -5 -25 L -5 -40 L 4 -40 L 4 -25 L 15 -25 L 15 -18 L 4 -18 L 4 6 Z" fill="#0b0416"/>
     <path d="M-16 -25 L 15 -25 M -5 -40 L 4 -40" stroke="#3d1c56" stroke-width="1.6" opacity="0.5"/>
   </g>
 
-  <!-- Pasto muerto alrededor del parche -->
+  <!-- ==================== PARCHE DE CALABAZAS ====================== -->
+  <!-- Protagonista del suelo en movil: mas grandes y centrados. La esquina
+       inferior derecha queda despejada para el boton calabaza del dock. -->
+  <ellipse cx="200" cy="1466" rx="105" ry="19" fill="url(#m-pool)"/>
+  <ellipse cx="372" cy="1476" rx="130" ry="22" fill="url(#m-pool)"/>
+  <ellipse cx="545" cy="1464" rx="98" ry="18" fill="url(#m-pool)"/>
+
+  <use href="#m-pumpkin-amber" transform="translate(200 1434) scale(0.95) rotate(-3)"/>
+  <use href="#m-pumpkin-amber" transform="translate(372 1422) scale(1.38)"/>
+  <use href="#m-pumpkin-violet" transform="translate(310 1450) scale(0.62) rotate(4)"/>
+  <use href="#m-pumpkin-violet" transform="translate(545 1428) scale(1.05) rotate(2) scale(-1,1)"/>
+  <use href="#m-pumpkin-amber" transform="translate(612 1448) scale(0.68) rotate(-5)"/>
+
   <g stroke="#0a0512" opacity="0.85">
-    <use href="#fnm-grass" transform="translate(596 844)"/>
-    <use href="#fnm-grass" transform="translate(636 850) scale(0.8)"/>
-    <use href="#fnm-grass" transform="translate(742 846) scale(1.1)"/>
-    <use href="#fnm-grass" transform="translate(842 852) scale(0.9)"/>
-    <use href="#fnm-grass" transform="translate(920 846) scale(0.75)"/>
-    <use href="#fnm-grass" transform="translate(1000 854) scale(1.05)"/>
-    <use href="#fnm-grass" transform="translate(1052 842) scale(0.85)"/>
+    <use href="#m-grass" transform="translate(112 1450)"/>
+    <use href="#m-grass" transform="translate(262 1456) scale(0.8)"/>
+    <use href="#m-grass" transform="translate(446 1452) scale(1.1)"/>
+    <use href="#m-grass" transform="translate(508 1460) scale(0.9)"/>
+    <use href="#m-grass" transform="translate(596 1452) scale(0.75)"/>
+    <use href="#m-grass" transform="translate(672 1462) scale(1.0)"/>
   </g>
 
-  <!-- Bruma final: asienta el parche sin apagar su luz -->
-  <rect y="786" width="1600" height="114" fill="url(#fnm-fog)" opacity="0.28"/>
+  <!-- Bruma final -->
+  <rect y="1400" width="740" height="200" fill="url(#m-fog)" opacity="0.28"/>
 </svg>
