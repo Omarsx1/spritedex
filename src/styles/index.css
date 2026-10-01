@@ -981,6 +981,12 @@ html::after {
   position: relative;
   z-index: 10;
   text-align: center;
+  /* Sin esto el bloque se ajusta al contenido: .hero__content es un flex column
+     con align-items center, asi que sus hijos no se estiran. Con FORTNITE en
+     flujo el ancho lo daba el propio texto, pero en temporada los dos hijos
+     del wrap son absolutos y la caja colapsaba a 172px, con el wordmark
+     dibujado a un tercio de lo previsto. */
+  width: 100%;
 }
 
 .hero__title {
@@ -8380,22 +8386,26 @@ html.theme-fortnitemares::after {
    Antes el alto venia de un max-height y la caja de 290px se recortaba, que
    es justo lo que dejaba el logo pequeno. */
 .hero__title-line-wrap {
-  --fnm-logo-h: 173px;
+  --fnm-logo-w: 520px;
   position: relative;
   display: grid;
   place-items: center;
   width: 100%;
+  height: calc(var(--fnm-logo-w) / 3);
   transition: height 420ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Dimensionado por ANCHO, no por alto. El wordmark es de 3:1, asi que con
+   width + height:auto escala proporcionalmente y max-width solo puede
+   estrecharlo, nunca recortarlo. Al revés (height:100% + width:auto) el
+   max-width encogia la caja pero el alto se mantenia, y el logo se salia. */
 .hero__title-fnm-svg {
   position: absolute;
   top: 50%;
   left: 50%;
-  height: 100%;
-  width: auto;
+  width: var(--fnm-logo-w);
   max-width: 100%;
-  object-fit: contain;
+  height: auto;
   transform: translate(-50%, -50%) scale(0.82);
   opacity: 0;
   filter: drop-shadow(0 0 14px rgba(192, 38, 211, 0.85))
@@ -8406,11 +8416,11 @@ html.theme-fortnitemares::after {
 }
 
 @media (max-width: 768px) {
-  .hero__title-line-wrap { --fnm-logo-h: 132px; }
+  .hero__title-line-wrap { --fnm-logo-w: 480px; }
 }
 
 @media (max-width: 480px) {
-  .hero__title-line-wrap { --fnm-logo-h: 108px; }
+  .hero__title-line-wrap { --fnm-logo-w: 355px; }
 }
 
 /* Estado normal: solo el texto, y el alto lo marca el propio texto. */
@@ -8426,7 +8436,7 @@ html.theme-fortnitemares::after {
 /* Estado tematico: el wordmark define el alto y el texto sale del flujo, para
    que la caja mida lo que mide el logo y no un max-height recortado. */
 .hero__title[data-fnm-logo='themed'] .hero__title-line-wrap {
-  height: var(--fnm-logo-h);
+  height: calc(var(--fnm-logo-w) / 3);
 }
 
 .hero__title[data-fnm-logo='themed'] .hero__title-line--glitch {
