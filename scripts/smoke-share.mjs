@@ -85,11 +85,29 @@ async function main() {
     await esperar(9000);
 
     const viva = await page.evaluate(() => !document.body.innerText.includes('Reanudando Spritedex'));
-    const abierto = await page.evaluate(() => {
+    const abierto = await page.evaluate(async () => {
+      // Si estamos en movil con dock flotante, abrir el dock primero para desplegar las opciones
+      const trigger = document.querySelector('.fnm-pumpkin-btn, .pm-trigger');
+      if (trigger) {
+        trigger.click();
+        await new Promise((r) => setTimeout(r, 400));
+      }
+
       const todo = [...document.querySelectorAll('button,a')].filter((b) => !b.closest('.sdm-share-pro'));
-      const visible = (b) => { const r = b.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+      const visible = (b) => {
+        const r = b.getBoundingClientRect();
+        const style = window.getComputedStyle(b);
+        return r.width > 0 && r.height > 0 && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+      };
       const cand = todo.filter((b) => /compartir/i.test((b.textContent || '') + ' ' + (b.getAttribute('title') || '') + ' ' + (b.getAttribute('aria-label') || '')) && visible(b));
-      if (!cand.length) return false;
+      if (!cand.length) {
+        const fallback = todo.filter((b) => /compartir/i.test((b.textContent || '') + ' ' + (b.getAttribute('title') || '') + ' ' + (b.getAttribute('aria-label') || '')));
+        if (fallback.length) {
+          fallback[0].click();
+          return true;
+        }
+        return false;
+      }
       cand[0].click();
       return true;
     });
