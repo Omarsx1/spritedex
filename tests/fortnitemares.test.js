@@ -16,7 +16,7 @@ import {
   applySeasonalTheme,
   subscribeSeasonalState
 } from '../src/config/seasonalEvent.js';
-import { FNM_PHASES, FNM_SWARM_COUNT } from '../src/config/fortnitemaresTimeline.js';
+import { FNM_PHASES, FNM_SWARM_COUNT, FNM_BOOT_DELAY } from '../src/config/fortnitemaresTimeline.js';
 import { HALLOWEEN_COLORS, isBatSwarmActive } from '../src/utils/confetti.js';
 import { createBatSwarm, fireFlyingBats } from '../src/utils/batSwarm.js';
 
@@ -42,6 +42,14 @@ test('the entrance runs as an ordered season-launch sequence, not a stall', () =
   const total = FNM_PHASES[FNM_PHASES.length - 1].at;
   assert.ok(total >= 3500, 'the cinematic must be a real moment, not a 1.9s sting');
   assert.ok(total <= 7000, 'but it must not overstay its welcome');
+});
+
+// The entrance must arrive AFTER the visitor has seen the normal app, never on
+// top of the first paint: seen immediately it reads as a loading screen instead
+// of a moment worth watching.
+test('the entrance waits before it starts, so the visitor sees the normal app first', () => {
+  assert.ok(FNM_BOOT_DELAY >= 4000, 'starting sooner robs the transition of its surprise');
+  assert.ok(FNM_BOOT_DELAY <= 8000, 'waiting longer than this makes the app feel broken');
 });
 
 test('the entrance transforms the interface by parts, in order', () => {

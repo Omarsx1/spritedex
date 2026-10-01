@@ -25,4 +25,8 @@ export const FNM_PHASES = [
 export const FNM_SWARM_COUNT = 34;
 
 /** Pause before the first part starts, so the first paint is still the normal UI. */
-export const FNM_BOOT_DELAY = 320;
+/* Pausa antes de la primera parte. No es tecnica: es dramatica. Con unos
+   segundos por delante, el visitante ve la web de siempre, se acomoda, y la
+   transformacion le llega por sorpresa. Al entrar de golpe no se siente como
+   un momento, se siente como una pantalla de carga. */
+export const FNM_BOOT_DELAY = 5600;
