@@ -16,8 +16,10 @@ export const FNM_PHASES = [
   { id: 'done', at: 4400 }      // cinematic finished, theme stays on
 ];
 
-/** Bats released at the swarm beat. */
-export const FNM_SWARM_COUNT = 26;
+/* Bats released at the swarm beat. The count is what makes the entrance read as
+   a flock crossing the screen rather than a handful of sprites; below ~20 the
+   gaps between them are more visible than the swarm itself. */
+export const FNM_SWARM_COUNT = 34;
 
 /** Pause before the corruption starts, so the first paint is still the normal UI. */
 export const FNM_BOOT_DELAY = 320;

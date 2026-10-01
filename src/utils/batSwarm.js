@@ -38,22 +38,26 @@ function prefersReducedMotion() {
  * oscillates with the wingbeat phase, so the silhouette visibly flaps.
  */
 function drawBat(ctx, size, wing) {
-  const span = size * (0.45 + 0.55 * wing);
-  const rise = size * (0.1 + 0.22 * wing);
+  const span = size * (0.5 + 0.62 * wing);
+  const rise = size * (0.16 + 0.3 * wing);
+  const body = size * 0.16;
 
   ctx.beginPath();
-  ctx.moveTo(0, size * 0.18);
-  // left wing
-  ctx.quadraticCurveTo(-span * 0.55, -rise * 0.35, -span, -rise);
-  ctx.quadraticCurveTo(-span * 0.62, rise * 0.32, -span * 0.26, rise * 0.2);
-  // left ear / body
-  ctx.lineTo(-size * 0.1, -size * 0.2);
-  ctx.lineTo(0, -size * 0.1);
-  ctx.lineTo(size * 0.1, -size * 0.2);
-  // right wing
-  ctx.lineTo(size * 0.26, rise * 0.2);
-  ctx.quadraticCurveTo(span * 0.62, rise * 0.32, span, -rise);
-  ctx.quadraticCurveTo(span * 0.55, -rise * 0.35, 0, size * 0.18);
+  ctx.moveTo(0, size * 0.16);
+  // Ala izquierda: dos curvas, la exterior (punta) y la interior (entre las
+  // alas), para que la silueta lea como murcielago y no como un arco.
+  ctx.quadraticCurveTo(-span * 0.5, -rise * 0.5, -span, -rise);
+  ctx.quadraticCurveTo(-span * 0.7, rise * 0.18, -span * 0.34, rise * 0.42);
+  ctx.quadraticCurveTo(-body * 1.5, rise * 0.16, -body, -body * 0.5);
+  // Orejas y cabeza
+  ctx.lineTo(-body * 0.85, -body * 1.5);
+  ctx.lineTo(0, -body * 0.35);
+  ctx.lineTo(body * 0.85, -body * 1.5);
+  ctx.lineTo(body, -body * 0.5);
+  // Ala derecha, espejo exacto de la izquierda
+  ctx.quadraticCurveTo(body * 1.5, rise * 0.16, span * 0.34, rise * 0.42);
+  ctx.quadraticCurveTo(span * 0.7, rise * 0.18, span, -rise);
+  ctx.quadraticCurveTo(span * 0.5, -rise * 0.5, 0, size * 0.16);
   ctx.closePath();
   ctx.fill();
 }
@@ -63,24 +67,24 @@ function createBat(rng, width, height, fromEdge) {
   const side = fromEdge ?? Math.floor(rng() * 4);
   let x;
   let y;
-  if (side === 0) { x = -40; y = rng() * height; }
-  else if (side === 1) { x = width + 40; y = rng() * height; }
-  else if (side === 2) { x = rng() * width; y = -40; }
-  else { x = rng() * width; y = height + 40; }
+  if (side === 0) { x = -90; y = rng() * height; }
+  else if (side === 1) { x = width + 90; y = rng() * height; }
+  else if (side === 2) { x = rng() * width; y = -90; }
+  else { x = rng() * width; y = height + 90; }
 
   const heading = rng() * Math.PI * 2;
   return {
     x,
     y,
     heading,
-    speed: 55 + rng() * 190,
+    speed: 70 + rng() * 240,
     turn: (rng() - 0.5) * 2.6,
     wander: 0.4 + rng() * 1.5,
-    size: 12 + rng() * 26,
+    size: 22 + rng() * 46,
     phase: rng() * Math.PI * 2,
     beat: 7 + rng() * 9,
     tint: BAT_TINTS[Math.floor(rng() * BAT_TINTS.length)],
-    glow: rng() > 0.6
+    glow: rng() > 0.4
   };
 }
 
@@ -131,9 +135,12 @@ export function createBatSwarm(options = {}) {
   let elapsed = 0;
   let stopped = false;
   // Ambient swarms fade in gently; a burst punches in fast.
-  const fadeIn = mode === 'burst' ? 90 : 1400;
-  const total = duration || (reduced ? 0 : mode === 'burst' ? 4200 : 3600);
-  const fadeOut = mode === 'burst' ? 620 : 2200;
+  const fadeIn = mode === 'burst' ? 90 : 900;
+  const total = duration || (mode === 'burst' ? 4200 : 3600);
+  /* The fade-out has to stay a fraction of the life. A fixed 2200 ms on a 3600 ms
+     ambient swarm meant the bats spent most of their time dimming instead of
+     flying, which is exactly the "they are not really there" feeling. */
+  const fadeOut = Math.min(mode === 'burst' ? 620 : 900, total * 0.35);
 
   const seed = (n) => {
     // Deterministic PRNG so tests and replays behave the same.
