@@ -126,6 +126,17 @@ export function applyBatchNoveltyRules(spritesList) {
       };
     }
 
+    /* Salida manual de la ventana de novedad. Sin esto, un evento que ya
+       termino sigue contando como nuevo solo porque su fecha cae dentro de
+       los 7 dias: el cumpleanos se apago y su cartel seguia encendido. */
+    if (s.notNew) {
+      return {
+        ...s,
+        isNew: false,
+        noveltyReason: 'excluded'
+      };
+    }
+
     // Normal case: We have spirits released in the last 7 days
     if (activeRecent.length > 0) {
       const isWithin7 = s.daysSince >= 0 && s.daysSince <= 7;

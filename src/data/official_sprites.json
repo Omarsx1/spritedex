@@ -2068,7 +2068,8 @@
     "gen": 2,
     "unreleased": false,
     "isNew": true,
-    "releaseDate": "2026-09-26"
+    "releaseDate": "2026-09-26",
+    "notNew": true
   },
   {
     "id": "birthday_gold",
@@ -2078,7 +2079,8 @@
     "gen": 2,
     "unreleased": false,
     "isNew": true,
-    "releaseDate": "2026-09-26"
+    "releaseDate": "2026-09-26",
+    "notNew": true
   },
   {
     "id": "birthday_cheatmaster",
@@ -2088,7 +2090,8 @@
     "gen": 2,
     "unreleased": false,
     "isNew": true,
-    "releaseDate": "2026-09-26"
+    "releaseDate": "2026-09-26",
+    "notNew": true
   },
   {
     "id": "birthday_loothacker",
@@ -2098,7 +2101,8 @@
     "gen": 2,
     "unreleased": false,
     "isNew": true,
-    "releaseDate": "2026-09-26"
+    "releaseDate": "2026-09-26",
+    "notNew": true
   },
   {
     "id": "birthday_bountyhunter",
@@ -2108,7 +2112,8 @@
     "gen": 2,
     "unreleased": false,
     "isNew": true,
-    "releaseDate": "2026-09-26"
+    "releaseDate": "2026-09-26",
+    "notNew": true
   },
   {
     "id": "birthday_tricktreat",

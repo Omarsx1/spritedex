@@ -981,6 +981,11 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   if (item.unreleased) {
     isNew = false;
   }
+  /* Salida manual de la ventana de novedad: un evento que ya termino no debe
+     seguir contando como nuevo solo porque su fecha cae dentro de los 7 dias. */
+  if (item.notNew) {
+     isNew = false;
+  }
 
   return {
     id: item.id,
@@ -996,6 +1001,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     dropChanceNum: item.unreleased ? 0 : dropChanceNum,
     unreleased: item.unreleased || false,
     isNew: isNew,
+    notNew: Boolean(item.notNew),
     releaseDate: relDateVal || null,
     release_date: relDateVal || null,
     image: imagePath,
