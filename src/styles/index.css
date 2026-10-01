@@ -8374,22 +8374,27 @@ html.theme-fortnitemares::after {
    overlay simule la transformacion encima.
    ========================================================================== */
 
+/* El alto del bloque lo marca el wordmark, no el texto. El SVG es de 3:1
+   (viewBox 3000x1000), asi que se fija el alto y el ancho sale solo: asi el
+   logo manda en el titulo, igual que FORTNITE manda en la version normal.
+   Antes el alto venia de un max-height y la caja de 290px se recortaba, que
+   es justo lo que dejaba el logo pequeno. */
 .hero__title-line-wrap {
+  --fnm-logo-h: 173px;
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  place-items: center;
   width: 100%;
+  transition: height 420ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hero__title-fnm-svg {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 100%;
-  max-width: 520px;
-  height: auto;
-  max-height: 120px;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
   object-fit: contain;
   transform: translate(-50%, -50%) scale(0.82);
   opacity: 0;
@@ -8401,23 +8406,43 @@ html.theme-fortnitemares::after {
 }
 
 @media (max-width: 768px) {
-  .hero__title-fnm-svg { max-width: 340px; max-height: 85px; }
+  .hero__title-line-wrap { --fnm-logo-h: 132px; }
 }
 
 @media (max-width: 480px) {
-  .hero__title-fnm-svg { max-width: 290px; max-height: 72px; }
+  .hero__title-line-wrap { --fnm-logo-h: 108px; }
 }
 
-/* Estado normal: solo el texto. El SVG esta oculto pero montado. */
+/* Estado normal: solo el texto, y el alto lo marca el propio texto. */
+.hero__title[data-fnm-logo='normal'] .hero__title-line-wrap {
+  height: auto;
+}
+
 .hero__title[data-fnm-logo='normal'] .hero__title-fnm-svg {
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.82);
 }
 
-/* Estado tematico: el wordmark Fortnitemares toma el lugar del texto. */
+/* Estado tematico: el wordmark define el alto y el texto sale del flujo, para
+   que la caja mida lo que mide el logo y no un max-height recortado. */
+.hero__title[data-fnm-logo='themed'] .hero__title-line-wrap {
+  height: var(--fnm-logo-h);
+}
+
+.hero__title[data-fnm-logo='themed'] .hero__title-line--glitch {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+/* Estado tematico: el wordmark Fortnitemares toma el lugar del texto. El texto
+   sale del flujo y se desvanece con un leve empuje: al estar absoluto, su
+   transform se combina con el centrado vertical. */
 .hero__title[data-fnm-logo='themed'] .hero__title-line--glitch {
   opacity: 0;
-  transform: scale(1.06);
+  transform: translateY(-50%) scale(1.06);
   filter: blur(6px);
   transition: opacity 260ms ease, transform 420ms ease, filter 260ms ease;
 }
