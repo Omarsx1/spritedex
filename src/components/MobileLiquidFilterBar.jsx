@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal, X, RotateCcw } from 'lucide-react';
 import { THEMES_LIST, ALL_SPRITES, pickFamilyName, pickThemeName } from '../data/spritesData';
 import { t } from '../i18n';
 import { safeStorage } from '../utils/safeStorage';
+import { contarNovedades, claveAvisoNovedades } from '../utils/novedadesAviso';
 
 const STATUS_OPTIONS = [
   { value: 'all', labelKey: 'filtrosMovil.todos' },
@@ -32,13 +33,15 @@ export function MobileLiquidFilterBar({
 
   // ═══ SMART ONE-TIME DISCOVERY COACHMARK (NUEVO DROP CUMPLEAÑOS - 2026-09-26) ═══
   const newSpiritsCount = useMemo(() => {
-    return ALL_SPRITES.filter(s => s.isNew && !s.unreleased).length;
+    return contarNovedades(ALL_SPRITES);
   }, []);
 
-  const NEW_SPIRITS_COACHMARK_KEY = 'spritedex_seen_new_drop_2026_09_26_birthday';
+  /* La clave del aviso sale del drop mas reciente: cada tanda de espiritus
+     nuevos vuelve a avisar una vez por navegador. */
+  const claveNovedades = useMemo(() => claveAvisoNovedades(ALL_SPRITES), []);
 
   const [showNewTooltip, setShowNewTooltip] = useState(() => {
-    if (safeStorage.getItem(NEW_SPIRITS_COACHMARK_KEY)) return false;
+    if (safeStorage.getItem(claveNovedades)) return false;
     return newSpiritsCount > 0;
   });
   const [isDismissing, setIsDismissing] = useState(false);
@@ -46,7 +49,7 @@ export function MobileLiquidFilterBar({
   useEffect(() => {
     if (statusFilter === 'new') {
       setShowNewTooltip(false);
-      safeStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
+      safeStorage.setItem(claveNovedades, 'true');
     }
   }, [statusFilter]);
 
@@ -56,7 +59,7 @@ export function MobileLiquidFilterBar({
     setTimeout(() => {
       setShowNewTooltip(false);
     }, 220);
-    safeStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
+    safeStorage.setItem(claveNovedades, 'true');
   };
 
   const handleDismissTooltip = (e) => {
@@ -65,7 +68,7 @@ export function MobileLiquidFilterBar({
     setTimeout(() => {
       setShowNewTooltip(false);
     }, 220);
-    safeStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
+    safeStorage.setItem(claveNovedades, 'true');
   };
 
   const [canDismiss, setCanDismiss] = useState(false);
