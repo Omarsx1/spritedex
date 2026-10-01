@@ -251,7 +251,7 @@ const FAMILY_NAMES_ES = {
   blinky: 'Blinky',
   birthday: 'Pastel de Cumpleaños',
   pond: 'Estanque',
-  spookydash: 'Spooky Dash',
+  spookydash: 'Impulso aterrador',
   vampire: 'Vampiro',
   deer: 'El Ciervo',
   dumpsterdive: 'Mapache'

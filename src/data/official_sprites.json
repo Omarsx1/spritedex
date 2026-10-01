@@ -2247,7 +2247,7 @@
   },
   {
     "id": "spookydash_basic",
-    "name": "Spooky Dash",
+    "name": "Impulso aterrador",
     "theme": "Basic",
     "rarity": "Mythic",
     "unreleased": false,
@@ -2257,7 +2257,7 @@
   },
   {
     "id": "spookydash_gold",
-    "name": "Spooky Dash Dorado",
+    "name": "Impulso aterrador Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
@@ -2267,7 +2267,7 @@
   },
   {
     "id": "spookydash_cheatmaster",
-    "name": "Spooky Dash Hacker",
+    "name": "Impulso aterrador Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
@@ -2277,7 +2277,7 @@
   },
   {
     "id": "spookydash_loothacker",
-    "name": "Spooky Dash Hacker de Botín",
+    "name": "Impulso aterrador Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
@@ -2287,7 +2287,7 @@
   },
   {
     "id": "spookydash_bountyhunter",
-    "name": "Spooky Dash Cazarrecompensas",
+    "name": "Impulso aterrador Cazarrecompensas",
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
@@ -2297,7 +2297,7 @@
   },
   {
     "id": "spookydash_tricktreat",
-    "name": "Spooky Dash Dulce o Truco",
+    "name": "Impulso aterrador Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
     "unreleased": true,
