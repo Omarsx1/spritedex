@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Bosque tenebroso de Fortnitemares.
+
+  Capa de atmosfera para body.theme-fortnitemares::before. SVG vectorial en vez
+  de un bitmap: pesa casi nada, se ve nitido en cualquier densidad de pantalla
+  y cada elemento (niebla, ramas, luna) se puede animar por separado con CSS.
+
+  Se dibuja en coordenadas 0 0 1600 900 y se estira con preserveAspectRatio para
+  cubrir cualquier viewport, desde un iPhone en vertical hasta un monitor.
+  Todo el arte vive en la mitad inferior: la superior queda despejada para que el
+  titulo y la ficha del sprite respiren.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" role="presentation" aria-hidden="true">
+  <defs>
+    <!-- Niebla: se desplaza con CSS para dar sensacion de lento arrastre -->
+    <linearGradient id="fnm-fog" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3b0764" stop-opacity="0"/>
+      <stop offset="55%" stop-color="#4c1d95" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#2e1065" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Luna carmesi: el unico punto calido y lejanisimo de la escena -->
+    <radialGradient id="fnm-moon" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff1f2" stop-opacity="0.95"/>
+      <stop offset="38%" stop-color="#fda4af" stop-opacity="0.55"/>
+      <stop offset="70%" stop-color="#e11d48" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#e11d48" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Degradado de suelo: apaga la base para que el grid no se lea debajo -->
+    <linearGradient id="fnm-ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#05020a" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#05020a" stop-opacity="0.92"/>
+    </linearGradient>
+
+    <!-- Silueta de arbol: se reutiliza escalado y reflejado para poblar el bosque -->
+    <g id="fnm-tree" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <!-- tronco, con una leve curva para que no parezca un palo -->
+      <path d="M0 0 C -6 -58 -3 -104 4 -146 C 9 -176 6 -206 0 -232" stroke-width="13"/>
+      <!-- ramas principales -->
+      <path d="M1 -140 C -22 -156 -40 -170 -60 -176" stroke-width="7"/>
+      <path d="M1 -150 C 24 -164 44 -176 66 -180" stroke-width="7"/>
+      <path d="M3 -196 C -16 -212 -28 -224 -44 -232" stroke-width="5"/>
+      <path d="M2 -212 C 18 -226 30 -238 44 -242" stroke-width="5"/>
+      <!-- subramas, las que dan el perfil asqueroso -->
+      <path d="M-60 -176 C -74 -190 -88 -196 -104 -198" stroke-width="4"/>
+      <path d="M-58 -174 C -60 -192 -66 -206 -80 -216" stroke-width="4"/>
+      <path d="M66 -180 C 82 -192 98 -196 116 -194" stroke-width="4"/>
+      <path d="M64 -178 C 68 -196 78 -208 94 -214" stroke-width="4"/>
+      <path d="M-44 -232 C -56 -244 -68 -250 -82 -252" stroke-width="3.5"/>
+      <path d="M-42 -230 C -44 -246 -52 -258 -66 -264" stroke-width="3.5"/>
+      <path d="M44 -242 C 58 -250 72 -254 86 -254" stroke-width="3.5"/>
+      <path d="M-104 -198 C -116 -206 -126 -208 -138 -208" stroke-width="3"/>
+      <path d="M116 -194 C 128 -200 138 -200 150 -198" stroke-width="3"/>
+    </g>
+
+    <!-- Version sin tronco, solo ramas: para el segundo plano, mas difusa -->
+    <g id="fnm-bare" fill="none" stroke-linecap="round">
+      <path d="M0 0 C -4 -46 -2 -82 3 -112" stroke-width="8"/>
+      <path d="M2 -70 C -18 -84 -32 -94 -48 -98" stroke-width="5"/>
+      <path d="M1 -84 C 20 -96 38 -104 56 -106" stroke-width="5"/>
+      <path d="M3 -108 C -12 -120 -22 -128 -34 -132" stroke-width="3.5"/>
+      <path d="M-48 -98 C -60 -108 -72 -112 -86 -114" stroke-width="3"/>
+      <path d="M56 -106 C 70 -114 84 -118 98 -116" stroke-width="3"/>
+    </g>
+  </defs>
+
+  <!-- Cielo: carmesi sangre apagandose hacia arriba -->
+  <rect width="1600" height="900" fill="#0a0410"/>
+
+  <radialGradient id="fnm-sky" cx="72%" cy="16%" r="86%">
+    <stop offset="0%" stop-color="#7f1d3a" stop-opacity="0.62"/>
+    <stop offset="34%" stop-color="#4c1d95" stop-opacity="0.34"/>
+    <stop offset="68%" stop-color="#2e1065" stop-opacity="0.16"/>
+    <stop offset="100%" stop-color="#0a0410" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="1600" height="900" fill="url(#fnm-sky)"/>
+
+  <!-- Resplandor de horizonte detras de la linea de arboles. Es lo que
+       convierte la silueta en silueta: sin luz atras, un arbol negro sobre
+       negro no se lee. Se mantiene en la banda baja para sobrevivir al
+       recorte central que hace 'cover' en pantallas verticales. -->
+  <linearGradient id="fnm-horizon" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#db2777" stop-opacity="0"/>
+    <stop offset="46%" stop-color="#db2777" stop-opacity="0.42"/>
+    <stop offset="78%" stop-color="#7e22ce" stop-opacity="0.30"/>
+    <stop offset="100%" stop-color="#4c1d95" stop-opacity="0"/>
+  </linearGradient>
+  <rect y="430" width="1600" height="330" fill="url(#fnm-horizon)"/>
+
+  <!-- Luna carmesi, alta y a la derecha -->
+  <circle cx="1215" cy="196" r="205" fill="url(#fnm-moon)"/>
+  <circle cx="1215" cy="196" r="27" fill="#ffe4e6" opacity="0.62"/>
+
+  <!-- Cuervos cruzando la luna: la firma del evento -->
+  <g fill="#02010a" opacity="0.88">
+    <path d="M1092 168 q 11 -13 23 0 q 12 -13 23 0 l -23 -5 z"/>
+    <path d="M1332 232 q 8 -10 17 0 q 9 -10 17 0 l -17 -4 z"/>
+    <path d="M1168 268 q 7 -8 14 0 q 7 -8 14 0 l -14 -3 z"/>
+  </g>
+
+  <!-- Niebla alta: la mas difusa, da profundidad antes de los arboles -->
+  <rect y="230" width="1600" height="330" fill="url(#fnm-fog)" opacity="0.45"/>
+
+  <!-- PLANO LEJANO: arboles sin tronco, casi fundidos con la niebla -->
+  <g stroke="#3b0f63" opacity="0.72">
+    <use href="#fnm-bare" transform="translate(120 612) scale(0.72)"/>
+    <use href="#fnm-bare" transform="translate(330 628) scale(0.58)"/>
+    <use href="#fnm-bare" transform="translate(505 618) scale(0.80)"/>
+    <use href="#fnm-bare" transform="translate(700 632) scale(0.62)"/>
+    <use href="#fnm-bare" transform="translate(858 616) scale(0.75)"/>
+    <use href="#fnm-bare" transform="translate(1035 630) scale(0.60)"/>
+    <use href="#fnm-bare" transform="translate(1180 620) scale(0.78)"/>
+    <use href="#fnm-bare" transform="translate(1395 628) scale(0.66)"/>
+    <use href="#fnm-bare" transform="translate(1530 618) scale(0.74)"/>
+  </g>
+
+  <!-- Niebla media: separa el plano lejano del medio -->
+  <rect y="380" width="1600" height="300" fill="url(#fnm-fog)" opacity="0.5"/>
+
+  <!-- PLANO MEDIO: arboles con tronco, ya con silueta legible -->
+  <g stroke="#1a0730" opacity="0.95">
+    <use href="#fnm-tree" transform="translate(232 742) scale(0.86)"/>
+    <use href="#fnm-tree" transform="translate(508 758) scale(0.70)"/>
+    <use href="#fnm-tree" transform="translate(806 748) scale(0.92)"/>
+    <use href="#fnm-tree" transform="translate(1088 762) scale(0.74)"/>
+    <use href="#fnm-tree" transform="translate(1330 744) scale(0.88)"/>
+  </g>
+
+  <!-- Arboles de relleno en el centro: el recorte vertical de 'cover' en movil
+       deja fuera los arboles de los bordes, asi que el miolo tambien lleva
+       arboles para que nunca se vea una franja vacia. -->
+  <g stroke="#1a0730" opacity="0.9">
+    <use href="#fnm-tree" transform="translate(690 764) scale(0.52)"/>
+    <use href="#fnm-tree" transform="translate(905 758) scale(0.58)"/>
+    <use href="#fnm-bare" transform="translate(788 700) scale(0.86)"/>
+    <use href="#fnm-bare" transform="translate(990 694) scale(0.78)"/>
+  </g>
+
+  <!-- Niebla baja, la mas densa: es la que envuelve los troncos -->
+  <rect y="530" width="1600" height="270" fill="url(#fnm-fog)" opacity="0.62"/>
+
+  <!-- PLANO DELANTERO: los dos arboles que enmarcan, casi negros -->
+  <g stroke="#05020a">
+    <use href="#fnm-tree" transform="translate(96 900) scale(1.34)"/>
+    <use href="#fnm-tree" transform="translate(1512 902) scale(1.26)"/>
+  </g>
+
+  <!-- Suelo: apaga la base para que las tarjetas queden por encima -->
+  <rect y="700" width="1600" height="200" fill="url(#fnm-ground)"/>
+</svg>

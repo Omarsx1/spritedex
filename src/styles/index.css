@@ -8305,62 +8305,66 @@ body:has(.modal-overlay) {
    profondisimo, violeta neon en los brillos, jamas naranja commodity.
    ========================================================================== */
 
-/* Fondo de Pesadilla Global */
+/* El bosque vive en su propia capa fija (::before), no como background del body:
+   asi su tamano no depende de lo larga que sea la pagina y no hace falta
+   'background-attachment: fixed', que en iOS da tirones al hacer scroll. */
 body.theme-fortnitemares {
   background-color: #07030d;
 }
 
-/* Rejilla: se mantiene la retícula de la base, recoloreada a la paleta nocturna. */
 body.theme-fortnitemares::before {
-  background-image:
-    linear-gradient(rgba(217, 70, 239, 0.10) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(217, 70, 239, 0.10) 1px, transparent 1px),
-    linear-gradient(rgba(190, 24, 93, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(190, 24, 93, 0.06) 1px, transparent 1px);
-  background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background-image: url('/fortnitemares-forest.svg');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  z-index: -2;
+  pointer-events: none;
+  transform: translateZ(0);
+  will-change: transform;
+  /* Respiracion lenta. Se anima transform, no background-position: mover el
+     fondo repinta la capa entera en cada frame y eso se nota en el movil. */
+  animation: fnm-forest-breathe 18s ease-in-out infinite alternate;
 }
 
-/* Niebla carmesi-magenta: la atmosfera de la key art, no un gradiente plano.
-   Los radiales se reparten y bajan de intensidad porque en movil el area es
-   pequena y un radial fuerte en la parte superior se lee como una banda rosa
-   solida encima del titulo, no como atmosfera. */
+@keyframes fnm-forest-breathe {
+  0%   { transform: translate3d(0, 0, 0) scale(1.03); }
+  100% { transform: translate3d(0, -12px, 0) scale(1.03); }
+}
+
+/* Niebla carmesi-magenta: atmosphere, not a veil. The forest silhouette is the
+   subject now, so the fog only thickens toward the horizon and bottom, leaving
+   the top clear for the title. */
 body.theme-fortnitemares::after {
   background:
-    radial-gradient(115% 58% at 50% -24%, rgba(190, 24, 93, 0.28) 0%, rgba(109, 40, 217, 0.14) 46%, transparent 72%),
-    radial-gradient(60% 38% at 8% 26%, rgba(168, 85, 247, 0.13) 0%, transparent 70%),
-    radial-gradient(60% 38% at 92% 20%, rgba(217, 70, 239, 0.12) 0%, transparent 70%),
-    radial-gradient(70% 40% at 50% 58%, rgba(76, 5, 149, 0.16) 0%, transparent 74%),
-    radial-gradient(125% 62% at 50% 110%, rgba(59, 7, 100, 0.42) 0%, transparent 72%),
-    radial-gradient(135% 90% at 50% 42%, transparent 24%, rgba(4, 1, 8, 0.9) 100%);
+    radial-gradient(115% 40% at 50% 0%, rgba(190, 24, 93, 0.16) 0%, transparent 66%),
+    radial-gradient(60% 28% at 8% 32%, rgba(168, 85, 247, 0.07) 0%, transparent 70%),
+    radial-gradient(60% 28% at 92% 28%, rgba(217, 70, 239, 0.06) 0%, transparent 70%),
+    radial-gradient(100% 26% at 50% 78%, rgba(76, 5, 149, 0.18) 0%, transparent 78%),
+    radial-gradient(125% 34% at 50% 100%, rgba(59, 7, 100, 0.26) 0%, transparent 76%),
+    radial-gradient(150% 105% at 50% 46%, transparent 52%, rgba(4, 1, 8, 0.58) 100%);
+  animation: fnm-fog-drift 26s ease-in-out infinite alternate;
 }
 
-/* Barras de interference CRT: carmesi y violeta, nunca naranja de Halloween.
-   La regla base fija 28 barras cortas con posiciones pensadas para escritorio;
-   en movil se apilan y se leen como un bloque magenta solido. Por eso el tema
-   estacional reparte las suyas por toda la superficie, con alfas mas bajos: el
-   efecto es una interferencia dispersa, no una franja de color. */
+/* Slow lateral sway: the mist creeps across the trunks. */
+@keyframes fnm-fog-drift {
+  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 26px -12px, -18px 8px, 22px -6px, -12px 10px, 16px -8px, 0 0; }
+}
+
+/* Las barras de interferencia CRT tambien se van durante la temporada. Sobre el
+   bosque se leen como rayas sueltas, no como una senal de television, y ensucian
+   el arte. La corrupcion de senal no se pierde: sigue existiendo dentro de la
+   cinematica de entrada, que es donde aporta (capa .fnm-glitch-bars). Al terminar
+   el evento la regla base las repone. */
 html.theme-fortnitemares::after {
-  background-image:
-    linear-gradient(rgba(217, 70, 239, 0.20), rgba(217, 70, 239, 0.20)),
-    linear-gradient(rgba(236, 72, 153, 0.16), rgba(236, 72, 153, 0.16)),
-    linear-gradient(rgba(168, 85, 247, 0.14), rgba(168, 85, 247, 0.14)),
-    linear-gradient(rgba(190, 24, 93, 0.15), rgba(190, 24, 93, 0.15)),
-    linear-gradient(rgba(232, 121, 249, 0.10), rgba(232, 121, 249, 0.10)),
-    linear-gradient(rgba(147, 51, 234, 0.13), rgba(147, 51, 234, 0.13));
-  background-size:
-    180px 2px,
-    64px 2px,
-    120px 2px,
-    44px 2px,
-    90px 2px,
-    32px 2px;
-  background-position:
-    6% 18%,
-    68% 42%,
-    34% 71%,
-    86% 12%,
-    12% 63%,
-    52% 27%;
+  background-image: none;
 }
 
 /* ==========================================================================
