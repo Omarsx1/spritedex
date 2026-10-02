@@ -106,7 +106,6 @@ export default {
   "amigos.vistaDeAmigo": "Friend view",
   "amigos.volverALaApp": "Back to the app",
   "auth.accesoRapido": "⚡ 1-Click Quick Access (No Sign-Up)",
-  "auth.accesoRapidoConectado": "Connected through 1-Click Quick Access",
   "auth.avisoLocal": "✓ In the meantime, your data is 100% safe, stored locally on your device.",
   "auth.ayudaCorreoContacto": "Only so we can return your account if you forget your password",
   "auth.cambioAutomatico": "Every change is saved automatically",

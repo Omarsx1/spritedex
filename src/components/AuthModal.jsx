@@ -482,12 +482,17 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
 
         {user ? (
           <div className="auth-modal__body">
-            <div className="auth-modal__status-card">
-              <div className="auth-modal__status-title">{t('auth.sincronizadoNube')}</div>
-              <div className="auth-modal__status-text">
-                {esReclamo ? t('auth.accesoRapidoConectado') : t('auth.cambioAutomatico')}
+            {/* La tarjeta solo para cuentas: al invitado le decia "sincronizado en la nube"
+                justo debajo de "guardado solo en este dispositivo". Su progreso si sube, pero
+                la llave para volver a el vive en este navegador, y eso no se promete. */}
+            {!esReclamo && (
+              <div className="auth-modal__status-card">
+                <div className="auth-modal__status-title">{t('auth.sincronizadoNube')}</div>
+                <div className="auth-modal__status-text">
+                {t('auth.cambioAutomatico')}
+                </div>
               </div>
-            </div>
+            )}
 
             {esReclamo && (
               <div className="auth-modal__link-section">

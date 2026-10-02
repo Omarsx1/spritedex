@@ -107,7 +107,6 @@ export default {
   "amigos.vistaDeAmigo": "Vista de amigo",
   "amigos.volverALaApp": "Volver a la app",
   "auth.accesoRapido": "⚡ Acceso Rápido 1-Clic (Sin Registro)",
-  "auth.accesoRapidoConectado": "Conectado mediante Acceso Rápido 1-Clic",
   "auth.avisoLocal": "✓ Mientras tanto, tus datos están 100% seguros guardados localmente en tu dispositivo.",
   "auth.ayudaCorreoContacto": "Solo para poder devolverte la cuenta si olvidas la contraseña",
   "auth.cambioAutomatico": "Cualquier cambio se guarda automáticamente",
