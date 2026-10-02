@@ -4447,10 +4447,12 @@ body:has(.modal-overlay) {
 }
 
 .auth-modal__link-title {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   color: #c084fc;
   font-weight: 700;
-  margin-bottom: 6px;
+  text-align: center;
+  line-height: 1.35;
+  margin-bottom: 10px;
 }
 
 .auth-modal__link-desc {
