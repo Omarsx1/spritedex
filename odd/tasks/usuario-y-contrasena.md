@@ -132,7 +132,8 @@ sprite count did not change.
 - No backend, no email sender, no custom domain in this version.
 - Google and real email stay available as secondary paths; the seven existing accounts are not
   touched.
-- Claim threshold: 5 sprites marked, or the first visit to /amigos while anonymous.
+- Claim threshold: 30 sprites marked, or the first visit to /amigos while anonymous. It started at
+  5 and was raised after the first real test, where the notice arrived too early to be welcome.
 - The availability hint only appears when there is no session (after signing out), because in
   production the guest session always exists.
 - When the browser blocks localStorage, the once-per-browser modal degrades to once-per-visit.

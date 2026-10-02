@@ -848,7 +848,9 @@ useEffect(() => {
     () => Object.keys(userState || {}).filter((k) => k !== '_profile' && userState[k]?.owned).length,
     [userState]
   );
-  const mostrarAvisoReclamo = Boolean(user?.is_anonymous) && marcadosPropios >= 5;
+  // A los 30, no a los 5: el aviso llega cuando de verdad hay una coleccion que perder, y
+  // antes de eso solo molesta a quien esta probando la app.
+  const mostrarAvisoReclamo = Boolean(user?.is_anonymous) && marcadosPropios >= 30;
 
   // Una sola vez por navegador: cuando se cumple la condicion y no hay otro modal encima,
   // abre la modal de autenticacion con retraso, ya fuera del primer pintado. El marcador se
