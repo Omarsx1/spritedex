@@ -494,9 +494,6 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
                 <div className="auth-modal__link-title">
                   {t('auth.convierteCuenta')}
                 </div>
-                <p className="auth-modal__link-desc">
-                  {t('auth.reclamarDesc')}
-                </p>
 
                 <Alertas error={error} message={message} />
 
