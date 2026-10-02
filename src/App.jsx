@@ -43,6 +43,7 @@ import {
 } from './utils/friendCode';
 import { getLang, conIdioma, rutaSinIdioma } from './i18n';
 import { codigoFichaEnRuta } from './utils/visitaEnlace';
+import { codigoNormalizado } from './utils/fichaAmigo';
 
 // Carga diferida (code splitting) para modales secundarios y suite administrativa
 // El precalculo de la captura no arranca antes de este margen desde que se abre la app,
@@ -170,6 +171,12 @@ export function App() {
     const friendParam = new URLSearchParams(window.location.search).get('friend');
     return friendParam ? decodeCollectionState(friendParam) : null;
   });
+  // Identidad de lo que esta cargado ahora mismo: el codigo y el dueño de la colección que
+  // se ve en la ficha. Es la señal de "ya cargado", y NO connectedFriendCode: el enlace por
+  // token nunca escribe ese estado, y un valor viejo de localStorage puede no coincidir con
+  // lo que hay en pantalla.
+  const [codigoCargado, setCodigoCargado] = useState('');
+  const [userIdCargado, setUserIdCargado] = useState('');
 
   const [activeProfile, setActiveProfile] = useState(() => {
     const params = new URLSearchParams(window.location.search);
@@ -211,37 +218,30 @@ export function App() {
     }
   }, [user]);
 
-  // Real-time Friend Code Connection & Subscriptions
+  // A) Cargar la colección conectada: una sola vez por codigo. Si el codigo conectado ya es
+  // el cargado, el clic que lo pidio ya trajo la colección: se salta el fetch de mas.
   useEffect(() => {
-    if (!connectedFriendCode) {
-      setIsLiveConnected(false);
-      return;
-    }
-
-    let unsubscribe = null;
-    let isCancelled = false;
-
+    if (!connectedFriendCode) { setUserIdCargado(''); return undefined; }
+    if (codigoNormalizado(connectedFriendCode) === codigoNormalizado(codigoCargado)) return undefined;
+    let cancelado = false;
     fetchCollectionByFriendCode(connectedFriendCode).then((data) => {
-      if (isCancelled) return;
-      if (data && data.userState) {
-        setFriendState(data.userState);
-        setIsLiveConnected(true);
-        saveLastConnectedFriendCode(connectedFriendCode);
-
-        // Start realtime WebSocket subscription
-        unsubscribe = subscribeToFriendCollection(data.userId, (liveState) => {
-          if (!isCancelled) {
-            setFriendState(liveState);
-          }
-        });
-      }
+      if (cancelado || !data || !data.userState) return;
+      setFriendState(data.userState);
+      const codigo = data.friendCode || connectedFriendCode;
+      setCodigoCargado(codigo);
+      setUserIdCargado(data.userId || '');
+      saveLastConnectedFriendCode(codigo);
     });
+    return () => { cancelado = true; };
+  }, [connectedFriendCode, codigoCargado]);
 
-    return () => {
-      isCancelled = true;
-      if (unsubscribe) unsubscribe();
-    };
-  }, [connectedFriendCode]);
+  // B) En vivo: una sola suscripcion por dueño cargado. El tiempo real vive aparte de la
+  // carga; asi cargar y suscribir no se pisan en el mismo efecto.
+  useEffect(() => {
+    if (!userIdCargado) { setIsLiveConnected(false); return undefined; }
+    setIsLiveConnected(true);
+    return subscribeToFriendCollection(userIdCargado, (liveState) => setFriendState(liveState));
+  }, [userIdCargado]);
 
   // Enlace por token: se lee la coleccion compartida. No abre tiempo real (es una foto y
   // el visitante no tiene por que ser amigo), asi que la etiqueta no dice "en vivo".
@@ -258,7 +258,12 @@ export function App() {
       setFriendState(data.userState);
       // La ficha de la pagina de amigos se dibuja con el codigo en la ruta; con un enlace
       // por token hay que darselo desde aqui o la pagina queda en blanco.
-      setCodigoDeToken(data.friendCode || '');
+      const codigo = data.friendCode || '';
+      setCodigoDeToken(codigo);
+      // La visita por token SI es una coleccion ya cargada, asi que la ficha no ofrece
+      // cargarla otra vez. Lo que NO hace es tocar userIdCargado: el visitante no tiene por
+      // que ser amigo, y sin dueño no se abre tiempo real.
+      setCodigoCargado(codigo);
     });
     return () => { cancelado = true; };
   }, [shareToken]);
@@ -572,10 +577,12 @@ export function App() {
     const data = await fetchCollectionByFriendCode(code);
     if (data && data.userState) {
       setFriendState(data.userState);
-      setConnectedFriendCode(data.friendCode || code);
-      setIsLiveConnected(true);
+      const codigo = data.friendCode || code;
+      setCodigoCargado(codigo);
+      setUserIdCargado(data.userId || '');
+      setConnectedFriendCode(codigo);
       setActiveProfile('friend');
-      saveLastConnectedFriendCode(data.friendCode || code);
+      saveLastConnectedFriendCode(codigo);
       return true;
     }
     return false;
@@ -583,6 +590,8 @@ export function App() {
 
   const handleDisconnectFriend = () => {
     setFriendState(null);
+    setCodigoCargado('');
+    setUserIdCargado('');
     setConnectedFriendCode('');
     setIsLiveConnected(false);
     setActiveProfile('mine');
@@ -831,6 +840,7 @@ useEffect(() => {
           myShareToken={myShareToken}
           avisoExterno={tokenSinResultado ? t('amigos.enlaceSinResultado') : ''}
           codigoFicha={codigoEnRuta}
+          codigoCargado={codigoCargado}
           userState={userState}
           friendState={friendState}
           spritesScope={scopedSprites}
@@ -849,6 +859,10 @@ useEffect(() => {
               setActiveProfile('mine');
               irA('/amigos/' + encodeURIComponent(codigo));
             }
+            // El resultado tiene que volver a la pagina: sin este return, FriendsPage recibe
+            // undefined, el aviso de "no pudimos ver esa colección" nunca se dibuja y el clic
+            // fallido abriria una comparación vacia.
+            return ok;
           }}
           onVerEnApp={async (codigo) => {
             const ok = await handleConnectFriendCode(codigo);
