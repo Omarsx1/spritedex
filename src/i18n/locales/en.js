@@ -141,6 +141,7 @@ export default {
   "auth.placeholderCorreo": "Your email",
   "auth.placeholderCorreoContacto": "Contact email (optional)",
   "auth.placeholderNuevaContrasena": "New password",
+  "auth.puedesCerrar": "You can close this window and keep marking: your progress keeps saving on this device.",
   "auth.placeholderUsuario": "Your username",
   "auth.registrarse": "Sign Up",
   "auth.sesionInvitadoCerrada": "Your guest session is closed. You can now sign in with your username and password.",

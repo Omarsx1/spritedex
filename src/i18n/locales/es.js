@@ -142,6 +142,7 @@ export default {
   "auth.placeholderCorreo": "Tu correo electrónico",
   "auth.placeholderCorreoContacto": "Correo de contacto (opcional)",
   "auth.placeholderNuevaContrasena": "Nueva contraseña",
+  "auth.puedesCerrar": "Puedes cerrar esta ventana y seguir marcando: tu progreso se sigue guardando en este dispositivo.",
   "auth.placeholderUsuario": "Tu nombre de usuario",
   "auth.registrarse": "Registrarse",
   "auth.sesionInvitadoCerrada": "Cerramos tu sesión de invitado. Ya puedes entrar con tu usuario y contraseña.",

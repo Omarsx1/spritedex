@@ -4459,7 +4459,8 @@ body:has(.modal-overlay) {
 
 .auth-modal__link-desc {
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.35);
+  /* 0.35 sobre este fondo oscuro no se leia: la ventana es para leer, no un adorno. */
+  color: rgba(255, 255, 255, 0.62);
   line-height: 1.5;
   margin-bottom: 14px;
 }
@@ -4724,7 +4725,7 @@ body:has(.modal-overlay) {
 .auth-modal__toggle {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.55);
   font-size: 0.74rem;
   font-weight: 600;
   cursor: pointer;
@@ -4739,7 +4740,7 @@ body:has(.modal-overlay) {
    ni con la accion principal ni con el enlace de entrar. */
 .auth-modal__toggle--tenue {
   font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.45);
   letter-spacing: 0.02em;
 }
 

@@ -373,6 +373,8 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
           {/* El aviso va aqui, pegado al correo opcional: es justo lo que se pierde si
               olvida la contrasena y no dejo ninguno. */}
           <p className="auth-modal__link-desc">{t('auth.guardaContrasena')}</p>
+          {/* Nadie deberia sentir que esta obligado: cerrar la ventana no le cuesta nada. */}
+          <p className="auth-modal__link-desc">{t('auth.puedesCerrar')}</p>
         </>
       )}
 
