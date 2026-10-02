@@ -283,7 +283,14 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
 
         <div className="sdm-friends__group">
           <span className="sdm-friends__label"><Users size={12} /> {t('amigos.amigosConteo', { n: radar.amigos.length })}</span>
-          {radar.amigos.length === 0 ? (
+          {/* La lista no afirma nada que no haya comprobado: mientras no llegue la respuesta
+              se dice que esta cargando (tambien mientras se resuelve la sesion), si la
+              lectura fallo se dice eso, y "sin amigos" queda para cuando de verdad se sabe. */}
+          {!radar.cargado && radar.fallo ? (
+            <p className="sdm-friends__hint">{t('amigos.noSePudoLeerRed')}</p>
+          ) : !radar.cargado && (radar.haySesion || !radar.sesionLista) ? (
+            <p className="sdm-friends__hint">{t('amigos.cargandoRed')}</p>
+          ) : radar.amigos.length === 0 ? (
             <p className="sdm-friends__hint">{t('amigos.sinAmigos')}</p>
           ) : radar.amigos.map((a) => {
             const suyo = radar.codigoDeAmigo(a);
