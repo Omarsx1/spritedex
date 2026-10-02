@@ -80,10 +80,12 @@ A read-only diagnosis on 2026-10-01 found four real defects in one flow:
   - Acceptance: the same code is fetched once per click; the realtime subscription still
     opens for the loaded friend and closes when the code changes or on disconnect; the
     `?share=` visit still loads without a subscription.
-- [ ] **AMF-04 — Verify and commit as one work unit.** Run the checks below, then record a
+- [x] **AMF-04 — Verify and commit as one work unit.** Run the checks below, then record a
   Conventional Commit (Spanish, no AI attribution) on the feature branch and write its
   identity here as evidence.
   - Checks: `npm test` (`node --test`), `npm run lint`, `npm run build`.
+  - Commit: `ebdb3921b029eb6983acaae0850b181e200327ab` — `fix(amigos)`, 5 files,
+    +266 / -37, on `codex/amigos-ficha-comparacion`.
 
 ## Evidence and disposition
 Checks on the final bytes (2026-10-01, `codex/amigos-ficha-comparacion`):
