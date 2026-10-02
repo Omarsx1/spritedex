@@ -115,7 +115,7 @@ export default {
   "auth.conectadoComoInvitado": "Signed in as Guest",
   "auth.continuarGoogle": "Continue with Google",
   "auth.contrasenaCorta": "Password must be at least 8 characters",
-  "auth.convierteCuenta": "🔗 Convert your account to access it from other phones",
+"auth.convierteCuenta": "Convert your account to access it from other phones",
   "auth.crearCuenta": "Create Account",
   "auth.cuentaCreada": "Account created! Check your email or sign in.",
   "auth.cuentaNoCompletada": "We couldn't complete your account: the change stayed pending and your session is still a guest.",

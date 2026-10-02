@@ -116,7 +116,7 @@ export default {
   "auth.conectadoComoInvitado": "Conectado como Invitado",
   "auth.continuarGoogle": "Continuar con Google",
   "auth.contrasenaCorta": "La contraseña debe tener al menos 8 caracteres",
-  "auth.convierteCuenta": "🔗 Convierte tu cuenta para acceder desde otros celulares",
+"auth.convierteCuenta": "Convierte tu cuenta para acceder desde otros celulares",
   "auth.crearCuenta": "Crear Cuenta",
   "auth.cuentaCreada": "¡Cuenta creada! Revisa tu correo o inicia sesión.",
   "auth.cuentaNoCompletada": "No pudimos completar tu cuenta: el cambio quedó pendiente y tu sesión sigue como invitado.",
