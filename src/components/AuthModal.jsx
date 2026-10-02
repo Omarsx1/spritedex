@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal } from './ui/Modal';
 import { Google } from './ui/Google';
 import { conGoogle, origenActual } from '../utils/authActions';
-import { X, Cloud, LogIn, LogOut, Mail, Key, ShieldCheck, User, Eye, EyeOff } from 'lucide-react';
+import { X, Cloud, LogOut, Mail, Key, ShieldCheck, User, Eye, EyeOff } from 'lucide-react';
 import { getSupabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from '../utils/supabase';
 import { trackEvent } from '../utils/telemetry';
 import { t } from '../i18n';
@@ -387,8 +387,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
         className="btn-primary auth-modal__btn-submit"
         disabled={loading || !puedeEnviar}
       >
-        <LogIn size={16} />
-        <span>{esReclamo || isSignUp ? t('auth.registrarse') : t('auth.iniciarSesion')}</span>
+        <span>{esReclamo || isSignUp ? t('auth.crearMiCuenta') : t('auth.iniciarSesion')}</span>
       </button>
     </form>
   );
@@ -454,7 +453,7 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
       <button
         type="button"
         onClick={() => { setModoCorreo(!modoCorreo); setError(null); setMessage(null); }}
-        className="auth-modal__toggle"
+        className="auth-modal__toggle auth-modal__toggle--tenue"
         aria-expanded={modoCorreo}
       >
         {t('auth.otrosMetodos')}

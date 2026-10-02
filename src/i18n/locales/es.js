@@ -117,6 +117,7 @@ export default {
   "auth.contrasenaCorta": "La contraseña debe tener al menos 8 caracteres",
   "auth.convierteCuenta": "Guarda tu progreso en la nube",
   "auth.crearCuenta": "Crear Cuenta",
+  "auth.crearMiCuenta": "Crear mi cuenta",
   "auth.cuentaCreada": "¡Cuenta creada! Revisa tu correo o inicia sesión.",
   "auth.cuentaNoCompletada": "No pudimos completar tu cuenta: el cambio quedó pendiente y tu sesión sigue como invitado.",
   "auth.cuentaVinculada": "¡Excelente! Tu cuenta ahora está vinculada a tu correo. Puedes usarla en cualquier dispositivo.",

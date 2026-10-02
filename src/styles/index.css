@@ -4733,6 +4733,19 @@ body:has(.modal-overlay) {
   color: rgba(255, 255, 255, 0.7);
 }
 
+/* "Otros metodos" es la salida menos importante: un punto menos de peso para que no compita
+   ni con la accion principal ni con el enlace de entrar. */
+.auth-modal__toggle--tenue {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.28);
+  letter-spacing: 0.02em;
+}
+
+/* Respuesta al toque: en movil un boton tiene que sentirse pulsado. */
+.auth-modal__btn-submit:active {
+  transform: scale(0.985);
+}
+
 /* El ojo, DENTRO de la casilla de contrasena: ese rincon queda libre porque el campo
    reserva el hueco con padding-right. */
 .auth-modal__input--ojo {

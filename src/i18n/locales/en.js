@@ -116,6 +116,7 @@ export default {
   "auth.contrasenaCorta": "Password must be at least 8 characters",
   "auth.convierteCuenta": "Save your progress to the cloud",
   "auth.crearCuenta": "Create Account",
+  "auth.crearMiCuenta": "Create my account",
   "auth.cuentaCreada": "Account created! Check your email or sign in.",
   "auth.cuentaNoCompletada": "We couldn't complete your account: the change stayed pending and your session is still a guest.",
   "auth.cuentaVinculada": "Nice! Your account is now linked to your email. You can use it on any device.",
