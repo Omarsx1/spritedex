@@ -9610,3 +9610,15 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .motion-disabled .fnm-sat-btn {
   transition: none;
 }
+
+/* El aviso de borrado flota: con 360px fijos y pegado a los bordes parecia un panel lateral.
+   Solo toca a los avisos (toast); los modales centrados del panel no llevan esta clase. */
+.swal2-toast.swal2-popup {
+  margin: 16px;
+  width: auto;
+  max-width: min(92vw, 420px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
