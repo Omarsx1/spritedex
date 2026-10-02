@@ -366,6 +366,9 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
             />
           </div>
           <p className="auth-modal__link-desc">{t('auth.ayudaCorreoContacto')}</p>
+          {/* El aviso va aqui, pegado al correo opcional: es justo lo que se pierde si
+              olvida la contrasena y no dejo ninguno. */}
+          <p className="auth-modal__link-desc">{t('auth.guardaContrasena')}</p>
         </>
       )}
 

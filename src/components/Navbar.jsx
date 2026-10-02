@@ -254,7 +254,7 @@ export function Navbar({
                     className="app-navbar__dropdown-item app-navbar__dropdown-item--crear"
                   >
                     <UserPlus size={15} />
-                    <span>{t('reclamo.crearUsuario')}</span>
+                    <span>{t('nav.entrarOCrearUsuario')}</span>
                   </button>
                   <p className="app-navbar__dropdown-nota">
                     {t('nav.notaAnonimo')}
