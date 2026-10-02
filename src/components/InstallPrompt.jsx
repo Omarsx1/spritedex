@@ -85,6 +85,15 @@ export function InstallPrompt() {
     }
   };
 
+  // Mientras el cartel de instalar esta en pantalla, la calabaza se aparta: los dos viven
+  // en la esquina de abajo a la derecha y el cartel la tapaba a medias. El efecto va antes
+  // del return temprano porque los hooks no pueden quedar despues de un return condicional.
+  useEffect(() => {
+    if (showPrompt) document.body.dataset.instalar = 'on';
+    else delete document.body.dataset.instalar;
+    return () => { delete document.body.dataset.instalar; };
+  }, [showPrompt]);
+
   if (!showPrompt) return null;
 
   return (

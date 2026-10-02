@@ -16,6 +16,7 @@ import { FilterBar } from './components/FilterBar';
 import { SpriteCard } from './components/SpriteCard';
 import { SpriteDetailModal } from './components/SpriteDetailModal';
 import { PrivacyNotice } from './components/PrivacyNotice';
+import { ClaimAccountBanner } from './components/ClaimAccountBanner';
 import { InstallPrompt } from './components/InstallPrompt';
 import { Footer } from './components/Footer';
 import { FriendsPage } from './components/FriendsPage';
@@ -67,6 +68,12 @@ const LOCAL_STATE_UPDATED_KEY = 'spritedex_state_updated_at_v1';
 // perder la coleccion para siempre. Se guarda aqui y se restaura sola.
 const RECOVERY_STORAGE_KEY = 'spritedex_state_recovery_v1';
 const RECOVERY_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+// Aviso de reclamo progresivo: una sola vez por navegador, no una vez por sesion. El
+// marcador es local a proposito: el aviso persigue al invitado, que por definicion no
+// tiene cuenta donde guardarlo.
+const CLAVE_AVISO_RECLAMO = 'spritedex_claim_aviso_v1';
+// Retraso desde que se cumple la condicion: la modal no puede competir con el primer pintado.
+const AVISO_RECLAMO_RETRASO_MS = 2000;
 
 export function App() {
   const isMobile = useIsMobile(600);
@@ -832,9 +839,55 @@ useEffect(() => {
   const busquedaActual = typeof window !== 'undefined' ? window.location.search : '';
   const codigoEnRuta = codigoFichaEnRuta(rutaApp, busquedaActual, codigoDeToken);
 
+  // Reclamo progresivo: ve el aviso el invitado con algo que proteger, y solo ese. La
+  // condicion vive aqui, en un solo lugar, porque los dos arboles de render (la app y la
+  // pagina de amigos) tienen que decidir lo mismo.
+  // Se cuenta lo PROPIO y no lo que se esta viendo: en MODO AMIGO ownedCount es la coleccion
+  // del amigo, asi que un invitado sin nada recibia el aviso por mirar la de otro.
+  const marcadosPropios = useMemo(
+    () => Object.keys(userState || {}).filter((k) => k !== '_profile' && userState[k]?.owned).length,
+    [userState]
+  );
+  const mostrarAvisoReclamo = Boolean(user?.is_anonymous) && marcadosPropios >= 5;
+
+  // Una sola vez por navegador: cuando se cumple la condicion y no hay otro modal encima,
+  // abre la modal de autenticacion con retraso, ya fuera del primer pintado. El marcador se
+  // escribe al abrir (no al programar) para que cerrarla no la reabra sola.
+  useEffect(() => {
+    if (!mostrarAvisoReclamo) return undefined;
+    // Fuera de produccion no se crean usuarios reales, asi que el aviso no tiene destino.
+    if (shouldSkipAnonymousAuth()) return undefined;
+    if (safeStorage.getItem(CLAVE_AVISO_RECLAMO) === 'true') return undefined;
+    const hayModalAbierto = Boolean(selectedSprite) || showShareModal || showBackupModal ||
+      showCompareModal || showFooterPrivacyModal || showAuthModal;
+    if (hayModalAbierto) return undefined;
+    const timer = setTimeout(() => {
+      safeStorage.setItem(CLAVE_AVISO_RECLAMO, 'true');
+      setShowAuthModal(true);
+    }, AVISO_RECLAMO_RETRASO_MS);
+    return () => clearTimeout(timer);
+  }, [mostrarAvisoReclamo, selectedSprite, showShareModal, showBackupModal, showCompareModal, showFooterPrivacyModal, showAuthModal]);
+
+  // La modal de autenticacion se dibuja en los dos arboles: la pagina de amigos retorna
+  // antes de llegar a los modales de la app, y el aviso de reclamo tiene que poder abrirla
+  // tambien desde esa pantalla.
+  const modalAuth = showAuthModal && (!user || user.is_anonymous) ? (
+    <AuthModal
+      user={user}
+      onClose={() => setShowAuthModal(false)}
+      onAuthSuccess={() => {
+        setShowAuthModal(false);
+      }}
+      onSignOut={handleSignOutCleanup}
+    />
+  ) : null;
+
   if (enAmigos) {
     return (
       <div className="app-container">
+        {mostrarAvisoReclamo && (
+          <ClaimAccountBanner onCrearUsuario={() => setShowAuthModal(true)} />
+        )}
         <FriendsPage
           myFriendCode={myFriendCode}
           myShareToken={myShareToken}
@@ -873,6 +926,7 @@ useEffect(() => {
           }}
           onAbrirModal={() => setShowCompareModal(true)}
         />
+        <Suspense fallback={null}>{modalAuth}</Suspense>
       </div>
     );
   }
@@ -956,6 +1010,10 @@ useEffect(() => {
         onOpenCompareModal={() => irA('/amigos')}
         onOpenAuthModal={() => setShowAuthModal(true)}
       />
+
+      {mostrarAvisoReclamo && (
+        <ClaimAccountBanner onCrearUsuario={() => setShowAuthModal(true)} />
+      )}
 
       {/* Barra flotante sutil (Únicamente cuando se está explorando activamente la colección de un amigo) */}
       {activeProfile === 'friend' && (
@@ -1134,16 +1192,7 @@ useEffect(() => {
         )}
 
         {/* Tambien con sesion anonima: es la unica via para vincular la cuenta. */}
-        {showAuthModal && (!user || user.is_anonymous) && (
-          <AuthModal
-            user={user}
-            onClose={() => setShowAuthModal(false)}
-            onAuthSuccess={() => {
-              setShowAuthModal(false);
-            }}
-            onSignOut={handleSignOutCleanup}
-          />
-        )}
+        {modalAuth}
 
         {showFooterPrivacyModal && (
           <PrivacyPolicyModal onClose={() => setShowFooterPrivacyModal(false)} />

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Download, User, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone, AlertTriangle, Mail } from 'lucide-react';
+import { Download, User, UserPlus, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone, AlertTriangle, Mail } from 'lucide-react';
 import { Google } from './ui/Google';
 import { getSupabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
 import { safeStorage } from '../utils/safeStorage';
+import { usuarioDeSesion, esCorreoSintetico } from '../utils/usuario';
 import { GENERATIONS } from '../data/spritesData';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { t } from '../i18n';
@@ -103,6 +104,15 @@ export function Navbar({
   }, [user]);
 
   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+
+  // Linea de identidad: el usuario con @ cuando la cuenta tiene uno, si no el correo real.
+  // El alias sintetico <usuario>@spritedex.gg no se muestra nunca como si fuera un correo.
+  const identidad = useMemo(() => {
+    const usuario = usuarioDeSesion(user);
+    if (usuario) return '@' + usuario;
+    if (user && user.email && !esCorreoSintetico(user.email)) return user.email;
+    return '';
+  }, [user]);
 
   // Click outside listener to close dropdowns
   useEffect(() => {
@@ -214,6 +224,9 @@ export function Navbar({
                   )}
                   <div className="app-navbar__dropdown-meta">
                     <span className="app-navbar__dropdown-name">{nombreCorto}</span>
+                    {/* El @usuario y el correo comparten la linea secundaria del menu: el
+                        estilo de --email ya era exactamente eso (una linea corta y tenue). */}
+                    {identidad && <span className="app-navbar__dropdown-email">{identidad}</span>}
                     <span className="app-navbar__dropdown-code">{myFriendCode}</span>
                   </div>
                 </div>
@@ -236,6 +249,13 @@ export function Navbar({
 
               {esAnonimo && (
                 <>
+                  <button
+                    onClick={() => { setIsUserMenuOpen(false); onOpenAuthModal(); }}
+                    className="app-navbar__dropdown-item app-navbar__dropdown-item--crear"
+                  >
+                    <UserPlus size={15} />
+                    <span>{t('nav.entrarOCrearUsuario')}</span>
+                  </button>
                   <p className="app-navbar__dropdown-nota">
                     {t('nav.notaAnonimo')}
                   </p>
