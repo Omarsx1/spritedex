@@ -88,6 +88,38 @@ Do not enable the redirect to spritedex.gg while this returns rows:
 Reminder: with _profile written only since 2026-08-27, older rows never appear in this query;
 check them with the marcados query in the release notes before moving the domain.
 
+## Evidence and disposition
+Checks on the final bytes (2026-10-02, `codex/usuario-y-contrasena`):
+- `npm test` → 109 tests, 109 pass, 0 fail (branch-point baseline 98; +11 username cases).
+- `npm run lint` → exit 0, no warning on a touched line.
+- `npm run build` → exit 0.
+
+Work units: `8242f55` (credential: module, tests, AuthModal, locales; +583/-119),
+`4f9da8f` (progressive claim: banner, App, Navbar, CSS; +229/-11) and `96d8100` (the RPC
+migration and this document; +137).
+
+Independent verifier: one read-only verifier returned CONFIRMED WITH RESERVATIONS and found
+two real defects, both corrected before the commits were made:
+- In production the app always holds a silent anonymous session, so the sign-in form in the
+  no-user tree was unreachable: a returning user on a new device could only claim, never sign
+  in. Fixed with the "¿Ya tienes usuario? Entra" action, which signs the guest session out,
+  asks the parent for the recovery copy and switches the form to sign-in mode.
+- The claim reported success without checking the conversion: with Confirm email still ON,
+  `updateUser` leaves the change pending, the user stays anonymous, and the UI both lied and
+  counted a conversion that never happened. It now fails closed (no success message, no
+  telemetry) and maps a taken username to the localised message.
+
+Also from the audit: the RPC now normalises exactly like the client, and the settings section
+states the real consequence of turning confirmation off.
+
+Nothing is proven end to end: there is no local Supabase session, no test mounts the
+components, the anonymous claim cannot be exercised here, and the RPC has never been run.
+
+## Next step
+Apply the dashboard settings, run the migration, then a live smoke: claim on one browser, sign
+in from a second one, and confirm in Supabase that the `user_id`, the `friend_code` and the
+sprite count did not change.
+
 ## Assumptions
 - No backend, no email sender, no custom domain in this version.
 - Google and real email stay available as secondary paths; the seven existing accounts are not
