@@ -28,6 +28,8 @@ Two user-visible symptoms, one design gap each:
   - Acceptance: a cold entry never shows "Todavía no tienes amigos aceptados" before the first answer; a manual refresh and a re-entry with cached data never show the loading line.
 - [x] **AML-04 — Verify and commit as one work unit.** Run the checks below, then record a Conventional Commit (Spanish, no AI attribution) and write its identity here.
   - Checks: `npm test`, `npm run lint`, `npm run build`.
+  - Commit: `c4bc12380c47e05e4238ce683bbec12d201d4313` — `fix(amigos)`, 7 files,
+    +189 / -13, on `codex/amigos-ficha-comparacion`.
 
 ## Evidence and disposition
 Checks on the final bytes (2026-10-01, `codex/amigos-ficha-comparacion`):
@@ -71,4 +73,3 @@ There is no local Supabase session, so the cached re-entry and the silent revali
 ## Next step
 A live smoke pass on a real session: a cold entry with no cache, a re-entry with cache, and a
 failed read. Then decide which of the open findings deserve their own change.
-
