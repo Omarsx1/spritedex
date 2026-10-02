@@ -883,6 +883,22 @@ html::after {
   color: #ffffff;
 }
 
+/* "Crear mi usuario" es la accion que persigue el aviso de reclamo: va primero en el menu
+   del invitado, centrada y con el acento verde, para que no se lea como un enlace mas
+   (el otro boton grande del menu, el rojo de salir, ya marca ese contraste). */
+.app-navbar__dropdown-item--crear {
+  justify-content: center;
+  color: #04120c;
+  background: #10b981;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 800;
+}
+
+.app-navbar__dropdown-item--crear:hover {
+  background: #34d399;
+  color: #04120c;
+}
+
 /* --- Responsive --- */
 @media (max-width: 600px) {
   .app-navbar {
@@ -5788,6 +5804,83 @@ body:has(.modal-overlay) {
   .sdm-friend-pill__exit {
     padding: 4px 9px;
     font-size: 0.68rem;
+  }
+}
+
+/* Aviso de reclamo: reutiliza el lenguaje de .sdm-friend-pill (pastilla centrada, cristal
+   y borde de acento) para no inventar un componente visual nuevo; lleva clase propia
+   porque su contenido es otro (texto, CTA y cierre) y su acento es el verde de la cuenta. */
+.claim-banner {
+  max-width: 540px;
+  margin: 0 auto 14px;
+  padding: 8px 12px 8px 16px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(16, 185, 129, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-sizing: border-box;
+}
+
+.claim-banner__icon {
+  color: #34d399;
+  flex-shrink: 0;
+}
+
+.claim-banner__texto {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: #e2e8f0;
+}
+
+.claim-banner__cta {
+  background: #10b981;
+  border: none;
+  color: #04120c;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.claim-banner__cta:hover {
+  background: #34d399;
+}
+
+.claim-banner__close {
+  display: flex;
+  background: transparent;
+  border: none;
+  color: rgba(226, 232, 240, 0.6);
+  cursor: pointer;
+  line-height: 0;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.claim-banner__close:hover {
+  color: #ffffff;
+}
+
+@media (max-width: 600px) {
+  .claim-banner {
+    margin: 0 12px 10px 12px;
+    padding: 7px 10px 7px 12px;
+    gap: 8px;
+  }
+  .claim-banner__texto {
+    font-size: 0.72rem;
   }
 }
 
