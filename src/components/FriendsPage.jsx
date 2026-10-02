@@ -3,6 +3,7 @@ import { ALL_SPRITES, pickName } from '../data/spritesData';
 import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw } from 'lucide-react';
 import { useFriendRequests } from '../hooks/useFriendRequests';
 import { generateShareUrl } from '../utils/friendCode';
+import { fichaYaCargada } from '../utils/fichaAmigo';
 import { t } from '../i18n';
 import { LanguageSwitcher } from './LanguageSwitcher';
 
@@ -10,7 +11,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
 // gestionan personas y en la ficha del amigo se compara la coleccion (fase 2).
 // Reutiliza los estilos .sdm-friends que ya estaban aprobados.
-export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, onAbrirModal }) {
+export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, onAbrirModal, codigoCargado }) {
   // Comparación rápida para la ficha: lo que él tiene y yo no, y al revés. Es la misma
   // idea que las listas de la modal, aquí resumida para tenerla en la página.
   const listas = useMemo(() => {
@@ -48,8 +49,10 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
   // Comparación, porque ese enlace existe justo para ver la comparación con esa persona.
   const [vista, setVista] = useState(codigoFicha ? 'comparacion' : 'amigos');
 
-  // Con un enlace por token el codigo llega DESPUES del montaje, asi que la pestaña se
-  // corrige sola en cuanto aparece; si no, el enlace abriria la pestaña de amigos vacia.
+  // Respaldo para los enlaces: con un enlace por token el codigo llega DESPUES del montaje,
+  // asi que la pestaña se corrige sola en cuanto aparece; si no, el enlace abriria la
+  // pestaña de amigos vacia. El clic ya no depende de esto: "Ver colección" abre la
+  // comparación directamente (ver verColeccion).
   useEffect(() => {
     if (codigoFicha) setVista('comparacion');
   }, [codigoFicha]);
@@ -57,10 +60,21 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
   const codigoCorto = (myFriendCode || '').replace(/^SDEX-/i, '');
   const enlace = generateShareUrl(myShareToken, myFriendCode || 'SDEX-0000');
 
-  // Sin amistad aceptada la coleccion ya no se puede leer: se avisa en vez de no hacer nada.
+  // La colección de la ficha ya esta en pantalla: la misma regla que prueba el codigo
+  // pedido contra el cargado decide si el boton "Ver su colección" sobra.
+  const fichaCargada = fichaYaCargada({ codigoFicha, codigoCargado, hayColeccion: Boolean(friendState) });
+
+  // El clic ES la intencion: al elegir "Ver colección" se abre la comparación aqui mismo,
+  // sin depender del codigo de la ruta. La ruta es solo el respaldo para quien llega por un
+  // enlace (/amigos/SDEX-XXXX), donde no hay clic que valga.
+  // Sin amistad aceptada la colección ya no se puede leer: se avisa en vez de no hacer nada.
   const verColeccion = async (codigo) => {
     const ok = await onVerColeccion(codigo);
-    if (ok === false) setAviso(t('amigos.noSePudoVer'));
+    if (ok === false) { setAviso(t('amigos.noSePudoVer')); return false; }
+    // El aviso se limpia al exito: si no, "no pudimos ver esa colección" sobrevivia a la
+    // carga siguiente.
+    setAviso('');
+    setVista('comparacion');
     return ok;
   };
 
@@ -178,7 +192,12 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
               </div>
               <div className="sdm-friends__row">
                 <div className="sdm-friends__actions">
-                  <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => verColeccion(codigoFicha)}>{t('amigos.verSuColeccion')}</button>
+                  {/* El boton sobra si esa colección ya esta cargada: pulsarlo no haria nada.
+                      Se deja mientras no este cargada para que quien llega por un enlace
+                      todavia tenga como cargarla. */}
+                  {!fichaCargada && (
+                    <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => verColeccion(codigoFicha)}>{t('amigos.verSuColeccion')}</button>
+                  )}
                   {onVerEnApp && (
                     <button type="button" className="sdm-friends__btn" onClick={() => onAbrirModal && onAbrirModal()}>
                       {t('amigos.comparacionCompleta')}
