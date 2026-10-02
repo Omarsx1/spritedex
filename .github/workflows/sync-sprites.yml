@@ -55,6 +55,9 @@ jobs:
           sudo apt-get install -y webp
           node scripts/generate_sprite_thumbs.js
 
+      - name: Actualizar catálogo de idiomas
+        run: node scripts/build_locale_catalog.mjs
+
       - name: Validar integridad con OxLint
         # La configuracion se fija a mano: sin esto, en el runner el lint no aplicaba
         # las reglas del proyecto y el gate pasaba con 0 errores aunque hubiera fallos.
@@ -103,5 +106,17 @@ jobs:
             fi
             echo "✅ Catálogo sincronizado y cambios subidos con éxito."
           else
-            echo "ℹ️ No hay cambios en el catálogo. Todo al día."
+            # Aviso de estancamiento: el peor fallo de este pipeline es el silencio.
+            # Si el scrapeo se bloquea, no hay cambios, el job termina en verde y el
+            # catálogo se queda viejo sin que nadie lo note. Aquí se convierte ese
+            # silencio en un job rojo (GitHub avisa por correo) cuando se pasa el
+            # límite de días sin ninguna actualización.
+            LIMITE="${SYNC_STALE_DAYS:-10}"
+            ULTIMO=$(git log -1 --format=%ct -- src/data/official_sprites.json || echo 0)
+            DIAS=$(( ( $(date +%s) - ULTIMO ) / 86400 ))
+            if [ "$DIAS" -ge "$LIMITE" ]; then
+              echo "::error::El catálogo lleva $DIAS días sin cambios (límite: $LIMITE). La fuente puede estar bloqueando el scrapeo: revisa si fortnite.gg responde con un chequeo anti-bots."
+              exit 1
+            fi
+            echo "ℹ️ No hay cambios en el catálogo. Última actualización hace $DIAS días (límite: $LIMITE)."
           fi

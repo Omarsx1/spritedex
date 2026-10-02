@@ -173,7 +173,11 @@ const PARENT_TO_FAMILY = {
   pedicureantacid: 'wick',
   llama: 'llama',
   peely: 'peely',
-  increaseheals: 'morgana'
+  increaseheals: 'morgana',
+  phasedash: 'spookydash',
+  healthsiphon: 'vampire',
+  increasedmelee: 'deer',
+  winnerd: 'dumpsterdive'
 };
 
 const VARIANT_TO_THEME = {
@@ -188,6 +192,9 @@ const VARIANT_TO_THEME = {
   'bounty hunter': 'Bounty Hunter',
   bountyhunter: 'Bounty Hunter',
   reaper: 'Bounty Hunter',
+  tricktreat: 'Trick or Treat',
+  'trick or treat': 'Trick or Treat',
+  trickortreat: 'Trick or Treat',
   candy: 'Candy',
   gummy: 'Candy',
   galaxy: 'Galaxy',
@@ -243,7 +250,11 @@ const FAMILY_NAMES_ES = {
   morgana: 'Morgana',
   blinky: 'Blinky',
   birthday: 'Pastel de Cumpleaños',
-  pond: 'Estanque'
+  pond: 'Estanque',
+  spookydash: 'Impulso aterrador',
+  vampire: 'Vampiro',
+  deer: 'El Ciervo',
+  dumpsterdive: 'Mapache'
 };
 
 const THEME_NAMES_ES = {
@@ -252,6 +263,7 @@ const THEME_NAMES_ES = {
   Cheatmaster: 'Hacker',
   'Loot Hacker': 'Hacker de Botín',
   'Bounty Hunter': 'Cazarrecompensas',
+  'Trick or Treat': 'Dulce o Truco',
   Candy: 'Gomita',
   Galaxy: 'Galáctico',
   Holofoil: 'Holográfico',
@@ -266,6 +278,7 @@ const VARIANT_ORDER = [
   'Cheatmaster',
   'Loot Hacker',
   'Bounty Hunter',
+  'Trick or Treat',
   'Candy',
   'Galaxy',
   'Cube',
@@ -375,15 +388,34 @@ async function syncSprites() {
     await page.setViewport({ width: 1920, height: 1080 });
 
     console.log(`🌐 Navegando a ${BASE_URL}/sprites...`);
-    await page.goto(`${BASE_URL}/sprites`, { waitUntil: 'networkidle2', timeout: 45000 });
 
-    // Esperar a que el DOM o Cloudflare se resuelva
-    try {
-      await page.waitForSelector('.sprite-card', { timeout: 15000 });
-    } catch {
-      console.log('⏳ Esperando verificación de Cloudflare / carga de cartas...');
-      await page.waitForSelector('.sprite-card', { timeout: 30000 }).catch(() => {});
+    /* A veces fortnite.gg responde con un chequeo anti-bots ("One More Step") y la
+       pagina se queda sin ninguna tarjeta. Antes eso NO era un error: el script
+       seguia, encontraba "sin cambios" y terminaba diciendo que todo estaba al
+       dia, asi que el catalogo se congelaba en silencio y nadie se enteraba.
+       Ahora se reintenta y, si sigue bloqueado, se falla sin tocar el catalogo. */
+    let tarjetasEnLaPagina = 0;
+    for (let intento = 1; intento <= 3 && tarjetasEnLaPagina === 0; intento += 1) {
+      await page.goto(`${BASE_URL}/sprites`, { waitUntil: 'networkidle2', timeout: 45000 });
+      try {
+        await page.waitForSelector('.sprite-card', { timeout: intento === 1 ? 15000 : 30000 });
+      } catch {
+        console.log(`⏳ Intento ${intento}: esperando verificacion de Cloudflare / carga de cartas...`);
+      }
+      tarjetasEnLaPagina = await page.$$eval('.sprite-card', (nodos) => nodos.length).catch(() => 0);
+      if (tarjetasEnLaPagina === 0 && intento < 3) {
+        await new Promise((resolve) => setTimeout(resolve, 8000));
+      }
     }
+
+    if (tarjetasEnLaPagina === 0) {
+      console.error('❌ La pagina no devolvio ninguna tarjeta: fortnite.gg esta bloqueando el scrapeo.');
+      console.error('   Se aborta SIN tocar el catalogo para no dar por bueno un vacio. Revisa el aviso del workflow.');
+      process.exitCode = 1;
+      return;
+    }
+
+    console.log(`✅ ${tarjetasEnLaPagina} tarjetas encontradas.`);
 
     // Activar checkbox de no lanzados si existe
     try {
@@ -636,7 +668,7 @@ async function syncSprites() {
       const parentNorm = normalizeKey(card.parent);
       const familyId = PARENT_TO_FAMILY[parentNorm] || parentNorm || normalizeKey(card.name);
       const theme = VARIANT_TO_THEME[(card.variant || '').toLowerCase()] || card.variant || 'Basic';
-      const themeKey = normalizeKey(theme);
+      const themeKey = (theme === 'Trick or Treat' || theme === 'tricktreat') ? 'tricktreat' : normalizeKey(theme);
       const expectedId = `${familyId}_${themeKey}`;
 
       // Determinar si es no lanzado respetando el estado directo de Fortnite.gg (Victorioso siempre activo)
@@ -644,6 +676,12 @@ async function syncSprites() {
       if (theme === 'Bounty Hunter' && (familyId === 'crown' || parentNorm === 'crown')) {
         isCardUnreleased = false;
       }
+      // Antes habia aqui una regla que forzaba "Dulce o Truco" a lanzado pasara
+      // lo que pasara. El efecto era que la app enseñaba como publicados 23
+      // variantes que Fortnite.gg da por NO lanzadas, y el sync no podia
+      // corregirlo porque el propio scraper mentia sobre el dato. Ahora se
+      // respeta la fuente; quien quiera verlas tiene el interruptor de no
+      // lanzados en la app.
 
       // Buscar en el catálogo oficial tanto por ID exacto, como por ID alternativo de rift, como por familia + tema
       const themeNorm = theme.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -669,12 +707,23 @@ async function syncSprites() {
       if (existingKey) {
         const { item } = officialMap.get(existingKey);
 
+        // El catalogo obedece al sitio en las DOS direcciones. Antes solo se
+        // manejaba "no lanzado -> lanzado", asi que cualquier marca puesta a mano
+        // se quedaba pegada para siempre y la app enseñaba como publicados
+        // espiritus que la fuente da por no lanzados.
         // Caso: espíritu antes no lanzado que acaba de publicarse oficialmente
         if (item.unreleased === true && isCardUnreleased === false) {
           console.log(`✨ ¡Nuevo lanzamiento detectado!: ${item.id} (${item.name}) ya está disponible en Fortnite.`);
           item.unreleased = false;
           item.isNew = true;
           item.releaseDate = today;
+          catalogChanges++;
+        } else if (item.unreleased === false && isCardUnreleased === true) {
+          // La fuente lo da por no lanzado: se corrige la marca en vez de
+          // mantener una publicacion que el juego todavia no ha hecho.
+          console.log(`↩️ ${item.id} (${item.name}) vuelve a marcarse como no lanzado: Fortnite.gg no lo da por publicado.`);
+          item.unreleased = true;
+          item.isNew = false;
           catalogChanges++;
         }
       } else {

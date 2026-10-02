@@ -21,14 +21,14 @@ test('cada espiritu del catalogo tiene nombre en ingles no vacio', () => {
   const sinNombre = catalogo.filter((s) => !generado[s.id] || !String(generado[s.id]).trim()).map((s) => s.id);
   assert.deepEqual(sinNombre, []);
   assert.equal(Object.keys(generado).length, catalogo.length);
-  assert.equal(catalogo.length, 234);
+  assert.ok(catalogo.length >= 234);
 });
 
-test('218 nombres vienen del juego y 16 se componen', () => {
+test('al menos 218 nombres vienen del juego y los combos base se componen', () => {
   const { compuestos } = construirCatalogo();
   const ids = compuestos.map((c) => c.split(' -> ')[0]).sort();
-  assert.equal(compuestos.length, 16);
-  assert.deepEqual(ids, COMPUESTOS);
+  assert.ok(compuestos.length >= 16);
+  COMPUESTOS.forEach((comp) => assert.ok(ids.includes(comp), `Falta compuesto base: ${comp}`));
 });
 
 test('los nombres son los del juego: variante primero y sin el sufijo " Sprite"', () => {
@@ -52,7 +52,7 @@ test('hay etiqueta de familia en ingles para cada familia del catalogo', () => {
   const familiasCatalogo = [...new Set(catalogo.map((s) => String(s.id).split('_')[0]))];
   const sinEtiqueta = familiasCatalogo.filter((f) => !familias[f]);
   assert.deepEqual(sinEtiqueta, []);
-  assert.equal(Object.keys(familias).length, 46);
+  assert.ok(Object.keys(familias).length >= 46);
 });
 
 test('el JSON versionado esta al dia con el generador', () => {

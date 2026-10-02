@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getSupabase } from '../utils/supabase';
 import { normalizeFriendCode } from '../utils/friendCode';
+import { leerRed, guardarRed } from '../utils/redAmigos';
 
 // Solicitudes y amistades del Radar. La base guarda una fila por relacion
 // (pending | accepted | rejected) con el codigo de cada lado, asi que se puede mostrar
@@ -15,6 +16,15 @@ export function useFriendRequests() {
   const [enviadas, setEnviadas] = useState([]);
   const [amigos, setAmigos] = useState([]);
   const [cargando, setCargando] = useState(true);
+  // "cargado" significa que una respuesta de la red ya llego. Sin esto la pagina respondia
+  // "no tienes amigos" a una pregunta que todavia nadie habia hecho.
+  const [cargado, setCargado] = useState(false);
+  // ¿Ya se sabe si hay sesion? Sin esto la pagina no distingue "todavia no se sabe" de "no
+  // hay sesion", y mientras la sesion se resolvia afirmaba que no tenias amigos.
+  const [sesionLista, setSesionLista] = useState(false);
+  // La lectura fallo y no hay nada guardado que mostrar. Decirlo es mas honesto que afirmar
+  // que no tienes a nadie.
+  const [fallo, setFallo] = useState(false);
 
   // El usuario sale de la sesion (anonima o con cuenta): asi la modal no necesita que
   // App le pase nada nuevo.
@@ -24,22 +34,28 @@ export function useFriendRequests() {
       try {
         const supabase = await getSupabase();
         if (!supabase) return;
-        const { data } = await supabase.auth.getUser();
-        if (vivo) setYo(data?.user || null);
+        // getSession() lee la sesion local. getUser() validaba el token contra el servidor
+        // en cada montaje y retrasaba la lista; aqui solo hace falta el id.
+        const { data } = await supabase.auth.getSession();
+        if (vivo) setYo(data?.session?.user || null);
       } catch (err) {
         console.warn('[amigos] sin sesion para solicitudes:', err);
       } finally {
+        if (vivo) setSesionLista(true);
         if (vivo) setCargando(false);
       }
     })();
     return () => { vivo = false; };
   }, []);
 
-  const cargar = useCallback(async () => {
-    if (!yo?.id) return;
+  const cargar = useCallback(async ({ silencioso = false } = {}) => {
+    // Sin sesion no hay nada que leer: si se sale sin bajar la bandera, el boton de
+    // actualizar queda deshabilitado para siempre.
+    if (!yo?.id) { setCargando(false); return; }
     const supabase = await getSupabase();
-    if (!supabase) return;
-    setCargando(true);
+    if (!supabase) { setCargando(false); return; }
+    // En silencio: la lista ya esta pintada desde la cache y no debe parpadear.
+    if (!silencioso) setCargando(true);
     try {
       const { data, error } = await supabase
         .from('friend_requests')
@@ -47,17 +63,41 @@ export function useFriendRequests() {
         .or(`from_user.eq.${yo.id},to_user.eq.${yo.id}`);
       if (error) throw error;
       const filas = data || [];
-      setRecibidas(filas.filter((f) => f.status === 'pending' && f.to_user === yo.id));
-      setEnviadas(filas.filter((f) => f.status === 'pending' && f.from_user === yo.id));
-      setAmigos(filas.filter((f) => f.status === 'accepted'));
+      const red = {
+        recibidas: filas.filter((f) => f.status === 'pending' && f.to_user === yo.id),
+        enviadas: filas.filter((f) => f.status === 'pending' && f.from_user === yo.id),
+        amigos: filas.filter((f) => f.status === 'accepted')
+      };
+      setRecibidas(red.recibidas);
+      setEnviadas(red.enviadas);
+      setAmigos(red.amigos);
+      // La cache solo se escribe con una respuesta buena: un fallo no borra lo que ya se sabia.
+      setCargado(true);
+      setFallo(false);
+      guardarRed(yo.id, red);
     } catch (err) {
       console.warn('[amigos] no se pudieron leer las solicitudes:', err);
+      setFallo(true);
     } finally {
       setCargando(false);
     }
   }, [yo]);
 
-  useEffect(() => { cargar(); }, [cargar]);
+  useEffect(() => {
+    if (!yo?.id) return;
+    // Salir de /amigos desmonta la pagina y se llevaba consigo toda la lista: si ya hay una
+    // lectura guardada, se pinta al instante y se revalida por detras.
+    const guardada = leerRed(yo.id);
+    if (guardada) {
+      setRecibidas(guardada.recibidas);
+      setEnviadas(guardada.enviadas);
+      setAmigos(guardada.amigos);
+      setCargado(true);
+      cargar({ silencioso: true });
+      return;
+    }
+    cargar();
+  }, [yo, cargar]);
 
   // Codigo -> dueño. Es el unico puente entre lo que la gente escribe y un uuid.
   const resolverCodigo = useCallback(async (codigo) => {
@@ -130,6 +170,5 @@ export function useFriendRequests() {
     fila.from_user === yo?.id ? fila.to_code : fila.from_code
   ), [yo]);
 
-  return { haySesion: Boolean(yo?.id), recibidas, enviadas, amigos, cargando, cargar, enviar, aceptar, rechazar, borrar, codigoDeAmigo };
+  return { haySesion: Boolean(yo?.id), sesionLista, fallo, recibidas, enviadas, amigos, cargando, cargado, cargar, enviar, aceptar, rechazar, borrar, codigoDeAmigo };
 }
-

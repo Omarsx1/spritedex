@@ -299,6 +299,7 @@ export function Navbar({
                     return (
                       <button
                         key={op.id}
+                        data-gen={op.id}
                         className={`app-navbar__gen-option ${activa ? 'selected' : ''}`}
                         style={{ '--gen-rgb': rgbDe(op.color) }}
                         onClick={() => { if (onGenChange) onGenChange(op.id); setIsNavMenuOpen(false); }}
@@ -327,7 +328,9 @@ export function Navbar({
                   aria-pressed={animationsEnabled}
                 >
                   <div className="action-btn-left">
-                    {animationsEnabled ? <Zap size={15} color="#00F0E8" /> : <ZapOff size={15} />}
+                    {/* El acento del icono sale de una variable para que la temporada lo
+                        pueda virar sin duplicar el icono ni tocar el comportamiento. */}
+                    {animationsEnabled ? <Zap size={15} color="var(--nav-accent, #00F0E8)" /> : <ZapOff size={15} />}
                     <span>{animationsEnabled ? t('nav.desactivarAnimaciones') : t('nav.activarAnimaciones')}</span>
                   </div>
                 </button>
@@ -341,7 +344,7 @@ export function Navbar({
                   }}
                 >
                   <div className="action-btn-left">
-                    <Smartphone size={15} color="#00F0E8" />
+                    <Smartphone size={15} color="var(--nav-accent, #00F0E8)" />
                     <span>{t('nav.instalar')}</span>
                   </div>
                 </button>

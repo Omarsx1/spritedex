@@ -6,6 +6,8 @@ import { Liquid } from 'liquid-gooey';
 import { allSprites as defaultAllSprites } from '../data/spritesData';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { t } from '../i18n';
+import { hasSeenFortnitemaresIntro, isFortnitemaresActive } from '../config/seasonalEvent';
+import { PumpkinIcon } from './icons/PumpkinIcon';
 
 export function Header({
   spritesPool,
@@ -30,25 +32,15 @@ export function Header({
     Math.floor(Math.random() * (spritePool.length || 1))
   );
 
-  // 3 orbiting satellite sprites (different from main)
-  const [orbitIndices, setOrbitIndices] = useState(() => {
-    const indices = [];
-    const used = new Set();
-    while (indices.length < 3 && indices.length < spritePool.length) {
-      const idx = Math.floor(Math.random() * spritePool.length);
-      if (!used.has(idx)) {
-        used.add(idx);
-        indices.push(idx);
-      }
-    }
-    return indices;
-  });
-
   const activeSpriteRef = useRef(null);
+  const showcaseRef = useRef(null);
+  const apparateTimerRef = useRef(null);
+  // Guardia contra swaps solapados: la rotacion periodica y el cambio de
+  // temporada no deben pisar la misma aparicion.
+  const apparatingRef = useRef(false);
   // Indice ya elegido para la proxima rotacion: se decide un tick antes para que su
   // miniatura tenga tiempo de cargar y el cambio no muestre un hueco.
   const upcomingSpriteRef = useRef(null);
-  const orbitContainerRef = useRef(null);
   const titleRef = useRef(null);
   const statsRef = useRef(null);
   const actionsRef = useRef(null);
@@ -57,11 +49,36 @@ export function Header({
   // Menú gooey de acciones (solo móvil): réplica 1:1 de libraries.dev/gooey
   const isMobile = useIsMobile(768);
   const [actionsOpen, setActionsOpen] = useState(false);
+  // En la primera visita la cinematica manda el cambio: el wordmark arranca
+  // normal y muta cuando la parte "title" difunda el cambio de temporada.
+  // Los visitantes que ya la vieron entran directamente tematicos.
+  const [isFortnitemares, setIsFortnitemares] = useState(
+    () => isFortnitemaresActive() && hasSeenFortnitemaresIntro()
+  );
+  const seasonRef = useRef(isFortnitemares);
+  // El intercambio de espiritus (swapSpirit) vive mas abajo y dispara la
+  // aparicion magica tambien cuando la temporada cambie en vivo.
+  const swapSpiritRef = useRef(() => {});
+
+  useEffect(() => {
+    const handleSeasonChange = (e) => {
+      const next = e?.detail?.active !== undefined ? Boolean(e.detail.active) : isFortnitemaresActive();
+      if (next !== seasonRef.current) {
+        seasonRef.current = next;
+        setIsFortnitemares(next);
+        // La marca no es lo unico que muta: el espiritu central se disuelve en
+        // humo y se rematerializa con la nueva temporada.
+        swapSpiritRef.current();
+      }
+    };
+    window.addEventListener('spritedex:season-change', handleSeasonChange);
+    return () => window.removeEventListener('spritedex:season-change', handleSeasonChange);
+  }, []);
 
   // Evita que el modo Ahorro de Batería de Android active prefers-reduced-motion
   // y apague la física líquida de liquid-gooey salvo que el usuario lo desactive en el menú
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
     const isMotionDisabled = () => document.documentElement.classList.contains('motion-disabled') || document.body?.classList.contains('motion-disabled');
     const origMatchMedia = window.matchMedia;
     window.matchMedia = function (query) {
@@ -79,6 +96,9 @@ export function Header({
         };
       }
       return origMatchMedia.call(window, query);
+    };
+    return () => {
+      window.matchMedia = origMatchMedia;
     };
   }, []);
 
@@ -179,69 +199,95 @@ export function Header({
     img.src = src;
   }, []);
 
-  // Precarga la miniatura del proximo sprite y la de los satelites actuales, para
-  // que el cambio de la rotacion no muestre un hueco.
+  // Precarga la miniatura del proximo sprite para que el cambio de la rotacion
+  // no muestre un hueco.
   useEffect(() => {
     if (spritePool.length === 0) return;
     const next = pickNextSpriteIndex(spriteIndex);
     upcomingSpriteRef.current = next;
     preloadThumb(spritePool[next]);
-    orbitIndices.forEach((idx) => preloadThumb(spritePool[idx]));
-  }, [spritePool, spriteIndex, orbitIndices, pickNextSpriteIndex, preloadThumb]);
+  }, [spritePool, spriteIndex, pickNextSpriteIndex, preloadThumb]);
+
+  // Intercambio del espiritu: se disuelve en humo y el siguiente se
+  // materializa. Lo disparan la rotacion periodica Y el cambio de temporada
+  // (la cinematica), para que la aparicion magica se vea al entrar a
+  // Fortnitemares.
+  const swapSpirit = useCallback(() => {
+    if (apparatingRef.current || document.hidden || !activeSpriteRef.current) return;
+    apparatingRef.current = true;
+
+    const showcase = showcaseRef.current;
+    if (showcase) {
+      showcase.classList.remove('is-arriving');
+      void showcase.offsetWidth;
+      showcase.classList.add('is-leaving');
+    }
+
+    // Salida estilo Animales Fantasticos: el espiritu se arremolina y se
+    // disuelve en humo.
+    gsap.to(activeSpriteRef.current, {
+      scale: 0.55,
+      opacity: 0,
+      rotation: 18,
+      filter: 'blur(10px)',
+      y: -6,
+      duration: 0.5,
+      ease: 'power2.in',
+      onComplete: () => {
+        setSpriteIndex((prev) => {
+          const planned = upcomingSpriteRef.current;
+          if (planned !== null && planned !== undefined && planned !== prev) {
+            upcomingSpriteRef.current = null;
+            return planned;
+          }
+          return pickNextSpriteIndex(prev);
+        });
+      }
+    });
+  }, [pickNextSpriteIndex]);
+
+  useEffect(() => {
+    swapSpiritRef.current = swapSpirit;
+  }, [swapSpirit]);
 
   // Rotate hero sprite with visibility and performance awareness
   useEffect(() => {
-    if (spritePool.length === 0) return;
+    if (spritePool.length === 0) return undefined;
 
     const intervalTime = window.innerWidth <= 600 ? 5500 : 3500;
     const interval = setInterval(() => {
-      if (document.hidden || !activeSpriteRef.current) return;
-
-      gsap.to(activeSpriteRef.current, {
-        scale: 0.7,
-        opacity: 0,
-        y: -20,
-        duration: 0.35,
-        ease: 'power2.in',
-        onComplete: () => {
-          setSpriteIndex((prev) => {
-            const planned = upcomingSpriteRef.current;
-            if (planned !== null && planned !== undefined && planned !== prev) {
-              upcomingSpriteRef.current = null;
-              return planned;
-            }
-            return pickNextSpriteIndex(prev);
-          });
-
-          // Also shuffle one random orbit sprite
-          setOrbitIndices((prev) => {
-            const copy = [...prev];
-            const slot = Math.floor(Math.random() * copy.length);
-            let next;
-            const allUsed = new Set([...copy, spriteIndex]);
-            do {
-              next = Math.floor(Math.random() * spritePool.length);
-            } while (allUsed.has(next) && spritePool.length > 4);
-            copy[slot] = next;
-            return copy;
-          });
-        }
-      });
+      if (document.hidden) return;
+      swapSpirit();
     }, intervalTime);
 
     return () => clearInterval(interval);
-  }, [spritePool, spriteIndex, pickNextSpriteIndex]);
+  }, [spritePool, swapSpirit]);
 
-  // GSAP animate in when spriteIndex changes
+  // GSAP apparition when spriteIndex changes: humo convergiendo en espiral y
+  // el espiritu condensando desde la borrosidad.
   useEffect(() => {
-    if (activeSpriteRef.current) {
-      gsap.fromTo(
-        activeSpriteRef.current,
-        { scale: 1.3, opacity: 0, y: 20 },
-        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: 'back.out(1.8)' }
-      );
+    if (!activeSpriteRef.current) return undefined;
+    const showcase = showcaseRef.current;
+    if (showcase) {
+      showcase.classList.remove('is-leaving');
+      void showcase.offsetWidth;
+      showcase.classList.add('is-arriving');
+      clearTimeout(apparateTimerRef.current);
+      apparateTimerRef.current = setTimeout(() => {
+        if (showcaseRef.current) showcaseRef.current.classList.remove('is-arriving');
+      }, 950);
     }
+    gsap.fromTo(
+      activeSpriteRef.current,
+      { scale: 0.66, opacity: 0, rotation: -14, filter: 'blur(12px)', y: 8 },
+      { scale: 1, opacity: 1, rotation: 0, filter: 'blur(0px)', y: 0, duration: 0.75, ease: 'power3.out' }
+    );
+    // La entrada ya arranco: la rotacion periodica puede volver a dispararse.
+    apparatingRef.current = false;
+    return undefined;
   }, [spriteIndex]);
+
+  useEffect(() => () => clearTimeout(apparateTimerRef.current), []);
 
   const handleImgError = useCallback((e) => {
     e.target.onerror = null;
@@ -253,20 +299,42 @@ export function Header({
       <div className="hero__content">
         {/* Title */}
         <div className="hero__title-block" ref={titleRef} style={{ position: 'relative', zIndex: 10 }}>
-          <h1 className="hero__title">
-            <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">FORTNITE</span>
-            <span className="hero__title-line hero__title-line--accent">SPRITEDEX</span>
+          <h1 className="hero__title" data-fnm-logo={isFortnitemares ? 'themed' : 'normal'}>
+            <span className="hero__title-line-wrap">
+              {/* Fantasmas RGB del wordmark: el mismo split rojo/cian del glitch
+                  de FORTNITE, pero enmascarando la silueta de Fortnitemares.
+                  El contenedor centra; los keyframes de glitch pueden entonces
+                  usar transform sin perder el centrado. */}
+              <span className="hero__title-fnm-ghosts" aria-hidden="true">
+                <span className="hero__title-fnm-ghost hero__title-fnm-ghost--r" />
+                <span className="hero__title-fnm-ghost hero__title-fnm-ghost--b" />
+              </span>
+              <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">
+                FORTNITE
+              </span>
+              <img
+                src="/fortnitemares.svg"
+                alt="FORTNITEMARES"
+                className="hero__title-fnm-svg"
+                aria-hidden={!isFortnitemares}
+              />
+            </span>
+            <span className={`hero__title-line hero__title-line--accent ${isFortnitemares ? 'hero__title-line--accent-fnm' : ''}`}>
+              SPRITEDEX
+            </span>
           </h1>
         </div>
 
-        {/* Central sprite showcase with orbiting satellites */}
+        {/* Central sprite showcase: solo el espiritu central, que aparece y
+            desaparece como en Animales Fantasticos (capa de humo + chispas) */}
         <div
           className="hero__showcase"
+          ref={showcaseRef}
           style={{
-            width: '180px',
-            height: '180px',
-            maxWidth: '180px',
-            maxHeight: '180px',
+            width: '216px',
+            height: '216px',
+            maxWidth: '216px',
+            maxHeight: '216px',
             position: 'relative',
             zIndex: 2,
             display: 'flex',
@@ -274,37 +342,19 @@ export function Header({
             justifyContent: 'center'
           }}
         >
-          <div className="hero__orbit-ring" ref={orbitContainerRef}>
-            {orbitIndices.map((idx, i) => {
-              const sprite = spritePool[idx];
-              if (!sprite) return null;
-              return (
-                <div key={`orbit-${i}`} className={`hero__satellite hero__satellite--${i}`}>
-                  <img
-                    src={sprite.thumb || sprite.image}
-                    alt={sprite.fullName}
-                    className="hero__satellite-img"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      maxWidth: '40px',
-                      maxHeight: '40px',
-                      objectFit: 'contain'
-                    }}
-                    onError={handleImgError}
-                  />
-                </div>
-              );
-            })}
+          <div className="hero__apparate" aria-hidden="true">
+            <span className="hero__smoke hero__smoke--1" />
+            <span className="hero__smoke hero__smoke--2" />
+            <span className="hero__smoke hero__smoke--3" />
           </div>
           <div
             className="hero__hero-sprite"
             ref={activeSpriteRef}
             style={{
-              width: '120px',
-              height: '120px',
-              maxWidth: '120px',
-              maxHeight: '120px',
+              width: '152px',
+              height: '152px',
+              maxWidth: '152px',
+              maxHeight: '152px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -321,8 +371,8 @@ export function Header({
                 style={{
                   width: '100%',
                   height: '100%',
-                  maxWidth: '120px',
-                  maxHeight: '120px',
+                  maxWidth: '152px',
+                  maxHeight: '152px',
                   objectFit: 'contain',
                   display: 'block'
                 }}
@@ -409,91 +459,163 @@ export function Header({
 
       {isMobile && typeof document !== 'undefined' && createPortal(
         <div className="hero__dock" ref={dockRef}>
-          <Liquid
-            blur={7}
-            contrast={19}
-            fill="#0c152d"
-            filterPadding={80}
-            shadow="0 4px 18px rgba(0, 0, 0, 0.55), 0 0 12px rgba(0, 240, 232, 0.18)"
-            className={`pm ${actionsOpen ? 'pm-open' : ''}`}
-          >
-            <Liquid.Item
-              className="pm-slot"
-              x={actionsOpen ? -56 : 0}
-              y={actionsOpen ? -34 : 0}
-              transition={gooeyTransition}
-              delay={0}
-            >
-              <button
-                type="button"
-                className="pm-btn pm-sat"
-                aria-label={t('header.radarAmigos')}
-                tabIndex={actionsOpen ? 0 : -1}
-                onClick={() => {
-                  toggleActions();
-                  onOpenCompareModal();
+          {isFortnitemares ? (
+            <div className={`fnm-dock ${actionsOpen ? 'is-open' : ''}`}>
+              {/* Satélite Amigos */}
+              <div
+                className={`fnm-sat fnm-sat--friends ${actionsOpen ? 'is-visible' : ''}`}
+                style={{
+                  transform: actionsOpen ? 'translate(-56px, -34px) scale(1)' : 'translate(0, 0) scale(0.3)',
+                  opacity: actionsOpen ? 1 : 0,
+                  pointerEvents: actionsOpen ? 'auto' : 'none',
+                  transition: 'transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 200ms ease'
                 }}
               >
-                <span
-                  className="pm-sat-icon"
-                  style={{
-                    transitionDelay: actionsOpen ? '110ms' : '0ms'
+                <button
+                  type="button"
+                  className="fnm-sat-btn"
+                  aria-label={t('header.radarAmigos')}
+                  tabIndex={actionsOpen ? 0 : -1}
+                  onClick={() => {
+                    toggleActions();
+                    onOpenCompareModal();
                   }}
                 >
                   <Users size={19} strokeWidth={2.2} />
-                </span>
-              </button>
-            </Liquid.Item>
+                </button>
+              </div>
 
-            <Liquid.Item
-              className="pm-slot"
-              x={0}
-              y={actionsOpen ? -66 : 0}
-              transition={gooeyTransition}
-              delay={actionsOpen ? 35 : 0}
-            >
-              <button
-                type="button"
-                className="pm-btn pm-sat"
-                aria-label={t('header.compartirImagen')}
-                tabIndex={actionsOpen ? 0 : -1}
-                onClick={() => {
-                  toggleActions();
-                  onOpenShareModal();
-                }}
-                onMouseEnter={() => {
-                  import('../components/ShareImageModal');
-                }}
-                onTouchStart={() => {
-                  import('../components/ShareImageModal');
+              {/* Satélite Compartir */}
+              <div
+                className={`fnm-sat fnm-sat--share ${actionsOpen ? 'is-visible' : ''}`}
+                style={{
+                  transform: actionsOpen ? 'translate(0px, -66px) scale(1)' : 'translate(0, 0) scale(0.3)',
+                  opacity: actionsOpen ? 1 : 0,
+                  pointerEvents: actionsOpen ? 'auto' : 'none',
+                  transition: 'transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1) 30ms, opacity 200ms ease'
                 }}
               >
-                <span
-                  className="pm-sat-icon"
-                  style={{
-                    transitionDelay: actionsOpen ? '150ms' : '0ms'
+                <button
+                  type="button"
+                  className="fnm-sat-btn"
+                  aria-label={t('header.compartirImagen')}
+                  tabIndex={actionsOpen ? 0 : -1}
+                  onClick={() => {
+                    toggleActions();
+                    onOpenShareModal();
+                  }}
+                  onMouseEnter={() => {
+                    import('../components/ShareImageModal');
+                  }}
+                  onTouchStart={() => {
+                    import('../components/ShareImageModal');
                   }}
                 >
                   <Share2 size={19} strokeWidth={2.2} />
-                </span>
-              </button>
-            </Liquid.Item>
+                </button>
+              </div>
 
-            <Liquid.Item className="pm-slot">
+              {/* Botón Principal: Solo la calabaza, SIN fondo alguno */}
               <button
                 type="button"
-                className="pm-btn pm-main"
+                className="fnm-pumpkin-btn"
                 aria-expanded={actionsOpen}
                 aria-label={actionsOpen ? t('header.cerrarAcciones') : t('header.abrirAcciones')}
                 onClick={toggleActions}
               >
-                <span className="pm-main-icon-wrap">
-                  <Gamepad2 size={22} strokeWidth={2.2} className={`pm-icon-pad ${actionsOpen ? 'is-hidden' : ''}`} />
-                  <X size={20} strokeWidth={2.4} className={`pm-icon-close ${actionsOpen ? 'is-visible' : ''}`} />
-                </span>
+                <PumpkinIcon
+                  size={50}
+                  className={`fnm-pumpkin-svg ${actionsOpen ? 'is-open' : ''}`}
+                />
               </button>
-            </Liquid.Item>
-          </Liquid>
+            </div>
+          ) : (
+            <Liquid
+              blur={7}
+              contrast={19}
+              fill="#0c152d"
+              filterPadding={80}
+              shadow="0 4px 18px rgba(0, 0, 0, 0.55), 0 0 12px rgba(0, 240, 232, 0.18)"
+              className={`pm ${actionsOpen ? 'pm-open' : ''}`}
+            >
+              <Liquid.Item
+                className="pm-slot"
+                x={actionsOpen ? -56 : 0}
+                y={actionsOpen ? -34 : 0}
+                transition={gooeyTransition}
+                delay={0}
+              >
+                <button
+                  type="button"
+                  className="pm-btn pm-sat"
+                  aria-label={t('header.radarAmigos')}
+                  tabIndex={actionsOpen ? 0 : -1}
+                  onClick={() => {
+                    toggleActions();
+                    onOpenCompareModal();
+                  }}
+                >
+                  <span
+                    className="pm-sat-icon"
+                    style={{
+                      transitionDelay: actionsOpen ? '110ms' : '0ms'
+                    }}
+                  >
+                    <Users size={19} strokeWidth={2.2} />
+                  </span>
+                </button>
+              </Liquid.Item>
+
+              <Liquid.Item
+                className="pm-slot"
+                x={0}
+                y={actionsOpen ? -66 : 0}
+                transition={gooeyTransition}
+                delay={actionsOpen ? 35 : 0}
+              >
+                <button
+                  type="button"
+                  className="pm-btn pm-sat"
+                  aria-label={t('header.compartirImagen')}
+                  tabIndex={actionsOpen ? 0 : -1}
+                  onClick={() => {
+                    toggleActions();
+                    onOpenShareModal();
+                  }}
+                  onMouseEnter={() => {
+                    import('../components/ShareImageModal');
+                  }}
+                  onTouchStart={() => {
+                    import('../components/ShareImageModal');
+                  }}
+                >
+                  <span
+                    className="pm-sat-icon"
+                    style={{
+                      transitionDelay: actionsOpen ? '150ms' : '0ms'
+                    }}
+                  >
+                    <Share2 size={19} strokeWidth={2.2} />
+                  </span>
+                </button>
+              </Liquid.Item>
+
+              <Liquid.Item className="pm-slot">
+                <button
+                  type="button"
+                  className="pm-btn pm-main"
+                  aria-expanded={actionsOpen}
+                  aria-label={actionsOpen ? t('header.cerrarAcciones') : t('header.abrirAcciones')}
+                  onClick={toggleActions}
+                >
+                  <span className="pm-main-icon-wrap">
+                    <Gamepad2 size={22} strokeWidth={2.2} className={`pm-icon-pad ${actionsOpen ? 'is-hidden' : ''}`} />
+                    <X size={20} strokeWidth={2.4} className={`pm-icon-close ${actionsOpen ? 'is-visible' : ''}`} />
+                  </span>
+                </button>
+              </Liquid.Item>
+            </Liquid>
+          )}
         </div>,
         document.body
       )}

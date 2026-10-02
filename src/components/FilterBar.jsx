@@ -4,6 +4,7 @@ import { THEMES_LIST, ALL_SPRITES, pickFamilyName, pickThemeName } from '../data
 import { t } from '../i18n';
 import { MobileLiquidFilterBar } from './MobileLiquidFilterBar';
 import { safeStorage } from '../utils/safeStorage';
+import { contarNovedades, claveAvisoNovedades } from '../utils/novedadesAviso';
 
 const VARIANT_COLORS = {
   Basic:       { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' },
@@ -48,13 +49,15 @@ export function FilterBar({
 
   // Compute number of active new spirits
   const newSpiritsCount = useMemo(() => {
-    return ALL_SPRITES.filter(s => s.isNew && !s.unreleased).length;
+    return contarNovedades(ALL_SPRITES);
   }, []);
 
-  const NEW_SPIRITS_COACHMARK_KEY = 'spritedex_seen_new_drop_2026_09_26_birthday';
+  /* La clave del aviso sale del drop mas reciente: cada tanda de espiritus
+     nuevos vuelve a avisar una vez por navegador. */
+  const claveNovedades = useMemo(() => claveAvisoNovedades(ALL_SPRITES), []);
 
   const [showNewTooltip, setShowNewTooltip] = useState(() => {
-    if (safeStorage.getItem(NEW_SPIRITS_COACHMARK_KEY)) return false;
+    if (safeStorage.getItem(claveNovedades)) return false;
     return newSpiritsCount > 0;
   });
   const [isDismissing, setIsDismissing] = useState(false);
@@ -62,7 +65,7 @@ export function FilterBar({
   useEffect(() => {
     if (statusFilter === 'new') {
       setShowNewTooltip(false);
-      safeStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
+      safeStorage.setItem(claveNovedades, 'true');
     }
   }, [statusFilter]);
 
@@ -72,7 +75,7 @@ export function FilterBar({
     setTimeout(() => {
       setShowNewTooltip(false);
     }, 220);
-    safeStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
+    safeStorage.setItem(claveNovedades, 'true');
   };
 
   const handleDismissTooltip = (e) => {
@@ -81,7 +84,7 @@ export function FilterBar({
     setTimeout(() => {
       setShowNewTooltip(false);
     }, 220);
-    safeStorage.setItem(NEW_SPIRITS_COACHMARK_KEY, 'true');
+    safeStorage.setItem(claveNovedades, 'true');
   };
 
   // Compute available families scoped to activeGen and showUnreleased
