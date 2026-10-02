@@ -9644,3 +9644,15 @@ body .swal2-container .swal2-toast.swal2-popup {
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45) !important;
 }
+
+/* El vampiro pide un poco mas que la calabaza: su cabeza esta todavia mas baja y 6px no
+   bastaban. Va al final del archivo a proposito, para ganarle a cualquier regla anterior
+   con la misma especificidad. */
+.sprite-card[data-familia="vampire"] .card-image__crown {
+  top: -6px;
+}
+
+.ms-spotlight-card[data-familia="vampire"] .ms-card__crown {
+  top: 10px;
+}
+
