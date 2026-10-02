@@ -306,6 +306,7 @@ function FamilySpotlightRow({
       <div
         key={sprite.id}
         className={`ms-spotlight-card ${isActive ? 'is-active' : 'is-inactive'} sprite-card ${isOwned ? 'is-owned' : ''} ${isMastered ? ('is-mastered ' + (sprite.gen === 2 ? 'is-glitch-mastered' : 'is-classic-mastered')) : ''}`}
+        data-familia={String(sprite?.id || '').split('_')[0]}
         style={{
           width: `${cardWidth}px`,
           height: `${CARD_HEIGHT}px`,

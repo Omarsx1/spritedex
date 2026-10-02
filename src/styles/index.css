@@ -3573,6 +3573,17 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   pointer-events: none !important;
 }
 
+/* Crown lift for `spookydash` ("Impulso aterrador") and `vampire` ("Vampiro") only:
+   el arte de estos dos tiene la cabeza más baja y la corona queda apoyada en el cráneo.
+   Se sube 6px por vista; tamaño, sombra, rotación y desplazamiento quedan intactos. */
+.sprite-card:is([data-familia="spookydash"], [data-familia="vampire"]) .card-image__crown {
+  top: -2px; /* base top: 4px - 6px */
+}
+
+.ms-spotlight-card:is([data-familia="spookydash"], [data-familia="vampire"]) .ms-card__crown {
+  top: 14px; /* base top: 20px - 6px; conserva translateX(-10%) rotate(8deg) */
+}
+
 /* Fallback CSS ::before pseudo elements */
 .sprite-card.is-mastered .card-image:not(:has(.card-image__crown))::before {
   content: "";
@@ -9633,4 +9644,3 @@ body .swal2-container .swal2-toast.swal2-popup {
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45) !important;
 }
-

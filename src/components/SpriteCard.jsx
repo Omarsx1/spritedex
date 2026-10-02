@@ -194,6 +194,7 @@ function SpriteCardBase({
   return (
     <div
       className={`sprite-card ${isOwned ? 'is-owned' : ''} ${isMastered ? ('is-mastered ' + (sprite.gen === 2 ? 'is-glitch-mastered' : 'is-classic-mastered')) : ''}`}
+      data-familia={String(sprite?.id || '').split('_')[0]}
       style={{
         background: styleInfo.background,
         borderColor: styleInfo.borderColor,
