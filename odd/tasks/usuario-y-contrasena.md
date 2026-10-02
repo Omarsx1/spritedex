@@ -97,6 +97,7 @@ Checks on the final bytes (2026-10-02, `codex/usuario-y-contrasena`):
 Work units: `8242f55` (credential: module, tests, AuthModal, locales; +583/-119),
 `4f9da8f` (progressive claim: banner, App, Navbar, CSS; +229/-11) and `96d8100` (the RPC
 migration and this document; +137).
+`35e9943` — the password warning in the creation form and the menu entry renamed to\n"Sign in or create account" (copy and one hint; no logic changes).
 
 Independent verifier: one read-only verifier returned CONFIRMED WITH RESERVATIONS and found
 two real defects, both corrected before the commits were made:
