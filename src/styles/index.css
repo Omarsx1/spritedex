@@ -4731,6 +4731,35 @@ body:has(.modal-overlay) {
   color: rgba(255, 255, 255, 0.7);
 }
 
+/* El ojo, DENTRO de la casilla de contrasena: ese rincon queda libre porque el campo
+   reserva el hueco con padding-right. */
+.auth-modal__input--ojo {
+  padding-right: 44px;
+}
+
+.auth-modal__ojo {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.auth-modal__ojo:hover {
+  color: rgba(255, 255, 255, 0.75);
+}
+
 
 /* ===== Sprite Detail Modal (SDM) ===== */
 .sdm {
@@ -8817,6 +8846,13 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
 /* ==========================================================================
    BOTÓN FLOTANTE MÓVIL: CALABAZA PURA (SIN FONDO)
    ========================================================================== */
+/* La calabaza cede su esquina mientras el cartel de instalar esta en pantalla: los dos
+   viven abajo a la derecha y el cartel la tapaba a medias. */
+body[data-instalar='on'] .fnm-pumpkin-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .fnm-dock {
   position: relative;
   width: 140px;

@@ -98,6 +98,7 @@ Work units: `8242f55` (credential: module, tests, AuthModal, locales; +583/-119)
 `4f9da8f` (progressive claim: banner, App, Navbar, CSS; +229/-11) and `96d8100` (the RPC
 migration and this document; +137).
 `35e9943` — the password warning in the creation form and the menu entry renamed to\n"Sign in or create account" (copy and one hint; no logic changes).
+Post-verification UI pass, after the user reviewed real screenshots: the check icon was\ndropped from the cloud-status card, the password reveal became an eye inside the field instead of\na text button, and the seasonal pumpkin now steps aside while the install banner is on screen\n(they shared the bottom-right corner).
 
 Independent verifier: one read-only verifier returned CONFIRMED WITH RESERVATIONS and found
 two real defects, both corrected before the commits were made:

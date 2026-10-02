@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal } from './ui/Modal';
 import { Google } from './ui/Google';
 import { conGoogle, origenActual } from '../utils/authActions';
-import { X, Cloud, LogIn, LogOut, CheckCircle, Mail, Key, ShieldCheck, User } from 'lucide-react';
+import { X, Cloud, LogIn, LogOut, Mail, Key, ShieldCheck, User, Eye, EyeOff } from 'lucide-react';
 import { getSupabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from '../utils/supabase';
 import { trackEvent } from '../utils/telemetry';
 import { t } from '../i18n';
@@ -339,16 +339,20 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete={esReclamo || isSignUp ? 'new-password' : 'current-password'}
-          className="auth-modal__input"
+          className="auth-modal__input auth-modal__input--ojo"
         />
+        {/* El ojo vive DENTRO de la casilla: el boton de texto de antes empujaba el
+            formulario hacia abajo y se leia como un paso mas del registro. */}
+        <button
+          type="button"
+          onClick={() => setVerContrasena(!verContrasena)}
+          className="auth-modal__ojo"
+          aria-label={verContrasena ? t('auth.ocultarContrasena') : t('auth.mostrarContrasena')}
+          title={verContrasena ? t('auth.ocultarContrasena') : t('auth.mostrarContrasena')}
+        >
+          {verContrasena ? <EyeOff size={16} /> : <Eye size={16} />}
+        </button>
       </div>
-      <button
-        type="button"
-        onClick={() => setVerContrasena(!verContrasena)}
-        className="auth-modal__toggle"
-      >
-        {verContrasena ? t('auth.ocultarContrasena') : t('auth.mostrarContrasena')}
-      </button>
 
       {ayudaContrasena && <p className="auth-modal__link-desc">{ayudaContrasena}</p>}
 
@@ -479,7 +483,6 @@ export function AuthModal({ user, onClose, onAuthSuccess, onSignOut }) {
         {user ? (
           <div className="auth-modal__body">
             <div className="auth-modal__status-card">
-              <CheckCircle size={24} color="#10b981" className="auth-modal__status-icon" />
               <div className="auth-modal__status-title">{t('auth.sincronizadoNube')}</div>
               <div className="auth-modal__status-text">
                 {esReclamo ? t('auth.accesoRapidoConectado') : t('auth.cambioAutomatico')}
