@@ -6,7 +6,7 @@ import { sounds } from '../utils/audio';
 import gsap from 'gsap';
 import { Modal } from './ui/Modal';
 
-export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel, onClose }) {
+export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel, readOnly = false, onClose }) {
   const [activeSprite, setActiveSprite] = useState(sprite);
   const modalRef = useRef(null);
   const headerRef = useRef(null);
@@ -230,13 +230,13 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                 {/* Status pill */}
                 <div
                   className="sdm__variant-status"
-                  onClick={(e) => {
+                  onClick={readOnly ? undefined : (e) => {
                     e.stopPropagation();
                     if (v.unreleased) return;
                     onToggleOwned(v.id);
                     sounds.playToggle(!vOwned, v.gen);
                   }}
-                  style={{ cursor: v.unreleased ? 'not-allowed' : 'pointer' }}
+                  style={{ cursor: readOnly ? 'default' : (v.unreleased ? 'not-allowed' : 'pointer') }}
                 >
                   <span className={`sdm__pill ${v.unreleased ? 'sdm__pill--unreleased' : vMastered ? 'sdm__pill--gold' : vOwned ? 'sdm__pill--green' : ''}`}>
                     {v.unreleased ? t('detalle.noLanzadoCandado') : vMastered ? '⭐ MAX' : vOwned ? t('detalle.atrapado') : t('detalle.faltante')}
@@ -244,7 +244,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                 </div>
 
                 {/* Level selectors */}
-                {vOwned && !v.unreleased && (
+                {vOwned && !v.unreleased && !readOnly && (
                   <div className="sdm__variant-levels">
                     {[1, 2, 3, 4, 5].map((lvl) => (
                       <button

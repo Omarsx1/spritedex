@@ -58,6 +58,9 @@ pending and would strand every anonymous identity permanently once a redirect ex
 
 ## Supabase dashboard settings (admin action, not code)
 - **Confirm email: OFF.** Mandatory: with the synthetic domain a confirmation step would leave the
+  It cannot be turned back on while the username is the credential: the synthetic address cannot
+  receive mail, so every new signup would wait forever. Re-enabling it would mean asking for a real
+  email at signup and giving up username login. Existing accounts are unaffected either way.
   user stuck (undeliverable address) and the conversion would never complete. Accepted
   consequence: `signUp` hands a live session to ANY address, so someone could pre-register a real
   person's address before its owner does. That is a pre-registration vector, not merely a "login
@@ -66,14 +69,17 @@ pending and would strand every anonymous identity permanently once a redirect ex
 - Keep the existing rate limits on signups.
 
 ## Password reset playbook (v1, manual)
-1. The user writes in and says which username they lost access to and which contact email they
-   registered (if any).
-2. In Supabase, Authentication, look up `<usuario>@spritedex.gg` and confirm
-   `raw_user_meta_data.email_contacto` matches what they gave.
-3. Only if it matches, send a password reset to that contact address from the Auth UI (or set a
-   temporary one and force a change). Never reset on the strength of the username alone.
-4. Record the action in this document. The UI must never promise an automatic reset, because there
-   is no email sender.
+1. The user writes in with the username they lost access to and the contact email they
+   registered, if any.
+2. In Supabase, Authentication, look up `<usuario>@spritedex.gg` and check that
+   `raw_user_meta_data.email_contacto` matches the address they gave. A match only proves they
+   know the address, and knowing an address is not a secret.
+3. Require **proof of possession**: the person must write back **from** that address before the
+   account is returned. Knowledge of the username and the address is never enough, and no reset
+   is granted on the username alone.
+4. Only then set a temporary password from the Auth UI and force a change on the next sign-in.
+   The UI must never promise an automatic reset: there is no email sender.
+5. Record the reset here, with the date and the address that proved possession.
 
 ## Domain gate (repeat before every domain move)
 Do not enable the redirect to spritedex.gg while this returns rows:
@@ -126,7 +132,8 @@ sprite count did not change.
 - No backend, no email sender, no custom domain in this version.
 - Google and real email stay available as secondary paths; the seven existing accounts are not
   touched.
-- Claim threshold: 5 sprites marked, or the first visit to /amigos while anonymous.
+- Claim threshold: 30 sprites marked, or the first visit to /amigos while anonymous. It started at
+  5 and was raised after the first real test, where the notice arrived too early to be welcome.
 - The availability hint only appears when there is no session (after signing out), because in
   production the guest session always exists.
 - When the browser blocks localStorage, the once-per-browser modal degrades to once-per-visit.

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useDeferredValue, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useDeferredValue, useRef, lazy, Suspense } from 'react';
 import { VARIANT_ORDER, FAMILY_NAMES_MAP, pickFamilyName } from './data/spritesData';
 import { t } from './i18n';
 
@@ -45,6 +45,8 @@ import {
 import { getLang, conIdioma, rutaSinIdioma } from './i18n';
 import { codigoFichaEnRuta } from './utils/visitaEnlace';
 import { codigoNormalizado } from './utils/fichaAmigo';
+import { isDeadSessionError } from './utils/deadSession';
+import { useFriendRequests } from './hooks/useFriendRequests';
 
 // Carga diferida (code splitting) para modales secundarios y suite administrativa
 // El precalculo de la captura no arranca antes de este margen desde que se abre la app,
@@ -78,6 +80,10 @@ const AVISO_RECLAMO_RETRASO_MS = 2000;
 export function App() {
   const isMobile = useIsMobile(600);
   const { sprites: dynamicSprites, refreshDynamicSprites } = useDynamicSprites();
+  // Lector unico de la red de amigos para el badge del header: la pagina de Amigos y el
+  // modal siguen con su propia instancia, asi que esto no altera su comportamiento.
+  const { recibidas: solicitudesRecibidas } = useFriendRequests();
+  const solicitudesNuevas = solicitudesRecibidas.length;
 
   // Detección de ruta secreta /portal-override /studio-override o ?studio=true
   const [isAdminPortal, setIsAdminPortal] = useState(() => {
@@ -197,6 +203,11 @@ export function App() {
   // Supabase Auth & Cloud Sync State
   const [user, setUser] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  // Identidades cuya sesion ya se reinicio en esta pestaña. Si el mismo error vuelve a
+  // llegar (el reintento del debounce, o dos sincronizaciones a la vez), no se cierra
+  // sesion otra vez ni se encadenan identidades nuevas sin parar.
+  const deadSessionHandled = useRef(new Set());
 
   // Filters matching fortnite.gg
   const [activeGen, setActiveGen] = useState(2); // 2 = 2ª Generación (GLITCH) by default!
@@ -411,7 +422,9 @@ export function App() {
     if (error) alert(error.message);
   };
 
-  const handleSignOutCleanup = () => {
+  // Estable mientras no cambie el progreso: el efecto de sincronizacion lo usa para la
+  // sesion muerta, y una identidad nueva por render reiniciaria ese efecto sin motivo.
+  const handleSignOutCleanup = useCallback(() => {
     // Antes de limpiar, guardar la copia de recuperacion: es lo unico que le queda a
     // un usuario anonimo despues de cerrar sesion.
     try {
@@ -423,7 +436,7 @@ export function App() {
     }
     setUserState({});
     safeStorage.removeItem(LOCAL_STORAGE_KEY);
-  };
+  }, [userState]);
 
   // Restaura la copia recuperable cuando no hay progreso local y la sesion es de
   // invitado (o no hay sesion). Nunca pisa el progreso de una cuenta con sesion
@@ -515,7 +528,28 @@ export function App() {
             updated_at: new Date().toISOString()
           };
           queueCloudSync(payload);
-          await supabase.from('user_collections').upsert(payload, { onConflict: 'user_id' });
+          const { error: syncError } = await supabase
+            .from('user_collections')
+            .upsert(payload, { onConflict: 'user_id' });
+
+          // Identidad borrada en Supabase (clave foranea contra auth.users) o token ya
+          // rechazado: la sesion guardada en el navegador apunta a alguien que ya no
+          // existe, asi que cada guardado falla en silencio y el usuario pierde lo que
+          // marco en esa ventana. Reaccionar en el acto: guardar la copia de recuperacion
+          // (handleSignOutCleanup, que es lo unico que le queda) y cerrar la sesion, para
+          // que el arranque cree una identidad nueva y la restauracion devuelva sus
+          // marcados. Una sola vez por identidad caida.
+          if (isDeadSessionError(syncError) && !deadSessionHandled.current.has(user.id)) {
+            deadSessionHandled.current.add(user.id);
+            console.info('[amigos] la identidad ya no existe; se reinicia la sesion');
+            // Cerrar la sesion es best-effort: si la red falla, no debe retrasar ni
+            // impedir la copia de recuperacion.
+            Promise.resolve(supabase.auth.signOut()).catch(() => {});
+            handleSignOutCleanup();
+            clearCloudSync();
+            return;
+          }
+
           clearCloudSync();
         } catch (err) {
           console.error('Failed to sync to Supabase:', err);
@@ -523,7 +557,7 @@ export function App() {
       }, 600);
       return () => clearTimeout(timer);
     }
-  }, [userState, user, myFriendCode, showShareModal]);
+  }, [userState, user, myFriendCode, showShareModal, handleSignOutCleanup]);
 
   // Salida garantizada: si la pestaña se cierra o pasa a segundo plano con un sync
   // pendiente, se empuja con keepalive en vez de esperar el debounce de 600 ms.
@@ -848,7 +882,9 @@ useEffect(() => {
     () => Object.keys(userState || {}).filter((k) => k !== '_profile' && userState[k]?.owned).length,
     [userState]
   );
-  const mostrarAvisoReclamo = Boolean(user?.is_anonymous) && marcadosPropios >= 5;
+  // A los 30, no a los 5: el aviso llega cuando de verdad hay una coleccion que perder, y
+  // antes de eso solo molesta a quien esta probando la app.
+  const mostrarAvisoReclamo = Boolean(user?.is_anonymous) && marcadosPropios >= 30;
 
   // Una sola vez por navegador: cuando se cumple la condicion y no hay otro modal encima,
   // abre la modal de autenticacion con retraso, ya fuera del primer pintado. El marcador se
@@ -1005,6 +1041,7 @@ useEffect(() => {
         user={user}
         isLiveConnected={isLiveConnected}
         connectedFriendCode={connectedFriendCode}
+        solicitudesNuevas={solicitudesNuevas}
         onOpenShareModal={() => setShowShareModal(true)}
         onOpenBackupModal={() => setShowBackupModal(true)}
         onOpenCompareModal={() => irA('/amigos')}
@@ -1137,6 +1174,7 @@ useEffect(() => {
           userState={userState}
           onToggleOwned={handleToggleOwned}
           onSetLevel={handleSetLevel}
+          readOnly={activeProfile === 'friend'}
           onClose={handleCloseDetail}
         />
       )}

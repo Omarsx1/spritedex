@@ -3573,6 +3573,17 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   pointer-events: none !important;
 }
 
+/* Crown lift for `spookydash` ("Impulso aterrador") and `vampire` ("Vampiro") only:
+   el arte de estos dos tiene la cabeza más baja y la corona queda apoyada en el cráneo.
+   Se sube 6px por vista; tamaño, sombra, rotación y desplazamiento quedan intactos. */
+.sprite-card:is([data-familia="spookydash"], [data-familia="vampire"]) .card-image__crown {
+  top: -2px; /* base top: 4px - 6px */
+}
+
+.ms-spotlight-card:is([data-familia="spookydash"], [data-familia="vampire"]) .ms-card__crown {
+  top: 14px; /* base top: 20px - 6px; conserva translateX(-10%) rotate(8deg) */
+}
+
 /* Fallback CSS ::before pseudo elements */
 .sprite-card.is-mastered .card-image:not(:has(.card-image__crown))::before {
   content: "";
@@ -3878,6 +3889,15 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .card-owned-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
+}
+/* La vista de amigo es solo lectura: mismo aspecto, pero sin senal de click. */
+.card-owned-btn.is-readonly,
+.owned-btn-sm.is-readonly {
+  cursor: default;
+}
+.card-owned-btn.is-readonly:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .card-owned-btn.owned {
@@ -4343,7 +4363,9 @@ body:has(.modal-overlay) {
 /* ===== AUTH MODAL — Glassmorphic (navbar-consistent) ===== */
 .auth-modal__content {
   max-width: 400px;
-  background: rgba(12, 14, 22, 0.8);
+  /* Casi opaca: esta ventana es la superficie de lectura. Con 0.8 las cartas de detras se
+     leian a traves del texto y la vista se volvia ilegible. */
+  background: rgba(12, 14, 22, 0.97);
   backdrop-filter: blur(32px) saturate(1.8);
   -webkit-backdrop-filter: blur(32px) saturate(1.8);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -4457,7 +4479,8 @@ body:has(.modal-overlay) {
 
 .auth-modal__link-desc {
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.35);
+  /* 0.35 sobre este fondo oscuro no se leia: la ventana es para leer, no un adorno. */
+  color: rgba(255, 255, 255, 0.62);
   line-height: 1.5;
   margin-bottom: 14px;
 }
@@ -4722,7 +4745,7 @@ body:has(.modal-overlay) {
 .auth-modal__toggle {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.55);
   font-size: 0.74rem;
   font-weight: 600;
   cursor: pointer;
@@ -4737,7 +4760,7 @@ body:has(.modal-overlay) {
    ni con la accion principal ni con el enlace de entrar. */
 .auth-modal__toggle--tenue {
   font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.45);
   letter-spacing: 0.02em;
 }
 
@@ -5757,19 +5780,43 @@ body:has(.modal-overlay) {
   }
 }
 
-/* Indicador de conexión de amigo en vivo en Hero */
-.hero__live-indicator {
+/* Badge de solicitudes pendientes. Estatico a proposito: sin animacion, sin transicion
+   y sin will-change, porque la app prioriza fluidez y esto es solo un dato. Va sobre el
+   boton de Amigos de escritorio y sobre el FAB (calabaza o mando) en movil, que es el
+   unico acceso visible a Amigos mientras el anillo de satelites esta cerrado. */
+.solicitudes-badge {
   position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
-  border: 1.5px solid #060714;
-  animation: pulseGlow 2s infinite ease-in-out;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #ef4444;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 17px;
+  text-align: center;
+  pointer-events: none;
+  z-index: 2;
 }
+
+/* Cada badge cuelga del boton (no del icono) y asoma la mitad: para eso el boton tiene
+   que ser el bloque contenedor. Ninguno de los que llevan badge recorta con overflow. */
+.fnm-sat-btn { position: relative; }
+
+/* Boton de escritorio: el badge cuelga del envoltorio, pegado a la esquina del boton,
+   mitad dentro y mitad fuera. Dentro no puede ir: .hero__btn recorta con overflow. */
+.hero__btn-wrap { position: relative; display: inline-flex; }
+.solicitudes-badge--pill { top: -8px; right: -8px; }
+
+/* Botones redondos de 44px (satelites y FAB del mando): el centro del badge cae sobre
+   el borde del circulo, que es lo que se lee como mitad dentro y mitad fuera. */
+.solicitudes-badge--round { top: -2px; right: -2px; }
+
+/* Calabaza: el arte mide 50px dentro de un boton de 72px, asi que el borde visible no es
+   el del boton. Estos 10px ponen el centro del badge sobre el borde del arte. */
+.solicitudes-badge--fab { top: 10px; right: 10px; }
 
 /* Barra flotante sutil cuando se explora la colección de un amigo */
 .sdm-friend-pill {
@@ -8333,10 +8380,16 @@ body:has(.modal-overlay) {
   display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px;
   padding: 7px 5px; border-radius: 12px;
   background: rgba(255, 255, 255, 0.045); border: 1px solid rgba(56, 189, 248, 0.28);
+  /* Un nombre sin espacios (Cazarecompensas) empujaba la tarjeta y se salia del grid. */
+  min-width: 0;
 }
 .fpage__mini--suyo { border-color: rgba(52, 211, 153, 0.28); }
 .fpage__mini img { width: 44px; height: 44px; object-fit: contain; }
-.fpage__miniNombre { font-size: 0.63rem; font-weight: 700; color: #dbe3ee; text-align: center; line-height: 1.2; }
+.fpage__miniNombre {
+  font-size: 0.63rem; font-weight: 700; color: #dbe3ee; text-align: center; line-height: 1.2;
+  width: 100%;
+  overflow-wrap: anywhere;
+}
 
 /* Contraste de los botones del radar y de la ficha. El texto estaba bien, pero el cuerpo
    del boton era una superficie al 6% con borde al 12%: se confundia con el fondo y no se
@@ -9606,4 +9659,38 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .motion-disabled .fnm-sat,
 .motion-disabled .fnm-sat-btn {
   transition: none;
+}
+
+/* El aviso de borrado flota: con 360px fijos y pegado a los bordes parecia un panel lateral.
+   Solo toca a los avisos (toast); los modales centrados del panel no llevan esta clase. */
+.swal2-toast.swal2-popup {
+  margin: 16px;
+  width: auto;
+  max-width: min(92vw, 420px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+
+/* SweetAlert2 trae sus propias reglas para el aviso y ganan por orden de carga, asi que la
+   version suave no bastaba: el aviso seguia pegado a los bordes como un panel lateral. */
+body .swal2-container .swal2-toast.swal2-popup {
+  margin: 16px !important;
+  width: auto !important;
+  max-width: min(92vw, 420px) !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* El vampiro pide un poco mas que la calabaza: su cabeza esta todavia mas baja y 6px no
+   bastaban. Va al final del archivo a proposito, para ganarle a cualquier regla anterior
+   con la misma especificidad. */
+.sprite-card[data-familia="vampire"] .card-image__crown {
+  top: -6px;
+}
+
+.ms-spotlight-card[data-familia="vampire"] .ms-card__crown {
+  top: 10px;
 }

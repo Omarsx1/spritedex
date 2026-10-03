@@ -16,9 +16,11 @@ import {
   Star,
   Layers,
   Crown,
-  AlertTriangle
+  AlertTriangle,
+  Trash2
 } from 'lucide-react';
 import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
+import Swal from 'sweetalert2';
 import { getMyFriendCode } from '../../utils/friendCode';
 import { getClientCountry, resolveCountry } from '../../utils/telemetry';
 
@@ -409,6 +411,83 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
+  };
+
+  // Borrado de usuario. El borrado real ocurre en la base: aquí solo se confirma
+  // escribiendo el código de la fila y se llama a la función borrar_usuario().
+  const swalBase = {
+    background: darkMode ? '#171717' : '#FFFFFF',
+    color: darkMode ? '#EDEDED' : '#0F172A',
+    backdrop: 'rgba(0, 0, 0, 0.75)',
+    borderRadius: '16px'
+  };
+
+  const handleDeleteUser = async (user) => {
+    const codigoEsperado = String(user.friendCode || '').replace(/\s+/g, '').toUpperCase();
+
+    const confirmacion = await Swal.fire({
+      title: '¿Borrar este usuario?',
+      text: `Se borrará la cuenta y su progreso. Esta acción no se puede deshacer. Escribe el código ${codigoEsperado} para continuar.`,
+      icon: 'warning',
+      input: 'text',
+      inputPlaceholder: 'SDEX-XXXX',
+      inputAttributes: { autocapitalize: 'characters', autocomplete: 'off', spellcheck: 'false' },
+      inputValidator: (valor) => {
+        const escrito = String(valor || '').replace(/\s+/g, '').toUpperCase();
+        if (!escrito) return 'Escribe el código del usuario para continuar.';
+        if (escrito !== codigoEsperado) return 'El código no coincide con el de esta fila.';
+        return undefined;
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Sí, borrar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+      iconColor: '#F59E0B',
+      confirmButtonColor: '#EF4444',
+      cancelButtonColor: darkMode ? '#262626' : '#94A3B8',
+      ...swalBase
+    });
+
+    if (!confirmacion.isConfirmed) return;
+
+    const mostrarError = (texto) => Swal.fire({
+      title: 'No se pudo borrar',
+      text: texto,
+      icon: 'error',
+      confirmButtonText: 'Aceptar',
+      iconColor: '#EF4444',
+      confirmButtonColor: darkMode ? '#3ECF8E' : '#3B82F6',
+      ...swalBase
+    });
+
+    try {
+      const supabase = await getSupabase();
+      if (!supabase) throw new Error('La nube no está configurada.');
+      const { error } = await supabase.rpc('borrar_usuario', {
+        objetivo: user.userId,
+        confirmacion: confirmacion.value
+      });
+      if (error) {
+        // El mensaje de la función ya está escrito para leerse tal cual.
+        await mostrarError(error.message || 'No pude borrar el usuario.');
+        return;
+      }
+      await loadUserData();
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Usuario borrado',
+        text: `${user.friendCode} ya no está en la lista.`,
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+        iconColor: '#10B981',
+        ...swalBase
+      });
+    } catch (e) {
+      await mostrarError(e?.message || String(e));
+    }
   };
 
   const formatRelativeTime = (isoString) => {
@@ -1067,6 +1146,25 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                             </span>
                           );
                         })()}
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteUser(user)}
+                          title="Borrar usuario"
+                          aria-label={`Borrar usuario ${user.friendCode}`}
+                          style={{
+                            marginLeft: '8px',
+                            verticalAlign: 'middle',
+                            background: 'none',
+                            border: 'none',
+                            color: c.textMuted,
+                            cursor: 'pointer',
+                            padding: '2px',
+                            display: 'inline-flex',
+                            alignItems: 'center'
+                          }}
+                        >
+                          <Trash2 size={13} />
+                        </button>
                       </td>
                     </tr>
                   );
