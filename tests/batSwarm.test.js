@@ -167,6 +167,18 @@ test('con la silueta cargada el enjambre la dibuja en vez de las facetas', async
   const facetas = dom.canvas.calls.filter((c) => c[0] === 'fill');
   assert.equal(facetas.length, 0, 'con silueta lista no se rellenan facetas');
 
+  const escalas = dom.canvas.calls.filter((c) => c[0] === 'scale');
+  assert.ok(escalas.length > 0, 'aplica escala de envergadura diedra en las alas');
+
+  // Los giros del aleteo (tilt) son sutiles (tilt <= 0.11 rad / ~6.3°), no de tijera extrema (0.75 rad / 43°)
+  const girosAleteo = dom.canvas.calls
+    .filter((c) => c[0] === 'rotate' && Math.abs(c[1]) <= 0.20)
+    .map((c) => Math.abs(c[1]));
+  assert.ok(girosAleteo.length > 0, 'se aplicaron giros sutiles de ala');
+  for (const giro of girosAleteo) {
+    assert.ok(giro <= 0.15, `el giro de ala ${giro} rad es sutil y orgánico, no exagerado`);
+  }
+
   swarm.stop();
   delete globalThis.Image;
 });
