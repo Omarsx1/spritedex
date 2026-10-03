@@ -1048,6 +1048,7 @@ export function pickThemeName(theme, lang = getLang()) {
 
 // Orden oficial de familias de 2ª Generación idéntico a la secuencia de Fortnite
 export const FORTNITE_GEN2_FAMILY_ORDER = [
+  'dumpsterdive',
   'jonesy',
   'adventure',
   'bush',
@@ -1070,9 +1071,8 @@ export const FORTNITE_GEN2_FAMILY_ORDER = [
   'crash',
   'morgana',
   'spookydash',
-  'vampire',
   'deer',
-  'dumpsterdive'
+  'vampire'
 ];
 
 // All unique sprite families for the SPRITE filter dropdown (preserva orden oficial del Dex)
