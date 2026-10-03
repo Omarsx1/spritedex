@@ -15,6 +15,8 @@ import {
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const arranque = html.match(/<script>([\s\S]*?)<\/script>/g)?.find((s) => s.includes('theme-fortnitemares'));
+const css = readFileSync(new URL('../src/styles/index.css', import.meta.url), 'utf8');
+const componente = readFileSync(new URL('../src/components/FortnitemaresTransition.jsx', import.meta.url), 'utf8');
 
 test('index.html trae el arranque del tema antes del primer pintado', () => {
   assert.ok(arranque, 'falta el script que enciende el tema sin esperar al bundle');
@@ -41,4 +43,31 @@ test('el arranque respeta a quien todavia no vio la cinematica', () => {
     'debe contemplar a quien pidio menos movimiento: ese visitante nunca ve la cinematica'
   );
   assert.match(arranque, /if \(!vioIntro && !quieto\) return;/, 'la cinematica pendiente manda');
+});
+
+test('el bosque viaja en el armazon, antes del root', () => {
+  const bosques = [...html.matchAll(/class="fnm-forest"/g)];
+  assert.equal(bosques.length, 1, 'debe haber una sola capa de bosque en el armazon');
+  assert.ok(
+    html.indexOf('class="fnm-forest"') < html.indexOf('<div id="root">'),
+    'el bosque tiene que existir antes que el root'
+  );
+});
+
+test('React ya no monta su propia capa de bosque', () => {
+  assert.ok(
+    !componente.includes('className="fnm-forest"'),
+    'dos capas identicas serian doble pintado: la del armazon es la unica'
+  );
+});
+
+test('sin la clase del tema el bosque se queda oculto', () => {
+  const regla = css.match(/html:not\(\.theme-fortnitemares\) \.fnm-forest \{([^}]*)\}/);
+  assert.ok(regla, 'es lo que mantiene intacta la cinematica de los nuevos usuarios');
+  assert.match(regla[1], /opacity:\s*0/, 'el bosque debe quedar transparente');
+  assert.match(
+    regla[1],
+    /animation:\s*none/,
+    'sin animation none, fnm-forest-light anima opacity y le gana a la regla: el bosque se veria antes de la cinematica'
+  );
 });
