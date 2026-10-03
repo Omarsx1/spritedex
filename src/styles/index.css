@@ -8356,10 +8356,16 @@ body:has(.modal-overlay) {
   display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px;
   padding: 7px 5px; border-radius: 12px;
   background: rgba(255, 255, 255, 0.045); border: 1px solid rgba(56, 189, 248, 0.28);
+  /* Un nombre sin espacios (Cazarecompensas) empujaba la tarjeta y se salia del grid. */
+  min-width: 0;
 }
 .fpage__mini--suyo { border-color: rgba(52, 211, 153, 0.28); }
 .fpage__mini img { width: 44px; height: 44px; object-fit: contain; }
-.fpage__miniNombre { font-size: 0.63rem; font-weight: 700; color: #dbe3ee; text-align: center; line-height: 1.2; }
+.fpage__miniNombre {
+  font-size: 0.63rem; font-weight: 700; color: #dbe3ee; text-align: center; line-height: 1.2;
+  width: 100%;
+  overflow-wrap: anywhere;
+}
 
 /* Contraste de los botones del radar y de la ficha. El texto estaba bien, pero el cuerpo
    del boton era una superficie al 6% con borde al 12%: se confundia con el fondo y no se
