@@ -1064,6 +1064,66 @@
     "isNew": false
   },
   {
+    "id": "dumpsterdive_basic",
+    "name": "Mapache",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 2,
+    "releaseDate": "2026-10-01"
+  },
+  {
+    "id": "dumpsterdive_gold",
+    "name": "Mapache Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 2,
+    "releaseDate": "2026-10-01"
+  },
+  {
+    "id": "dumpsterdive_cheatmaster",
+    "name": "Mapache Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 2,
+    "releaseDate": "2026-10-01"
+  },
+  {
+    "id": "dumpsterdive_loothacker",
+    "name": "Mapache Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 2,
+    "releaseDate": "2026-10-01"
+  },
+  {
+    "id": "dumpsterdive_bountyhunter",
+    "name": "Mapache Cazarrecompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 2,
+    "releaseDate": "2026-10-01"
+  },
+  {
+    "id": "dumpsterdive_tricktreat",
+    "name": "Mapache Dulce o Truco",
+    "theme": "Trick or Treat",
+    "rarity": "Special",
+    "unreleased": true,
+    "isNew": false,
+    "gen": 2,
+    "releaseDate": "2026-10-01"
+  },
+  {
     "id": "jonesy_basic",
     "name": "Jonesy",
     "theme": "Basic",
@@ -2306,66 +2366,6 @@
     "releaseDate": "2026-10-01"
   },
   {
-    "id": "vampire_basic",
-    "name": "Vampiro",
-    "theme": "Basic",
-    "rarity": "Legendary",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 2,
-    "releaseDate": "2026-10-01"
-  },
-  {
-    "id": "vampire_gold",
-    "name": "Vampiro Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 2,
-    "releaseDate": "2026-10-01"
-  },
-  {
-    "id": "vampire_cheatmaster",
-    "name": "Vampiro Hacker",
-    "theme": "Cheatmaster",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 2,
-    "releaseDate": "2026-10-01"
-  },
-  {
-    "id": "vampire_loothacker",
-    "name": "Vampiro Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 2,
-    "releaseDate": "2026-10-01"
-  },
-  {
-    "id": "vampire_bountyhunter",
-    "name": "Vampiro Cazarrecompensas",
-    "theme": "Bounty Hunter",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 2,
-    "releaseDate": "2026-10-01"
-  },
-  {
-    "id": "vampire_tricktreat",
-    "name": "Vampiro Dulce o Truco",
-    "theme": "Trick or Treat",
-    "rarity": "Special",
-    "unreleased": true,
-    "isNew": false,
-    "gen": 2,
-    "releaseDate": "2026-10-01"
-  },
-  {
     "id": "deer_basic",
     "name": "El Ciervo",
     "theme": "Basic",
@@ -2426,18 +2426,18 @@
     "releaseDate": "2026-10-01"
   },
   {
-    "id": "dumpsterdive_basic",
-    "name": "Mapache",
+    "id": "vampire_basic",
+    "name": "Vampiro",
     "theme": "Basic",
-    "rarity": "Epic",
+    "rarity": "Legendary",
     "unreleased": false,
     "isNew": true,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
   {
-    "id": "dumpsterdive_gold",
-    "name": "Mapache Dorado",
+    "id": "vampire_gold",
+    "name": "Vampiro Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
@@ -2446,8 +2446,8 @@
     "releaseDate": "2026-10-01"
   },
   {
-    "id": "dumpsterdive_cheatmaster",
-    "name": "Mapache Hacker",
+    "id": "vampire_cheatmaster",
+    "name": "Vampiro Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
@@ -2456,8 +2456,8 @@
     "releaseDate": "2026-10-01"
   },
   {
-    "id": "dumpsterdive_loothacker",
-    "name": "Mapache Hacker de Botín",
+    "id": "vampire_loothacker",
+    "name": "Vampiro Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
@@ -2466,8 +2466,8 @@
     "releaseDate": "2026-10-01"
   },
   {
-    "id": "dumpsterdive_bountyhunter",
-    "name": "Mapache Cazarrecompensas",
+    "id": "vampire_bountyhunter",
+    "name": "Vampiro Cazarrecompensas",
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
@@ -2476,8 +2476,8 @@
     "releaseDate": "2026-10-01"
   },
   {
-    "id": "dumpsterdive_tricktreat",
-    "name": "Mapache Dulce o Truco",
+    "id": "vampire_tricktreat",
+    "name": "Vampiro Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
     "unreleased": true,
