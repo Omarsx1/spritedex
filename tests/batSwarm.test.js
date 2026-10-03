@@ -18,6 +18,8 @@ function makeCanvasStub() {
     restore: () => calls.push(['restore']),
     translate: (...a) => calls.push(['translate', ...a]),
     rotate: (...a) => calls.push(['rotate', ...a]),
+    scale: (...a) => calls.push(['scale', ...a]),
+    drawImage: (...a) => calls.push(['drawImage', ...a]),
     beginPath: () => calls.push(['beginPath']),
     closePath: () => calls.push(['closePath']),
     moveTo: (...a) => calls.push(['moveTo', ...a]),
@@ -136,4 +138,33 @@ test('the swarm is a no-op without a DOM, instead of throwing', async () => {
   delete globalThis.document;
   assert.equal(fireFlyingBats(), null);
   assert.ok(dom);
+});
+
+test('con la silueta cargada el enjambre la dibuja en vez de las facetas', async () => {
+  const dom = installDom();
+  let pedida = null;
+  // Imagen que carga en cuanto se le asigna el src, como la del navegador.
+  globalThis.Image = class {
+    set src(valor) {
+      pedida = valor;
+      this.complete = true;
+      Promise.resolve().then(() => this.onload && this.onload());
+    }
+  };
+
+  const { createBatSwarm } = await import('../src/utils/batSwarm.js?nomock=silueta');
+  const swarm = createBatSwarm({ count: 4, mode: 'burst' });
+  assert.ok(swarm);
+  await Promise.resolve();
+  dom.frames[0](0);
+  dom.frames[0](16);
+
+  assert.equal(pedida, '/murcielago.svg', 'la silueta se pide al arrancar el enjambre');
+  const dibujos = dom.canvas.calls.filter((c) => c[0] === 'drawImage');
+  assert.ok(dibujos.length >= 4, `cada murcielago se dibuja con la imagen, hubo ${dibujos.length}`);
+  const facetas = dom.canvas.calls.filter((c) => c[0] === 'fill');
+  assert.equal(facetas.length, 0, 'con silueta lista no se rellenan facetas');
+
+  swarm.stop();
+  delete globalThis.Image;
 });
