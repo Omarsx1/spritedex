@@ -9,6 +9,13 @@ import { t } from '../i18n';
 import { hasSeenFortnitemaresIntro, isFortnitemaresActive } from '../config/seasonalEvent';
 import { PumpkinIcon } from './icons/PumpkinIcon';
 
+// Indicador de solicitudes pendientes. Estatico a proposito: sin animacion, sin
+// transicion y sin will-change — la app prioriza fluidez y esto es solo un dato.
+function BadgeSolicitudes({ n, className = '' }) {
+  if (!n) return null;
+  return <span className={`solicitudes-badge ${className}`} aria-hidden="true">{n > 9 ? '9+' : n}</span>;
+}
+
 export function Header({
   spritesPool,
   totalCount,
@@ -17,6 +24,7 @@ export function Header({
   user,
   isLiveConnected,
   connectedFriendCode,
+  solicitudesNuevas = 0,
   onOpenShareModal,
   onOpenBackupModal,
   onOpenCompareModal,
@@ -48,6 +56,10 @@ export function Header({
 
   // Menú gooey de acciones (solo móvil): réplica 1:1 de libraries.dev/gooey
   const isMobile = useIsMobile(768);
+  // El badge va oculto a lectores de pantalla: el conteo viaja en el nombre del boton.
+  const etiquetaSolicitudes = solicitudesNuevas > 0
+    ? ' · ' + t('header.solicitudesNuevas', { n: solicitudesNuevas })
+    : '';
   const [actionsOpen, setActionsOpen] = useState(false);
   // En la primera visita la cinematica manda el cambio: el wordmark arranca
   // normal y muta cuando la parte "title" difunda el cambio de temporada.
@@ -406,18 +418,21 @@ export function Header({
           <div className="hero__actions" ref={actionsRef}>
             {!isMobile && (
               <>
-                <button
-                  className="hero__btn hero__btn--primary"
-                  onClick={onOpenCompareModal}
-                  title={isLiveConnected ? t('header.radarConectado', { codigo: connectedFriendCode }) : t('header.radarAmigos')}
-                  style={{ position: 'relative' }}
-                >
-                  <Users size={16} className="hero__btn-icon" />
-                  <span className="hero__btn-text">{t('header.amigos')}</span>
-                  {isLiveConnected && (
-                    <span className="hero__live-indicator" title={t('header.conectadoEnVivo', { codigo: connectedFriendCode })} />
-                  )}
-                </button>
+                {/* El badge vive en el envoltorio y no dentro del boton: .hero__btn tiene
+                    overflow hidden (por su brillo al pasar el raton) y lo recortaria. */}
+                <span className="hero__btn-wrap">
+                  <button
+                    className="hero__btn hero__btn--primary"
+                    onClick={onOpenCompareModal}
+                    title={isLiveConnected ? t('header.radarConectado', { codigo: connectedFriendCode }) : t('header.radarAmigos')}
+                    aria-label={(isLiveConnected ? t('header.radarConectado', { codigo: connectedFriendCode }) : t('header.radarAmigos')) + etiquetaSolicitudes}
+                    style={{ position: 'relative' }}
+                  >
+                    <Users size={16} className="hero__btn-icon" />
+                    <span className="hero__btn-text">{t('header.amigos')}</span>
+                  </button>
+                  <BadgeSolicitudes n={solicitudesNuevas} className="solicitudes-badge--pill" />
+                </span>
                 <button
                   className="hero__btn hero__btn--accent"
                   onClick={onOpenShareModal}
@@ -474,7 +489,7 @@ export function Header({
                 <button
                   type="button"
                   className="fnm-sat-btn"
-                  aria-label={t('header.radarAmigos')}
+                  aria-label={t('header.radarAmigos') + etiquetaSolicitudes}
                   tabIndex={actionsOpen ? 0 : -1}
                   onClick={() => {
                     toggleActions();
@@ -482,6 +497,7 @@ export function Header({
                   }}
                 >
                   <Users size={19} strokeWidth={2.2} />
+                  <BadgeSolicitudes n={solicitudesNuevas} className="solicitudes-badge--round" />
                 </button>
               </div>
 
@@ -520,13 +536,14 @@ export function Header({
                 type="button"
                 className="fnm-pumpkin-btn"
                 aria-expanded={actionsOpen}
-                aria-label={actionsOpen ? t('header.cerrarAcciones') : t('header.abrirAcciones')}
+                aria-label={(actionsOpen ? t('header.cerrarAcciones') : t('header.abrirAcciones')) + etiquetaSolicitudes}
                 onClick={toggleActions}
               >
                 <PumpkinIcon
                   size={50}
                   className={`fnm-pumpkin-svg ${actionsOpen ? 'is-open' : ''}`}
                 />
+                <BadgeSolicitudes n={solicitudesNuevas} className="solicitudes-badge--fab" />
               </button>
             </div>
           ) : (
@@ -548,7 +565,7 @@ export function Header({
                 <button
                   type="button"
                   className="pm-btn pm-sat"
-                  aria-label={t('header.radarAmigos')}
+                  aria-label={t('header.radarAmigos') + etiquetaSolicitudes}
                   tabIndex={actionsOpen ? 0 : -1}
                   onClick={() => {
                     toggleActions();
@@ -563,6 +580,7 @@ export function Header({
                   >
                     <Users size={19} strokeWidth={2.2} />
                   </span>
+                  <BadgeSolicitudes n={solicitudesNuevas} className="solicitudes-badge--round" />
                 </button>
               </Liquid.Item>
 
@@ -605,13 +623,14 @@ export function Header({
                   type="button"
                   className="pm-btn pm-main"
                   aria-expanded={actionsOpen}
-                  aria-label={actionsOpen ? t('header.cerrarAcciones') : t('header.abrirAcciones')}
+                  aria-label={(actionsOpen ? t('header.cerrarAcciones') : t('header.abrirAcciones')) + etiquetaSolicitudes}
                   onClick={toggleActions}
                 >
                   <span className="pm-main-icon-wrap">
                     <Gamepad2 size={22} strokeWidth={2.2} className={`pm-icon-pad ${actionsOpen ? 'is-hidden' : ''}`} />
                     <X size={20} strokeWidth={2.4} className={`pm-icon-close ${actionsOpen ? 'is-visible' : ''}`} />
                   </span>
+                  <BadgeSolicitudes n={solicitudesNuevas} className="solicitudes-badge--round" />
                 </button>
               </Liquid.Item>
             </Liquid>

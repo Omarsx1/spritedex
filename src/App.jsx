@@ -46,6 +46,7 @@ import { getLang, conIdioma, rutaSinIdioma } from './i18n';
 import { codigoFichaEnRuta } from './utils/visitaEnlace';
 import { codigoNormalizado } from './utils/fichaAmigo';
 import { isDeadSessionError } from './utils/deadSession';
+import { useFriendRequests } from './hooks/useFriendRequests';
 
 // Carga diferida (code splitting) para modales secundarios y suite administrativa
 // El precalculo de la captura no arranca antes de este margen desde que se abre la app,
@@ -79,6 +80,10 @@ const AVISO_RECLAMO_RETRASO_MS = 2000;
 export function App() {
   const isMobile = useIsMobile(600);
   const { sprites: dynamicSprites, refreshDynamicSprites } = useDynamicSprites();
+  // Lector unico de la red de amigos para el badge del header: la pagina de Amigos y el
+  // modal siguen con su propia instancia, asi que esto no altera su comportamiento.
+  const { recibidas: solicitudesRecibidas } = useFriendRequests();
+  const solicitudesNuevas = solicitudesRecibidas.length;
 
   // Detección de ruta secreta /portal-override /studio-override o ?studio=true
   const [isAdminPortal, setIsAdminPortal] = useState(() => {
@@ -1036,6 +1041,7 @@ useEffect(() => {
         user={user}
         isLiveConnected={isLiveConnected}
         connectedFriendCode={connectedFriendCode}
+        solicitudesNuevas={solicitudesNuevas}
         onOpenShareModal={() => setShowShareModal(true)}
         onOpenBackupModal={() => setShowBackupModal(true)}
         onOpenCompareModal={() => irA('/amigos')}

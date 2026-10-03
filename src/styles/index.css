@@ -5780,19 +5780,43 @@ body:has(.modal-overlay) {
   }
 }
 
-/* Indicador de conexión de amigo en vivo en Hero */
-.hero__live-indicator {
+/* Badge de solicitudes pendientes. Estatico a proposito: sin animacion, sin transicion
+   y sin will-change, porque la app prioriza fluidez y esto es solo un dato. Va sobre el
+   boton de Amigos de escritorio y sobre el FAB (calabaza o mando) en movil, que es el
+   unico acceso visible a Amigos mientras el anillo de satelites esta cerrado. */
+.solicitudes-badge {
   position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
-  border: 1.5px solid #060714;
-  animation: pulseGlow 2s infinite ease-in-out;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #ef4444;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 17px;
+  text-align: center;
+  pointer-events: none;
+  z-index: 2;
 }
+
+/* Cada badge cuelga del boton (no del icono) y asoma la mitad: para eso el boton tiene
+   que ser el bloque contenedor. Ninguno de los que llevan badge recorta con overflow. */
+.fnm-sat-btn { position: relative; }
+
+/* Boton de escritorio: el badge cuelga del envoltorio, pegado a la esquina del boton,
+   mitad dentro y mitad fuera. Dentro no puede ir: .hero__btn recorta con overflow. */
+.hero__btn-wrap { position: relative; display: inline-flex; }
+.solicitudes-badge--pill { top: -8px; right: -8px; }
+
+/* Botones redondos de 44px (satelites y FAB del mando): el centro del badge cae sobre
+   el borde del circulo, que es lo que se lee como mitad dentro y mitad fuera. */
+.solicitudes-badge--round { top: -2px; right: -2px; }
+
+/* Calabaza: el arte mide 50px dentro de un boton de 72px, asi que el borde visible no es
+   el del boton. Estos 10px ponen el centro del badge sobre el borde del arte. */
+.solicitudes-badge--fab { top: 10px; right: 10px; }
 
 /* Barra flotante sutil cuando se explora la colección de un amigo */
 .sdm-friend-pill {
@@ -9670,4 +9694,3 @@ body .swal2-container .swal2-toast.swal2-popup {
 .ms-spotlight-card[data-familia="vampire"] .ms-card__crown {
   top: 10px;
 }
-
