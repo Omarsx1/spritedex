@@ -45,9 +45,38 @@ function curve(ctx, cp1x, cp1y, cp2x, cp2y, x, y) {
    descarga llegue. */
 let batSilhouette = null;
 let batSilhouetteAsked = false;
+let batParts = null;
 
 function silhouetteReady() {
-  return Boolean(batSilhouette && batSilhouette.complete !== false);
+  return Boolean(batParts);
+}
+
+/* La silueta se parte en tres piezas al cargar (ala izquierda, cuerpo, ala derecha). Asi
+   el aleteo puede ser lo que es: cada ala girando sobre su hombro. Antes era un aplastado
+   vertical del bicho entero y se veia de goma. Las piezas se rasterizan una sola vez, de
+   modo que cada fotograma cuesta tres drawImage y ningun recorte. */
+function buildBatParts(img) {
+  const w = img.naturalWidth || img.width || 0;
+  const h = img.naturalHeight || img.height || 0;
+  if (!w || !h || typeof document === 'undefined') return null;
+
+  const corte = Math.round(w * 0.42);   // donde acaba el ala izquierda
+  const cuerpo = Math.round(w * 0.16);  // franja del cuerpo
+  const recorte = (sx, sw) => {
+    const c = document.createElement('canvas');
+    c.width = sw;
+    c.height = h;
+    const cx = c.getContext('2d');
+    if (!cx) return null;
+    cx.drawImage(img, sx, 0, sw, h, 0, 0, sw, h);
+    return c;
+  };
+
+  const izq = recorte(0, corte);
+  const centro = recorte(corte, cuerpo);
+  const der = recorte(corte + cuerpo, w - corte - cuerpo);
+  if (!izq || !centro || !der) return null;
+  return { izq, centro, der, ancho: w, corte, cuerpo };
 }
 
 function loadBatSilhouette() {
@@ -56,11 +85,18 @@ function loadBatSilhouette() {
   try {
     const img = new Image();
     img.decoding = 'async';
-    img.onload = () => { batSilhouette = img; };
+    img.onload = () => {
+      batSilhouette = img;
+      batParts = buildBatParts(img);
+    };
     // Si la descarga falla (red, cache envenenada, un 404 puntual), se vuelve a pedir
     // en el proximo enjambre: sin esto, un fallo de una vez condenaba la sesion entera
     // a las facetas y el sintoma era "no veo los murcielagos nuevos".
-    img.onerror = () => { batSilhouetteAsked = false; };
+    img.onerror = () => {
+      batSilhouette = null;
+      batParts = null;
+      batSilhouetteAsked = false;
+    };
     img.src = '/murcielago.svg';
   } catch {
     // sin silueta: quedan las facetas
@@ -70,9 +106,12 @@ function loadBatSilhouette() {
 function drawSilhouetteBat(ctx, size, wingFold, depthLayer) {
   const ancho = size * 2.05;
   const alto = ancho / (1784.16 / 787.54);
-  // Una imagen no se dobla: el golpe de ala se lee como un aplastado vertical, que a
-  // esta escala se percibe igual que el pliegue.
-  const escalaY = 1 + wingFold * 0.3;
+  // Cada ala gira sobre su hombro, que es donde la pieza del ala toca el cuerpo. El
+  // hombro izquierdo cae a 0.08 del centro (el ala ocupa el 42% del ancho desde el borde).
+  const anchoAla = ancho * (batParts.corte / batParts.ancho);
+  const anchoCuerpo = ancho * (batParts.cuerpo / batParts.ancho);
+  const hombro = -(ancho / 2 - anchoAla);
+  const giro = wingFold * 0.75;
 
   if (depthLayer === 2) {
     ctx.save();
@@ -82,10 +121,22 @@ function drawSilhouetteBat(ctx, size, wingFold, depthLayer) {
     ctx.restore();
   }
 
+  // Ala izquierda: gira sobre el hombro izquierdo.
   ctx.save();
-  if (typeof ctx.scale === 'function') ctx.scale(1, escalaY);
-  ctx.drawImage(batSilhouette, -ancho / 2, -alto / 2, ancho, alto);
+  ctx.translate(hombro, 0);
+  ctx.rotate(giro);
+  ctx.drawImage(batParts.izq, -anchoAla, -alto / 2, anchoAla, alto);
   ctx.restore();
+
+  // Ala derecha: el giro es simetrico.
+  ctx.save();
+  ctx.translate(-hombro, 0);
+  ctx.rotate(-giro);
+  ctx.drawImage(batParts.der, 0, -alto / 2, anchoAla, alto);
+  ctx.restore();
+
+  // Cuerpo encima, para tapar la junta de las alas.
+  ctx.drawImage(batParts.centro, hombro, -alto / 2, anchoCuerpo, alto);
 }
 
 /**
