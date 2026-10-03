@@ -57,6 +57,10 @@ function loadBatSilhouette() {
     const img = new Image();
     img.decoding = 'async';
     img.onload = () => { batSilhouette = img; };
+    // Si la descarga falla (red, cache envenenada, un 404 puntual), se vuelve a pedir
+    // en el proximo enjambre: sin esto, un fallo de una vez condenaba la sesion entera
+    // a las facetas y el sintoma era "no veo los murcielagos nuevos".
+    img.onerror = () => { batSilhouetteAsked = false; };
     img.src = '/murcielago.svg';
   } catch {
     // sin silueta: quedan las facetas

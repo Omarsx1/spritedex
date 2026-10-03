@@ -168,3 +168,26 @@ test('con la silueta cargada el enjambre la dibuja en vez de las facetas', async
   swarm.stop();
   delete globalThis.Image;
 });
+
+test('si la silueta falla, el siguiente enjambre la vuelve a pedir', async () => {
+  const dom = installDom();
+  const pedidas = [];
+  globalThis.Image = class {
+    set src(valor) {
+      pedidas.push(valor);
+      this.complete = false;
+      Promise.resolve().then(() => this.onerror && this.onerror());
+    }
+  };
+
+  const { createBatSwarm } = await import('../src/utils/batSwarm.js?nomock=fallo');
+  const uno = createBatSwarm({ count: 2, mode: 'burst' });
+  await Promise.resolve();
+  uno.stop();
+  const dos = createBatSwarm({ count: 2, mode: 'burst' });
+  await Promise.resolve();
+  dos.stop();
+
+  assert.equal(pedidas.length, 2, 'un fallo no debe condenar la sesion a las facetas');
+  delete globalThis.Image;
+});
