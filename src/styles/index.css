@@ -9720,3 +9720,34 @@ body .swal2-container .swal2-toast.swal2-popup {
 .ms-spotlight-card[data-familia="vampire"] .ms-card__crown {
   top: 10px;
 }
+
+/* ==========================================================================
+   iOS: WebKit pierde capas al hacer scroll y la pantalla se pone blanca un
+   instante (reportado en un iPhone 13 Pro, incluso despues de quitar el
+   repintado de la niebla). Dos medidas, SOLO en iOS:
+   1. Fuera el desenfoque de fondo: es la pieza que WebKit repinta mal al
+      desplazarse y la que mantiene decenas de capas compuestas a la vez. Cada
+      elemento conserva su propio fondo, que ya se lee sin el blur.
+   2. Fuera las animaciones decorativas infinitas: mantenian capas de pantalla
+      completa en movimiento permanente (bosque, niebla y fuego de calabazas).
+   Ninguna otra plataforma cambia: la condicion solo es cierta en WebKit de iOS.
+   ========================================================================== */
+@supports (-webkit-touch-callout: none) {
+  *,
+  *::before,
+  *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .fnm-forest {
+    animation: none !important;
+    /* Sin animacion no hace falta la pista de capa: menos memoria de GPU. */
+    will-change: auto !important;
+  }
+
+  body.theme-fortnitemares::after,
+  html.theme-fortnitemares::after {
+    animation: none !important;
+  }
+}
