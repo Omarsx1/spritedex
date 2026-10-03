@@ -38,6 +38,52 @@ function curve(ctx, cp1x, cp1y, cp2x, cp2y, x, y) {
   }
 }
 
+/* Silueta real del murcielago (public/murcielago.svg). Se carga una vez y se dibuja
+   como imagen: se ve como un murcielago de verdad y cuesta menos que rellenar decenas
+   de facetas por fotograma. Si la imagen no esta lista, o no existe Image (tests,
+   SSR), el enjambre sigue dibujando las facetas de siempre: nunca depende de que la
+   descarga llegue. */
+let batSilhouette = null;
+let batSilhouetteAsked = false;
+
+function silhouetteReady() {
+  return Boolean(batSilhouette && batSilhouette.complete !== false);
+}
+
+function loadBatSilhouette() {
+  if (batSilhouetteAsked || typeof Image === 'undefined') return;
+  batSilhouetteAsked = true;
+  try {
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = () => { batSilhouette = img; };
+    img.src = '/murcielago.svg';
+  } catch {
+    // sin silueta: quedan las facetas
+  }
+}
+
+function drawSilhouetteBat(ctx, size, wingFold, depthLayer) {
+  const ancho = size * 2.05;
+  const alto = ancho / (1784.16 / 787.54);
+  // Una imagen no se dobla: el golpe de ala se lee como un aplastado vertical, que a
+  // esta escala se percibe igual que el pliegue.
+  const escalaY = 1 + wingFold * 0.3;
+
+  if (depthLayer === 2) {
+    ctx.save();
+    ctx.globalAlpha = ctx.globalAlpha * 0.42;
+    ctx.translate(0, size * 0.16);
+    ctx.drawImage(batSilhouette, -ancho / 2, -alto / 2, ancho, alto);
+    ctx.restore();
+  }
+
+  ctx.save();
+  if (typeof ctx.scale === 'function') ctx.scale(1, escalaY);
+  ctx.drawImage(batSilhouette, -ancho / 2, -alto / 2, ancho, alto);
+  ctx.restore();
+}
+
 /**
  * Traza la silueta exterior del murciélago origami para la sombra o máscara.
  */
@@ -109,6 +155,11 @@ function traceBatContour(ctx, size, dy) {
  * Dibuja un murciélago origami facetado con sombreado 3D y aleteo.
  */
 function drawOrigamiBat(ctx, size, wingFold, depthLayer, bank = 0) {
+  if (silhouetteReady()) {
+    drawSilhouetteBat(ctx, size, wingFold, depthLayer);
+    return;
+  }
+
   // wingFold oscila entre -0.7 (downstroke) y +0.7 (upstroke)
   const dy = wingFold * size * 0.42;
 
@@ -322,6 +373,8 @@ function createBat(rng, width, height, mode, index, total) {
  */
 export function createBatSwarm(options = {}) {
   if (typeof document === 'undefined') return null;
+
+  loadBatSilhouette();
 
   const { count = 30, duration = 0, mode = 'ambient' } = options;
 
