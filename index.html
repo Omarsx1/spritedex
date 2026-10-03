@@ -45,6 +45,50 @@
     <title>Spritedex — Espíritus de Fortnite</title>
   </head>
   <body>
+    <!-- Tema de temporada ANTES del primer pintado.
+         React enciende el tema en un efecto (FortnitemaresTransition), o sea despues del
+         primer fotograma: quien ya vio la cinematica alcanzaba a ver la interfaz antigua
+         durante un parpadeo. Aqui se decide sin esperar al bundle.
+         Las dos fronteras y la clave del intro son las de src/config/seasonalEvent.js, y
+         tests/fnm-arranque.test.js impide que se separen. -->
+    <script>
+      (function () {
+        try {
+          var host = location.hostname;
+          var local = host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host === '' || /\.(local|localhost)$/.test(host);
+          var params = new URLSearchParams(location.search);
+
+          if (local) {
+            // Espejo del modo desarrollo de seasonalEvent.js: bandera > override > encendido.
+            // Asi el parpadeo tampoco se ve en local y las banderas siguen mandando.
+            if (params.has('intro')) return;
+            var flag = params.get('halloween');
+            if (flag === null) flag = params.get('fortnitemares');
+            if (flag === '0' || flag === 'false') return;
+            if (flag !== '1' && flag !== 'true') {
+              var override = null;
+              try { override = localStorage.getItem('spritedex_halloween_override'); } catch (e) {}
+              if (override === 'false') return;
+            }
+          } else {
+            var ahora = Date.now();
+            if (ahora < new Date('2026-10-01T00:00:00-05:00').getTime()) return;
+            if (ahora >= new Date('2026-11-04T00:00:00-05:00').getTime()) return;
+          }
+
+          // Con la cinematica pendiente el tema lo enciende ella: adelantarlo mostraria el
+          // tema encendido y apagado justo antes de la funcion.
+          var vioIntro = false;
+          try { vioIntro = localStorage.getItem('spritedex_fortnitemares_intro_seen_v1') === 'true'; } catch (e) {}
+          var quieto = false;
+          try { quieto = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+          if (!vioIntro && !quieto) return;
+
+          document.documentElement.classList.add('theme-fortnitemares');
+          document.body.classList.add('theme-fortnitemares');
+        } catch (e) {}
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
