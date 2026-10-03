@@ -5,6 +5,19 @@ class SoundManager {
     this.ctx = null;
     this.enabled = true;
     this.audioPool = {};
+    // Con la pagina oculta no hay nada que sonar: dormir el contexto evita que el
+    // navegador mantenga una sesion de audio viva. En el movil eso se ve como un
+    // reproductor en la pantalla de bloqueo, incluso con la app cerrada.
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => this.dormir());
+      window.addEventListener('pagehide', () => this.dormir());
+    }
+  }
+
+  dormir() {
+    if (this.ctx && this.ctx.state === 'running') {
+      this.ctx.suspend().catch(() => {});
+    }
   }
 
   initContext() {
@@ -25,7 +38,30 @@ class SoundManager {
     try {
       const audio = new Audio(src);
       audio.volume = volume;
-      audio.play().catch(() => {});
+      // El elemento se suelta en cuanto termina. Si se queda vivo, el navegador lo
+      // cuenta como sesion de medios activa y en el movil aparece un reproductor
+      // fantasma en la pantalla de bloqueo, incluso despues de cerrar la app.
+      let suelto = false;
+      const soltar = () => {
+        if (suelto) return;
+        suelto = true;
+        try {
+          audio.pause();
+          audio.removeAttribute('src');
+          audio.load();
+        } catch {
+          // el elemento ya no esta: nada que soltar
+        }
+      };
+      audio.addEventListener('ended', soltar, { once: true });
+      audio.addEventListener('error', soltar, { once: true });
+      // Red de seguridad: si 'ended' no llega (pestaña oculta, el sistema pausa),
+      // se suelta al cumplirse su duracion.
+      audio.addEventListener('loadedmetadata', () => {
+        const ms = Number.isFinite(audio.duration) ? audio.duration * 1000 + 1200 : 5000;
+        setTimeout(soltar, Math.min(ms, 20000));
+      }, { once: true });
+      audio.play().catch(soltar);
     } catch (e) {
       console.warn('Audio sample play error:', e);
     }
