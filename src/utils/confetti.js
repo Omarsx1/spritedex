@@ -95,15 +95,27 @@ export function buildThemedConfettiOptions(options = {}, shapes) {
  * an emoji bat to confetti produces a particle that arcs and falls, which is
  * exactly the dead-bat-confetti effect the seasonal design rejects.
  */
+/**
+ * Traduce el aviso a la rafaga de murcielagos. Atrapar un espiritu es un aviso normal;
+ * llegar a nivel 5 es el momento grande, asi que lleva mas murcielagos y dura mas.
+ * Vive aparte del DOM para poder probarse sin navegador.
+ */
+export function batBurstFor(options = {}) {
+  return options.maxeo
+    ? { count: 24, duration: 3400, mode: 'burst' }
+    : { count: 10, duration: 2600, mode: 'burst' };
+}
+
 export function fireConfetti(options = {}) {
+  const { maxeo = false, ...resto } = options;
   if (isFortnitemaresActive()) {
-    fireFlyingBats({ count: 10, duration: 2600, mode: 'burst' });
+    fireFlyingBats(batBurstFor({ maxeo }));
     return;
   }
 
   getConfetti()
     .then((confetti) => {
-      confetti(options);
+      confetti(resto);
     })
     .catch(() => {});
 }

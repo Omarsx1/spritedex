@@ -17,7 +17,7 @@ import {
   subscribeSeasonalState
 } from '../src/config/seasonalEvent.js';
 import { FNM_PHASES, FNM_SWARM_COUNT, FNM_BOOT_DELAY } from '../src/config/fortnitemaresTimeline.js';
-import { HALLOWEEN_COLORS, isBatSwarmActive } from '../src/utils/confetti.js';
+import { HALLOWEEN_COLORS, isBatSwarmActive, batBurstFor } from '../src/utils/confetti.js';
 import { createBatSwarm, fireFlyingBats } from '../src/utils/batSwarm.js';
 
 const INSIDE = new Date('2026-10-15T12:00:00-05:00');
@@ -197,4 +197,16 @@ test('an open tab drops the theme once the window closes', () => {
     delete globalThis.window;
     delete globalThis.document;
   }
+});
+
+test('maxear dispara mas murcielagos que atrapar', () => {
+  const alAtrapar = batBurstFor();
+  const alMaxear = batBurstFor({ maxeo: true });
+
+  assert.equal(alAtrapar.count, 10, 'atrapar se queda como estaba');
+  assert.equal(alAtrapar.mode, 'burst');
+  assert.equal(alAtrapar.duration, 2600);
+  assert.ok(alMaxear.count > alAtrapar.count, 'maxear lleva mas murcielagos');
+  assert.ok(alMaxear.duration > alAtrapar.duration, 'y dura mas');
+  assert.equal(batBurstFor({ maxeo: false }).count, alAtrapar.count, 'solo maxear cambia');
 });

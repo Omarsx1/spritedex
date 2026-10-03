@@ -281,7 +281,7 @@ function FamilySpotlightRow({
         onSetLevel(sprite.id, newLevel);
         sounds.playToggle(true, sprite.gen);
         sounds.playLevelUp(newLevel, sprite.gen);
-        if (newLevel === 5) fireConfetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
+        if (newLevel === 5) fireConfetti({ particleCount: 60, spread: 70, origin: { y: 0.7 }, maxeo: true });
         else fireConfetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
       } else if (level === 1 && newLevel === 1) {
         onToggleOwned(sprite.id);
@@ -289,7 +289,7 @@ function FamilySpotlightRow({
       } else {
         onSetLevel(sprite.id, newLevel);
         sounds.playLevelUp(newLevel, sprite.gen);
-        if (newLevel === 5) fireConfetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
+        if (newLevel === 5) fireConfetti({ particleCount: 60, spread: 70, origin: { y: 0.7 }, maxeo: true });
       }
     };
 

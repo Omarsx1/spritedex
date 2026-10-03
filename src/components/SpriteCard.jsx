@@ -72,7 +72,7 @@ function SpriteCardBase({
     onSetLevel(sprite.id, newLevel);
     sounds.playLevelUp(newLevel, sprite.gen);
     if (newLevel === 5) {
-      fireConfetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
+      fireConfetti({ particleCount: 60, spread: 70, origin: { y: 0.7 }, maxeo: true });
     }
   };
 
