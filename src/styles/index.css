@@ -50,7 +50,11 @@ body {
   color: var(--text);
   font-family: var(--font-sans);
   min-height: 100vh;
+  /* clip y no hidden: hidden convierte el body en contenedor de scroll (en iOS
+     overflow-y pasa a auto) y el scroll del body en WebKit es una fuente conocida de
+     parpadeos. clip recorta igual, sin crear scroller. hidden queda de respaldo. */
   overflow-x: hidden;
+  overflow-x: clip;
   position: relative;
 }
 
