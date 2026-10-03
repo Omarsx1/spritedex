@@ -42,7 +42,11 @@
 }
 
 body {
-  background-color: #060714;
+  /* El color del lienzo vive en html (index.html lo trae en linea y el tema lo
+     sobreescribe mas abajo). Si el body pintara su propia caja opaca, taparia las
+     capas con z-index negativo que van detras del contenido: el bosque de temporada
+     desaparecia de la pantalla aunque siguiera en el DOM. */
+  background-color: transparent;
   color: var(--text);
   font-family: var(--font-sans);
   min-height: 100vh;
@@ -8544,15 +8548,10 @@ body:has(.modal-overlay) {
    profondisimo, violeta neon en los brillos, jamas naranja commodity.
    ========================================================================== */
 
-/* El bosque vive en su propia capa fija (::before), no como background del body:
-   asi su tamano no depende de lo larga que sea la pagina y no hace falta
-   'background-attachment: fixed', que en iOS da tirones al hacer scroll. */
-body.theme-fortnitemares {
-  background-color: #07030d;
-}
-
-/* El lienzo tambien cambia en temporada: es lo que se ve en el rebote de iOS y lo que
-   evita el fogonazo claro entre el fondo en linea y el tema. */
+/* La capa del bosque es un elemento real con z-index negativo (no un ::before), asi que
+   el color de temporada tiene que vivir en html: un fondo opaco en el body la taparia.
+   Ademas es lo que se ve en el rebote de iOS y lo que evita el fogonazo claro entre el
+   fondo en linea y el tema. */
 html.theme-fortnitemares {
   background-color: #07030d;
 }
