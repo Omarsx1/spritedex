@@ -8551,6 +8551,12 @@ body.theme-fortnitemares {
   background-color: #07030d;
 }
 
+/* El lienzo tambien cambia en temporada: es lo que se ve en el rebote de iOS y lo que
+   evita el fogonazo claro entre el fondo en linea y el tema. */
+html.theme-fortnitemares {
+  background-color: #07030d;
+}
+
 /* En temporada la rejilla se apaga (cruza al bosque, no desaparece de golpe). */
 html.theme-fortnitemares body::before {
   opacity: 0;
@@ -8594,6 +8600,18 @@ html:not([data-fnm-phase]) .fnm-forest {
     fnm-forest-light 9s ease-in-out infinite alternate;
 }
 
+/* Sin la clase del tema, el bosque no existe para el visitante. Es lo que mantiene
+   intacta la cinematica de los nuevos: ven la rejilla hasta la parte "ground". El
+   armazon de index.html monta esta capa antes del primer pintado para que quien ya
+   vio la cinematica entre directo al bosque, sin esperar al bundle. */
+html:not(.theme-fortnitemares) .fnm-forest {
+  /* animation: none es obligatorio: fnm-forest-light anima opacity, y una animacion
+     gana sobre esta declaracion por mas especifica que sea. Sin esto, el bosque se
+     veia igual antes de la cinematica. */
+  animation: none;
+  opacity: 0;
+}
+
 /* Parte 1 (boot/title): el bosque todavia no existe para el visitante. */
 html[data-fnm-phase='boot'] .fnm-forest,
 html[data-fnm-phase='title'] .fnm-forest {
@@ -8630,6 +8648,15 @@ body.theme-fortnitemares::after {
     radial-gradient(100% 26% at 50% 78%, rgba(76, 5, 149, 0.12) 0%, transparent 78%),
     radial-gradient(125% 34% at 50% 100%, rgba(59, 7, 100, 0.20) 0%, transparent 76%),
     radial-gradient(150% 105% at 50% 46%, transparent 52%, rgba(4, 1, 8, 0.62) 100%);
+  /* La niebla se mueve con transform, no moviendo los degradados. Animando
+     background-position se repinta la pantalla entera 60 veces por segundo y en iOS
+     eso termina en tirones y en fogonazos blancos al hacer scroll (la capa se pierde).
+     La capa se sale 24px por lado para que el vaiven no deje borde descubierto. */
+  top: -24px;
+  left: -24px;
+  width: calc(100vw + 48px);
+  height: calc(100vh + 48px);
+  height: calc(100dvh + 48px);
   animation: fnm-fog-drift 26s ease-in-out infinite alternate;
   /* La niebla llega con la parte 2 (ground): cruza junto con el bosque. */
   opacity: 1;
@@ -8643,8 +8670,8 @@ html[data-fnm-phase='title'] body.theme-fortnitemares::after {
 
 /* Slow lateral sway: the mist creeps across the trunks. */
 @keyframes fnm-fog-drift {
-  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
-  100% { background-position: 26px -12px, -18px 8px, 22px -6px, -12px 10px, 16px -8px, 0 0; }
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(20px, -12px, 0); }
 }
 
 /* Fuego de calabazas: html::after queda libre en temporada (la capa de ruido

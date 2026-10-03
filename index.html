@@ -37,6 +37,10 @@
     <meta name="apple-mobile-web-app-title" content="Spritedex" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#060714" />
+    <!-- El fondo va en linea para que el primer pintado NUNCA sea blanco: en iOS el
+         navegador alcanza a pintar antes de que llegue la hoja de estilos y se ve un
+         fogonazo blanco al recargar. El tema de temporada lo sobreescribe por clase. -->
+    <style>html { background-color: #060714; }</style>
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png" />
@@ -89,6 +93,11 @@
         } catch (e) {}
       })();
     </script>
+    <!-- El bosque de la temporada, montado en el armazon y no en React: asi existe ya en
+         el primer fotograma para quien vio la cinematica. Su visibilidad la decide el CSS:
+         sin la clase del tema no se ve, que es lo que mantiene intacta la cinematica de
+         los nuevos (ven la rejilla hasta la parte "ground"). -->
+    <div class="fnm-forest" aria-hidden="true"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
