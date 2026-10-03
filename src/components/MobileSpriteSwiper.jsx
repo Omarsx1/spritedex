@@ -256,8 +256,6 @@ function FamilySpotlightRow({
     const isOwned = spriteState.owned;
     const level = spriteState.level || 1;
     const isMastered = isOwned && level === 5;
-    const myOwned = userState[sprite.id]?.owned;
-    const friendCanLend = isFriendView && isOwned && !myOwned;
     const rarityInfo = getRarityInfo(sprite.rarity);
     const styleInfo = getCachedCardStyle(sprite);
 
@@ -266,15 +264,8 @@ function FamilySpotlightRow({
     const handleToggleBadgeClick = (e) => {
       e.stopPropagation();
       if (sprite.unreleased) return;
-      if (isFriendView) {
-        if (friendCanLend) {
-          const nextOwned = !myOwned;
-          onToggleOwned(sprite.id);
-          sounds.playToggle(nextOwned, sprite.gen);
-          if (nextOwned) fireConfetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
-        }
-        return;
-      }
+      // La vista de amigo es solo lectura: ahi nunca se toca el Dex propio.
+      if (isFriendView) return;
       const nextOwned = !isOwned;
       onToggleOwned(sprite.id);
       sounds.playToggle(nextOwned, sprite.gen);
@@ -456,17 +447,16 @@ function FamilySpotlightRow({
                     </button>
                   ))}
                 </div>
+              ) : isFriendView ? (
+                <div className="card-owned-btn is-readonly">
+                  <span className="btn-text">{t('swiper.noLoTiene')}</span>
+                </div>
               ) : (
                 <button
                   className="card-owned-btn"
                   onClick={handleToggleBadgeClick}
-                  style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800 } : {}}
                 >
-                  <span className="btn-text">
-                    {isFriendView
-                      ? (friendCanLend ? t('swiper.registrarEnMiDex') : t('swiper.noLoTiene'))
-                      : t('swiper.sinAtrapar')}
-                  </span>
+                  <span className="btn-text">{t('swiper.sinAtrapar')}</span>
                 </button>
               )}
             </div>

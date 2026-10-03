@@ -34,16 +34,8 @@ function SpriteCardBase({
   const handleToggleClick = (e) => {
     e.stopPropagation();
     if (sprite.unreleased) return;
-    if (isFriendView) {
-      // In friend view, clicking action button toggles ownership in MY collection
-      const nextOwned = !myOwned;
-      onToggleOwned(sprite.id);
-      sounds.playToggle(nextOwned, sprite.gen);
-      if (nextOwned) {
-        fireConfetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
-      }
-      return;
-    }
+    // La vista de amigo es solo lectura: ahi nunca se toca el Dex propio.
+    if (isFriendView) return;
 
     const nextOwned = !isOwned;
     onToggleOwned(sprite.id);
@@ -89,8 +81,8 @@ function SpriteCardBase({
     return (
       <div
         className={`sprite-list-item ${isOwned ? 'is-owned' : ''} ${isMastered ? ('is-mastered ' + (sprite.gen === 2 ? 'is-glitch-mastered' : 'is-classic-mastered')) : ''}`}
-        onClick={handleToggleClick}
-        style={{ cursor: sprite.unreleased ? 'default' : 'pointer' }}
+        onClick={isFriendView ? undefined : handleToggleClick}
+        style={{ cursor: (sprite.unreleased || isFriendView) ? 'default' : 'pointer' }}
       >
         <div className="list-item-image">
           {isMastered && (
@@ -170,19 +162,22 @@ function SpriteCardBase({
                   ))}
                 </div>
               )}
-              <button
-                className={`owned-btn-sm ${isMastered ? 'mastered' : isOwned ? 'owned' : ''}`}
-                onClick={handleToggleClick}
-                style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff' } : {}}
-              >
-                {isFriendView
-                  ? (friendCanLend
-                    ? (myOwned ? t('carta.registrado') : t('carta.registrarEnMiDex'))
-                    : isOwned ? t('carta.tuAmigoLoTiene') : t('carta.noLoTiene'))
-                  : (isMastered
+              {isFriendView ? (
+                <span className={`owned-btn-sm is-readonly ${isOwned ? 'owned' : ''}`}>
+                  {isOwned
+                    ? (myOwned ? t('carta.registrado') : t('carta.tuAmigoLoTiene'))
+                    : t('carta.noLoTiene')}
+                </span>
+              ) : (
+                <button
+                  className={`owned-btn-sm ${isMastered ? 'mastered' : isOwned ? 'owned' : ''}`}
+                  onClick={handleToggleClick}
+                >
+                  {isMastered
                     ? t('carta.maxeado')
-                    : isOwned ? t('carta.atrapadoNivel', { n: level }) : t('carta.sinAtrapar'))}
-              </button>
+                    : isOwned ? t('carta.atrapadoNivel', { n: level }) : t('carta.sinAtrapar')}
+                </button>
+              )}
             </>
           )}
         </div>
@@ -199,9 +194,9 @@ function SpriteCardBase({
         background: styleInfo.background,
         borderColor: styleInfo.borderColor,
         position: 'relative',
-        cursor: sprite.unreleased ? 'default' : 'pointer'
+        cursor: (sprite.unreleased || isFriendView) ? 'default' : 'pointer'
       }}
-      onClick={handleToggleClick}
+      onClick={isFriendView ? undefined : handleToggleClick}
     >
       {/* Cyber Glitch Visual FX for Gen 2 Mastered cards */}
       {isMastered && sprite.gen === 2 && (
@@ -317,17 +312,16 @@ function SpriteCardBase({
             </button>
           ))}
         </div>
+      ) : isFriendView ? (
+        <div className="card-owned-btn is-readonly">
+          <span className="btn-text">{t('carta.noLoTiene')}</span>
+        </div>
       ) : (
         <button
           className="card-owned-btn"
           onClick={handleToggleClick}
-          style={isFriendView && friendCanLend ? { background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: '#fff', fontWeight: 800 } : {}}
         >
-          <span className="btn-text">
-            {isFriendView
-              ? (friendCanLend ? t('carta.registrarEnMiDex') : t('carta.noLoTiene'))
-              : t('carta.sinAtrapar')}
-          </span>
+          <span className="btn-text">{t('carta.sinAtrapar')}</span>
         </button>
       )}
     </div>

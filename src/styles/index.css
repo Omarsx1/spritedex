@@ -3890,6 +3890,15 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
 }
+/* La vista de amigo es solo lectura: mismo aspecto, pero sin senal de click. */
+.card-owned-btn.is-readonly,
+.owned-btn-sm.is-readonly {
+  cursor: default;
+}
+.card-owned-btn.is-readonly:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+}
 
 .card-owned-btn.owned {
   background: var(--emerald);

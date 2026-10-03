@@ -1168,6 +1168,7 @@ useEffect(() => {
           userState={userState}
           onToggleOwned={handleToggleOwned}
           onSetLevel={handleSetLevel}
+          readOnly={activeProfile === 'friend'}
           onClose={handleCloseDetail}
         />
       )}
