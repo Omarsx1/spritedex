@@ -106,37 +106,56 @@ function loadBatSilhouette() {
 function drawSilhouetteBat(ctx, size, wingFold, depthLayer) {
   const ancho = size * 2.05;
   const alto = ancho / (1784.16 / 787.54);
-  // Cada ala gira sobre su hombro, que es donde la pieza del ala toca el cuerpo. El
-  // hombro izquierdo cae a 0.08 del centro (el ala ocupa el 42% del ancho desde el borde).
   const anchoAla = ancho * (batParts.corte / batParts.ancho);
   const anchoCuerpo = ancho * (batParts.cuerpo / batParts.ancho);
-  const hombro = -(ancho / 2 - anchoAla);
-  const giro = wingFold * 0.75;
+  const hombroX = -(ancho / 2 - anchoAla);
+  const hombroY = -alto * 0.18;
 
+  // Cinemática de aleteo 3D orgánico:
+  // - En la subida (upstroke: wingFold > 0), las alas se elevan en 3D: la envergadura proyectada
+  //   se contrae (spanScale) y las puntas se orientan sutilmente hacia arriba/adelante (tilt).
+  // - En la bajada (downstroke: wingFold < 0), las alas se despliegan al 100% capturando aire (chordScale).
+  // - La articulación pivota en la inserción real del hombro (hombroX, hombroY), no en el centro del bicho.
+  // - Sustentación vertical sutil (bobY): el cuerpo experimenta un impulso vertical al batir hacia abajo.
+  const spanScale = 1 - (wingFold > 0 ? wingFold * 0.35 : Math.abs(wingFold) * 0.08);
+  const chordScale = 1 + (wingFold < 0 ? Math.abs(wingFold) * 0.10 : -wingFold * 0.12);
+  const tilt = wingFold * 0.16;
+  const bobY = wingFold * (alto * 0.06);
+
+  const renderBat = (c) => {
+    // Ala izquierda: pivota sobre la junta superior del hombro izquierdo
+    c.save();
+    c.translate(hombroX, hombroY);
+    if (typeof c.rotate === 'function') c.rotate(tilt);
+    if (typeof c.scale === 'function') c.scale(spanScale, chordScale);
+    c.drawImage(batParts.izq, -anchoAla, -alto / 2 - hombroY, anchoAla, alto);
+    c.restore();
+
+    // Ala derecha: rotación simétrica sobre el hombro derecho
+    c.save();
+    c.translate(-hombroX, hombroY);
+    if (typeof c.rotate === 'function') c.rotate(-tilt);
+    if (typeof c.scale === 'function') c.scale(spanScale, chordScale);
+    c.drawImage(batParts.der, 0, -alto / 2 - hombroY, anchoAla, alto);
+    c.restore();
+
+    // Cuerpo en el centro superpuesto encima, tapando limpiamente la unión de las alas
+    c.drawImage(batParts.centro, hombroX, -alto / 2, anchoCuerpo, alto);
+  };
+
+  // Sombra proyectada en primer plano (capa 2) que aletea en sincronía con el murciélago
   if (depthLayer === 2) {
     ctx.save();
-    ctx.globalAlpha = ctx.globalAlpha * 0.42;
-    ctx.translate(0, size * 0.16);
-    ctx.drawImage(batSilhouette, -ancho / 2, -alto / 2, ancho, alto);
+    ctx.globalAlpha = ctx.globalAlpha * 0.38;
+    ctx.translate(0, size * 0.16 + bobY);
+    renderBat(ctx);
     ctx.restore();
   }
 
-  // Ala izquierda: gira sobre el hombro izquierdo.
   ctx.save();
-  ctx.translate(hombro, 0);
-  ctx.rotate(giro);
-  ctx.drawImage(batParts.izq, -anchoAla, -alto / 2, anchoAla, alto);
+  ctx.translate(0, bobY);
+  renderBat(ctx);
   ctx.restore();
-
-  // Ala derecha: el giro es simetrico.
-  ctx.save();
-  ctx.translate(-hombro, 0);
-  ctx.rotate(-giro);
-  ctx.drawImage(batParts.der, 0, -alto / 2, anchoAla, alto);
-  ctx.restore();
-
-  // Cuerpo encima, para tapar la junta de las alas.
-  ctx.drawImage(batParts.centro, hombro, -alto / 2, anchoCuerpo, alto);
 }
 
 /**

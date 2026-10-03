@@ -219,10 +219,6 @@ export function FortnitemaresTransition({ onComplete }) {
 
   return (
     <>
-      {/* El bosque persistente de la temporada: vive debajo del contenido y
-          cruza desde la rejilla en la parte "ground" de la cinematica. */}
-      {themed && <div className="fnm-forest" aria-hidden="true" />}
-
       {armed && (
         <div className="fnm-cinematic" data-phase={phase || 'boot'}>
           {/* Nada tapa la interfaz: las piezas reales se transforman solas. */}
