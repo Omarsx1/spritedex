@@ -148,6 +148,8 @@ test('con la silueta cargada el enjambre la dibuja en vez de las facetas', async
     set src(valor) {
       pedida = valor;
       this.complete = true;
+      this.naturalWidth = 1784;
+      this.naturalHeight = 787;
       Promise.resolve().then(() => this.onload && this.onload());
     }
   };
