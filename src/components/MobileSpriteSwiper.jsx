@@ -352,11 +352,7 @@ function FamilySpotlightRow({
           {/* Badge de nivel o amigo */}
           {!sprite.unreleased && (
             isFriendView ? (
-              friendCanLend ? (
-                <div className="ms-level-tag ms-level-tag--lend ms-spotlight-fade" onClick={handleToggleBadgeClick}>
-                  {myOwned ? t('swiper.registradoMayus') : t('swiper.presta')}
-                </div>
-              ) : isOwned ? (
+              isOwned ? (
                 <div className="ms-level-tag ms-level-tag--friend ms-spotlight-fade">
                   {t('swiper.amigo')}
                 </div>

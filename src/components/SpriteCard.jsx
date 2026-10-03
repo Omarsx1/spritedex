@@ -232,11 +232,7 @@ function SpriteCardBase({
 
       {/* Badge de nivel o amigo (esquina superior derecha, solo si no es unreleased y está atrapado o vista amigo) */}
       {!sprite.unreleased && (isFriendView ? (
-        friendCanLend ? (
-          <div className="ms-level-tag ms-level-tag--lend" onClick={handleToggleClick}>
-            {myOwned ? t('carta.registradoMayus') : t('carta.presta')}
-          </div>
-        ) : isOwned ? (
+        isOwned ? (
           <div className="ms-level-tag ms-level-tag--friend">
             {t('carta.amigo')}
           </div>
