@@ -50,20 +50,32 @@ Sin afectar a los usuarios: ningun cambio visible, ninguna ruta rota.
       `.webp` y los assets todavia en `.png`, es decir imagenes rotas.
 
 ## Fuera de alcance (encontrado durante el trabajo)
-- [ ] T6 **16 espiritus sin arte real**: los 10 ids sin ningun archivo (`ghost_gem`,
-      `dream_gem`, `king_gem`, `fishy_gem`, `striker_gem`, `seven_gem`, `demon_holofoil`,
-      `fishy_holofoil`, `boss_holofoil`, `striker_rift`) y los 6 placeholders vectoriales
-      (`air_gem`, `aura_holofoil`, `batman_gem`, `boss_gem`, `duck_holofoil`, `peely_candy`).
-      Hacen falta los recortes; sin ellos esas fichas caen al `onError` y muestran otro espiritu.
-- [ ] T7 Los 114 derivados huerfanos (T3) quedan a la espera de confirmar los ids de la BD.
+- [x] T6 **Arte real: 4 espiritus estrenan imagen y 1 deja el placeholder.** Se descargaron del
+      mismo origen que usa el pipeline (`staticvacant.github.io/fnsprites`) y se convirtieron a
+      WebP q85: `ghost_gem`, `dream_gem`, `demon_holofoil`, `king_gem` (los cuatro mostraban
+      OTRO espiritu por el fallback) y `boss_gem` (tenia un placeholder vectorial). Quedan **6
+      espiritus sin arte en el origen** (`fishy_holofoil`, `fishy_gem`, `striker_rift`,
+      `striker_gem`, `boss_holofoil`, `seven_gem`) y **5 placeholders** (`air_gem`,
+      `aura_holofoil`, `batman_gem`, `duck_holofoil`, `peely_candy`): hay que conseguirlos de otra
+      fuente. `peely_candy` ademas apunta por alias a `peely_gummy.webp`, y se comprobo que es
+      EXACTAMENTE el mismo arte, asi que el alias es correcto y no se toca.
+- [x] T7 **126 derivados huerfanos borrados** (63 miniaturas + 63 collages, 1,50 MB). Se verifico
+      par a par que cada nombre del volcado crudo (`Jonesy_base`, `fire_duck`,
+      `T_Icon_BR_Creature_*_L`) es el mismo espiritu que el catalogo identifica con otro slug
+      (`jonesy_basic`, `fire_quack`...) y que su gemelo tiene archivo raiz Y miniatura propios. El
+      manifiesto se reconstruye escaneando la carpeta: 307 -> 244 entradas.
 
 ## Resultado medido (2026-10-04)
 | Metrica | Antes | Despues |
 |---|---|---|
 | Peso de `dist/` | 39 MB | **21 MB** (−46%) |
-| Peso de `public/` | 35 MB | 19 MB |
-| Espiritus en `public/sprites` | 108 PNG + 169 WebP | **0 PNG** + 270 WebP + 7 SVG |
-| Coste por deploy | ~1,17 GB-mes | ~0,63 GB-mes |
+| Peso de `public/` | 35 MB | 18 MB |
+| Espiritus en `public/sprites` | 108 PNG + 169 WebP | **0 PNG** + 271 WebP + 6 SVG |
+| Espiritus sin imagen | 10 | **6** |
+| Coste por deploy | ~1,17 GB-mes | ~0,6 GB-mes |
+
+Segunda tanda (tras el primer cierre): 126 derivados duplicados (−1,50 MB), 5 espiritus con arte
+real y 15 miniaturas que faltaban. `dist/` baja de 21 a **20 MB**.
 
 - Rutas `/sprites/` literales en el bundle construido: **351, ninguna rota** (las 2 que el
   regex marca son nombres con espacio de miniaturas huerfanas, que existen).
