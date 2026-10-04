@@ -378,6 +378,7 @@ export default {
   "footer.guia": "Sprite guide",
   "footer.espiritus": "All sprites",
   "detalle.verFicha": "View page",
+  "compartir.volver": "Back to the app",
   "header.abrirAcciones": "Open actions",
   "header.amigos": "Friends",
   "header.atrapados": "CAUGHT",

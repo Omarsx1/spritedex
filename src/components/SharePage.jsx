@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { X, Download, Share2, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Download, Share2, Copy, Check } from 'lucide-react';
 import { pickName } from '../data/spritesData';
 import { generateSpritedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, marcarEsperaActiva, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import { safeStorage } from '../utils/safeStorage';
-import { Modal } from './ui/Modal';
 import gsap from 'gsap';
 import { t } from '../i18n';
 
@@ -40,7 +39,7 @@ function leerPerfActivado() {
   return params.has('perf') || window.location.hash.toLowerCase().includes('perf');
 }
 
-export function ShareImageModal({ filteredSprites, allSprites, userState, activeFiltersLabel, onClose }) {
+export function SharePage({ filteredSprites, allSprites, userState, activeFiltersLabel, onBack }) {
   const [format, setFormat] = useState(DEFAULT_EXPORT_FORMAT); // 'checklist', 'square'
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
   const [bgStyle] = useState(DEFAULT_EXPORT_BG_STYLE); // 'glitch_override', 'blueprint', 'dark_matrix'
@@ -71,7 +70,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const [cachedBlob, setCachedBlob] = useState(() => initialCached?.blob || null);
   const [previewCanvas, setPreviewCanvas] = useState(() => initialCached?.canvas || null);
   const [isGenerating, setIsGenerating] = useState(() => !initialCached);
-  const [isClosing, setIsClosing] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
   const [perf, setPerf] = useState(null);
   const [showPerf, setShowPerf] = useState(() => {
@@ -140,12 +138,9 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     }
   }, []);
 
-  const handleClose = () => {
-    if (isClosing) return;
-    setIsClosing(true);
-    setTimeout(() => {
-      onClose();
-    }, 220);
+  // Antes era una modal y cerraba con animacion; ahora es una vista propia: volver es navegar.
+  const handleBack = () => {
+    onBack();
   };
 
   // Entrance animation matching modern spring physics (rápido y a 60/120fps)
@@ -512,16 +507,15 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   ) : null;
 
   return (
-    <Modal
-      onClose={handleClose}
-      closeOnEscape={!isClosing}
-      overlayClassName={isClosing ? 'is-closing' : ''}
-      className={`sdm-share-pro ${isClosing ? 'is-closing' : ''}`}
-      innerRef={modalRef}
-      afterCard={medidorPerf}
-    >
+    <div className="spage">
+      {medidorPerf}
+      {/* El layout de la vista vive en el CSS (grid areas sobre estas clases). */}
+      <div className="sdm-share-pro" ref={modalRef}>
         {/* Header Elegante y Minimalista */}
         <div className="sdm-share-pro__header">
+          <button className="fpage__back" onClick={handleBack} aria-label={t('compartir.volver')} title={t('compartir.volver')}>
+            <ArrowLeft size={20} />
+          </button>
           <div className="sdm-share-pro__title-wrap">
             <div>
               <h2 className="sdm-share-pro__title" onPointerUp={manejarTapTitulo}>{t('compartir.titulo')}</h2>
@@ -530,9 +524,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
               </p>
             </div>
           </div>
-          <button className="sdm-share-pro__close" onClick={handleClose} aria-label={t('compartir.cerrarModal')}>
-            <X size={18} />
-          </button>
         </div>
 
         {/* Toolbar de Configuración Compacta */}
@@ -662,6 +653,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
           </button>
         </div>
 
-    </Modal>
+      </div>
+    </div>
   );
 }

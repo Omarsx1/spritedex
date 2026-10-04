@@ -438,10 +438,10 @@ export function Header({
                   className="hero__btn hero__btn--accent"
                   onClick={onOpenShareModal}
                   onMouseEnter={() => {
-                    import('../components/ShareImageModal');
+                    import('../components/SharePage');
                   }}
                   onTouchStart={() => {
-                    import('../components/ShareImageModal');
+                    import('../components/SharePage');
                   }}
                   title={t('header.compartirImagenTitulo')}
                 >
@@ -522,10 +522,10 @@ export function Header({
                     onOpenShareModal();
                   }}
                   onMouseEnter={() => {
-                    import('../components/ShareImageModal');
+                    import('../components/SharePage');
                   }}
                   onTouchStart={() => {
-                    import('../components/ShareImageModal');
+                    import('../components/SharePage');
                   }}
                 >
                   <Share2 size={19} strokeWidth={2.2} />
@@ -602,10 +602,10 @@ export function Header({
                     onOpenShareModal();
                   }}
                   onMouseEnter={() => {
-                    import('../components/ShareImageModal');
+                    import('../components/SharePage');
                   }}
                   onTouchStart={() => {
-                    import('../components/ShareImageModal');
+                    import('../components/SharePage');
                   }}
                 >
                   <span

@@ -379,6 +379,7 @@ export default {
   "footer.guia": "Guía de espíritus",
   "footer.espiritus": "Todos los espíritus",
   "detalle.verFicha": "Ver ficha",
+  "compartir.volver": "Volver a la app",
   "header.abrirAcciones": "Abrir acciones",
   "header.amigos": "Amigos",
   "header.atrapados": "ATRAPADOS",

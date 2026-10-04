@@ -9876,3 +9876,83 @@ body .swal2-container .swal2-toast.swal2-popup {
     gap: 20px;
   }
 }
+
+/* ── Vista de compartir ───────────────────────────────────────────────────────────────────
+   Compartir dejo de ser una modal: ahora es una vista propia (/compartir) para poder mirar la
+   lona en grande, que era el motivo del cambio. El layout se resuelve aqui, sobre las clases
+   que ya traia la modal, asi que su logica quedo intacta. */
+.spage {
+  /* Contenedor propio, no .fpage: las reglas de escritorio de la vista de amigos se aplicarian
+     tambien aqui y le dejaban una columna fantasma de 420px. */
+  min-height: 100dvh;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: max(18px, env(safe-area-inset-top)) 22px max(26px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* La tarjeta deja de ser tarjeta: cada bloque es su propia pieza sobre el fondo. */
+.spage .sdm-share-pro {
+  max-width: none;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  overflow: visible;
+  display: grid;
+  grid-template-areas: "cabecera" "controles" "vista" "acciones";
+  gap: 14px;
+}
+
+.spage .sdm-share-pro__header { grid-area: cabecera; }
+.spage .sdm-share-pro__controls { grid-area: controles; }
+.spage .sdm-share-pro__preview-wrap { grid-area: vista; }
+.spage .sdm-share-pro__actions { grid-area: acciones; }
+
+.spage .sdm-share-pro__controls,
+.spage .sdm-share-pro__actions {
+  background: rgba(8, 12, 24, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+/* En la vista no hay tope de modal: la lona puede usar el alto de la pantalla. */
+.spage .sdm-share-pro__preview-wrap {
+  max-height: none;
+  min-height: 0;
+  height: 100%;
+}
+
+.spage .sdm-share-pro__preview-img {
+  max-height: 72dvh;
+}
+
+@media (min-width: 1000px) {
+  /* Dos columnas: los ajustes a la izquierda y la lona a la derecha, que es la protagonista. */
+  .spage .sdm-share-pro {
+    grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
+    grid-template-areas: "cabecera cabecera" "controles vista" "acciones vista";
+    align-items: start;
+    column-gap: 24px;
+  }
+
+  /* La columna de ajustes es mas estrecha que la modal (640px): en dos columnas no cabia y la
+     fila de FORMATO se cortaba. Un grupo por fila. */
+  .spage .sdm-share-pro__controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .spage .sdm-share-pro__preview-img {
+    max-height: calc(100dvh - 230px);
+  }
+
+  .spage .sdm-share-pro__actions {
+    position: sticky;
+    bottom: 16px;
+  }
+}

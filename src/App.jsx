@@ -59,7 +59,7 @@ const PRECALCULO_CALMA_MS = 2000;
 
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
 const AdminAuthGate = lazy(() => import('./components/admin/AdminAuthGate').then(m => ({ default: m.AdminAuthGate })));
-const ShareImageModal = lazy(() => import('./components/ShareImageModal').then(m => ({ default: m.ShareImageModal })));
+const SharePage = lazy(() => import('./components/SharePage').then(m => ({ default: m.SharePage })));
 const BackupModal = lazy(() => import('./components/BackupModal').then(m => ({ default: m.BackupModal })));
 const FriendCompareModal = lazy(() => import('./components/FriendCompareModal').then(m => ({ default: m.FriendCompareModal })));
 const AuthModal = lazy(() => import('./components/AuthModal').then(m => ({ default: m.AuthModal })));
@@ -225,7 +225,13 @@ export function App() {
 
   // Modals
   const [selectedSprite, setSelectedSprite] = useState(null);
-  const [showShareModal, setShowShareModal] = useState(false);
+  // La ruta de la app se lee SIN el prefijo de idioma: /en/compartir y /compartir son la misma
+  // pantalla. Vive aqui arriba porque hay efectos que ya la consultan antes de su bloque, y
+  // compartir dejo de ser una modal para ser una vista propia.
+  const rutaActual = typeof window !== 'undefined' ? window.location.pathname : '';
+  const rutaApp = rutaSinIdioma(rutaActual);
+  const [enAmigos, setEnAmigos] = useState(() => rutaApp.indexOf('/amigos') === 0);
+  const [enCompartir, setEnCompartir] = useState(() => rutaApp.indexOf('/compartir') === 0);
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [showFooterPrivacyModal, setShowFooterPrivacyModal] = useState(false);
@@ -294,7 +300,7 @@ export function App() {
 
     const idleTimer = setTimeout(() => {
       // 1. Precarga del chunk del modal en la caché del navegador
-      import('./components/ShareImageModal');
+      import('./components/SharePage');
 
       // 2. Precarga en reposo de las MINIATURAS que usara el export (por lotes de 10),
       // para que compartir sea instantaneo. Son ~1,5 MB por generacion, no los 19 MB
@@ -475,7 +481,7 @@ export function App() {
     // produccion que en el tunel (que no tiene Supabase). Al cerrar la modal este
     // efecto vuelve a ejecutarse y sincroniza; si el usuario cierra la pestana antes,
     // lo cubre el flush con keepalive de mas abajo.
-    if (showShareModal) return;
+    if (enCompartir) return;
 
     if (isSupabaseConfigured && user) {
       const timer = setTimeout(async () => {
@@ -559,7 +565,7 @@ export function App() {
       }, 600);
       return () => clearTimeout(timer);
     }
-  }, [userState, user, myFriendCode, showShareModal, handleSignOutCleanup]);
+  }, [userState, user, myFriendCode, enCompartir, handleSignOutCleanup]);
 
   // Salida garantizada: si la pestaña se cierra o pasa a segundo plano con un sync
   // pendiente, se empuja con keepalive en vez de esperar el debounce de 600 ms.
@@ -765,7 +771,7 @@ export function App() {
   // una sola vez por cambio de progreso.
   // OJO: va despues de scopedSprites a proposito; usarlo antes seria un TDZ.
 useEffect(() => {
-    if (typeof window === 'undefined' || isAdminPortal || showShareModal) return;
+    if (typeof window === 'undefined' || isAdminPortal || enCompartir) return;
     if (!Array.isArray(scopedSprites) || scopedSprites.length === 0) return;
 
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -826,7 +832,7 @@ useEffect(() => {
       clearTimeout(timer);
       EVENTOS.forEach((ev) => window.removeEventListener(ev, marcarActividad));
     };
-  }, [scopedSprites, userState, isAdminPortal, showShareModal]);
+  }, [scopedSprites, userState, isAdminPortal, enCompartir]);
 
   const activeState = activeProfile === 'friend' && friendState ? friendState : userState;
   const totalCount = scopedSprites.length;
@@ -851,9 +857,6 @@ useEffect(() => {
   // Página de amigos (fase 1): ruta propia para tener espacio de verdad. La modal sigue
   // viva en paralelo, así nadie pierde el radar mientras migramos.
   // La ruta de la app se lee SIN el prefijo de idioma: /en/amigos y /amigos son la misma pantalla.
-  const rutaActual = typeof window !== 'undefined' ? window.location.pathname : '';
-  const rutaApp = rutaSinIdioma(rutaActual);
-  const [enAmigos, setEnAmigos] = useState(() => rutaApp.indexOf('/amigos') === 0);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -916,7 +919,7 @@ useEffect(() => {
     // Fuera de produccion no se crean usuarios reales, asi que el aviso no tiene destino.
     if (shouldSkipAnonymousAuth()) return undefined;
     if (safeStorage.getItem(CLAVE_AVISO_RECLAMO) === 'true') return undefined;
-    const hayModalAbierto = Boolean(selectedSprite) || showShareModal || showBackupModal ||
+    const hayModalAbierto = Boolean(selectedSprite) || enCompartir || showBackupModal ||
       showCompareModal || showFooterPrivacyModal || showAuthModal;
     if (hayModalAbierto) return undefined;
     const timer = setTimeout(() => {
@@ -924,7 +927,7 @@ useEffect(() => {
       setShowAuthModal(true);
     }, AVISO_RECLAMO_RETRASO_MS);
     return () => clearTimeout(timer);
-  }, [mostrarAvisoReclamo, selectedSprite, showShareModal, showBackupModal, showCompareModal, showFooterPrivacyModal, showAuthModal]);
+  }, [mostrarAvisoReclamo, selectedSprite, enCompartir, showBackupModal, showCompareModal, showFooterPrivacyModal, showAuthModal]);
 
   // La modal de autenticacion se dibuja en los dos arboles: la pagina de amigos retorna
   // antes de llegar a los modales de la app, y el aviso de reclamo tiene que poder abrirla
@@ -939,6 +942,31 @@ useEffect(() => {
       onSignOut={handleSignOutCleanup}
     />
   ) : null;
+
+  if (enCompartir) {
+    return (
+      <div className="app-container">
+        {mostrarAvisoReclamo && (
+          <ClaimAccountBanner onCrearUsuario={() => setShowAuthModal(true)} />
+        )}
+        <SharePage
+          filteredSprites={filteredSprites}
+          allSprites={scopedSprites}
+          userState={userState}
+          activeFiltersLabel={
+            [
+              baseFilter !== 'all' ? t('app.filtroVariante', { valor: baseFilter }) : '',
+              spriteFilter !== 'all' ? t('app.filtroFamilia', { valor: familiaVisible }) : '',
+              searchQuery ? t('app.filtroBusqueda', { valor: searchQuery }) : ''
+            ]
+              .filter(Boolean)
+              .join(' · ') || t('app.sinFiltros')
+          }
+          onBack={() => irA('/')}
+        />
+      </div>
+    );
+  }
 
   if (enAmigos) {
     return (
@@ -1064,7 +1092,7 @@ useEffect(() => {
         isLiveConnected={isLiveConnected}
         connectedFriendCode={connectedFriendCode}
         solicitudesNuevas={solicitudesNuevas}
-        onOpenShareModal={() => setShowShareModal(true)}
+        onOpenShareModal={() => irA('/compartir')}
         onOpenBackupModal={() => setShowBackupModal(true)}
         onOpenCompareModal={() => irA('/amigos')}
         onOpenAuthModal={() => setShowAuthModal(true)}
@@ -1202,25 +1230,6 @@ useEffect(() => {
       )}
 
       <Suspense fallback={null}>
-        {showShareModal && (
-          <ShareImageModal
-            filteredSprites={filteredSprites}
-            allSprites={scopedSprites}
-            userState={userState}
-            activeGen={activeGen}
-            activeFiltersLabel={
-              [
-                baseFilter !== 'all' ? t('app.filtroVariante', { valor: baseFilter }) : '',
-                spriteFilter !== 'all' ? t('app.filtroFamilia', { valor: familiaVisible }) : '',
-                searchQuery ? t('app.filtroBusqueda', { valor: searchQuery }) : ''
-              ]
-                .filter(Boolean)
-                .join(' · ') || t('app.sinFiltros')
-            }
-            onClose={() => setShowShareModal(false)}
-          />
-        )}
-
         {showBackupModal && (
           <BackupModal
             userState={userState}
