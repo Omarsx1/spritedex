@@ -767,18 +767,24 @@ async function renderGlitchOverrideTemplate({
   ctx.save();
   const scale = width / 1200;
 
+  // En temporada el encabezado se viste de Fortnitemares: mismos sitios y misma tipografia,
+  // solo cambian los textos y el acento, para que la lona siga siendo reconocible.
+  const enTemporada = isFortnitemaresActive();
+  const acentoCabecera = enTemporada ? '#e879f9' : '#00F0E8';
+  const acentoCabeceraRgba = enTemporada ? 'rgba(232, 121, 249, 0.7)' : 'rgba(0, 240, 232, 0.7)';
+
   // Top Small Header: "FORTNITE , NUEVOS"
   ctx.font = `900 ${Math.round(14 * Math.min(1.2, scale))}px "Outfit", "Inter", "Arial Black", sans-serif`;
-  ctx.fillStyle = '#00F0E8';
+  ctx.fillStyle = acentoCabecera;
   ctx.textAlign = 'center';
   ctx.letterSpacing = '3px';
-  ctx.shadowColor = 'rgba(0, 240, 232, 0.7)';
+  ctx.shadowColor = acentoCabeceraRgba;
   ctx.shadowBlur = 8;
   const topTextY = Math.round(34 * Math.min(1.15, scale));
-  ctx.fillText(t('lona.arriba'), width / 2, topTextY);
+  ctx.fillText(enTemporada ? t('lona.arribaMares') : t('lona.arriba'), width / 2, topTextY);
 
   // Main Big Title: "SPRITEDEX OVERRIDE"
-  const titleText = t('lona.titulo');
+  const titleText = enTemporada ? t('lona.tituloMares') : t('lona.titulo');
   const baseTitleFontSize = isSquare ? (cols >= 8 ? 44 : 48) : 52;
   const titleFontSize = Math.round(baseTitleFontSize * Math.min(1.22, Math.max(0.9, scale)));
   ctx.font = `900 ${titleFontSize}px "Burbank Big Condensed", "Impact", "Arial Black", sans-serif`;
@@ -786,7 +792,7 @@ async function renderGlitchOverrideTemplate({
   const titleY = topTextY + Math.round(50 * Math.min(1.15, scale));
 
   // Chromatic Aberration Shadows
-  ctx.fillStyle = '#00F0E8';
+  ctx.fillStyle = acentoCabecera;
   ctx.fillText(titleText, width / 2 + 3, titleY);
 
   ctx.fillStyle = '#ff0055';
@@ -799,7 +805,7 @@ async function renderGlitchOverrideTemplate({
   ctx.shadowBlur = 0;
 
   // Tagline Pill Capsule: "ROMPE LAS REGLAS • CAMBIA EL JUEGO"
-  const capsuleText = t('lona.lema');
+  const capsuleText = enTemporada ? t('lona.lemaMares') : t('lona.lema');
   const capsuleFontSize = Math.round(10.5 * Math.min(1.15, scale));
   ctx.font = `900 ${capsuleFontSize}px "Outfit", "Inter", "Arial Black", sans-serif`;
   ctx.letterSpacing = '1px';
