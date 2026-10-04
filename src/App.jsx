@@ -860,7 +860,11 @@ useEffect(() => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
-    const alVolver = () => setEnAmigos(rutaSinIdioma(window.location.pathname).indexOf('/amigos') === 0);
+    const alVolver = () => {
+      const ruta = rutaSinIdioma(window.location.pathname);
+      setEnAmigos(ruta.indexOf('/amigos') === 0);
+      setEnCompartir(ruta.indexOf('/compartir') === 0);
+    };
     window.addEventListener('popstate', alVolver);
     return () => window.removeEventListener('popstate', alVolver);
   }, []);
@@ -890,6 +894,7 @@ useEffect(() => {
     if (typeof window === 'undefined') return;
     window.history.pushState({}, '', conIdioma(ruta, getLang()));
     setEnAmigos(ruta.indexOf('/amigos') === 0);
+    setEnCompartir(ruta.indexOf('/compartir') === 0);
   }, []);
 
   // Codigo de amigo que venga en la ruta (/amigos/SDEX-XXXX) o en el enlace actual
