@@ -7855,6 +7855,8 @@ a.app-footer__privacy-btn {
   text-decoration: none;
 }
 
+
+
 /* Enlace a la ficha publica del espiritu, dentro del detalle. */
 .sdm__ficha {
   display: inline-block;
@@ -9784,5 +9786,93 @@ body .swal2-container .swal2-toast.swal2-popup {
   body.theme-fortnitemares::after,
   html.theme-fortnitemares::after {
     animation: none !important;
+  }
+}
+
+/* ── Vista de amigos en escritorio ────────────────────────────────────────────────────────
+   Los envoltorios (lateral / principal) no existen para el layout en movil: con
+   display: contents los hijos se colocan igual que antes, asi que la vista movil queda
+   intacta. Desde 1000px la pagina se comporta como una ventana: cabecera y pestañas en la
+   misma fila, y debajo dos columnas que llenan el alto disponible. Asi el fondo de temporada
+   vuelve a ser un marco y no la pared del fondo. */
+.fpage__lateral,
+.fpage__principal {
+  display: contents;
+}
+
+@media (min-width: 1000px) {
+  .fpage {
+    max-width: 1240px;
+    padding-left: 26px;
+    padding-right: 26px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+    grid-template-rows: auto auto;
+    align-items: end;
+    /* Sin esto, las filas se reparten el alto de la pagina (que hereda min-height: 100vh) y la
+       cabecera y las tarjetas acaban pegadas al fondo de su fila. */
+    align-content: start;
+    column-gap: 28px;
+    row-gap: 16px;
+  }
+
+  .fpage__top {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  /* Las pestañas suben a la fila de la cabecera, alineadas con la columna de contenido. */
+  .fpage__tabs {
+    grid-column: 2;
+    grid-row: 1;
+    max-width: none;
+  }
+
+  .fpage__title {
+    font-size: 1.9rem;
+  }
+
+  .fpage__sub {
+    font-size: 0.85rem;
+  }
+
+  .fpage .sdm-friends {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
+    gap: 20px 28px;
+    align-items: start;
+    /* En escritorio se cae el panel contenedor: cada bloque es su propia tarjeta sobre el
+       fondo, como las fichas de la app. El fondo de temporada vuelve a ser el lienzo y no una
+       pared, y no queda un cajon oscuro vacio llenando la pantalla. */
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: 0;
+  }
+
+  .fpage__lateral,
+  .fpage__principal {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+
+  /* Cada bloque, una tarjeta: mismo borde y mismo fondo que las fichas de la app. */
+  .fpage__lateral > .sdm-friends__group,
+  .fpage__principal > .sdm-friends__group,
+  .fpage__bloqueFicha > .sdm-friends__group {
+    background: rgba(8, 12, 24, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 14px;
+  }
+
+  .fpage__bloqueFicha {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
 }

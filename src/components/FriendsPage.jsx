@@ -99,7 +99,10 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
   return (
     <div className="fpage">
       <div className="fpage__top">
-        <button className="fpage__back" onClick={onBack} aria-label={t('amigos.volverALaApp')}>
+        {/* Vuelve a la app, no atras: en una PWA instalada no hay boton del navegador y quien
+            llega por un enlace de amigo puede no tener historial. El title lo explica al pasar
+            el raton en escritorio, donde el icono solo no lo dice. */}
+        <button className="fpage__back" onClick={onBack} aria-label={t('amigos.volverALaApp')} title={t('amigos.volverALaApp')}>
           <ArrowLeft size={18} />
         </button>
         <div className="fpage__headText">
@@ -137,207 +140,211 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
       </div>
 
       <div className="sdm-friends" data-vista={vista}>
-        <div className="sdm-friends__group">
-          <span className="sdm-friends__label">{t('amigos.tuCodigoDeAmigo')}</span>
-          <div className="sdm-friends__row">
-            <span className="sdm-friends__plate">
-              <span className="sdm-friends__prefix">SDEX</span>
-              <span className="sdm-friends__code">{codigoCorto || '????'}</span>
-            </span>
-            <div className="sdm-friends__actions">
-              <button type="button" className="sdm-friends__btn" onClick={() => copiar(myFriendCode || '', 'codigo')}>
-                {copiado === 'codigo' ? <Check size={13} /> : <Copy size={13} />}
-                <span>{copiado === 'codigo' ? t('amigos.copiado') : t('amigos.copiar')}</span>
-              </button>
-              <button type="button" className="sdm-friends__btn" onClick={() => copiar(enlace, 'enlace')}>
-                {copiado === 'enlace' ? <Check size={13} /> : <Zap size={13} />}
-                <span>{t('amigos.enlace')}</span>
+        <div className="fpage__lateral">
+          <div className="sdm-friends__group">
+            <span className="sdm-friends__label">{t('amigos.tuCodigoDeAmigo')}</span>
+            <div className="sdm-friends__row">
+              <span className="sdm-friends__plate">
+                <span className="sdm-friends__prefix">SDEX</span>
+                <span className="sdm-friends__code">{codigoCorto || '????'}</span>
+              </span>
+              <div className="sdm-friends__actions">
+                <button type="button" className="sdm-friends__btn" onClick={() => copiar(myFriendCode || '', 'codigo')}>
+                  {copiado === 'codigo' ? <Check size={13} /> : <Copy size={13} />}
+                  <span>{copiado === 'codigo' ? t('amigos.copiado') : t('amigos.copiar')}</span>
+                </button>
+                <button type="button" className="sdm-friends__btn" onClick={() => copiar(enlace, 'enlace')}>
+                  {copiado === 'enlace' ? <Check size={13} /> : <Zap size={13} />}
+                  <span>{t('amigos.enlace')}</span>
+                </button>
+              </div>
+            </div>
+            <p className="sdm-friends__hint sdm-friends__hint--aviso">{t('amigos.avisoEnlace')}</p>
+            <p className="sdm-friends__hint">{t('amigos.hintCodigo')}</p>
+          </div>
+
+          <div className="sdm-friends__group">
+            <span className="sdm-friends__label"><UserPlus size={12} /> {t('amigos.agregarAmigo')}</span>
+            <div className="sdm-friends__add">
+              <input
+                type="text"
+                className="sdm-friends__input"
+                placeholder={t('amigos.placeholderCodigo')}
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value.toUpperCase())}
+                onKeyDown={(e) => { if (e.key === 'Enter') enviar(); }}
+              />
+              <button type="button" className="sdm-friends__send" onClick={enviar} disabled={!codigo.trim()}>
+                {t('amigos.enviarSolicitud')}
               </button>
             </div>
+            {avisoVisible && <p className="sdm-friends__aviso">{avisoVisible}</p>}
+            {!radar.haySesion && (
+              <p className="sdm-friends__aviso">{t('amigos.necesitasSesion')}</p>
+            )}
           </div>
-          <p className="sdm-friends__hint sdm-friends__hint--aviso">{t('amigos.avisoEnlace')}</p>
-          <p className="sdm-friends__hint">{t('amigos.hintCodigo')}</p>
-        </div>
 
-        <div className="sdm-friends__group">
-          <span className="sdm-friends__label"><UserPlus size={12} /> {t('amigos.agregarAmigo')}</span>
-          <div className="sdm-friends__add">
-            <input
-              type="text"
-              className="sdm-friends__input"
-              placeholder={t('amigos.placeholderCodigo')}
-              value={codigo}
-              onChange={(e) => setCodigo(e.target.value.toUpperCase())}
-              onKeyDown={(e) => { if (e.key === 'Enter') enviar(); }}
-            />
-            <button type="button" className="sdm-friends__send" onClick={enviar} disabled={!codigo.trim()}>
-              {t('amigos.enviarSolicitud')}
-            </button>
-          </div>
-          {avisoVisible && <p className="sdm-friends__aviso">{avisoVisible}</p>}
-          {!radar.haySesion && (
-            <p className="sdm-friends__aviso">{t('amigos.necesitasSesion')}</p>
-          )}
         </div>
-
-          <div className="fpage__bloqueFicha">
-          {codigoFicha && (
-            <div className="sdm-friends__group">
-              <div className="sdm-friends__fichaHead">
-                <span className="sdm-friends__label">{t('amigos.fichaCompartida')}</span>
-                <span className="sdm-friends__plate">
-                  <span className="sdm-friends__prefix">SDEX</span>
-                  <span className="sdm-friends__code">{String(codigoFicha).replace(/^SDEX-/i, '')}</span>
-                </span>
+        <div className="fpage__principal">
+            <div className="fpage__bloqueFicha">
+            {codigoFicha && (
+              <div className="sdm-friends__group">
+                <div className="sdm-friends__fichaHead">
+                  <span className="sdm-friends__label">{t('amigos.fichaCompartida')}</span>
+                  <span className="sdm-friends__plate">
+                    <span className="sdm-friends__prefix">SDEX</span>
+                    <span className="sdm-friends__code">{String(codigoFicha).replace(/^SDEX-/i, '')}</span>
+                  </span>
+                </div>
+                <div className="sdm-friends__row">
+                  <div className="sdm-friends__actions">
+                    {/* El boton sobra si esa colección ya esta cargada: pulsarlo no haria nada.
+                        Se deja mientras no este cargada para que quien llega por un enlace
+                        todavia tenga como cargarla. */}
+                    {!fichaCargada && (
+                      <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => verColeccion(codigoFicha)}>{t('amigos.verSuColeccion')}</button>
+                    )}
+                    {onVerEnApp && (
+                      <button type="button" className="sdm-friends__btn" onClick={() => onAbrirModal && onAbrirModal()}>
+                        {t('amigos.comparacionCompleta')}
+                      </button>
+                    )}
+                      <button type="button" className="sdm-friends__btn" onClick={() => onVerEnApp(codigoFicha)}>
+                        {t('amigos.vistaDeAmigo')}
+                      </button>
+                  </div>
+                </div>
               </div>
-              <div className="sdm-friends__row">
-                <div className="sdm-friends__actions">
-                  {/* El boton sobra si esa colección ya esta cargada: pulsarlo no haria nada.
-                      Se deja mientras no este cargada para que quien llega por un enlace
-                      todavia tenga como cargarla. */}
-                  {!fichaCargada && (
-                    <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => verColeccion(codigoFicha)}>{t('amigos.verSuColeccion')}</button>
-                  )}
-                  {onVerEnApp && (
-                    <button type="button" className="sdm-friends__btn" onClick={() => onAbrirModal && onAbrirModal()}>
-                      {t('amigos.comparacionCompleta')}
+            )}
+
+            {codigoFicha && friendState && (
+              <div className="sdm-friends__group">
+                <span className="sdm-friends__label">{t('amigos.teFaltanConteo', { n: listas.teFaltan.length })}</span>
+                <p className="sdm-friends__hint">{t('amigos.teFaltanHint')}</p>
+                {listas.teFaltan.length === 0 ? (
+                  <p className="sdm-friends__hint">{t('amigos.teFaltanVacio')}</p>
+                ) : (<>
+                  <div className="fpage__minis">
+                    {(verTodos.teFaltan ? listas.teFaltan : listas.teFaltan.slice(0, 12)).map((s) => (
+                      <div key={s.id} className="fpage__mini">
+                        {s.img ? <img src={s.img} alt={s.name} loading="lazy" decoding="async" width={44} height={44} /> : <span className="fpage__miniNombre">?</span>}
+                        <span className="fpage__miniNombre">{s.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {listas.teFaltan.length > 12 && (
+                    <button type="button" className="sdm-friends__btn sdm-friends__btn--ver" onClick={() => setVerTodos((v) => ({ ...v, teFaltan: !v.teFaltan }))}>
+                      {verTodos.teFaltan ? t('amigos.verMenos') : t('amigos.verLos', { n: listas.teFaltan.length })}
                     </button>
                   )}
-                    <button type="button" className="sdm-friends__btn" onClick={() => onVerEnApp(codigoFicha)}>
-                      {t('amigos.vistaDeAmigo')}
+                  </>
+                )}
+                <span className="sdm-friends__label">{t('amigos.leFaltanConteo', { n: listas.leFaltan.length })}</span>
+                <p className="sdm-friends__hint">{t('amigos.leFaltanHint')}</p>
+                {listas.leFaltan.length === 0 ? (
+                  <p className="sdm-friends__hint">{t('amigos.leFaltanVacio')}</p>
+                ) : (<>
+                  <div className="fpage__minis">
+                    {(verTodos.leFaltan ? listas.leFaltan : listas.leFaltan.slice(0, 12)).map((s) => (
+                      <div key={s.id} className="fpage__mini fpage__mini--suyo">
+                        {s.img ? <img src={s.img} alt={s.name} loading="lazy" decoding="async" width={44} height={44} /> : <span className="fpage__miniNombre">?</span>}
+                        <span className="fpage__miniNombre">{s.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {listas.leFaltan.length > 12 && (
+                    <button type="button" className="sdm-friends__btn sdm-friends__btn--ver" onClick={() => setVerTodos((v) => ({ ...v, leFaltan: !v.leFaltan }))}>
+                      {verTodos.leFaltan ? t('amigos.verMenos') : t('amigos.verLos', { n: listas.leFaltan.length })}
                     </button>
-                </div>
+                  )}
+                  </>
+                )}
               </div>
-            </div>
-          )}
+            )}
 
-          {codigoFicha && friendState && (
+            {codigoFicha && !friendState && (
+              <div className="sdm-friends__group">
+                <p className="sdm-friends__hint">{t('amigos.sinFichaHint')}</p>
+              </div>
+            )}
+            </div>
+
+          {radar.recibidas.length > 0 && (
             <div className="sdm-friends__group">
-              <span className="sdm-friends__label">{t('amigos.teFaltanConteo', { n: listas.teFaltan.length })}</span>
-              <p className="sdm-friends__hint">{t('amigos.teFaltanHint')}</p>
-              {listas.teFaltan.length === 0 ? (
-                <p className="sdm-friends__hint">{t('amigos.teFaltanVacio')}</p>
-              ) : (<>
-                <div className="fpage__minis">
-                  {(verTodos.teFaltan ? listas.teFaltan : listas.teFaltan.slice(0, 12)).map((s) => (
-                    <div key={s.id} className="fpage__mini">
-                      {s.img ? <img src={s.img} alt={s.name} loading="lazy" decoding="async" width={44} height={44} /> : <span className="fpage__miniNombre">?</span>}
-                      <span className="fpage__miniNombre">{s.name}</span>
-                    </div>
-                  ))}
+              <span className="sdm-friends__label">{t('amigos.solicitudesConteo', { n: radar.recibidas.length })}</span>
+              {radar.recibidas.map((s) => (
+                <div key={s.id} className="sdm-friends__row">
+                  <span className="sdm-friends__plate">
+                    <span className="sdm-friends__prefix">SDEX</span>
+                    <span className="sdm-friends__code">{String(s.from_code || '').replace(/^SDEX-/i, '')}</span>
+                  </span>
+                  <div className="sdm-friends__actions">
+                    <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => radar.aceptar(s.id)}>{t('amigos.aceptar')}</button>
+                    <button type="button" className="sdm-friends__btn" onClick={() => radar.rechazar(s.id)}>{t('amigos.rechazar')}</button>
+                  </div>
                 </div>
-                {listas.teFaltan.length > 12 && (
-                  <button type="button" className="sdm-friends__btn sdm-friends__btn--ver" onClick={() => setVerTodos((v) => ({ ...v, teFaltan: !v.teFaltan }))}>
-                    {verTodos.teFaltan ? t('amigos.verMenos') : t('amigos.verLos', { n: listas.teFaltan.length })}
-                  </button>
-                )}
-                </>
-              )}
-              <span className="sdm-friends__label">{t('amigos.leFaltanConteo', { n: listas.leFaltan.length })}</span>
-              <p className="sdm-friends__hint">{t('amigos.leFaltanHint')}</p>
-              {listas.leFaltan.length === 0 ? (
-                <p className="sdm-friends__hint">{t('amigos.leFaltanVacio')}</p>
-              ) : (<>
-                <div className="fpage__minis">
-                  {(verTodos.leFaltan ? listas.leFaltan : listas.leFaltan.slice(0, 12)).map((s) => (
-                    <div key={s.id} className="fpage__mini fpage__mini--suyo">
-                      {s.img ? <img src={s.img} alt={s.name} loading="lazy" decoding="async" width={44} height={44} /> : <span className="fpage__miniNombre">?</span>}
-                      <span className="fpage__miniNombre">{s.name}</span>
-                    </div>
-                  ))}
-                </div>
-                {listas.leFaltan.length > 12 && (
-                  <button type="button" className="sdm-friends__btn sdm-friends__btn--ver" onClick={() => setVerTodos((v) => ({ ...v, leFaltan: !v.leFaltan }))}>
-                    {verTodos.leFaltan ? t('amigos.verMenos') : t('amigos.verLos', { n: listas.leFaltan.length })}
-                  </button>
-                )}
-                </>
-              )}
+              ))}
             </div>
           )}
 
-          {codigoFicha && !friendState && (
-            <div className="sdm-friends__group">
-              <p className="sdm-friends__hint">{t('amigos.sinFichaHint')}</p>
-            </div>
-          )}
-          </div>
-
-        {radar.recibidas.length > 0 && (
           <div className="sdm-friends__group">
-            <span className="sdm-friends__label">{t('amigos.solicitudesConteo', { n: radar.recibidas.length })}</span>
-            {radar.recibidas.map((s) => (
-              <div key={s.id} className="sdm-friends__row">
-                <span className="sdm-friends__plate">
-                  <span className="sdm-friends__prefix">SDEX</span>
-                  <span className="sdm-friends__code">{String(s.from_code || '').replace(/^SDEX-/i, '')}</span>
-                </span>
-                <div className="sdm-friends__actions">
-                  <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => radar.aceptar(s.id)}>{t('amigos.aceptar')}</button>
-                  <button type="button" className="sdm-friends__btn" onClick={() => radar.rechazar(s.id)}>{t('amigos.rechazar')}</button>
+            <span className="sdm-friends__label"><Users size={12} /> {t('amigos.amigosConteo', { n: radar.amigos.length })}</span>
+            {/* La lista no afirma nada que no haya comprobado: mientras no llegue la respuesta
+                se dice que esta cargando (tambien mientras se resuelve la sesion), si la
+                lectura fallo se dice eso, y "sin amigos" queda para cuando de verdad se sabe. */}
+            {!radar.cargado && radar.fallo ? (
+              <p className="sdm-friends__hint">{t('amigos.noSePudoLeerRed')}</p>
+            ) : !radar.cargado && (radar.haySesion || !radar.sesionLista) ? (
+              <p className="sdm-friends__hint">{t('amigos.cargandoRed')}</p>
+            ) : radar.amigos.length === 0 ? (
+              <p className="sdm-friends__hint">{t('amigos.sinAmigos')}</p>
+            ) : radar.amigos.map((a) => {
+              const suyo = radar.codigoDeAmigo(a);
+              return (
+                <div key={a.id} className="sdm-friends__row">
+                  <span className="sdm-friends__plate">
+                    <span className="sdm-friends__prefix">SDEX</span>
+                    <span className="sdm-friends__code">{String(suyo || '').replace(/^SDEX-/i, '')}</span>
+                  </span>
+                  <div className="sdm-friends__actions">
+                    <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => verColeccion(suyo)}>{t('amigos.verColeccion')}</button>
+                    <button
+                      type="button"
+                      className="sdm-friends__btn sdm-friends__btn--danger"
+                      onClick={() => {
+                        radar.borrar(a.id);
+                        // Si estabas viendo SU coleccion, hay que salir de esa vista: si no,
+                        // al volver a la app queda el cartel de MODO AMIGO con datos de
+                        // alguien que ya no es tu amigo.
+                        if (onAmigoQuitado) onAmigoQuitado(suyo);
+                      }}
+                    >
+                      {t('amigos.quitar')}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        )}
 
-        <div className="sdm-friends__group">
-          <span className="sdm-friends__label"><Users size={12} /> {t('amigos.amigosConteo', { n: radar.amigos.length })}</span>
-          {/* La lista no afirma nada que no haya comprobado: mientras no llegue la respuesta
-              se dice que esta cargando (tambien mientras se resuelve la sesion), si la
-              lectura fallo se dice eso, y "sin amigos" queda para cuando de verdad se sabe. */}
-          {!radar.cargado && radar.fallo ? (
-            <p className="sdm-friends__hint">{t('amigos.noSePudoLeerRed')}</p>
-          ) : !radar.cargado && (radar.haySesion || !radar.sesionLista) ? (
-            <p className="sdm-friends__hint">{t('amigos.cargandoRed')}</p>
-          ) : radar.amigos.length === 0 ? (
-            <p className="sdm-friends__hint">{t('amigos.sinAmigos')}</p>
-          ) : radar.amigos.map((a) => {
-            const suyo = radar.codigoDeAmigo(a);
-            return (
-              <div key={a.id} className="sdm-friends__row">
-                <span className="sdm-friends__plate">
-                  <span className="sdm-friends__prefix">SDEX</span>
-                  <span className="sdm-friends__code">{String(suyo || '').replace(/^SDEX-/i, '')}</span>
-                </span>
-                <div className="sdm-friends__actions">
-                  <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => verColeccion(suyo)}>{t('amigos.verColeccion')}</button>
-                  <button
-                    type="button"
-                    className="sdm-friends__btn sdm-friends__btn--danger"
-                    onClick={() => {
-                      radar.borrar(a.id);
-                      // Si estabas viendo SU coleccion, hay que salir de esa vista: si no,
-                      // al volver a la app queda el cartel de MODO AMIGO con datos de
-                      // alguien que ya no es tu amigo.
-                      if (onAmigoQuitado) onAmigoQuitado(suyo);
-                    }}
-                  >
-                    {t('amigos.quitar')}
-                  </button>
+          {radar.enviadas.length > 0 && (
+            <div className="sdm-friends__group">
+              <span className="sdm-friends__label">{t('amigos.enviadasConteo', { n: radar.enviadas.length })}</span>
+              {radar.enviadas.map((s) => (
+                <div key={s.id} className="sdm-friends__row">
+                  <span className="sdm-friends__plate">
+                    <span className="sdm-friends__prefix">SDEX</span>
+                    <span className="sdm-friends__code">{String(s.to_code || '').replace(/^SDEX-/i, '')}</span>
+                  </span>
+                  <div className="sdm-friends__actions">
+                    <span className="sdm-friends__pendiente">{t('amigos.esperando')}</span>
+                    <button type="button" className="sdm-friends__btn" onClick={() => radar.borrar(s.id)}>{t('amigos.cancelar')}</button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+          )}
         </div>
-
-        {radar.enviadas.length > 0 && (
-          <div className="sdm-friends__group">
-            <span className="sdm-friends__label">{t('amigos.enviadasConteo', { n: radar.enviadas.length })}</span>
-            {radar.enviadas.map((s) => (
-              <div key={s.id} className="sdm-friends__row">
-                <span className="sdm-friends__plate">
-                  <span className="sdm-friends__prefix">SDEX</span>
-                  <span className="sdm-friends__code">{String(s.to_code || '').replace(/^SDEX-/i, '')}</span>
-                </span>
-                <div className="sdm-friends__actions">
-                  <span className="sdm-friends__pendiente">{t('amigos.esperando')}</span>
-                  <button type="button" className="sdm-friends__btn" onClick={() => radar.borrar(s.id)}>{t('amigos.cancelar')}</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
