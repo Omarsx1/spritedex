@@ -140,7 +140,10 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // filo; las capturas guardadas con el encabezado anterior no valen.
   // v45: fuera el prologo de marca; la capsula pasa a "SPRITEDEX • SOBREVIVE A LA NOCHE".
   // v46: el QR deja el panel de tarjeta y estrena esquinas HUD + halo de escaneo.
-  return `v46_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v48: el nombre se ajusta de verdad a su banda: crece hasta llenarla, se reparte en
+  // dos lineas solo cuando eso lo agranda y se centra con metricas reales de la fuente.
+  // v49: el espiritu que falta se pinta apagado (sin color y en penumbra).
+  return `v49_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -567,92 +570,130 @@ export async function generateSpritedexCardImage({
   return result;
 }
 
-// Ajusta nombres inspirándose en el diseño de alta calidad de la app (Imagen 2):
-// - Tipografía Outfit bold/extrabold
-// - Nombres con variante larga "Hacker de Botín" se dividen en 2 líneas equilibradas (Espíritu arriba, Hacker de Botín abajo)
-// - Mantiene el tamaño tipográfico grande y legible (sin comprimir a 7px en 1 línea)
-// - Cero truncado (...)
-function getSpriteNameLines(ctx, fullName, maxW, baseFontSize, familyName) {
-  if (!fullName) return { lines: [''], fontSize: baseFontSize };
+// Nombre del espiritu: reparto en lineas y tamano que llena su banda.
+//
+// La banda util es el hueco real entre el borde inferior del espiritu y la linea del
+// estado. El nombre se ajusta a ESE hueco en vez de a un tamano fijo: crece hasta llenarlo
+// en cualquier formato y con cualquier numero de espiritus, se reparte en dos lineas solo
+// cuando eso lo agranda de verdad, y nunca toca ni el espiritu ni la linea.
+const NOMBRE_MIN_PX = 9;
+const NOMBRE_LINE_RATIO = 1.14;
+const NOMBRE_REF_PX = 100;
+// Cuanto ancho de la ficha puede ocupar el nombre. Al 100% quedaba pegado a los bordes.
+const ANCHO_NOMBRE_FICHA = 0.82;
+// Dos lineas tienen que ganarle a una por este margen: partir un nombre que ya cabia bien
+// solo desordena la ficha.
+const NOMBRE_VENTAJA_DOS_LINEAS = 1.15;
 
-  // 1. Variante larga "Hacker de Botín" (inspirado directamente en la tarjeta de la app - Imagen 2)
+function medirBloqueNombre(ctx, lines, fontSize) {
+  ctx.font = `800 ${fontSize}px "Outfit", "Inter", sans-serif`;
+  let ancho = 0;
+  let ascendente = 0;
+  let descendente = 0;
+  for (const linea of lines) {
+    const medida = ctx.measureText(linea);
+    ancho = Math.max(ancho, medida.width);
+    // El ascendente y el descendente reales incluyen tildes y colas: con un tanteo fijo el
+    // bloque quedaba unos pixeles por debajo del centro de su banda.
+    ascendente = Math.max(ascendente, medida.actualBoundingBoxAscent || fontSize * 0.78);
+    descendente = Math.max(descendente, medida.actualBoundingBoxDescent || fontSize * 0.22);
+  }
+  return {
+    ancho,
+    ascendente,
+    descendente,
+    alto: (lines.length - 1) * fontSize * NOMBRE_LINE_RATIO + ascendente + descendente
+  };
+}
+
+// Repartos posibles del nombre: primero las reglas de la app (variante "Hacker de Botín" y
+// familia conocida) y despues el corte por ancho medido real, el que deja la linea mas
+// larga lo mas corta posible para que el nombre pueda ser mas grande. Antes se cortaba por
+// numero de letras: con letras anchas y estrechas la pareja salia descompensada.
+export function repartirNombreEnLineas(fullName, familyNames, medirAncho = null) {
+  if (!fullName) return [];
+
   if (fullName.includes('Hacker de Botín')) {
-    const prefix = fullName.replace('Hacker de Botín', '').trim();
-    const l1 = prefix || 'Espíritu';
-    const l2 = 'Hacker de Botín';
-
-    for (let s = baseFontSize; s >= 8; s -= 0.5) {
-      ctx.font = `800 ${s}px "Outfit", "Inter", sans-serif`;
-      if (ctx.measureText(l1).width <= maxW && ctx.measureText(l2).width <= maxW) {
-        return { lines: [l1, l2], fontSize: s };
-      }
-    }
-    return { lines: [l1, l2], fontSize: 8 };
+    return [[fullName.replace('Hacker de Botín', '').trim() || 'Espíritu', 'Hacker de Botín']];
   }
 
-  // 2. Variante con familia conocida (si no entra holgadamente en 1 línea a tamaño completo)
-  if (familyName && fullName.startsWith(familyName)) {
-    const variantPart = fullName.slice(familyName.length).trim();
-    if (variantPart) {
-      // Probar si entra cómodamente en 1 línea a tamaño completo con margen generoso (14px)
-      ctx.font = `800 ${baseFontSize}px "Outfit", "Inter", sans-serif`;
-      if (ctx.measureText(fullName).width <= maxW - 14) {
-        return { lines: [fullName], fontSize: baseFontSize };
-      }
-
-      // Si no entra holgadamente, dividir como en la app: Familia arriba, Variante abajo
-      for (let s = baseFontSize; s >= 8; s -= 0.5) {
-        ctx.font = `800 ${s}px "Outfit", "Inter", sans-serif`;
-        if (ctx.measureText(familyName).width <= maxW && ctx.measureText(variantPart).width <= maxW) {
-          return { lines: [familyName, variantPart], fontSize: s };
-        }
-      }
-      return { lines: [familyName, variantPart], fontSize: 8 };
-    }
+  const candidatos = [];
+  // El mismo reparto puede salir por familia y por ancho (es lo normal): se guarda una vez.
+  const yaEsta = (lineas) => candidatos.some(
+    (c) => c.length === lineas.length && c.every((linea, i) => linea === lineas[i])
+  );
+  // La familia puede venir en espanol o en ingles: la que empiece el nombre da el reparto
+  // bueno, y asi el idioma de la lona no cambia como se parten las lineas.
+  const familias = Array.isArray(familyNames) ? familyNames : [familyNames];
+  for (const familia of familias) {
+    if (!familia || !fullName.startsWith(familia)) continue;
+    const variante = fullName.slice(familia.length).trim();
+    if (variante && !yaEsta([familia, variante])) candidatos.push([familia, variante]);
   }
 
-  // 3. Probar en 1 sola línea con tamaño base completo (sin apretar)
-  ctx.font = `800 ${baseFontSize}px "Outfit", "Inter", sans-serif`;
-  if (ctx.measureText(fullName).width <= maxW - 10) {
-    return { lines: [fullName], fontSize: baseFontSize };
-  }
-
-  // 4. Si tiene múltiples palabras y no cabe cómodamente en 1 línea, dividir en 2 líneas equilibradas
-  const words = fullName.split(' ');
-  if (words.length > 1) {
-    let bestL1 = '';
-    let bestL2 = '';
-    let bestDiff = Infinity;
-
-    for (let i = 1; i < words.length; i++) {
-      const l1 = words.slice(0, i).join(' ');
-      const l2 = words.slice(i).join(' ');
-      const diff = Math.abs(l1.length - l2.length);
-      if (diff < bestDiff) {
-        bestDiff = diff;
-        bestL1 = l1;
-        bestL2 = l2;
+  const palabras = fullName.split(' ').filter(Boolean);
+  if (palabras.length > 1) {
+    const ancho = medirAncho || ((texto) => texto.length);
+    let mejorCorte = 1;
+    let mejorAncho = Infinity;
+    for (let i = 1; i < palabras.length; i += 1) {
+      const l1 = palabras.slice(0, i).join(' ');
+      const l2 = palabras.slice(i).join(' ');
+      const mayor = Math.max(ancho(l1), ancho(l2));
+      if (mayor < mejorAncho) {
+        mejorAncho = mayor;
+        mejorCorte = i;
       }
     }
+    const pareja = [palabras.slice(0, mejorCorte).join(' '), palabras.slice(mejorCorte).join(' ')];
+    if (!yaEsta(pareja)) candidatos.push(pareja);
+  }
+  return candidatos;
+}
 
-    for (let s = baseFontSize; s >= 8; s -= 0.5) {
-      ctx.font = `800 ${s}px "Outfit", "Inter", sans-serif`;
-      if (ctx.measureText(bestL1).width <= maxW && ctx.measureText(bestL2).width <= maxW) {
-        return { lines: [bestL1, bestL2], fontSize: s };
-      }
-    }
-    return { lines: [bestL1, bestL2], fontSize: 8 };
+// Tamano mas grande que entra en la banda. El ancho escala lineal con el tamano, asi que
+// una sola medida a 100 px da el maximo exacto por ancho; el alto se comprueba con las
+// metricas reales y se recorta en pasos de medio pixel.
+function ajustarNombreEnBanda(ctx, lines, maxAncho, maxAlto, objetivo) {
+  ctx.font = `800 ${NOMBRE_REF_PX}px "Outfit", "Inter", sans-serif`;
+  let anchoRef = 0;
+  for (const linea of lines) anchoRef = Math.max(anchoRef, ctx.measureText(linea).width);
+  const porAncho = anchoRef > 0 ? (maxAncho * NOMBRE_REF_PX) / anchoRef : objetivo;
+  let tamano = Math.floor(Math.max(NOMBRE_MIN_PX, Math.min(objetivo, porAncho)) * 2) / 2;
+  let medida = medirBloqueNombre(ctx, lines, tamano);
+  while (tamano > NOMBRE_MIN_PX && (medida.alto > maxAlto || medida.ancho > maxAncho)) {
+    tamano -= 0.5;
+    medida = medirBloqueNombre(ctx, lines, tamano);
+  }
+  return { lines, fontSize: tamano, ...medida };
+}
+
+export function getSpriteNameLines(ctx, fullName, maxAncho, maxAlto, objetivo, familyNames) {
+  if (!fullName) {
+    return { lines: [''], fontSize: objetivo, ancho: 0, alto: 0, ascendente: 0, descendente: 0 };
   }
 
-  // 5. Si es una sola palabra muy larga, reducir tamaño suavemente
-  for (let s = baseFontSize; s >= 7; s -= 0.5) {
-    ctx.font = `800 ${s}px "Outfit", "Inter", sans-serif`;
-    if (ctx.measureText(fullName).width <= maxW) {
-      return { lines: [fullName], fontSize: s };
-    }
+  const unaLinea = ajustarNombreEnBanda(ctx, [fullName], maxAncho, maxAlto, objetivo);
+  const candidatos = repartirNombreEnLineas(fullName, familyNames, (texto) => {
+    ctx.font = `800 ${NOMBRE_REF_PX}px "Outfit", "Inter", sans-serif`;
+    return ctx.measureText(texto).width;
+  });
+  if (!candidatos.length) return unaLinea;
+  // "Hacker de Botín" es una regla de diseno, no una opcion: se respeta aunque salga algo
+  // mas pequeno que en una sola linea.
+  if (fullName.includes('Hacker de Botín')) {
+    return ajustarNombreEnBanda(ctx, candidatos[0], maxAncho, maxAlto, objetivo);
   }
 
-  return { lines: [fullName], fontSize: 7 };
+  // Los candidatos van por orden de preferencia (familia primero): uno posterior solo lo
+  // desbanca si de verdad deja el nombre bastante mas grande.
+  let mejor = null;
+  for (const lines of candidatos) {
+    const ajuste = ajustarNombreEnBanda(ctx, lines, maxAncho, maxAlto, objetivo);
+    if (!mejor || ajuste.fontSize > mejor.fontSize * 1.10) mejor = ajuste;
+  }
+  if (mejor && mejor.fontSize > unaLinea.fontSize * NOMBRE_VENTAJA_DOS_LINEAS) return mejor;
+  return unaLinea;
 }
 
 // -------------------------------------------------------------
@@ -667,6 +708,36 @@ const TARJETAS_POR_TANDA = 6;
 // Cuando hay alguien esperando la captura, tandas mas grandes: menos cesiones,
 // menos frames regalados, y aun asi el hilo respira de sobra para pintar el spinner.
 const TARJETAS_POR_TANDA_ESPERANDO = 25;
+// Espiritu que todavia no esta: se pinta apagado, como una ficha sin desbloquear. La
+// distincion no es "resaltar el que tienes" sino lo contrario: brilla el que ya es tuyo y
+// el que falta se queda mate.
+const ESPIRITU_FALTANTE_ALPHA = 0.92;
+// Velo gris oscuro: al mezclarse con el espiritu le quita color (se acerca al gris) y
+// brillo a la vez, que es justo lo que se lee como "apagado".
+const ESPIRITU_FALTANTE_VELO = 'rgba(96, 98, 110, 0.7)';
+
+// Lienzo de trabajo reutilizado para apagar los espiritus que faltan. Se dibuja ahi el
+// espiritu y se le echa el velo recortado a su silueta (source-atop solo pinta donde ya hay
+// espiritu), sin tocar el resto de la ficha.
+// Con ctx.filter ('saturate(...) brightness(...)') el resultado era el mismo, pero costaba
+// ~3 ms por espiritu: la lona de 64 fichas pasaba de 241 ms a 829 ms de dibujo.
+let lienzoApagado = null;
+function dibujarEspirituApagado(ctx, img, x, y, tamano) {
+  const lado = Math.max(1, Math.round(tamano));
+  if (!lienzoApagado) lienzoApagado = document.createElement('canvas');
+  if (lienzoApagado.width !== lado || lienzoApagado.height !== lado) {
+    lienzoApagado.width = lado;
+    lienzoApagado.height = lado;
+  }
+  const lc = lienzoApagado.getContext('2d');
+  lc.clearRect(0, 0, lado, lado);
+  lc.drawImage(img, 0, 0, lado, lado);
+  lc.globalCompositeOperation = 'source-atop';
+  lc.fillStyle = ESPIRITU_FALTANTE_VELO;
+  lc.fillRect(0, 0, lado, lado);
+  lc.globalCompositeOperation = 'source-over';
+  ctx.drawImage(lienzoApagado, x, y, tamano, tamano);
+}
 // Ceder con setTimeout evita el bloqueo, pero no deja pintar: las tareas se
 // encadenan y el frame se retrasa. Con requestIdleCallback decide el navegador
 // cuando hay hueco real, y el timeout impide que el precálculo se quede parado.
@@ -1197,7 +1268,9 @@ async function renderGlitchOverrideTemplate({
 
     // 2. Zona de Nombre: Bounding box simétrico con gap limpio sobre el badge (nombre bajado un poco)
     const gapNameBadge = Math.max(3, Math.min(5, Math.round(cardH * 0.018)));
-    const nameZoneH = Math.max(28, Math.min(50, Math.round(cardH * 0.24)));
+    // La banda del nombre crece con la ficha (tope 64): en fichas grandes el nombre puede
+    // usar su espacio en vez de quedar encogido contra la linea.
+    const nameZoneH = Math.max(28, Math.min(64, Math.round(cardH * 0.24)));
     const nameZoneBottom = badgeY - gapNameBadge;
     const nameZoneTop = nameZoneBottom - nameZoneH;
 
@@ -1248,10 +1321,12 @@ async function renderGlitchOverrideTemplate({
         ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
         ctx.shadowBlur = 0;
       } else {
-        // En NO atrapados: el mismo resplandor, mas tenue: es lo que permite distinguir de un
-        // vistazo de que espiritu es cada ficha sin volver a pintar el panel de color.
-        auraGrad.addColorStop(0, hexToRgba(spiritHue, 0.18));
-        auraGrad.addColorStop(0.55, hexToRgba(spiritHue, 0.07));
+        // En NO atrapados: halo tenue (deja ver de que espiritu es la ficha sin devolverle el
+        // color al panel) y el espiritu apagado. Antes solo bajaba la opacidad al 85% y casi
+        // no se notaba: ahora se le quita el color y el brillo, asi que la ficha se lee como
+        // "me falta" de un solo vistazo, sin mirar el borde ni la etiqueta.
+        auraGrad.addColorStop(0, hexToRgba(spiritHue, 0.12));
+        auraGrad.addColorStop(0.55, hexToRgba(spiritHue, 0.05));
         auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
         ctx.fillStyle = auraGrad;
@@ -1259,50 +1334,57 @@ async function renderGlitchOverrideTemplate({
         ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.globalAlpha = 0.85;
-        ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
+        ctx.globalAlpha = ESPIRITU_FALTANTE_ALPHA;
+        dibujarEspirituApagado(ctx, spriteImg, imgX, imgY, imgSize);
       }
       ctx.restore();
     }
 
-    // C. Nombre: mas grande y anclado abajo, de modo que las fichas queden alineadas
-    // entre si. Antes cada nombre se centraba en su zona y, con una o dos lineas, los
-    // bloques bailaban de una tarjeta a otra.
-    const baseNameFontSize = Math.max(
+    // C. Nombre: la banda util es el hueco real entre el borde inferior del espiritu y la
+    // linea del estado. El tamano sale de ESA banda (no de un tope fijo) y el bloque se
+    // centra ahi con las metricas reales de la fuente, asi que la ficha se lee igual de
+    // bien con 3 espiritus que con 100.
+    // El nombre no llega a los bordes de la ficha: a ancho completo parecia un titular y le
+    // robaba el aire a la tarjeta.
+    const maxTextW = Math.round(cardW * ANCHO_NOMBRE_FICHA);
+    // Aire propio de la banda (no toca la reserva del espiritu): separa el nombre del
+    // espiritu arriba y de la linea del estado abajo, que es lo que lo hace respirar.
+    const aireBanda = Math.max(4, Math.min(18, Math.round(cardH * 0.028)));
+    const bandaTop = (spriteImg ? imgY + imgSize : nameZoneTop) + aireBanda;
+    const bandaAlto = Math.max(24, badgeY - aireBanda - bandaTop);
+    // Objetivo de una linea: ni mas del 10,5% del ancho de la ficha (una tarjeta pequena no
+    // pide un titular) ni mas de media banda de alto.
+    const objetivoNombre = Math.max(
       10,
-      Math.min(
-        16,
-        // Proporcional al ancho de la celda (0.072): asi una tarjeta pequena no lleva un
-        // nombre casi tan grande como una grande, que es lo que pasaba con el tope a 18.
-        Math.floor(cardW * 0.072)
-      )
+      Math.min(48, Math.round(cardW * 0.105), Math.round(bandaAlto * 0.52))
     );
 
     ctx.save();
     ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
     ctx.fillStyle = isOwned ? '#ffffff' : 'rgba(255, 255, 255, 0.86)';
     ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
     ctx.shadowBlur = 4;
     ctx.shadowOffsetY = 1;
 
-    const maxTextW = cardW - 10;
     const nameFit = getSpriteNameLines(
       ctx,
       pickName(sprite),
       maxTextW,
-      baseNameFontSize,
-      sprite.familyNameEn || sprite.familyName || sprite.family_name
+      bandaAlto,
+      objetivoNombre,
+      [sprite.familyName, sprite.familyNameEn, sprite.family_name]
     );
     ctx.font = `800 ${nameFit.fontSize}px "Outfit", "Inter", sans-serif`;
 
-    const lineHeight = Math.round(nameFit.fontSize * 1.1);
-    // Aire tambien por arriba: el nombre quedaba a 4px de la linea.
-    const ultimaLineaY = badgeY - Math.max(12, Math.round(nameFit.fontSize * 0.7));
-    if (nameFit.lines.length === 1) {
-      ctx.fillText(nameFit.lines[0], cardX + cardW / 2, ultimaLineaY);
-    } else {
-      ctx.fillText(nameFit.lines[0], cardX + cardW / 2, ultimaLineaY - lineHeight);
-      ctx.fillText(nameFit.lines[1], cardX + cardW / 2, ultimaLineaY);
+    // Centrado geometrico de la banda con el alto real del bloque (ascendente +
+    // descendente + interlineado): la misma distancia al espiritu y a la linea en
+    // cualquier tamano, sin tanteos de pixeles.
+    const lineHeight = nameFit.fontSize * NOMBRE_LINE_RATIO;
+    const bloqueTop = bandaTop + Math.max(0, (bandaAlto - nameFit.alto) / 2);
+    const primeraLineaY = bloqueTop + nameFit.ascendente;
+    for (let f = 0; f < nameFit.lines.length; f += 1) {
+      ctx.fillText(nameFit.lines[f], cardX + cardW / 2, primeraLineaY + f * lineHeight);
     }
     ctx.restore();
 
