@@ -5425,6 +5425,33 @@ body:has(.modal-overlay) {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.sdm-share-pro__user-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sdm-share-pro__input {
+  flex: 1;
+  min-width: 140px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e6ecf5;
+  font: 700 0.8rem var(--font-sans);
+  outline: none;
+}
+
+.sdm-share-pro__input::placeholder {
+  color: rgba(230, 236, 245, 0.4);
+}
+
+.sdm-share-pro__input:focus {
+  border-color: rgba(0, 240, 232, 0.5);
+}
+
 .sdm-share-pro__seg-group {
   display: flex;
   flex-direction: column;

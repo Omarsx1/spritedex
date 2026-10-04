@@ -3,12 +3,27 @@ import { X, Download, Share2, Copy, Check } from 'lucide-react';
 import { pickName } from '../data/spritesData';
 import { generateSpritedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, marcarEsperaActiva, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
+import { safeStorage } from '../utils/safeStorage';
 import { Modal } from './ui/Modal';
 import gsap from 'gsap';
 import { t } from '../i18n';
 
 // Caché persistente global para previews de plantillas generadas (0ms instantáneo entre aperturas y formatos)
 const globalTemplatePreviewCache = new Map();
+
+// Firma del dueño: se recuerda en el dispositivo y decide si aparece en la lona.
+const CLAVE_USUARIO = 'spritedex_fortnite_user';
+const CLAVE_MOSTRAR_USUARIO = 'spritedex_fortnite_user_visible';
+const LARGO_USUARIO = 24;
+
+function usuarioGuardado() {
+  const valor = safeStorage.getItem(CLAVE_USUARIO);
+  return typeof valor === 'string' ? valor : '';
+}
+
+function mostrarUsuarioGuardado() {
+  return safeStorage.getItem(CLAVE_MOSTRAR_USUARIO) !== 'false';
+}
 
 // Estado del medidor de diagnostico. Apagado por defecto (no aparece para nadie) y
 // se enciende solo cuando se pide: ?perf=1, #perf o doble toque en el titulo del
@@ -29,11 +44,26 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
   const [format, setFormat] = useState(DEFAULT_EXPORT_FORMAT); // 'checklist', 'square'
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
   const [bgStyle] = useState(DEFAULT_EXPORT_BG_STYLE); // 'glitch_override', 'blueprint', 'dark_matrix'
+  const [fortniteUser, setFortniteUser] = useState(usuarioGuardado);
+  const [mostrarUsuario, setMostrarUsuario] = useState(mostrarUsuarioGuardado);
+  const firma = mostrarUsuario ? fortniteUser.trim() : '';
+
+  // El nombre se guarda en el dispositivo segun se escribe: no hay boton de guardar.
+  const cambiarUsuario = useCallback((valor) => {
+    const limpio = String(valor || '').slice(0, LARGO_USUARIO);
+    setFortniteUser(limpio);
+    safeStorage.setItem(CLAVE_USUARIO, limpio);
+  }, []);
+
+  const cambiarMostrarUsuario = useCallback((visible) => {
+    setMostrarUsuario(visible);
+    safeStorage.setItem(CLAVE_MOSTRAR_USUARIO, visible ? 'true' : 'false');
+  }, []);
 
   // Clave de preview canónica para mostrar la plantilla en 0ms si ya está en caché
   const initialCount = allSprites.length;
   const initialOwned = allSprites.filter(s => userState[s.id]?.owned).length;
-  const initialCacheKey = getCanvasCacheKey(DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE, initialCount, initialOwned, allSprites, userState);
+  const initialCacheKey = getCanvasCacheKey(DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE, initialCount, initialOwned, allSprites, userState, firma);
   const initialCached = globalTemplatePreviewCache.get(initialCacheKey) || globalCanvasCache.get(initialCacheKey);
 
   const [dataUrl, setDataUrl] = useState(() => initialCached?.url || initialCached?.dataUrl || (typeof initialCached === 'string' ? initialCached : ''));
@@ -191,7 +221,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       return;
     }
 
-    const currentKey = getCanvasCacheKey(format, bgStyle, spritesList.length, ownedInScope, spritesList, userState);
+    const currentKey = getCanvasCacheKey(format, bgStyle, spritesList.length, ownedInScope, spritesList, userState, firma);
     const cached = globalTemplatePreviewCache.get(currentKey) || globalCanvasCache.get(currentKey);
     if (cached) {
       const url = typeof cached === 'string' ? cached : (cached.url || cached.dataUrl || '');
@@ -248,7 +278,8 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         spritesList,
         userState,
         format,
-        bgStyle
+        bgStyle,
+        usuario: firma
       })).then((res) => {
         if (activeJobIdRef.current === jobId) {
           const canvasListo = res?.canvas || null;
@@ -518,6 +549,36 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
                   {f.label}
                 </button>
               ))}
+            </div>
+          </div>
+
+          <div className="sdm-share-pro__seg-group">
+            <span className="sdm-share-pro__seg-label">{t('compartir.usuario')}</span>
+            <div className="sdm-share-pro__user-row">
+              <input
+                className="sdm-share-pro__input"
+                type="text"
+                value={fortniteUser}
+                maxLength={LARGO_USUARIO}
+                placeholder={t('compartir.usuarioPlaceholder')}
+                onChange={(e) => cambiarUsuario(e.target.value)}
+                spellCheck={false}
+                autoComplete="off"
+              />
+              <div className="sdm-share-pro__segmented">
+                <button
+                  className={`sdm-share-pro__seg-btn ${mostrarUsuario ? 'sdm-share-pro__seg-btn--active' : ''}`}
+                  onClick={() => cambiarMostrarUsuario(true)}
+                >
+                  {t('compartir.usuarioCon')}
+                </button>
+                <button
+                  className={`sdm-share-pro__seg-btn ${!mostrarUsuario ? 'sdm-share-pro__seg-btn--active' : ''}`}
+                  onClick={() => cambiarMostrarUsuario(false)}
+                >
+                  {t('compartir.usuarioSin')}
+                </button>
+              </div>
             </div>
           </div>
         </div>
