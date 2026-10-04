@@ -130,9 +130,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // en memoria con el dibujo anterior no deben reutilizarse.
   // v36: el vertical tambien recorta el ancho del lienzo (tope de ancho de celda), asi que
   // las capturas guardadas en memoria con el dibujo anterior tampoco valen.
-  // v37: el HUD pinta el alcance de la lista (Nuevos/Atrapados/Faltantes) y el progreso
-  // contra el total general; cada combinacion tiene su propia captura.
-  return `v37_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v38: el HUD gana base oscura y tipografia mas clara y grande para que el alcance
+  // ("nuevos", "faltantes"...) se lea sobre cualquier fondo; las capturas anteriores no valen.
+  return `v38_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -935,10 +935,13 @@ async function renderGlitchOverrideTemplate({
   const hudX = (width - hudW) / 2;
   const hudY = capsuleY + capsuleH + Math.round(8 * Math.min(1.1, scale));
 
-  // HUD Frame Border
+  // HUD Frame: una base oscura tenue garantiza que el texto se lea sobre cualquier fondo
+  // (el arte de temporada tiene zonas claras donde el gris del alcance se perdia).
+  roundRect(ctx, hudX, hudY, hudW, hudH, 4);
+  ctx.fillStyle = 'rgba(6, 8, 16, 0.42)';
+  ctx.fill();
   ctx.strokeStyle = 'rgba(0, 240, 232, 0.55)';
   ctx.lineWidth = 1;
-  roundRect(ctx, hudX, hudY, hudW, hudH, 4);
   ctx.stroke();
 
   // Corner brackets on HUD
@@ -961,12 +964,13 @@ async function renderGlitchOverrideTemplate({
 
   const hudTextY = hudY + Math.round(18 * Math.min(1.15, scale));
   ctx.textAlign = 'left';
-  ctx.font = `900 ${Math.round(12 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
-  ctx.fillStyle = '#ff0055';
+  // Numero en blanco y etiqueta clara: el alcance es informacion, no decoracion.
+  ctx.font = `900 ${Math.round(13 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
+  ctx.fillStyle = '#ffffff';
   const numeroHudW = ctx.measureText(numeroHud).width;
   ctx.fillText(numeroHud, hudX + 14, hudTextY);
-  ctx.font = `700 ${Math.round(10 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
-  ctx.fillStyle = '#94a3b8';
+  ctx.font = `700 ${Math.round(11 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
+  ctx.fillStyle = '#cbd5e1';
   ctx.fillText(etiquetaHud, hudX + 14 + numeroHudW + 4, hudTextY);
 
   ctx.textAlign = 'right';
