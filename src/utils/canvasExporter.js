@@ -130,9 +130,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // en memoria con el dibujo anterior no deben reutilizarse.
   // v36: el vertical tambien recorta el ancho del lienzo (tope de ancho de celda), asi que
   // las capturas guardadas en memoria con el dibujo anterior tampoco valen.
-  // v39: la barra del HUD ancla el degradado al riel completo y gana brillo de cristal;
-  // las capturas guardadas con la barra anterior no valen.
-  return `v39_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v40: el pie reserva sitio proporcional al formato y la firma (ID - nombre) ya no queda
+  // pegada a la ultima fila de fichas; las capturas anteriores no valen.
+  return `v40_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -711,7 +711,6 @@ async function renderGlitchOverrideTemplate({
   // En temporada el encabezado lleva el logo real de Fortnitemares, que necesita mas alto.
   const enTemporada = isFortnitemaresActive();
   let headerH = enTemporada ? 265 : 195;
-  let footerH = 45;
   const paddingX = 36;
 
   // -------------------------------------------------------------
@@ -723,18 +722,15 @@ async function renderGlitchOverrideTemplate({
       width = 1200;
       height = 1200;
       headerH = 190;
-      footerH = 45;
     } else if (totalSprites <= 68) {
       width = 1600;
       height = 1600;
       headerH = 165;
-      footerH = 45;
     } else {
       // Colecciones grandes (como los 117 de Gen 1)
       width = 1800;
       height = 1800;
       headerH = 160;
-      footerH = 42;
     }
 
     // Cuadrícula simétrica 1:1 (cols nunca menores que rows)
@@ -777,6 +773,16 @@ async function renderGlitchOverrideTemplate({
   // pie. En vertical es 1080 (el marco 9:16) aunque el lienzo acabe recortado; en cuadrado
   // es el propio marco, que ya cambia de resolucion segun el tamano de la coleccion.
   const anchoDiseno = isSquare ? width : 1080;
+
+  // El pie reserva sitio proporcional al formato: con la firma (ID - nombre) y la marca,
+  // las lonas llenas las dejaban pegadas a la ultima fila de fichas. Todo lo del pie
+  // (alto reservado, tamanos y baselines) escala junto para que el hueco sea el mismo.
+  const escFooter = anchoDiseno / 1200;
+  const firmaAlto = Math.round(13 * escFooter);
+  const marcaAlto = Math.round(12 * escFooter);
+  const footerH = Math.round(58 * escFooter);
+  const baseFirma = Math.round(34 * escFooter);
+  const baseMarca = Math.round(16 * escFooter);
 
   // En temporada el encabezado lleva el logo real y necesita su sitio. Se calcula con las
   // MISMAS proporciones con las que luego se dibuja, para que nunca tape la capsula ni la
@@ -1302,7 +1308,7 @@ async function renderGlitchOverrideTemplate({
     ctx.save();
     ctx.textAlign = 'center';
     const limite = width * 0.7;
-    let firmaSize = Math.round(13 * (anchoDiseno / 1200));
+    let firmaSize = firmaAlto;
     const textoFirma = t('lona.usuario', { nombre: usuario });
     ctx.font = `800 ${firmaSize}px "Outfit", "Inter", sans-serif`;
     while (firmaSize > 9 && ctx.measureText(textoFirma).width > limite) {
@@ -1312,17 +1318,17 @@ async function renderGlitchOverrideTemplate({
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(0, 240, 232, 0.45)';
     ctx.shadowBlur = 8;
-    ctx.fillText(textoFirma, width / 2, height - 34);
+    ctx.fillText(textoFirma, width / 2, height - baseFirma);
     ctx.restore();
   }
 
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.font = `700 ${Math.round(12 * (anchoDiseno / 1200))}px "Outfit", "Inter", monospace, sans-serif`;
+  ctx.font = `700 ${marcaAlto}px "Outfit", "Inter", monospace, sans-serif`;
   ctx.fillStyle = '#38bdf8';
   ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
   ctx.shadowBlur = 6;
-  ctx.fillText(enTemporada ? t('lona.marcaMares') : t('lona.marca'), width / 2, height - 16);
+  ctx.fillText(enTemporada ? t('lona.marcaMares') : t('lona.marca'), width / 2, height - baseMarca);
   ctx.restore();
 
   // Codificar el PNG de 1280x2515 es la parte mas cara del export (2-6 s en movil),
