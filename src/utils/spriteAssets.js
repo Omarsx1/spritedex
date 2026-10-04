@@ -19,7 +19,7 @@ const SPRITES_DIR = '/sprites/';
 // equivocado y por eso no se pintaba). Rasterizarlos a WebP los haria siete veces mas pesados
 // y borrosos al ampliarlos, asi que se quedan vectoriales.
 const ASSET_VECTORIAL = new Set([
-  'air_gem', 'aura_holofoil', 'batman_gem', 'boss_gem', 'duck_holofoil', 'peely_candy'
+  'air_gem', 'aura_holofoil', 'batman_gem', 'duck_holofoil', 'peely_candy'
 ]);
 
 export function rutaAssetEspiritu(id) {
