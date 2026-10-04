@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v15: nombres y pie de estado de la ficha cambiaron de tamano y sitio; las capturas
-  // guardadas en memoria con el dibujo anterior no deben reutilizarse.
-  return `v15_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v16: nombres y pie de estado de la ficha volvieron a cambiar de tamano y aire; las
+  // capturas guardadas en memoria con el dibujo anterior no deben reutilizarse.
+  return `v16_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -952,12 +952,13 @@ async function renderGlitchOverrideTemplate({
     ctx.restore();
 
     // B. Proporciones y Geometría Interna Adaptativa (Distribución vertical simétrica y centrada)
-    const badgeH = isUltraCompact ? 14 : Math.max(16, Math.min(20, Math.round(cardH * 0.125)));
+    const badgeH = isUltraCompact ? 15 : Math.max(18, Math.min(23, Math.round(cardH * 0.145)));
     const badgeW = Math.max(46, Math.min(cardW - 12, Math.round(cardW * (isUltraCompact ? 0.88 : 0.82))));
     const badgeFontSize = isUltraCompact ? 7.5 : Math.max(8, Math.min(10, badgeH * 0.50));
 
     // 1. Badge inferior: Anclado exactamente a 4px del filo inferior del cuadro
-    const bottomGutter = 4;
+    // Aire por debajo: con 4px el pie quedaba pegado al filo de la ficha.
+    const bottomGutter = isUltraCompact ? 8 : 12;
     const badgeX = cardX + (cardW - badgeW) / 2;
     const badgeY = cardY + cardH - badgeH - bottomGutter;
 
@@ -1035,8 +1036,8 @@ async function renderGlitchOverrideTemplate({
     const baseNameFontSize = Math.max(
       10,
       Math.min(
-        isUltraCompact ? 12 : (isCompact ? 13 : 15),
-        Math.floor(cardW * 0.115)
+        isUltraCompact ? 12 : (isCompact ? 14 : 17),
+        Math.floor(cardW * 0.125)
       )
     );
 
@@ -1080,7 +1081,7 @@ async function renderGlitchOverrideTemplate({
     ctx.fillRect(cardX + 6, badgeY, cardW - 12, 1);
 
     const puntoX = cardX + 13;
-    const puntoR = Math.max(2.4, badgeH * 0.15);
+    const puntoR = Math.max(2.8, badgeH * 0.18);
     ctx.beginPath();
     ctx.arc(puntoX, estadoY, puntoR, 0, Math.PI * 2);
     if (isOwned) {
@@ -1088,13 +1089,13 @@ async function renderGlitchOverrideTemplate({
       ctx.fill();
     } else {
       ctx.strokeStyle = estadoColor;
-      ctx.lineWidth = 1.4;
+      ctx.lineWidth = 1.7;
       ctx.stroke();
     }
 
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.font = `900 ${Math.max(9, Math.min(12, badgeH * 0.62))}px "Outfit", "Inter", sans-serif`;
+    ctx.font = `900 ${Math.max(10, Math.min(14, badgeH * 0.72))}px "Outfit", "Inter", sans-serif`;
     ctx.letterSpacing = '0.6px';
     ctx.fillStyle = estadoColor;
     ctx.fillText(estadoTexto, puntoX + puntoR + 7, estadoY);
