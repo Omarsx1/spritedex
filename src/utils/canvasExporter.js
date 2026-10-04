@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v14: el vertical reparte las celdas para llenar el marco 9:16, asi que las capturas
-  // guardadas en memoria con la geometria anterior no deben reutilizarse.
-  return `v14_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v15: nombres y pie de estado de la ficha cambiaron de tamano y sitio; las capturas
+  // guardadas en memoria con el dibujo anterior no deben reutilizarse.
+  return `v15_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -963,7 +963,7 @@ async function renderGlitchOverrideTemplate({
 
     // 2. Zona de Nombre: Bounding box simétrico con gap limpio sobre el badge (nombre bajado un poco)
     const gapNameBadge = isUltraCompact ? 3 : 4;
-    const nameZoneH = isUltraCompact ? 22 : Math.max(26, Math.min(32, Math.round(cardH * 0.18)));
+    const nameZoneH = isUltraCompact ? 26 : Math.max(30, Math.min(38, Math.round(cardH * 0.2)));
     const nameZoneBottom = badgeY - gapNameBadge;
     const nameZoneTop = nameZoneBottom - nameZoneH;
 
@@ -1029,23 +1029,25 @@ async function renderGlitchOverrideTemplate({
       ctx.restore();
     }
 
-    // C. Sprite Name: centrado y bajado un poco dentro de nameZoneH
+    // C. Nombre: mas grande y anclado abajo, de modo que las fichas queden alineadas
+    // entre si. Antes cada nombre se centraba en su zona y, con una o dos lineas, los
+    // bloques bailaban de una tarjeta a otra.
     const baseNameFontSize = Math.max(
-      8,
+      10,
       Math.min(
-        isUltraCompact ? 9 : (isCompact ? 10 : 11.5),
-        Math.floor(cardW * 0.08)
+        isUltraCompact ? 12 : (isCompact ? 13 : 15),
+        Math.floor(cardW * 0.115)
       )
     );
 
     ctx.save();
     ctx.textAlign = 'center';
-    ctx.fillStyle = isOwned ? '#ffffff' : 'rgba(255, 255, 255, 0.88)';
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-    ctx.shadowBlur = 3;
+    ctx.fillStyle = isOwned ? '#ffffff' : 'rgba(255, 255, 255, 0.86)';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
+    ctx.shadowBlur = 4;
     ctx.shadowOffsetY = 1;
 
-    const maxTextW = cardW - 8;
+    const maxTextW = cardW - 10;
     const nameFit = getSpriteNameLines(
       ctx,
       pickName(sprite),
@@ -1055,44 +1057,47 @@ async function renderGlitchOverrideTemplate({
     );
     ctx.font = `800 ${nameFit.fontSize}px "Outfit", "Inter", sans-serif`;
 
+    const lineHeight = Math.round(nameFit.fontSize * 1.1);
+    const ultimaLineaY = badgeY - Math.max(5, Math.round(nameFit.fontSize * 0.4));
     if (nameFit.lines.length === 1) {
-      const textY = nameZoneTop + Math.floor(nameZoneH / 2) + Math.floor(nameFit.fontSize * 0.35) + 2;
-      ctx.fillText(nameFit.lines[0], cardX + cardW / 2, textY);
+      ctx.fillText(nameFit.lines[0], cardX + cardW / 2, ultimaLineaY);
     } else {
-      const lineHeight = Math.round(nameFit.fontSize * 1.16);
-      const blockH = lineHeight + nameFit.fontSize;
-      const startY = nameZoneTop + Math.floor((nameZoneH - blockH) / 2) + Math.floor(nameFit.fontSize * 0.85) + 2;
-      ctx.fillText(nameFit.lines[0], cardX + cardW / 2, startY);
-      ctx.fillText(nameFit.lines[1], cardX + cardW / 2, startY + lineHeight);
+      ctx.fillText(nameFit.lines[0], cardX + cardW / 2, ultimaLineaY - lineHeight);
+      ctx.fillText(nameFit.lines[1], cardX + cardW / 2, ultimaLineaY);
     }
     ctx.restore();
 
-    // D. Cyber Badge at Bottom (Exactamente a 4px encima del filo inferior del cuadro)
-    const badgeCornerR = Math.max(3, Math.min(5, Math.round(badgeH * 0.25)));
+    // D. Pie de ficha: una linea fina, un punto de estado y el texto en su color. Antes
+    // era una pildora rellena que parecia un boton y se comia la tarjeta. El punto va
+    // relleno cuando lo tienes y en anillo cuando te falta, para que el estado tambien se
+    // distinga sin depender del color.
+    const estadoColor = isOwned ? '#00F0E8' : '#EF4444';
+    const estadoTexto = isOwned ? t('lona.hackeado') : t('lona.faltante');
+    const estadoY = badgeY + badgeH / 2;
 
     ctx.save();
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = `900 ${badgeFontSize}px "Outfit", "Inter", sans-serif`;
+    ctx.fillStyle = isOwned ? 'rgba(0, 240, 232, 0.30)' : 'rgba(239, 68, 68, 0.30)';
+    ctx.fillRect(cardX + 6, badgeY, cardW - 12, 1);
 
-    const badgeCenterX = cardX + cardW / 2;
-    const badgeCenterY = badgeY + badgeH / 2;
-
+    const puntoX = cardX + 13;
+    const puntoR = Math.max(2.4, badgeH * 0.15);
+    ctx.beginPath();
+    ctx.arc(puntoX, estadoY, puntoR, 0, Math.PI * 2);
     if (isOwned) {
-      roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeCornerR);
-      ctx.fillStyle = '#00F0E8';
+      ctx.fillStyle = estadoColor;
       ctx.fill();
-
-      ctx.fillStyle = '#060714';
-      ctx.fillText(t('lona.hackeado'), badgeCenterX, badgeCenterY);
     } else {
-      roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeCornerR);
-      ctx.fillStyle = '#EF4444';
-      ctx.fill();
-
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillText(t('lona.faltante'), badgeCenterX, badgeCenterY);
+      ctx.strokeStyle = estadoColor;
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
     }
+
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.font = `900 ${Math.max(9, Math.min(12, badgeH * 0.62))}px "Outfit", "Inter", sans-serif`;
+    ctx.letterSpacing = '0.6px';
+    ctx.fillStyle = estadoColor;
+    ctx.fillText(estadoTexto, puntoX + puntoR + 7, estadoY);
     ctx.restore();
   }
 
