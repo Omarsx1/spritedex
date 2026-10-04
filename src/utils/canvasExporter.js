@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v23: los tamanos de la ficha son proporcionales (sin escalones por cantidad); las
-  // capturas guardadas en memoria con el dibujo anterior no deben reutilizarse.
-  return `v23_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v24: la ficha es oscura y el color es solo del estado; las capturas guardadas en
+  // memoria con el dibujo anterior no deben reutilizarse.
+  return `v24_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -932,20 +932,15 @@ async function renderGlitchOverrideTemplate({
     ctx.fillStyle = fondoFicha;
     ctx.fill();
 
-    // Encima, el velo del estado: lo justo para que la ficha no sea un rectangulo plano.
-    const colorEstado = isMastered ? '#facc15' : spiritHue;
-    ctx.fillStyle = isOwned
-      ? (isMastered ? 'rgba(234, 179, 8, 0.18)' : hexToRgba(spiritHue, 0.18))
-      : 'rgba(10, 14, 28, 0.34)';
-    ctx.fill();
+    // Un solo color de estado para borde, filo y esquinas: nada de tintes por espiritu, que
+    // eran los que hacian parecer cada ficha un cuadro de color distinto.
+    const colorEstado = isOwned ? '#00F0E8' : '#EF4444';
 
     // Filo de luz en el borde superior: le da volumen sin ensuciar el contenido.
-    ctx.fillStyle = hexToRgba(colorEstado, 0.35);
+    ctx.fillStyle = hexToRgba(colorEstado, 0.32);
     ctx.fillRect(cardX + cornerRadius, cardY + 1, cardW - cornerRadius * 2, 1);
 
-    ctx.strokeStyle = isOwned
-      ? (isMastered ? 'rgba(234, 179, 8, 0.85)' : hexToRgba(spiritHue, 0.70))
-      : hexToRgba(spiritHue, 0.40);
+    ctx.strokeStyle = hexToRgba(colorEstado, isOwned ? 0.55 : 0.42);
     ctx.lineWidth = isMastered ? 1.5 : 1;
     ctx.stroke();
 
@@ -954,7 +949,7 @@ async function renderGlitchOverrideTemplate({
     const brazo = Math.max(6, Math.min(10, Math.round(cardW * 0.07)));
     const grosorEsquina = Math.max(1.5, Math.min(2.5, cardW * 0.012));
     const margenEsquina = 2;
-    ctx.strokeStyle = isOwned ? hexToRgba(colorEstado, isMastered ? 0.95 : 0.75) : hexToRgba(spiritHue, 0.55);
+    ctx.strokeStyle = hexToRgba(colorEstado, isOwned ? 0.80 : 0.55);
     ctx.lineWidth = grosorEsquina;
     ctx.beginPath();
     ctx.moveTo(cardX + margenEsquina, cardY + margenEsquina + brazo);
