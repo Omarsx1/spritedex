@@ -7850,6 +7850,27 @@ body:has(.modal-overlay) {
   background: rgba(255, 255, 255, 0.08);
 }
 
+/* Los enlaces del pie reutilizan la capsula del boton de privacidad. */
+a.app-footer__privacy-btn {
+  text-decoration: none;
+}
+
+/* Enlace a la ficha publica del espiritu, dentro del detalle. */
+.sdm__ficha {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(0, 240, 232, 0.85);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 240, 232, 0.35);
+}
+
+.sdm__ficha:hover {
+  color: #ffffff;
+  border-bottom-color: #ffffff;
+}
+
 /* En Mobile: Mantiene la cápsula horizontal en una sola fila sin apilamiento */
 @media (max-width: 600px) {
   .app-footer {

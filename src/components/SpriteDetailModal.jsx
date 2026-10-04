@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Zap, Sparkles } from 'lucide-react';
 import { SPRITE_FAMILIES, getSpriteCardStyle, getRarityInfo, pickName, pickThemeName, pickTexto } from '../data/spritesData';
-import { t } from '../i18n';
+import { t, conIdioma, getLang } from '../i18n';
+import { rutaEspiritu } from '../seo/espiritus.js';
 import { sounds } from '../utils/audio';
 import { rutaBasicoFamilia, rutaFallbackEspiritu } from '../utils/spriteAssets';
 import gsap from 'gsap';
@@ -118,6 +119,11 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                 </span>
               )}
             </div>
+            {/* Ficha publica: pagina estatica con los datos del espiritu, URL propia para
+                compartir y la que enlaza el resto del sitio. */}
+            <a className="sdm__ficha" href={conIdioma(rutaEspiritu(activeSprite.id), getLang())}>
+              {t('detalle.verFicha')}
+            </a>
           </div>
         </div>
 
