@@ -37,12 +37,18 @@ existian; esta crea las que no existian.
 `dist/` pasa de 20 a **26 MB** (+6 MB de HTML). Es el precio de tener 558 paginas: siguen
 siendo 13 MB menos que los 39 MB originales.
 
+## Enlace profundo (cerrado)
+- [x] T5 Los CTA de las fichas llevan a `/?s=<slug>` y `/en?s=<slug>` (forma canonica, sin
+      barra final) y la app los resuelve en `src/utils/enlaceEspiritu.js`: abre el detalle de
+      ESE espiritu. Tambien acepta la ruta `/espiritu/<slug>`, que es la que ve la app en
+      desarrollo (en produccion la sirve el HTML estatico). Se resuelve una sola vez, cuando la
+      lista ya esta cargada, para no reabrir el modal si el usuario lo cierra.
+- Verificado con Chrome headless sobre el build: `/?s=spookydash-gold` abre
+  "Impulso aterrador Dorado"; sin enlace no abre nada; `?s=no-existe` no abre nada ni lanza
+  errores. 161/161 pruebas.
+
 ## Pendiente
-- Enlace profundo: si alguien abre `/espiritu/<slug>` en el navegador ve la ficha estatica con
-  un CTA, no la app con ese espiritu abierto. Siguiente paso natural: que la SPA lea la ruta y
-  abra el detalle.
 - Arte para los 6 espiritus (`fishy_gem`, `fishy_holofoil`, `striker_gem`, `striker_rift`,
   `boss_holofoil`, `seven_gem`).
 - F3 Core Web Vitals, F4 contenido/E-E-A-T, F5 medicion.
 - Nada desplegado: el usuario pidio seguir en rama.
-
