@@ -110,7 +110,7 @@ export const DEFAULT_EXPORT_FORMAT = 'checklist';
 export const DEFAULT_EXPORT_BG_STYLE = 'glitch_override';
 
 // Clave canónica unificada para caché de plantillas de canvas (0ms instantáneo y sin colisiones entre filtros)
-export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFAULT_EXPORT_BG_STYLE, count = 0, ownedCount = 0, spritesList = [], userState = {}) {
+export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFAULT_EXPORT_BG_STYLE, count = 0, ownedCount = 0, spritesList = [], userState = {}, usuario = '') {
   let hash = 0;
   if (Array.isArray(spritesList) && spritesList.length > 0) {
     for (let i = 0; i < spritesList.length; i++) {
@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v27: nombre y estado un escalon mas pequenos; las capturas guardadas en memoria con el
-  // dibujo anterior no deben reutilizarse.
-  return `v27_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v28: la lona puede llevar la firma del usuario; las capturas guardadas en memoria con
+  // el dibujo anterior (o con otro nombre) no deben reutilizarse.
+  return `v28_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -462,11 +462,13 @@ export async function generateSpritedexCardImage({
   userState,
   format = DEFAULT_EXPORT_FORMAT, // 'checklist', 'square'
   bgStyle = DEFAULT_EXPORT_BG_STYLE, // 'glitch_override', 'blueprint', 'dark_matrix'
-  useBackgroundTemplate = true
+  useBackgroundTemplate = true,
+  usuario = '' // nombre de Fortnite del duenno: se pinta en el pie, junto al QR
 }) {
   const effectiveBgStyle = bgStyle || (useBackgroundTemplate ? 'glitch_override' : 'dark_matrix');
   const ownedCount = spritesList.filter(s => userState[s.id]?.owned).length;
-  const cacheKey = getCanvasCacheKey(format, effectiveBgStyle, spritesList.length, ownedCount, spritesList, userState);
+  const firma = String(usuario || '').trim();
+  const cacheKey = getCanvasCacheKey(format, effectiveBgStyle, spritesList.length, ownedCount, spritesList, userState, firma);
 
   // 1. Devolución instantánea a 0ms si la plantilla ya fue generada previamente
   if (globalCanvasCache.has(cacheKey)) {
@@ -520,7 +522,8 @@ export async function generateSpritedexCardImage({
     userState,
     format,
     bgStyle: effectiveBgStyle,
-    loadedImagesMap
+    loadedImagesMap,
+    usuario: firma
   });
 
   globalCanvasCache.set(cacheKey, result);
@@ -665,7 +668,8 @@ async function renderGlitchOverrideTemplate({
   userState,
   format,
   bgStyle,
-  loadedImagesMap
+  loadedImagesMap,
+  usuario = ''
 }) {
   const canvas = document.createElement('canvas');
   const totalSprites = spritesList.length;
@@ -1151,13 +1155,34 @@ async function renderGlitchOverrideTemplate({
   ctx.restore();
 
   // 4. FOOTER WATERMARK
+  // La firma va justo encima de la marca de agua y debajo del QR: es el unico sitio que no
+  // compite ni con la cuadricula ni con el header, y queda al lado del codigo que lleva a
+  // la coleccion. Si el nombre es largo, se reduce el tamano hasta que entra.
+  if (usuario) {
+    ctx.save();
+    ctx.textAlign = 'center';
+    const limite = width * 0.7;
+    let firmaSize = Math.round(13 * (width / 1200));
+    const textoFirma = `@${usuario}`;
+    ctx.font = `800 ${firmaSize}px "Outfit", "Inter", sans-serif`;
+    while (firmaSize > 9 && ctx.measureText(textoFirma).width > limite) {
+      firmaSize -= 1;
+      ctx.font = `800 ${firmaSize}px "Outfit", "Inter", sans-serif`;
+    }
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(0, 240, 232, 0.45)';
+    ctx.shadowBlur = 8;
+    ctx.fillText(textoFirma, width / 2, height - 34);
+    ctx.restore();
+  }
+
   ctx.save();
   ctx.textAlign = 'center';
   ctx.font = `700 ${Math.round(12 * (width / 1200))}px "Outfit", "Inter", monospace, sans-serif`;
   ctx.fillStyle = '#38bdf8';
   ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
   ctx.shadowBlur = 6;
-  ctx.fillText(t('lona.marca'), width / 2, height - 16);
+  ctx.fillText(enTemporada ? t('lona.marcaMares') : t('lona.marca'), width / 2, height - 16);
   ctx.restore();
 
   // Codificar el PNG de 1280x2515 es la parte mas cara del export (2-6 s en movil),
