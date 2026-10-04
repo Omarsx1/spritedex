@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v20: el panel de la ficha gana base oscura para el fondo de temporada; las capturas
-  // guardadas en memoria con el dibujo anterior no deben reutilizarse.
-  return `v20_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v21: panel mas oscuro y texto un punto menor; las capturas guardadas en memoria con
+  // el dibujo anterior no deben reutilizarse.
+  return `v21_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -927,13 +927,13 @@ async function renderGlitchOverrideTemplate({
 
     // Base oscura casi opaca. Antes el panel era solo un tinte translucido y, con el arte
     // de temporada detras, el fondo se transparentaba y las fichas se veian sucias.
-    ctx.fillStyle = 'rgba(6, 7, 20, 0.90)';
+    ctx.fillStyle = 'rgba(4, 5, 14, 0.97)';
     ctx.fill();
 
     // Encima, el velo del estado: lo justo para que la ficha no sea un rectangulo plano.
     ctx.fillStyle = isOwned
-      ? (isMastered ? 'rgba(234, 179, 8, 0.20)' : hexToRgba(spiritHue, 0.20))
-      : 'rgba(15, 23, 42, 0.34)';
+      ? (isMastered ? 'rgba(234, 179, 8, 0.18)' : hexToRgba(spiritHue, 0.18))
+      : 'rgba(10, 14, 28, 0.34)';
     ctx.fill();
 
     ctx.strokeStyle = isOwned
@@ -1036,8 +1036,8 @@ async function renderGlitchOverrideTemplate({
     const baseNameFontSize = Math.max(
       10,
       Math.min(
-        isUltraCompact ? 14 : (isCompact ? 16 : 20),
-        Math.floor(cardW * 0.15)
+        isUltraCompact ? 13 : (isCompact ? 15 : 17),
+        Math.floor(cardW * 0.14)
       )
     );
 
@@ -1098,7 +1098,7 @@ async function renderGlitchOverrideTemplate({
 
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.font = `900 ${Math.max(11, Math.min(16, badgeH * 0.72))}px "Outfit", "Inter", sans-serif`;
+    ctx.font = `900 ${Math.max(10, Math.min(15, badgeH * 0.68))}px "Outfit", "Inter", sans-serif`;
     ctx.letterSpacing = '0.6px';
     ctx.fillStyle = estadoColor;
     ctx.fillText(estadoTexto, puntoX + puntoR + 7, estadoY);
