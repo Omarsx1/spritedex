@@ -130,9 +130,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // en memoria con el dibujo anterior no deben reutilizarse.
   // v36: el vertical tambien recorta el ancho del lienzo (tope de ancho de celda), asi que
   // las capturas guardadas en memoria con el dibujo anterior tampoco valen.
-  // v38: el HUD gana base oscura y tipografia mas clara y grande para que el alcance
-  // ("nuevos", "faltantes"...) se lea sobre cualquier fondo; las capturas anteriores no valen.
-  return `v38_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v39: la barra del HUD ancla el degradado al riel completo y gana brillo de cristal;
+  // las capturas guardadas con la barra anterior no valen.
+  return `v39_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -980,20 +980,20 @@ async function renderGlitchOverrideTemplate({
 
   // Barra neon del HUD: riel con borde, marcas de cuarto y remate encendido en el avance.
   const barX = hudX + 14;
-  const barH = Math.round(7 * Math.min(1.15, scale));
+  const barH = Math.round(8 * Math.min(1.15, scale));
   const barY = hudY + hudH - barH - 5;
   const barW = hudW - 28;
   const barRadio = barH / 2;
 
   roundRect(ctx, barX, barY, barW, barH, barRadio);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
   ctx.fill();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
   ctx.lineWidth = 1;
   ctx.stroke();
 
   // Marcas de 25/50/75: el riel se lee como medidor y no como una linea vacia.
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.14)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
   for (const cuarto of [0.25, 0.5, 0.75]) {
     ctx.fillRect(Math.round(barX + barW * cuarto), Math.round(barY + barH * 0.3), 1, Math.round(barH * 0.4));
   }
@@ -1002,22 +1002,32 @@ async function renderGlitchOverrideTemplate({
   const fillW = avance > 0 ? Math.max(barH, (barW * avance) / 100) : 0;
   if (fillW > 0) {
     roundRect(ctx, barX, barY, fillW, barH, barRadio);
-    const grad = ctx.createLinearGradient(barX, barY, barX + fillW, barY);
+    // El degradado va anclado al riel completo: el color dice cuanto queda para el 100,
+    // no cuanto mide el relleno (antes, al 20%, el arcoiris entero cabia en ese 20% y la
+    // barra parecia completa; ahora la punta solo llega al cian cerca del final).
+    const grad = ctx.createLinearGradient(barX, barY, barX + barW, barY);
     grad.addColorStop(0, '#ff0055');
-    grad.addColorStop(0.7, '#ec4899');
+    grad.addColorStop(0.55, '#d946ef');
     grad.addColorStop(1, '#00F0E8');
     ctx.fillStyle = grad;
-    ctx.shadowColor = 'rgba(255, 0, 85, 0.65)';
+    ctx.shadowColor = 'rgba(255, 0, 85, 0.55)';
     ctx.shadowBlur = 8;
     ctx.fill();
     ctx.shadowBlur = 0;
 
+    // Brillo superior: le da volumen de cristal al relleno sin ensuciar el color.
+    const brilloW = fillW - barH;
+    if (brilloW > 2) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+      ctx.fillRect(barX + barRadio, barY + Math.max(1, Math.round(barH * 0.18)), brilloW, Math.max(1, Math.round(barH * 0.2)));
+    }
+
     // Remate luminoso: el borde del avance queda encendido, como el cabezal del medidor.
     ctx.save();
-    ctx.shadowColor = 'rgba(255, 255, 255, 0.75)';
-    ctx.shadowBlur = 6;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
-    ctx.fillRect(barX + fillW - 1, barY + 1, 1.5, barH - 2);
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+    ctx.shadowBlur = 7;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+    ctx.fillRect(barX + fillW - 1.5, barY + 1, 2, barH - 2);
     ctx.restore();
   }
 
