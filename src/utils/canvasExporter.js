@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v31: la firma pasa a leerse "ID - nombre"; las capturas guardadas en memoria con el
-  // dibujo anterior no deben reutilizarse.
-  return `v31_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
+  // v33: el logo de temporada se pinta con degradado claro; las capturas guardadas en
+  // memoria con el dibujo anterior no deben reutilizarse.
+  return `v33_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -492,6 +492,9 @@ export async function generateSpritedexCardImage({
     return fondo === '/background.webp' ? null : loadImage('/background.webp');
   });
 
+  // En temporada el encabezado usa el logo real de Fortnitemares (el mismo SVG del hero).
+  const logoMaresPromise = isFortnitemaresActive() ? loadImage('/fortnitemares.svg') : Promise.resolve(null);
+
   // Con alguien esperando (modal abierto) se piden todas de golpe porque el objetivo
   // es que la captura salga ya. En segundo plano se piden de a pocas: el precálculo
   // pedia 90 y pico imagenes de una sola vez apenas se entraba a la app, y eso se
@@ -513,6 +516,9 @@ export async function generateSpritedexCardImage({
   await Promise.all([
     bgImgPromise.then((img) => {
       if (img) loadedImagesMap['__bg_override__'] = img;
+    }),
+    logoMaresPromise.then((img) => {
+      if (img) loadedImagesMap['__logo_mares__'] = img;
     }),
     ...Array.from({ length: Math.min(concurrencia, lista.length) }, cargarSprite)
   ]);
@@ -683,7 +689,9 @@ async function renderGlitchOverrideTemplate({
   let height = 1520;
   let cols = 6;
   let cellH;
-  let headerH = 195;
+  // En temporada el encabezado lleva el logo real de Fortnitemares, que necesita mas alto.
+  const enTemporada = isFortnitemaresActive();
+  let headerH = enTemporada ? 265 : 195;
   let footerH = 45;
   const paddingX = 36;
 
@@ -779,40 +787,74 @@ async function renderGlitchOverrideTemplate({
 
   // En temporada el encabezado se viste de Fortnitemares: mismos sitios y misma tipografia,
   // solo cambian los textos y el acento, para que la lona siga siendo reconocible.
-  const enTemporada = isFortnitemaresActive();
   const acentoCabecera = enTemporada ? '#e879f9' : '#00F0E8';
   const acentoCabeceraRgba = enTemporada ? 'rgba(232, 121, 249, 0.7)' : 'rgba(0, 240, 232, 0.7)';
 
-  // Top Small Header: "FORTNITE , NUEVOS"
-  ctx.font = `900 ${Math.round(14 * Math.min(1.2, scale))}px "Outfit", "Inter", "Arial Black", sans-serif`;
-  ctx.fillStyle = acentoCabecera;
-  ctx.textAlign = 'center';
-  ctx.letterSpacing = '3px';
-  ctx.shadowColor = acentoCabeceraRgba;
-  ctx.shadowBlur = 8;
-  const topTextY = Math.round(34 * Math.min(1.15, scale));
-  ctx.fillText(enTemporada ? t('lona.arribaMares') : t('lona.arriba'), width / 2, topTextY);
+  // En temporada el titulo es el logo de Fortnitemares (el mismo arte del hero). Si la
+  // imagen no cargara, se cae al titulo de texto para no dejar el encabezado vacio.
+  const logoMares = enTemporada ? loadedImagesMap['__logo_mares__'] : null;
+  let titleY;
 
-  // Main Big Title: "SPRITEDEX OVERRIDE"
-  const titleText = enTemporada ? t('lona.tituloMares') : t('lona.titulo');
-  const baseTitleFontSize = isSquare ? (cols >= 8 ? 44 : 48) : 52;
-  const titleFontSize = Math.round(baseTitleFontSize * Math.min(1.22, Math.max(0.9, scale)));
-  ctx.font = `900 ${titleFontSize}px "Burbank Big Condensed", "Impact", "Arial Black", sans-serif`;
+  if (logoMares) {
+    const logoW = Math.round(width * 0.52);
+    const proporcion = logoMares.naturalWidth ? (logoMares.naturalHeight / logoMares.naturalWidth) : (1 / 3);
+    const logoH = Math.round(logoW * proporcion);
+    const logoY = Math.round(30 * Math.min(1.15, scale));
 
-  const titleY = topTextY + Math.round(50 * Math.min(1.15, scale));
+    // El SVG oficial es relleno negro con contorno neon: sobre el fondo oscuro de la lona
+    // el relleno se pierde. Se usa como mascara y se pinta con un degradado claro, asi el
+    // wordmark se lee igual que en la key art (que va sobre magenta).
+    const capaLogo = document.createElement('canvas');
+    capaLogo.width = logoW;
+    capaLogo.height = logoH;
+    const ctxLogo = capaLogo.getContext('2d');
+    ctxLogo.drawImage(logoMares, 0, 0, logoW, logoH);
+    ctxLogo.globalCompositeOperation = 'source-in';
+    const gradLogo = ctxLogo.createLinearGradient(0, 0, 0, logoH);
+    gradLogo.addColorStop(0, '#ffffff');
+    gradLogo.addColorStop(0.55, '#f5d0fe');
+    gradLogo.addColorStop(1, '#e879f9');
+    ctxLogo.fillStyle = gradLogo;
+    ctxLogo.fillRect(0, 0, logoW, logoH);
 
-  // Chromatic Aberration Shadows
-  ctx.fillStyle = acentoCabecera;
-  ctx.fillText(titleText, width / 2 + 3, titleY);
+    ctx.save();
+    ctx.shadowColor = 'rgba(232, 121, 249, 0.45)';
+    ctx.shadowBlur = 18;
+    ctx.drawImage(capaLogo, (width - logoW) / 2, logoY);
+    ctx.restore();
+    titleY = logoY + logoH;
+  } else {
+    // Top Small Header: "FORTNITE , NUEVOS"
+    ctx.font = `900 ${Math.round(14 * Math.min(1.2, scale))}px "Outfit", "Inter", "Arial Black", sans-serif`;
+    ctx.fillStyle = acentoCabecera;
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '3px';
+    ctx.shadowColor = acentoCabeceraRgba;
+    ctx.shadowBlur = 8;
+    const topTextY = Math.round(34 * Math.min(1.15, scale));
+    ctx.fillText(enTemporada ? t('lona.arribaMares') : t('lona.arriba'), width / 2, topTextY);
 
-  ctx.fillStyle = '#ff0055';
-  ctx.fillText(titleText, width / 2 - 3, titleY);
+    // Main Big Title: "SPRITEDEX OVERRIDE"
+    const titleText = enTemporada ? t('lona.tituloMares') : t('lona.titulo');
+    const baseTitleFontSize = isSquare ? (cols >= 8 ? 44 : 48) : 52;
+    const titleFontSize = Math.round(baseTitleFontSize * Math.min(1.22, Math.max(0.9, scale)));
+    ctx.font = `900 ${titleFontSize}px "Burbank Big Condensed", "Impact", "Arial Black", sans-serif`;
 
-  ctx.fillStyle = '#ffffff';
-  ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
-  ctx.shadowBlur = 14;
-  ctx.fillText(titleText, width / 2, titleY);
-  ctx.shadowBlur = 0;
+    titleY = topTextY + Math.round(50 * Math.min(1.15, scale));
+
+    // Chromatic Aberration Shadows
+    ctx.fillStyle = acentoCabecera;
+    ctx.fillText(titleText, width / 2 + 3, titleY);
+
+    ctx.fillStyle = '#ff0055';
+    ctx.fillText(titleText, width / 2 - 3, titleY);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
+    ctx.shadowBlur = 14;
+    ctx.fillText(titleText, width / 2, titleY);
+    ctx.shadowBlur = 0;
+  }
 
   // Tagline Pill Capsule: "ROMPE LAS REGLAS • CAMBIA EL JUEGO"
   const capsuleText = enTemporada ? t('lona.lemaMares') : t('lona.lema');
