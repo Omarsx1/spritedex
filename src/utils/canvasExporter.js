@@ -320,6 +320,21 @@ function roundRect(ctx, x, y, width, height, radius) {
   ctx.closePath();
 }
 
+// Ultima fila con pixeles visibles de una mascara: el SVG oficial del wordmark deja aire
+// abajo (13 px de 180 al dibujarse a 540), asi que anclar la capsula al alto del archivo
+// la dejaba flotando. Se mide el borde real de las letras y se usa ese valor.
+function medirBordeInferior(ctxLogo, ancho, alto) {
+  try {
+    const datos = ctxLogo.getImageData(0, 0, ancho, alto).data;
+    for (let y = alto - 1; y >= 0; y -= 1) {
+      for (let x = 0; x < ancho; x += 1) {
+        if (datos[(y * ancho + x) * 4 + 3] > 8) return y + 1;
+      }
+    }
+  } catch {}
+  return alto;
+}
+
 // Draw crop & fill background
 function drawCroppedBackground(ctx, img, canvasW, canvasH) {
   if (!img || !img.width || !img.height) return;
@@ -787,12 +802,40 @@ async function renderGlitchOverrideTemplate({
   // En temporada el encabezado lleva el logo real y necesita su sitio. Se calcula con las
   // MISMAS proporciones con las que luego se dibuja, para que nunca tape la capsula ni la
   // barra de progreso: en el formato cuadrado su propio alto fijo pisaba este calculo.
+  // La mascara del logo se arma aqui una sola vez: la medicion del borde real de las
+  // letras alimenta tanto la reserva de alto como el dibujo del encabezado.
+  let logoMaresListo = null;
   if (enTemporada) {
     const u = Math.min(1.15, anchoDiseno / 1200);
-    const logoAlto = Math.round((anchoDiseno * 0.5) / 3); // el SVG es 3:1
-    // Los huecos coinciden con los del dibujo: prologo (28) + hueco del logo (22) + logo +
-    // capsula pegada (8) + capsula (22) + HUD separado (16) + HUD (36) + margen (16).
-    const altoNecesario = Math.round(28 * u) + Math.round(22 * u) + logoAlto + Math.round(8 * u) + Math.round(22 * u) + Math.round(16 * u) + Math.round(36 * u) + 16;
+    const fuenteLogo = loadedImagesMap['__logo_mares__'];
+    let logoAlto = Math.round((anchoDiseno * 0.5) / 3); // el SVG es 3:1
+    let bordeLetras = logoAlto;
+    if (fuenteLogo) {
+      const logoW = Math.min(Math.round(anchoDiseno * 0.5), width - paddingX * 2);
+      const proporcion = fuenteLogo.naturalWidth ? (fuenteLogo.naturalHeight / fuenteLogo.naturalWidth) : (1 / 3);
+      const logoH = Math.round(logoW * proporcion);
+      // El SVG oficial es relleno negro con contorno neon: sobre el fondo oscuro de la lona
+      // el relleno se pierde. Se usa como mascara y se pinta con un degradado claro, asi el
+      // wordmark se lee igual que en la key art (que va sobre magenta).
+      const capaLogo = document.createElement('canvas');
+      capaLogo.width = logoW;
+      capaLogo.height = logoH;
+      const ctxLogo = capaLogo.getContext('2d');
+      ctxLogo.drawImage(fuenteLogo, 0, 0, logoW, logoH);
+      ctxLogo.globalCompositeOperation = 'source-in';
+      const gradLogo = ctxLogo.createLinearGradient(0, 0, 0, logoH);
+      gradLogo.addColorStop(0, '#ffffff');
+      gradLogo.addColorStop(0.55, '#f5d0fe');
+      gradLogo.addColorStop(1, '#e879f9');
+      ctxLogo.fillStyle = gradLogo;
+      ctxLogo.fillRect(0, 0, logoW, logoH);
+      bordeLetras = medirBordeInferior(ctxLogo, logoW, logoH);
+      logoAlto = logoH;
+      logoMaresListo = { capa: capaLogo, w: logoW, h: logoH, borde: bordeLetras };
+    }
+    // Los huecos coinciden con los del dibujo: prologo (28) + hueco del logo (22) + letras
+    // + capsula pegada (6) + capsula (22) + HUD separado (16) + HUD (36) + margen (16).
+    const altoNecesario = Math.round(28 * u) + Math.round(22 * u) + bordeLetras + Math.round(6 * u) + Math.round(22 * u) + Math.round(16 * u) + Math.round(36 * u) + 16;
     headerH = Math.max(headerH, altoNecesario);
   }
 
@@ -850,10 +893,9 @@ async function renderGlitchOverrideTemplate({
 
   // En temporada el titulo es el logo de Fortnitemares (el mismo arte del hero). Si la
   // imagen no cargara, se cae al titulo de texto para no dejar el encabezado vacio.
-  const logoMares = enTemporada ? loadedImagesMap['__logo_mares__'] : null;
   let titleY;
 
-  if (logoMares) {
+  if (logoMaresListo) {
     // Prologo de marca sobre el wordmark: mismo patron que fuera de temporada (linea
     // pequena arriba + titulo grande), para que el encabezado no sea solo un logo suelto.
     const prologoY = Math.round(28 * Math.min(1.15, scale));
@@ -867,26 +909,9 @@ async function renderGlitchOverrideTemplate({
     ctx.shadowBlur = 0;
     ctx.letterSpacing = '0px';
 
-    const logoW = Math.min(Math.round(anchoDiseno * 0.5), width - paddingX * 2);
-    const proporcion = logoMares.naturalWidth ? (logoMares.naturalHeight / logoMares.naturalWidth) : (1 / 3);
-    const logoH = Math.round(logoW * proporcion);
+    const logoW = logoMaresListo.w;
+    const logoH = logoMaresListo.h;
     const logoY = prologoY + Math.round(22 * Math.min(1.15, scale));
-
-    // El SVG oficial es relleno negro con contorno neon: sobre el fondo oscuro de la lona
-    // el relleno se pierde. Se usa como mascara y se pinta con un degradado claro, asi el
-    // wordmark se lee igual que en la key art (que va sobre magenta).
-    const capaLogo = document.createElement('canvas');
-    capaLogo.width = logoW;
-    capaLogo.height = logoH;
-    const ctxLogo = capaLogo.getContext('2d');
-    ctxLogo.drawImage(logoMares, 0, 0, logoW, logoH);
-    ctxLogo.globalCompositeOperation = 'source-in';
-    const gradLogo = ctxLogo.createLinearGradient(0, 0, 0, logoH);
-    gradLogo.addColorStop(0, '#ffffff');
-    gradLogo.addColorStop(0.55, '#f5d0fe');
-    gradLogo.addColorStop(1, '#e879f9');
-    ctxLogo.fillStyle = gradLogo;
-    ctxLogo.fillRect(0, 0, logoW, logoH);
 
     // Halo suave detras del wordmark: profundidad de key art sin ensuciar el dibujo.
     const haloY = logoY + logoH / 2;
@@ -905,9 +930,10 @@ async function renderGlitchOverrideTemplate({
     ctx.save();
     ctx.shadowColor = 'rgba(232, 121, 249, 0.45)';
     ctx.shadowBlur = 18;
-    ctx.drawImage(capaLogo, (width - logoW) / 2, logoY);
+    ctx.drawImage(logoMaresListo.capa, (width - logoW) / 2, logoY);
     ctx.restore();
-    titleY = logoY + logoH;
+    // La capsula se ancla al borde visible de las letras, no al lienzo del SVG.
+    titleY = logoY + logoMaresListo.borde;
   } else {
     // Top Small Header: "FORTNITE , NUEVOS"
     ctx.font = `900 ${Math.round(14 * Math.min(1.2, scale))}px "Outfit", "Inter", "Arial Black", sans-serif`;
@@ -950,7 +976,7 @@ async function renderGlitchOverrideTemplate({
   const capsuleH = Math.round(22 * Math.min(1.15, scale));
   const capsuleX = (width - capsuleW) / 2;
   // La capsula va pegada al logo: el lema es parte del titulo, no del panel de progreso.
-  const capsuleY = titleY + Math.round(8 * Math.min(1.1, scale));
+  const capsuleY = titleY + Math.round(6 * Math.min(1.1, scale));
 
   roundRect(ctx, capsuleX, capsuleY, capsuleW, capsuleH, 5);
   const capsuleGrad = ctx.createLinearGradient(capsuleX, capsuleY, capsuleX + capsuleW, capsuleY);
