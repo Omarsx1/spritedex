@@ -18,6 +18,7 @@ import {
 } from '../src/config/seasonalEvent.js';
 import { FNM_PHASES, FNM_SWARM_COUNT, FNM_BOOT_DELAY } from '../src/config/fortnitemaresTimeline.js';
 import { HALLOWEEN_COLORS, isBatSwarmActive, batBurstFor } from '../src/utils/confetti.js';
+import { rutaFondoPlantilla } from '../src/utils/canvasExporter.js';
 import { createBatSwarm, fireFlyingBats } from '../src/utils/batSwarm.js';
 
 const INSIDE = new Date('2026-10-15T12:00:00-05:00');
@@ -209,4 +210,26 @@ test('maxear dispara mas murcielagos que atrapar', () => {
   assert.ok(alMaxear.count > alAtrapar.count, 'maxear lleva mas murcielagos');
   assert.ok(alMaxear.duration > alAtrapar.duration, 'y dura mas');
   assert.equal(batBurstFor({ maxeo: false }).count, alAtrapar.count, 'solo maxear cambia');
+});
+
+test('la plantilla de compartir usa el fondo de temporada', () => {
+  const RealDate = Date;
+  const RealWindow = globalThis.window;
+  const conFecha = (iso) => class extends RealDate {
+    constructor(...args) { super(...(args.length ? args : [iso])); }
+    static now() { return new RealDate(iso).getTime(); }
+  };
+
+  globalThis.window = { location: { search: '' } };
+  try {
+    globalThis.Date = conFecha('2026-10-15T12:00:00-05:00');
+    assert.equal(rutaFondoPlantilla(), '/bac_mares.webp', 'en temporada la captura sale con el arte de Fortnitemares');
+
+    globalThis.Date = conFecha('2026-06-01T12:00:00-05:00');
+    assert.equal(rutaFondoPlantilla(), '/background.webp', 'fuera de temporada queda el de siempre');
+  } finally {
+    globalThis.Date = RealDate;
+    if (RealWindow === undefined) delete globalThis.window;
+    else globalThis.window = RealWindow;
+  }
 });
