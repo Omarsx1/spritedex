@@ -126,7 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  return `v12_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v13: el formato vertical pasa a 9:16 fijo, asi que las capturas guardadas en memoria
+  // con el marco viejo no deben reutilizarse.
+  return `v13_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -676,6 +678,7 @@ async function renderGlitchOverrideTemplate({
   let width = 1080;
   let height = 1520;
   let cols = 6;
+  let cellH;
   let headerH = 195;
   let footerH = 45;
   const paddingX = 36;
@@ -711,20 +714,22 @@ async function renderGlitchOverrideTemplate({
     else if (totalSprites <= 63) cols = 8; // Caso ideal Imagen 2 (8x8 = 64)
     else cols = Math.max(8, Math.ceil(Math.sqrt(totalSlotsNeeded))); // 11x11 para 117
   } else {
-    // Formato Vertical (📱 Checklist / Poster móvil)
-    if (totalSprites <= 8) {
-      cols = 4;
-      width = 1080;
-    } else if (totalSprites <= 18) {
-      cols = 5;
-      width = 1080;
-    } else if (totalSprites <= 70) {
-      cols = 6;
-      width = 1080; // Caso ideal Imagen 4 (61 espíritus)
-    } else {
-      // Colecciones grandes en vertical (p.ej. 117 de Gen 1): 8 columnas
-      cols = 8;
-      width = 1280;
+    // Formato Vertical: 9:16 fijo (1080x1920), que es lo que piden las redes (historias,
+    // reels, tiktok). Antes la altura se calculaba con la coleccion, asi que con pocos
+    // espiritus salia un lienzo 4:3 apaisado y con muchos uno de 1:2,2: ninguno servia
+    // tal cual en una red. Ahora el marco es fijo y lo que se adapta es la cuadricula.
+    width = 1080;
+    height = 1920;
+
+    const alturaUtil = height - headerH - footerH;
+    cellH = totalSprites > 70 ? 150 : 168;
+    // Columnas: las justas para que quepan las filas, empezando por 4.
+    cols = 4;
+    while (cols < 16 && Math.ceil(totalSlotsNeeded / cols) * cellH > alturaUtil) cols += 1;
+    // Si ni con todas las columnas entra, se encogen las celdas hasta un minimo legible.
+    const filasNecesarias = Math.ceil(totalSlotsNeeded / cols);
+    if (filasNecesarias * cellH > alturaUtil) {
+      cellH = Math.max(96, Math.floor(alturaUtil / filasNecesarias));
     }
   }
 
@@ -732,11 +737,8 @@ async function renderGlitchOverrideTemplate({
   const availW = width - paddingX * 2;
   const cellW = Math.floor(availW / cols);
 
-  let cellH;
   if (!isSquare) {
-    const desiredCellH = totalSprites > 70 ? 175 : 190;
-    height = headerH + rows * desiredCellH + footerH;
-    cellH = desiredCellH;
+    // El vertical ya trae marco fijo y celdas calculadas arriba: no se rehace la altura.
   } else {
     // En formato cuadrado 1:1, distribuimos el espacio vertical simétricamente
     cellH = Math.floor((height - headerH - footerH) / rows);
