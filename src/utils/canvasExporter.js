@@ -50,17 +50,23 @@ function drawModernDotQR(ctx, qrX, qrY, qrSize, url = dominioParaCompartir()) {
     const count = qr.getModuleCount();
     const cellSize = qrSize / count;
 
-    // 1. Dibuja los 3 patrones de detección de posición con geometría ISO estándar para reconocimiento instantáneo de cámara
+    // 1. Dibuja los 3 patrones de detección de posición con geometría ISO estándar para
+    // reconocimiento instantáneo de cámara, pero con las esquinas redondeadas: mismo
+    // ratio 1:1:3:1:1 (el que leen los escáneres), acabado moderno.
     const drawFinderPattern = (startX, startY) => {
+      const lado = 7 * cellSize;
       // Anillo exterior 7x7 en cian neón
       ctx.fillStyle = '#00F0E8';
-      ctx.fillRect(startX, startY, 7 * cellSize, 7 * cellSize);
+      roundRect(ctx, startX, startY, lado, lado, cellSize * 1.6);
+      ctx.fill();
       // Espacio intermedio 5x5 oscuro
       ctx.fillStyle = '#060a14';
-      ctx.fillRect(startX + cellSize, startY + cellSize, 5 * cellSize, 5 * cellSize);
+      roundRect(ctx, startX + cellSize, startY + cellSize, 5 * cellSize, 5 * cellSize, cellSize * 1.1);
+      ctx.fill();
       // Núcleo central 3x3 en cian neón
       ctx.fillStyle = '#00F0E8';
-      ctx.fillRect(startX + 2 * cellSize, startY + 2 * cellSize, 3 * cellSize, 3 * cellSize);
+      roundRect(ctx, startX + 2 * cellSize, startY + 2 * cellSize, 3 * cellSize, 3 * cellSize, cellSize * 0.7);
+      ctx.fill();
     };
 
     drawFinderPattern(qrX, qrY); // Superior izquierdo
@@ -68,7 +74,7 @@ function drawModernDotQR(ctx, qrX, qrY, qrSize, url = dominioParaCompartir()) {
     drawFinderPattern(qrX, qrY + (count - 7) * cellSize); // Inferior izquierdo
 
     // 2. Dibuja todos los módulos de datos como puntos circulares de alto contraste en un solo pase
-    const dotRadius = cellSize * 0.44;
+    const dotRadius = cellSize * 0.46;
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
 
@@ -133,7 +139,8 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // v43: el encabezado de temporada gana prologo de marca, halo del logo y capsula con
   // filo; las capturas guardadas con el encabezado anterior no valen.
   // v45: fuera el prologo de marca; la capsula pasa a "SPRITEDEX • SOBREVIVE A LA NOCHE".
-  return `v45_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v46: el QR deja el panel de tarjeta y estrena esquinas HUD + halo de escaneo.
+  return `v46_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -1338,9 +1345,9 @@ async function renderGlitchOverrideTemplate({
   // Un respiro antes del bloque del QR y la marca de agua.
   await cederTurno();
 
-  // 3.B. CODIGO QR: vive en su propia ficha con el mismo lenguaje que las tarjetas
-  // (panel oscuro, borde y esquinas HUD) para que la cuadricula se vea uniforme, y lleva
-  // el dominio debajo: sin marco el QR flotaba al lado de las fichas.
+  // 3.B. CODIGO QR: sin panel de tarjeta. El codigo flota sobre la plantilla con su propio
+  // tratamiento: un fundido radial muy suave que le da zona de silencio al escaner,
+  // esquinas HUD alrededor y el dominio debajo.
   const qrColIdx = (totalSlotsNeeded - 1) % cols;
   const qrRowIdx = rows - 1;
   const qrFilaItems = Math.min(cols, totalSlotsNeeded - qrRowIdx * cols);
@@ -1351,7 +1358,6 @@ async function renderGlitchOverrideTemplate({
   const qrCardY = startY + qrRowIdx * cellH + qrCardMarginY;
   const qrCardW = cellW - qrCardMarginX * 2;
   const qrCardH = cellH - qrCardMarginY * 2;
-  const qrCornerRadius = Math.min(10, Math.max(5, Math.round(qrCardW * 0.055)));
 
   // El dominio bajo el QR solo entra (y solo hace falta) en las celdas amplias.
   const qrConTexto = qrCardW >= 150 && qrCardH >= 150;
@@ -1359,38 +1365,48 @@ async function renderGlitchOverrideTemplate({
   const qrSize = Math.min(qrCardW - 14, qrCardH - 14 - qrCaptionAlto, 180);
   const qrInnerX = qrCardX + (qrCardW - qrSize) / 2;
   const qrInnerY = qrCardY + Math.round((qrCardH - qrSize - qrCaptionAlto) / 2);
+  const qrCentroX = qrInnerX + qrSize / 2;
+  const qrCentroY = qrInnerY + qrSize / 2;
 
+  // Fundido radial detras del codigo: limpia la zona de escaneo sin dibujar una tarjeta.
   ctx.save();
-  roundRect(ctx, qrCardX, qrCardY, qrCardW, qrCardH, qrCornerRadius);
-  const fondoQr = ctx.createLinearGradient(0, qrCardY, 0, qrCardY + qrCardH);
-  fondoQr.addColorStop(0, 'rgba(16, 19, 36, 0.98)');
-  fondoQr.addColorStop(0.55, 'rgba(8, 10, 22, 0.98)');
-  fondoQr.addColorStop(1, 'rgba(4, 5, 12, 0.98)');
-  ctx.fillStyle = fondoQr;
+  const haloQr = ctx.createRadialGradient(qrCentroX, qrCentroY, qrSize * 0.32, qrCentroX, qrCentroY, qrSize * 1.08);
+  haloQr.addColorStop(0, 'rgba(4, 5, 12, 0.62)');
+  haloQr.addColorStop(0.7, 'rgba(4, 5, 12, 0.40)');
+  haloQr.addColorStop(1, 'rgba(4, 5, 12, 0)');
+  ctx.fillStyle = haloQr;
+  ctx.beginPath();
+  ctx.arc(qrCentroX, qrCentroY, qrSize * 1.08, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(0, 240, 232, 0.42)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
+  ctx.restore();
 
-  // Esquinas HUD, iguales que las de las fichas de espiritus.
-  const brazoQr = Math.max(6, Math.min(10, Math.round(qrCardW * 0.07)));
-  const grosorQr = Math.max(1.5, Math.min(2.5, qrCardW * 0.012));
-  const margenQr = 2;
-  ctx.strokeStyle = 'rgba(0, 240, 232, 0.65)';
+  // Esquinas HUD alrededor del codigo, como las fichas pero sin caja: el marco lo pone la
+  // mirada, no un borde.
+  const brazoQr = Math.round(qrSize * 0.16);
+  const grosorQr = Math.max(2, Math.round(qrSize * 0.024));
+  const huecoQr = Math.round(qrSize * 0.12);
+  const cajaQr = {
+    x: qrInnerX - huecoQr,
+    y: qrInnerY - huecoQr,
+    w: qrSize + huecoQr * 2,
+    h: qrSize + qrCaptionAlto + huecoQr * 2
+  };
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0, 240, 232, 0.85)';
   ctx.lineWidth = grosorQr;
   ctx.beginPath();
-  ctx.moveTo(qrCardX + margenQr, qrCardY + margenQr + brazoQr);
-  ctx.lineTo(qrCardX + margenQr, qrCardY + margenQr);
-  ctx.lineTo(qrCardX + margenQr + brazoQr, qrCardY + margenQr);
-  ctx.moveTo(qrCardX + qrCardW - margenQr - brazoQr, qrCardY + margenQr);
-  ctx.lineTo(qrCardX + qrCardW - margenQr, qrCardY + margenQr);
-  ctx.lineTo(qrCardX + qrCardW - margenQr, qrCardY + margenQr + brazoQr);
-  ctx.moveTo(qrCardX + margenQr, qrCardY + qrCardH - margenQr - brazoQr);
-  ctx.lineTo(qrCardX + margenQr, qrCardY + qrCardH - margenQr);
-  ctx.lineTo(qrCardX + margenQr + brazoQr, qrCardY + qrCardH - margenQr);
-  ctx.moveTo(qrCardX + qrCardW - margenQr - brazoQr, qrCardY + qrCardH - margenQr);
-  ctx.lineTo(qrCardX + qrCardW - margenQr, qrCardY + qrCardH - margenQr);
-  ctx.lineTo(qrCardX + qrCardW - margenQr, qrCardY + qrCardH - margenQr - brazoQr);
+  ctx.moveTo(cajaQr.x, cajaQr.y + brazoQr);
+  ctx.lineTo(cajaQr.x, cajaQr.y);
+  ctx.lineTo(cajaQr.x + brazoQr, cajaQr.y);
+  ctx.moveTo(cajaQr.x + cajaQr.w - brazoQr, cajaQr.y);
+  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y);
+  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y + brazoQr);
+  ctx.moveTo(cajaQr.x, cajaQr.y + cajaQr.h - brazoQr);
+  ctx.lineTo(cajaQr.x, cajaQr.y + cajaQr.h);
+  ctx.lineTo(cajaQr.x + brazoQr, cajaQr.y + cajaQr.h);
+  ctx.moveTo(cajaQr.x + cajaQr.w - brazoQr, cajaQr.y + cajaQr.h);
+  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y + cajaQr.h);
+  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y + cajaQr.h - brazoQr);
   ctx.stroke();
   ctx.restore();
 
@@ -1400,12 +1416,12 @@ async function renderGlitchOverrideTemplate({
 
   if (qrConTexto) {
     let hostQr = 'spritedex.gg';
-    try { hostQr = new URL(targetUrl).host.replace(/^www./, ''); } catch {}
+    try { hostQr = new URL(targetUrl).host.replace(/^www[.]/, ''); } catch {}
     ctx.textAlign = 'center';
     ctx.letterSpacing = '1.5px';
     ctx.font = `900 ${Math.round(10 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
     ctx.fillStyle = '#00F0E8';
-    ctx.fillText(hostQr, qrCardX + qrCardW / 2, qrInnerY + qrSize + Math.round(14 * Math.min(1.15, scale)));
+    ctx.fillText(hostQr, qrCentroX, qrInnerY + qrSize + Math.round(15 * Math.min(1.15, scale)));
   }
   ctx.restore();
 
