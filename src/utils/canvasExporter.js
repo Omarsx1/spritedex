@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v13: el formato vertical pasa a 9:16 fijo, asi que las capturas guardadas en memoria
-  // con el marco viejo no deben reutilizarse.
-  return `v13_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v14: el vertical reparte las celdas para llenar el marco 9:16, asi que las capturas
+  // guardadas en memoria con la geometria anterior no deben reutilizarse.
+  return `v14_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -721,27 +721,31 @@ async function renderGlitchOverrideTemplate({
     width = 1080;
     height = 1920;
 
-    const alturaUtil = height - headerH - footerH;
-    cellH = totalSprites > 70 ? 150 : 168;
-    // Columnas: las justas para que quepan las filas, empezando por 4.
-    cols = 4;
-    while (cols < 16 && Math.ceil(totalSlotsNeeded / cols) * cellH > alturaUtil) cols += 1;
-    // Si ni con todas las columnas entra, se encogen las celdas hasta un minimo legible.
-    const filasNecesarias = Math.ceil(totalSlotsNeeded / cols);
-    if (filasNecesarias * cellH > alturaUtil) {
-      cellH = Math.max(96, Math.floor(alturaUtil / filasNecesarias));
+    // Columnas: la proporcion filas/columnas que deja la celda algo mas alta que ancha,
+    // que es la que llena un marco 9:16 sin franjas vacias ni celdas deformadas.
+    let mejorCols = 4;
+    let mejorError = Infinity;
+    for (let c = 3; c <= 12; c += 1) {
+      const f = Math.ceil(totalSlotsNeeded / c);
+      const error = Math.abs(f / c - 1.43);
+      if (error < mejorError) {
+        mejorError = error;
+        mejorCols = c;
+      }
     }
+    cols = mejorCols;
   }
 
   const rows = Math.max(1, Math.ceil(totalSlotsNeeded / cols));
   const availW = width - paddingX * 2;
   const cellW = Math.floor(availW / cols);
 
+  // La celda se reparte el alto disponible para llenar el marco, en los dos formatos.
+  cellH = Math.floor((height - headerH - footerH) / rows);
   if (!isSquare) {
-    // El vertical ya trae marco fijo y celdas calculadas arriba: no se rehace la altura.
-  } else {
-    // En formato cuadrado 1:1, distribuimos el espacio vertical simétricamente
-    cellH = Math.floor((height - headerH - footerH) / rows);
+    // En vertical lleva techo: una celda mucho mas alta que ancha deforma la ficha.
+    const anchoCelda = Math.floor((width - paddingX * 2) / cols);
+    cellH = Math.min(cellH, Math.floor(anchoCelda * 1.25));
   }
 
   const availH = height - headerH - footerH;
