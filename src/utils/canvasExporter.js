@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v33: el logo de temporada se pinta con degradado claro; las capturas guardadas en
-  // memoria con el dibujo anterior no deben reutilizarse.
-  return `v33_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
+  // v34: el encabezado de temporada reserva el alto que necesita el logo; las capturas
+  // guardadas en memoria con el dibujo anterior no deben reutilizarse.
+  return `v34_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -754,6 +754,16 @@ async function renderGlitchOverrideTemplate({
     cols = mejorCols;
   }
 
+  // En temporada el encabezado lleva el logo real y necesita su sitio. Se calcula con las
+  // MISMAS proporciones con las que luego se dibuja, para que nunca tape la capsula ni la
+  // barra de progreso: en el formato cuadrado su propio alto fijo pisaba este calculo.
+  if (enTemporada) {
+    const u = Math.min(1.15, width / 1200);
+    const logoAlto = Math.round((width * 0.5) / 3); // el SVG es 3:1
+    const altoNecesario = Math.round(30 * u) + logoAlto + Math.round(14 * u) + Math.round(22 * u) + Math.round(8 * u) + Math.round(36 * u) + 16;
+    headerH = Math.max(headerH, altoNecesario);
+  }
+
   const rows = Math.max(1, Math.ceil(totalSlotsNeeded / cols));
   const availW = width - paddingX * 2;
   const cellW = Math.floor(availW / cols);
@@ -796,7 +806,7 @@ async function renderGlitchOverrideTemplate({
   let titleY;
 
   if (logoMares) {
-    const logoW = Math.round(width * 0.52);
+    const logoW = Math.round(width * 0.5);
     const proporcion = logoMares.naturalWidth ? (logoMares.naturalHeight / logoMares.naturalWidth) : (1 / 3);
     const logoH = Math.round(logoW * proporcion);
     const logoY = Math.round(30 * Math.min(1.15, scale));
