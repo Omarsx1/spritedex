@@ -4,6 +4,7 @@ import { Lock } from 'lucide-react';
 import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER, pickName } from '../data/spritesData';
 import { t } from '../i18n';
 import { sounds } from '../utils/audio';
+import { rutaBasicoFamilia, rutaFallbackEspiritu } from '../utils/spriteAssets';
 import { SonicRing } from './SonicRing';
 import { safeStorage } from '../utils/safeStorage';
 import { trackEvent } from '../utils/telemetry';
@@ -398,15 +399,10 @@ function FamilySpotlightRow({
                 if (!e.target.dataset.triedBase) {
                   e.target.dataset.triedBase = 'true';
                   const baseId = sprite.id ? sprite.id.split('_')[0] : 'water';
-                  const isWebpBase = sprite.gen === 2 || ['pond', 'klombo', 'sonic', 'shadow', 'tails', 'crash', 'blinky', 'birthday', 'morgana', '8bit', 'adventure', 'bush', 'jonesy', 'killswitch', 'stormscout', 'onigiri', 'overshield', 'xray', 'peely', 'llama', 'ironmouse'].includes(baseId);
-                  if (isWebpBase) {
-                    e.target.src = `/sprites/${baseId}_basic.webp`;
-                  } else {
-                    e.target.src = `/sprites/${baseId}_basic.png`;
-                  }
+                  e.target.src = rutaBasicoFamilia(baseId);
                 } else {
                   e.target.onerror = null;
-                  e.target.src = sprite.gen === 2 ? '/sprites/sonic_basic.webp' : '/sprites/water_basic.png';
+                  e.target.src = rutaFallbackEspiritu(sprite.gen);
                 }
               }}
             />

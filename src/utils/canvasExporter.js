@@ -5,6 +5,7 @@
 import { generateQRMatrix } from './qrGenerator.js';
 import { t } from '../i18n/texto.js';
 import { pickName } from './spriteName.js';
+import { rutaAssetEspiritu } from './spriteAssets.js';
 import { isFortnitemaresActive } from '../config/seasonalEvent.js';
 
 // Caché en memoria de matriz QR para evitar recalcular polinomios en cada exportación
@@ -159,7 +160,7 @@ export function srcParaCollage(sprite) {
   if (sprite.id === 'pond_gold') return '/sprites/pond_gold.webp';
   const base = sprite.thumb || sprite.image;
   if (base && base.indexOf(COLLAGE_DIR) !== -1) return base.replace(COLLAGE_DIR, COLLAGE_DIR_ALT);
-  return base || (sprite.gen === 2 ? `/sprites/${sprite.id}.webp` : `/sprites/${sprite.id}.png`);
+  return base || rutaAssetEspiritu(sprite.id);
 }
 
 export function loadImage(src, bajaPrioridad = false) {

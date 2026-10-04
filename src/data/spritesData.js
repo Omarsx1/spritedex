@@ -10,6 +10,7 @@ import catalogEn from './i18n/catalog.en.json';
 import familiasEn from './i18n/familias.en.json';
 import textosJuego from './i18n/textos.juego.json';
 import { getLang, t } from '../i18n/texto.js';
+import { rutaAssetEspiritu, rutaBasicoFamilia } from '../utils/spriteAssets.js';
 
 export const SPRITE_THUMBS = spriteThumbsJson;
 
@@ -851,7 +852,7 @@ export const WEBP_MAP = {
   'water_quack': '/sprites/water_duck.webp',
   'earth_quack': '/sprites/earth_duck.webp',
   'fire_quack': '/sprites/fire_duck.webp',
-  'zeropoint_quack': '/sprites/zeropoint_duck.png',
+  'zeropoint_quack': '/sprites/zeropoint_duck.webp',
   'zeropoint_holofoil': '/sprites/zeropoint_holofoil.webp',
   'grim_holofoil': '/sprites/grim_holofoil.webp',
   'grim_gem': '/sprites/grim_gem.webp',
@@ -909,7 +910,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   let dropChanceNum = parseFloat(dropChance);
 
   // Dynamic image resolution for real webp and png assets
-  let imagePath = WEBP_MAP[item.id] || (item.gen === 2 ? `/sprites/${item.id}.webp` : `/sprites/${item.id}.png`);
+  let imagePath = WEBP_MAP[item.id] || rutaAssetEspiritu(item.id);
 
   const normName = (item.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
   const normTheme = (item.theme || '').toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -1086,7 +1087,7 @@ export const SPRITE_FAMILIES_WITH_IMAGES = [...new Set(ALL_SPRITES.map(s => s.fa
     return {
       name,
       familyId,
-      image: sprite ? sprite.image : `/sprites/${familyId}_basic.png`
+      image: sprite ? sprite.image : rutaBasicoFamilia(familyId)
     };
   });
 

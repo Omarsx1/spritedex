@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { Liquid } from 'liquid-gooey';
 import { allSprites as defaultAllSprites } from '../data/spritesData';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { rutaFallbackEspiritu } from '../utils/spriteAssets';
 import { t } from '../i18n';
 import { hasSeenFortnitemaresIntro, isFortnitemaresActive } from '../config/seasonalEvent';
 import { PumpkinIcon } from './icons/PumpkinIcon';
@@ -303,7 +304,7 @@ export function Header({
 
   const handleImgError = useCallback((e) => {
     e.target.onerror = null;
-    e.target.src = '/sprites/water_basic.png';
+    e.target.src = rutaFallbackEspiritu(1);
   }, []);
 
   return (
