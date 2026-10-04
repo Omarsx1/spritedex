@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v24: la ficha es oscura y el color es solo del estado; las capturas guardadas en
-  // memoria con el dibujo anterior no deben reutilizarse.
-  return `v24_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v25: el resplandor del espiritu se ajusta; las capturas guardadas en memoria con el
+  // dibujo anterior no deben reutilizarse.
+  return `v25_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -1010,10 +1010,10 @@ async function renderGlitchOverrideTemplate({
       );
 
       if (isOwned) {
-        // En atrapados: resplandor luminoso vibrante con degradado suave hacia transparencia total
+        // En atrapados: resplandor en su color, contenido para que acompanie sin gritar.
         const glowColor = isMastered ? '#facc15' : spiritHue;
-        auraGrad.addColorStop(0, isMastered ? 'rgba(250, 204, 21, 0.50)' : hexToRgba(glowColor, 0.40));
-        auraGrad.addColorStop(0.55, isMastered ? 'rgba(250, 204, 21, 0.18)' : hexToRgba(glowColor, 0.14));
+        auraGrad.addColorStop(0, isMastered ? 'rgba(250, 204, 21, 0.38)' : hexToRgba(glowColor, 0.30));
+        auraGrad.addColorStop(0.55, isMastered ? 'rgba(250, 204, 21, 0.14)' : hexToRgba(glowColor, 0.12));
         auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
         ctx.fillStyle = auraGrad;
@@ -1028,8 +1028,10 @@ async function renderGlitchOverrideTemplate({
         ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
         ctx.shadowBlur = 0;
       } else {
-        // En NO atrapados: resplandor muy sutil y suave sin manchas ni círculos duros
-        auraGrad.addColorStop(0, hexToRgba(spiritHue, 0.08));
+        // En NO atrapados: el mismo resplandor, mas tenue: es lo que permite distinguir de un
+        // vistazo de que espiritu es cada ficha sin volver a pintar el panel de color.
+        auraGrad.addColorStop(0, hexToRgba(spiritHue, 0.18));
+        auraGrad.addColorStop(0.55, hexToRgba(spiritHue, 0.07));
         auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
         ctx.fillStyle = auraGrad;
