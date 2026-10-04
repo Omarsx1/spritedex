@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+    <!-- Sin maximum-scale ni user-scalable=no: bloquear el zoom es un problema de
+         accesibilidad y Google lo señala en la validacion movil. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Spritedex de Fortnite: Rastrear capturas, variantes, niveles 1 al 5, clasificar por generaciones y exportar tarjetas para compartir en redes sociales." />
     <link rel="canonical" href="https://spritedex.gg/" />
 

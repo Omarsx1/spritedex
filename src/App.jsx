@@ -43,6 +43,7 @@ import {
   getLastConnectedFriendCode
 } from './utils/friendCode';
 import { getLang, conIdioma, rutaSinIdioma } from './i18n';
+import { aplicarSeoRuta } from './seo/head.js';
 import { codigoFichaEnRuta } from './utils/visitaEnlace';
 import { codigoNormalizado } from './utils/fichaAmigo';
 import { isDeadSessionError } from './utils/deadSession';
@@ -859,6 +860,14 @@ useEffect(() => {
     window.addEventListener('popstate', alVolver);
     return () => window.removeEventListener('popstate', alVolver);
   }, []);
+
+  // El <head> de cada ruta lo escribe el build (scripts/prerender-seo.mjs), con su titulo,
+  // su canonical y su hreflang. Esto lo mantiene al dia cuando se navega dentro de la app sin
+  // recargar, y marca noindex mientras el portal de administracion esta abierto.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    aplicarSeoRuta(window.location.pathname, { noindex: isAdminPortal });
+  }, [enAmigos, isAdminPortal]);
 
   // Toda navegacion interna conserva el idioma activo.
   const irA = useCallback((ruta) => {
