@@ -130,9 +130,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // en memoria con el dibujo anterior no deben reutilizarse.
   // v36: el vertical tambien recorta el ancho del lienzo (tope de ancho de celda), asi que
   // las capturas guardadas en memoria con el dibujo anterior tampoco valen.
-  // v41: la capsula del lema sube (queda pegada al logo) y el HUD baja (se separa); las
-  // capturas guardadas con el encabezado anterior no valen.
-  return `v41_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v42: el QR vive en su propia ficha con marco y las filas incompletas se centran;
+  // las capturas guardadas con la cuadricula anterior no valen.
+  return `v42_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -1058,7 +1058,12 @@ async function renderGlitchOverrideTemplate({
     const colIdx = idx % cols;
     const rowIdx = Math.floor(idx / cols);
 
-    const x = startX + colIdx * cellW;
+    // Si la ultima fila queda incompleta (sin contar el QR), se centra: la cuadricula se
+    // lee como composicion y el hueco no queda cargado a un lado.
+    const itemsEnFila = Math.min(cols, totalSlotsNeeded - rowIdx * cols);
+    const offsetFila = ((cols - itemsEnFila) * cellW) / 2;
+
+    const x = startX + offsetFila + colIdx * cellW;
     const y = startY + rowIdx * cellH;
 
     const state = userState[sprite.id] || { owned: false, level: 1 };
@@ -1283,23 +1288,75 @@ async function renderGlitchOverrideTemplate({
   // Un respiro antes del bloque del QR y la marca de agua.
   await cederTurno();
 
-  // 3.B. CÓDIGO QR DE PUNTOS MODERNO (Centrado en el último slot)
-  const qrColIdx = cols - 1;
+  // 3.B. CODIGO QR: vive en su propia ficha con el mismo lenguaje que las tarjetas
+  // (panel oscuro, borde y esquinas HUD) para que la cuadricula se vea uniforme, y lleva
+  // el dominio debajo: sin marco el QR flotaba al lado de las fichas.
+  const qrColIdx = (totalSlotsNeeded - 1) % cols;
   const qrRowIdx = rows - 1;
+  const qrFilaItems = Math.min(cols, totalSlotsNeeded - qrRowIdx * cols);
+  const qrOffsetFila = ((cols - qrFilaItems) * cellW) / 2;
   const qrCardMarginX = Math.max(4, Math.round(cellW * 0.035));
   const qrCardMarginY = Math.max(4, Math.round(cellH * 0.035));
-  const qrCardX = startX + qrColIdx * cellW + qrCardMarginX;
+  const qrCardX = startX + qrOffsetFila + qrColIdx * cellW + qrCardMarginX;
   const qrCardY = startY + qrRowIdx * cellH + qrCardMarginY;
   const qrCardW = cellW - qrCardMarginX * 2;
   const qrCardH = cellH - qrCardMarginY * 2;
+  const qrCornerRadius = Math.min(10, Math.max(5, Math.round(qrCardW * 0.055)));
 
-  const qrSize = Math.min(qrCardW - 14, qrCardH - 14, 180);
+  // El dominio bajo el QR solo entra (y solo hace falta) en las celdas amplias.
+  const qrConTexto = qrCardW >= 150 && qrCardH >= 150;
+  const qrCaptionAlto = qrConTexto ? Math.round(18 * Math.min(1.15, scale)) : 0;
+  const qrSize = Math.min(qrCardW - 14, qrCardH - 14 - qrCaptionAlto, 180);
   const qrInnerX = qrCardX + (qrCardW - qrSize) / 2;
-  const qrInnerY = qrCardY + (qrCardH - qrSize) / 2;
+  const qrInnerY = qrCardY + Math.round((qrCardH - qrSize - qrCaptionAlto) / 2);
+
+  ctx.save();
+  roundRect(ctx, qrCardX, qrCardY, qrCardW, qrCardH, qrCornerRadius);
+  const fondoQr = ctx.createLinearGradient(0, qrCardY, 0, qrCardY + qrCardH);
+  fondoQr.addColorStop(0, 'rgba(16, 19, 36, 0.98)');
+  fondoQr.addColorStop(0.55, 'rgba(8, 10, 22, 0.98)');
+  fondoQr.addColorStop(1, 'rgba(4, 5, 12, 0.98)');
+  ctx.fillStyle = fondoQr;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0, 240, 232, 0.42)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Esquinas HUD, iguales que las de las fichas de espiritus.
+  const brazoQr = Math.max(6, Math.min(10, Math.round(qrCardW * 0.07)));
+  const grosorQr = Math.max(1.5, Math.min(2.5, qrCardW * 0.012));
+  const margenQr = 2;
+  ctx.strokeStyle = 'rgba(0, 240, 232, 0.65)';
+  ctx.lineWidth = grosorQr;
+  ctx.beginPath();
+  ctx.moveTo(qrCardX + margenQr, qrCardY + margenQr + brazoQr);
+  ctx.lineTo(qrCardX + margenQr, qrCardY + margenQr);
+  ctx.lineTo(qrCardX + margenQr + brazoQr, qrCardY + margenQr);
+  ctx.moveTo(qrCardX + qrCardW - margenQr - brazoQr, qrCardY + margenQr);
+  ctx.lineTo(qrCardX + qrCardW - margenQr, qrCardY + margenQr);
+  ctx.lineTo(qrCardX + qrCardW - margenQr, qrCardY + margenQr + brazoQr);
+  ctx.moveTo(qrCardX + margenQr, qrCardY + qrCardH - margenQr - brazoQr);
+  ctx.lineTo(qrCardX + margenQr, qrCardY + qrCardH - margenQr);
+  ctx.lineTo(qrCardX + margenQr + brazoQr, qrCardY + qrCardH - margenQr);
+  ctx.moveTo(qrCardX + qrCardW - margenQr - brazoQr, qrCardY + qrCardH - margenQr);
+  ctx.lineTo(qrCardX + qrCardW - margenQr, qrCardY + qrCardH - margenQr);
+  ctx.lineTo(qrCardX + qrCardW - margenQr, qrCardY + qrCardH - margenQr - brazoQr);
+  ctx.stroke();
+  ctx.restore();
 
   ctx.save();
   const targetUrl = dominioParaCompartir();
   drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, targetUrl);
+
+  if (qrConTexto) {
+    let hostQr = 'spritedex.gg';
+    try { hostQr = new URL(targetUrl).host.replace(/^www./, ''); } catch {}
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '1.5px';
+    ctx.font = `900 ${Math.round(10 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
+    ctx.fillStyle = '#00F0E8';
+    ctx.fillText(hostQr, qrCardX + qrCardW / 2, qrInnerY + qrSize + Math.round(14 * Math.min(1.15, scale)));
+  }
   ctx.restore();
 
   // 4. FOOTER WATERMARK
