@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v17: el nombre y el estado de la ficha crecen de nuevo; las capturas guardadas en
+  // v18: el pie de la ficha separa el texto de la linea; las capturas guardadas en
   // memoria con el dibujo anterior no deben reutilizarse.
-  return `v17_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  return `v18_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -952,13 +952,13 @@ async function renderGlitchOverrideTemplate({
     ctx.restore();
 
     // B. Proporciones y Geometría Interna Adaptativa (Distribución vertical simétrica y centrada)
-    const badgeH = isUltraCompact ? 17 : Math.max(20, Math.min(26, Math.round(cardH * 0.16)));
+    const badgeH = isUltraCompact ? 19 : Math.max(22, Math.min(30, Math.round(cardH * 0.18)));
     const badgeW = Math.max(46, Math.min(cardW - 12, Math.round(cardW * (isUltraCompact ? 0.88 : 0.82))));
     const badgeFontSize = isUltraCompact ? 7.5 : Math.max(8, Math.min(10, badgeH * 0.50));
 
     // 1. Badge inferior: Anclado exactamente a 4px del filo inferior del cuadro
     // Aire por debajo: con 4px el pie quedaba pegado al filo de la ficha.
-    const bottomGutter = isUltraCompact ? 8 : 12;
+    const bottomGutter = isUltraCompact ? 10 : 14;
     const badgeX = cardX + (cardW - badgeW) / 2;
     const badgeY = cardY + cardH - badgeH - bottomGutter;
 
@@ -1059,7 +1059,7 @@ async function renderGlitchOverrideTemplate({
     ctx.font = `800 ${nameFit.fontSize}px "Outfit", "Inter", sans-serif`;
 
     const lineHeight = Math.round(nameFit.fontSize * 1.1);
-    const ultimaLineaY = badgeY - Math.max(5, Math.round(nameFit.fontSize * 0.4));
+    const ultimaLineaY = badgeY - Math.max(8, Math.round(nameFit.fontSize * 0.5));
     if (nameFit.lines.length === 1) {
       ctx.fillText(nameFit.lines[0], cardX + cardW / 2, ultimaLineaY);
     } else {
@@ -1074,7 +1074,9 @@ async function renderGlitchOverrideTemplate({
     // distinga sin depender del color.
     const estadoColor = isOwned ? '#00F0E8' : '#EF4444';
     const estadoTexto = isOwned ? t('lona.hackeado') : t('lona.faltante');
-    const estadoY = badgeY + badgeH / 2;
+    // El texto va por debajo del centro de la banda: centrado quedaba a 5px de la linea
+    // y se leia pegada a ella.
+    const estadoY = badgeY + badgeH * 0.68;
 
     ctx.save();
     ctx.fillStyle = isOwned ? 'rgba(0, 240, 232, 0.30)' : 'rgba(239, 68, 68, 0.30)';
