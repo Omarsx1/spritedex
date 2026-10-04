@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v21: panel mas oscuro y texto un punto menor; las capturas guardadas en memoria con
-  // el dibujo anterior no deben reutilizarse.
-  return `v21_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v22: la ficha gana profundidad, filo de luz y esquinas HUD; las capturas guardadas en
+  // memoria con el dibujo anterior no deben reutilizarse.
+  return `v22_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -925,16 +925,25 @@ async function renderGlitchOverrideTemplate({
     ctx.save();
     roundRect(ctx, cardX, cardY, cardW, cardH, cornerRadius);
 
-    // Base oscura casi opaca. Antes el panel era solo un tinte translucido y, con el arte
-    // de temporada detras, el fondo se transparentaba y las fichas se veian sucias.
-    ctx.fillStyle = 'rgba(4, 5, 14, 0.97)';
+    // Base oscura con profundidad: mas clara arriba y casi negra abajo. Antes el panel era
+    // solo un tinte translucido y, con el arte de temporada detras, se veia sucio.
+    const fondoFicha = ctx.createLinearGradient(0, cardY, 0, cardY + cardH);
+    fondoFicha.addColorStop(0, 'rgba(16, 19, 36, 0.98)');
+    fondoFicha.addColorStop(0.55, 'rgba(8, 10, 22, 0.98)');
+    fondoFicha.addColorStop(1, 'rgba(4, 5, 12, 0.98)');
+    ctx.fillStyle = fondoFicha;
     ctx.fill();
 
     // Encima, el velo del estado: lo justo para que la ficha no sea un rectangulo plano.
+    const colorEstado = isMastered ? '#facc15' : spiritHue;
     ctx.fillStyle = isOwned
       ? (isMastered ? 'rgba(234, 179, 8, 0.18)' : hexToRgba(spiritHue, 0.18))
       : 'rgba(10, 14, 28, 0.34)';
     ctx.fill();
+
+    // Filo de luz en el borde superior: le da volumen sin ensuciar el contenido.
+    ctx.fillStyle = hexToRgba(colorEstado, 0.35);
+    ctx.fillRect(cardX + cornerRadius, cardY + 1, cardW - cornerRadius * 2, 1);
 
     ctx.strokeStyle = isOwned
       ? (isMastered ? 'rgba(234, 179, 8, 0.85)' : hexToRgba(spiritHue, 0.70))
@@ -942,13 +951,27 @@ async function renderGlitchOverrideTemplate({
     ctx.lineWidth = isMastered ? 1.5 : 1;
     ctx.stroke();
 
-    // Corner pixel ticks con el color del espíritu
-    const tickSize = Math.max(2, Math.min(4, Math.round(cardW * 0.025)));
-    ctx.fillStyle = isOwned ? (isMastered ? '#facc15' : spiritHue) : hexToRgba(spiritHue, 0.50);
-    ctx.fillRect(cardX + 2, cardY + 2, tickSize, tickSize);
-    ctx.fillRect(cardX + cardW - 2 - tickSize, cardY + 2, tickSize, tickSize);
-    ctx.fillRect(cardX + 2, cardY + cardH - 2 - tickSize, tickSize, tickSize);
-    ctx.fillRect(cardX + cardW - 2 - tickSize, cardY + cardH - 2 - tickSize, tickSize, tickSize);
+    // Esquinas tipo HUD: dos trazos en L por esquina, en el color del estado. Sustituyen a
+    // los cuatro cuadraditos; mismo coste y la ficha gana caracter.
+    const brazo = Math.max(6, Math.min(10, Math.round(cardW * 0.07)));
+    const grosorEsquina = Math.max(1.5, Math.min(2.5, cardW * 0.012));
+    const margenEsquina = 2;
+    ctx.strokeStyle = isOwned ? hexToRgba(colorEstado, isMastered ? 0.95 : 0.75) : hexToRgba(spiritHue, 0.55);
+    ctx.lineWidth = grosorEsquina;
+    ctx.beginPath();
+    ctx.moveTo(cardX + margenEsquina, cardY + margenEsquina + brazo);
+    ctx.lineTo(cardX + margenEsquina, cardY + margenEsquina);
+    ctx.lineTo(cardX + margenEsquina + brazo, cardY + margenEsquina);
+    ctx.moveTo(cardX + cardW - margenEsquina - brazo, cardY + margenEsquina);
+    ctx.lineTo(cardX + cardW - margenEsquina, cardY + margenEsquina);
+    ctx.lineTo(cardX + cardW - margenEsquina, cardY + margenEsquina + brazo);
+    ctx.moveTo(cardX + margenEsquina, cardY + cardH - margenEsquina - brazo);
+    ctx.lineTo(cardX + margenEsquina, cardY + cardH - margenEsquina);
+    ctx.lineTo(cardX + margenEsquina + brazo, cardY + cardH - margenEsquina);
+    ctx.moveTo(cardX + cardW - margenEsquina - brazo, cardY + cardH - margenEsquina);
+    ctx.lineTo(cardX + cardW - margenEsquina, cardY + cardH - margenEsquina);
+    ctx.lineTo(cardX + cardW - margenEsquina, cardY + cardH - margenEsquina - brazo);
+    ctx.stroke();
     ctx.restore();
 
     // B. Proporciones y Geometría Interna Adaptativa (Distribución vertical simétrica y centrada)
