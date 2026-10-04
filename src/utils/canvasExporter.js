@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v34: el encabezado de temporada reserva el alto que necesita el logo; las capturas
-  // guardadas en memoria con el dibujo anterior no deben reutilizarse.
-  return `v34_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
+  // v35: el vertical encoge el lienzo a lo que ocupa el contenido; las capturas guardadas
+  // en memoria con el dibujo anterior no deben reutilizarse.
+  return `v35_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -774,6 +774,13 @@ async function renderGlitchOverrideTemplate({
     // En vertical lleva techo: una celda mucho mas alta que ancha deforma la ficha.
     const anchoCelda = Math.floor((width - paddingX * 2) / cols);
     cellH = Math.min(cellH, Math.floor(anchoCelda * 1.25));
+
+    // Con pocos espiritus el marco 9:16 se quedaba con dos franjas vacias enormes: se
+    // encoge el lienzo a lo que ocupa el contenido (el fondo se recorta solo, porque se
+    // dibuja en modo cover) y asi el titulo, la barra, las fichas y el QR conservan su
+    // tamano en cualquier coleccion. Queda entre 4:5 y 9:16.
+    const altoContenido = headerH + rows * cellH + footerH;
+    height = Math.max(Math.round(width * 1.25), Math.min(1920, altoContenido));
   }
 
   const availH = height - headerH - footerH;
