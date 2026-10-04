@@ -28,7 +28,10 @@ export function rutaHubEspiritus() {
 }
 
 export function rutaConIdiomaEspiritu(ruta, lang) {
-  return lang === 'en' ? '/en' + ruta : ruta;
+  // La raiz no lleva barra final: /en, no /en/ (que seria otra URL para el mismo contenido).
+  const limpia = ruta === '/' ? '' : ruta;
+  if (lang === 'en') return '/en' + limpia;
+  return limpia || '/';
 }
 
 export function canonicalEspiritu(id, lang) {
@@ -308,7 +311,7 @@ export function htmlPaginaEspiritu(ficha, lang) {
     d.perk ? '<h2>' + escapar(t.perk) + '</h2><p>' + escapar(d.perk) + '</p>' : '',
     '<h2>' + escapar(t.otras + ' ' + d.familia) + '</h2>',
     '<ul class="variantes">' + hermanas + '</ul>',
-    '<p class="cta"><a class="principal" href="' + base + '">' + escapar(t.cta) + '</a><a class="secundario" href="' + hub + '">' + escapar(t.todos) + '</a></p>',
+    '<p class="cta"><a class="principal" href="' + base + '?s=' + slugDeEspiritu(ficha.id) + '">' + escapar(t.cta) + '</a><a class="secundario" href="' + hub + '">' + escapar(t.todos) + '</a></p>',
     '</main>',
     pieDePagina(lang),
     '</div>',

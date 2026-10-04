@@ -103,6 +103,11 @@ test('enlaza a sus variantes y marca la actual como pagina actual', () => {
   assert.ok(html.includes('aria-current="page"'), 'la variante actual deberia ser texto, no enlace');
 });
 
+test('el CTA lleva el enlace profundo en forma canonica', () => {
+  assert.ok(htmlPaginaEspiritu(ficha, 'es').includes('href="/?s=spookydash-gold"'));
+  assert.ok(htmlPaginaEspiritu(ficha, 'en').includes('href="/en?s=spookydash-gold"'));
+});
+
 test('el indice enlaza a todas las fichas y su ItemList las cuenta', () => {
   const fichas = [ficha, { ...ficha, id: 'water_basic', hermanas: [], es: { ...ficha.es, nombre: 'Agua' }, en: { ...ficha.en, nombre: 'Water' } }];
   for (const lang of ['es', 'en']) {

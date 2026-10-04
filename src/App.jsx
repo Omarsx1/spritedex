@@ -44,6 +44,7 @@ import {
 } from './utils/friendCode';
 import { getLang, conIdioma, rutaSinIdioma } from './i18n';
 import { aplicarSeoRuta } from './seo/head.js';
+import { espirituDeEnlace } from './utils/enlaceEspiritu.js';
 import { codigoFichaEnRuta } from './utils/visitaEnlace';
 import { codigoNormalizado } from './utils/fichaAmigo';
 import { isDeadSessionError } from './utils/deadSession';
@@ -868,6 +869,18 @@ useEffect(() => {
     if (typeof window === 'undefined') return;
     aplicarSeoRuta(window.location.pathname, { noindex: isAdminPortal });
   }, [enAmigos, isAdminPortal]);
+
+  // Enlace profundo a un espiritu: ?s=<slug> (los CTA de las paginas estaticas) o
+  // /espiritu/<slug> (la ruta que ve la app en desarrollo; en produccion la sirve el HTML
+  // estatico). Se resuelve una sola vez, cuando la lista ya esta cargada.
+  const enlaceEspirituResuelto = useRef(false);
+  useEffect(() => {
+    if (enlaceEspirituResuelto.current || typeof window === 'undefined') return;
+    if (!dynamicSprites || !dynamicSprites.length) return;
+    enlaceEspirituResuelto.current = true;
+    const sprite = espirituDeEnlace(window.location.pathname, window.location.search, dynamicSprites);
+    if (sprite) handleOpenDetail(sprite);
+  }, [dynamicSprites, handleOpenDetail]);
 
   // Toda navegacion interna conserva el idioma activo.
   const irA = useCallback((ruta) => {
