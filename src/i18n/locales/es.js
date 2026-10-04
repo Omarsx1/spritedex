@@ -303,6 +303,7 @@ export default {
   "compartir.todos": "Todos",
   "compartir.vacio": "No hay espíritus para mostrar en esta categoría.",
   "compartir.vertical": "📱 Vertical",
+  "compartir.horizontal": "🔳 Horizontal",
   "detalle.atrapado": "✔ Atrapado",
   "detalle.coleccion": "COLECCIÓN",
   "detalle.costeInvocacion": "Coste de invocación",

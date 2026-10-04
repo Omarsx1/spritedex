@@ -508,7 +508,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
             <div className="sdm-share-pro__segmented">
               {[
                 { id: 'checklist', label: t('compartir.vertical') },
-                { id: 'square', label: '🔳 1:1' }
+                { id: 'square', label: t('compartir.horizontal') }
               ].map(f => (
                 <button
                   key={f.id}
