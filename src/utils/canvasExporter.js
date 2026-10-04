@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v30: con pocos espiritus la cuadricula es de 2 columnas en los dos formatos; las
-  // capturas guardadas en memoria con el dibujo anterior no deben reutilizarse.
-  return `v30_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
+  // v31: la firma pasa a leerse "ID - nombre"; las capturas guardadas en memoria con el
+  // dibujo anterior no deben reutilizarse.
+  return `v31_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -1169,7 +1169,7 @@ async function renderGlitchOverrideTemplate({
     ctx.textAlign = 'center';
     const limite = width * 0.7;
     let firmaSize = Math.round(13 * (width / 1200));
-    const textoFirma = `@${usuario}`;
+    const textoFirma = t('lona.usuario', { nombre: usuario });
     ctx.font = `800 ${firmaSize}px "Outfit", "Inter", sans-serif`;
     while (firmaSize > 9 && ctx.measureText(textoFirma).width > limite) {
       firmaSize -= 1;
