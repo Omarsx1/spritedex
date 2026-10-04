@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v26: los tamanos de la ficha vuelven a ser proporcionales al ancho de celda; las
-  // capturas guardadas en memoria con el dibujo anterior no deben reutilizarse.
-  return `v26_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v27: nombre y estado un escalon mas pequenos; las capturas guardadas en memoria con el
+  // dibujo anterior no deben reutilizarse.
+  return `v27_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -1051,10 +1051,10 @@ async function renderGlitchOverrideTemplate({
     const baseNameFontSize = Math.max(
       10,
       Math.min(
-        18,
-        // Proporcional al ancho de la celda (0.085): asi una tarjeta pequena no lleva un
+        16,
+        // Proporcional al ancho de la celda (0.072): asi una tarjeta pequena no lleva un
         // nombre casi tan grande como una grande, que es lo que pasaba con el tope a 18.
-        Math.floor(cardW * 0.085)
+        Math.floor(cardW * 0.072)
       )
     );
 
@@ -1115,7 +1115,7 @@ async function renderGlitchOverrideTemplate({
 
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.font = `900 ${Math.max(10, Math.min(15, badgeH * 0.68))}px "Outfit", "Inter", sans-serif`;
+    ctx.font = `900 ${Math.max(9, Math.min(13, badgeH * 0.62))}px "Outfit", "Inter", sans-serif`;
     ctx.letterSpacing = '0.6px';
     ctx.fillStyle = estadoColor;
     ctx.fillText(estadoTexto, puntoX + puntoR + 7, estadoY);
