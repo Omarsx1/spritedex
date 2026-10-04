@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v18: el pie de la ficha separa el texto de la linea; las capturas guardadas en
+  // v19: el nombre tambien se separa de la linea del pie; las capturas guardadas en
   // memoria con el dibujo anterior no deben reutilizarse.
-  return `v18_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  return `v19_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -964,7 +964,7 @@ async function renderGlitchOverrideTemplate({
 
     // 2. Zona de Nombre: Bounding box simétrico con gap limpio sobre el badge (nombre bajado un poco)
     const gapNameBadge = isUltraCompact ? 3 : 4;
-    const nameZoneH = isUltraCompact ? 30 : Math.max(34, Math.min(46, Math.round(cardH * 0.23)));
+    const nameZoneH = isUltraCompact ? 34 : Math.max(40, Math.min(54, Math.round(cardH * 0.26)));
     const nameZoneBottom = badgeY - gapNameBadge;
     const nameZoneTop = nameZoneBottom - nameZoneH;
 
@@ -1059,7 +1059,8 @@ async function renderGlitchOverrideTemplate({
     ctx.font = `800 ${nameFit.fontSize}px "Outfit", "Inter", sans-serif`;
 
     const lineHeight = Math.round(nameFit.fontSize * 1.1);
-    const ultimaLineaY = badgeY - Math.max(8, Math.round(nameFit.fontSize * 0.5));
+    // Aire tambien por arriba: el nombre quedaba a 4px de la linea.
+    const ultimaLineaY = badgeY - Math.max(12, Math.round(nameFit.fontSize * 0.7));
     if (nameFit.lines.length === 1) {
       ctx.fillText(nameFit.lines[0], cardX + cardW / 2, ultimaLineaY);
     } else {
