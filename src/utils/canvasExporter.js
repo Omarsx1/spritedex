@@ -110,7 +110,7 @@ export const DEFAULT_EXPORT_FORMAT = 'checklist';
 export const DEFAULT_EXPORT_BG_STYLE = 'glitch_override';
 
 // Clave canónica unificada para caché de plantillas de canvas (0ms instantáneo y sin colisiones entre filtros)
-export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFAULT_EXPORT_BG_STYLE, count = 0, ownedCount = 0, spritesList = [], userState = {}, usuario = '') {
+export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFAULT_EXPORT_BG_STYLE, count = 0, ownedCount = 0, spritesList = [], userState = {}, usuario = '', alcance = 'all', generalOwned = null, generalTotal = null) {
   let hash = 0;
   if (Array.isArray(spritesList) && spritesList.length > 0) {
     for (let i = 0; i < spritesList.length; i++) {
@@ -130,7 +130,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // en memoria con el dibujo anterior no deben reutilizarse.
   // v36: el vertical tambien recorta el ancho del lienzo (tope de ancho de celda), asi que
   // las capturas guardadas en memoria con el dibujo anterior tampoco valen.
-  return `v36_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
+  // v37: el HUD pinta el alcance de la lista (Nuevos/Atrapados/Faltantes) y el progreso
+  // contra el total general; cada combinacion tiene su propia captura.
+  return `v37_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -465,12 +467,14 @@ export async function generateSpritedexCardImage({
   format = DEFAULT_EXPORT_FORMAT, // 'checklist', 'square'
   bgStyle = DEFAULT_EXPORT_BG_STYLE, // 'glitch_override', 'blueprint', 'dark_matrix'
   useBackgroundTemplate = true,
-  usuario = '' // nombre de Fortnite del duenno: se pinta en el pie, junto al QR
+  usuario = '', // nombre de Fortnite del duenno: se pinta en el pie, junto al QR
+  alcance = 'all', // que lista muestra la lona: all | new | owned | missing (contexto del HUD)
+  progresoGeneral = null // { owned, total } de TODA la coleccion: el progreso real
 }) {
   const effectiveBgStyle = bgStyle || (useBackgroundTemplate ? 'glitch_override' : 'dark_matrix');
   const ownedCount = spritesList.filter(s => userState[s.id]?.owned).length;
   const firma = String(usuario || '').trim();
-  const cacheKey = getCanvasCacheKey(format, effectiveBgStyle, spritesList.length, ownedCount, spritesList, userState, firma);
+  const cacheKey = getCanvasCacheKey(format, effectiveBgStyle, spritesList.length, ownedCount, spritesList, userState, firma, alcance, progresoGeneral?.owned ?? null, progresoGeneral?.total ?? null);
 
   // 1. Devolución instantánea a 0ms si la plantilla ya fue generada previamente
   if (globalCanvasCache.has(cacheKey)) {
@@ -531,7 +535,9 @@ export async function generateSpritedexCardImage({
     format,
     bgStyle: effectiveBgStyle,
     loadedImagesMap,
-    usuario: firma
+    usuario: firma,
+    alcance,
+    progresoGeneral
   });
 
   globalCanvasCache.set(cacheKey, result);
@@ -677,12 +683,23 @@ async function renderGlitchOverrideTemplate({
   format,
   bgStyle,
   loadedImagesMap,
-  usuario = ''
+  usuario = '',
+  alcance = 'all',
+  progresoGeneral = null
 }) {
   const canvas = document.createElement('canvas');
   const totalSprites = spritesList.length;
   const ownedCount = spritesList.filter(s => userState[s.id]?.owned).length;
   const pctOwned = totalSprites > 0 ? Math.round((ownedCount / totalSprites) * 100) : 0;
+
+  // Progreso real de la coleccion. Con una lista parcial (Nuevos, Faltantes, Atrapados)
+  // el % contra ESA lista enganna: "0 de 3 nuevos" pintaba "PROGRESO 0%" aunque la
+  // coleccion entera vaya al 79%. El HUD pinta el progreso general y la izquierda dice
+  // que lista es; sin datos generales se cae al comportamiento de siempre.
+  const usaGeneral = alcance !== 'all' && !!progresoGeneral && Number.isFinite(progresoGeneral.total) && progresoGeneral.total > 0;
+  const pctBarra = usaGeneral
+    ? Math.round((Math.min(Math.max(0, progresoGeneral.owned), progresoGeneral.total) / progresoGeneral.total) * 100)
+    : pctOwned;
 
   const totalSlotsNeeded = totalSprites + 1; // Reserva espacio para el código QR
   const isSquare = format === 'square';
@@ -910,7 +927,9 @@ async function renderGlitchOverrideTemplate({
   ctx.textAlign = 'center';
   ctx.fillText(capsuleText, width / 2, capsuleY + Math.round(15 * Math.min(1.15, scale)));
 
-  // HUD Status Bar: "X/Y Espíritus atrapados" | "PROGRESO: X%"
+  // HUD Status Bar: la izquierda dice QUE lista es y la derecha el progreso de la
+  // coleccion. Antes ambas hablaban de la lista exportada y con "Nuevos"/"Faltantes"
+  // el % salia engannoso (0 de 3 nuevos = "PROGRESO 0%" con la coleccion al 79%).
   const hudW = Math.min(width - paddingX * 2 - 30, Math.round(580 * Math.min(1.25, scale)));
   const hudH = Math.round(36 * Math.min(1.15, scale));
   const hudX = (width - hudW) / 2;
@@ -933,34 +952,52 @@ async function renderGlitchOverrideTemplate({
   ctx.fillRect(hudX + hudW - 5, hudY + hudH - 1, 6, 2);
   ctx.fillRect(hudX + hudW - 1, hudY + hudH - 5, 2, 6);
 
-  // HUD Text
+  // HUD Text: numero + etiqueta del alcance. En "Atrapados"/"Faltantes" el numero es el
+  // tamano de la lista; el "owned" del alcance no aporta (seria 26/26 o 0/26).
+  const numeroHud = (alcance === 'owned' || alcance === 'missing') ? `${totalSprites}` : `${ownedCount} / ${totalSprites}`;
+  const etiquetaHud = alcance === 'new' ? t('lona.nuevos')
+    : alcance === 'missing' ? t('lona.faltantes')
+    : t('lona.atrapados');
+
   const hudTextY = hudY + Math.round(18 * Math.min(1.15, scale));
   ctx.textAlign = 'left';
   ctx.font = `900 ${Math.round(12 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
   ctx.fillStyle = '#ff0055';
-  ctx.fillText(`${ownedCount} / ${totalSprites}`, hudX + 14, hudTextY);
+  const numeroHudW = ctx.measureText(numeroHud).width;
+  ctx.fillText(numeroHud, hudX + 14, hudTextY);
   ctx.font = `700 ${Math.round(10 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
   ctx.fillStyle = '#94a3b8';
-  ctx.fillText(t('lona.atrapados'), hudX + 14 + ctx.measureText(`${ownedCount} / ${totalSprites} `).width + 4, hudTextY);
+  ctx.fillText(etiquetaHud, hudX + 14 + numeroHudW + 4, hudTextY);
 
   ctx.textAlign = 'right';
   ctx.font = `900 ${Math.round(11 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
   ctx.fillStyle = '#00F0E8';
-  ctx.fillText(t('lona.progreso', { pct: pctOwned }), hudX + hudW - 14, hudTextY);
+  ctx.fillText(usaGeneral ? t('lona.progresoGeneral', { pct: pctBarra }) : t('lona.progreso', { pct: pctBarra }), hudX + hudW - 14, hudTextY);
 
-  // Neon Progress Bar inside HUD
+  // Barra neon del HUD: riel con borde, marcas de cuarto y remate encendido en el avance.
   const barX = hudX + 14;
-  const barH = Math.round(6 * Math.min(1.15, scale));
+  const barH = Math.round(7 * Math.min(1.15, scale));
   const barY = hudY + hudH - barH - 5;
   const barW = hudW - 28;
+  const barRadio = barH / 2;
 
-  roundRect(ctx, barX, barY, barW, barH, 3);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+  roundRect(ctx, barX, barY, barW, barH, barRadio);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
   ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
 
-  const fillW = Math.max(barH, (barW * Math.min(100, Math.max(0, pctOwned))) / 100);
+  // Marcas de 25/50/75: el riel se lee como medidor y no como una linea vacia.
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.14)';
+  for (const cuarto of [0.25, 0.5, 0.75]) {
+    ctx.fillRect(Math.round(barX + barW * cuarto), Math.round(barY + barH * 0.3), 1, Math.round(barH * 0.4));
+  }
+
+  const avance = Math.min(100, Math.max(0, pctBarra));
+  const fillW = avance > 0 ? Math.max(barH, (barW * avance) / 100) : 0;
   if (fillW > 0) {
-    roundRect(ctx, barX, barY, fillW, barH, 3);
+    roundRect(ctx, barX, barY, fillW, barH, barRadio);
     const grad = ctx.createLinearGradient(barX, barY, barX + fillW, barY);
     grad.addColorStop(0, '#ff0055');
     grad.addColorStop(0.7, '#ec4899');
@@ -970,6 +1007,14 @@ async function renderGlitchOverrideTemplate({
     ctx.shadowBlur = 8;
     ctx.fill();
     ctx.shadowBlur = 0;
+
+    // Remate luminoso: el borde del avance queda encendido, como el cabezal del medidor.
+    ctx.save();
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.75)';
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+    ctx.fillRect(barX + fillW - 1, barY + 1, 1.5, barH - 2);
+    ctx.restore();
   }
 
   ctx.restore();
