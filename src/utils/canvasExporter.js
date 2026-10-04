@@ -132,7 +132,8 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // las capturas guardadas en memoria con el dibujo anterior tampoco valen.
   // v43: el encabezado de temporada gana prologo de marca, halo del logo y capsula con
   // filo; las capturas guardadas con el encabezado anterior no valen.
-  return `v43_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v45: fuera el prologo de marca; la capsula pasa a "SPRITEDEX • SOBREVIVE A LA NOCHE".
+  return `v45_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -833,9 +834,9 @@ async function renderGlitchOverrideTemplate({
       logoAlto = logoH;
       logoMaresListo = { capa: capaLogo, w: logoW, h: logoH, borde: bordeLetras };
     }
-    // Los huecos coinciden con los del dibujo: prologo (28) + hueco del logo (22) + letras
-    // + capsula pegada (6) + capsula (22) + HUD separado (16) + HUD (36) + margen (16).
-    const altoNecesario = Math.round(28 * u) + Math.round(22 * u) + bordeLetras + Math.round(6 * u) + Math.round(22 * u) + Math.round(16 * u) + Math.round(36 * u) + 16;
+    // Los huecos coinciden con los del dibujo: logo (30) + letras + capsula pegada (6) +
+    // capsula (22) + HUD separado (16) + HUD (36) + margen (16).
+    const altoNecesario = Math.round(30 * u) + bordeLetras + Math.round(6 * u) + Math.round(22 * u) + Math.round(16 * u) + Math.round(36 * u) + 16;
     headerH = Math.max(headerH, altoNecesario);
   }
 
@@ -896,22 +897,9 @@ async function renderGlitchOverrideTemplate({
   let titleY;
 
   if (logoMaresListo) {
-    // Prologo de marca sobre el wordmark: mismo patron que fuera de temporada (linea
-    // pequena arriba + titulo grande), para que el encabezado no sea solo un logo suelto.
-    const prologoY = Math.round(28 * Math.min(1.15, scale));
-    ctx.font = `900 ${Math.round(14 * Math.min(1.15, scale))}px "Outfit", "Inter", "Arial Black", sans-serif`;
-    ctx.fillStyle = acentoCabecera;
-    ctx.textAlign = 'center';
-    ctx.letterSpacing = '4px';
-    ctx.shadowColor = acentoCabeceraRgba;
-    ctx.shadowBlur = 8;
-    ctx.fillText(t('lona.prologo'), width / 2, prologoY);
-    ctx.shadowBlur = 0;
-    ctx.letterSpacing = '0px';
-
     const logoW = logoMaresListo.w;
     const logoH = logoMaresListo.h;
-    const logoY = prologoY + Math.round(22 * Math.min(1.15, scale));
+    const logoY = Math.round(30 * Math.min(1.15, scale));
 
     // Halo suave detras del wordmark: profundidad de key art sin ensuciar el dibujo.
     const haloY = logoY + logoH / 2;
