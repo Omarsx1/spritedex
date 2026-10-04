@@ -209,6 +209,27 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     return spritesList.length > 0 ? Math.round((ownedInScope / spritesList.length) * 100) : 0;
   }, [spritesList, ownedInScope]);
 
+  // Progreso de TODA la coleccion: es el que pinta el HUD de la lona cuando la lista
+  // exportada es parcial (Nuevos, Atrapados, Faltantes). El "% completado" de la lista
+  // filtrada engannaba: 0 de 3 nuevos salia como 0% aunque la coleccion este al 79%.
+  const generalOwned = useMemo(() => allSprites.filter(s => userState[s.id]?.owned).length, [allSprites, userState]);
+  const pctGeneral = allSprites.length > 0 ? Math.round((generalOwned / allSprites.length) * 100) : 0;
+  const alcance = scope === 'all' ? 'all' : scope;
+  // Memoizado: el efecto de generacion lo usa en sus dependencias y un objeto nuevo por
+  // render dispararia una captura por cada repintado del modal.
+  const progresoGeneral = useMemo(
+    () => (scope === 'all' ? null : { owned: generalOwned, total: allSprites.length }),
+    [scope, generalOwned, allSprites]
+  );
+
+  const subtitulo = useMemo(() => {
+    const general = { ownedG: generalOwned, totalG: allSprites.length, pctG: pctGeneral };
+    if (scope === 'new') return t('compartir.subtituloNuevos', { owned: ownedInScope, total: spritesList.length, ...general });
+    if (scope === 'owned') return t('compartir.subtituloAtrapados', { count: spritesList.length, ...general });
+    if (scope === 'missing') return t('compartir.subtituloFaltantes', { count: spritesList.length, ...general });
+    return t('compartir.subtitulo', { owned: ownedInScope, total: spritesList.length, pct: pctInScope });
+  }, [scope, ownedInScope, spritesList, generalOwned, pctGeneral, allSprites, pctInScope]);
+
   // Trigger canvas generation on setting changes with instant in-memory preview cache
   useEffect(() => {
     const inicioPase = Date.now();
@@ -221,7 +242,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
       return;
     }
 
-    const currentKey = getCanvasCacheKey(format, bgStyle, spritesList.length, ownedInScope, spritesList, userState, firma);
+    const currentKey = getCanvasCacheKey(format, bgStyle, spritesList.length, ownedInScope, spritesList, userState, firma, alcance, progresoGeneral?.owned ?? null, progresoGeneral?.total ?? null);
     const cached = globalTemplatePreviewCache.get(currentKey) || globalCanvasCache.get(currentKey);
     if (cached) {
       const url = typeof cached === 'string' ? cached : (cached.url || cached.dataUrl || '');
@@ -279,7 +300,9 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         userState,
         format,
         bgStyle,
-        usuario: firma
+        usuario: firma,
+        alcance,
+        progresoGeneral
       })).then((res) => {
         if (activeJobIdRef.current === jobId) {
           const canvasListo = res?.canvas || null;
@@ -316,7 +339,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
     return () => {
       clearTimeout(timer);
     };
-  }, [spritesList, userState, format, bgStyle, ownedInScope, queuePngEncode, showPerf]);
+  }, [spritesList, userState, format, bgStyle, ownedInScope, queuePngEncode, showPerf, scope, generalOwned, alcance, progresoGeneral]);
 
   // El canvas se inserta a mano para que React no lo recree en cada render.
   useEffect(() => {
@@ -503,7 +526,7 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
             <div>
               <h2 className="sdm-share-pro__title" onPointerUp={manejarTapTitulo}>{t('compartir.titulo')}</h2>
               <p className="sdm-share-pro__subtitle">
-                {t('compartir.subtitulo', { owned: ownedInScope, total: spritesList.length, pct: pctInScope })}
+                {subtitulo}
               </p>
             </div>
           </div>

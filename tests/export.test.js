@@ -36,6 +36,13 @@ test('cambiar el formato o el fondo invalida la clave', () => {
   assert.notEqual(base, getCanvasCacheKey(DEFAULT_EXPORT_FORMAT, 'blueprint', 3, 0, sprites, {}));
 });
 
+test('la lista parcial invalida la clave por alcance y progreso general', () => {
+  const base = clave({});
+  const nuevos = getCanvasCacheKey(DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE, 3, 0, sprites, {}, '', 'new', 96, 122);
+  assert.notEqual(base, nuevos);
+  assert.notEqual(nuevos, getCanvasCacheKey(DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE, 3, 0, sprites, {}, '', 'new', 97, 122));
+});
+
 test('la clave lleva marca de version para poder invalidar todo de golpe', () => {
   assert.match(clave({}), /^v\d+_/);
 });
@@ -46,4 +53,3 @@ test('el contrato por defecto no cambia por accidente', () => {
   assert.equal(DEFAULT_EXPORT_FORMAT, 'checklist');
   assert.equal(DEFAULT_EXPORT_BG_STYLE, 'glitch_override');
 });
-
