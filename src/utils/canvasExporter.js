@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v28: la lona puede llevar la firma del usuario; las capturas guardadas en memoria con
-  // el dibujo anterior (o con otro nombre) no deben reutilizarse.
-  return `v28_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
+  // v30: con pocos espiritus la cuadricula es de 2 columnas en los dos formatos; las
+  // capturas guardadas en memoria con el dibujo anterior no deben reutilizarse.
+  return `v30_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -711,7 +711,10 @@ async function renderGlitchOverrideTemplate({
     }
 
     // Cuadrícula simétrica 1:1 (cols nunca menores que rows)
-    if (totalSprites <= 5) cols = 3;
+    // Con 3 fichas o menos, la 2x2 llena el marco y deja el QR junto a una tarjeta: con 3
+    // columnas salian tres fichas y el QR solo en la fila de abajo, con medio marco vacio.
+    if (totalSprites <= 3) cols = 2;
+    else if (totalSprites <= 5) cols = 3;
     else if (totalSprites <= 11) cols = 3;
     else if (totalSprites <= 19) cols = 4;
     else if (totalSprites <= 35) cols = 6; // Caso ideal Imagen 3 (6x6 = 36)
@@ -727,9 +730,12 @@ async function renderGlitchOverrideTemplate({
 
     // Columnas: la proporcion filas/columnas que deja la celda algo mas alta que ancha,
     // que es la que llena un marco 9:16 sin franjas vacias ni celdas deformadas.
-    let mejorCols = 4;
+    let mejorCols = 2;
     let mejorError = Infinity;
-    for (let c = 3; c <= 12; c += 1) {
+    // Desde 2 columnas: con pocos espiritus (3 o 4 fichas) la 2x2 es la que llena el marco
+    // con tarjetas grandes; empezando en 3 salian tres fichas arriba y el QR solo debajo,
+    // con dos franjas vacias enormes.
+    for (let c = 2; c <= 12; c += 1) {
       const f = Math.ceil(totalSlotsNeeded / c);
       const error = Math.abs(f / c - 1.43);
       if (error < mejorError) {
