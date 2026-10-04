@@ -11,12 +11,13 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const fuentes = ['src/utils/batSwarm.js', 'src/styles/index.css'];
+const fuentes = ['src/utils/batSwarm.js', 'src/utils/canvasExporter.js', 'src/styles/index.css'];
 
 const activos = new Set();
 for (const fuente of fuentes) {
   const texto = readFileSync(path.join(raiz, fuente), 'utf8');
-  for (const m of texto.matchAll(/['"](\/[a-z0-9-]+\.svg)['"]/gi)) activos.add(m[1]);
+  // Solo rutas literales: las plantillas con ${} son dinamicas y no se pueden comprobar.
+  for (const m of texto.matchAll(/['"](\/[-a-zA-Z0-9_]+\.[a-z0-9]{2,5})['"]/g)) activos.add(m[1]);
 }
 
 test('cada activo citado en el codigo existe y esta versionado', () => {

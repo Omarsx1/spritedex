@@ -5,6 +5,7 @@
 import { generateQRMatrix } from './qrGenerator.js';
 import { t } from '../i18n/texto.js';
 import { pickName } from './spriteName.js';
+import { isFortnitemaresActive } from '../config/seasonalEvent.js';
 
 // Caché en memoria de matriz QR para evitar recalcular polinomios en cada exportación
 let cachedQRMatrix = null;
@@ -31,6 +32,15 @@ export function dominioParaCompartir() {
     if (ORIGENES_PUBLICOS.includes(origen)) return origen + '/';
   } catch {}
   return DOMINIO_CANONICO;
+}
+
+/**
+ * Fondo de la plantilla de compartir. En temporada la captura sale con el arte de
+ * Fortnitemares; el resto del ano usa el de siempre. Si el de temporada no cargara, la
+ * captura se hace igual con el de siempre: la plantilla nunca se queda sin fondo.
+ */
+export function rutaFondoPlantilla() {
+  return isFortnitemaresActive() ? '/bac_mares.webp' : '/background.webp';
 }
 
 // Renderiza un código QR moderno con estilo de puntos/círculos y acentos cibernéticos (100% escaneable)
@@ -215,7 +225,7 @@ let turnoPrecarga = 0;
 // o sea ~1,8 MB de miniaturas saliendo de golpe mientras la app pintaba la primera pantalla.
 export function preloadCanvasAssets(spritesList = [], batchSize = 4) {
   if (typeof window === 'undefined') return;
-  loadImage('/background.webp', true);
+  loadImage(rutaFondoPlantilla(), true);
 
   if (Array.isArray(spritesList) && spritesList.length > 0) {
     // El efecto de App se dispara varias veces al arrancar (catalogo de cache y luego
@@ -266,9 +276,9 @@ export function preloadCanvasAssets(spritesList = [], batchSize = 4) {
 // Precarga de fondo al inicializar el módulo
 if (typeof window !== 'undefined') {
   if (window.requestIdleCallback) {
-    window.requestIdleCallback(() => loadImage('/background.webp'));
+    window.requestIdleCallback(() => loadImage(rutaFondoPlantilla()));
   } else {
-    setTimeout(() => loadImage('/background.webp'), 50);
+    setTimeout(() => loadImage(rutaFondoPlantilla()), 50);
   }
 }
 
@@ -470,8 +480,13 @@ export async function generateSpritedexCardImage({
 
   const loadedImagesMap = {};
 
-  // Load official glitch wallpaper
-  const bgImgPromise = loadImage('/background.webp');
+  // Load official glitch wallpaper (en temporada, el arte de Fortnitemares)
+  const fondo = rutaFondoPlantilla();
+  const bgImgPromise = loadImage(fondo).then((img) => {
+    if (img) return img;
+    // Sin el arte de temporada, la captura no se queda sin fondo.
+    return fondo === '/background.webp' ? null : loadImage('/background.webp');
+  });
 
   // Con alguien esperando (modal abierto) se piden todas de golpe porque el objetivo
   // es que la captura salga ya. En segundo plano se piden de a pocas: el precálculo
