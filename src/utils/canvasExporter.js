@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v22: la ficha gana profundidad, filo de luz y esquinas HUD; las capturas guardadas en
-  // memoria con el dibujo anterior no deben reutilizarse.
-  return `v22_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v23: los tamanos de la ficha son proporcionales (sin escalones por cantidad); las
+  // capturas guardadas en memoria con el dibujo anterior no deben reutilizarse.
+  return `v23_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -891,8 +891,6 @@ async function renderGlitchOverrideTemplate({
   const startX = (width - gridW) / 2;
   const startY = headerH + Math.max(8, Math.floor((availH - gridH) / 2));
 
-  const isCompact = cols >= 8;
-  const isUltraCompact = cols >= 10;
 
   for (let idx = 0; idx < spritesList.length; idx++) {
     const tanda = esperasActivas > 0 ? TARJETAS_POR_TANDA_ESPERANDO : TARJETAS_POR_TANDA;
@@ -975,19 +973,16 @@ async function renderGlitchOverrideTemplate({
     ctx.restore();
 
     // B. Proporciones y Geometría Interna Adaptativa (Distribución vertical simétrica y centrada)
-    const badgeH = isUltraCompact ? 19 : Math.max(22, Math.min(30, Math.round(cardH * 0.18)));
-    const badgeW = Math.max(46, Math.min(cardW - 12, Math.round(cardW * (isUltraCompact ? 0.88 : 0.82))));
-    const badgeFontSize = isUltraCompact ? 7.5 : Math.max(8, Math.min(10, badgeH * 0.50));
-
-    // 1. Badge inferior: Anclado exactamente a 4px del filo inferior del cuadro
-    // Aire por debajo: con 4px el pie quedaba pegado al filo de la ficha.
-    const bottomGutter = isUltraCompact ? 10 : 14;
-    const badgeX = cardX + (cardW - badgeW) / 2;
+    // Tamaños proporcionales a la celda, sin escalones: asi todas las pestañas y cualquier
+    // cantidad de espiritus salen con el mismo estilo. Antes habia tres regimenes
+    // (normal, compacto y ultra) y el aspecto cambiaba segun cuantos fueran.
+    const badgeH = Math.max(19, Math.min(30, Math.round(cardH * 0.18)));
+    const bottomGutter = Math.max(9, Math.min(14, Math.round(cardH * 0.05)));
     const badgeY = cardY + cardH - badgeH - bottomGutter;
 
     // 2. Zona de Nombre: Bounding box simétrico con gap limpio sobre el badge (nombre bajado un poco)
-    const gapNameBadge = isUltraCompact ? 3 : 4;
-    const nameZoneH = isUltraCompact ? 34 : Math.max(40, Math.min(54, Math.round(cardH * 0.26)));
+    const gapNameBadge = Math.max(3, Math.min(6, Math.round(cardH * 0.02)));
+    const nameZoneH = Math.max(30, Math.min(54, Math.round(cardH * 0.26)));
     const nameZoneBottom = badgeY - gapNameBadge;
     const nameZoneTop = nameZoneBottom - nameZoneH;
 
@@ -1032,7 +1027,7 @@ async function renderGlitchOverrideTemplate({
         ctx.fill();
 
         // Resplandor directo sobre la silueta del espíritu
-        const imgShadowBlur = isUltraCompact ? 8 : (isCompact ? 10 : 16);
+        const imgShadowBlur = Math.max(8, Math.min(16, Math.round(cardW * 0.07)));
         ctx.shadowColor = hexToRgba(glowColor, isMastered ? 0.80 : 0.65);
         ctx.shadowBlur = imgShadowBlur;
         ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
@@ -1059,7 +1054,7 @@ async function renderGlitchOverrideTemplate({
     const baseNameFontSize = Math.max(
       10,
       Math.min(
-        isUltraCompact ? 13 : (isCompact ? 15 : 17),
+        18,
         Math.floor(cardW * 0.14)
       )
     );
