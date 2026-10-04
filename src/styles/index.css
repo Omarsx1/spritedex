@@ -9937,6 +9937,9 @@ body .swal2-container .swal2-toast.swal2-popup {
   .spage .sdm-share-pro {
     grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
     grid-template-areas: "cabecera cabecera" "controles vista" "acciones vista";
+    /* La tercera fila es la que absorbe el alto que sobra, para que el hueco quede debajo de
+       los botones y no entre los ajustes y ellos. */
+    grid-template-rows: auto auto 1fr;
     align-items: start;
     column-gap: 24px;
   }
@@ -9951,8 +9954,9 @@ body .swal2-container .swal2-toast.swal2-popup {
     max-height: calc(100dvh - 230px);
   }
 
+  /* Los botones van pegados a los ajustes, no al fondo de la ventana: con position: sticky
+     quedaban abajo del todo y entre medias quedaba un hueco muerto de casi 400px. */
   .spage .sdm-share-pro__actions {
-    position: sticky;
-    bottom: 16px;
+    align-self: start;
   }
 }
