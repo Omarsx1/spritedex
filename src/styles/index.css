@@ -8345,9 +8345,10 @@ a.app-footer__privacy-btn {
   min-height: 100vh;
   max-width: 620px;
   margin: 0 auto;
-  /* El aire lateral crece con la ventana en vez de ir por escalones: con tramos fijos siempre
-     habia un ancho donde volvia a quedar pegado. */
-  padding: max(18px, env(safe-area-inset-top)) clamp(20px, 6vw, 48px) max(26px, env(safe-area-inset-bottom));
+  /* El aire lateral crece con la ventana desde los 16px del telefono (donde el contenido tiene
+     que ir a lo ancho) hasta los 48px de escritorio. Ni escalones ni un suelo alto: con suelo
+     de 20px, en un iPhone se perdia ancho util. */
+  padding: max(18px, env(safe-area-inset-top)) clamp(16px, calc(16px + (100vw - 393px) * 0.13), 48px) max(26px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -9887,8 +9888,8 @@ body .swal2-container .swal2-toast.swal2-popup {
   min-height: 100dvh;
   max-width: 1240px;
   margin: 0 auto;
-  /* Aire lateral continuo: crece con la ventana, asi no hay ningun ancho donde quede pegado. */
-  padding: max(18px, env(safe-area-inset-top)) clamp(20px, 6vw, 48px) max(26px, env(safe-area-inset-bottom));
+  /* Mismo criterio que la vista de amigos: 16px en el telefono y creciendo con la ventana. */
+  padding: max(18px, env(safe-area-inset-top)) clamp(16px, calc(16px + (100vw - 393px) * 0.13), 48px) max(26px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -9931,7 +9932,9 @@ body .swal2-container .swal2-toast.swal2-popup {
 }
 
 .spage .sdm-share-pro__preview-img {
-  max-height: 72dvh;
+  /* En el telefono la lona es lo que hay que ver: se le da el alto para que llene el ancho de
+     la tarjeta en vez de quedarse corta. */
+  max-height: 82dvh;
 }
 
 @media (min-width: 1000px) {
