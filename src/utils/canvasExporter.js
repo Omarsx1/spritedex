@@ -130,9 +130,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // en memoria con el dibujo anterior no deben reutilizarse.
   // v36: el vertical tambien recorta el ancho del lienzo (tope de ancho de celda), asi que
   // las capturas guardadas en memoria con el dibujo anterior tampoco valen.
-  // v40: el pie reserva sitio proporcional al formato y la firma (ID - nombre) ya no queda
-  // pegada a la ultima fila de fichas; las capturas anteriores no valen.
-  return `v40_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v41: la capsula del lema sube (queda pegada al logo) y el HUD baja (se separa); las
+  // capturas guardadas con el encabezado anterior no valen.
+  return `v41_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -790,7 +790,8 @@ async function renderGlitchOverrideTemplate({
   if (enTemporada) {
     const u = Math.min(1.15, anchoDiseno / 1200);
     const logoAlto = Math.round((anchoDiseno * 0.5) / 3); // el SVG es 3:1
-    const altoNecesario = Math.round(30 * u) + logoAlto + Math.round(14 * u) + Math.round(22 * u) + Math.round(8 * u) + Math.round(36 * u) + 16;
+    // Los huecos coinciden con los del dibujo: capsula pegada al logo (8) y HUD separado (16).
+    const altoNecesario = Math.round(30 * u) + logoAlto + Math.round(8 * u) + Math.round(22 * u) + Math.round(16 * u) + Math.round(36 * u) + 16;
     headerH = Math.max(headerH, altoNecesario);
   }
 
@@ -920,7 +921,8 @@ async function renderGlitchOverrideTemplate({
   const capsuleW = ctx.measureText(capsuleText).width + Math.round(28 * scale);
   const capsuleH = Math.round(22 * Math.min(1.15, scale));
   const capsuleX = (width - capsuleW) / 2;
-  const capsuleY = titleY + Math.round(14 * Math.min(1.1, scale));
+  // La capsula va pegada al logo: el lema es parte del titulo, no del panel de progreso.
+  const capsuleY = titleY + Math.round(8 * Math.min(1.1, scale));
 
   roundRect(ctx, capsuleX, capsuleY, capsuleW, capsuleH, 5);
   const capsuleGrad = ctx.createLinearGradient(capsuleX, capsuleY, capsuleX + capsuleW, capsuleY);
@@ -939,7 +941,7 @@ async function renderGlitchOverrideTemplate({
   const hudW = Math.min(width - paddingX * 2 - 30, Math.round(580 * Math.min(1.25, scale)));
   const hudH = Math.round(36 * Math.min(1.15, scale));
   const hudX = (width - hudW) / 2;
-  const hudY = capsuleY + capsuleH + Math.round(8 * Math.min(1.1, scale));
+  const hudY = capsuleY + capsuleH + Math.round(16 * Math.min(1.1, scale));
 
   // HUD Frame: una base oscura tenue garantiza que el texto se lea sobre cualquier fondo
   // (el arte de temporada tiene zonas claras donde el gris del alcance se perdia).
