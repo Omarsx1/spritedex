@@ -35,17 +35,43 @@ Sin afectar a los usuarios: ningun cambio visible, ninguna ruta rota.
   iOS y el manifest los leen por nombre y formato. No se tocan.
 
 ## Checklist
-- [ ] T1 (canvasExporter, tests) El trabajo ya verificado de la lona (nombre en su banda +
-      espiritu que falta apagado) entra como su propio work unit, antes de tocar assets.
-- [ ] T2 (public, scripts) Sacar `public/sprites 2gen/` de `public/` a `assets-src/sprites-2gen/`
-      y quitarla de `SOURCE_DIRS`. El material fuente se conserva, deja de desplegarse.
-- [ ] T3 (public) Borrar miniaturas y collages huerfanos (id que no esta en el catalogo y
-      nombre sin referencias en `src/`), `improvedslide_basic.webp` y los `.DS_Store`.
-- [ ] T4 (src/utils/spriteAssets.js + consumidores) Una sola resolucion de ruta para el
-      asset del espiritu; mismo resultado que hoy. Refactor sin cambio visible.
-- [ ] T5 (public/sprites) Convertir los PNG reales de gen 1 a WebP 512 px q88 y actualizar
-      la resolucion para que devuelva `.webp`. Los 7 con extension mentirosa se arreglan:
-      los 6 SVG se rasterizan a WebP y el WebP disfrazado se renombra.
+- [x] T1 (canvasExporter, tests) El trabajo ya verificado de la lona entra como su propio work
+      unit antes de tocar assets. Commit `a3ef42d`.
+- [x] T2 (public, scripts) `public/sprites 2gen/` pasa a `assets-src/sprites-2gen/` y el
+      generador la lee de ahi: deja de desplegarse sin perder el material. Commit `8061195`.
+      Medido: −1,73 MB por deploy. Ademas el generador omite y avisa de los origenes cuyo id no
+      esta en el catalogo (causa de los derivados huerfanos).
+- [x] T3 (public) Borrados los `.DS_Store`. **Los 114 derivados huerfanos NO se borraron**:
+      `public.sprites` tiene columna `image` y el admin hace `upsert`, asi que un espiritu de la
+      BD puede tener uno de esos ids y su miniatura ser la unica imagen que muestra. Borrarlos
+      exige confirmar antes los ids de la BD. Queda pendiente, no bloquea.
+- [x] T4+T5 juntos (spriteAssets + consumidores + assets) Commits `7e39b92`. Se hacen en un
+      solo work unit a proposito: separarlos dejaria un estado intermedio con la regla en
+      `.webp` y los assets todavia en `.png`, es decir imagenes rotas.
+
+## Fuera de alcance (encontrado durante el trabajo)
+- [ ] T6 **16 espiritus sin arte real**: los 10 ids sin ningun archivo (`ghost_gem`,
+      `dream_gem`, `king_gem`, `fishy_gem`, `striker_gem`, `seven_gem`, `demon_holofoil`,
+      `fishy_holofoil`, `boss_holofoil`, `striker_rift`) y los 6 placeholders vectoriales
+      (`air_gem`, `aura_holofoil`, `batman_gem`, `boss_gem`, `duck_holofoil`, `peely_candy`).
+      Hacen falta los recortes; sin ellos esas fichas caen al `onError` y muestran otro espiritu.
+- [ ] T7 Los 114 derivados huerfanos (T3) quedan a la espera de confirmar los ids de la BD.
+
+## Resultado medido (2026-10-04)
+| Metrica | Antes | Despues |
+|---|---|---|
+| Peso de `dist/` | 39 MB | **21 MB** (−46%) |
+| Peso de `public/` | 35 MB | 19 MB |
+| Espiritus en `public/sprites` | 108 PNG + 169 WebP | **0 PNG** + 270 WebP + 7 SVG |
+| Coste por deploy | ~1,17 GB-mes | ~0,63 GB-mes |
+
+- Rutas `/sprites/` literales en el bundle construido: **351, ninguna rota** (las 2 que el
+  regex marca son nombres con espacio de miniaturas huerfanas, que existen).
+- Ids del catalogo sin archivo: **los mismos 10 de antes** (no se perdio ninguno).
+- Assets convertidos: 12/12 cargan desde `rutaAssetEspiritu`, con alfa y 512x512 preservados.
+- Los PNG pasaron de 148 KB de media a ~18-40 KB (q85, `-m 6`, `-alpha_q 100`).
+- `node --test` 140/140, `oxlint` sin hallazgos nuevos, `vite build` correcto.
+- La lona sigue dibujando igual: 3 fichas 93 ms, 64 fichas 241 ms (sin regresion de tiempo).
 
 ## Restricciones
 - Nada de arte inventado ni de ocultar fichas sin permiso.
@@ -60,4 +86,3 @@ Sin afectar a los usuarios: ningun cambio visible, ninguna ruta rota.
 - T4 y T5: render headless de la lona en 3 escenarios (3, 12 y 64 fichas) + la ficha de
   detalle de un espiritu de gen 1, comparando que todas las imagenes cargan.
 - Cierre: `pnpm build` y peso final de `dist/`.
-
