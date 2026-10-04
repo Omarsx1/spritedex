@@ -13,6 +13,9 @@ import path from 'node:path';
 import { createServer } from 'vite';
 import { RUTAS, SITIO, IMAGEN_REDES, canonicalDe, alternatesDe, etiquetasSeo, jsonLdDe } from '../src/seo/rutas.js';
 import { htmlPaginaEspiritu, htmlHubEspiritus, rutaEspiritu, rutaHubEspiritus, rutaConIdiomaEspiritu, canonicalEspiritu, alternatesDeEspiritu, etiquetasHubEspiritus } from '../src/seo/espiritus.js';
+import { slugDeEspiritu } from '../src/seo/espiritus.js';
+import { htmlGuia, htmlAcerca, htmlNovedades, etiquetasGuia, etiquetasAcerca, etiquetasNovedades } from '../src/seo/contenido.js';
+import { RUTAS_CONTENIDO } from '../src/seo/plantilla.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DIST = path.join(ROOT, 'dist');
@@ -121,6 +124,39 @@ function construirFichas(sprites, pickTexto) {
   });
 }
 
+// Numeros reales de la coleccion para la guia: nada inventado, todo contado aqui.
+function datosGuia(sprites) {
+  const cuenta = (clave) => {
+    const mapa = new Map();
+    for (const s of sprites) {
+      const k = s[clave] || '';
+      mapa.set(k, (mapa.get(k) || 0) + 1);
+    }
+    return [...mapa.entries()].map(([nombre, n]) => ({ nombre, n })).sort((a, b) => b.n - a.n);
+  };
+  const numeros = sprites
+    .map((s) => Number(String(s.dropChanceDisplay || '').replace('%', '').replace(',', '.')))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  return {
+    total: sprites.length,
+    familias: new Set(sprites.map((s) => s.familyId)).size,
+    porRareza: cuenta('rarity'),
+    costos: new Set(sprites.map((s) => s.summonCost).filter(Boolean)).size,
+    dropMin: numeros.length ? Math.min(...numeros) : 0,
+    dropMax: numeros.length ? Math.max(...numeros) : 0,
+    fecha: new Date().toISOString().slice(0, 10)
+  };
+}
+
+function ultimosEspiritus(fichas) {
+  return fichas
+    .filter((f) => f.lanzamiento)
+    .slice()
+    .sort((a, b) => String(b.lanzamiento).localeCompare(String(a.lanzamiento)))
+    .slice(0, 16)
+    .map((f) => ({ ...f, slug: slugDeEspiritu(f.id) }));
+}
+
 function sitemap(extras = []) {
   const filas = [];
   for (const entrada of RUTAS) {
@@ -203,6 +239,27 @@ async function main() {
     const etiquetas = etiquetasHubEspiritus(fichas.length, lang);
     extras.push({ loc: etiquetas.canonical, alternates: etiquetas.alternates, frecuencia: 'weekly', prioridad: 0.8 });
     paginas++;
+  }
+
+  // Paginas de contenido: guia, novedades y acerca, en los dos idiomas.
+  const guia = datosGuia(sprites);
+  const novedades = { ultimos: ultimosEspiritus(fichas) };
+  const contenido = [
+    ['guia', etiquetasGuia, () => htmlGuia(guia, 'es'), () => htmlGuia(guia, 'en')],
+    ['novedades', etiquetasNovedades, () => htmlNovedades(novedades, 'es'), () => htmlNovedades(novedades, 'en')],
+    ['acerca', etiquetasAcerca, () => htmlAcerca(guia, 'es'), () => htmlAcerca(guia, 'en')]
+  ];
+  for (const [clave, etiquetasDe, enEspanol, enIngles] of contenido) {
+    const rutaBase = RUTAS_CONTENIDO[clave];
+    for (const lang of ['es', 'en']) {
+      const ruta = rutaConIdiomaEspiritu(rutaBase, lang);
+      const destino = path.join(DIST, ruta.slice(1), 'index.html');
+      fs.mkdirSync(path.dirname(destino), { recursive: true });
+      fs.writeFileSync(destino, lang === 'es' ? enEspanol() : enIngles());
+      const etiquetas = etiquetasDe(lang);
+      extras.push({ loc: etiquetas.canonical, alternates: etiquetas.alternates, frecuencia: 'monthly', prioridad: clave === 'guia' ? 0.9 : 0.6 });
+      paginas++;
+    }
   }
 
   fs.writeFileSync(path.join(DIST, 'sitemap.xml'), sitemap(extras));

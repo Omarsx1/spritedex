@@ -8,7 +8,8 @@
 // Por que existe: los 278 espiritus solo vivian dentro de la SPA (el detalle se abria en un
 // modal por estado, sin URL). Todo su contenido unico era invisible para un buscador.
 
-import { SITIO, IMAGEN_REDES } from './rutas.js';
+import { SITIO } from './rutas.js';
+import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, ZONA } from './plantilla.js';
 
 const RUTA_HUB = '/espiritus';
 
@@ -28,10 +29,7 @@ export function rutaHubEspiritus() {
 }
 
 export function rutaConIdiomaEspiritu(ruta, lang) {
-  // La raiz no lleva barra final: /en, no /en/ (que seria otra URL para el mismo contenido).
-  const limpia = ruta === '/' ? '' : ruta;
-  if (lang === 'en') return '/en' + limpia;
-  return limpia || '/';
+  return conIdiomaRuta(ruta, lang);
 }
 
 export function canonicalEspiritu(id, lang) {
@@ -45,22 +43,6 @@ export function alternatesDeEspiritu(id) {
     { hreflang: 'x-default', href: canonicalEspiritu(id, 'es') }
   ];
 }
-
-function recortar(texto, maximo) {
-  const limpio = String(texto || '').replace(/\s+/g, ' ').trim();
-  if (limpio.length <= maximo) return limpio;
-  // Los tres puntos cuentan dentro del limite: recortar a maximo - 1 y añadirlos daba uno de mas.
-  const corte = limpio.slice(0, maximo - 3).replace(/[\s,;:.]+[^\s]*$/, '');
-  return corte + '...';
-}
-
-// Un nombre con "</script>" dentro del JSON-LD cerraria la etiqueta antes de tiempo y romperia
-// la pagina. En JSON, \u003c es el mismo caracter y el consumidor lo lee igual.
-function jsonSeguro(datos) {
-  return JSON.stringify(datos).replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
-}
-
-const ZONA = { es: 'Espíritu de Fortnite', en: 'Fortnite Sprite' };
 
 export function etiquetasEspiritu(ficha, lang) {
   const datos = ficha[lang];
@@ -183,93 +165,12 @@ export function jsonLdHubEspiritus(fichas, lang) {
   };
 }
 
-const escapar = (texto) => String(texto === undefined || texto === null ? '' : texto)
-  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-const ETIQUETAS = {
-  es: { rareza: 'Rareza', generacion: 'Generación', variante: 'Variante', familia: 'Familia', drop: 'Probabilidad (cofre de espíritu)', costo: 'Costo de invocación', ubicacion: 'Dónde aparece', lanzamiento: 'Lanzamiento', habilidad: 'Habilidad', perk: 'Extra exclusivo', otras: 'Otras variantes de', todos: 'Ver todos los espíritus', cta: 'Rastrea tu colección en Spritedex', inicio: 'Inicio', espiritus: 'Espíritus', aviso: 'Proyecto de fans sin relación con Epic Games.', privacidad: 'Privacidad', sinImagen: 'Todavía no tenemos imagen de este espíritu.' },
-  en: { rareza: 'Rarity', generacion: 'Generation', variante: 'Variant', familia: 'Family', drop: 'Drop chance (sprite chest)', costo: 'Summon cost', ubicacion: 'Where to find it', lanzamiento: 'Release', habilidad: 'Ability', perk: 'Exclusive perk', otras: 'Other', todos: 'See all sprites', cta: 'Track your collection on Spritedex', inicio: 'Home', espiritus: 'Sprites', aviso: 'Fan project, not affiliated with Epic Games.', privacidad: 'Privacy', sinImagen: 'We do not have an image for this sprite yet.' }
-};
-
-const CSS = [
-  ':root { color-scheme: dark; --fondo: #060714; --panel: #101324; --borde: rgba(0,240,232,.28); --acento: #00F0E8; --texto: #e8ecf8; --apagado: #9aa4bd; }',
-  '* { box-sizing: border-box; }',
-  'body { margin: 0; background: var(--fondo); color: var(--texto); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }',
-  'a { color: var(--acento); }',
-  '.envoltura { max-width: 880px; margin: 0 auto; padding: 20px 18px 56px; }',
-  'header.marca { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0 18px; }',
-  'header.marca a { font-weight: 800; letter-spacing: .12em; text-decoration: none; text-transform: uppercase; }',
-  'nav.migas { font-size: 13px; color: var(--apagado); margin-bottom: 14px; }',
-  'nav.migas ol { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; }',
-  'nav.migas li + li::before { content: "›"; margin-right: 6px; color: var(--apagado); }',
-  'h1 { font-size: clamp(26px, 5vw, 40px); line-height: 1.15; margin: 0 0 6px; }',
-  '.lead { color: var(--apagado); margin: 0 0 20px; }',
-  '.ficha { display: grid; gap: 24px; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); align-items: start; }',
-  '@media (max-width: 700px) { .ficha { grid-template-columns: 1fr; } }',
-  '.arte { background: radial-gradient(circle at 50% 40%, rgba(0,240,232,.10), transparent 65%); border: 1px solid var(--borde); border-radius: 16px; padding: 12px; margin: 0; }',
-  '.arte img { width: 100%; height: auto; display: block; }',
-  'dl.datos { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; margin: 0; }',
-  'dl.datos dt { color: var(--apagado); font-size: 14px; }',
-  'dl.datos dd { margin: 0; font-weight: 600; }',
-  'h2 { font-size: 20px; margin: 28px 0 8px; }',
-  'ul.variantes { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0; }',
-  'ul.variantes a { border: 1px solid var(--borde); border-radius: 999px; padding: 6px 12px; text-decoration: none; font-size: 14px; }',
-  'ul.variantes span { border: 1px solid rgba(255,255,255,.08); border-radius: 999px; padding: 6px 12px; font-size: 14px; color: var(--apagado); }',
-  '.cta { margin: 30px 0 0; display: flex; flex-wrap: wrap; gap: 12px; }',
-  '.cta a { border-radius: 10px; padding: 11px 18px; text-decoration: none; font-weight: 700; }',
-  '.cta a.principal { background: var(--acento); color: #04121a; }',
-  '.cta a.secundario { border: 1px solid var(--borde); }',
-  'footer.pie { border-top: 1px solid rgba(255,255,255,.08); margin-top: 40px; padding-top: 16px; color: var(--apagado); font-size: 13px; }',
-  'ul.indice { list-style: none; padding: 0; columns: 2; column-gap: 28px; }',
-  '@media (max-width: 640px) { ul.indice { columns: 1; } }',
-  'ul.indice li { break-inside: avoid; margin-bottom: 6px; }',
-  'h3 { margin: 22px 0 8px; font-size: 17px; color: var(--apagado); text-transform: uppercase; letter-spacing: .08em; }'
-].join('\n');
-
-function headHtml(etiquetas, ogImage) {
-  return [
-    '<meta charset="utf-8" />',
-    '<meta name="viewport" content="width=device-width, initial-scale=1.0" />',
-    '<title>' + escapar(etiquetas.titulo) + '</title>',
-    '<meta name="description" content="' + escapar(etiquetas.descripcion) + '" />',
-    '<link rel="canonical" href="' + etiquetas.canonical + '" />',
-    '<meta name="robots" content="index, follow, max-image-preview:large" />',
-    ...etiquetas.alternates.map((a) => '<link rel="alternate" hreflang="' + a.hreflang + '" href="' + a.href + '" />'),
-    '<meta property="og:type" content="website" />',
-    '<meta property="og:site_name" content="Spritedex" />',
-    '<meta property="og:url" content="' + etiquetas.canonical + '" />',
-    '<meta property="og:title" content="' + escapar(etiquetas.titulo) + '" />',
-    '<meta property="og:description" content="' + escapar(etiquetas.descripcion) + '" />',
-    '<meta property="og:image" content="' + (ogImage || IMAGEN_REDES) + '" />',
-    '<meta property="og:locale" content="' + (etiquetas.lang === 'en' ? 'en_US' : 'es_MX') + '" />',
-    '<meta property="og:locale:alternate" content="' + (etiquetas.lang === 'en' ? 'es_MX' : 'en_US') + '" />',
-    '<meta name="twitter:card" content="summary" />',
-    '<meta name="twitter:title" content="' + escapar(etiquetas.titulo) + '" />',
-    '<meta name="twitter:description" content="' + escapar(etiquetas.descripcion) + '" />',
-    '<meta name="twitter:image" content="' + (ogImage || IMAGEN_REDES) + '" />',
-    '<link rel="icon" type="image/svg+xml" href="/favicon.svg" />',
-    '<style>' + CSS + '</style>'
-  ].join('\n    ');
-}
-
-function migas(items) {
-  return '<nav class="migas" aria-label="Ruta"><ol>' + items.map((i) => (
-    i.href ? '<li><a href="' + i.href + '">' + escapar(i.nombre) + '</a></li>' : '<li>' + escapar(i.nombre) + '</li>'
-  )).join('') + '</ol></nav>';
-}
-
-function pieDePagina(lang) {
-  const t = ETIQUETAS[lang];
-  const inicio = rutaConIdiomaEspiritu('/', lang);
-  return '<footer class="pie"><p>' + escapar(t.aviso) + ' <a href="' + inicio + 'privacidad">' + escapar(t.privacidad) + '</a></p></footer>';
-}
-
 export function htmlPaginaEspiritu(ficha, lang) {
   const etiquetas = etiquetasEspiritu(ficha, lang);
-  const t = ETIQUETAS[lang];
+  const t = TEXTO[lang];
   const d = ficha[lang];
-  const base = rutaConIdiomaEspiritu('/', lang);
-  const hub = rutaConIdiomaEspiritu(RUTA_HUB, lang);
+  const base = conIdiomaRuta('/', lang);
+  const hub = conIdiomaRuta(RUTA_HUB, lang);
   const filas = [
     [t.rareza, ficha.rareza],
     [t.generacion, String(ficha.generacion)],
@@ -283,18 +184,9 @@ export function htmlPaginaEspiritu(ficha, lang) {
   const hermanas = (ficha.hermanas || []).map((h) => (
     h.id === ficha.id
       ? '<li><span aria-current="page">' + escapar(h[lang].nombre) + '</span></li>'
-      : '<li><a href="' + rutaConIdiomaEspiritu(rutaEspiritu(h.id), lang) + '">' + escapar(h[lang].nombre) + '</a></li>'
+      : '<li><a href="' + conIdiomaRuta(rutaEspiritu(h.id), lang) + '">' + escapar(h[lang].nombre) + '</a></li>'
   )).join('');
-  return [
-    '<!doctype html>',
-    '<html lang="' + lang + '">',
-    '<head>',
-    '    ' + headHtml(etiquetas, SITIO + ficha.thumb),
-    '    <script type="application/ld+json">' + jsonSeguro(jsonLdEspiritu(ficha, lang)) + '</script>',
-    '</head>',
-    '<body>',
-    '<div class="envoltura">',
-    '<header class="marca"><a href="' + base + '">Spritedex</a><a href="' + hub + '">' + escapar(t.todos) + '</a></header>',
+  const cuerpo = [
     migas([{ nombre: t.inicio, href: base }, { nombre: t.espiritus, href: hub }, { nombre: d.nombre }]),
     '<main>',
     '<h1>' + escapar(d.nombre) + '</h1>',
@@ -311,20 +203,16 @@ export function htmlPaginaEspiritu(ficha, lang) {
     d.perk ? '<h2>' + escapar(t.perk) + '</h2><p>' + escapar(d.perk) + '</p>' : '',
     '<h2>' + escapar(t.otras + ' ' + d.familia) + '</h2>',
     '<ul class="variantes">' + hermanas + '</ul>',
-    '<p class="cta"><a class="principal" href="' + base + '?s=' + slugDeEspiritu(ficha.id) + '">' + escapar(t.cta) + '</a><a class="secundario" href="' + hub + '">' + escapar(t.todos) + '</a></p>',
-    '</main>',
-    pieDePagina(lang),
-    '</div>',
-    '</body>',
-    '</html>',
-    ''
-  ].join('\n');
+    ctaHtml(lang, { conEnlace: '?s=' + slugDeEspiritu(ficha.id) }),
+    '</main>'
+  ].filter(Boolean).join('\n');
+  return documento({ lang, etiquetas, jsonLd: jsonLdEspiritu(ficha, lang), cuerpo, ogImage: ficha.thumb ? SITIO + ficha.thumb : undefined });
 }
 
 export function htmlHubEspiritus(fichas, lang) {
   const etiquetas = etiquetasHubEspiritus(fichas.length, lang);
-  const t = ETIQUETAS[lang];
-  const base = rutaConIdiomaEspiritu('/', lang);
+  const t = TEXTO[lang];
+  const base = conIdiomaRuta('/', lang);
   const porFamilia = new Map();
   for (const f of fichas) {
     const clave = f[lang].familia;
@@ -333,30 +221,17 @@ export function htmlHubEspiritus(fichas, lang) {
   }
   const bloques = [...porFamilia.entries()].map(([familia, lista]) => (
     '<h3>' + escapar(familia) + '</h3><ul class="indice">' + lista.map((f) => (
-      '<li><a href="' + rutaConIdiomaEspiritu(rutaEspiritu(f.id), lang) + '">' + escapar(f[lang].nombre) + '</a></li>'
+      '<li><a href="' + conIdiomaRuta(rutaEspiritu(f.id), lang) + '">' + escapar(f[lang].nombre) + '</a></li>'
     )).join('') + '</ul>'
   )).join('');
-  return [
-    '<!doctype html>',
-    '<html lang="' + lang + '">',
-    '<head>',
-    '    ' + headHtml(etiquetas),
-    '    <script type="application/ld+json">' + jsonSeguro(jsonLdHubEspiritus(fichas, lang)) + '</script>',
-    '</head>',
-    '<body>',
-    '<div class="envoltura">',
-    '<header class="marca"><a href="' + base + '">Spritedex</a></header>',
+  const cuerpo = [
     migas([{ nombre: t.inicio, href: base }, { nombre: t.espiritus }]),
     '<main>',
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
     bloques,
     '<p class="cta"><a class="principal" href="' + base + '">' + escapar(t.cta) + '</a></p>',
-    '</main>',
-    pieDePagina(lang),
-    '</div>',
-    '</body>',
-    '</html>',
-    ''
-  ].join('\n');
+    '</main>'
+  ].filter(Boolean).join('\n');
+  return documento({ lang, etiquetas, jsonLd: jsonLdHubEspiritus(fichas, lang), cuerpo });
 }

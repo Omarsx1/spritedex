@@ -79,7 +79,7 @@ test('la pagina lleva un solo h1, el canonical, el hreflang y el JSON-LD', () =>
     const html = htmlPaginaEspiritu(ficha, lang);
     assert.equal((html.match(/<h1>/g) || []).length, 1, lang + ': h1 unico');
     assert.ok(html.includes('<link rel="canonical" href="' + canonicalEspiritu(ficha.id, lang) + '" />'));
-    assert.equal((html.match(/hreflang=/g) || []).length, 3, lang + ': tres hreflang');
+    assert.equal((html.match(/<link rel="alternate" hreflang=/g) || []).length, 3, lang + ': tres hreflang en el head');
     assert.equal((html.match(/application\/ld\+json/g) || []).length, 1, lang + ': un JSON-LD');
     assert.ok(html.includes('<html lang="' + lang + '">'));
     assert.ok(html.includes('alt="' + ficha[lang].nombre + '"'), lang + ': falta el alt');
