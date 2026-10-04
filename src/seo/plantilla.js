@@ -141,7 +141,6 @@ export function migas(items) {
 
 export function pieDePagina(lang) {
   const t = TEXTO[lang];
-  const inicio = conIdiomaRuta('/', lang);
   const enlaces = [
     { href: conIdiomaRuta('/guia-espiritus', lang), nombre: t.guia },
     { href: conIdiomaRuta('/espiritus', lang), nombre: t.todos },
