@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v19: el nombre tambien se separa de la linea del pie; las capturas guardadas en
-  // memoria con el dibujo anterior no deben reutilizarse.
-  return `v19_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v20: el panel de la ficha gana base oscura para el fondo de temporada; las capturas
+  // guardadas en memoria con el dibujo anterior no deben reutilizarse.
+  return `v20_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -924,23 +924,23 @@ async function renderGlitchOverrideTemplate({
     // A. Cyber Tile Container (Renderizado vectorial ultrarrápido sin shadowBlur)
     ctx.save();
     roundRect(ctx, cardX, cardY, cardW, cardH, cornerRadius);
-    if (isOwned) {
-      ctx.fillStyle = isMastered
-        ? 'rgba(234, 179, 8, 0.16)'
-        : hexToRgba(spiritHue, 0.12);
-      ctx.fill();
-      ctx.strokeStyle = isMastered
-        ? 'rgba(234, 179, 8, 0.85)'
-        : hexToRgba(spiritHue, 0.65);
-      ctx.lineWidth = isMastered ? 1.5 : 1;
-      ctx.stroke();
-    } else {
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
-      ctx.fill();
-      ctx.strokeStyle = hexToRgba(spiritHue, 0.28);
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
+
+    // Base oscura casi opaca. Antes el panel era solo un tinte translucido y, con el arte
+    // de temporada detras, el fondo se transparentaba y las fichas se veian sucias.
+    ctx.fillStyle = 'rgba(6, 7, 20, 0.90)';
+    ctx.fill();
+
+    // Encima, el velo del estado: lo justo para que la ficha no sea un rectangulo plano.
+    ctx.fillStyle = isOwned
+      ? (isMastered ? 'rgba(234, 179, 8, 0.20)' : hexToRgba(spiritHue, 0.20))
+      : 'rgba(15, 23, 42, 0.34)';
+    ctx.fill();
+
+    ctx.strokeStyle = isOwned
+      ? (isMastered ? 'rgba(234, 179, 8, 0.85)' : hexToRgba(spiritHue, 0.70))
+      : hexToRgba(spiritHue, 0.40);
+    ctx.lineWidth = isMastered ? 1.5 : 1;
+    ctx.stroke();
 
     // Corner pixel ticks con el color del espíritu
     const tickSize = Math.max(2, Math.min(4, Math.round(cardW * 0.025)));
