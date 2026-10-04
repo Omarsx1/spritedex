@@ -8345,19 +8345,12 @@ a.app-footer__privacy-btn {
   min-height: 100vh;
   max-width: 620px;
   margin: 0 auto;
-  padding: max(18px, env(safe-area-inset-top)) 16px max(26px, env(safe-area-inset-bottom));
+  /* El aire lateral crece con la ventana en vez de ir por escalones: con tramos fijos siempre
+     habia un ancho donde volvia a quedar pegado. */
+  padding: max(18px, env(safe-area-inset-top)) clamp(20px, 6vw, 48px) max(26px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 14px;
-}
-
-/* Mismo aire lateral por tramos que la vista de compartir: 16px en el telefono, 36px en
-   ventanas medianas y 44px en escritorio. Antes eran 26px fijos y el contenido quedaba pegado. */
-@media (min-width: 520px) {
-  .fpage {
-    padding-left: 36px;
-    padding-right: 36px;
-  }
 }
 .fpage__top { display: flex; align-items: center; gap: 12px; }
 .fpage__headText { flex: 1; min-width: 0; }
@@ -9812,8 +9805,6 @@ body .swal2-container .swal2-toast.swal2-popup {
 @media (min-width: 1000px) {
   .fpage {
     max-width: 1240px;
-    padding-left: 44px;
-    padding-right: 44px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
     grid-template-rows: auto auto;
@@ -9876,7 +9867,7 @@ body .swal2-container .swal2-toast.swal2-popup {
     background: rgba(8, 12, 24, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 14px;
-    padding: 14px;
+    padding: 18px;
   }
 
   .fpage__bloqueFicha {
@@ -9896,26 +9887,11 @@ body .swal2-container .swal2-toast.swal2-popup {
   min-height: 100dvh;
   max-width: 1240px;
   margin: 0 auto;
-  /* Aire lateral por tramos: en el telefono 20px (lo normal), en ventanas medianas y en
-     escritorio bastante mas, que a 22px el contenido quedaba pegado al borde. */
-  padding: max(18px, env(safe-area-inset-top)) 20px max(26px, env(safe-area-inset-bottom));
+  /* Aire lateral continuo: crece con la ventana, asi no hay ningun ancho donde quede pegado. */
+  padding: max(18px, env(safe-area-inset-top)) clamp(20px, 6vw, 48px) max(26px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 14px;
-}
-
-@media (min-width: 520px) {
-  .spage {
-    padding-left: 36px;
-    padding-right: 36px;
-  }
-}
-
-@media (min-width: 1000px) {
-  .spage {
-    padding-left: 44px;
-    padding-right: 44px;
-  }
 }
 
 /* La tarjeta deja de ser tarjeta: cada bloque es su propia pieza sobre el fondo. */
@@ -9943,7 +9919,8 @@ body .swal2-container .swal2-toast.swal2-popup {
   background: rgba(8, 12, 24, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  padding: 14px;
+  /* Un poco mas de relleno interno: con 14px los controles quedaban pegados al borde. */
+  padding: 18px;
 }
 
 /* En la vista no hay tope de modal: la lona puede usar el alto de la pantalla. */
