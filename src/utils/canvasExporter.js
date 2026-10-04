@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v25: el resplandor del espiritu se ajusta; las capturas guardadas en memoria con el
-  // dibujo anterior no deben reutilizarse.
-  return `v25_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v26: los tamanos de la ficha vuelven a ser proporcionales al ancho de celda; las
+  // capturas guardadas en memoria con el dibujo anterior no deben reutilizarse.
+  return `v26_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -971,13 +971,13 @@ async function renderGlitchOverrideTemplate({
     // Tamaños proporcionales a la celda, sin escalones: asi todas las pestañas y cualquier
     // cantidad de espiritus salen con el mismo estilo. Antes habia tres regimenes
     // (normal, compacto y ultra) y el aspecto cambiaba segun cuantos fueran.
-    const badgeH = Math.max(19, Math.min(30, Math.round(cardH * 0.18)));
-    const bottomGutter = Math.max(9, Math.min(14, Math.round(cardH * 0.05)));
+    const badgeH = Math.max(16, Math.min(28, Math.round(cardH * 0.15)));
+    const bottomGutter = Math.max(8, Math.min(13, Math.round(cardH * 0.045)));
     const badgeY = cardY + cardH - badgeH - bottomGutter;
 
     // 2. Zona de Nombre: Bounding box simétrico con gap limpio sobre el badge (nombre bajado un poco)
-    const gapNameBadge = Math.max(3, Math.min(6, Math.round(cardH * 0.02)));
-    const nameZoneH = Math.max(30, Math.min(54, Math.round(cardH * 0.26)));
+    const gapNameBadge = Math.max(3, Math.min(5, Math.round(cardH * 0.018)));
+    const nameZoneH = Math.max(28, Math.min(50, Math.round(cardH * 0.24)));
     const nameZoneBottom = badgeY - gapNameBadge;
     const nameZoneTop = nameZoneBottom - nameZoneH;
 
@@ -1052,7 +1052,9 @@ async function renderGlitchOverrideTemplate({
       10,
       Math.min(
         18,
-        Math.floor(cardW * 0.14)
+        // Proporcional al ancho de la celda (0.085): asi una tarjeta pequena no lleva un
+        // nombre casi tan grande como una grande, que es lo que pasaba con el tope a 18.
+        Math.floor(cardW * 0.085)
       )
     );
 
