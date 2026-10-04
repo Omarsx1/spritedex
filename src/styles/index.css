@@ -9887,10 +9887,26 @@ body .swal2-container .swal2-toast.swal2-popup {
   min-height: 100dvh;
   max-width: 1240px;
   margin: 0 auto;
-  padding: max(18px, env(safe-area-inset-top)) 22px max(26px, env(safe-area-inset-bottom));
+  /* Aire lateral por tramos: en el telefono 20px (lo normal), en ventanas medianas y en
+     escritorio bastante mas, que a 22px el contenido quedaba pegado al borde. */
+  padding: max(18px, env(safe-area-inset-top)) 20px max(26px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+@media (min-width: 520px) {
+  .spage {
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+}
+
+@media (min-width: 1000px) {
+  .spage {
+    padding-left: 44px;
+    padding-right: 44px;
+  }
 }
 
 /* La tarjeta deja de ser tarjeta: cada bloque es su propia pieza sobre el fondo. */
