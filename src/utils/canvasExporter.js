@@ -126,9 +126,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
     }
   }
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
-  // v16: nombres y pie de estado de la ficha volvieron a cambiar de tamano y aire; las
-  // capturas guardadas en memoria con el dibujo anterior no deben reutilizarse.
-  return `v16_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
+  // v17: el nombre y el estado de la ficha crecen de nuevo; las capturas guardadas en
+  // memoria con el dibujo anterior no deben reutilizarse.
+  return `v17_${format}_${bgStyle}_${count}_${ownedCount}_${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -952,7 +952,7 @@ async function renderGlitchOverrideTemplate({
     ctx.restore();
 
     // B. Proporciones y Geometría Interna Adaptativa (Distribución vertical simétrica y centrada)
-    const badgeH = isUltraCompact ? 15 : Math.max(18, Math.min(23, Math.round(cardH * 0.145)));
+    const badgeH = isUltraCompact ? 17 : Math.max(20, Math.min(26, Math.round(cardH * 0.16)));
     const badgeW = Math.max(46, Math.min(cardW - 12, Math.round(cardW * (isUltraCompact ? 0.88 : 0.82))));
     const badgeFontSize = isUltraCompact ? 7.5 : Math.max(8, Math.min(10, badgeH * 0.50));
 
@@ -964,7 +964,7 @@ async function renderGlitchOverrideTemplate({
 
     // 2. Zona de Nombre: Bounding box simétrico con gap limpio sobre el badge (nombre bajado un poco)
     const gapNameBadge = isUltraCompact ? 3 : 4;
-    const nameZoneH = isUltraCompact ? 26 : Math.max(30, Math.min(38, Math.round(cardH * 0.2)));
+    const nameZoneH = isUltraCompact ? 30 : Math.max(34, Math.min(46, Math.round(cardH * 0.23)));
     const nameZoneBottom = badgeY - gapNameBadge;
     const nameZoneTop = nameZoneBottom - nameZoneH;
 
@@ -1036,8 +1036,8 @@ async function renderGlitchOverrideTemplate({
     const baseNameFontSize = Math.max(
       10,
       Math.min(
-        isUltraCompact ? 12 : (isCompact ? 14 : 17),
-        Math.floor(cardW * 0.125)
+        isUltraCompact ? 14 : (isCompact ? 16 : 20),
+        Math.floor(cardW * 0.15)
       )
     );
 
@@ -1095,7 +1095,7 @@ async function renderGlitchOverrideTemplate({
 
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.font = `900 ${Math.max(10, Math.min(14, badgeH * 0.72))}px "Outfit", "Inter", sans-serif`;
+    ctx.font = `900 ${Math.max(11, Math.min(16, badgeH * 0.72))}px "Outfit", "Inter", sans-serif`;
     ctx.letterSpacing = '0.6px';
     ctx.fillStyle = estadoColor;
     ctx.fillText(estadoTexto, puntoX + puntoR + 7, estadoY);
