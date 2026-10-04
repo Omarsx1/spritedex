@@ -8350,6 +8350,15 @@ a.app-footer__privacy-btn {
   flex-direction: column;
   gap: 14px;
 }
+
+/* Mismo aire lateral por tramos que la vista de compartir: 16px en el telefono, 36px en
+   ventanas medianas y 44px en escritorio. Antes eran 26px fijos y el contenido quedaba pegado. */
+@media (min-width: 520px) {
+  .fpage {
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+}
 .fpage__top { display: flex; align-items: center; gap: 12px; }
 .fpage__headText { flex: 1; min-width: 0; }
 .fpage__title { margin: 0; font-size: 1.45rem; font-weight: 900; color: #fff; }
@@ -9803,8 +9812,8 @@ body .swal2-container .swal2-toast.swal2-popup {
 @media (min-width: 1000px) {
   .fpage {
     max-width: 1240px;
-    padding-left: 26px;
-    padding-right: 26px;
+    padding-left: 44px;
+    padding-right: 44px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
     grid-template-rows: auto auto;
