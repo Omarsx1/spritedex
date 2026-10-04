@@ -302,6 +302,7 @@ export default {
   "compartir.todos": "All",
   "compartir.vacio": "No sprites to show in this category.",
   "compartir.vertical": "📱 Portrait",
+  "compartir.horizontal": "🔳 Horizontal",
   "detalle.atrapado": "✔ Caught",
   "detalle.coleccion": "COLLECTION",
   "detalle.costeInvocacion": "Summon cost",
