@@ -128,7 +128,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // v12: la captura pasa de PNG a JPEG, asi que las guardadas antes no se reutilizan.
   // v35: el vertical encoge el lienzo a lo que ocupa el contenido; las capturas guardadas
   // en memoria con el dibujo anterior no deben reutilizarse.
-  return `v35_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
+  // v36: el vertical tambien recorta el ancho del lienzo (tope de ancho de celda), asi que
+  // las capturas guardadas en memoria con el dibujo anterior tampoco valen.
+  return `v36_${format}_${bgStyle}_${count}_${ownedCount}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -754,31 +756,45 @@ async function renderGlitchOverrideTemplate({
     cols = mejorCols;
   }
 
+  // Ancho de diseno: la referencia fija con la que se calculan tipografia, barra, logo y
+  // pie. En vertical es 1080 (el marco 9:16) aunque el lienzo acabe recortado; en cuadrado
+  // es el propio marco, que ya cambia de resolucion segun el tamano de la coleccion.
+  const anchoDiseno = isSquare ? width : 1080;
+
   // En temporada el encabezado lleva el logo real y necesita su sitio. Se calcula con las
   // MISMAS proporciones con las que luego se dibuja, para que nunca tape la capsula ni la
   // barra de progreso: en el formato cuadrado su propio alto fijo pisaba este calculo.
   if (enTemporada) {
-    const u = Math.min(1.15, width / 1200);
-    const logoAlto = Math.round((width * 0.5) / 3); // el SVG es 3:1
+    const u = Math.min(1.15, anchoDiseno / 1200);
+    const logoAlto = Math.round((anchoDiseno * 0.5) / 3); // el SVG es 3:1
     const altoNecesario = Math.round(30 * u) + logoAlto + Math.round(14 * u) + Math.round(22 * u) + Math.round(8 * u) + Math.round(36 * u) + 16;
     headerH = Math.max(headerH, altoNecesario);
   }
 
   const rows = Math.max(1, Math.ceil(totalSlotsNeeded / cols));
-  const availW = width - paddingX * 2;
-  const cellW = Math.floor(availW / cols);
+  let cellW = Math.floor((anchoDiseno - paddingX * 2) / cols);
+
+  // Con pocos espiritus la celda se inflaba (2 columnas de 504 px) y las fichas salian
+  // gigantes al lado del titulo. En vertical el ancho de celda lleva techo: como mucho el
+  // que usa una cuadricula tipica de 4 columnas, que es el tamano con el que se ve la
+  // ficha en el resto de plantillas.
+  const CELDA_MAX_VERTICAL = 270;
+  if (!isSquare) {
+    cellW = Math.min(cellW, CELDA_MAX_VERTICAL);
+
+    // El lienzo se encoge a lo que ocupa la cuadricula (el fondo se recorta solo, porque
+    // se dibuja en modo cover), de modo que la barra, el titulo, las fichas y el QR
+    // conservan su tamano en cualquier coleccion.
+    width = paddingX * 2 + cellW * cols;
+  }
 
   // La celda se reparte el alto disponible para llenar el marco, en los dos formatos.
   cellH = Math.floor((height - headerH - footerH) / rows);
   if (!isSquare) {
     // En vertical lleva techo: una celda mucho mas alta que ancha deforma la ficha.
-    const anchoCelda = Math.floor((width - paddingX * 2) / cols);
-    cellH = Math.min(cellH, Math.floor(anchoCelda * 1.25));
+    cellH = Math.min(cellH, Math.floor(cellW * 1.25));
 
-    // Con pocos espiritus el marco 9:16 se quedaba con dos franjas vacias enormes: se
-    // encoge el lienzo a lo que ocupa el contenido (el fondo se recorta solo, porque se
-    // dibuja en modo cover) y asi el titulo, la barra, las fichas y el QR conservan su
-    // tamano en cualquier coleccion. Queda entre 4:5 y 9:16.
+    // El alto tambien encoge a lo que ocupa el contenido, para no dejar franjas vacias.
     const altoContenido = headerH + rows * cellH + footerH;
     height = Math.max(Math.round(width * 1.25), Math.min(1920, altoContenido));
   }
@@ -800,7 +816,7 @@ async function renderGlitchOverrideTemplate({
 
   // 2. HEADER SECTION (GLITCH OVERRIDE STYLE)
   ctx.save();
-  const scale = width / 1200;
+  const scale = anchoDiseno / 1200;
 
   // En temporada el encabezado se viste de Fortnitemares: mismos sitios y misma tipografia,
   // solo cambian los textos y el acento, para que la lona siga siendo reconocible.
@@ -813,7 +829,7 @@ async function renderGlitchOverrideTemplate({
   let titleY;
 
   if (logoMares) {
-    const logoW = Math.round(width * 0.5);
+    const logoW = Math.min(Math.round(anchoDiseno * 0.5), width - paddingX * 2);
     const proporcion = logoMares.naturalWidth ? (logoMares.naturalHeight / logoMares.naturalWidth) : (1 / 3);
     const logoH = Math.round(logoW * proporcion);
     const logoY = Math.round(30 * Math.min(1.15, scale));
@@ -895,7 +911,7 @@ async function renderGlitchOverrideTemplate({
   ctx.fillText(capsuleText, width / 2, capsuleY + Math.round(15 * Math.min(1.15, scale)));
 
   // HUD Status Bar: "X/Y Espíritus atrapados" | "PROGRESO: X%"
-  const hudW = Math.min(availW - 30, Math.round(580 * Math.min(1.25, scale)));
+  const hudW = Math.min(width - paddingX * 2 - 30, Math.round(580 * Math.min(1.25, scale)));
   const hudH = Math.round(36 * Math.min(1.15, scale));
   const hudX = (width - hudW) / 2;
   const hudY = capsuleY + capsuleH + Math.round(8 * Math.min(1.1, scale));
@@ -1227,7 +1243,7 @@ async function renderGlitchOverrideTemplate({
     ctx.save();
     ctx.textAlign = 'center';
     const limite = width * 0.7;
-    let firmaSize = Math.round(13 * (width / 1200));
+    let firmaSize = Math.round(13 * (anchoDiseno / 1200));
     const textoFirma = t('lona.usuario', { nombre: usuario });
     ctx.font = `800 ${firmaSize}px "Outfit", "Inter", sans-serif`;
     while (firmaSize > 9 && ctx.measureText(textoFirma).width > limite) {
@@ -1243,7 +1259,7 @@ async function renderGlitchOverrideTemplate({
 
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.font = `700 ${Math.round(12 * (width / 1200))}px "Outfit", "Inter", monospace, sans-serif`;
+  ctx.font = `700 ${Math.round(12 * (anchoDiseno / 1200))}px "Outfit", "Inter", monospace, sans-serif`;
   ctx.fillStyle = '#38bdf8';
   ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
   ctx.shadowBlur = 6;
