@@ -10,7 +10,9 @@
 // lo que el buscador lee antes de ejecutar nada.
 import fs from 'node:fs';
 import path from 'node:path';
+import { createServer } from 'vite';
 import { RUTAS, SITIO, IMAGEN_REDES, canonicalDe, alternatesDe, etiquetasSeo, jsonLdDe } from '../src/seo/rutas.js';
+import { htmlPaginaEspiritu, htmlHubEspiritus, rutaEspiritu, rutaHubEspiritus, rutaConIdiomaEspiritu, canonicalEspiritu, alternatesDeEspiritu, etiquetasHubEspiritus } from '../src/seo/espiritus.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DIST = path.join(ROOT, 'dist');
@@ -56,7 +58,70 @@ function bloqueHead(entrada) {
   return lineas.filter(Boolean).join('\n    ');
 }
 
-function sitemap() {
+// Los 278 espiritus viven en src/data/spritesData.js, que importa JSON y solo Vite sabe
+// cargar. Se usa su mismo pipeline (ssrLoadModule) para no duplicar el enriquecido: nombres
+// en ingles, familia, habilidad traducida (pickTexto) y demas los resuelve la app.
+async function cargarEspiritus() {
+  const servidor = await createServer({
+    server: { middlewareMode: true, hmr: false },
+    appType: 'custom',
+    logLevel: 'silent',
+    optimizeDeps: { noDiscovery: true }
+  });
+  try {
+    const modulo = await servidor.ssrLoadModule('/src/data/spritesData.js');
+    return { sprites: modulo.ALL_SPRITES, pickTexto: modulo.pickTexto };
+  } finally {
+    await servidor.close();
+  }
+}
+
+function construirFichas(sprites, pickTexto) {
+  const porFamilia = new Map();
+  for (const s of sprites) {
+    if (!porFamilia.has(s.familyId)) porFamilia.set(s.familyId, []);
+    porFamilia.get(s.familyId).push(s);
+  }
+  return sprites.map((s) => {
+    // Sin archivo no se pinta <img>: 6 espiritus todavia no tienen arte y una imagen rota se
+    // ve peor que un aviso.
+    const candidato = s.thumb || s.image;
+    const hayImagen = Boolean(candidato) && fs.existsSync(path.join(DIST, candidato));
+    return {
+    id: s.id,
+    rareza: s.rarity,
+    generacion: s.gen,
+    drop: s.dropChanceDisplay,
+    thumb: hayImagen ? candidato : '',
+    lanzamiento: s.releaseDate || '',
+    hermanas: (porFamilia.get(s.familyId) || []).map((h) => ({
+      id: h.id,
+      es: { nombre: h.fullName },
+      en: { nombre: h.fullNameEn }
+    })),
+    es: {
+      nombre: s.fullName,
+      familia: s.familyName,
+      variante: s.variantDisplay,
+      habilidad: s.ability,
+      perk: s.specialPerk,
+      ubicacion: s.location,
+      costo: s.summonCost
+    },
+    en: {
+      nombre: s.fullNameEn,
+      familia: s.familyNameEn,
+      variante: s.variantDisplayEn,
+      habilidad: pickTexto(s.ability, 'en'),
+      perk: pickTexto(s.specialPerk, 'en'),
+      ubicacion: pickTexto(s.location, 'en'),
+      costo: pickTexto(s.summonCost, 'en')
+    }
+    };
+  });
+}
+
+function sitemap(extras = []) {
   const filas = [];
   for (const entrada of RUTAS) {
     const multilingue = entrada.idiomas.length > 1;
@@ -73,6 +138,16 @@ function sitemap() {
       ].join('\n'));
     }
   }
+  for (const extra of extras) {
+    filas.push([
+      '  <url>',
+      '    <loc>' + extra.loc + '</loc>',
+      ...extra.alternates.map((a) => '    <xhtml:link rel="alternate" hreflang="' + a.hreflang + '" href="' + a.href + '" />'),
+      '    <changefreq>' + extra.frecuencia + '</changefreq>',
+      '    <priority>' + extra.prioridad.toFixed(1) + '</priority>',
+      '  </url>'
+    ].join('\n'));
+  }
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
@@ -82,7 +157,7 @@ function sitemap() {
   ].join('\n');
 }
 
-function main() {
+async function main() {
   const fuente = path.join(DIST, 'index.html');
   if (!fs.existsSync(fuente)) {
     console.error('Falta dist/index.html. Corre el build antes: pnpm build');
@@ -105,9 +180,35 @@ function main() {
     }
   }
 
-  fs.writeFileSync(path.join(DIST, 'sitemap.xml'), sitemap());
+  // Paginas de espiritu: una por idioma mas el indice.
+  const { sprites, pickTexto } = await cargarEspiritus();
+  const fichas = construirFichas(sprites, pickTexto);
+  const extras = [];
+  let paginas = 0;
+  for (const ficha of fichas) {
+    for (const lang of ['es', 'en']) {
+      const ruta = rutaConIdiomaEspiritu(rutaEspiritu(ficha.id), lang);
+      const destino = path.join(DIST, ruta.slice(1), 'index.html');
+      fs.mkdirSync(path.dirname(destino), { recursive: true });
+      fs.writeFileSync(destino, htmlPaginaEspiritu(ficha, lang));
+      extras.push({ loc: canonicalEspiritu(ficha.id, lang), alternates: alternatesDeEspiritu(ficha.id), frecuencia: 'monthly', prioridad: 0.5 });
+      paginas++;
+    }
+  }
+  for (const lang of ['es', 'en']) {
+    const ruta = rutaConIdiomaEspiritu(rutaHubEspiritus(), lang);
+    const destino = path.join(DIST, ruta.slice(1), 'index.html');
+    fs.mkdirSync(path.dirname(destino), { recursive: true });
+    fs.writeFileSync(destino, htmlHubEspiritus(fichas, lang));
+    const etiquetas = etiquetasHubEspiritus(fichas.length, lang);
+    extras.push({ loc: etiquetas.canonical, alternates: etiquetas.alternates, frecuencia: 'weekly', prioridad: 0.8 });
+    paginas++;
+  }
+
+  fs.writeFileSync(path.join(DIST, 'sitemap.xml'), sitemap(extras));
   console.log('SEO: HTML por ruta -> ' + escritas.join(', '));
-  console.log('SEO: sitemap con ' + RUTAS.reduce((n, r) => n + r.idiomas.length, 0) + ' URLs (desde la tabla de rutas)');
+  console.log('SEO: ' + paginas + ' paginas de espiritu (' + fichas.length + ' fichas x 2 idiomas + indice)');
+  console.log('SEO: sitemap con ' + (RUTAS.reduce((n, r) => n + r.idiomas.length, 0) + extras.length) + ' URLs');
 }
 
 main();
