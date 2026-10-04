@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { X, Download, Share2, Copy, Check, Sparkles } from 'lucide-react';
+import { X, Download, Share2, Copy, Check } from 'lucide-react';
 import { pickName } from '../data/spritesData';
 import { generateSpritedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, marcarEsperaActiva, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
@@ -469,9 +469,6 @@ export function ShareImageModal({ filteredSprites, allSprites, userState, active
         {/* Header Elegante y Minimalista */}
         <div className="sdm-share-pro__header">
           <div className="sdm-share-pro__title-wrap">
-            <div className="sdm-share-pro__icon-badge">
-              <Sparkles size={18} color="#00F0E8" />
-            </div>
             <div>
               <h2 className="sdm-share-pro__title" onPointerUp={manejarTapTitulo}>{t('compartir.titulo')}</h2>
               <p className="sdm-share-pro__subtitle">
