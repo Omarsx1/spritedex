@@ -41,6 +41,7 @@ export default {
   "lona.arribaMares": "FORTNITE , FORTNITEMARES",
   "lona.titulo": "SPRITEDEX OVERRIDE",
   "lona.tituloMares": "SPRITEDEX FORTNITEMARES",
+  "lona.prologo": "SPRITEDEX",
   "lona.usuario": "ID - {nombre}",
   "lona.lema": "BREAK THE RULES • CHANGE THE GAME",
   "lona.lemaMares": "COLLECT SPIRITS • SURVIVE THE NIGHT",

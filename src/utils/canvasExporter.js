@@ -130,9 +130,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // en memoria con el dibujo anterior no deben reutilizarse.
   // v36: el vertical tambien recorta el ancho del lienzo (tope de ancho de celda), asi que
   // las capturas guardadas en memoria con el dibujo anterior tampoco valen.
-  // v42: el QR vive en su propia ficha con marco y las filas incompletas se centran;
-  // las capturas guardadas con la cuadricula anterior no valen.
-  return `v42_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v43: el encabezado de temporada gana prologo de marca, halo del logo y capsula con
+  // filo; las capturas guardadas con el encabezado anterior no valen.
+  return `v43_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -790,8 +790,9 @@ async function renderGlitchOverrideTemplate({
   if (enTemporada) {
     const u = Math.min(1.15, anchoDiseno / 1200);
     const logoAlto = Math.round((anchoDiseno * 0.5) / 3); // el SVG es 3:1
-    // Los huecos coinciden con los del dibujo: capsula pegada al logo (8) y HUD separado (16).
-    const altoNecesario = Math.round(30 * u) + logoAlto + Math.round(8 * u) + Math.round(22 * u) + Math.round(16 * u) + Math.round(36 * u) + 16;
+    // Los huecos coinciden con los del dibujo: prologo (28) + hueco del logo (22) + logo +
+    // capsula pegada (8) + capsula (22) + HUD separado (16) + HUD (36) + margen (16).
+    const altoNecesario = Math.round(28 * u) + Math.round(22 * u) + logoAlto + Math.round(8 * u) + Math.round(22 * u) + Math.round(16 * u) + Math.round(36 * u) + 16;
     headerH = Math.max(headerH, altoNecesario);
   }
 
@@ -853,10 +854,23 @@ async function renderGlitchOverrideTemplate({
   let titleY;
 
   if (logoMares) {
+    // Prologo de marca sobre el wordmark: mismo patron que fuera de temporada (linea
+    // pequena arriba + titulo grande), para que el encabezado no sea solo un logo suelto.
+    const prologoY = Math.round(28 * Math.min(1.15, scale));
+    ctx.font = `900 ${Math.round(14 * Math.min(1.15, scale))}px "Outfit", "Inter", "Arial Black", sans-serif`;
+    ctx.fillStyle = acentoCabecera;
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '4px';
+    ctx.shadowColor = acentoCabeceraRgba;
+    ctx.shadowBlur = 8;
+    ctx.fillText(t('lona.prologo'), width / 2, prologoY);
+    ctx.shadowBlur = 0;
+    ctx.letterSpacing = '0px';
+
     const logoW = Math.min(Math.round(anchoDiseno * 0.5), width - paddingX * 2);
     const proporcion = logoMares.naturalWidth ? (logoMares.naturalHeight / logoMares.naturalWidth) : (1 / 3);
     const logoH = Math.round(logoW * proporcion);
-    const logoY = Math.round(30 * Math.min(1.15, scale));
+    const logoY = prologoY + Math.round(22 * Math.min(1.15, scale));
 
     // El SVG oficial es relleno negro con contorno neon: sobre el fondo oscuro de la lona
     // el relleno se pierde. Se usa como mascara y se pinta con un degradado claro, asi el
@@ -873,6 +887,20 @@ async function renderGlitchOverrideTemplate({
     gradLogo.addColorStop(1, '#e879f9');
     ctxLogo.fillStyle = gradLogo;
     ctxLogo.fillRect(0, 0, logoW, logoH);
+
+    // Halo suave detras del wordmark: profundidad de key art sin ensuciar el dibujo.
+    const haloY = logoY + logoH / 2;
+    const haloR = logoW * 0.62;
+    const gradHalo = ctx.createRadialGradient(width / 2, haloY, 10, width / 2, haloY, haloR);
+    gradHalo.addColorStop(0, 'rgba(232, 121, 249, 0.18)');
+    gradHalo.addColorStop(0.6, 'rgba(147, 51, 234, 0.10)');
+    gradHalo.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.save();
+    ctx.fillStyle = gradHalo;
+    ctx.beginPath();
+    ctx.ellipse(width / 2, haloY, haloR, logoH * 0.65, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
 
     ctx.save();
     ctx.shadowColor = 'rgba(232, 121, 249, 0.45)';
@@ -928,8 +956,16 @@ async function renderGlitchOverrideTemplate({
   const capsuleGrad = ctx.createLinearGradient(capsuleX, capsuleY, capsuleX + capsuleW, capsuleY);
   capsuleGrad.addColorStop(0, '#ff0055');
   capsuleGrad.addColorStop(1, '#d90429');
+  ctx.save();
+  ctx.shadowColor = 'rgba(255, 0, 85, 0.45)';
+  ctx.shadowBlur = 10;
   ctx.fillStyle = capsuleGrad;
   ctx.fill();
+  ctx.restore();
+  // Filo claro: la capsula se lee como insignia y no como un rectangulo pegado.
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.30)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
 
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'center';
