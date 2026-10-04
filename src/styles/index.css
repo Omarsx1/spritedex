@@ -31,7 +31,9 @@
   --gold: #facc15;
   --emerald: #10b981;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-heading: 'Outfit', sans-serif;
+  /* Inter va de respaldo a proposito: mientras Outfit llega, los titulos ya salen con una
+     sans parecida en vez del sans del sistema, que es lo que movia el layout al cambiar. */
+  --font-heading: 'Outfit', 'Inter', sans-serif;
   --font-fortnite: 'Burbank Big Condensed', 'FortniteFont', sans-serif;
 }
 
