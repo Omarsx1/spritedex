@@ -10046,40 +10046,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 /* ==========================================================================
-   FASE 5 / T7 — prefers-reduced-motion: apaga los bucles decorativos infinitos
-   Solo decorativos: el spinner de carga (sdm-share-pro__spinner) y el radar
-   del comparador comunican estado y se quedan. `!important` a proposito:
-   varios selectores base tienen mas especificidad que un bloque suelto (por
-   eso el bloque viejo de mas arriba perdia contra .hero__title[data-fnm-logo=..]).
-   ========================================================================== */
-@media (prefers-reduced-motion: reduce) {
-  /* El glitch del titulo de temporada SE CONSERVA a proposito con movimiento
-     reducido: son las dos copias cromaticas del wordmark y las del logo
-     Fortnitemares, un hipo corto por pasos sobre el titulo (no un bucle de
-     pantalla completa), y es la firma visual de la temporada que el usuario
-     pidio ver. Ademas la app ya ignora a proposito el reduce del sistema para
-     su fisica (Header.jsx parchea window.matchMedia), asi que apagarlo aqui
-     solo por el reduce rompia esa politica. El resto de bucles decorativos
-     sigue apagado. */
-  .hero__title[data-fnm-logo='themed'] .hero__title-fnm-svg,
-  .hero__title-line--accent,
-  .hero__hero-img,
-  .hero__spin-icon,
-  .gen-tab-badge.glitch-pulse,
-  .status-pill-count-badge,
-  .mobile-new-coachmark,
-  .sprite-card.is-mastered.is-glitch-mastered,
-  .cyber-lines span,
-  .scan-line,
-  .card-particles span,
-  .card-owned-btn.mastered,
-  .sdm-share__glitch-btn:hover::before,
-  .sdm-share__glitch-btn:hover::after {
-    animation: none !important;
-  }
-}
-
-/* ==========================================================================
    FASE 5 / T8 — TACTIL/MOVIL: sin backdrop-filter
    Es la propiedad mas cara de la GPU movil antigua. Se conserva el mismo
    fondo rgba de cada regla (mismo color base y alfa del diseno) y solo se
