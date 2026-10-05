@@ -5,6 +5,17 @@
 // con puppeteer-core y, por cada offset de scroll, mide:
 //   - firstFrameBlank: tarjetas del viewport sin arte en el primer frame tras empezar a scrollear
 //   - framesWithBlank / framesSampled: fraccion de frames muestreados con al menos un hueco
+//   - (--scroll-mode roundtrip) artifactFrames / framesSampled: frames donde al menos UNA tarjeta
+//     del viewport, con la imagen YA completa, muestra el fondo de su tarjeta en vez de arte. Es
+//     una medicion de PIXELES (page.screenshot -> canvas + getImageData), no de bytes: una imagen
+//     cacheada igual destella si el navegador tiro su render. Bajada y subida se reportan por
+//     separado (la subida es el caso que el usuario reporta) y un frame de CONTROL asentado mide
+//     los falsos positivos del criterio.
+//   - (--scroll-mode roundtrip) la latencia de pintado por posicion: cuantas capturas seguidas
+//     (sin mover el scroll) hacen falta hasta que ninguna tarjeta ya cargada muestre el fondo.
+//     Tambien se mide el COSTE en CPU del gesto: deltas de Performance.getMetrics (TaskDuration,
+//     ScriptDuration, LayoutDuration, RecalcStyleDuration) en ms y por segundo de scroll, long
+//     tasks durante el gesto separadas por direccion, y el conteo de capas compuestas (LayerTree).
 //   - msToFirstArtVisible: ms hasta el primer frame con TODAS las tarjetas del viewport listas
 //   - imagesNotLoadedAtEnd: tarjetas del viewport sin imagen lista al terminar el paso
 //   - (con --log-network) requests por paso, count404, urls404, slowest3, basicFallbacks
@@ -16,7 +27,8 @@
 //
 // El scroll puede ser "jump" (salto directo al offset, comportamiento historico) o
 // "continuous" (pasos de 200 px cada 45 ms, lo que hace una rueda real: el navegador precarga
-// por distancia y los lazy entran de a poco en el viewport).
+// por distancia y los lazy entran de a poco en el viewport) o "roundtrip" (baja a 200 px por paso
+// hasta --roundtrip-max y despues SUBE de vuelta al tope, muestreando pixeles en cada direccion).
 //
 // --scenario <scroll|idle|startup> (default scroll):
 //   scroll: comportamiento historico (pasos de scroll en cada offset).
@@ -30,6 +42,10 @@
 //           lcpMs/lcpElement/lcpSize, fcpMs, ttfbMs, domContentLoadedMs, loadEventMs, longTasks
 //           (count/totalMax/top5), firstSpriteCardMs, jsCriticalBytes (scripts que terminan de
 //           responder antes del LCP) y la primera request a Supabase.
+//
+// --roundtrip-max <px> (default 5000): tope de la ronda en --scroll-mode roundtrip (se recorta al
+//   fondo del documento). --artifact-samples <n> (default 4): capturas por posicion sin mover el
+//   scroll; la primera alimenta la metrica titular y las extra, la latencia de pintado.
 //
 // --block-urls <patrones> (default vacio): lista separada por comas de patrones de URL que se
 // bloquean a nivel de red via CDP Network.setBlockedURLs. Sirve para medir que compraria diferir
@@ -99,6 +115,26 @@ const CACHE_HTML = 'public, max-age=0, must-revalidate';
 const CONTINUOUS_STRIDE_PX = 200;
 const CONTINUOUS_INTERVAL_MS = 45;
 
+// Fase 5 / T6: gesto de ida y vuelta. Baja de a 200 px hasta el tope de la ronda y despues SUBE
+// de vuelta al tope, muestreando PIXELES en cada direccion por separado. La subida es el caso que
+// el usuario reporta ("scrolleo hacia arriba y veo huecos y tarjetas sin cargar").
+const ROUNDTRIP_MAX_DEFAULT = 5000;
+const ROUNDTRIP_STRIDE_PX = CONTINUOUS_STRIDE_PX;
+const ROUNDTRIP_INTERVAL_MS = CONTINUOUS_INTERVAL_MS;
+// Tolerancias del criterio de artefactos de pintado (ver analyzeArtifactFrame). Son canales 0-255
+// sobre PNG sin perdida: el mismo pixel de un frame asentado es identico, asi que 16 sobra.
+const ARTIFACT_BG_TOL = 16;
+const ARTIFACT_REF_TOL = 28;
+const ARTIFACT_GRID = 5;
+const ARTIFACT_MAX_FRAMES = 400;
+// Capturas extra por posicion (sin mover el scroll): miden cuantas capturas hacen falta hasta que
+// el viewport queda pintado. La primera captura alimenta la metrica titular; las extra, la
+// latencia de pintado por posicion, que es lo que distingue "raster normal" de "render diferido".
+const ARTIFACT_RECAPTURE_MS = 25;
+const ARTIFACT_SAMPLES_DEFAULT = 4;
+
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 // Mbps -> bytes/s en base decimal (8 Mbps = 8_000_000 bits/s = 1_000_000 B/s).
 const THROTTLES = {
   none: null,
@@ -118,6 +154,206 @@ const MIME = new Map([
   ['.ico', 'image/x-icon']
 ]);
 
+// ---------------------------------------------------------------------------
+// Medicion de ARTEFACTOS DE PINTADO (Fase 5 / T6).
+//
+// Mide PIXELES, no bytes. Una tarjeta cuya imagen YA esta completa (img.complete &&
+// naturalWidth > 0) puede igual mostrarse vacia si el navegador descarto su render
+// (content-visibility: auto): al volver a entrar al viewport la pinta de nuevo y, mientras tanto,
+// se ve el fondo de la tarjeta. La medicion de bytes no puede ver eso: la imagen ya llego.
+//
+// CRITERIO EXACTO por tarjeta, en un frame muestreado (esta funcion corre EN la pagina):
+//   bg        = fondo real de la tarjeta en ESE frame: mediana de hasta 6 muestras tomadas en su
+//               padding (franja de 14 px a los lados, donde la caja .card-image no llega), con
+//               respaldo en getComputedStyle(card).background-color si no hay muestras validas.
+//   puntos    = rejilla 5x5 dentro de la caja .card-image (fracciones 0.1 .. 0.9).
+//   flatBg    = TODOS los puntos caen dentro de ARTIFACT_BG_TOL de bg, o sea la caja entera
+//               muestra el fondo de la tarjeta.
+//   ref       = parche 5x5 del centro de .card-image, aprendido cuando esa MISMA tarjeta se vio
+//               PINTADA (flatBg falso). Es la referencia propia de la tarjeta.
+//   ambiguous = ref existe y ref tambien es "bg" -> esa tarjeta no sirve para decidir.
+//   artefacto = imagen lista && flatBg && ref existe && !ambiguous && diff(ref, centro) > REF_TOL.
+//
+// Un frame es ARTEFACTO si al menos UNA tarjeta del viewport cumple lo anterior. Un frame es
+// BLANK (la metrica vieja, de bytes) si al menos una tarjeta del viewport no tiene imagen lista.
+// El guardarrail de ref evita el falso positivo obvio (arte oscuro parecido al fondo): una tarjeta
+// solo cuenta si ANTES se la vio pintada con pixeles suficientemente distintos del fondo.
+async function analyzeArtifactFrame(payload) {
+  const { dataUrl, phase, refs, bgTol, refTol, grid } = payload;
+  const img = new Image();
+  img.src = dataUrl;
+  await img.decode();
+  const canvas = document.createElement('canvas');
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0);
+  const W = canvas.width;
+  const H = canvas.height;
+  const px = ctx.getImageData(0, 0, W, H).data;
+
+  const sampleAt = (x, y) => {
+    const xi = Math.round(x);
+    const yi = Math.round(y);
+    if (!(xi >= 0 && yi >= 0 && xi < W && yi < H)) return null;
+    const o = (yi * W + xi) * 4;
+    return [px[o], px[o + 1], px[o + 2]];
+  };
+  const medianOf = (values, ch) => {
+    const s = values.map((v) => v[ch]).sort((a, b) => a - b);
+    return s[Math.floor((s.length - 1) / 2)];
+  };
+  const medianColor = (values) => (values.length === 0
+    ? null
+    : [medianOf(values, 0), medianOf(values, 1), medianOf(values, 2)]);
+  const diff = (a, b) => (!a || !b ? Infinity : Math.max(
+    Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]), Math.abs(a[2] - b[2])
+  ));
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const cards = Array.from(document.querySelectorAll('.sprites-grid .sprite-card'));
+  const inViewportIndices = [];
+  const learnedRefs = [];
+  const details = [];
+  let readyInView = 0;
+  let blankInView = 0;
+  let flatBgReady = 0;
+  let ambiguousReady = 0;
+  let artifactCards = 0;
+  let occludedCards = 0;
+
+  cards.forEach((card, i) => {
+    const rect = card.getBoundingClientRect();
+    const inView = rect.bottom > 0 && rect.top < vh && rect.right > 0 && rect.left < vw;
+    if (!inView) return;
+    inViewportIndices.push(i);
+    const imageBox = card.querySelector('.card-image');
+    const cardImg = card.querySelector('.card-image img:not(.card-image__crown)');
+    const ready = Boolean(cardImg) && cardImg.complete && cardImg.naturalWidth > 0;
+    if (!ready || !imageBox) {
+      blankInView += 1;
+      return;
+    }
+    readyInView += 1;
+
+    // pick(): muestra un pixel SOLO si el punto no esta tapado por otra capa (navbar fijo, modal,
+    // prompt de instalacion, adornos de temporada). Sin este filtro, cualquier overlay oscuro
+    // encima de una tarjeta se lee como "fondo de la tarjeta" y da un falso positivo.
+    const pick = (x, y) => {
+      const xi = Math.round(x);
+      const yi = Math.round(y);
+      if (!(xi >= 0 && yi >= 0 && xi < W && yi < H)) return null;
+      const el = document.elementFromPoint(xi, yi);
+      if (!el || !(el === card || card.contains(el))) return null;
+      return sampleAt(xi, yi);
+    };
+
+    // Fondo real de la tarjeta: franja del padding lateral de 14 px, fuera de .card-image.
+    const bgSamples = [];
+    for (const yy of [rect.top + 16, rect.top + rect.height / 2, rect.bottom - 8]) {
+      const left = pick(rect.left + 4, yy);
+      const right = pick(rect.right - 5, yy);
+      if (left) bgSamples.push(left);
+      if (right) bgSamples.push(right);
+    }
+    let bg = medianColor(bgSamples);
+    if (!bg) {
+      const computed = String(getComputedStyle(card).backgroundColor || '');
+      const nums = computed.split(/[^0-9.]+/).map(Number).filter((n) => Number.isFinite(n));
+      if (nums.length >= 3) bg = [nums[0], nums[1], nums[2]];
+    }
+    if (!bg) return;
+
+    // Region juzgable: interseccion de la caja .card-image con el viewport. Se muestrea DENTRO de
+    // la interseccion para poder juzgar tambien a las tarjetas que estan entrando, que es donde
+    // vive el artefacto del render diferido (la tarjeta recien expuesta).
+    const ib = imageBox.getBoundingClientRect();
+    const irW = Math.min(ib.right, vw) - Math.max(ib.left, 0);
+    const irH = Math.min(ib.bottom, vh) - Math.max(ib.top, 0);
+    if (irW < 10 || irH < 10) {
+      occludedCards += 1;
+      return;
+    }
+    const irLeft = Math.max(ib.left, 0);
+    const irTop = Math.max(ib.top, 0);
+    const points = [];
+    let occludedPoints = 0;
+    for (let gy = 0; gy < grid; gy += 1) {
+      for (let gx = 0; gx < grid; gx += 1) {
+        const fx = 0.1 + (0.8 * gx) / (grid - 1);
+        const fy = 0.1 + (0.8 * gy) / (grid - 1);
+        const s = pick(irLeft + irW * fx, irTop + irH * fy);
+        if (s) points.push(s);
+        else occludedPoints += 1;
+      }
+    }
+    if (points.length < 8) {
+      occludedCards += 1;
+      return;
+    }
+
+    const regionMedian = medianColor(points);
+    const paintedPoints = points.filter((s) => diff(s, bg) > bgTol).length;
+    const flatBg = paintedPoints === 0;
+    const paintedBefore = refs[String(i)] || null;
+    // Solo informativo (no decide): cuanto se diferencia la region visible de la ultima region que
+    // se vio pintada en esa tarjeta. Con regiones recortadas la comparacion no es valida.
+    const lastPaintedDiff = paintedBefore && regionMedian ? diff(regionMedian, paintedBefore) : null;
+
+    let artifact = false;
+    if (flatBg) {
+      flatBgReady += 1;
+      // Nunca se la vio pintada: no hay evidencia de que deba mostrar arte -> no se la juzga.
+      if (!paintedBefore) ambiguousReady += 1;
+      else {
+        artifact = true;
+        artifactCards += 1;
+      }
+    } else if (!paintedBefore && regionMedian) {
+      // Se vio pintada: queda marcada como tarjeta con arte para el resto de la corrida.
+      learnedRefs.push([String(i), regionMedian]);
+    }
+    if (flatBg || artifact) {
+      details.push({
+        i,
+        artifact,
+        flatBg,
+        paintedPoints,
+        paintedBefore: Boolean(paintedBefore),
+        lastPaintedDiff: lastPaintedDiff === null ? null : Math.round(lastPaintedDiff),
+        regionMatchesLastPainted: lastPaintedDiff !== null && lastPaintedDiff <= refTol,
+        ready,
+        cardTop: Math.round(rect.top),
+        cardBottom: Math.round(rect.bottom),
+        visibleBox: [
+          Math.round(irLeft), Math.round(irTop), Math.round(irW), Math.round(irH)
+        ],
+        usablePoints: points.length,
+        occludedPoints,
+        bg
+      });
+    }
+  });
+
+  return {
+    phase,
+    scrollY: Math.round(window.scrollY),
+    inViewportCards: readyInView + blankInView,
+    inViewportIndices,
+    readyInView,
+    blankInView,
+    flatBgReady,
+    ambiguousReady,
+    artifactCards,
+    occludedCards,
+    isArtifactFrame: artifactCards > 0,
+    isBlankFrame: blankInView > 0,
+    learnedRefs,
+    details
+  };
+}
+
 function parseArgs(argv) {
   const args = {
     runs: 1,
@@ -130,7 +366,9 @@ function parseArgs(argv) {
     logNetwork: false,
     debugRects: false,
     blockUrls: [],
-    offsets: DEFAULT_OFFSETS.slice()
+    offsets: DEFAULT_OFFSETS.slice(),
+    roundtripMax: ROUNDTRIP_MAX_DEFAULT,
+    artifactSamples: ARTIFACT_SAMPLES_DEFAULT
   };
   for (let i = 0; i < argv.length; i += 1) {
     const flag = argv[i];
@@ -171,6 +409,12 @@ function parseArgs(argv) {
         .map((part) => Number(part.trim()))
         .filter((n) => Number.isFinite(n) && n >= 0);
       i += 1;
+    } else if (flag === '--roundtrip-max') {
+      args.roundtripMax = Number(argv[i + 1]);
+      i += 1;
+    } else if (flag === '--artifact-samples') {
+      args.artifactSamples = Number(argv[i + 1]);
+      i += 1;
     } else {
       throw new Error('Argumento no reconocido: ' + flag);
     }
@@ -181,8 +425,14 @@ function parseArgs(argv) {
   if (!(args.throttle in THROTTLES)) {
     throw new Error('--throttle debe ser uno de: ' + Object.keys(THROTTLES).join(', '));
   }
-  if (args.scrollMode !== 'jump' && args.scrollMode !== 'continuous') {
-    throw new Error('--scroll-mode debe ser jump o continuous');
+  if (args.scrollMode !== 'jump' && args.scrollMode !== 'continuous' && args.scrollMode !== 'roundtrip') {
+    throw new Error('--scroll-mode debe ser jump, continuous o roundtrip');
+  }
+  if (!Number.isFinite(args.roundtripMax) || args.roundtripMax < 0) {
+    throw new Error('--roundtrip-max debe ser un numero >= 0');
+  }
+  if (!Number.isInteger(args.artifactSamples) || args.artifactSamples < 0) {
+    throw new Error('--artifact-samples debe ser un entero >= 0 (0 = gesto sin capturas, solo CPU)');
   }
   if (args.scenario !== 'scroll' && args.scenario !== 'idle' && args.scenario !== 'startup') {
     throw new Error('--scenario debe ser scroll, idle o startup');
@@ -452,6 +702,474 @@ async function measureStep(page, cfg) {
       requests
     };
   }, cfg);
+}
+
+// Lectura barata (sin screenshot) para el modo CPU puro: indices en viewport y cuantas tarjetas
+// estan listas. Se usa cuando --artifact-samples 0, para medir trabajo del gesto sin la carga del
+// propio arnes.
+function readLightFrame(page) {
+  return page.evaluate(() => {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const cards = Array.from(document.querySelectorAll('.sprites-grid .sprite-card'));
+    const indices = [];
+    let ready = 0;
+    let blank = 0;
+    cards.forEach((card, i) => {
+      const rect = card.getBoundingClientRect();
+      if (!(rect.bottom > 0 && rect.top < vh && rect.right > 0 && rect.left < vw)) return;
+      indices.push(i);
+      const img = card.querySelector('.card-image img:not(.card-image__crown)');
+      if (img && img.complete && img.naturalWidth > 0) ready += 1;
+      else blank += 1;
+    });
+    return { scrollY: Math.round(window.scrollY), indices, ready, blank };
+  });
+}
+
+function newRoundtripPhase(name, fromY, toY) {
+  return {
+    phase: name,
+    fromY: Math.round(fromY),
+    toY: Math.round(toY),
+    framesSampled: 0,
+    artifactFrames: 0,
+    blankFrames: 0,
+    artifactCardsTotal: 0,
+    cardsSeen: 0,
+    inViewportIndices: [],
+    positions: [],
+    frames: []
+  };
+}
+
+// Metricas de proceso del renderer (CDP Performance domain). Los deltas alrededor del gesto son
+// milisegundos de CPU del hilo principal atribuibles al gesto: TaskDuration es el trabajo total,
+// ScriptDuration el JS, LayoutDuration el layout y RecalcStyleDuration el recalculo de estilo.
+// Es un proxy: no separa hilos de raster ni GPU, pero es comparable antes/despues bajo el mismo
+// protocolo.
+async function readPerfMetrics(client) {
+  const res = await client.send('Performance.getMetrics');
+  const map = new Map();
+  for (const metric of res.metrics || []) map.set(metric.name, metric.value);
+  const seconds = (name) => (Number(map.get(name)) || 0) * 1000;
+  return {
+    taskMs: seconds('TaskDuration'),
+    scriptMs: seconds('ScriptDuration'),
+    layoutMs: seconds('LayoutDuration'),
+    recalcStyleMs: seconds('RecalcStyleDuration'),
+    layoutCount: Number(map.get('LayoutCount')) || 0,
+    recalcStyleCount: Number(map.get('RecalcStyleCount')) || 0,
+    jsHeapUsedBytes: Number(map.get('JSHeapUsedSize')) || 0,
+    nodes: Number(map.get('Nodes')) || 0
+  };
+}
+
+// Fase 5 / T6: gesto de ida y vuelta con muestreo de PIXELES.
+//
+// El scroll lo maneja Node (no la pagina) para poder intercalar un page.screenshot() por frame:
+// screenshot -> data URL -> canvas + getImageData dentro de la pagina -> veredicto por tarjeta.
+// Sin dependencias nuevas: el decodificador de PNG es el propio navegador (mismo origen, sin taint).
+//
+// Cada fase se muestrea por separado (bajada y subida) y al final se toma un frame de CONTROL ya
+// asentado (SETTLE_MS de quietud) que sirve como medida de FALSOS POSITIVOS del criterio.
+async function measureRoundtrip(page, cfg, client) {
+  const geometry = await page.evaluate((max) => {
+    const bottom = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    return { bottom, targetY: Math.min(max, bottom), startY: window.scrollY };
+  }, cfg.roundtripMax);
+
+  // --- Extension (calor/CPU en moviles antiguos) -------------------------------------------
+  // Long tasks durante el gesto, no solo durante el arranque: se instala un observer y se vacia
+  // la lista al inicio de cada fase, asi la bajada y la subida se reportan por separado.
+  const longTasksSupported = await page.evaluate(() => {
+    window.__rtLongTasks = [];
+    window.__rtLongObserver = null;
+    try {
+      window.__rtLongObserver = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          window.__rtLongTasks.push({
+            start: Math.round(entry.startTime * 100) / 100,
+            dur: Math.round(entry.duration * 100) / 100
+          });
+        }
+      });
+      window.__rtLongObserver.observe({ entryTypes: ['longtask'] });
+      return true;
+    } catch {
+      return false;
+    }
+  });
+  await client.send('Performance.enable');
+  let layersSupported = false;
+  let layerCount = null;
+  try {
+    if (typeof client.on === 'function') {
+      client.on('LayerTree.layerTreeDidChange', ({ layers }) => {
+        if (Array.isArray(layers)) layerCount = layers.length;
+      });
+    }
+    await client.send('LayerTree.enable');
+    layersSupported = true;
+  } catch {
+    layersSupported = false;
+  }
+  const metricsBefore = await readPerfMetrics(client);
+  const gestureWallStart = Date.now();
+
+  const startedAt = await page.evaluate(() => performance.now());
+  const refs = {};
+  const phases = {
+    down: newRoundtripPhase('down', geometry.startY, geometry.targetY),
+    up: newRoundtripPhase('up', geometry.targetY, geometry.startY)
+  };
+
+  const sampleFrame = async (phaseName) => {
+    const shot = await page.screenshot({ type: 'png' });
+    const frame = await page.evaluate(analyzeArtifactFrame, {
+      dataUrl: 'data:image/png;base64,' + Buffer.from(shot).toString('base64'),
+      phase: phaseName,
+      refs,
+      bgTol: ARTIFACT_BG_TOL,
+      refTol: ARTIFACT_REF_TOL,
+      grid: ARTIFACT_GRID
+    });
+    // Las refs se aprenden en la pagina pero viajan por structured clone, asi que se fusionan aca.
+    if (Array.isArray(frame.learnedRefs)) {
+      for (const entry of frame.learnedRefs) if (!refs[entry[0]]) refs[entry[0]] = entry[1];
+    }
+    delete frame.learnedRefs;
+    return frame;
+  };
+
+  const drivePhase = async (phaseName) => {
+    const phase = phases[phaseName];
+    const stepDir = phase.toY >= phase.fromY ? 1 : -1;
+    const vistos = new Set();
+    let y = phase.fromY;
+    for (let i = 0; i < ARTIFACT_MAX_FRAMES; i += 1) {
+      await page.evaluate((yy) => window.scrollTo(0, yy), y);
+      // Espera a que el navegador PRODUZCA un frame en la posicion nueva antes de capturar. Sin esto
+      // el screenshot cae en el estado previo al pintado de la franja recien expuesta, y eso ocurre
+      // hasta en una web normal (es latencia de captura, no el artefacto que reporta el usuario).
+      // Dos rAF = al menos una oportunidad de pintado del area recien expuesta.
+      await page.evaluate(() => new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      }));
+      // Primera captura: la metrica titular (1 frame por posicion = muestreo uniforme, comparable
+      // entre builds). Capturas extra SIN mover el scroll: la latencia de pintado de la posicion.
+      let posicion = null;
+      if (cfg.artifactSamples === 0) {
+        // Modo CPU puro: sin screenshots. El delta de Performance.getMetrics queda casi sin el
+        // coste del arnes (solo la lectura de viewport), asi que el delta es atribuible a la app.
+        const light = await readLightFrame(page);
+        phase.framesSampled += 1;
+        if (light.blank > 0) phase.blankFrames += 1;
+        phase.cardsSeen += light.ready + light.blank;
+        for (const indice of light.indices) vistos.add(indice);
+        phase.frames.push({
+          y: light.scrollY,
+          inViewport: light.ready + light.blank,
+          ready: light.ready,
+          blank: light.blank,
+          occluded: null,
+          artifactCards: 0,
+          artifact: false,
+          detail: []
+        });
+        posicion = {
+          y: light.scrollY,
+          captures: 0,
+          cleared: true,
+          artifactCards: 0,
+          flatBgReady: null,
+          ambiguousReady: null,
+          occludedCards: null,
+          cards: []
+        };
+      } else {
+        for (let c = 0; c < cfg.artifactSamples; c += 1) {
+          const frame = await sampleFrame(phaseName);
+          if (c === 0) {
+            phase.framesSampled += 1;
+            if (frame.isArtifactFrame) phase.artifactFrames += 1;
+            if (frame.isBlankFrame) phase.blankFrames += 1;
+            phase.artifactCardsTotal += frame.artifactCards;
+            phase.cardsSeen += frame.inViewportCards;
+            for (const indice of frame.inViewportIndices) vistos.add(indice);
+            phase.frames.push({
+              y: frame.scrollY,
+              inViewport: frame.inViewportCards,
+              ready: frame.readyInView,
+              blank: frame.blankInView,
+              flatBg: frame.flatBgReady,
+              ambiguous: frame.ambiguousReady,
+              occluded: frame.occludedCards,
+              artifactCards: frame.artifactCards,
+              artifact: frame.isArtifactFrame,
+              detail: frame.details
+            });
+          }
+          posicion = {
+            y: frame.scrollY,
+            captures: c + 1,
+            cleared: !frame.isArtifactFrame,
+            artifactCards: frame.artifactCards,
+            flatBgReady: frame.flatBgReady,
+            ambiguousReady: frame.ambiguousReady,
+            occludedCards: frame.occludedCards,
+            cards: frame.details
+          };
+          if (!frame.isArtifactFrame) break;
+          if (c + 1 < cfg.artifactSamples) await delay(ARTIFACT_RECAPTURE_MS);
+        }
+      }
+      phase.positions.push(posicion);
+      if (y === phase.toY) break;
+      y = stepDir > 0
+        ? Math.min(phase.toY, y + ROUNDTRIP_STRIDE_PX)
+        : Math.max(phase.toY, y - ROUNDTRIP_STRIDE_PX);
+      await delay(ROUNDTRIP_INTERVAL_MS);
+    }
+    phase.inViewportIndices = Array.from(vistos).sort((a, b) => a - b);
+    return phase;
+  };
+
+  const resetLongTasks = () => page.evaluate(() => {
+    if (Array.isArray(window.__rtLongTasks)) window.__rtLongTasks.length = 0;
+  });
+  const readLongTasks = async () => {
+    await delay(50);
+    const entries = await page.evaluate(
+      () => (Array.isArray(window.__rtLongTasks) ? window.__rtLongTasks.slice() : null)
+    );
+    if (!entries) return { supported: false, count: null, totalMs: null, maxMs: null };
+    return {
+      supported: true,
+      count: entries.length,
+      totalMs: round(entries.reduce((acc, entry) => acc + entry.dur, 0)),
+      maxMs: entries.length > 0 ? Math.max(...entries.map((entry) => entry.dur)) : 0
+    };
+  };
+
+  await resetLongTasks();
+  const down = await drivePhase('down');
+  const downLongTasks = await readLongTasks();
+  await resetLongTasks();
+  const up = await drivePhase('up');
+  const upLongTasks = await readLongTasks();
+
+  const gestureWallMs = Date.now() - gestureWallStart;
+  const metricsAfter = await readPerfMetrics(client);
+  const delta = {
+    taskMs: round(metricsAfter.taskMs - metricsBefore.taskMs),
+    scriptMs: round(metricsAfter.scriptMs - metricsBefore.scriptMs),
+    layoutMs: round(metricsAfter.layoutMs - metricsBefore.layoutMs),
+    recalcStyleMs: round(metricsAfter.recalcStyleMs - metricsBefore.recalcStyleMs)
+  };
+  const perSecond = gestureWallMs > 0
+    ? {
+        taskMs: round(delta.taskMs / (gestureWallMs / 1000)),
+        scriptMs: round(delta.scriptMs / (gestureWallMs / 1000)),
+        layoutMs: round(delta.layoutMs / (gestureWallMs / 1000)),
+        recalcStyleMs: round(delta.recalcStyleMs / (gestureWallMs / 1000))
+      }
+    : null;
+  const scrollPx = Math.abs(down.toY - down.fromY) + Math.abs(up.toY - up.fromY);
+  const cpu = {
+    gestureMs: gestureWallMs,
+    scrollPx,
+    perf: delta,
+    perSecond,
+    layoutCount: metricsAfter.layoutCount - metricsBefore.layoutCount,
+    recalcStyleCount: metricsAfter.recalcStyleCount - metricsBefore.recalcStyleCount,
+    longTasks: { supported: longTasksSupported, down: downLongTasks, up: upLongTasks },
+    layers: { supported: layersSupported, count: layersSupported ? layerCount : null }
+  };
+
+  // Frame de control: se vuelve al tope de la ronda, se deja asentar y se captura. Ahi todas las
+  // tarjetas deberian estar pintadas. Cualquier artefacto marcado en el control es un FALSO POSITIVO
+  // del criterio (y su tasa sale de estos numeros). Se hace en el tope de la ronda y no en el tope
+  // del documento porque arriba de todo el grid todavia no entra en el viewport (0 tarjetas).
+  await page.evaluate((yy) => window.scrollTo(0, yy), geometry.targetY);
+  await delay(SETTLE_MS);
+  const controlFrame = await sampleFrame('control');
+  const control = {
+    scrollY: controlFrame.scrollY,
+    inViewportCards: controlFrame.inViewportCards,
+    readyInView: controlFrame.readyInView,
+    flatBgReady: controlFrame.flatBgReady,
+    ambiguousReady: controlFrame.ambiguousReady,
+    artifactCards: controlFrame.artifactCards,
+    isArtifactFrame: controlFrame.isArtifactFrame
+  };
+
+  const requests = cfg.logNetwork
+    ? await page.evaluate((cut) => performance.getEntriesByType('resource')
+        .filter((entry) => entry.startTime >= cut - 0.5)
+        .map((entry) => ({
+          url: entry.name,
+          status: typeof entry.responseStatus === 'number' ? entry.responseStatus : null,
+          type: entry.initiatorType || null,
+          startTime: Math.round(entry.startTime * 100) / 100,
+          responseEnd: Math.round(entry.responseEnd * 100) / 100,
+          transferSize: entry.transferSize,
+          encodedBodySize: entry.encodedBodySize,
+          duration: Math.round(entry.duration * 100) / 100
+        })), startedAt)
+    : null;
+
+  return {
+    targetY: Math.round(geometry.targetY),
+    maxScrollY: Math.round(geometry.bottom),
+    startY: Math.round(geometry.startY),
+    stridePx: ROUNDTRIP_STRIDE_PX,
+    intervalMs: ROUNDTRIP_INTERVAL_MS,
+    artifactSamples: cfg.artifactSamples,
+    refsLearned: Object.keys(refs).length,
+    down,
+    up,
+    control,
+    cpu,
+    requests
+  };
+}
+
+function enrichRoundtripWithNetwork(roundtrip, statusByUrl) {
+  if (!roundtrip || !Array.isArray(roundtrip.requests)) return roundtrip;
+  const enriched = enrichRequests(roundtrip.requests, statusByUrl);
+  const delCollage = roundtrip.requests.filter((r) => r.url.indexOf(COLLAGE_URL_MARK) !== -1);
+  return {
+    ...roundtrip,
+    count404: enriched.count404,
+    urls404: enriched.urls404,
+    slowest3: enriched.slowest3,
+    collageBytes: delCollage.reduce((acc, r) => acc + (Number(r.transferSize) || 0), 0),
+    collageRequests: delCollage.length,
+    transferBytes: roundtrip.requests.reduce((acc, r) => acc + (Number(r.transferSize) || 0), 0)
+  };
+}
+
+// Latencia de pintado por posicion: cuantas capturas (sin mover el scroll) hicieron falta hasta
+// que el viewport dejo de mostrar el fondo de la tarjeta en una tarjeta ya cargada. Se agrupan
+// todas las posiciones de todas las corridas de esa fase (mismo set de offsets en cada corrida).
+function summarizePaintLatency(entries, name) {
+  const posiciones = entries.flatMap((entry) => (entry[name] && Array.isArray(entry[name].positions)
+    ? entry[name].positions
+    : [])).filter((p) => p && typeof p.captures === 'number' && p.captures > 0);
+  if (posiciones.length === 0) return null;
+  const valores = posiciones.map((p) => p.captures);
+  const histograma = {};
+  for (const v of valores) histograma[String(v)] = (histograma[String(v)] || 0) + 1;
+  const ordenados = valores.slice().sort((a, b) => a - b);
+  return {
+    positions: posiciones.length,
+    median: round(median(valores)),
+    p90: ordenados[Math.min(ordenados.length - 1, Math.floor(ordenados.length * 0.9))],
+    max: Math.max(...valores),
+    notCleared: posiciones.filter((p) => !p.cleared).length,
+    histogram: histograma
+  };
+}
+
+function summarizeRoundtripCpu(entries) {
+  const cpus = entries.map((entry) => entry.cpu).filter(Boolean);
+  if (cpus.length === 0) return null;
+  const mm = (fn) => round(median(cpus.map(fn)));
+  return {
+    gestureMs: mm((c) => c.gestureMs),
+    scrollPx: mm((c) => c.scrollPx),
+    perf: {
+      taskMs: mm((c) => c.perf.taskMs),
+      scriptMs: mm((c) => c.perf.scriptMs),
+      layoutMs: mm((c) => c.perf.layoutMs),
+      recalcStyleMs: mm((c) => c.perf.recalcStyleMs)
+    },
+    perSecond: {
+      taskMs: mm((c) => (c.perSecond ? c.perSecond.taskMs : null)),
+      scriptMs: mm((c) => (c.perSecond ? c.perSecond.scriptMs : null)),
+      layoutMs: mm((c) => (c.perSecond ? c.perSecond.layoutMs : null)),
+      recalcStyleMs: mm((c) => (c.perSecond ? c.perSecond.recalcStyleMs : null))
+    },
+    layoutCount: mm((c) => c.layoutCount),
+    recalcStyleCount: mm((c) => c.recalcStyleCount),
+    longTasksSupported: cpus.some((c) => c.longTasks.supported),
+    longTasksDown: {
+      count: mm((c) => c.longTasks.down.count),
+      totalMs: mm((c) => c.longTasks.down.totalMs),
+      maxMs: mm((c) => c.longTasks.down.maxMs)
+    },
+    longTasksUp: {
+      count: mm((c) => c.longTasks.up.count),
+      totalMs: mm((c) => c.longTasks.up.totalMs),
+      maxMs: mm((c) => c.longTasks.up.maxMs)
+    },
+    layersSupported: cpus.every((c) => c.layers.supported),
+    layerCount: cpus.every((c) => c.layers.supported) ? mm((c) => c.layers.count) : null,
+    perRun: cpus.map((c) => ({
+      gestureMs: c.gestureMs,
+      taskMs: c.perf.taskMs,
+      scriptMs: c.perf.scriptMs,
+      layoutMs: c.perf.layoutMs,
+      recalcStyleMs: c.perf.recalcStyleMs,
+      taskMsPerSecond: c.perSecond ? c.perSecond.taskMs : null,
+      longTasksDown: c.longTasks.down.count,
+      longTasksUp: c.longTasks.up.count,
+      layers: c.layers.count
+    }))
+  };
+}
+
+function buildRoundtripSummary(runs) {
+  const entries = runs.map((run) => run.roundtrip).filter(Boolean);
+  if (entries.length === 0) return null;
+  const m = (fn) => round(median(entries.map(fn)));
+  const fase = (name) => ({
+    phase: name,
+    fromY: m((e) => e[name].fromY),
+    toY: m((e) => e[name].toY),
+    framesSampled: m((e) => e[name].framesSampled),
+    artifactFrames: m((e) => e[name].artifactFrames),
+    artifactFrameRatio: m((e) => (e[name].framesSampled > 0
+      ? Math.round((e[name].artifactFrames / e[name].framesSampled) * 10000) / 10000
+      : null)),
+    blankFrames: m((e) => e[name].blankFrames),
+    blankFrameRatio: m((e) => (e[name].framesSampled > 0
+      ? Math.round((e[name].blankFrames / e[name].framesSampled) * 10000) / 10000
+      : null)),
+    artifactCardsTotal: m((e) => e[name].artifactCardsTotal),
+    paintLatency: summarizePaintLatency(entries, name),
+    perRun: entries.map((e) => ({
+      framesSampled: e[name].framesSampled,
+      artifactFrames: e[name].artifactFrames,
+      blankFrames: e[name].blankFrames,
+      artifactCards: e[name].artifactCardsTotal
+    }))
+  });
+  return {
+    targetY: m((e) => e.targetY),
+    maxScrollY: m((e) => e.maxScrollY),
+    startY: m((e) => e.startY),
+    stridePx: entries[0].stridePx,
+    intervalMs: entries[0].intervalMs,
+    refsLearned: m((e) => e.refsLearned),
+    artifactSamples: entries[0].artifactSamples,
+    count404: round(median(entries.map((e) => (typeof e.count404 === 'number' ? e.count404 : 0)))),
+    collageBytes: round(median(entries.map((e) => (typeof e.collageBytes === 'number' ? e.collageBytes : 0)))),
+    transferBytes: round(median(entries.map((e) => (typeof e.transferBytes === 'number' ? e.transferBytes : 0)))),
+    cpu: summarizeRoundtripCpu(entries),
+    down: fase('down'),
+    up: fase('up'),
+    control: {
+      framesSampled: entries.length,
+      artifactFrames: entries.filter((e) => e.control.isArtifactFrame).length,
+      artifactCards: m((e) => e.control.artifactCards),
+      flatBgReady: m((e) => e.control.flatBgReady),
+      ambiguousReady: m((e) => e.control.ambiguousReady),
+      inViewportCards: m((e) => e.control.inViewportCards),
+      isArtifactFramePerRun: entries.map((e) => e.control.isArtifactFrame)
+    }
+  };
 }
 
 function enrichRequests(rawRequests, statusByUrl) {
@@ -959,17 +1677,22 @@ async function runOnce(cfg, baseUrl, runIndex) {
     }
 
     const steps = [];
-    for (const offset of cfg.stepOffsets) {
-      const step = await measureStep(page, {
-        offset,
-        scrollMode: cfg.scrollMode,
-        stride: CONTINUOUS_STRIDE_PX,
-        interval: CONTINUOUS_INTERVAL_MS,
-        stepTimeoutMs: STEP_TIMEOUT_MS,
-        logNetwork: cfg.logNetwork,
-        debugRects: cfg.debugRects
-      });
-      steps.push(enrichStepWithNetwork(step, statusByUrl));
+    let roundtrip = null;
+    if (cfg.scrollMode === 'roundtrip') {
+      roundtrip = enrichRoundtripWithNetwork(await measureRoundtrip(page, cfg, client), statusByUrl);
+    } else {
+      for (const offset of cfg.stepOffsets) {
+        const step = await measureStep(page, {
+          offset,
+          scrollMode: cfg.scrollMode,
+          stride: CONTINUOUS_STRIDE_PX,
+          interval: CONTINUOUS_INTERVAL_MS,
+          stepTimeoutMs: STEP_TIMEOUT_MS,
+          logNetwork: cfg.logNetwork,
+          debugRects: cfg.debugRects
+        });
+        steps.push(enrichStepWithNetwork(step, statusByUrl));
+      }
     }
 
     // Union de los indices vistos en el viewport (carga + pasos): dice si lo calentado llego a
@@ -980,6 +1703,13 @@ async function runOnce(cfg, baseUrl, runIndex) {
     }
     for (const step of steps) {
       if (Array.isArray(step.inViewportIndices)) step.inViewportIndices.forEach((indice) => everInViewport.add(indice));
+    }
+    if (roundtrip) {
+      for (const fase of [roundtrip.down, roundtrip.up]) {
+        if (fase && Array.isArray(fase.inViewportIndices)) {
+          fase.inViewportIndices.forEach((indice) => everInViewport.add(indice));
+        }
+      }
     }
     const warm = await page.evaluate((everEnViewport) => {
       const log = Array.isArray(window.__spriteWarmLog) ? window.__spriteWarmLog : [];
@@ -1002,7 +1732,8 @@ async function runOnce(cfg, baseUrl, runIndex) {
 
     const runTransferBytes = cfg.logNetwork
       ? (load ? (Number(load.transferBytes) || 0) : 0) +
-        steps.reduce((acc, step) => acc + (Number(step.transferBytes) || 0), 0)
+        steps.reduce((acc, step) => acc + (Number(step.transferBytes) || 0), 0) +
+        (roundtrip ? (Number(roundtrip.transferBytes) || 0) : 0)
       : null;
 
     // Escenario idle: sin scroll. Primero cuanto tarda en terminar el preload del export por si
@@ -1027,6 +1758,7 @@ async function runOnce(cfg, baseUrl, runIndex) {
       loadIdleMs: idleMs,
       loadIdleTimedOut: idleTimedOut,
       steps,
+      roundtrip,
       idle,
       startup,
       warm,
@@ -1147,6 +1879,7 @@ function buildSummary(runs, cfg) {
     perOffset,
     idle: runs.some((run) => run.idle) ? buildIdleSummary(runs) : null,
     startup: runs.some((run) => run.startup) ? buildStartupSummary(runs) : null,
+    roundtrip: cfg.scrollMode === 'roundtrip' ? buildRoundtripSummary(runs) : null,
     warm,
     totals
   };
@@ -1215,7 +1948,9 @@ async function main() {
   const cfg = {
     dir: args.dir,
     offsets: args.offsets,
-    stepOffsets: args.scenario === 'scroll' ? args.offsets : [],
+    stepOffsets: args.scenario === 'scroll' && args.scrollMode !== 'roundtrip' ? args.offsets : [],
+    roundtripMax: args.roundtripMax,
+    artifactSamples: args.artifactSamples,
     scrollMode: args.scrollMode,
     scenario: args.scenario,
     logNetwork: args.logNetwork,
@@ -1298,6 +2033,50 @@ async function main() {
             .join(' | '));
         }
       }
+      if (result.roundtrip) {
+        const rt = result.roundtrip;
+        console.log(
+          '  run ' + i + ' ROUNDTRIP: targetY=' + rt.targetY + ' maxScrollY=' + rt.maxScrollY +
+          ' refsLearned=' + rt.refsLearned
+        );
+        for (const fase of [rt.down, rt.up]) {
+          console.log(
+            '    ' + fase.phase + ' y' + fase.fromY + '->' + fase.toY +
+            ': artifactFrames=' + fase.artifactFrames + '/' + fase.framesSampled +
+            ' blankFrames=' + fase.blankFrames + '/' + fase.framesSampled +
+            ' artifactCards=' + fase.artifactCardsTotal
+          );
+        }
+        console.log(
+          '    control(asentado): artifactFrames=' + (rt.control.isArtifactFrame ? 1 : 0) + '/1' +
+          ' artifactCards=' + rt.control.artifactCards +
+          ' flatBg=' + rt.control.flatBgReady +
+          ' ambiguous=' + rt.control.ambiguousReady +
+          ' inViewport=' + rt.control.inViewportCards
+        );
+        if (rt.cpu) {
+          console.log(
+            '    cpu: gestureMs=' + rt.cpu.gestureMs + ' scrollPx=' + rt.cpu.scrollPx +
+            ' taskMs=' + rt.cpu.perf.taskMs + ' (' + (rt.cpu.perSecond ? rt.cpu.perSecond.taskMs : '?') + '/s)' +
+            ' scriptMs=' + rt.cpu.perf.scriptMs + ' (' + (rt.cpu.perSecond ? rt.cpu.perSecond.scriptMs : '?') + '/s)' +
+            ' layoutMs=' + rt.cpu.perf.layoutMs + ' recalcStyleMs=' + rt.cpu.perf.recalcStyleMs +
+            ' layoutCount=' + rt.cpu.layoutCount + ' recalcStyleCount=' + rt.cpu.recalcStyleCount
+          );
+          console.log(
+            '    longTasks: down=' + rt.cpu.longTasks.down.count + '/' + rt.cpu.longTasks.down.totalMs + 'ms' +
+            ' up=' + rt.cpu.longTasks.up.count + '/' + rt.cpu.longTasks.up.totalMs + 'ms' +
+            ' layers=' + (rt.cpu.layers.supported ? rt.cpu.layers.count : 'n/d')
+          );
+        }
+        for (const fase of [rt.down, rt.up]) {
+          const capturas = fase.positions.map((p) => p.captures);
+          console.log(
+            '    ' + fase.phase + ' latenciaPintado: capturasPorPosicion=' + JSON.stringify(capturas) +
+            ' max=' + Math.max(...capturas) +
+            ' sinDespejar=' + fase.positions.filter((p) => !p.cleared).length
+          );
+        }
+      }
     }
 
     const summary = buildSummary(runs, cfg);
@@ -1368,7 +2147,7 @@ async function main() {
         (summary.startup.jsCriticalUrls.length > 0 ? summary.startup.jsCriticalUrls.join(' ') : '(ninguna)')
       );
     }
-    console.log('[measure] medianas por offset:');
+    if (cfg.stepOffsets.length > 0) console.log('[measure] medianas por offset:');
     for (const offset of cfg.stepOffsets) {
       const entry = summary.perOffset[String(offset)];
       console.log(
@@ -1411,6 +2190,60 @@ async function main() {
         ' stepsTransferBytes=' + summary.totals.stepsTransferBytes +
         ' runTransferBytes=' + summary.totals.runTransferBytes
       );
+    }
+
+    if (summary.roundtrip) {
+      const rt = summary.roundtrip;
+      console.log(
+        '[measure] roundtrip: targetY=' + rt.targetY + ' (maxScrollY=' + rt.maxScrollY + ')' +
+        ' stride=' + rt.stridePx + 'px cada ' + rt.intervalMs + 'ms' +
+        ' refsLearned=' + rt.refsLearned +
+        ' count404=' + rt.count404 + ' collageBytes=' + rt.collageBytes +
+        ' transferBytes=' + rt.transferBytes
+      );
+      for (const fase of [rt.down, rt.up]) {
+        console.log(
+          '    ' + fase.phase + ': artifactFrames=' + fase.artifactFrames + '/' + fase.framesSampled +
+          ' (ratio=' + fase.artifactFrameRatio + ')' +
+          ' blankFrames=' + fase.blankFrames + '/' + fase.framesSampled +
+          ' (ratio=' + fase.blankFrameRatio + ')' +
+          ' artifactCards=' + fase.artifactCardsTotal +
+          ' porCorrida=' + JSON.stringify(fase.perRun)
+        );
+      }
+      console.log(
+        '    control(asentado): artifactFrames=' + rt.control.artifactFrames + '/' + rt.control.framesSampled +
+        ' (falsos positivos) artifactCards=' + rt.control.artifactCards +
+        ' flatBg=' + rt.control.flatBgReady + ' ambiguous=' + rt.control.ambiguousReady +
+        ' inViewport=' + rt.control.inViewportCards
+      );
+      for (const fase of [rt.down, rt.up]) {
+        const lat = fase.paintLatency;
+        if (lat) {
+          console.log(
+            '    ' + fase.phase + ' latenciaPintado: median=' + lat.median + ' p90=' + lat.p90 +
+            ' max=' + lat.max + ' posiciones=' + lat.positions +
+            ' sinDespejar=' + lat.notCleared + ' histograma=' + JSON.stringify(lat.histogram)
+          );
+        }
+      }
+      if (rt.cpu) {
+        console.log(
+          '[measure] cpu del gesto: gestureMs=' + rt.cpu.gestureMs + ' scrollPx=' + rt.cpu.scrollPx +
+          ' taskMs=' + rt.cpu.perf.taskMs + ' (' + rt.cpu.perSecond.taskMs + '/s)' +
+          ' scriptMs=' + rt.cpu.perf.scriptMs + ' (' + rt.cpu.perSecond.scriptMs + '/s)' +
+          ' layoutMs=' + rt.cpu.perf.layoutMs + ' (' + rt.cpu.perSecond.layoutMs + '/s)' +
+          ' recalcStyleMs=' + rt.cpu.perf.recalcStyleMs + ' (' + rt.cpu.perSecond.recalcStyleMs + '/s)'
+        );
+        console.log(
+          '[measure] cpu del gesto (long tasks y capas): down=' + rt.cpu.longTasksDown.count + '/' + rt.cpu.longTasksDown.totalMs + 'ms' +
+          ' up=' + rt.cpu.longTasksUp.count + '/' + rt.cpu.longTasksUp.totalMs + 'ms' +
+          ' layoutCount=' + rt.cpu.layoutCount + ' recalcStyleCount=' + rt.cpu.recalcStyleCount +
+          ' layers=' + (rt.cpu.layersSupported ? rt.cpu.layerCount : 'n/d') +
+          ' artifactSamples=' + rt.artifactSamples +
+          ' porCorrida=' + JSON.stringify(rt.cpu.perRun)
+        );
+      }
     }
 
     if (args.out) {

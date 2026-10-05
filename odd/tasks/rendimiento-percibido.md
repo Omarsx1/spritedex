@@ -107,6 +107,68 @@ Meta: LCP <= 2.5 s y como maximo 3 long tasks > 50 ms en la carga a 4g, sin quit
       Evidencia: /tmp/f3-{before,after}-startup.json, /tmp/f3-{before,after}-cont.json,
       /tmp/dist-f3-before.
 
++## Fase 5 — Comportamiento de web normal (sin artefactos) y calor
+
+Reporte del usuario: "entro, hago scroll y veo todo normal; scrolleo hacia arriba y veo huecos y
+tarjetas sin cargar". Firma de @@content-visibility: auto@@: el navegador descarta el render de las
+tarjetas que salen de pantalla, aunque su imagen ya este cargada, y las vuelve a dibujar al entrar.
+
+**Cambio aplicado** (@@src/styles/index.css@@): @@.sprite-card@@ ya no tiene @@content-visibility@@,
+@@contain-intrinsic-size@@ ni @@contain@@, en TODAS las anchuras, y se elimino el media query de
+768px que solo lo apagaba en movil. Con esto la grilla se comporta como una web normal.
+
+**Lo que la medicion NO pudo hacer (honesto):** el arnes por pixeles no reprodujo el sintoma en
+ninguno de los dos builds. Con el guardarrail "la region cambio de verdad" el conteo es 0/26 en los
+dos; los 1-3 flags por 26 son falsos positivos cuantificados (overlay fijo del header, franjas de
+borde) y en el control asentado son 0/180. **No puedo afirmar que el cambio arregle el sintoma del
+usuario.** La causa de la ceguera es la resolucion temporal: una captura por posicion con ~300 ms de
+latencia se pierde cualquier hueco mas corto, y el arnes es de escritorio sin GPU. Verificar en
+movil real queda pendiente y no lo puedo hacer desde aca.
+
+**Lo que SI midio el arnes (proxy de calor, CPU 4x, mismo gesto):**
+
+| metrica por gesto | con render diferido | sin render diferido | delta |
+|---|---|---|---|
+| TaskDuration por gesto | 2188,0 ms | 2286,8 ms | +4,5% |
+| TaskDuration por segundo de scroll | 493,4 ms/s | 523,4 ms/s | **+6,1% (rangos sin solapar)** |
+| LayoutDuration | 72,3 ms | 32,6 ms | **-54,8%** |
+| LayoutCount | 64 | 34 | -46,9% |
+| RecalcStyleDuration | 175,0 ms | 151,3 ms | -13,5% |
+| long tasks > 50 ms | 0 | 0 | = |
+| capas compuestas | 35 | 35 | = |
+
+Conclusion: quitar el render diferido **cambia trabajo de layout por trabajo de pintado**:
++~30 ms de CPU por segundo de scroll y la mitad de layout. No es gratis, es chico, y es medible.
+Los 12 presupuestos de @@npm run perf@@ siguen en 12/12 PASS (firstSpriteCardMs +4 ms, ruido) y T3
+mejora (5400: 0,17 -> 0,07 y 50,8 -> 16,6 ms).
+
+**El calor NO estaba en las tarjetas.** @@content-visibility@@ nunca ahorro pintado de lo que esta
+fuera de pantalla (el navegador no lo pinta igual): ahorraba layout y estilo. Las fuentes reales de
+calor sostenido, inventariadas en el codigo:
+
+1. **@@filter@@ por tarjeta** (2 inline en @@SpriteCard.jsx@@): @@grayscale(55%) opacity(0.68)
+   brightness(1.2) contrast(1.15)@@ en las no atrapadas y @@drop-shadow(0 6px 12px)@@ en las
+   atrapadas. Un filtro fuerza una pasada de rastro por tarjeta. Es el coste dominante por tarjeta.
+2. **31 animaciones @@infinite@@**, varias encendidas siempre: @@hero-glitch-r/b@@ con
+   @@steps(1, end) infinite@@, @@titleShimmer@@, @@heroFloat@@, @@heroSpin@@, @@scanMove@@,
+   @@lineGrow@@ x4, @@glitch-border-pulse@@, @@pulse@@. Repintan de forma continua: calor sostenido
+   con scroll o sin el.
+3. **80 @@backdrop-filter@@**: la propiedad mas cara en GPU movil antigua. Si alguna queda visible
+   siempre, es trabajo de GPU constante.
+4. **@@batSwarm.js@@**: canvas a pantalla completa con bucle de @@requestAnimationFrame@@ escalado por
+   DPR. Carga sostenida de CPU/GPU considerable en un telefono, y esta activo por temporada.
+5. **@@will-change@@ en 15 sitios** y 135 @@box-shadow@@: capas y pintado.
+
+Siguiente paso propuesto, en este orden y preservando los elementos visuales:
+T6: reemplazar el @@filter@@ por tarjeta por una tecnica de pintado barato (mismo efecto a la vista).
+T7: pausar las animaciones @@infinite@@ cuando no estan en pantalla + respetar @@prefers-reduced-motion@@.
+T8: auditar los @@backdrop-filter@@ siempre visibles y el canvas del enjambre (bucle en pausa cuando
+    no se ve, tope de DPR en equipos humildes).
+T9: calidad adaptativa por equipo (saveData, hardwareConcurrency, deviceMemory) para que los equipos
+    capaces no pierdan nada y los antiguos no se calienten.
+Cada uno se mide con el proxy de CPU por gesto del arnes, con el objetivo de recuperar mas calor del
+que costo quitar el render diferido.
+
 ## Fase 4 — Guardarrailes
 
 Meta: que esto no vuelva a engordar sin que nadie se entere.

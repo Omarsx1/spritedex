@@ -3125,9 +3125,11 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 /* ===== Sprite Card (fortnite.gg style) ===== */
 .sprite-card {
-  content-visibility: auto;
-  contain-intrinsic-size: 0 245px;
-  contain: layout style;
+  /* Sin render diferido (content-visibility / contain) a proposito, en TODAS las anchuras: el
+     navegador descarta el render de las tarjetas que salen de pantalla y las vuelve a dibujar al
+     entrar, asi que el contenido YA cargado parpadea al scrollear, sobre todo hacia arriba. Una
+     web normal no hace eso. El coste de layout del primer render se asume: es una grilla de
+     tarjetas, no miles de nodos. */
   border-radius: 14px;
   padding: 22px 14px 14px;
   display: flex;
@@ -3139,13 +3141,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   overflow: hidden;
   border: 0.5px solid rgba(255, 255, 255, 0.1);
   background-color: #161b22;
-}
-
-@media (max-width: 768px) {
-  .sprite-card {
-    content-visibility: visible !important;
-    contain: none !important;
-  }
 }
 
 /* Theme Gradients & Border Colors (Fortnite.gg Exact Design) */
