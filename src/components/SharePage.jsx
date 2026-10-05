@@ -348,19 +348,18 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
     }
   }, [previewCanvas, isGenerating]);
 
-  // Texto para pegar donde no cabe una imagen (Discord, Reddit, foros). Solo entra lo que
-  // se puede intercambiar de verdad: fuera los que no sueltan nada (0% o sin lanzar) y
-  // ordenados por probabilidad, que es el orden en el que conviene pedirlos. Remata con el
-  // enlace a la coleccion, para que el "y N mas" tenga respuesta.
+  // Texto para pegar donde no cabe una imagen (Discord, Reddit, foros). Solo entra lo que se
+  // puede intercambiar de verdad (fuera los que no sueltan nada todavia) y en el orden del
+  // catalogo, que es el que la persona ya conoce de la app: la probabilidad no se usa como
+  // criterio en ninguna parte, asi que no se inventa aqui. Remata con el enlace a la
+  // coleccion, para que el "y N mas" tenga respuesta.
   const LINEAS_TEXTO = 15;
   const getShareableText = () => {
     const total = spritesList.length;
     const owned = spritesList.filter(s => userState[s.id]?.owned).length;
     const mastered = spritesList.filter(s => userState[s.id]?.owned && userState[s.id]?.level === 5).length;
     const missing = spritesList.filter(s => !userState[s.id]?.owned);
-    const intercambiables = missing
-      .filter((m) => !m.unreleased && Number(m.dropChanceNum) > 0)
-      .sort((a, b) => Number(b.dropChanceNum) - Number(a.dropChanceNum));
+    const intercambiables = missing.filter((m) => !m.unreleased && Number(m.dropChanceNum) > 0);
 
     const scopeLabels = {
       all: t('compartir.scopeCompleta'),
@@ -379,7 +378,7 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
     if (intercambiables.length > 0) {
       text += t('compartir.textoBusco', { n: intercambiables.length }) + '\n';
       intercambiables.slice(0, LINEAS_TEXTO).forEach((m) => {
-        text += `- ${pickName(m)} · ${m.dropChanceDisplay || m.dropChance}\n`;
+        text += `- ${pickName(m)}\n`;
       });
       if (intercambiables.length > LINEAS_TEXTO) text += t('compartir.textoMas', { n: intercambiables.length - LINEAS_TEXTO }) + '\n';
       text += '\n';
