@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "protocol": {
+    "harness": "scripts/measure-scroll-cards.mjs",
+    "throttle": "4g",
+    "runs": 3,
+    "scrollMode": "continuous",
+    "offsets": [2400, 5400],
+    "viewport": "1440x900",
+    "note": "El perfil 4g del arnes es SINTETICO (60 ms RTT, 8/3 Mbps, CPU 4x); no es una red real. Los umbrales de abajo estan atados a ESE perfil, a esa ventana y a Chrome headless. El servidor del arnes sirve sin comprimir, asi que los presupuestos de bytes son CRUDOS."
+  },
+  "budgets": [
+    {
+      "id": "startup-lcp",
+      "metric": "startup.lcpMs",
+      "source": "startup",
+      "scenario": "arranque a 4g (--scenario startup --throttle 4g --runs 3)",
+      "path": "startup.lcpMs",
+      "op": "<=",
+      "threshold": 1700,
+      "unit": "ms",
+      "baseline": 1476,
+      "note": "Fase 3/T4: mediana de lcpMs 1476 ms a 4g (ruido +-50 ms). Margen +224 ms (+15%). El elemento LCP es la imagen del hero. OJO: lcpMs es la ULTIMA candidata y el hero rota cada 3.5 s, asi que una corrida que idlea largo puede reportar ~8 s; con --runs 3 la mediana tolera una corrida asi. Si este presupuesto falla, revisa lcpCandidates en el JSON crudo antes de culpar al build."
+    },
+    {
+      "id": "startup-fcp",
+      "metric": "startup.fcpMs",
+      "source": "startup",
+      "scenario": "arranque a 4g (--scenario startup --throttle 4g --runs 3)",
+      "path": "startup.fcpMs",
+      "op": "<=",
+      "threshold": 1500,
+      "unit": "ms",
+      "baseline": 1364,
+      "note": "Fase 3/T4: FCP mediano 1364 ms a 4g. Margen +136 ms (+10%)."
+    },
+    {
+      "id": "startup-long-tasks",
+      "metric": "startup.longTaskCount",
+      "source": "startup",
+      "scenario": "arranque a 4g (--scenario startup --throttle 4g --runs 3)",
+      "path": "startup.longTaskCount",
+      "op": "<=",
+      "threshold": 4,
+      "unit": "tareas > 50 ms",
+      "baseline": "1-3",
+      "note": "Fase 3/T4: 1 a 3 long tasks > 50 ms por corrida a 4g (mediana 1). Techo 4 = una tarea de holgura sobre el peor caso medido."
+    },
+    {
+      "id": "startup-js-critical-bytes",
+      "metric": "startup.jsCriticalBytes",
+      "source": "startup",
+      "scenario": "arranque a 4g (--scenario startup --throttle 4g --runs 3)",
+      "path": "startup.jsCriticalBytes",
+      "op": "<=",
+      "threshold": 800000,
+      "unit": "B",
+      "baseline": 756237,
+      "note": "Fase 3/T4: los chunks del camino critico suman 756.237 B crudos (index + vendor-react + gsap + texto/i18n + supabase + runtime). Margen +43.763 B (+5.8%). Son bytes CRUDOS: el arnes sirve sin comprimir y por HTTP/1.1, y en Vercel ese JS viaja ~3.7x mas chico."
+    },
+    {
+      "id": "startup-first-sprite-card",
+      "metric": "startup.firstSpriteCardMs",
+      "source": "startup",
+      "scenario": "arranque a 4g (--scenario startup --throttle 4g --runs 3)",
+      "path": "startup.firstSpriteCardMs",
+      "op": "<=",
+      "threshold": 1400,
+      "unit": "ms",
+      "baseline": 1258,
+      "note": "Fase 3/T4: la primera .sprite-card se pinta a 1258 ms a 4g. Margen +142 ms (+11%)."
+    },
+    {
+      "id": "scroll-2400-frames-with-blank",
+      "metric": "perOffset[2400].blankFrameRatio (framesWithBlank)",
+      "source": "scroll",
+      "scenario": "scroll continuo a 4g, offset 2400 (--scroll-mode continuous --offsets 2400,5400 --log-network)",
+      "path": "perOffset.2400.blankFrameRatio",
+      "op": "<=",
+      "threshold": 0.1,
+      "unit": "ratio de frames",
+      "baseline": 0,
+      "note": "Fase 2/T3 y Fase 3/T4: 0.00 con scroll continuo a 2400 (el arte ya esta presente al llegar). Techo 0.10 = un frame suelto de ruido sobre los ~34 muestreados."
+    },
+    {
+      "id": "scroll-2400-ms-to-target",
+      "metric": "perOffset[2400].msToAllCompleteFromTarget (msToTarget)",
+      "source": "scroll",
+      "scenario": "scroll continuo a 4g, offset 2400 (--scroll-mode continuous --offsets 2400,5400 --log-network)",
+      "path": "perOffset.2400.msToAllCompleteFromTarget",
+      "op": "<=",
+      "threshold": 60,
+      "unit": "ms",
+      "baseline": 0,
+      "note": "Fase 2/T3: 0.0 ms desde llegar al offset. Techo 60 ms = ~4 frames a 60 fps, suficiente para no marcar ruido de un solo frame."
+    },
+    {
+      "id": "scroll-5400-frames-with-blank",
+      "metric": "perOffset[5400].blankFrameRatio (framesWithBlank)",
+      "source": "scroll",
+      "scenario": "scroll continuo a 4g, offset 5400 (--scroll-mode continuous --offsets 2400,5400 --log-network)",
+      "path": "perOffset.5400.blankFrameRatio",
+      "op": "<=",
+      "threshold": 0.35,
+      "unit": "ratio de frames",
+      "baseline": 0.11,
+      "note": "Fase 3/T4: 0.11 (el mejor caso medido; la Fase 2/T3 midio 0.34). Techo 0.35 = margen justo sobre el peor caso realista: el paso barre 3000 px en 675 ms y no cabe mas arte que eso por el piso de ancho de banda."
+    },
+    {
+      "id": "scroll-5400-ms-to-target",
+      "metric": "perOffset[5400].msToAllCompleteFromTarget (msToTarget)",
+      "source": "scroll",
+      "scenario": "scroll continuo a 4g, offset 5400 (--scroll-mode continuous --offsets 2400,5400 --log-network)",
+      "path": "perOffset.5400.msToAllCompleteFromTarget",
+      "op": "<=",
+      "threshold": 150,
+      "unit": "ms",
+      "baseline": 16.4,
+      "note": "Fase 3/T4: 16.4 ms desde llegar al offset (la Fase 2/T3 midio 117 ms). Techo 150 ms deja aire para el volantazo de 3000 px sin dejar de atrapar una regresion real."
+    },
+    {
+      "id": "scroll-run-transfer-bytes",
+      "metric": "totals.runTransferBytes",
+      "source": "scroll",
+      "scenario": "carga en frio a 4g + scroll continuo 2400/5400 (una corrida completa, cache vacia por userDataDir nuevo)",
+      "path": "totals.runTransferBytes",
+      "op": "<=",
+      "threshold": 4200000,
+      "unit": "B",
+      "baseline": 3880000,
+      "note": "Fase 0: 3.88 MB decimales (3.88e6 B) para la corrida completa (carga + pasos); la Fase 2/T3 sumo +5.1% de bytes por el calentador. Techo 4.2 MB decimales (+8% sobre la linea base). Medido en la calibracion de la Fase 4: 3.757e6 B. Son bytes CRUDOS sin comprimir."
+    },
+    {
+      "id": "scroll-2400-collage-bytes",
+      "metric": "perOffset[2400].collageBytes",
+      "source": "scroll",
+      "scenario": "scroll continuo a 4g, offset 2400 (--log-network)",
+      "path": "perOffset.2400.collageBytes",
+      "op": "<=",
+      "threshold": 50000,
+      "unit": "B",
+      "baseline": 0,
+      "note": "Fase 1/T1 y Fase 2/T3: 0 B de /sprites/collage/ que ARRANCAN dentro del paso (el preload del export ya no compite con el grid). Techo 50.000 B = margen para algun arranque residual sin tapar una regresion."
+    },
+    {
+      "id": "scroll-5400-collage-bytes",
+      "metric": "perOffset[5400].collageBytes",
+      "source": "scroll",
+      "scenario": "scroll continuo a 4g, offset 5400 (--log-network)",
+      "path": "perOffset.5400.collageBytes",
+      "op": "<=",
+      "threshold": 50000,
+      "unit": "B",
+      "baseline": 0,
+      "note": "Fase 1/T1 y Fase 2/T3: 0 B de /sprites/collage/ que ARRANCAN dentro del paso. Techo 50.000 B por la misma razon que el paso 2400."
+    }
+  ]
+}

@@ -111,8 +111,19 @@ Meta: LCP <= 2.5 s y como maximo 3 long tasks > 50 ms en la carga a 4g, sin quit
 
 Meta: que esto no vuelva a engordar sin que nadie se entere.
 
-- [ ] T5 — Presupuesto medible y repetible (`npm run perf`) con umbrales por recurso y por metrica
-      de scroll, reutilizando `scripts/measure-scroll-cards.mjs`.
+- [x] **T5 — hecho.** `npm run perf` (`scripts/perf-budget.mjs` + `perf/budget.json`) corre el
+      protocolo fijo (arranque + scroll continuo en 2400 y 5400, 4g, 3 corridas), compara 12
+      presupuestos con nota de origen y sale con codigo distinto de 0 si alguno se pasa.
+      Verificado: 12/12 PASS con los presupuestos reales (exit 0) y 1 FAIL con exit 1 cuando se
+      incumple un umbral a proposito (con `--budget` a un archivo alternativo, sin tocar el real).
+      - Margen consumido: en la corrida real el offset 5400 salio peor que en la calibracion
+        (0.17 de ratio y 50.1 ms, contra 0.07 y 0 que se usaron como linea base). Pasa, pero con
+        menos aire del que dice la nota. Si se acerca otra vez, el proximo paso es T3.b (menos bytes
+        por tarjeta), no subir el umbral.
+      - Lo que NO cubre: movil/swiper, la lona de compartir, shareReadyMs, count404, long tasks
+        durante el scroll, slow3g, otras rutas (amigos, admin), SEO/prerender, memoria/GPU.
+      - Sin cableado en CI: nadie corre `npm run perf` automaticamente y no se guarda linea base
+        por commit.
 
 ## Restricciones
 
@@ -134,15 +145,28 @@ Meta: que esto no vuelva a engordar sin que nadie se entere.
 
 ## Progreso
 
-Fase 0 cerrada. Fase 1 / T1 hecho y medido (criterio de bytes sin cumplir, ver arriba). T2 diferido a
-despues de la Fase 2 por impacto. Fase 2 / T3 hecho y medido: gana el caso realista (2400) y no
-alcanza a cubrir un volantazo de 3000 px en 675 ms, por piso de ancho de banda. Fase 3 / T4 medido y
-diagnosticado: el JS critico ya es el minimo necesario y lo recortable no pasa el umbral de medicion
-en produccion. Fase 4 / T5 en curso.
+Fases 0 a 4 cerradas.
+
+- Fase 0: linea base medida (3.88 MB en frio a 4g, con el desglose por recurso).
+- Fase 1 / T1: el preload del export deja de competir con el scroll (frames con hueco 33% -> 17% y
+  132 -> 51 ms en 2400). No reduce bytes: los reubica. T2 (collages de 10 sprites) queda diferido.
+- Fase 2 / T3: calentador por delante. Caso realista resuelto (2400: 0% de frames con hueco y 0 ms);
+  el volantazo de 3000 px en 675 ms no cabe en 8 Mbps, es piso fisico.
+- Fase 3 / T4: medido y diagnosticado. El grid no espera a Supabase, el JS critico ya es el minimo y
+  lo recortable no pasa el ruido en produccion.
+- Fase 4 / T5: presupuesto reproducible con 12 umbrales y fallo demostrado.
+- Imagenes: miniaturas y collage a WebP q70 (-11%), sin perdida de alfa.
 
 ## Siguiente paso
 
-T5: presupuesto reproducible (npm run perf) con umbrales por metrica, para que esto no vuelva a
-engordar sin que nadie se entere. Pendientes con decision de producto: P4 (autoalojar las fuentes
-para quitar el tercero render-blocking, cero cambio visual, pero exige descargar los woff2) y T3.b
-(subir el ritmo del calentador y/o bajar bytes por tarjeta, que toca la nitidez del arte).
+Pendientes, todos con decision de producto o de infraestructura:
+
+1. **P4 (el mayor que queda en la cadena critica)**: autoalojar Inter y Outfit para quitar el
+   stylesheet render-blocking de un tercero (index.html:36). Cero cambio visual, pero exige bajar los
+   woff2 y hoy la red esta restringida.
+2. **T3.b**: subir el ritmo del calentador (120 -> ~40 ms) y/o bajar bytes por tarjeta. Lo segundo
+   toca la nitidez del arte.
+3. **T2**: collages de los 10 sprites sin derivada (~118 KB y consistencia de datos).
+4. **P1/P2**: cargar solo el locale activo (~ -9 ms reales) y sacar gsap del camino critico
+   (~ -22 ms reales, con riesgo de parpadeo en la animacion del hero). Medidos antes de tocar nada.
+5. **Cablear `npm run perf` en CI** con una linea base por commit.
