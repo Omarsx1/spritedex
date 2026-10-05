@@ -390,7 +390,7 @@ function FamilySpotlightRow({
               height={CARD_HEIGHT}
               draggable={false}
               style={{
-                filter: !isOwned ? 'grayscale(55%)' : 'none',
+                filter: !isOwned ? 'grayscale(55%)' : 'drop-shadow(0 6px 14px rgba(0,0,0,0.5))',
                 opacity: !isOwned ? 0.68 : 1,
                 cursor: isActive ? 'pointer' : 'default'
               }}

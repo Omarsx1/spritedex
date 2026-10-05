@@ -260,7 +260,7 @@ function SpriteCardBase({
           onClick={handleImageClick}
           title={t('carta.clicFigura')}
           style={{
-            filter: !isOwned ? 'grayscale(55%)' : 'none',
+            filter: !isOwned ? 'grayscale(55%)' : 'drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
             opacity: !isOwned ? 0.68 : 1,
             cursor: 'pointer'
           }}

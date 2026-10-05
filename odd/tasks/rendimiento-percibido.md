@@ -107,14 +107,14 @@ Meta: LCP <= 2.5 s y como maximo 3 long tasks > 50 ms en la carga a 4g, sin quit
       Evidencia: /tmp/f3-{before,after}-startup.json, /tmp/f3-{before,after}-cont.json,
       /tmp/dist-f3-before.
 
-+## Fase 5 — Comportamiento de web normal (sin artefactos) y calor
+## Fase 5 — Comportamiento de web normal (sin artefactos) y calor
 
 Reporte del usuario: "entro, hago scroll y veo todo normal; scrolleo hacia arriba y veo huecos y
-tarjetas sin cargar". Firma de @@content-visibility: auto@@: el navegador descarta el render de las
+tarjetas sin cargar". Firma de `content-visibility: auto`: el navegador descarta el render de las
 tarjetas que salen de pantalla, aunque su imagen ya este cargada, y las vuelve a dibujar al entrar.
 
-**Cambio aplicado** (@@src/styles/index.css@@): @@.sprite-card@@ ya no tiene @@content-visibility@@,
-@@contain-intrinsic-size@@ ni @@contain@@, en TODAS las anchuras, y se elimino el media query de
+**Cambio aplicado** (`src/styles/index.css`): `.sprite-card` ya no tiene `content-visibility`,
+`contain-intrinsic-size` ni `contain`, en TODAS las anchuras, y se elimino el media query de
 768px que solo lo apagaba en movil. Con esto la grilla se comporta como una web normal.
 
 **Lo que la medicion NO pudo hacer (honesto):** el arnes por pixeles no reprodujo el sintoma en
@@ -138,71 +138,93 @@ movil real queda pendiente y no lo puedo hacer desde aca.
 | capas compuestas | 35 | 35 | = |
 
 Conclusion: quitar el render diferido **cambia trabajo de layout por trabajo de pintado**:
-+~30 ms de CPU por segundo de scroll y la mitad de layout. No es gratis, es chico, y es medible.
-Los 12 presupuestos de @@npm run perf@@ siguen en 12/12 PASS (firstSpriteCardMs +4 ms, ruido) y T3
+~30 ms de CPU por segundo de scroll y la mitad de layout. No es gratis, es chico, y es medible.
+Los 12 presupuestos de `npm run perf` siguen en 12/12 PASS (firstSpriteCardMs +4 ms, ruido) y T3
 mejora (5400: 0,17 -> 0,07 y 50,8 -> 16,6 ms).
 
-**El calor NO estaba en las tarjetas.** @@content-visibility@@ nunca ahorro pintado de lo que esta
+**El calor NO estaba en las tarjetas.** `content-visibility` nunca ahorro pintado de lo que esta
 fuera de pantalla (el navegador no lo pinta igual): ahorraba layout y estilo. Las fuentes reales de
 calor sostenido, inventariadas en el codigo:
 
-1. **@@filter@@ por tarjeta** (2 inline en @@SpriteCard.jsx@@): @@grayscale(55%) opacity(0.68)
-   brightness(1.2) contrast(1.15)@@ en las no atrapadas y @@drop-shadow(0 6px 12px)@@ en las
+1. **`filter` por tarjeta** (2 inline en `SpriteCard.jsx`): `grayscale(55%) opacity(0.68)
+   brightness(1.2) contrast(1.15)` en las no atrapadas y `drop-shadow(0 6px 12px)` en las
    atrapadas. Un filtro fuerza una pasada de rastro por tarjeta. Es el coste dominante por tarjeta.
-2. **31 animaciones @@infinite@@**, varias encendidas siempre: @@hero-glitch-r/b@@ con
-   @@steps(1, end) infinite@@, @@titleShimmer@@, @@heroFloat@@, @@heroSpin@@, @@scanMove@@,
-   @@lineGrow@@ x4, @@glitch-border-pulse@@, @@pulse@@. Repintan de forma continua: calor sostenido
+2. **31 animaciones `infinite`**, varias encendidas siempre: `hero-glitch-r/b` con
+   `steps(1, end) infinite`, `titleShimmer`, `heroFloat`, `heroSpin`, `scanMove`,
+   `lineGrow` x4, `glitch-border-pulse`, `pulse`. Repintan de forma continua: calor sostenido
    con scroll o sin el.
-3. **80 @@backdrop-filter@@**: la propiedad mas cara en GPU movil antigua. Si alguna queda visible
+3. **80 `backdrop-filter`**: la propiedad mas cara en GPU movil antigua. Si alguna queda visible
    siempre, es trabajo de GPU constante.
-4. **@@batSwarm.js@@**: canvas a pantalla completa con bucle de @@requestAnimationFrame@@ escalado por
+4. **`batSwarm.js`**: canvas a pantalla completa con bucle de `requestAnimationFrame` escalado por
    DPR. Carga sostenida de CPU/GPU considerable en un telefono, y esta activo por temporada.
-5. **@@will-change@@ en 15 sitios** y 135 @@box-shadow@@: capas y pintado.
+5. **`will-change` en 15 sitios** y 135 `box-shadow`: capas y pintado.
 
 Siguiente paso propuesto, en este orden y preservando los elementos visuales:
-T6: reemplazar el @@filter@@ por tarjeta por una tecnica de pintado barato (mismo efecto a la vista).
-T7: pausar las animaciones @@infinite@@ cuando no estan en pantalla + respetar @@prefers-reduced-motion@@.
-T8: auditar los @@backdrop-filter@@ siempre visibles y el canvas del enjambre (bucle en pausa cuando
+T6: reemplazar el `filter` por tarjeta por una tecnica de pintado barato (mismo efecto a la vista).
+T7: pausar las animaciones `infinite` cuando no estan en pantalla + respetar `prefers-reduced-motion`.
+T8: auditar los `backdrop-filter` siempre visibles y el canvas del enjambre (bucle en pausa cuando
     no se ve, tope de DPR en equipos humildes).
 T9: calidad adaptativa por equipo (saveData, hardwareConcurrency, deviceMemory) para que los equipos
     capaces no pierdan nada y los antiguos no se calienten.
 Cada uno se mide con el proxy de CPU por gesto del arnes, con el objetivo de recuperar mas calor del
 que costo quitar el render diferido.
 
-+### Punto 1 ejecutado: filtros por tarjeta
+### Punto 1 ejecutado: filtros por tarjeta
 
 **Cambio:** de 4 filtros encadenados a 1 sola pasada de shader por imagen, en los tres sitios
 (grilla, lista y swiper):
-- No atrapada: @@filter: grayscale(<mismo %>)@@ y la opacidad pasa a la propiedad CSS @@opacity@@
-  (se compone, sin shader extra). Se eliminan @@brightness(1.2)@@ y @@contrast(1.15)@@.
-- Atrapada: fuera el @@drop-shadow()@@ de la imagen; la profundidad la da un @@box-shadow@@ estatico
-  en el contenedor (clase @@is-owned@@ que ya existia), cero cambios de marcado.
+- No atrapada: `filter: grayscale(<mismo %>)` y la opacidad pasa a la propiedad CSS `opacity`
+  (se compone, sin shader extra). Se eliminan `brightness(1.2)` y `contrast(1.15)`.
+- Atrapada: fuera el `drop-shadow()` de la imagen; la profundidad la da un `box-shadow` estatico
+  en el contenedor (clase `is-owned` que ya existia), cero cambios de marcado.
 - Control: maximo 1 funcion de filtro por imagen de tarjeta, 0 drop-shadow inline en imagenes de
   tarjeta, verificado en fuente y en el build.
 
 **CPU (proxy, roundtrip 4g, 3 corridas, sin capturas):** TaskDuration por segundo 525,19 -> 517,36
-ms/s (**-1,5%**) y por gesto 2335,5 -> 2267,6 ms (-2,9%). Runs crudos before @@[685,69 | 525,19 |
-521,40]@@ vs after @@[517,36 | 521,04 | 514,11]@@.
+ms/s (**-1,5%**) y por gesto 2335,5 -> 2267,6 ms (-2,9%). Runs crudos before `[685,69 | 525,19 |
+521,40]` vs after `[517,36 | 521,04 | 514,11]`.
 **Honesto:** la mejora medida es chica porque el proxy instrumenta el hilo principal y el coste de
 los filtros encadenados vive en raster/GPU, que el arnes no mide. El beneficio real se espera en GPU
 movil y **no se puede demostrar desde aca**.
 **Presupuestos:** 12/12 PASS. Tests 167/167. oxlint 0 errores.
 
 **Coste visual medido (misma tarjeta, mismo scroll, ambos builds):**
-- Atrapada: se nota el rectangulo del @@box-shadow@@ (ya no sigue la silueta del espiritu). Diff:
+- Atrapada: se nota el rectangulo del `box-shadow` (ya no sigue la silueta del espiritu). Diff:
   15,0% de pixeles de la banda cambian >8/255, media 3,3/255. A 1x se lee como halo oscuro detras
   del recuadro; a 3x se ve el borde recto.
-- No atrapada: quedan **levemente mas oscuras** al perder @@brightness@@/@@contrast@@: diff medio
+- No atrapada: quedan **levemente mas oscuras** al perder `brightness`/`contrast`: diff medio
   4,9/255 en la banda, hasta 39/255 en altas luces, 20,9% de pixeles >8.
 
-**Pendiente conocido:** @@index.css@@ ~9398 aplica 3 @@drop-shadow(...) !important@@ a imagenes
+**Pendiente conocido:** `index.css` ~9398 aplica 3 `drop-shadow(...) !important` a imagenes
 mastered solo bajo el tema Fortnitemares. Fuera del alcance de esta tarea.
 
-**Bug de instrumento descubierto (importante):** en este Chrome headless, @@page.screenshot({clip})@@
+**Bug de instrumento descubierto (importante):** en este Chrome headless, `page.screenshot({clip})`
 devuelve PNGs casi negros cuando hay capas compuestas. El recorte hay que hacerlo con canvas desde
 una captura completa. Consecuencia: la medicion de artefactos de la Fase 5 (**0/26 en ambos builds**)
 es **poco fiable** y no se puede usar para afirmar ni negar nada sobre el sintoma del usuario.
 
+
+### Correccion: el box-shadow del contenedor dibujaba un rectangulo
+
+Reporte del usuario con capturas: aparecio un cuadro rodeando al espiritu en las tarjetas atrapadas
+(movil y escritorio). Causa: el contenedor de la imagen (`.card-image`, `.ms-card__image`) es una
+**banda rectangular** que ocupa todo el ancho de la tarjeta, asi que el `box-shadow` dibujaba un
+rectangulo con bordes visibles. El `drop-shadow` anterior sigue la silueta del espiritu, y por eso
+no se notaba.
+
+**Arreglo:** fuera las dos reglas de `box-shadow` del contenedor; el estado atrapado vuelve al
+`drop-shadow` sobre la imagen (una sola pasada de filtro, y solo en las atrapadas). Se mantiene el
+ahorro real medido del punto 1: las NO atrapadas siguen con una sola pasada (`grayscale`) mas
+`opacity` como propiedad CSS, en vez de cuatro filtros encadenados.
+
+**Verificado:** estilos computados (`img.filter = drop-shadow(...)` y `boxShadow = none` en los dos
+contenedores); metrica del borde inferior de la banda -8,4/-8,4 -> -1,5/-1,5 en movil (control de
+gradiente -0,9) y -8,0/-7,9 -> -2,7/-2,7 en escritorio; el diff de pixeles entre builds marca
+exactamente el contorno rectangular que ya no existe; CPU por segundo de scroll 499,7 -> **488,2
+ms/s**; 12/12 presupuestos; tests 167/167.
+
+⚠️ Nota de proceso: los dos patches anteriores a este documento se aplicaron mal (quedaron 3 lineas
+con un + literal y 92 marcadores `` sin reemplazar por backticks). Reparado en el mismo commit.
 
 ## Fase 4 — Guardarrailes
 
