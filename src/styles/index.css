@@ -3647,6 +3647,17 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   transform: scale(1.08);
 }
 
+/* Profundidad del estado atrapado: sombra estatica del contenedor de la imagen (banda) en vez
+   de drop-shadow sobre la imagen. El drop-shadow sobre el img obliga a una pasada de filtro por
+   tarjeta en cada frame de scroll; el box-shadow se pinta con el contenedor y no se recalcula. */
+.sprite-card.is-owned .card-image {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+.sprite-card.is-owned .ms-card__image {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+}
+
 /* Card name */
 .card-name {
   font-family: var(--font-heading);

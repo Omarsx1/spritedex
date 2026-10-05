@@ -169,6 +169,41 @@ T9: calidad adaptativa por equipo (saveData, hardwareConcurrency, deviceMemory) 
 Cada uno se mide con el proxy de CPU por gesto del arnes, con el objetivo de recuperar mas calor del
 que costo quitar el render diferido.
 
++### Punto 1 ejecutado: filtros por tarjeta
+
+**Cambio:** de 4 filtros encadenados a 1 sola pasada de shader por imagen, en los tres sitios
+(grilla, lista y swiper):
+- No atrapada: @@filter: grayscale(<mismo %>)@@ y la opacidad pasa a la propiedad CSS @@opacity@@
+  (se compone, sin shader extra). Se eliminan @@brightness(1.2)@@ y @@contrast(1.15)@@.
+- Atrapada: fuera el @@drop-shadow()@@ de la imagen; la profundidad la da un @@box-shadow@@ estatico
+  en el contenedor (clase @@is-owned@@ que ya existia), cero cambios de marcado.
+- Control: maximo 1 funcion de filtro por imagen de tarjeta, 0 drop-shadow inline en imagenes de
+  tarjeta, verificado en fuente y en el build.
+
+**CPU (proxy, roundtrip 4g, 3 corridas, sin capturas):** TaskDuration por segundo 525,19 -> 517,36
+ms/s (**-1,5%**) y por gesto 2335,5 -> 2267,6 ms (-2,9%). Runs crudos before @@[685,69 | 525,19 |
+521,40]@@ vs after @@[517,36 | 521,04 | 514,11]@@.
+**Honesto:** la mejora medida es chica porque el proxy instrumenta el hilo principal y el coste de
+los filtros encadenados vive en raster/GPU, que el arnes no mide. El beneficio real se espera en GPU
+movil y **no se puede demostrar desde aca**.
+**Presupuestos:** 12/12 PASS. Tests 167/167. oxlint 0 errores.
+
+**Coste visual medido (misma tarjeta, mismo scroll, ambos builds):**
+- Atrapada: se nota el rectangulo del @@box-shadow@@ (ya no sigue la silueta del espiritu). Diff:
+  15,0% de pixeles de la banda cambian >8/255, media 3,3/255. A 1x se lee como halo oscuro detras
+  del recuadro; a 3x se ve el borde recto.
+- No atrapada: quedan **levemente mas oscuras** al perder @@brightness@@/@@contrast@@: diff medio
+  4,9/255 en la banda, hasta 39/255 en altas luces, 20,9% de pixeles >8.
+
+**Pendiente conocido:** @@index.css@@ ~9398 aplica 3 @@drop-shadow(...) !important@@ a imagenes
+mastered solo bajo el tema Fortnitemares. Fuera del alcance de esta tarea.
+
+**Bug de instrumento descubierto (importante):** en este Chrome headless, @@page.screenshot({clip})@@
+devuelve PNGs casi negros cuando hay capas compuestas. El recorte hay que hacerlo con canvas desde
+una captura completa. Consecuencia: la medicion de artefactos de la Fase 5 (**0/26 en ambos builds**)
+es **poco fiable** y no se puede usar para afirmar ni negar nada sobre el sintoma del usuario.
+
+
 ## Fase 4 — Guardarrailes
 
 Meta: que esto no vuelva a engordar sin que nadie se entere.
