@@ -39,7 +39,7 @@ function leerPerfActivado() {
   return params.has('perf') || window.location.hash.toLowerCase().includes('perf');
 }
 
-export function SharePage({ filteredSprites, allSprites, userState, activeFiltersLabel, onBack }) {
+export function SharePage({ filteredSprites, allSprites, userState, activeFiltersLabel, onBack, enlaceColeccion }) {
   const [format, setFormat] = useState(DEFAULT_EXPORT_FORMAT); // 'checklist', 'square'
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
   const [bgStyle] = useState(DEFAULT_EXPORT_BG_STYLE); // 'glitch_override', 'blueprint', 'dark_matrix'
@@ -348,11 +348,19 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
     }
   }, [previewCanvas, isGenerating]);
 
+  // Texto para pegar donde no cabe una imagen (Discord, Reddit, foros). Solo entra lo que
+  // se puede intercambiar de verdad: fuera los que no sueltan nada (0% o sin lanzar) y
+  // ordenados por probabilidad, que es el orden en el que conviene pedirlos. Remata con el
+  // enlace a la coleccion, para que el "y N mas" tenga respuesta.
+  const LINEAS_TEXTO = 15;
   const getShareableText = () => {
     const total = spritesList.length;
     const owned = spritesList.filter(s => userState[s.id]?.owned).length;
     const mastered = spritesList.filter(s => userState[s.id]?.owned && userState[s.id]?.level === 5).length;
     const missing = spritesList.filter(s => !userState[s.id]?.owned);
+    const intercambiables = missing
+      .filter((m) => !m.unreleased && Number(m.dropChanceNum) > 0)
+      .sort((a, b) => Number(b.dropChanceNum) - Number(a.dropChanceNum));
 
     const scopeLabels = {
       all: t('compartir.scopeCompleta'),
@@ -364,22 +372,24 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
     };
 
     let text = t('compartir.textoTitulo') + '\n';
-    text += t('compartir.textoVista', { vista: scopeLabels[scope] || t('compartir.plantilla') }) + '\n';
-    text += t('compartir.textoDesencriptados', { owned, total, pct: total > 0 ? Math.round((owned / total) * 100) : 0 }) + '\n';
-    text += t('compartir.textoMaxeados', { n: mastered }) + '\n\n';
+    text += t('compartir.textoDesencriptados', { owned, total, pct: total > 0 ? Math.round((owned / total) * 100) : 0 });
+    text += ' · ' + t('compartir.textoMaxeados', { n: mastered }) + '\n';
+    text += t('compartir.textoVista', { vista: scopeLabels[scope] || t('compartir.plantilla') }) + '\n\n';
 
-    if (missing.length > 0) {
-      text += t('compartir.textoBusco', { n: missing.length }) + '\n';
-      missing.slice(0, 10).forEach(m => {
-        text += `- ${pickName(m)} (${m.dropChanceDisplay || m.dropChance})\n`;
+    if (intercambiables.length > 0) {
+      text += t('compartir.textoBusco', { n: intercambiables.length }) + '\n';
+      intercambiables.slice(0, LINEAS_TEXTO).forEach((m) => {
+        text += `- ${pickName(m)} · ${m.dropChanceDisplay || m.dropChance}\n`;
       });
-      if (missing.length > 10) text += t('compartir.textoMas', { n: missing.length - 10 }) + '\n';
-      text += '\n' + t('compartir.textoIntercambio') + '\n';
-    } else {
-      text += t('compartir.textoCompleto') + '\n';
+      if (intercambiables.length > LINEAS_TEXTO) text += t('compartir.textoMas', { n: intercambiables.length - LINEAS_TEXTO }) + '\n';
+      text += '\n';
+    } else if (missing.length === 0) {
+      text += t('compartir.textoCompleto', { owned, total }) + '\n\n';
     }
 
-    text += `#SpritedexOverride #FortniteSprites #FortniteGlitch`;
+    if (enlaceColeccion) text += t('compartir.textoEnlace', { enlace: enlaceColeccion }) + '\n';
+    if (intercambiables.length > 0) text += t('compartir.textoIntercambio') + '\n';
+    text += '\n' + t('compartir.textoEtiquetas');
 
     return text;
   };
