@@ -1091,38 +1091,44 @@ html::after {
 .hero__title-line--glitch::before {
   color: var(--tg-rgb-r, #ff0055);
   /* La franja esta SIEMPRE puesta (como el text-shadow del original) y el glitch
-     es un evento: tres saltos cortos en medio segundo y vuelta a la calma. Antes
-     habia movimiento todo el rato y eso cansa la vista: parece nervioso. */
+     es un evento: un hipo por ciclo y vuelta a la calma. Antes habia movimiento
+     todo el rato y eso cansa la vista: parece nervioso. La ventana del hipo se
+     amplio (ver keyframes) para que se note sin volver a ese ruido constante. */
   animation: hero-glitch-r steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 1.8);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.2);
 }
 
 .hero__title-line--glitch::after {
   color: var(--tg-rgb-b, #00FFFB);
   animation: hero-glitch-b steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 1.8);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.2);
   /* Un pelo desfasada de la roja: los hipos no caen clavados a la vez. */
   animation-delay: 0.07s;
 }
 
-/* ~5 s de calma y, en el ultimo 12% del ciclo, un hipo: tres golpes y vuelta.
-   Dentro del hipo los saltos son duros (steps) para que se lea digital. */
+/* El hipo ocupa una porcion del ciclo mas grande para que el efecto se note.
+   ANTES: ciclo 2.8s*1.8 = 5.04s; calma 0%-88%, hipo 88%-94.5% (6.5% = ~328 ms,
+   cada golpe ~50-75 ms).
+   DESPUES: ciclo 2.8s*2.2 = 6.16s; calma 0%-70%, hipo 70%-90% (20% = ~1232 ms,
+   cada uno de los cuatro golpes sostenido 4% = ~246 ms).
+   Desplazamientos, colores y saltos duros (steps) son los MISMOS: solo cambia
+   cuanto tiempo queda el efecto en pantalla. */
 @keyframes hero-glitch-r {
-  0%, 88%     { transform: translateX(-0.1rem); opacity: 0.85; }
-  89%         { transform: translateX(-0.65rem); opacity: 1; }
-  90.5%       { transform: translateX(0.2rem) translateY(-0.02rem); opacity: 1; }
-  92%         { transform: translateX(-0.15rem); opacity: 1; }
-  93%         { transform: translateX(-0.85rem); opacity: 1; }
-  94.5%, 100% { transform: translateX(-0.1rem); opacity: 0.85; }
+  0%, 70%     { transform: translateX(-0.1rem); opacity: 0.85; }
+  74%         { transform: translateX(-0.65rem); opacity: 1; }
+  78%         { transform: translateX(0.2rem) translateY(-0.02rem); opacity: 1; }
+  82%         { transform: translateX(-0.15rem); opacity: 1; }
+  86%         { transform: translateX(-0.85rem); opacity: 1; }
+  90%, 100%   { transform: translateX(-0.1rem); opacity: 0.85; }
 }
 
 @keyframes hero-glitch-b {
-  0%, 88%     { transform: translateX(0.1rem); opacity: 0.85; }
-  89%         { transform: translateX(0.65rem); opacity: 1; }
-  90.5%       { transform: translateX(-0.2rem) translateY(0.02rem); opacity: 1; }
-  92%         { transform: translateX(0.15rem); opacity: 1; }
-  93%         { transform: translateX(0.85rem); opacity: 1; }
-  94.5%, 100% { transform: translateX(0.1rem); opacity: 0.85; }
+  0%, 70%     { transform: translateX(0.1rem); opacity: 0.85; }
+  74%         { transform: translateX(0.65rem); opacity: 1; }
+  78%         { transform: translateX(-0.2rem) translateY(0.02rem); opacity: 1; }
+  82%         { transform: translateX(0.15rem); opacity: 1; }
+  86%         { transform: translateX(0.85rem); opacity: 1; }
+  90%, 100%   { transform: translateX(0.1rem); opacity: 0.85; }
 }
 
 .hero__title-line--accent {
@@ -8881,14 +8887,14 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
      despues del bloom, no de golpe. */
   transition: opacity 600ms ease 380ms;
   animation: hero-glitch-r steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 1.8);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.2);
 }
 
 .hero__title[data-fnm-logo='themed'] .hero__title-fnm-ghost--b {
   opacity: 0.75;
   transition: opacity 600ms ease 460ms;
   animation: hero-glitch-b steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 1.8);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.2);
   animation-delay: 0.07s;
 }
 
@@ -10047,11 +10053,15 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
    eso el bloque viejo de mas arriba perdia contra .hero__title[data-fnm-logo=..]).
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
-  .hero__title-line--glitch::before,
-  .hero__title-line--glitch::after,
+  /* El glitch del titulo de temporada SE CONSERVA a proposito con movimiento
+     reducido: son las dos copias cromaticas del wordmark y las del logo
+     Fortnitemares, un hipo corto por pasos sobre el titulo (no un bucle de
+     pantalla completa), y es la firma visual de la temporada que el usuario
+     pidio ver. Ademas la app ya ignora a proposito el reduce del sistema para
+     su fisica (Header.jsx parchea window.matchMedia), asi que apagarlo aqui
+     solo por el reduce rompia esa politica. El resto de bucles decorativos
+     sigue apagado. */
   .hero__title[data-fnm-logo='themed'] .hero__title-fnm-svg,
-  .hero__title[data-fnm-logo='themed'] .hero__title-fnm-ghost--r,
-  .hero__title[data-fnm-logo='themed'] .hero__title-fnm-ghost--b,
   .hero__title-line--accent,
   .hero__hero-img,
   .hero__spin-icon,
