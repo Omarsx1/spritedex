@@ -7787,6 +7787,12 @@ body:has(.modal-overlay) {
 
 .app-footer__content {
   width: 100%;
+  /* border-box: con width 100% MAS su propio padding (10+6 px) y su borde (2 px), la pildora
+     del footer se pasaba EXACTAMENTE 18 px del ancho de la pantalla en movil. Eso hacia que el
+     documento midiera 408 px en un viewport de 390: el navegador mostraba la app desencajada y
+     habia que alejar el zoom para ver los elementos de la esquina. El padre ya era border-box;
+     el hijo no lo era. */
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
