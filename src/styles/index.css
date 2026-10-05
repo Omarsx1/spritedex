@@ -9974,6 +9974,18 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   background: radial-gradient(120% 90% at 50% 0%, rgba(28, 14, 46, 0.9) 0%, rgba(10, 5, 18, 0.94) 100%);
 }
 
+/* El envoltorio NO es una tarjeta en la vista: lo son sus piezas (ajustes, lona y botones).
+   Arrastraba la superficie de la modal vieja (rgba(13,7,24,.96), la banda #0E0A18 que se veia
+   detras de la cabecera) y, como su selector tiene mas especificidad que el de .spage, ganaba.
+   Se anula aqui. El degradado violeta de la pagina se queda: ese es el #190A22 que encierra. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__controls,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__actions {
   background: rgba(22, 11, 36, 0.72);
