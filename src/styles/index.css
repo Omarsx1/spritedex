@@ -1092,16 +1092,17 @@ html::after {
   color: var(--tg-rgb-r, #ff0055);
   /* La franja esta SIEMPRE puesta (como el text-shadow del original) y el glitch
      es un evento: un hipo por ciclo y vuelta a la calma. Antes habia movimiento
-     todo el rato y eso cansa la vista: parece nervioso. La ventana del hipo se
-     amplio (ver keyframes) para que se note sin volver a ese ruido constante. */
+     todo el rato y eso cansa la vista: parece nervioso. El hipo es CORTO y SECO
+     (49 ms por salto, ver keyframes) y lo que se alargo fue el ciclo: el efecto
+     se ve poco, pero cuando cae es nitido y no arrastrado. */
   animation: hero-glitch-r steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.2);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
 }
 
 .hero__title-line--glitch::after {
   color: var(--tg-rgb-b, #00FFFB);
   animation: hero-glitch-b steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.2);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
   /* Un pelo desfasada de la roja: los hipos no caen clavados a la vez. */
   animation-delay: 0.07s;
 }
@@ -1114,21 +1115,24 @@ html::after {
    Desplazamientos, colores y saltos duros (steps) son los MISMOS: solo cambia
    cuanto tiempo queda el efecto en pantalla. */
 @keyframes hero-glitch-r {
-  0%, 70%     { transform: translateX(-0.1rem); opacity: 0.85; }
-  74%         { transform: translateX(-0.65rem); opacity: 1; }
-  78%         { transform: translateX(0.2rem) translateY(-0.02rem); opacity: 1; }
-  82%         { transform: translateX(-0.15rem); opacity: 1; }
-  86%         { transform: translateX(-0.85rem); opacity: 1; }
-  90%, 100%   { transform: translateX(-0.1rem); opacity: 0.85; }
+  /* Hipo corto y seco: los cinco estados del glitch caen en 3,5% del ciclo (245 ms con el
+     ciclo de 7 s), con saltos de 49 ms cada uno. El ciclo se alargo para que el hipo sea un
+     evento raro: nitido y breve en vez de largo y arrastrado. */
+  0%, 90%     { transform: translateX(-0.1rem); opacity: 0.85; }
+  90.7%       { transform: translateX(-0.65rem); opacity: 1; }
+  91.4%       { transform: translateX(0.2rem) translateY(-0.02rem); opacity: 1; }
+  92.1%       { transform: translateX(-0.15rem); opacity: 1; }
+  92.8%       { transform: translateX(-0.85rem); opacity: 1; }
+  93.5%, 100% { transform: translateX(-0.1rem); opacity: 0.85; }
 }
 
 @keyframes hero-glitch-b {
-  0%, 70%     { transform: translateX(0.1rem); opacity: 0.85; }
-  74%         { transform: translateX(0.65rem); opacity: 1; }
-  78%         { transform: translateX(-0.2rem) translateY(0.02rem); opacity: 1; }
-  82%         { transform: translateX(0.15rem); opacity: 1; }
-  86%         { transform: translateX(0.85rem); opacity: 1; }
-  90%, 100%   { transform: translateX(0.1rem); opacity: 0.85; }
+  0%, 90%     { transform: translateX(0.1rem); opacity: 0.85; }
+  90.7%       { transform: translateX(0.65rem); opacity: 1; }
+  91.4%       { transform: translateX(-0.2rem) translateY(0.02rem); opacity: 1; }
+  92.1%       { transform: translateX(0.15rem); opacity: 1; }
+  92.8%       { transform: translateX(0.85rem); opacity: 1; }
+  93.5%, 100% { transform: translateX(0.1rem); opacity: 0.85; }
 }
 
 .hero__title-line--accent {
@@ -8887,14 +8891,14 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
      despues del bloom, no de golpe. */
   transition: opacity 600ms ease 380ms;
   animation: hero-glitch-r steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.2);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
 }
 
 .hero__title[data-fnm-logo='themed'] .hero__title-fnm-ghost--b {
   opacity: 0.75;
   transition: opacity 600ms ease 460ms;
   animation: hero-glitch-b steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.2);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
   animation-delay: 0.07s;
 }
 
