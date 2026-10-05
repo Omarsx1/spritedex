@@ -36,6 +36,8 @@ import { estadoAlTocarNivel } from './utils/niveles';
 import { setSyncSession, queueCloudSync, clearCloudSync, flushCloudSync } from './utils/pendingSync';
 import { safeStorage } from './utils/safeStorage';
 import { iniciarCalentador } from './utils/spritePrefetch';
+import { hayEnjambreActivo } from './utils/batSwarm';
+import { pausarAnimacionesFueraDePantalla } from './utils/pausaAnimaciones';
 import {
   getMyFriendCode,
   fetchCollectionByFriendCode,
@@ -812,6 +814,10 @@ export function App() {
     return iniciarCalentador(elementos, urls);
   }, [dynamicSprites, activeGen, filteredSprites, viewMode]);
 
+  // Fase 5/T7 (calor en reposo): los bloques que salen del viewport apagan sus animaciones CSS
+  // decorativas. Aditivo y reversible: si el observer no corre, todo se ve como siempre.
+  useEffect(() => pausarAnimacionesFueraDePantalla(), []);
+
   // Precalcula en segundo plano la captura de la modal de compartir. Es lo que hace
   // que la app local se sienta inmediata: alli la modal sale de cache. Sin esto, cada
   // espiritu marcado invalida la captura y la codificacion (4 s en un telefono) se
@@ -867,7 +873,12 @@ useEffect(() => {
       if (cancelado) return;
       const demasiadoPronto = Date.now() - ARRANQUE_APP < PRECALCULO_MIN_MS;
       const sigueTocando = Date.now() - ultimaActividad < PRECALCULO_CALMA_MS;
-      if (demasiadoPronto || sigueTocando) {
+      // Una ceremonia de murcielagos (marcar o maxear) corre en su propio canvas con rAF: el
+      // precálculo de la captura es un bloque largo en el hilo principal y la congelaba, que es
+      // el tiron que reporto el usuario. Se espera a que la ceremonia termine; el precálculo no
+      // pierde nada por esperar y el resultado es el mismo.
+      const ceremoniaEnCurso = hayEnjambreActivo();
+      if (demasiadoPronto || sigueTocando || ceremoniaEnCurso) {
         setTimeout(intentar, 600);
         return;
       }

@@ -10024,3 +10024,106 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__seg-label {
   color: rgba(216, 180, 254, 0.75);
 }
+
+/* ==========================================================================
+   FASE 5 / T7 — CALOR EN REPOSO: pausa de animaciones fuera de pantalla
+   pausaAnimaciones.js (cableado desde App.jsx) pone .is-fuera-de-pantalla en
+   los contenedores (hero, stats, filtro, coachmark) que salen del viewport.
+   Es pausa, no apagado: al volver siguen donde estaban. Si el observer no
+   corre, la clase nunca aparece y todo se ve igual que antes.
+   ========================================================================== */
+.is-fuera-de-pantalla,
+.is-fuera-de-pantalla *,
+.is-fuera-de-pantalla *::before,
+.is-fuera-de-pantalla *::after {
+  animation-play-state: paused !important;
+}
+
+/* ==========================================================================
+   FASE 5 / T7 — prefers-reduced-motion: apaga los bucles decorativos infinitos
+   Solo decorativos: el spinner de carga (sdm-share-pro__spinner) y el radar
+   del comparador comunican estado y se quedan. `!important` a proposito:
+   varios selectores base tienen mas especificidad que un bloque suelto (por
+   eso el bloque viejo de mas arriba perdia contra .hero__title[data-fnm-logo=..]).
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .hero__title-line--glitch::before,
+  .hero__title-line--glitch::after,
+  .hero__title[data-fnm-logo='themed'] .hero__title-fnm-svg,
+  .hero__title[data-fnm-logo='themed'] .hero__title-fnm-ghost--r,
+  .hero__title[data-fnm-logo='themed'] .hero__title-fnm-ghost--b,
+  .hero__title-line--accent,
+  .hero__hero-img,
+  .hero__spin-icon,
+  .gen-tab-badge.glitch-pulse,
+  .status-pill-count-badge,
+  .mobile-new-coachmark,
+  .sprite-card.is-mastered.is-glitch-mastered,
+  .cyber-lines span,
+  .scan-line,
+  .card-particles span,
+  .card-owned-btn.mastered,
+  .sdm-share__glitch-btn:hover::before,
+  .sdm-share__glitch-btn:hover::after {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   FASE 5 / T8 — TACTIL/MOVIL: sin backdrop-filter
+   Es la propiedad mas cara de la GPU movil antigua. Se conserva el mismo
+   fondo rgba de cada regla (mismo color base y alfa del diseno) y solo se
+   sube la alfa en las tres superficies que dependian del blur para leerse
+   sobre contenido ajeno (.sdm__close y las etiquetas de carta). Escritorio
+   no cambia: esta condicion solo es cierta con puntero grueso y sin hover.
+   ========================================================================== */
+@media (hover: none) and (pointer: coarse) {
+  .app-navbar__item,
+  .app-navbar__menu-btn,
+  .app-navbar__avatar,
+  .app-navbar__logo-mark,
+  .app-navbar__menu-dropdown,
+  .app-navbar__dropdown,
+  .hero__btn,
+  .gen-tab-btn,
+  .status-pill-btn,
+  .search-input-field,
+  .filter-pill-trigger,
+  .variant-grid-dropdown,
+  .sprite-grid-dropdown,
+  .filter-pill-checkbox,
+  .filter-view-toggle,
+  .mobile-new-coachmark__content,
+  .mobile-liquid-sheet-backdrop,
+  .modal-overlay,
+  .glass-panel,
+  .auth-modal__content,
+  .sdm__close,
+  .sdm-share-pro,
+  .sdm-friend-pill,
+  .claim-banner,
+  .sdm-compare__waiting,
+  .privacy-panel,
+  .ms-variant-tag,
+  .ms-level-tag,
+  .app-footer__content,
+  .install-prompt-card,
+  .fnm-skip-btn {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Las dos cortinas animaban el blur en keyframes; con !important queda
+     anulado en todo el ciclo y la opacidad se sigue animando igual. */
+  .mobile-liquid-sheet-backdrop,
+  .modal-overlay {
+    will-change: opacity;
+  }
+
+  /* Alfa ajustada solo donde el blur era lo que daba legibilidad */
+  .sdm__close,
+  .ms-variant-tag,
+  .ms-level-tag {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+}

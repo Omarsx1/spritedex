@@ -28,6 +28,22 @@ function prefersReducedMotion() {
   }
 }
 
+/* Equipos humildes: senales baratas y disponibles. Cualquiera de las tres basta para bajar el
+   tope de densidad del canvas (DPR): ahorro de datos activado, pocos nucleos o poca RAM. Los
+   equipos capaces no pierden nada porque conservan el tope de siempre (2x). */
+function esEquipoHumilde() {
+  if (typeof navigator === 'undefined') return false;
+  try {
+    const conexion = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conexion && conexion.saveData === true) return true;
+    if (typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4) return true;
+    if (typeof navigator.deviceMemory === 'number' && navigator.deviceMemory > 0 && navigator.deviceMemory <= 4) return true;
+  } catch {
+    // Sin APIs de equipo se asume capaz: el tope 2x es el comportamiento de siempre.
+  }
+  return false;
+}
+
 function curve(ctx, cp1x, cp1y, cp2x, cp2y, x, y) {
   if (typeof ctx.bezierCurveTo === 'function') {
     ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
@@ -445,6 +461,19 @@ function createBat(rng, width, height, mode, index, total) {
  * @param {'ambient'|'burst'} [options.mode]
  * @returns {{ stop: () => void, destroy: () => void }|null}
  */
+/* Un solo enjambre a la vez, y el nuevo REEMPLAZA al anterior.
+   Por que: cada enjambre abre su propio canvas y su propio bucle de requestAnimationFrame. Si el
+   usuario marca o maxea espiritus seguidos, antes quedaban dos o tres bucles compitiendo por el
+   hilo principal y los murcielagos se trababan por ratos. La celebracion se sigue viendo igual:
+   lo que desaparece son los bucles apilados. */
+let enjambreActivo = null;
+
+// Lo consulta el precálculo de la captura para no arrancar trabajo pesado en medio de una
+// ceremonia (era la otra causa del tiron al marcar).
+export function hayEnjambreActivo() {
+  return enjambreActivo !== null;
+}
+
 export function createBatSwarm(options = {}) {
   if (typeof document === 'undefined') return null;
 
@@ -461,6 +490,12 @@ export function createBatSwarm(options = {}) {
     : null;
 
   if (!requestFrame || reduced) return null;
+
+  // El que llega reemplaza al que estaba corriendo.
+  if (enjambreActivo) {
+    try { enjambreActivo.stop(); } catch { /* un enjambre que no se deja parar no puede bloquear al nuevo */ }
+    enjambreActivo = null;
+  }
 
   const canvas = document.createElement('canvas');
   canvas.setAttribute('aria-hidden', 'true');
@@ -481,6 +516,8 @@ export function createBatSwarm(options = {}) {
   let last = 0;
   let elapsed = 0;
   let stopped = false;
+  let pausado = false;
+  let propia = null;
 
   const fadeIn = mode === 'burst' ? 120 : 700;
   const total = duration || (mode === 'burst' ? 4400 : 3800);
@@ -494,8 +531,12 @@ export function createBatSwarm(options = {}) {
     };
   };
 
+  // Tope de densidad del canvas: 2x en equipos capaces, 1.5x en equipos humildes (saveData,
+  // <=4 nucleos o <=4 GB). El dibujo, la cantidad y la duracion no cambian: solo cuesta menos
+  // pintar el mismo enjambre en un telefono antiguo.
+  const dprTope = esEquipoHumilde() ? 1.5 : 2;
   const resize = () => {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, dprTope);
     width = window.innerWidth;
     height = window.innerHeight;
     canvas.width = Math.floor(width * dpr);
@@ -511,8 +552,10 @@ export function createBatSwarm(options = {}) {
   };
 
   const frame = (now) => {
-    if (stopped) return;
+    if (stopped || pausado) return;
     if (!last) last = now;
+    /* Clamp a 50 ms: si un frame llega tarde (pestana oculta, equipo saturado) el enjambre
+       avanza un tic, no un salto que consuma el presupuesto de duracion de golpe. */
     const dt = Math.min((now - last) / 1000, 0.05);
     last = now;
     elapsed += dt * 1000;
@@ -592,20 +635,48 @@ export function createBatSwarm(options = {}) {
     populate();
   };
 
+  /* La pestana oculta es calor gratis y un salto de reloj: los rAF dejan de llegar pero el
+     tiempo del mundo sigue. Pausa real: se cancela el frame pendiente y no se acumula tiempo
+     oculto; al volver, last se reancla a cero para que el primer frame valga dt=0 y el
+     enjambre continue exactamente donde estaba. */
+  const onVisibilityChange = () => {
+    if (typeof document === 'undefined') return;
+    if (document.hidden) {
+      if (stopped || pausado) return;
+      pausado = true;
+      if (cancelFrame) cancelFrame(frameHandle);
+    } else if (pausado && !stopped) {
+      pausado = false;
+      last = 0;
+      frameHandle = requestFrame(frame);
+    }
+  };
+
   const finish = () => {
     if (stopped) return;
     stopped = true;
+    if (enjambreActivo === propia) enjambreActivo = null;
     if (cancelFrame) cancelFrame(frameHandle);
     window.removeEventListener('resize', onResize);
+    if (typeof document.removeEventListener === 'function') {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    }
     if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
   };
 
   resize();
   populate();
   window.addEventListener('resize', onResize);
+  // Guarda de capacidad: el mock de los tests (y cualquier entorno sin DOM completo) no tiene
+  // addEventListener en document, y la pausa por pestana oculta es opcional por definicion.
+  if (typeof document.addEventListener === 'function') {
+    document.addEventListener('visibilitychange', onVisibilityChange);
+  }
   frameHandle = requestFrame(frame);
 
-  return { stop: finish, destroy: finish };
+  propia = { stop: finish, destroy: finish };
+  enjambreActivo = propia;
+  return propia;
 }
 
 /**

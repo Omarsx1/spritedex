@@ -42,6 +42,15 @@
 //           lcpMs/lcpElement/lcpSize, fcpMs, ttfbMs, domContentLoadedMs, loadEventMs, longTasks
 //           (count/totalMax/top5), firstSpriteCardMs, jsCriticalBytes (scripts que terminan de
 //           responder antes del LCP) y la primera request a Supabase.
+//   idle-cpu: carga, espera el mismo settle, aguarda a que el canvas transitorio del enjambre
+//           salga del DOM y abre una ventana fija de 10 s SIN ninguna interaccion. Reporta CPU
+//           del hilo principal EN REPOSO (deltas de Performance.getMetrics: TaskDuration,
+//           ScriptDuration, LayoutDuration y RecalcStyleDuration, en ms y por segundo) y las
+//           long tasks > 50 ms de la ventana. Es la metrica de calor en reposo (Fase 5, T7-T9).
+//           --idle-scroll <px> (default 0) deja la pagina desplazada antes de la ventana (el
+//           reposo tipico: el usuario bajo al grid y solto). --idle-media <none|reduce|touch>
+//           (default none) emula prefers-reduced-motion o puntero tactil ANTES de la ventana,
+//           para medir esos perfiles con el mismo protocolo.
 //
 // --roundtrip-max <px> (default 5000): tope de la ronda en --scroll-mode roundtrip (se recorta al
 //   fondo del documento). --artifact-samples <n> (default 4): capturas por posicion sin mover el
@@ -104,6 +113,13 @@ const IDLE_COLLAGE_MAX_MS = 45000;
 const SHARE_QUIET_MS = 600;
 const SHARE_MAX_MS = 30000;
 const COLLAGE_URL_MARK = '/sprites/collage/';
+
+// Escenario idle-cpu: ventana fija sin interaccion + margen extra tras el settle para que el
+// canvas del enjambre (intro de temporada, ~4.4 s y se autoelimina) no contamine la foto del
+// reposo. Si al abrir la ventana el canvas siguiera vivo, se reporta (batCanvasPresentAtStart).
+const IDLE_CPU_WINDOW_MS = 10000;
+const IDLE_CPU_SETTLE_EXTRA_MS = 1500;
+const IDLE_CPU_CANVAS_MAX_MS = 15000;
 
 // Cabeceras de cache copiadas de vercel.json. CACHE_SPRITES es la que importa para el calentador
 // de miniaturas: si cambia alli, cambiala aqui o la medicion miente.
@@ -368,7 +384,9 @@ function parseArgs(argv) {
     blockUrls: [],
     offsets: DEFAULT_OFFSETS.slice(),
     roundtripMax: ROUNDTRIP_MAX_DEFAULT,
-    artifactSamples: ARTIFACT_SAMPLES_DEFAULT
+    artifactSamples: ARTIFACT_SAMPLES_DEFAULT,
+    idleScroll: 0,
+    idleMedia: 'none'
   };
   for (let i = 0; i < argv.length; i += 1) {
     const flag = argv[i];
@@ -415,6 +433,12 @@ function parseArgs(argv) {
     } else if (flag === '--artifact-samples') {
       args.artifactSamples = Number(argv[i + 1]);
       i += 1;
+    } else if (flag === '--idle-scroll') {
+      args.idleScroll = Number(argv[i + 1]);
+      i += 1;
+    } else if (flag === '--idle-media') {
+      args.idleMedia = argv[i + 1];
+      i += 1;
     } else {
       throw new Error('Argumento no reconocido: ' + flag);
     }
@@ -434,8 +458,14 @@ function parseArgs(argv) {
   if (!Number.isInteger(args.artifactSamples) || args.artifactSamples < 0) {
     throw new Error('--artifact-samples debe ser un entero >= 0 (0 = gesto sin capturas, solo CPU)');
   }
-  if (args.scenario !== 'scroll' && args.scenario !== 'idle' && args.scenario !== 'startup') {
-    throw new Error('--scenario debe ser scroll, idle o startup');
+  if (args.scenario !== 'scroll' && args.scenario !== 'idle' && args.scenario !== 'startup' && args.scenario !== 'idle-cpu') {
+    throw new Error('--scenario debe ser scroll, idle, startup o idle-cpu');
+  }
+  if (!Number.isFinite(args.idleScroll) || args.idleScroll < 0) {
+    throw new Error('--idle-scroll debe ser un numero >= 0');
+  }
+  if (args.idleMedia !== 'none' && args.idleMedia !== 'reduce' && args.idleMedia !== 'touch') {
+    throw new Error('--idle-media debe ser none, reduce o touch');
   }
   if (args.offsets.length === 0) {
     throw new Error('--offsets debe listar al menos un entero');
@@ -1752,6 +1782,121 @@ async function runOnce(cfg, baseUrl, runIndex) {
       };
     }
 
+    // Escenario idle-cpu: CPU EN REPOSO. Primero se asegura de que no quede ningun transitorio
+    // del arranque: el canvas del enjambre se autoelimina al terminar su intro, y su coste no es
+    // "reposo". Despues abre una ventana fija sin interaccion y mide el delta de
+    // Performance.getMetrics del renderer (TaskDuration y compania) mas las long tasks > 50 ms.
+    let idleCpu = null;
+    if (cfg.scenario === 'idle-cpu') {
+      const canvasAlAbrir = await page.evaluate(async (maxMs) => {
+        const deadline = performance.now() + maxMs;
+        const canvasVivo = () => Boolean(document.querySelector('.fnm-bat-canvas'));
+        while (canvasVivo() && performance.now() < deadline) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+        return canvasVivo();
+      }, IDLE_CPU_CANVAS_MAX_MS);
+      // Perfil emulado (media tactil o motion reducido) ANTES de la ventana.
+      if (cfg.idleMedia === 'touch') {
+        await client.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
+        await delay(500);
+      } else if (cfg.idleMedia === 'reduce') {
+        await client.send('Emulation.setEmulatedMedia', { media: '', features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
+        await delay(500);
+      }
+      // Reposo tras scroll: deja la pagina donde el usuario la dejo y espera a que la red
+      // quede quieta otra vez (los lazy de la zona nueva cargan con el scroll).
+      if (cfg.idleScroll > 0) {
+        await page.evaluate((y) => window.scrollTo(0, y), cfg.idleScroll);
+        const inicioScroll = Date.now();
+        let count = -1;
+        let lastChange = Date.now();
+        for (;;) {
+          const n = await page.evaluate(() => performance.getEntriesByType('resource').length);
+          if (n !== count) {
+            count = n;
+            lastChange = Date.now();
+          }
+          const el = Date.now() - inicioScroll;
+          if (el >= 15000) break;
+          if (el >= 800 && Date.now() - lastChange >= 600) break;
+          await delay(100);
+        }
+      }
+      await delay(IDLE_CPU_SETTLE_EXTRA_MS);
+      const scrollYActual = await page.evaluate(() => Math.round(window.scrollY));
+      const mediaMatched = await page.evaluate((media) => {
+        if (media === 'touch') return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+        if (media === 'reduce') return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        return null;
+      }, cfg.idleMedia);
+      const animaciones = await page.evaluate(() => {
+        const list = document.getAnimations ? document.getAnimations() : [];
+        let running = 0;
+        let paused = 0;
+        for (const a of list) {
+          if (a.playState === 'running') running += 1;
+          else if (a.playState === 'paused') paused += 1;
+        }
+        return { total: list.length, running, paused };
+      });
+      const longTasksSupported = await page.evaluate(() => {
+        window.__idleCpuLongTasks = [];
+        try {
+          const observer = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+              window.__idleCpuLongTasks.push({
+                start: Math.round(entry.startTime * 100) / 100,
+                dur: Math.round(entry.duration * 100) / 100
+              });
+            }
+          });
+          observer.observe({ entryTypes: ['longtask'] });
+          return true;
+        } catch {
+          return false;
+        }
+      });
+      await client.send('Performance.enable');
+      const metricsBefore = await readPerfMetrics(client);
+      const ventanaInicio = Date.now();
+      await delay(IDLE_CPU_WINDOW_MS);
+      const wallMs = Date.now() - ventanaInicio;
+      const metricsAfter = await readPerfMetrics(client);
+      const longTasks = await page.evaluate(() => window.__idleCpuLongTasks || []);
+      const segundos = wallMs / 1000;
+      const delta = (antes, despues) => despues - antes;
+      idleCpu = {
+        windowMs: wallMs,
+        batCanvasPresentAtStart: canvasAlAbrir,
+        idleScrollY: scrollYActual,
+        idleMedia: cfg.idleMedia,
+        mediaMatched,
+        animations: animaciones,
+        longTasksSupported,
+        longTaskCount: longTasks.length,
+        longTaskTotalMs: round(longTasks.reduce((acc, t) => acc + t.dur, 0)),
+        longTaskMaxMs: round(longTasks.reduce((acc, t) => Math.max(acc, t.dur), 0)),
+        longTasksTop: longTasks.slice().sort((a, b) => b.dur - a.dur).slice(0, 5),
+        perf: {
+          taskMs: round(delta(metricsBefore.taskMs, metricsAfter.taskMs)),
+          scriptMs: round(delta(metricsBefore.scriptMs, metricsAfter.scriptMs)),
+          layoutMs: round(delta(metricsBefore.layoutMs, metricsAfter.layoutMs)),
+          recalcStyleMs: round(delta(metricsBefore.recalcStyleMs, metricsAfter.recalcStyleMs)),
+          layoutCount: delta(metricsBefore.layoutCount, metricsAfter.layoutCount),
+          recalcStyleCount: delta(metricsBefore.recalcStyleCount, metricsAfter.recalcStyleCount)
+        },
+        perSecond: {
+          taskMs: round(delta(metricsBefore.taskMs, metricsAfter.taskMs) / segundos),
+          scriptMs: round(delta(metricsBefore.scriptMs, metricsAfter.scriptMs) / segundos),
+          layoutMs: round(delta(metricsBefore.layoutMs, metricsAfter.layoutMs) / segundos),
+          recalcStyleMs: round(delta(metricsBefore.recalcStyleMs, metricsAfter.recalcStyleMs) / segundos)
+        },
+        jsHeapUsedBytes: metricsAfter.jsHeapUsedBytes,
+        nodes: metricsAfter.nodes
+      };
+    }
+
     return {
       run: runIndex,
       load,
@@ -1760,6 +1905,7 @@ async function runOnce(cfg, baseUrl, runIndex) {
       steps,
       roundtrip,
       idle,
+      idleCpu,
       startup,
       warm,
       runTransferBytes
@@ -1878,6 +2024,7 @@ function buildSummary(runs, cfg) {
       : null,
     perOffset,
     idle: runs.some((run) => run.idle) ? buildIdleSummary(runs) : null,
+    idleCpu: runs.some((run) => run.idleCpu) ? buildIdleCpuSummary(runs) : null,
     startup: runs.some((run) => run.startup) ? buildStartupSummary(runs) : null,
     roundtrip: cfg.scrollMode === 'roundtrip' ? buildRoundtripSummary(runs) : null,
     warm,
@@ -1901,6 +2048,50 @@ function buildIdleSummary(runs) {
     shareTimedOut: conShare.filter((entry) => entry.share.shareTimedOut).length,
     collageRequestsBeforeShare: round(median(entries.map((entry) => entry.share.collageRequestsBefore))),
     collageRequestsAfterShare: round(median(entries.map((entry) => entry.share.collageRequestsAfter)))
+  };
+}
+
+// Resumen del escenario idle-cpu: medianas sobre las corridas del CPU por segundo en reposo,
+// del trabajo total de la ventana y de las long tasks. porCorrida deja cada corrida cruda para
+// ver dispersion (el reposo es una foto con ruido y el delta before/after necesita rangos).
+function buildIdleCpuSummary(runs) {
+  const entradas = runs.map((run) => run.idleCpu).filter(Boolean);
+  if (entradas.length === 0) return null;
+  const m = (fn) => round(median(entradas.map(fn)));
+  return {
+    runs: entradas.length,
+    windowMs: m((e) => e.windowMs),
+    batCanvasPresentAtStart: entradas.some((e) => e.batCanvasPresentAtStart),
+    longTasksSupported: entradas.every((e) => e.longTasksSupported),
+    idleScrollY: entradas[0].idleScrollY,
+    idleMedia: entradas[0].idleMedia,
+    mediaMatched: entradas[0].mediaMatched,
+    animations: entradas[0].animations,
+    taskMsPerSecond: m((e) => e.perSecond.taskMs),
+    taskMs: m((e) => e.perf.taskMs),
+    scriptMsPerSecond: m((e) => e.perSecond.scriptMs),
+    scriptMs: m((e) => e.perf.scriptMs),
+    layoutMsPerSecond: m((e) => e.perSecond.layoutMs),
+    layoutMs: m((e) => e.perf.layoutMs),
+    recalcStyleMsPerSecond: m((e) => e.perSecond.recalcStyleMs),
+    recalcStyleMs: m((e) => e.perf.recalcStyleMs),
+    layoutCount: m((e) => e.perf.layoutCount),
+    recalcStyleCount: m((e) => e.perf.recalcStyleCount),
+    longTaskCount: m((e) => e.longTaskCount),
+    longTaskTotalMs: m((e) => e.longTaskTotalMs),
+    longTaskMaxMs: m((e) => e.longTaskMaxMs),
+    jsHeapUsedBytes: m((e) => e.jsHeapUsedBytes),
+    nodes: m((e) => e.nodes),
+    porCorrida: entradas.map((e) => ({
+      windowMs: e.windowMs,
+      taskMs: e.perf.taskMs,
+      taskMsPerSecond: e.perSecond.taskMs,
+      scriptMs: e.perf.scriptMs,
+      layoutMs: e.perf.layoutMs,
+      recalcStyleMs: e.perf.recalcStyleMs,
+      longTaskCount: e.longTaskCount,
+      longTaskMaxMs: e.longTaskMaxMs
+    }))
   };
 }
 
@@ -1951,6 +2142,8 @@ async function main() {
     stepOffsets: args.scenario === 'scroll' && args.scrollMode !== 'roundtrip' ? args.offsets : [],
     roundtripMax: args.roundtripMax,
     artifactSamples: args.artifactSamples,
+    idleScroll: args.idleScroll,
+    idleMedia: args.idleMedia,
     scrollMode: args.scrollMode,
     scenario: args.scenario,
     logNetwork: args.logNetwork,
@@ -2010,6 +2203,22 @@ async function main() {
           ' longTasks=' + result.startup.longTaskCount +
           ' longTaskMaxMs=' + fmtMs(result.startup.longTaskMaxMs) +
           ' jsCriticalBytes=' + (result.startup.jsCriticalBytes === null ? 'null' : result.startup.jsCriticalBytes)
+        );
+      }
+      if (result.idleCpu) {
+        console.log(
+          '  run ' + i + ' IDLE-CPU: taskMsPerSecond=' + result.idleCpu.perSecond.taskMs +
+          ' taskMs=' + result.idleCpu.perf.taskMs + ' en ' + result.idleCpu.windowMs + 'ms' +
+          ' scriptMs=' + result.idleCpu.perf.scriptMs +
+          ' layoutMs=' + result.idleCpu.perf.layoutMs +
+          ' recalcStyleMs=' + result.idleCpu.perf.recalcStyleMs +
+          ' longTasks=' + result.idleCpu.longTaskCount +
+          ' longTaskMaxMs=' + fmtMs(result.idleCpu.longTaskMaxMs) +
+          ' canvasAlInicio=' + result.idleCpu.batCanvasPresentAtStart +
+          ' scrollY=' + result.idleCpu.idleScrollY +
+          ' media=' + result.idleCpu.idleMedia +
+          ' (match=' + result.idleCpu.mediaMatched + ')' +
+          ' anims=' + result.idleCpu.animations.running + 'r/' + result.idleCpu.animations.paused + 'p'
         );
       }
       for (const step of result.steps) {
@@ -2120,6 +2329,24 @@ async function main() {
           ' (usa collageCompleteMs como guardarrail alternativo)'
         );
       }
+    }
+    if (summary.idleCpu) {
+      console.log(
+        '[measure] idle-cpu (EN REPOSO): taskMsPerSecond=' + summary.idleCpu.taskMsPerSecond +
+        ' (taskMs=' + summary.idleCpu.taskMs + ' por corrida de ' + summary.idleCpu.windowMs + 'ms)' +
+        ' scriptMsPerSecond=' + summary.idleCpu.scriptMsPerSecond +
+        ' layoutMsPerSecond=' + summary.idleCpu.layoutMsPerSecond +
+        ' recalcStyleMsPerSecond=' + summary.idleCpu.recalcStyleMsPerSecond +
+        ' longTasks=' + summary.idleCpu.longTaskCount +
+        ' longTaskTotalMs=' + summary.idleCpu.longTaskTotalMs +
+        ' longTaskMaxMs=' + fmtMs(summary.idleCpu.longTaskMaxMs) +
+        ' canvasAlInicio=' + summary.idleCpu.batCanvasPresentAtStart +
+        ' scrollY=' + summary.idleCpu.idleScrollY +
+        ' media=' + summary.idleCpu.idleMedia +
+        ' (match=' + summary.idleCpu.mediaMatched + ')' +
+        ' anims=' + summary.idleCpu.animations.running + 'r/' + summary.idleCpu.animations.paused + 'p'
+      );
+      console.log('    idle-cpu porCorrida=' + JSON.stringify(summary.idleCpu.porCorrida));
     }
     if (summary.startup) {
       console.log(
