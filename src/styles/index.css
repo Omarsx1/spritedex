@@ -7793,9 +7793,14 @@ body:has(.modal-overlay) {
      habia que alejar el zoom para ver los elementos de la esquina. El padre ya era border-box;
      el hijo no lo era. */
   box-sizing: border-box;
+  /* Es el containing block del panel de enlaces (bottom: 100% + 8px). */
+  position: relative;
+  /* 48 - 12 (padding vertical) - 2 (borde) = 34 px: el alto interno de la pildora. */
+  --footer-trigger: 34px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   height: 48px;
   padding: 6px 14px 6px 8px;
   border-radius: 9999px;
@@ -7813,6 +7818,7 @@ body:has(.modal-overlay) {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -7832,16 +7838,13 @@ body:has(.modal-overlay) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* Sin min-width: 0 el span no encoge por debajo de su contenido (min-width: auto)
+     y el texto se salia de la pildora en 320 px en vez de cortarse con puntos. */
+  min-width: 0;
 }
 
 .footer-short-text {
   display: none;
-}
-
-.app-footer__actions {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
 }
 
 .app-footer__privacy-btn {
@@ -7871,6 +7874,113 @@ a.app-footer__privacy-btn {
   text-decoration: none;
 }
 
+/* Boton disparador del panel: vive en la pildora cerrada, en el borde IZQUIERDO
+   (la esquina derecha queda bajo el FAB del hero, que la intercepta el toque).
+   --footer-trigger es el alto interno exacto de la pildora (48 - 12 - 2 = 34). */
+.app-footer__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--footer-trigger);
+  height: var(--footer-trigger);
+  padding: 0;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.app-footer__trigger:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Foco visible: mismo lenguaje que .lang-switch__btn, nunca se quita el outline. */
+.app-footer__trigger:focus-visible {
+  outline: 2px solid #22e6dc;
+  outline-offset: 2px;
+}
+
+.app-footer__chevron {
+  transition: transform 0.22s ease;
+}
+
+.app-footer__trigger[aria-expanded='true'] .app-footer__chevron {
+  transform: rotate(180deg);
+}
+
+/* Panel de enlaces: flota POR ENCIMA de la pildora. Al ser absolute no participa
+   del flujo, asi que abrirlo no cambia el scrollHeight del documento. */
+.app-footer__panel {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  right: auto;
+  width: 100%;
+  box-sizing: border-box;
+  /* En movil (pildora ~296-366 px) el panel ocupa el ancho de la pildora; en escritorio
+     queda anclado al borde izquierdo y topado a 420 px. Nada de right: 0: el disparador
+     ya vive a la izquierda, no en la esquina ocupada por el FAB. */
+  max-width: 420px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  border-radius: 18px;
+  background: rgba(12, 14, 22, 0.65);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  /* vh primero (navegadores sin dvh) y dvh despues: el tope nunca deja el panel
+     fuera de la pantalla, y overflow-y es la salida de emergencia. */
+  max-height: min(60vh, 360px);
+  max-height: min(60dvh, 360px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: appFooterPanelIn 0.16s ease-out;
+}
+
+@keyframes appFooterPanelIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-footer__panel {
+    animation: none;
+  }
+}
+
+/* Las filas del panel reutilizan la capsula de .app-footer__privacy-btn, pero en
+   columna, a lo ancho y con 44 px de alto tactil. */
+.app-footer__panel .app-footer__privacy-btn {
+  width: 100%;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.app-footer__panel-copy {
+  margin: 6px 4px 2px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.45);
+}
+
 
 
 /* Enlace a la ficha publica del espiritu, dentro del detalle. */
@@ -7889,7 +7999,8 @@ a.app-footer__privacy-btn {
   border-bottom-color: #ffffff;
 }
 
-/* En Mobile: Mantiene la cápsula horizontal en una sola fila sin apilamiento */
+/* En Mobile: la pildora cerrada se queda en UNA fila (logo + copyright + disparador).
+   Crece a 52 px porque 52 - 6 (padding) - 2 (borde) = 44: el alto tactil minimo. */
 @media (max-width: 600px) {
   .app-footer {
     width: calc(100% - 24px);
@@ -7898,8 +8009,9 @@ a.app-footer__privacy-btn {
   }
 
   .app-footer__content {
-    height: 44px;
-    padding: 4px 10px 4px 6px;
+    --footer-trigger: 44px;
+    height: 52px;
+    padding: 3px 6px 3px 8px;
     gap: 8px;
   }
 
@@ -7921,10 +8033,24 @@ a.app-footer__privacy-btn {
     font-size: 0.72rem;
   }
 
-  .app-footer__privacy-btn {
-    font-size: 0.72rem;
-    padding: 5px 8px;
-    gap: 4px;
+  .app-footer__panel {
+    padding: 6px;
+    border-radius: 16px;
+  }
+
+  .app-footer__panel .app-footer__privacy-btn {
+    padding: 8px 10px;
+  }
+}
+
+/* Tactil de cualquier ancho: el disparador tambien necesita 44x44 (una tablet con
+   dedo no entra en la media query de 600 px). El panel pierde el blur en el bloque
+   T8 de mas abajo, que es quien lo anula; aqui NO se reintroduce backdrop-filter. */
+@media (hover: none) and (pointer: coarse) {
+  .app-footer__content {
+    --footer-trigger: 44px;
+    height: 52px;
+    padding: 3px 6px 3px 8px;
   }
 }
 
@@ -10093,6 +10219,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   .ms-variant-tag,
   .ms-level-tag,
   .app-footer__content,
+  .app-footer__panel,
   .install-prompt-card,
   .fnm-skip-btn {
     -webkit-backdrop-filter: none !important;
@@ -10111,5 +10238,11 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   .ms-variant-tag,
   .ms-level-tag {
     background-color: rgba(0, 0, 0, 0.7);
+  }
+
+  /* Sin blur, el panel del pie quedaria translucido sobre el contenido: casi opaco.
+     Aqui NO se reintroduce backdrop-filter, solo se sube la alfa. */
+  .app-footer__panel {
+    background-color: rgba(12, 14, 22, 0.97);
   }
 }
