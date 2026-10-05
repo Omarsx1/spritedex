@@ -9965,3 +9965,50 @@ body .swal2-container .swal2-toast.swal2-popup {
     align-self: start;
   }
 }
+
+/* ── Vista de compartir en temporada ──────────────────────────────────────────────────────
+   La vista de amigos vira a violeta de noche, pero compartir se quedaba con las superficies
+   azules de fuera de temporada y con el arte de fondo asomando por todas partes: no parecia la
+   misma app. Mismas recetas que arriba, aplicadas a las clases de esta vista. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage {
+  background: radial-gradient(120% 90% at 50% 0%, rgba(28, 14, 46, 0.9) 0%, rgba(10, 5, 18, 0.94) 100%);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__controls,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__actions {
+  background: rgba(22, 11, 36, 0.72);
+  border-color: rgba(168, 85, 247, 0.26);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__preview-wrap {
+  background: rgba(18, 9, 30, 0.82);
+  border-color: rgba(168, 85, 247, 0.24);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__segmented {
+  background: rgba(26, 13, 42, 0.75);
+  border-color: rgba(168, 85, 247, 0.24);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__seg-btn {
+  color: rgba(196, 181, 253, 0.75);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__seg-btn--active {
+  color: #1a0b02;
+  background: linear-gradient(135deg, #ff922b, #f76707);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__input {
+  background: rgba(30, 16, 50, 0.85);
+  border-color: rgba(168, 85, 247, 0.28);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__input:focus {
+  border-color: #d946ef;
+  box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.22);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__seg-label {
+  color: rgba(216, 180, 254, 0.75);
+}
