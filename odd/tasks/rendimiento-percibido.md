@@ -79,8 +79,33 @@ Meta: framesWithBlank en continuo a 4g <= 0.05 y el arte ya presente al entrar a
 
 Meta: LCP <= 2.5 s y como maximo 3 long tasks > 50 ms en la carga a 4g, sin quitar ningun elemento.
 
-- [ ] T4 — Medir LCP, long tasks y que bloquea el primer pintado; dividir y diferir lo que no es
-      critico (el JS es el 25% de la carga en frio).
+- [x] **T4 — medido y diagnosticado. Sin cambio de fuente, y con razon.**
+      El arnes ahora mide LCP, FCP, TTFB, long tasks (> 50 ms) y jsCriticalBytes, con --scenario
+      startup y --block-urls para ablacion.
+      - El elemento LCP es la imagen del hero (1476 ms de mediana a 4g), no el grid.
+      - **La hipotesis del enunciado era falsa**: el grid NO espera a Supabase. La primera
+        `.sprite-card` se pinta a 1258 ms; el GET a /rest/v1/sprites arranca a ~2180 ms y responde a
+        2782-3041 ms. Ya pinta del catalogo estatico y cambia los datos despues.
+      - Los 6 chunks criticos suman 756.237 B (index 371k + vendor-react 255k + gsap 69k +
+        texto/i18n 53k + supabase 3.6k + runtime 0.7k) y no hay ni un byte no esencial ahi dentro.
+      - Sensibilidad medida por ablacion: +100 kB de JS critico = +118 ms de LCP. Quitar bytes NO
+        criticos no sirve: bloquear los 208 kB de Supabase empeoro el LCP (1476 -> 1500).
+      - Scroll continuo sin regresion: 5400 = 0.11 / 16.4 ms (antes 0.13 / 33.3).
+      - Bugs y propuestas medidas que NO entraron por superficie o por riesgo visual: P1 cargar solo
+        el locale activo (i18n 53.876 B, uno de los dos idiomas nunca se usa, ~ -32 ms locales y
+        ~ -9 ms en produccion); P2 sacar gsap del camino critico (~ -82 ms locales) pero su
+        animacion es del hero y podria parpadear al diferirse; P3 diferir componentes que si se
+        pintan en movil o en /amigos (viola la regla de oro); P4 Google Fonts como stylesheet
+        render-blocking de un tercero en index.html:36 (el unico punto de la cadena critica que no
+        controlamos, y en una red restringida directamente falla); P5 bug latente en
+        `vite.config.js`: `id.includes('react')` atrapa `lucide-react` (contiene "react") y deja la
+        rama vendor-icons como codigo muerto, ~70 kB de iconos terminan en vendor-react (0 ms de
+        ganancia, es higiene); P6 el burst de miniaturas bajo el pliegue cuesta <= 76 ms de LCP.
+      - Caveat de medicion: el servidor del arnes sirve sin comprimir y por HTTP/1.1, asi que en
+        Vercel esos 756 kB son ~202 kB y los recortes de bytes rinden ~3.7x menos. Por eso P1+P2
+        (~97 kB crudos) valdrian ~30 ms reales, por debajo del ruido del instrumento.
+      Evidencia: /tmp/f3-{before,after}-startup.json, /tmp/f3-{before,after}-cont.json,
+      /tmp/dist-f3-before.
 
 ## Fase 4 — Guardarrailes
 
@@ -111,11 +136,13 @@ Meta: que esto no vuelva a engordar sin que nadie se entere.
 
 Fase 0 cerrada. Fase 1 / T1 hecho y medido (criterio de bytes sin cumplir, ver arriba). T2 diferido a
 despues de la Fase 2 por impacto. Fase 2 / T3 hecho y medido: gana el caso realista (2400) y no
-alcanza a cubrir un volantazo de 3000 px en 675 ms, por piso de ancho de banda.
+alcanza a cubrir un volantazo de 3000 px en 675 ms, por piso de ancho de banda. Fase 3 / T4 medido y
+diagnosticado: el JS critico ya es el minimo necesario y lo recortable no pasa el umbral de medicion
+en produccion. Fase 4 / T5 en curso.
 
 ## Siguiente paso
 
-T3.b (opcional): subir el ritmo del calentador en ocio (120 ms -> ~40 ms, ventana 30 -> 60) para
-llenar mas rapido la ventaja, y/o bajar bytes por tarjeta. Lo segundo toca la nitidez del arte:
-decision de producto. Fase 3 / T4: LCP, long tasks y que bloquea el primer pintado (el JS es el 25%
-de la carga en frio).
+T5: presupuesto reproducible (npm run perf) con umbrales por metrica, para que esto no vuelva a
+engordar sin que nadie se entere. Pendientes con decision de producto: P4 (autoalojar las fuentes
+para quitar el tercero render-blocking, cero cambio visual, pero exige descargar los woff2) y T3.b
+(subir el ritmo del calentador y/o bajar bytes por tarjeta, que toca la nitidez del arte).

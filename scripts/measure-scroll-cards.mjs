@@ -18,13 +18,23 @@
 // "continuous" (pasos de 200 px cada 45 ms, lo que hace una rueda real: el navegador precarga
 // por distancia y los lazy entran de a poco en el viewport).
 //
-// --scenario <scroll|idle> (default scroll):
+// --scenario <scroll|idle|startup> (default scroll):
 //   scroll: comportamiento historico (pasos de scroll en cada offset).
 //   idle:   carga, espera el mismo settle que scroll, NO scrollea. Reporta
 //           collageCompleteMs (ms desde el inicio de la pagina hasta que termina de responder la
 //           ultima request /sprites/collage/) y, despues, invoca la vista de compartir por su
 //           nombre accesible y reporta shareReadyMs (ms desde la invocacion hasta que no arranca
 //           ninguna request /sprites/collage/ nueva durante 600 ms).
+//   startup: carga y espera el mismo settle, NO scrollea y NO clickea nada (no invoca compartir).
+//           Reporta metricas de arranque instrumentadas con evaluateOnNewDocument ANTES del goto:
+//           lcpMs/lcpElement/lcpSize, fcpMs, ttfbMs, domContentLoadedMs, loadEventMs, longTasks
+//           (count/totalMax/top5), firstSpriteCardMs, jsCriticalBytes (scripts que terminan de
+//           responder antes del LCP) y la primera request a Supabase.
+//
+// --block-urls <patrones> (default vacio): lista separada por comas de patrones de URL que se
+// bloquean a nivel de red via CDP Network.setBlockedURLs. Sirve para medir que compraria diferir
+// un candidato SIN tocar el codigo de la app: los imports dinamicos bloqueados rechazan y el
+// try/catch de la app los traga, asi que el arnes sigue igual. Ej: --block-urls "*supabase*".
 //
 // IMPORTANTE: --throttle aplica perfiles SINTETICOS via CDP (Network.emulateNetworkConditions
 // + Emulation.setCPUThrottlingRate) ANTES del goto. En localhost la latencia es ~0 y el ancho
@@ -119,6 +129,7 @@ function parseArgs(argv) {
     scenario: 'scroll',
     logNetwork: false,
     debugRects: false,
+    blockUrls: [],
     offsets: DEFAULT_OFFSETS.slice()
   };
   for (let i = 0; i < argv.length; i += 1) {
@@ -148,6 +159,12 @@ function parseArgs(argv) {
       args.logNetwork = true;
     } else if (flag === '--debug-rects') {
       args.debugRects = true;
+    } else if (flag === '--block-urls') {
+      args.blockUrls = String(argv[i + 1] || '')
+        .split(',')
+        .map((part) => part.trim())
+        .filter((part) => part.length > 0);
+      i += 1;
     } else if (flag === '--offsets') {
       args.offsets = String(argv[i + 1] || '')
         .split(',')
@@ -167,8 +184,8 @@ function parseArgs(argv) {
   if (args.scrollMode !== 'jump' && args.scrollMode !== 'continuous') {
     throw new Error('--scroll-mode debe ser jump o continuous');
   }
-  if (args.scenario !== 'scroll' && args.scenario !== 'idle') {
-    throw new Error('--scenario debe ser scroll o idle');
+  if (args.scenario !== 'scroll' && args.scenario !== 'idle' && args.scenario !== 'startup') {
+    throw new Error('--scenario debe ser scroll, idle o startup');
   }
   if (args.offsets.length === 0) {
     throw new Error('--offsets debe listar al menos un entero');
@@ -570,6 +587,256 @@ async function measureShareReady(page, quietMs, maxMs) {
   }, { quietMs, maxMs, marca: COLLAGE_URL_MARK });
 }
 
+// Instrumentacion de arranque (escenario startup). Se instala con evaluateOnNewDocument ANTES
+// del goto para que los observers (LCP, longtask, MutationObserver) existan antes de que corra el
+// codigo de la app. Todo lo que es tiempo queda en el reloj de performance.now() (timeOrigin), el
+// mismo de Resource Timing.
+function installStartupInstrumentation(page) {
+  return page.evaluateOnNewDocument(() => {
+    const estado = {
+      lcpMs: null,
+      lcpElement: null,
+      lcpSize: null,
+      lcpCandidates: [],
+      longTasks: [],
+      firstSpriteCardMs: null,
+      firstSupabaseUrl: null,
+      firstSupabaseRequestStartMs: null,
+      firstSupabaseResponseEndMs: null
+    };
+    const clavesLongTask = new Set();
+    const lcpStartTimes = new Set();
+
+    const redondear = (v) => (typeof v === 'number' && Number.isFinite(v) ? Math.round(v * 100) / 100 : null);
+
+    const describir = (el) => {
+      if (!el || !el.tagName) return null;
+      const clases = String((el.getAttribute && el.getAttribute('class')) || '')
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2);
+      return String(el.tagName).toLowerCase() + (clases.length > 0 ? '.' + clases.join('.') : '');
+    };
+
+    const esRutaScript = (nombre) => {
+      try {
+        const p = new URL(nombre, location.href).pathname.toLowerCase();
+        return p.endsWith('.js') || p.endsWith('.mjs');
+      } catch {
+        return false;
+      }
+    };
+
+    const recursos = () => {
+      try {
+        return performance.getEntriesByType('resource');
+      } catch {
+        return [];
+      }
+    };
+
+    const primeraSupabase = (entradas) => {
+      const coincidencias = entradas.filter((e) => /supabase/i.test(e.name));
+      coincidencias.sort((a, b) => a.startTime - b.startTime);
+      return coincidencias[0] || null;
+    };
+
+    const vacio = () => ({
+      lcpMs: null, lcpElement: null, lcpSize: null,
+      lcpCandidates: [], lcpInitialMs: null, lcpCandidatesCount: 0,
+      fcpMs: null, ttfbMs: null, domContentLoadedMs: null, loadEventMs: null,
+      longTaskCount: 0, longTaskTotalMs: 0, longTaskMaxMs: 0, longTasksTop5: [],
+      jsCriticalBytes: null, jsCriticalBytesAtStart: null, jsCriticalUrls: [],
+      firstSpriteCardMs: null,
+      firstSupabaseRequestStartMs: null, firstSupabaseResponseEndMs: null, firstSupabaseUrl: null,
+      supabaseRequestCount: 0
+    });
+
+    // LCP: nos quedamos con la ultima entrada observada (la candidata mas reciente).
+    try {
+      const obsLcp = new PerformanceObserver((lista) => {
+        const entradas = lista.getEntries();
+        // Guardamos TODAS las candidatas: el hero rota cada 3.5 s y llegan tardias mas grandes,
+        // asi que el ultimo lcpMs es inestable. lcpMs/lcpElement/lcpSize siguen siendo la ultima,
+        // pero lcpCandidates da la linea de tiempo honesta. Dedupe por startTime porque
+        // buffered:true puede reentregar entradas ya vistas.
+        for (const entrada of entradas) {
+          if (typeof entrada.startTime !== 'number' || lcpStartTimes.has(entrada.startTime)) continue;
+          lcpStartTimes.add(entrada.startTime);
+          estado.lcpCandidates.push({
+            startTime: entrada.startTime,
+            size: typeof entrada.size === 'number' ? entrada.size : null,
+            element: describir(entrada.element)
+          });
+        }
+        const ultima = entradas[entradas.length - 1];
+        if (!ultima) return;
+        estado.lcpMs = ultima.startTime;
+        estado.lcpSize = typeof ultima.size === 'number' ? ultima.size : null;
+        estado.lcpElement = describir(ultima.element);
+      });
+      obsLcp.observe({ type: 'largest-contentful-paint', buffered: true });
+    } catch { /* noop */ }
+
+    // Tareas largas (> 50 ms): buffered:true entrega lo ya ocurrido; el Set evita duplicados.
+    try {
+      const obsLong = new PerformanceObserver((lista) => {
+        for (const entrada of lista.getEntries()) {
+          const clave = entrada.startTime + ':' + entrada.duration;
+          if (clavesLongTask.has(clave)) continue;
+          clavesLongTask.add(clave);
+          if (entrada.duration > 50) {
+            estado.longTasks.push({ startTime: entrada.startTime, duration: entrada.duration });
+          }
+        }
+      });
+      obsLong.observe({ type: 'longtask', buffered: true });
+    } catch { /* noop */ }
+
+    // Primera tarjeta del grid: MutationObserver sobre todo el documento, o marca inmediata si ya
+    // existe una cuando se instala el observer.
+    try {
+      const marcar = () => {
+        if (estado.firstSpriteCardMs === null) estado.firstSpriteCardMs = performance.now();
+      };
+      if (document.querySelector('.sprite-card')) {
+        marcar();
+      } else {
+        const obsCartas = new MutationObserver(() => {
+          if (document.querySelector('.sprite-card')) {
+            marcar();
+            obsCartas.disconnect();
+          }
+        });
+        obsCartas.observe(document, { childList: true, subtree: true });
+      }
+    } catch { /* noop */ }
+
+    // Supabase: sondeo periodico hasta la primera request cuyo name contenga 'supabase'.
+    try {
+      const buscarSupabase = () => {
+        if (estado.firstSupabaseUrl !== null) return;
+        const primera = primeraSupabase(recursos());
+        if (primera) {
+          estado.firstSupabaseUrl = primera.name;
+          estado.firstSupabaseRequestStartMs = primera.startTime;
+          estado.firstSupabaseResponseEndMs = primera.responseEnd;
+        }
+      };
+      const intervalo = setInterval(() => {
+        buscarSupabase();
+        if (estado.firstSupabaseUrl !== null) clearInterval(intervalo);
+      }, 50);
+    } catch { /* noop */ }
+
+    // Lector que el arnes llama al final de la corrida. Nunca tira: devuelve nulls/vacios.
+    window.__startupMetrics = () => {
+      try {
+        const es = recursos();
+
+        let lcpMs = estado.lcpMs;
+        if (lcpMs === null) {
+          try {
+            const lcps = performance.getEntriesByType('largest-contentful-paint');
+            if (lcps && lcps.length > 0) {
+              const ultima = lcps[lcps.length - 1];
+              lcpMs = ultima.startTime;
+              estado.lcpSize = typeof ultima.size === 'number' ? ultima.size : estado.lcpSize;
+              estado.lcpElement = describir(ultima.element) || estado.lcpElement;
+            }
+          } catch { /* noop */ }
+        }
+
+        let fcpMs = null;
+        try {
+          const fcp = performance.getEntriesByName('first-contentful-paint')[0];
+          fcpMs = fcp ? fcp.startTime : null;
+        } catch { /* noop */ }
+
+        let ttfbMs = null;
+        let domContentLoadedMs = null;
+        let loadEventMs = null;
+        try {
+          const nav = performance.getEntriesByType('navigation')[0] || null;
+          if (nav) {
+            ttfbMs = nav.responseStart;
+            domContentLoadedMs = nav.domContentLoadedEventEnd;
+            loadEventMs = nav.loadEventEnd;
+          }
+        } catch { /* noop */ }
+
+        const longTasks = estado.longTasks
+          .slice()
+          .sort((a, b) => a.startTime - b.startTime)
+          .map((t) => ({ startTime: redondear(t.startTime), duration: redondear(t.duration) }));
+        const longTaskTotalMs = estado.longTasks.reduce((acc, t) => acc + (Number(t.duration) || 0), 0);
+        const longTaskMaxMs = estado.longTasks.reduce((acc, t) => Math.max(acc, Number(t.duration) || 0), 0);
+        const longTasksTop5 = estado.longTasks
+          .slice()
+          .sort((a, b) => b.duration - a.duration)
+          .slice(0, 5)
+          .map((t) => ({ startTime: redondear(t.startTime), duration: redondear(t.duration) }));
+
+        // Scripts del camino critico: initiatorType 'script' o pathname .js/.mjs. transferSize es
+        // 0 en aciertos de cache (y 0 tambien si el recurso fuese cross-origin sin Timing-Allow-
+        // Origin; aqui todo es mismo origen, asi que 0 significa cache). Si no hubo LCP, los
+        // totales de bytes del camino critico quedan en null.
+        const scripts = es.filter((e) => e.initiatorType === 'script' || esRutaScript(e.name));
+        const criticos = lcpMs === null ? [] : scripts.filter((e) => e.responseEnd <= lcpMs);
+        const jsCriticalBytes = lcpMs === null
+          ? null
+          : criticos.reduce((acc, e) => acc + (Number(e.transferSize) || 0), 0);
+        const jsCriticalBytesAtStart = lcpMs === null
+          ? null
+          : scripts.filter((e) => e.startTime <= lcpMs).reduce((acc, e) => acc + (Number(e.transferSize) || 0), 0);
+        const jsCriticalUrls = criticos.map((e) => e.name);
+
+        let firstSupabaseUrl = estado.firstSupabaseUrl;
+        let firstSupabaseRequestStartMs = estado.firstSupabaseRequestStartMs;
+        let firstSupabaseResponseEndMs = estado.firstSupabaseResponseEndMs;
+        const supabaseEntradas = es.filter((e) => /supabase/i.test(e.name));
+        if (firstSupabaseUrl === null && supabaseEntradas.length > 0) {
+          const primera = primeraSupabase(supabaseEntradas);
+          firstSupabaseUrl = primera.name;
+          firstSupabaseRequestStartMs = primera.startTime;
+          firstSupabaseResponseEndMs = primera.responseEnd;
+        }
+
+        return {
+          lcpMs: redondear(lcpMs),
+          lcpElement: estado.lcpElement,
+          lcpSize: redondear(estado.lcpSize),
+          lcpCandidates: estado.lcpCandidates.map((c) => ({
+            startTime: redondear(c.startTime),
+            size: redondear(c.size),
+            element: c.element
+          })),
+          lcpInitialMs: estado.lcpCandidates.length > 0 ? redondear(estado.lcpCandidates[0].startTime) : null,
+          lcpCandidatesCount: estado.lcpCandidates.length,
+          fcpMs: redondear(fcpMs),
+          ttfbMs: redondear(ttfbMs),
+          domContentLoadedMs: redondear(domContentLoadedMs),
+          loadEventMs: redondear(loadEventMs),
+          longTaskCount: longTasks.length,
+          longTaskTotalMs: redondear(longTaskTotalMs),
+          longTaskMaxMs: redondear(longTaskMaxMs),
+          longTasksTop5,
+          jsCriticalBytes,
+          jsCriticalBytesAtStart,
+          jsCriticalUrls,
+          firstSpriteCardMs: redondear(estado.firstSpriteCardMs),
+          firstSupabaseRequestStartMs: redondear(firstSupabaseRequestStartMs),
+          firstSupabaseResponseEndMs: redondear(firstSupabaseResponseEndMs),
+          firstSupabaseUrl,
+          supabaseRequestCount: supabaseEntradas.length
+        };
+      } catch {
+        return vacio();
+      }
+    };
+  });
+}
+
 async function runOnce(cfg, baseUrl, runIndex) {
   const userDataDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'scroll-cards-'));
   let browser = null;
@@ -592,6 +859,11 @@ async function runOnce(cfg, baseUrl, runIndex) {
       if (response && response.url) statusByUrl.set(response.url, response.status);
     });
     await client.send('Network.enable');
+    // --block-urls: bloqueo a nivel de red via CDP. Un import dinamico bloqueado rechaza y la app
+    // lo traga en su try/catch, asi que el arnes no se detiene por eso.
+    if (cfg.blockUrls.length > 0) {
+      await client.send('Network.setBlockedURLs', { urls: cfg.blockUrls });
+    }
     if (cfg.throttle) {
       await client.send('Network.emulateNetworkConditions', {
         offline: false,
@@ -600,6 +872,13 @@ async function runOnce(cfg, baseUrl, runIndex) {
         uploadThroughput: cfg.throttle.uploadThroughput
       });
       await client.send('Emulation.setCPUThrottlingRate', { rate: cfg.throttle.cpuRate });
+    }
+
+    // Instrumentacion de arranque: se instala ANTES del goto para que los observers (LCP,
+    // longtask, MutationObserver) existan antes de que corra el codigo de la app. Solo en el
+    // escenario startup para no alterar las mediciones de scroll/idle.
+    if (cfg.scenario === 'startup') {
+      await installStartupInstrumentation(page);
     }
 
     await page.goto(baseUrl, { waitUntil: 'load' });
@@ -626,6 +905,13 @@ async function runOnce(cfg, baseUrl, runIndex) {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
     const idleMs = Date.now() - idleStart;
+
+    // Escenario startup: lee las metricas instrumentadas por evaluateOnNewDocument despues de la
+    // espera de red (el lector vuelve a escanear Resource Timing y nunca tira). El resto de
+    // escenarios deja startup en null para no cambiar el JSON existente.
+    const startup = cfg.scenario === 'startup'
+      ? await page.evaluate(() => (typeof window.__startupMetrics === 'function' ? window.__startupMetrics() : null))
+      : null;
 
     // Fase de carga: todo lo pedido antes del primer paso. Ahi caen los 404 de la primera
     // pantalla, que si no se atribuirian a un paso de scroll que no los causo.
@@ -742,6 +1028,7 @@ async function runOnce(cfg, baseUrl, runIndex) {
       loadIdleTimedOut: idleTimedOut,
       steps,
       idle,
+      startup,
       warm,
       runTransferBytes
     };
@@ -838,6 +1125,7 @@ function buildSummary(runs, cfg) {
       scenario: cfg.scenario,
       continuous: { stridePx: CONTINUOUS_STRIDE_PX, intervalMs: CONTINUOUS_INTERVAL_MS },
       logNetwork: cfg.logNetwork,
+      blockUrls: cfg.blockUrls,
       offsets: cfg.offsets,
       stepOffsets: cfg.stepOffsets,
       runs: runs.length,
@@ -858,6 +1146,7 @@ function buildSummary(runs, cfg) {
       : null,
     perOffset,
     idle: runs.some((run) => run.idle) ? buildIdleSummary(runs) : null,
+    startup: runs.some((run) => run.startup) ? buildStartupSummary(runs) : null,
     warm,
     totals
   };
@@ -882,6 +1171,41 @@ function buildIdleSummary(runs) {
   };
 }
 
+// Resumen del escenario startup: medianas por metrica sobre las corridas con datos. lcpElement,
+// lcpCandidates, longTasksTop5 y firstSupabaseUrl son de la primera corrida (no tienen mediana
+// util); el resto se agrega con median sobre los run.startup presentes.
+function buildStartupSummary(runs) {
+  const entradas = runs.map((run) => run.startup).filter(Boolean);
+  const m = (fn) => round(median(entradas.map(fn)));
+  const jsCriticalUrls = [...new Set(entradas.flatMap((e) => e.jsCriticalUrls || []))].sort();
+  return {
+    lcpMs: m((e) => e.lcpMs),
+    lcpElement: entradas[0].lcpElement,
+    lcpSize: m((e) => e.lcpSize),
+    lcpInitialMs: m((e) => e.lcpInitialMs),
+    lcpCandidatesCount: m((e) => e.lcpCandidatesCount),
+    lcpCandidates: entradas[0].lcpCandidates,
+    fcpMs: m((e) => e.fcpMs),
+    ttfbMs: m((e) => e.ttfbMs),
+    domContentLoadedMs: m((e) => e.domContentLoadedMs),
+    loadEventMs: m((e) => e.loadEventMs),
+    longTaskCount: m((e) => e.longTaskCount),
+    longTaskTotalMs: m((e) => e.longTaskTotalMs),
+    longTaskMaxMs: m((e) => e.longTaskMaxMs),
+    longTasksTop5: entradas[0].longTasksTop5,
+    jsCriticalBytes: m((e) => e.jsCriticalBytes),
+    jsCriticalBytesAtStart: m((e) => e.jsCriticalBytesAtStart),
+    jsCriticalUrls,
+    jsCriticalUrlsCount: jsCriticalUrls.length,
+    firstSpriteCardMs: m((e) => e.firstSpriteCardMs),
+    firstSupabaseRequestStartMs: m((e) => e.firstSupabaseRequestStartMs),
+    firstSupabaseResponseEndMs: m((e) => e.firstSupabaseResponseEndMs),
+    firstSupabaseUrl: entradas[0].firstSupabaseUrl,
+    supabaseRequestCount: m((e) => e.supabaseRequestCount),
+    runs: entradas.length
+  };
+}
+
 function fmtMs(value) {
   return value === null || value === undefined ? 'null' : round(value);
 }
@@ -896,6 +1220,7 @@ async function main() {
     scenario: args.scenario,
     logNetwork: args.logNetwork,
     debugRects: args.debugRects,
+    blockUrls: args.blockUrls,
     throttleName: args.throttle,
     throttle: THROTTLES[args.throttle]
   };
@@ -914,6 +1239,7 @@ async function main() {
       '[measure] dir=' + cfg.dir + ' throttle=' + cfg.throttleName + ' scroll=' + cfg.scrollMode +
       ' logNetwork=' + cfg.logNetwork + ' runs=' + args.runs +
       ' scenario=' + cfg.scenario +
+      (cfg.blockUrls.length > 0 ? ' blockUrls=' + cfg.blockUrls.join(',') : '') +
       ' offsets=' + cfg.offsets.join(',') + ' viewport=' + VIEWPORT.width + 'x' + VIEWPORT.height
     );
     if (cfg.throttleName !== 'none') {
@@ -936,6 +1262,19 @@ async function main() {
           ' (uniq=' + result.load.urls404.length + ')' +
           ' fallbackCards=' + result.load.fallbackCardsAtLoad +
           ' idleMs=' + result.loadIdleMs + (result.loadIdleTimedOut ? ' (IDLE_TIMEOUT)' : '')
+        );
+      }
+      if (result.startup) {
+        console.log(
+          '  run ' + i + ' STARTUP: lcpMs=' + fmtMs(result.startup.lcpMs) +
+          ' fcpMs=' + fmtMs(result.startup.fcpMs) +
+          ' ttfbMs=' + fmtMs(result.startup.ttfbMs) +
+          ' dclMs=' + fmtMs(result.startup.domContentLoadedMs) +
+          ' loadMs=' + fmtMs(result.startup.loadEventMs) +
+          ' firstSpriteCardMs=' + fmtMs(result.startup.firstSpriteCardMs) +
+          ' longTasks=' + result.startup.longTaskCount +
+          ' longTaskMaxMs=' + fmtMs(result.startup.longTaskMaxMs) +
+          ' jsCriticalBytes=' + (result.startup.jsCriticalBytes === null ? 'null' : result.startup.jsCriticalBytes)
         );
       }
       for (const step of result.steps) {
@@ -1002,6 +1341,32 @@ async function main() {
           ' (usa collageCompleteMs como guardarrail alternativo)'
         );
       }
+    }
+    if (summary.startup) {
+      console.log(
+        '[measure] startup: lcpMs=' + summary.startup.lcpMs +
+        ' lcpElement=' + (summary.startup.lcpElement === null ? 'null' : summary.startup.lcpElement) +
+        ' lcpSize=' + summary.startup.lcpSize +
+        ' lcpInitialMs=' + summary.startup.lcpInitialMs +
+        ' lcpCandidates=' + summary.startup.lcpCandidatesCount +
+        ' fcpMs=' + summary.startup.fcpMs +
+        ' ttfbMs=' + summary.startup.ttfbMs +
+        ' dclMs=' + summary.startup.domContentLoadedMs +
+        ' loadMs=' + summary.startup.loadEventMs +
+        ' firstSpriteCardMs=' + summary.startup.firstSpriteCardMs +
+        ' longTasks=' + summary.startup.longTaskCount +
+        ' longTaskTotalMs=' + summary.startup.longTaskTotalMs +
+        ' longTaskMaxMs=' + summary.startup.longTaskMaxMs +
+        ' jsCriticalBytes=' + summary.startup.jsCriticalBytes +
+        ' jsCriticalBytesAtStart=' + summary.startup.jsCriticalBytesAtStart +
+        ' supabaseReq=' + summary.startup.supabaseRequestCount +
+        ' firstSupabaseStartMs=' + summary.startup.firstSupabaseRequestStartMs +
+        ' firstSupabaseEndMs=' + summary.startup.firstSupabaseResponseEndMs
+      );
+      console.log(
+        '    jsCriticalUrls@startup: ' +
+        (summary.startup.jsCriticalUrls.length > 0 ? summary.startup.jsCriticalUrls.join(' ') : '(ninguna)')
+      );
     }
     console.log('[measure] medianas por offset:');
     for (const offset of cfg.stepOffsets) {
