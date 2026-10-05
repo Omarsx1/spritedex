@@ -23,7 +23,7 @@ const COLLAGE_DIR = path.join(PUBLIC_DIR, 'sprites', 'collage');
 const MANIFEST_PATH = path.join(ROOT, 'src', 'data', 'sprite_thumbs.json');
 
 const MIN_SOURCE_BYTES = 24 * 1024;
-const WEBP_QUALITY = '80';
+const WEBP_QUALITY = '70';
 // Lado mayor de la miniatura. La tarjeta mide 205x284 CSS px, asi que 448 cubre
 // pantallas retina 2x sin acercarse al peso del origen de 512.
 const MAX_SIZE = 448;
