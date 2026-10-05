@@ -239,6 +239,10 @@ export function loadImage(src, bajaPrioridad = false) {
 
 // Precarga anticipada de recursos por lotes en reposo (idle) sin saturar la red ni bloquear el hilo.
 let turnoPrecarga = 0;
+// Pausa del calentamiento mientras el usuario scrollea: primero ve el arte de las tarjetas que
+// esta mirando, despues se calienta el export. La via rapida de la vista de compartir no se pausa.
+const PRECARGA_SCROLL_QUIET_MS = 700;
+const PRECARGA_SCROLL_RETRY_MS = 250;
 // Las tandas son pequenas y espaciadas a proposito: antes eran de 30 imagenes cada 16 ms,
 // o sea ~1,8 MB de miniaturas saliendo de golpe mientras la app pintaba la primera pantalla.
 export function preloadCanvasAssets(spritesList = [], batchSize = 4) {
@@ -251,9 +255,28 @@ export function preloadCanvasAssets(spritesList = [], batchSize = 4) {
     // multiplicaban, que es justo lo que se queria evitar.
     const miTurno = ++turnoPrecarga;
     let index = 0;
+    // Actividad de scroll del usuario: si acaba de scrollear, se espera. Nunca preventDefault.
+    let lastScrollAt = -Infinity;
+    const anotarScroll = () => { lastScrollAt = performance.now(); };
+    const alVolverVisible = () => {
+      if (document.visibilityState === 'visible') processBatch();
+    };
+    const quitarListeners = () => {
+      window.removeEventListener('scroll', anotarScroll);
+      document.removeEventListener('visibilitychange', alVolverVisible);
+    };
     const processBatch = () => {
-      if (miTurno !== turnoPrecarga) return;
-      if (index >= spritesList.length) return;
+      if (miTurno !== turnoPrecarga) { quitarListeners(); return; }
+      if (index >= spritesList.length) { quitarListeners(); return; }
+      if (esperasActivas <= 0) {
+        // Sin nadie esperando: no se calienta con la pestana oculta ni mientras el usuario
+        // scrollea. Se reprograma y se reintenta mas tarde (nada de busy loops).
+        if (document.visibilityState === 'hidden') return;
+        if (performance.now() - lastScrollAt < PRECARGA_SCROLL_QUIET_MS) {
+          setTimeout(processBatch, PRECARGA_SCROLL_RETRY_MS);
+          return;
+        }
+      }
       const slice = spritesList.slice(index, index + batchSize);
       index += batchSize;
       slice.forEach(s => {
@@ -276,8 +299,13 @@ export function preloadCanvasAssets(spritesList = [], batchSize = 4) {
         } else {
           setTimeout(processBatch, 900);
         }
+      } else {
+        quitarListeners();
       }
     };
+
+    window.addEventListener('scroll', anotarScroll, { passive: true });
+    document.addEventListener('visibilitychange', alVolverVisible);
 
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     const fast = !connection || connection.effectiveType === '4g' || connection.effectiveType === undefined;

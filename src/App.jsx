@@ -35,6 +35,7 @@ import { mergeCollections, sinPerfil } from './utils/mergeCollections';
 import { estadoAlTocarNivel } from './utils/niveles';
 import { setSyncSession, queueCloudSync, clearCloudSync, flushCloudSync } from './utils/pendingSync';
 import { safeStorage } from './utils/safeStorage';
+import { iniciarCalentador } from './utils/spritePrefetch';
 import {
   getMyFriendCode,
   fetchCollectionByFriendCode,
@@ -295,15 +296,28 @@ export function App() {
     return () => { cancelado = true; };
   }, [shareToken]);
 
-  // Precarga silenciosa no bloqueante en reposo (idle) para que la exportación sea instantánea
+  // Precarga silenciosa no bloqueante para que la exportación sea instantánea, pero SIN competir
+  // con lo que el usuario está mirando. Ya no hay un temporizador fijo de 1500 ms: el
+  // calentamiento arranca con la primera intención (puntero, rueda, teclado) o en el primer hueco
+  // de reposo, y solo con la pestaña visible.
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return undefined;
 
-    const idleTimer = setTimeout(() => {
+    let yaArranco = false;
+    let idleHandle = null;
+    let idleFallbackTimer = null;
+    let quitarListeners = () => {};
+
+    const calentar = () => {
+      if (yaArranco) return;
+      if (document.visibilityState !== 'visible') return;
+      yaArranco = true;
+      quitarListeners();
+
       // 1. Precarga del chunk del modal en la caché del navegador
       import('./components/SharePage');
 
-      // 2. Precarga en reposo de las MINIATURAS que usara el export (por lotes de 10),
+      // 2. Precarga en reposo de las MINIATURAS que usara el export (por lotes de 4),
       // para que compartir sea instantaneo. Son ~1,5 MB por generacion, no los 19 MB
       // de originales que se precargaban antes. Se salta con ahorro de datos o 2G.
       const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -323,9 +337,30 @@ export function App() {
           preloadCanvasAssets(preloadList, 4);
         }
       });
-    }, 1500);
+    };
 
-    return () => clearTimeout(idleTimer);
+    // Via 1: la primera intencion del usuario. Si esta scrolleando o tocando algo, esa era su
+    // prioridad: el calentamiento arranca igual, pero el exportador se pausa mientras haya scroll.
+    const eventos = ['pointerdown', 'wheel', 'touchstart', 'keydown'];
+    eventos.forEach((evento) => window.addEventListener(evento, calentar, { once: true, passive: true }));
+    quitarListeners = () => {
+      eventos.forEach((evento) => window.removeEventListener(evento, calentar));
+    };
+
+    // Via 2: el primer hueco de reposo despues de la carga (con tope de 4 s).
+    if (typeof window.requestIdleCallback === 'function') {
+      idleHandle = window.requestIdleCallback(() => calentar(), { timeout: 4000 });
+    } else {
+      idleFallbackTimer = setTimeout(calentar, 4000);
+    }
+
+    return () => {
+      quitarListeners();
+      if (idleHandle !== null && typeof window.cancelIdleCallback === 'function') {
+        window.cancelIdleCallback(idleHandle);
+      }
+      if (idleFallbackTimer !== null) clearTimeout(idleFallbackTimer);
+    };
   }, [dynamicSprites, activeGen]);
 
   // Listen to Supabase Auth State & Sync Cloud Data
@@ -764,6 +799,18 @@ export function App() {
       return true;
     });
  }, [dynamicSprites, activeGen, showUnreleased]);
+
+  // Calentador de miniaturas del grid. OJO: va despues de scopedSprites a proposito, porque
+  // filteredSprites (su dependencia) es un useMemo declarado mas arriba; antes seria un TDZ.
+  useEffect(() => {
+    // Calentador aditivo: deja en cache el arte de las tarjetas que estan por entrar al
+    // viewport. Si no corre o falla, la app se comporta igual que sin el.
+    const grid = document.querySelector('.sprites-grid');
+    if (!grid) return undefined;
+    const elementos = Array.from(grid.querySelectorAll('.sprite-card'));
+    const urls = filteredSprites.map((sprite) => sprite.thumb || sprite.image);
+    return iniciarCalentador(elementos, urls);
+  }, [dynamicSprites, activeGen, filteredSprites, viewMode]);
 
   // Precalcula en segundo plano la captura de la modal de compartir. Es lo que hace
   // que la app local se sienta inmediata: alli la modal sale de cache. Sin esto, cada
