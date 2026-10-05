@@ -144,7 +144,21 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // v48: el nombre se ajusta de verdad a su banda: crece hasta llenarla, se reparte en
   // dos lineas solo cuando eso lo agranda y se centra con metricas reales de la fuente.
   // v49: el espiritu que falta se pinta apagado (sin color y en penumbra).
-  return `v49_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v50: el pie pasa a firma grande a la izquierda + marca a la derecha; las capturas
+  // v49 guardadas con el pie anterior no valen.
+  // v51: fuera la insignia de prueba del pie (v50 quedo quemada por dos dibujos): las
+  // capturas guardadas con la insignia no valen.
+  // v52: firma y marca del pie comparten tamano; las capturas v51 con la marca pequena
+  // no valen.
+  // v53: mas aire alrededor del pie; las capturas v52 no valen.
+  // v54: mas aire entre la cuadricula y el pie; las capturas v53 no valen.
+  // v55: firma y marca del pie 2 px mas pequenas; las capturas v54 no valen.
+  // v56: los nombres de las fichas comparten una sola talla por lona.
+  // v57: el reparto del nombre prefiere un corte que ENTRE cuando la linea unica se queda
+  // en el suelo desbordando.
+  // v58: el nombre de las fichas va SIEMPRE en blanco pleno (antes los faltantes al 86%);
+  // las capturas v57 (y anteriores) no valen.
+  return `v58_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -721,8 +735,38 @@ export function getSpriteNameLines(ctx, fullName, maxAncho, maxAlto, objetivo, f
     const ajuste = ajustarNombreEnBanda(ctx, lines, maxAncho, maxAlto, objetivo);
     if (!mejor || ajuste.fontSize > mejor.fontSize * 1.10) mejor = ajuste;
   }
+  // Si la linea unica se quedo en el suelo SIN entrar (el bloque desborda la ficha), el
+  // margen del 15% no aplica: gana un reparto que entre de verdad, o el que desborde
+  // menos. Sin esto, nombres como "Exploratormentas Dorado" o "Pastel de Cumpleanos
+  // Dorado" quedaban en una linea saliendose de su tarjeta en las lonas densas.
+  const unaLineaEntra = unaLinea.ancho <= maxAncho && unaLinea.alto <= maxAlto;
+  if (!unaLineaEntra && mejor) {
+    const mejorEntra = mejor.ancho <= maxAncho && mejor.alto <= maxAlto;
+    if (mejorEntra || mejor.ancho < unaLinea.ancho) return mejor;
+  }
   if (mejor && mejor.fontSize > unaLinea.fontSize * NOMBRE_VENTAJA_DOS_LINEAS) return mejor;
   return unaLinea;
+}
+
+// Geometria interna de una ficha (relativa a su esquina): badge de estado abajo, banda
+// del nombre encima y zona del espiritu arriba. Una sola fuente para que el precálculo
+// de la talla unica de nombres use EXACTAMENTE la misma cadena que el dibujo.
+function geometriaFichaNombre(cardW, cardH, conImagen) {
+  const badgeH = Math.max(16, Math.min(28, Math.round(cardH * 0.15)));
+  const bottomGutter = Math.max(8, Math.min(13, Math.round(cardH * 0.045)));
+  const badgeY = cardH - badgeH - bottomGutter;
+  const gapNameBadge = Math.max(3, Math.min(5, Math.round(cardH * 0.018)));
+  const nameZoneH = Math.max(28, Math.min(64, Math.round(cardH * 0.24)));
+  const nameZoneTop = badgeY - gapNameBadge - nameZoneH;
+  const spriteZoneH = Math.max(36, nameZoneTop);
+  const imgSize = Math.max(36, Math.min(Math.floor(cardW * 0.62), Math.floor(spriteZoneH * 0.80)));
+  const imgY = Math.floor((spriteZoneH - imgSize) / 2);
+  const aireBanda = Math.max(4, Math.min(18, Math.round(cardH * 0.028)));
+  const bandaTop = (conImagen ? imgY + imgSize : nameZoneTop) + aireBanda;
+  const bandaAlto = Math.max(24, badgeY - aireBanda - bandaTop);
+  const maxTextW = Math.round(cardW * ANCHO_NOMBRE_FICHA);
+  const objetivo = Math.max(10, Math.min(48, Math.round(cardW * 0.105), Math.round(bandaAlto * 0.52)));
+  return { badgeH, badgeY, imgSize, imgY, bandaTop, bandaAlto, maxTextW, objetivo };
 }
 
 // -------------------------------------------------------------
@@ -897,15 +941,15 @@ async function renderGlitchOverrideTemplate({
   // es el propio marco, que ya cambia de resolucion segun el tamano de la coleccion.
   const anchoDiseno = isSquare ? width : 1080;
 
-  // El pie reserva sitio proporcional al formato: con la firma (ID - nombre) y la marca,
-  // las lonas llenas las dejaban pegadas a la ultima fila de fichas. Todo lo del pie
-  // (alto reservado, tamanos y baselines) escala junto para que el hueco sea el mismo.
+  // El pie reserva sitio proporcional al formato: la firma (ID - nombre) a la izquierda y
+  // la marca a la derecha, en una sola linea y con el mismo tamano. La version con
+  // recuadro y esquinas cargaba la zona (el QR ya tiene esquinas y el pie su marca), asi
+  // que el pie es tipografia limpia con aire alrededor. Todo lo del pie
+  // escala junto.
   const escFooter = anchoDiseno / 1200;
-  const firmaAlto = Math.round(13 * escFooter);
-  const marcaAlto = Math.round(12 * escFooter);
-  const footerH = Math.round(58 * escFooter);
-  const baseFirma = Math.round(34 * escFooter);
-  const baseMarca = Math.round(16 * escFooter);
+  const firmaAlto = Math.round(30 * escFooter);
+  const footerH = Math.round(148 * escFooter);
+  const baseFila = Math.round(60 * escFooter);
 
   // En temporada el encabezado lleva el logo real y necesita su sitio. Se calcula con las
   // MISMAS proporciones con las que luego se dibuja, para que nunca tape la capsula ni la
@@ -941,9 +985,9 @@ async function renderGlitchOverrideTemplate({
       logoAlto = logoH;
       logoMaresListo = { capa: capaLogo, w: logoW, h: logoH, borde: bordeLetras };
     }
-    // Los huecos coinciden con los del dibujo: logo (30) + letras + capsula pegada (6) +
+    // Los huecos coinciden con los del dibujo: logo (23) + letras + capsula pegada (6) +
     // capsula (22) + HUD separado (16) + HUD (36) + margen (16).
-    const altoNecesario = Math.round(30 * u) + bordeLetras + Math.round(6 * u) + Math.round(22 * u) + Math.round(16 * u) + Math.round(36 * u) + 16;
+    const altoNecesario = Math.round(23 * u) + bordeLetras + Math.round(6 * u) + Math.round(22 * u) + Math.round(16 * u) + Math.round(36 * u) + 16;
     headerH = Math.max(headerH, altoNecesario);
   }
 
@@ -1006,7 +1050,7 @@ async function renderGlitchOverrideTemplate({
   if (logoMaresListo) {
     const logoW = logoMaresListo.w;
     const logoH = logoMaresListo.h;
-    const logoY = Math.round(30 * Math.min(1.15, scale));
+    const logoY = Math.round(23 * Math.min(1.15, scale));
 
     // Halo suave detras del wordmark: profundidad de key art sin ensuciar el dibujo.
     const haloY = logoY + logoH / 2;
@@ -1206,6 +1250,27 @@ async function renderGlitchOverrideTemplate({
   const startX = (width - gridW) / 2;
   const startY = headerH + Math.max(8, Math.floor((availH - gridH) / 2));
 
+  // Talla unica de nombre para TODA la lona: la mayor con la que entra hasta el nombre mas
+  // exigente (cada uno con su mejor reparto). Antes cada nombre estiraba hasta llenar SU
+  // banda y una misma fila mezclaba 21, 23,5 y 25 px; la retícula se lee como una sola.
+  const nombreUniforme = (() => {
+    const refW = cellW - Math.max(4, Math.round(cellW * 0.035)) * 2;
+    const refH = cellH - Math.max(4, Math.round(cellH * 0.035)) * 2;
+    const geoRef = geometriaFichaNombre(refW, refH, true);
+    let talla = Infinity;
+    for (const sprite of spritesList) {
+      const fit = getSpriteNameLines(
+        ctx,
+        pickName(sprite),
+        geoRef.maxTextW,
+        geoRef.bandaAlto,
+        geoRef.objetivo,
+        [sprite.familyName, sprite.familyNameEn, sprite.family_name]
+      );
+      talla = Math.min(talla, fit.fontSize);
+    }
+    return Number.isFinite(talla) ? Math.max(NOMBRE_MIN_PX, Math.round(talla * 2) / 2) : geoRef.objetivo;
+  })();
 
   for (let idx = 0; idx < spritesList.length; idx++) {
     const tanda = esperasActivas > 0 ? TARJETAS_POR_TANDA_ESPERANDO : TARJETAS_POR_TANDA;
@@ -1291,31 +1356,15 @@ async function renderGlitchOverrideTemplate({
     // Tamaños proporcionales a la celda, sin escalones: asi todas las pestañas y cualquier
     // cantidad de espiritus salen con el mismo estilo. Antes habia tres regimenes
     // (normal, compacto y ultra) y el aspecto cambiaba segun cuantos fueran.
-    const badgeH = Math.max(16, Math.min(28, Math.round(cardH * 0.15)));
-    const bottomGutter = Math.max(8, Math.min(13, Math.round(cardH * 0.045)));
-    const badgeY = cardY + cardH - badgeH - bottomGutter;
-
-    // 2. Zona de Nombre: Bounding box simétrico con gap limpio sobre el badge (nombre bajado un poco)
-    const gapNameBadge = Math.max(3, Math.min(5, Math.round(cardH * 0.018)));
-    // La banda del nombre crece con la ficha (tope 64): en fichas grandes el nombre puede
-    // usar su espacio en vez de quedar encogido contra la linea.
-    const nameZoneH = Math.max(28, Math.min(64, Math.round(cardH * 0.24)));
-    const nameZoneBottom = badgeY - gapNameBadge;
-    const nameZoneTop = nameZoneBottom - nameZoneH;
-
-    // 3. Zona del Espíritu: Tamaño aumentado un poquito y centrado en el espacio superior
-    const spriteZoneH = Math.max(36, nameZoneTop - cardY);
-    const imgSize = Math.max(
-      36,
-      Math.min(
-        Math.floor(cardW * 0.62),
-        Math.floor(spriteZoneH * 0.80)
-      )
-    );
-    const imgX = cardX + (cardW - imgSize) / 2;
-    const imgY = cardY + Math.floor((spriteZoneH - imgSize) / 2);
-
+    // La cadena de medidas vive en geometriaFichaNombre: la MISMA que midio nombreUniforme
+    // antes de dibujar. Aqui solo se ancla a la posicion de la ficha.
     const spriteImg = loadedImagesMap[sprite.id];
+    const geo = geometriaFichaNombre(cardW, cardH, !!spriteImg);
+    const badgeH = geo.badgeH;
+    const badgeY = cardY + geo.badgeY;
+    const imgSize = geo.imgSize;
+    const imgX = cardX + (cardW - imgSize) / 2;
+    const imgY = cardY + geo.imgY;
 
     if (spriteImg) {
       ctx.save();
@@ -1369,29 +1418,21 @@ async function renderGlitchOverrideTemplate({
       ctx.restore();
     }
 
-    // C. Nombre: la banda util es el hueco real entre el borde inferior del espiritu y la
-    // linea del estado. El tamano sale de ESA banda (no de un tope fijo) y el bloque se
-    // centra ahi con las metricas reales de la fuente, asi que la ficha se lee igual de
-    // bien con 3 espiritus que con 100.
-    // El nombre no llega a los bordes de la ficha: a ancho completo parecia un titular y le
-    // robaba el aire a la tarjeta.
-    const maxTextW = Math.round(cardW * ANCHO_NOMBRE_FICHA);
-    // Aire propio de la banda (no toca la reserva del espiritu): separa el nombre del
-    // espiritu arriba y de la linea del estado abajo, que es lo que lo hace respirar.
-    const aireBanda = Math.max(4, Math.min(18, Math.round(cardH * 0.028)));
-    const bandaTop = (spriteImg ? imgY + imgSize : nameZoneTop) + aireBanda;
-    const bandaAlto = Math.max(24, badgeY - aireBanda - bandaTop);
-    // Objetivo de una linea: ni mas del 10,5% del ancho de la ficha (una tarjeta pequena no
-    // pide un titular) ni mas de media banda de alto.
-    const objetivoNombre = Math.max(
-      10,
-      Math.min(48, Math.round(cardW * 0.105), Math.round(bandaAlto * 0.52))
-    );
+    // C. Nombre: la banda y su medida llegan ya calculadas por geometriaFichaNombre; aqui
+    // solo se elige el reparto y se centra con las metricas reales de la fuente.
+    // La TALLA es comun a toda la lona (nombreUniforme): la misma fila ya no mezcla 21,
+    // 23,5 y 25 px segun lo que cada nombre pudiera estirarse.
+    const maxTextW = geo.maxTextW;
+    const bandaTop = cardY + geo.bandaTop;
+    const bandaAlto = geo.bandaAlto;
+    const objetivoNombre = geo.objetivo;
 
     ctx.save();
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
-    ctx.fillStyle = isOwned ? '#ffffff' : 'rgba(255, 255, 255, 0.86)';
+    // El nombre va SIEMPRE en blanco pleno: talla y brillo identicos en toda la cuadricula
+    // (la pertenencia ya la cuentan el borde, el badge y el propio espiritu apagado).
+    ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
     ctx.shadowBlur = 4;
     ctx.shadowOffsetY = 1;
@@ -1404,14 +1445,20 @@ async function renderGlitchOverrideTemplate({
       objetivoNombre,
       [sprite.familyName, sprite.familyNameEn, sprite.family_name]
     );
-    ctx.font = `800 ${nameFit.fontSize}px "Outfit", "Inter", sans-serif`;
+    // Talla unica de la lona; el minimo con el propio fit es solo un cinturon por si una
+    // ficha sin imagen cambia la banda (caso raro).
+    const tamanoNombre = Math.min(nombreUniforme, nameFit.fontSize);
+    const medidaNombre = tamanoNombre === nameFit.fontSize
+      ? nameFit
+      : medirBloqueNombre(ctx, nameFit.lines, tamanoNombre);
+    ctx.font = `800 ${tamanoNombre}px "Outfit", "Inter", sans-serif`;
 
     // Centrado geometrico de la banda con el alto real del bloque (ascendente +
     // descendente + interlineado): la misma distancia al espiritu y a la linea en
     // cualquier tamano, sin tanteos de pixeles.
-    const lineHeight = nameFit.fontSize * NOMBRE_LINE_RATIO;
-    const bloqueTop = bandaTop + Math.max(0, (bandaAlto - nameFit.alto) / 2);
-    const primeraLineaY = bloqueTop + nameFit.ascendente;
+    const lineHeight = tamanoNombre * NOMBRE_LINE_RATIO;
+    const bloqueTop = bandaTop + Math.max(0, (bandaAlto - medidaNombre.alto) / 2);
+    const primeraLineaY = bloqueTop + medidaNombre.ascendente;
     for (let f = 0; f < nameFit.lines.length; f += 1) {
       ctx.fillText(nameFit.lines[f], cardX + cardW / 2, primeraLineaY + f * lineHeight);
     }
@@ -1536,35 +1583,47 @@ async function renderGlitchOverrideTemplate({
   }
   ctx.restore();
 
-  // 4. FOOTER WATERMARK
-  // La firma va justo encima de la marca de agua y debajo del QR: es el unico sitio que no
-  // compite ni con la cuadricula ni con el header, y queda al lado del codigo que lleva a
-  // la coleccion. Si el nombre es largo, se reduce el tamano hasta que entra.
-  if (usuario) {
-    ctx.save();
-    ctx.textAlign = 'center';
-    const limite = width * 0.7;
-    let firmaSize = firmaAlto;
-    const textoFirma = t('lona.usuario', { nombre: usuario });
-    ctx.font = `800 ${firmaSize}px "Outfit", "Inter", sans-serif`;
-    while (firmaSize > 9 && ctx.measureText(textoFirma).width > limite) {
-      firmaSize -= 1;
-      ctx.font = `800 ${firmaSize}px "Outfit", "Inter", sans-serif`;
-    }
-    ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(0, 240, 232, 0.45)';
-    ctx.shadowBlur = 8;
-    ctx.fillText(textoFirma, width / 2, height - baseFirma);
-    ctx.restore();
+  // 4. FOOTER: FIRMA A LA IZQUIERDA + MARCA A LA DERECHA
+  // Una sola linea al pie: a la izquierda el ID de Fortnite y a la derecha la marca con
+  // el hashtag. Sin caja ni marco (el recuadro cargaba la zona junto al QR); el aire lo
+  // dan los margenes: lateral, superior e inferior. Si el nombre es muy largo, la pareja encoge
+  // junta hasta que entra.
+  const textoMarca = enTemporada ? t('lona.marcaMares') : t('lona.marca');
+  ctx.save();
+  ctx.textBaseline = 'alphabetic';
+  const footerPadX = Math.round(width * 0.05);
+  const huecoMin = Math.round(24 * escFooter);
+  const areaPie = width - footerPadX * 2;
+  const medirTexto = (texto, size, peso) => {
+    ctx.font = `${peso} ${size}px "Outfit", "Inter", sans-serif`;
+    return ctx.measureText(texto).width;
+  };
+  const textoFirma = usuario ? t('lona.usuario', { nombre: usuario }) : '';
+  // Firma y marca comparten tamano: el pie se lee como una sola linea de identidad.
+  let tamanioPie = firmaAlto;
+  const anchoFirma = usuario ? medirTexto(textoFirma, tamanioPie, 800) : 0;
+  const anchoMarca = medirTexto(textoMarca, tamanioPie, 700);
+  if (anchoFirma + anchoMarca > areaPie - huecoMin) {
+    const factor = Math.max(0.55, (areaPie - huecoMin) / (anchoFirma + anchoMarca));
+    tamanioPie = Math.max(Math.round(14 * escFooter), Math.floor(tamanioPie * factor));
   }
 
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.font = `700 ${marcaAlto}px "Outfit", "Inter", monospace, sans-serif`;
+  const baseFilaY = height - baseFila;
+  if (usuario) {
+    ctx.textAlign = 'left';
+    ctx.font = `800 ${tamanioPie}px "Outfit", "Inter", sans-serif`;
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(0, 240, 232, 0.45)';
+    ctx.shadowBlur = 10;
+    ctx.fillText(textoFirma, footerPadX, baseFilaY);
+  }
+  // La marca: a la derecha cuando hay firma; centrada cuando el pie va solo.
+  ctx.textAlign = usuario ? 'right' : 'center';
+  ctx.font = `700 ${tamanioPie}px "Outfit", "Inter", monospace, sans-serif`;
   ctx.fillStyle = '#38bdf8';
   ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
   ctx.shadowBlur = 6;
-  ctx.fillText(enTemporada ? t('lona.marcaMares') : t('lona.marca'), width / 2, height - baseMarca);
+  ctx.fillText(textoMarca, usuario ? width - footerPadX : width / 2, baseFilaY);
   ctx.restore();
 
   // Codificar el PNG de 1280x2515 es la parte mas cara del export (2-6 s en movil),
