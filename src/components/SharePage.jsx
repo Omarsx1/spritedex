@@ -94,8 +94,11 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
 
   const modalRef = useRef(null);
   const hasEnteredRef = useRef(false);
-  const activeJobIdRef = useRef(0);
   const previewHostRef = useRef(null);
+  // Clave vigente del preview. Los pases viejos quedan descartados por CLAVE (antes se
+  // comparaba un contador de trabajos y un pase de fondo podia descartar un resultado
+  // valido: la vista se quedaba con la lona anterior hasta el siguiente pase de fondo).
+  const activeKeyRef = useRef('');
 
   // Mientras la modal esta abierta hay alguien esperando: el dibujo deja de ceder
   // turno buscando reposo y termina cuanto antes (medido: menos espera sin bloquear).
@@ -106,13 +109,14 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
 
   // Codifica el PNG fuera del camino critico: primero se pinta la captura y despues,
   // en reposo, se prepara el archivo de Descargar/Compartir. Son 2-6 s menos de espera.
-  const queuePngEncode = useCallback((canvasToEncode, key, onlyForJobId, inicioDibujo) => {
+  const queuePngEncode = useCallback((canvasToEncode, key, inicioDibujo) => {
     if (!canvasToEncode) return;
     const run = () => {
-      if (onlyForJobId !== undefined && activeJobIdRef.current !== onlyForJobId) return;
+      // Si mientras tanto la vista cambio de clave, esta codificacion ya no pinta nada.
+      if (activeKeyRef.current !== key) return;
       const inicioCodificacion = Date.now();
       encodeCanvasToImage(canvasToEncode).then((enc) => {
-        if (onlyForJobId !== undefined && activeJobIdRef.current !== onlyForJobId) return;
+        if (activeKeyRef.current !== key) return;
         const prev = globalTemplatePreviewCache.get(key) || {};
         globalTemplatePreviewCache.set(key, { ...prev, canvas: canvasToEncode, url: enc.dataUrl, blob: enc.blob, file: enc.file });
         setDataUrl(enc.dataUrl);
@@ -229,6 +233,7 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
   useEffect(() => {
     const inicioPase = Date.now();
     if (spritesList.length === 0) {
+      activeKeyRef.current = '';
       setDataUrl('');
       setCachedFile(null);
       setCachedBlob(null);
@@ -238,6 +243,8 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
     }
 
     const currentKey = getCanvasCacheKey(format, bgStyle, spritesList.length, ownedInScope, spritesList, userState, firma, alcance, progresoGeneral?.owned ?? null, progresoGeneral?.total ?? null);
+    // Este pase pasa a ser el vigente: cualquier resultado de una clave anterior se descarta.
+    activeKeyRef.current = currentKey;
     const cached = globalTemplatePreviewCache.get(currentKey) || globalCanvasCache.get(currentKey);
     if (cached) {
       const url = typeof cached === 'string' ? cached : (cached.url || cached.dataUrl || '');
@@ -250,9 +257,9 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
       if (cachedCanvas && !url) {
         // La precarga en reposo ya pudo dejar el archivo en disco: usarlo antes de
         // recodificar evita pagar dos veces la misma codificacion.
-        const paseActual = activeJobIdRef.current;
+        const paseKey = currentKey;
         readCachedCapture(currentKey).then((guardada) => {
-          if (activeJobIdRef.current !== paseActual) return;
+          if (activeKeyRef.current !== paseKey) return;
           if (guardada) {
             setDataUrl(guardada.url);
             setCachedBlob(guardada.blob);
@@ -267,18 +274,21 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
     }
 
     setIsGenerating(true);
-    const jobId = ++activeJobIdRef.current;
 
     // Desacoplar la animación de apertura del modal (220ms) para que Android abra a 60/120fps fluidos.
     // Si el modal ya completó su entrada, usar un debounce suave de 60ms para evitar colisiones entre clics rápidos.
     const delay = hasEnteredRef.current ? 60 : 180;
 
     const timer = setTimeout(async () => {
-      if (activeJobIdRef.current !== jobId) return;
+      if (activeKeyRef.current !== currentKey) return;
 
       // Antes de dibujar nada: ¿esta misma captura ya se genero en este dispositivo?
-      const guardada = await readCachedCapture(currentKey);
-      if (activeJobIdRef.current !== jobId) return;
+      // Con watchdog: si la lectura de disco tarda o se queda colgada, se sigue dibujando.
+      const guardada = await Promise.race([
+        readCachedCapture(currentKey),
+        new Promise((r) => setTimeout(() => r(null), 2000))
+      ]);
+      if (activeKeyRef.current !== currentKey) return;
       if (guardada) {
         globalTemplatePreviewCache.set(currentKey, { canvas: null, url: guardada.url, blob: guardada.blob, file: guardada.file });
         setDataUrl(guardada.url);
@@ -299,7 +309,7 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
         alcance,
         progresoGeneral
       })).then((res) => {
-        if (activeJobIdRef.current === jobId) {
+        if (activeKeyRef.current === currentKey) {
           const canvasListo = res?.canvas || null;
           // La captura se pinta ya; el archivo llega despues sin bloquear la vista previa.
           setPreviewCanvas(canvasListo);
@@ -321,10 +331,10 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
               }
             }));
           }
-          queuePngEncode(canvasListo, currentKey, jobId, inicioDibujo);
+          queuePngEncode(canvasListo, currentKey, inicioDibujo);
         }
       }).catch((err) => {
-        if (activeJobIdRef.current === jobId) {
+        if (activeKeyRef.current === currentKey) {
           console.error('Error generando imagen de plantilla:', err);
           setIsGenerating(false);
         }
@@ -621,7 +631,7 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
             <div className="sdm-share-pro__canvas-host" ref={previewHostRef} />
           ) : (
             <img
-              src={dataUrl}
+              src={dataUrl || undefined}
               alt={t('compartir.altPreview')}
               className="sdm-share-pro__preview-img"
             />
