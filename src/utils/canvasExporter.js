@@ -158,7 +158,10 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // en el suelo desbordando.
   // v58: el nombre de las fichas va SIEMPRE en blanco pleno (antes los faltantes al 86%);
   // las capturas v57 (y anteriores) no valen.
-  return `v58_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v59: el QR deja su celda de la cuadricula y baja al pie, a la esquina donde estaba el
+  // hashtag (que ya no se dibuja); la cuadricula se llena solo con espiritus. Las capturas
+  // v58 (con el QR en la grilla y el hashtag en el pie) no valen.
+  return `v59_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -868,7 +871,9 @@ async function renderGlitchOverrideTemplate({
     ? Math.round((Math.min(Math.max(0, progresoGeneral.owned), progresoGeneral.total) / progresoGeneral.total) * 100)
     : pctOwned;
 
-  const totalSlotsNeeded = totalSprites + 1; // Reserva espacio para el código QR
+  // El QR ya no ocupa celda: vive en el pie, asi que la cuadricula se llena SOLO con
+  // espiritus. Con la reserva de antes (+1) el ultimo hueco quedaba vacio al sacar el QR.
+  const totalSlotsNeeded = totalSprites;
   const isSquare = format === 'square';
 
   let width = 1080;
@@ -948,8 +953,29 @@ async function renderGlitchOverrideTemplate({
   // escala junto.
   const escFooter = anchoDiseno / 1200;
   const firmaAlto = Math.round(30 * escFooter);
-  const footerH = Math.round(148 * escFooter);
   const baseFila = Math.round(60 * escFooter);
+
+  // El QR ya no vive en la grilla: baja al pie, a la esquina inferior derecha que ocupaba
+  // el hashtag. Su tamano manda en el alto de la banda, porque el pie tiene que dar sitio
+  // entero al codigo, a su hueco HUD y al dominio de debajo.
+  //
+  // Regla dura de escaneo: px por modulo >= 4. El tamano objetivo es un porcentaje del
+  // ancho de diseno, pero NUNCA baja del minimo escaneable de la matriz real (25 modulos
+  // con spritedex.gg, 29 con el host de Vercel): si el porcentaje no llegara, el codigo
+  // crece lo justo en vez de encogerse, y la banda del pie crece con el.
+  const escalaPie = Math.min(1.15, escFooter);
+  const QR_MIN_PX_POR_MODULO = 4;
+  const qrPieModulos = getCachedQR(dominioParaCompartir()).getModuleCount();
+  const qrPieSize = Math.max(
+    Math.round(anchoDiseno * 0.15),
+    Math.ceil(qrPieModulos * QR_MIN_PX_POR_MODULO) + 2
+  );
+  const qrPieCaptionAlto = Math.round(18 * escalaPie);
+  const qrPieHueco = Math.round(qrPieSize * 0.12);
+  const qrPieMargen = Math.round(16 * escFooter);
+  const qrPieCajaW = qrPieSize + qrPieHueco * 2;
+  const qrPieCajaH = qrPieSize + qrPieCaptionAlto + qrPieHueco * 2;
+  const footerH = Math.max(Math.round(148 * escFooter), qrPieCajaH + qrPieMargen * 2);
 
   // En temporada el encabezado lleva el logo real y necesita su sitio. Se calcula con las
   // MISMAS proporciones con las que luego se dibuja, para que nunca tape la capsula ni la
@@ -1250,6 +1276,80 @@ async function renderGlitchOverrideTemplate({
   const startX = (width - gridW) / 2;
   const startY = headerH + Math.max(8, Math.floor((availH - gridH) / 2));
 
+  // 3.A. QR DEL PIE: esquina inferior derecha, el sitio del hashtag. Se dibuja ANTES de la
+  // cuadricula para que su fundido radial no aterrice encima de una ficha: si la ultima
+  // fila llega al borde derecho, la ficha tapa la vignette, y el codigo (que vive siempre
+  // por debajo de la banda del pie) queda intacto.
+  const footerPadX = Math.round(width * 0.05);
+  const qrCajaX = width - footerPadX - qrPieSize - qrPieHueco;
+  const qrCajaY = height - qrPieMargen - qrPieCajaH;
+  const qrInnerX = qrCajaX + qrPieHueco;
+  const qrInnerY = qrCajaY + qrPieHueco;
+  const qrSize = qrPieSize;
+  const qrCaptionAlto = qrPieCaptionAlto;
+  const qrCentroX = qrInnerX + qrSize / 2;
+  const qrCentroY = qrInnerY + qrSize / 2;
+  // El dominio de debajo entra siempre: el alto del pie se reserva con qrPieCajaH, que ya
+  // cuenta esa linea, asi que el codigo nunca se queda sin su texto de referencia.
+  const qrConTexto = qrPieCajaH + qrPieMargen * 2 <= footerH + 1;
+
+  // Fundido radial detras del codigo: limpia la zona de escaneo sin dibujar una tarjeta.
+  ctx.save();
+  const haloQr = ctx.createRadialGradient(qrCentroX, qrCentroY, qrSize * 0.32, qrCentroX, qrCentroY, qrSize * 1.08);
+  haloQr.addColorStop(0, 'rgba(4, 5, 12, 0.62)');
+  haloQr.addColorStop(0.7, 'rgba(4, 5, 12, 0.40)');
+  haloQr.addColorStop(1, 'rgba(4, 5, 12, 0)');
+  ctx.fillStyle = haloQr;
+  ctx.beginPath();
+  ctx.arc(qrCentroX, qrCentroY, qrSize * 1.08, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Esquinas HUD alrededor del codigo, como las fichas pero sin caja: el marco lo pone la
+  // mirada, no un borde.
+  const brazoQr = Math.round(qrSize * 0.16);
+  const grosorQr = Math.max(2, Math.round(qrSize * 0.024));
+  const huecoQr = Math.round(qrSize * 0.12);
+  const cajaQr = {
+    x: qrInnerX - huecoQr,
+    y: qrInnerY - huecoQr,
+    w: qrSize + huecoQr * 2,
+    h: qrSize + qrCaptionAlto + huecoQr * 2
+  };
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0, 240, 232, 0.85)';
+  ctx.lineWidth = grosorQr;
+  ctx.beginPath();
+  ctx.moveTo(cajaQr.x, cajaQr.y + brazoQr);
+  ctx.lineTo(cajaQr.x, cajaQr.y);
+  ctx.lineTo(cajaQr.x + brazoQr, cajaQr.y);
+  ctx.moveTo(cajaQr.x + cajaQr.w - brazoQr, cajaQr.y);
+  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y);
+  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y + brazoQr);
+  ctx.moveTo(cajaQr.x, cajaQr.y + cajaQr.h - brazoQr);
+  ctx.lineTo(cajaQr.x, cajaQr.y + cajaQr.h);
+  ctx.lineTo(cajaQr.x + brazoQr, cajaQr.y + cajaQr.h);
+  ctx.moveTo(cajaQr.x + cajaQr.w - brazoQr, cajaQr.y + cajaQr.h);
+  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y + cajaQr.h);
+  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y + cajaQr.h - brazoQr);
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  const targetUrl = dominioParaCompartir();
+  drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, targetUrl);
+
+  if (qrConTexto) {
+    let hostQr = 'spritedex.gg';
+    try { hostQr = new URL(targetUrl).host.replace(/^www[.]/, ''); } catch {}
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '1.5px';
+    ctx.font = `900 ${Math.round(10 * escalaPie)}px "Outfit", "Inter", sans-serif`;
+    ctx.fillStyle = '#00F0E8';
+    ctx.fillText(hostQr, qrCentroX, qrInnerY + qrSize + Math.round(15 * escalaPie));
+  }
+  ctx.restore();
+
   // Talla unica de nombre para TODA la lona: la mayor con la que entra hasta el nombre mas
   // exigente (cada uno con su mejor reparto). Antes cada nombre estiraba hasta llenar SU
   // banda y una misma fila mezclaba 21, 23,5 y 25 px; la retícula se lee como una sola.
@@ -1500,111 +1600,26 @@ async function renderGlitchOverrideTemplate({
     ctx.restore();
   }
 
-  // Un respiro antes del bloque del QR y la marca de agua.
-  await cederTurno();
-
-  // 3.B. CODIGO QR: sin panel de tarjeta. El codigo flota sobre la plantilla con su propio
-  // tratamiento: un fundido radial muy suave que le da zona de silencio al escaner,
-  // esquinas HUD alrededor y el dominio debajo.
-  const qrColIdx = (totalSlotsNeeded - 1) % cols;
-  const qrRowIdx = rows - 1;
-  const qrFilaItems = Math.min(cols, totalSlotsNeeded - qrRowIdx * cols);
-  const qrOffsetFila = ((cols - qrFilaItems) * cellW) / 2;
-  const qrCardMarginX = Math.max(4, Math.round(cellW * 0.035));
-  const qrCardMarginY = Math.max(4, Math.round(cellH * 0.035));
-  const qrCardX = startX + qrOffsetFila + qrColIdx * cellW + qrCardMarginX;
-  const qrCardY = startY + qrRowIdx * cellH + qrCardMarginY;
-  const qrCardW = cellW - qrCardMarginX * 2;
-  const qrCardH = cellH - qrCardMarginY * 2;
-
-  // El dominio bajo el QR solo entra (y solo hace falta) en las celdas amplias.
-  const qrConTexto = qrCardW >= 150 && qrCardH >= 150;
-  const qrCaptionAlto = qrConTexto ? Math.round(18 * Math.min(1.15, scale)) : 0;
-  const qrSize = Math.min(qrCardW - 14, qrCardH - 14 - qrCaptionAlto, 180);
-  const qrInnerX = qrCardX + (qrCardW - qrSize) / 2;
-  const qrInnerY = qrCardY + Math.round((qrCardH - qrSize - qrCaptionAlto) / 2);
-  const qrCentroX = qrInnerX + qrSize / 2;
-  const qrCentroY = qrInnerY + qrSize / 2;
-
-  // Fundido radial detras del codigo: limpia la zona de escaneo sin dibujar una tarjeta.
-  ctx.save();
-  const haloQr = ctx.createRadialGradient(qrCentroX, qrCentroY, qrSize * 0.32, qrCentroX, qrCentroY, qrSize * 1.08);
-  haloQr.addColorStop(0, 'rgba(4, 5, 12, 0.62)');
-  haloQr.addColorStop(0.7, 'rgba(4, 5, 12, 0.40)');
-  haloQr.addColorStop(1, 'rgba(4, 5, 12, 0)');
-  ctx.fillStyle = haloQr;
-  ctx.beginPath();
-  ctx.arc(qrCentroX, qrCentroY, qrSize * 1.08, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-
-  // Esquinas HUD alrededor del codigo, como las fichas pero sin caja: el marco lo pone la
-  // mirada, no un borde.
-  const brazoQr = Math.round(qrSize * 0.16);
-  const grosorQr = Math.max(2, Math.round(qrSize * 0.024));
-  const huecoQr = Math.round(qrSize * 0.12);
-  const cajaQr = {
-    x: qrInnerX - huecoQr,
-    y: qrInnerY - huecoQr,
-    w: qrSize + huecoQr * 2,
-    h: qrSize + qrCaptionAlto + huecoQr * 2
-  };
-  ctx.save();
-  ctx.strokeStyle = 'rgba(0, 240, 232, 0.85)';
-  ctx.lineWidth = grosorQr;
-  ctx.beginPath();
-  ctx.moveTo(cajaQr.x, cajaQr.y + brazoQr);
-  ctx.lineTo(cajaQr.x, cajaQr.y);
-  ctx.lineTo(cajaQr.x + brazoQr, cajaQr.y);
-  ctx.moveTo(cajaQr.x + cajaQr.w - brazoQr, cajaQr.y);
-  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y);
-  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y + brazoQr);
-  ctx.moveTo(cajaQr.x, cajaQr.y + cajaQr.h - brazoQr);
-  ctx.lineTo(cajaQr.x, cajaQr.y + cajaQr.h);
-  ctx.lineTo(cajaQr.x + brazoQr, cajaQr.y + cajaQr.h);
-  ctx.moveTo(cajaQr.x + cajaQr.w - brazoQr, cajaQr.y + cajaQr.h);
-  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y + cajaQr.h);
-  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y + cajaQr.h - brazoQr);
-  ctx.stroke();
-  ctx.restore();
-
-  ctx.save();
-  const targetUrl = dominioParaCompartir();
-  drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, targetUrl);
-
-  if (qrConTexto) {
-    let hostQr = 'spritedex.gg';
-    try { hostQr = new URL(targetUrl).host.replace(/^www[.]/, ''); } catch {}
-    ctx.textAlign = 'center';
-    ctx.letterSpacing = '1.5px';
-    ctx.font = `900 ${Math.round(10 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
-    ctx.fillStyle = '#00F0E8';
-    ctx.fillText(hostQr, qrCentroX, qrInnerY + qrSize + Math.round(15 * Math.min(1.15, scale)));
-  }
-  ctx.restore();
-
-  // 4. FOOTER: FIRMA A LA IZQUIERDA + MARCA A LA DERECHA
-  // Una sola linea al pie: a la izquierda el ID de Fortnite y a la derecha la marca con
-  // el hashtag. Sin caja ni marco (el recuadro cargaba la zona junto al QR); el aire lo
-  // dan los margenes: lateral, superior e inferior. Si el nombre es muy largo, la pareja encoge
-  // junta hasta que entra.
-  const textoMarca = enTemporada ? t('lona.marcaMares') : t('lona.marca');
+  // 4. PIE: FIRMA A LA IZQUIERDA, EL QR A LA DERECHA
+  // Una sola linea al pie: a la izquierda el ID de Fortnite (exactamente como estaba) y a
+  // la derecha el QR que bajo de la cuadricula. El texto de marca con el hashtag YA NO SE
+  // DIBUJA: sus claves de i18n (lona.marca / lona.marcaMares) se conservan porque el test
+  // de paridad entre locales las cuenta, pero quedan sin uso en la lona.
   ctx.save();
   ctx.textBaseline = 'alphabetic';
-  const footerPadX = Math.round(width * 0.05);
   const huecoMin = Math.round(24 * escFooter);
-  const areaPie = width - footerPadX * 2;
+  // La firma solo dispone del ancho que deja el bloque del QR.
+  const areaFirma = width - footerPadX * 2 - qrPieCajaW - huecoMin;
   const medirTexto = (texto, size, peso) => {
     ctx.font = `${peso} ${size}px "Outfit", "Inter", sans-serif`;
     return ctx.measureText(texto).width;
   };
   const textoFirma = usuario ? t('lona.usuario', { nombre: usuario }) : '';
-  // Firma y marca comparten tamano: el pie se lee como una sola linea de identidad.
+  // La firma conserva su talla: solo encoge si no entra a la izquierda del QR.
   let tamanioPie = firmaAlto;
   const anchoFirma = usuario ? medirTexto(textoFirma, tamanioPie, 800) : 0;
-  const anchoMarca = medirTexto(textoMarca, tamanioPie, 700);
-  if (anchoFirma + anchoMarca > areaPie - huecoMin) {
-    const factor = Math.max(0.55, (areaPie - huecoMin) / (anchoFirma + anchoMarca));
+  if (usuario && anchoFirma > areaFirma) {
+    const factor = Math.max(0.55, areaFirma / anchoFirma);
     tamanioPie = Math.max(Math.round(14 * escFooter), Math.floor(tamanioPie * factor));
   }
 
@@ -1617,13 +1632,6 @@ async function renderGlitchOverrideTemplate({
     ctx.shadowBlur = 10;
     ctx.fillText(textoFirma, footerPadX, baseFilaY);
   }
-  // La marca: a la derecha cuando hay firma; centrada cuando el pie va solo.
-  ctx.textAlign = usuario ? 'right' : 'center';
-  ctx.font = `700 ${tamanioPie}px "Outfit", "Inter", monospace, sans-serif`;
-  ctx.fillStyle = '#38bdf8';
-  ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
-  ctx.shadowBlur = 6;
-  ctx.fillText(textoMarca, usuario ? width - footerPadX : width / 2, baseFilaY);
   ctx.restore();
 
   // Codificar el PNG de 1280x2515 es la parte mas cara del export (2-6 s en movil),
