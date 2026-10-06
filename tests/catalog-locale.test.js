@@ -1,5 +1,5 @@
 // El catalogo en ingles se genera desde la captura cruda de fortnite.gg. Estas pruebas
-// fijan el contrato: 234 nombres, 218 del juego y 16 compuestos con su misma regla.
+// fijan el contrato: los nombres del juego tal cual y el resto compuestos con su misma regla.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -10,11 +10,12 @@ const catalogo = leer('src/data/official_sprites.json');
 const generado = leer('src/data/i18n/catalog.en.json');
 const familias = leer('src/data/i18n/familias.en.json');
 
-// Los 16 combos que no estan en la captura cruda: se componen con "<Variante> <Familia> Sprite".
+// Los combos que no estan en la captura cruda: se componen con "<Variante> <Familia> Sprite".
+// Eran 16; los 8 que no existen en el juego (Gem Air, Holofoil Aura, Gem Batman, Holofoil Duck,
+// Holofoil Fishy, Gem Fishy, Holofoil Boss y Gem Seven) se borraron del catalogo.
 const COMPUESTOS = [
-  'air_gem', 'aura_holofoil', 'batman_gem', 'boss_gem', 'boss_holofoil', 'demon_holofoil',
-  'dream_gem', 'duck_holofoil', 'fishy_gem', 'fishy_holofoil', 'ghost_gem', 'king_gem',
-  'punk_gem', 'seven_gem', 'striker_gem', 'striker_rift'
+  'boss_gem', 'demon_holofoil', 'dream_gem', 'ghost_gem',
+  'king_gem', 'punk_gem', 'striker_gem', 'striker_rift'
 ];
 
 test('cada espiritu del catalogo tiene nombre en ingles no vacio', () => {
@@ -24,10 +25,10 @@ test('cada espiritu del catalogo tiene nombre en ingles no vacio', () => {
   assert.ok(catalogo.length >= 234);
 });
 
-test('al menos 218 nombres vienen del juego y los combos base se componen', () => {
+test('los nombres que no estan en la captura se componen, y son los que quedan', () => {
   const { compuestos } = construirCatalogo();
   const ids = compuestos.map((c) => c.split(' -> ')[0]).sort();
-  assert.ok(compuestos.length >= 16);
+  assert.ok(compuestos.length >= COMPUESTOS.length);
   COMPUESTOS.forEach((comp) => assert.ok(ids.includes(comp), `Falta compuesto base: ${comp}`));
 });
 
