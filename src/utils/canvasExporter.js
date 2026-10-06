@@ -185,7 +185,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // v63: el QR codifica el dominio pelado ('spritedex.gg', 21 modulos) en vez de la URL
   // completa (25 modulos), asi que baja el piso escaneable de 102 a 86 px y el objetivo al
   // 0,35 del ancho de celda; las capturas v62 con la URL completa no valen.
-  return `v63_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v64: el QR del pie va desnudo (fuera el fundido radial y las esquinas HUD); las capturas
+  // v63 guardadas con el marco anterior no valen.
+  return `v64_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -1314,64 +1316,22 @@ async function renderGlitchOverrideTemplate({
   const startY = headerH + Math.max(8, Math.floor((availH - gridH) / 2));
 
   // 3.A. QR DEL PIE: esquina inferior derecha, el sitio del hashtag. Se dibuja ANTES de la
-  // cuadricula para que su fundido radial no aterrice encima de una ficha: si la ultima
-  // fila llega al borde derecho, la ficha tapa la vignette, y el codigo (que vive siempre
-  // por debajo de la banda del pie) queda intacto.
+  // cuadricula para que, si la ultima fila llega al borde derecho, la ficha quede por encima
+  // del codigo (que vive siempre por debajo de la banda del pie) y este quede intacto.
   const footerPadX = Math.round(width * 0.05);
   const qrCajaX = width - footerPadX - qrPieSize - qrPieHueco;
   const qrCajaY = height - qrPieMargen - qrPieCajaH;
   const qrInnerX = qrCajaX + qrPieHueco;
   const qrInnerY = qrCajaY + qrPieHueco;
   const qrSize = qrPieSize;
-  const qrCaptionAlto = qrPieCaptionAlto;
   const qrCentroX = qrInnerX + qrSize / 2;
   const qrCentroY = qrInnerY + qrSize / 2;
   // El dominio de debajo entra siempre: el alto del pie se reserva con qrPieCajaH, que ya
   // cuenta esa linea, asi que el codigo nunca se queda sin su texto de referencia.
   const qrConTexto = qrPieCajaH + qrPieMargen * 2 <= footerH + 1;
 
-  // Fundido radial detras del codigo: limpia la zona de escaneo sin dibujar una tarjeta.
-  ctx.save();
-  const haloQr = ctx.createRadialGradient(qrCentroX, qrCentroY, qrSize * 0.32, qrCentroX, qrCentroY, qrSize * 1.08);
-  haloQr.addColorStop(0, 'rgba(4, 5, 12, 0.62)');
-  haloQr.addColorStop(0.7, 'rgba(4, 5, 12, 0.40)');
-  haloQr.addColorStop(1, 'rgba(4, 5, 12, 0)');
-  ctx.fillStyle = haloQr;
-  ctx.beginPath();
-  ctx.arc(qrCentroX, qrCentroY, qrSize * 1.08, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-
-  // Esquinas HUD alrededor del codigo, como las fichas pero sin caja: el marco lo pone la
-  // mirada, no un borde.
-  const brazoQr = Math.round(qrSize * 0.16);
-  const grosorQr = Math.max(2, Math.round(qrSize * 0.024));
-  const huecoQr = Math.round(qrSize * 0.12);
-  const cajaQr = {
-    x: qrInnerX - huecoQr,
-    y: qrInnerY - huecoQr,
-    w: qrSize + huecoQr * 2,
-    h: qrSize + qrCaptionAlto + huecoQr * 2
-  };
-  ctx.save();
-  ctx.strokeStyle = 'rgba(0, 240, 232, 0.85)';
-  ctx.lineWidth = grosorQr;
-  ctx.beginPath();
-  ctx.moveTo(cajaQr.x, cajaQr.y + brazoQr);
-  ctx.lineTo(cajaQr.x, cajaQr.y);
-  ctx.lineTo(cajaQr.x + brazoQr, cajaQr.y);
-  ctx.moveTo(cajaQr.x + cajaQr.w - brazoQr, cajaQr.y);
-  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y);
-  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y + brazoQr);
-  ctx.moveTo(cajaQr.x, cajaQr.y + cajaQr.h - brazoQr);
-  ctx.lineTo(cajaQr.x, cajaQr.y + cajaQr.h);
-  ctx.lineTo(cajaQr.x + brazoQr, cajaQr.y + cajaQr.h);
-  ctx.moveTo(cajaQr.x + cajaQr.w - brazoQr, cajaQr.y + cajaQr.h);
-  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y + cajaQr.h);
-  ctx.lineTo(cajaQr.x + cajaQr.w, cajaQr.y + cajaQr.h - brazoQr);
-  ctx.stroke();
-  ctx.restore();
-
+  // El codigo va desnudo sobre la plantilla: ni fundido de fondo ni esquinas HUD. Todo lo que
+  // se pinte aqui compite con la zona de escaneo, asi que solo baja el QR.
   ctx.save();
   const targetUrl = dominioParaCompartir();
   // El codigo lleva el dominio pelado; la leyenda de abajo sigue mostrando el dominio entero
