@@ -159,9 +159,13 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // v58: el nombre de las fichas va SIEMPRE en blanco pleno (antes los faltantes al 86%);
   // las capturas v57 (y anteriores) no valen.
   // v59: el QR deja su celda de la cuadricula y baja al pie, a la esquina donde estaba el
-  // hashtag (que ya no se dibuja); la cuadricula se llena solo con espiritus. Las capturas
-  // v58 (con el QR en la grilla y el hashtag en el pie) no valen.
-  return `v59_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // hashtag (que ya no se dibuja); la cuadricula se llena solo con espiritus.
+  // v60: el QR del pie se dimensiona por regla (objetivo de diseno con piso escaneable y
+  // techo) y la banda del pie se deriva de ese bloque.
+  // v61: el tamano del QR se deriva del ANCHO DE FICHA (cellW) y no del lienzo, para que
+  // acompane a la cuadricula; las capturas v60 (QR medido contra el ancho de diseno y
+  // desproporcionado en las cuadriculas densas) no valen.
+  return `v61_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -959,22 +963,44 @@ async function renderGlitchOverrideTemplate({
   // el hashtag. Su tamano manda en el alto de la banda, porque el pie tiene que dar sitio
   // entero al codigo, a su hueco HUD y al dominio de debajo.
   //
-  // Regla dura de escaneo: px por modulo >= 4. El tamano objetivo es un porcentaje del
-  // ancho de diseno, pero NUNCA baja del minimo escaneable de la matriz real (25 modulos
-  // con spritedex.gg, 29 con el host de Vercel): si el porcentaje no llegara, el codigo
-  // crece lo justo en vez de encogerse, y la banda del pie crece con el.
+  // El QR se mide con la MISMA vara que la ficha: su tamano se deriva del ANCHO DE FICHA
+  // (cellW), no del lienzo. Medido contra el ancho de diseno quedaba desproporcionado en
+  // los dos extremos: mas grande que una ficha en las cuadriculas densas y perdido en las
+  // lonas de 3 espiritus, donde la ficha es el triple de ancha.
+  //
+  // El ancho de celda no depende del pie, asi que se calcula aqui: es lo unico que el QR
+  // necesita para medirse, y la banda del pie se deriva despues de su bloque.
+  //
+  // Con pocos espiritus la celda se inflaba (2 columnas de 504 px) y las fichas salian
+  // gigantes al lado del titulo. En vertical el ancho de celda lleva techo: como mucho el
+  // que usa una cuadricula tipica de 4 columnas, que es el tamano con el que se ve la
+  // ficha en el resto de plantillas.
+  const CELDA_MAX_VERTICAL = 270;
+  let cellW = Math.floor((anchoDiseno - paddingX * 2) / cols);
+  if (!isSquare) cellW = Math.min(cellW, CELDA_MAX_VERTICAL);
+
+  // Regla dura de escaneo: px por modulo >= 4. El objetivo acompana a la ficha (0,6 del
+  // ancho de celda: 96 px con fichas de 160, 162 con fichas de 270) y el techo evita que el
+  // codigo llegue a medir como una ficha. El PISO manda SIEMPRE: si la cuadricula es tan
+  // densa que el objetivo cae por debajo del minimo escaneable, el QR se queda en el piso
+  // (102 px con la matriz de 25 modulos) aunque quede mas ancho que una ficha. Eso es
+  // fisica del QR, no diseno.
   const escalaPie = Math.min(1.15, escFooter);
   const QR_MIN_PX_POR_MODULO = 4;
+  const QR_MAX_PX = 220;
   const qrPieModulos = getCachedQR(dominioParaCompartir()).getModuleCount();
-  const qrPieSize = Math.max(
-    Math.round(anchoDiseno * 0.15),
-    Math.ceil(qrPieModulos * QR_MIN_PX_POR_MODULO) + 2
-  );
+  const qrPiePiso = Math.ceil(qrPieModulos * QR_MIN_PX_POR_MODULO) + 2;
+  const qrPieTecho = Math.min(Math.round(cellW * 0.85), QR_MAX_PX);
+  const qrPieObjetivo = Math.round(cellW * 0.6);
+  const qrPieSize = Math.max(qrPiePiso, Math.min(qrPieTecho, qrPieObjetivo));
   const qrPieCaptionAlto = Math.round(18 * escalaPie);
   const qrPieHueco = Math.round(qrPieSize * 0.12);
   const qrPieMargen = Math.round(16 * escFooter);
   const qrPieCajaW = qrPieSize + qrPieHueco * 2;
   const qrPieCajaH = qrPieSize + qrPieCaptionAlto + qrPieHueco * 2;
+  // La banda del pie se DERIVA del bloque del QR: codigo + linea del dominio + hueco de las
+  // esquinas HUD + margenes. El suelo proporcional al formato solo evita un pie raquitico
+  // cuando el bloque del QR es mas bajo que la tipografia del pie.
   const footerH = Math.max(Math.round(148 * escFooter), qrPieCajaH + qrPieMargen * 2);
 
   // En temporada el encabezado lleva el logo real y necesita su sitio. Se calcula con las
@@ -1018,16 +1044,7 @@ async function renderGlitchOverrideTemplate({
   }
 
   const rows = Math.max(1, Math.ceil(totalSlotsNeeded / cols));
-  let cellW = Math.floor((anchoDiseno - paddingX * 2) / cols);
-
-  // Con pocos espiritus la celda se inflaba (2 columnas de 504 px) y las fichas salian
-  // gigantes al lado del titulo. En vertical el ancho de celda lleva techo: como mucho el
-  // que usa una cuadricula tipica de 4 columnas, que es el tamano con el que se ve la
-  // ficha en el resto de plantillas.
-  const CELDA_MAX_VERTICAL = 270;
   if (!isSquare) {
-    cellW = Math.min(cellW, CELDA_MAX_VERTICAL);
-
     // El lienzo se encoge a lo que ocupa la cuadricula (el fondo se recorta solo, porque
     // se dibuja en modo cover), de modo que la barra, el titulo, las fichas y el QR
     // conservan su tamano en cualquier coleccion.
