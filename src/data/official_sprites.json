@@ -200,14 +200,6 @@
     "isNew": false
   },
   {
-    "id": "duck_holofoil",
-    "name": "Holofoil Duck",
-    "theme": "Holofoil",
-    "rarity": "Special",
-    "unreleased": true,
-    "isNew": false
-  },
-  {
     "id": "duck_gem",
     "name": "Gem Duck",
     "theme": "Gem",
@@ -568,22 +560,6 @@
     "isNew": false
   },
   {
-    "id": "fishy_holofoil",
-    "name": "Holofoil Fishy",
-    "theme": "Holofoil",
-    "rarity": "Special",
-    "unreleased": true,
-    "isNew": false
-  },
-  {
-    "id": "fishy_gem",
-    "name": "Gem Fishy",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true,
-    "isNew": false
-  },
-  {
     "id": "striker_basic",
     "name": "Striker",
     "theme": "Basic",
@@ -672,14 +648,6 @@
     "isNew": false
   },
   {
-    "id": "aura_holofoil",
-    "name": "Holofoil Aura",
-    "theme": "Holofoil",
-    "rarity": "Special",
-    "unreleased": true,
-    "isNew": false
-  },
-  {
     "id": "aura_gem",
     "name": "Gem Aura",
     "theme": "Gem",
@@ -725,14 +693,6 @@
     "theme": "Cube",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "boss_holofoil",
-    "name": "Holofoil Boss",
-    "theme": "Holofoil",
-    "rarity": "Special",
-    "unreleased": true,
     "isNew": false
   },
   {
@@ -840,14 +800,6 @@
     "isNew": false
   },
   {
-    "id": "air_gem",
-    "name": "Gem Air",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true,
-    "isNew": false
-  },
-  {
     "id": "seven_basic",
     "name": "Seven",
     "theme": "Basic",
@@ -885,14 +837,6 @@
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "seven_gem",
-    "name": "Gem Seven",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true,
     "isNew": false
   },
   {
@@ -941,14 +885,6 @@
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "batman_gem",
-    "name": "Gem Batman",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true,
     "isNew": false
   },
   {

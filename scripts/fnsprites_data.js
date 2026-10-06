@@ -27,7 +27,6 @@ const baseSprites = [
     { id: "duck_candy", name: "Gummy Duck", theme: "Candy", rarity: "Special", unreleased: false },
     { id: "duck_galaxy", name: "Galaxy Duck", theme: "Galaxy", rarity: "Special", unreleased: false },
     { id: "duck_gem", name: "Gem Duck", theme: "Gem", rarity: "Special", unreleased: false },
-    { id: "duck_holofoil", name: "Holofoil Duck", theme: "Holofoil", rarity: "Special", unreleased: true },
 	
     { id: "ghost_basic", name: "Ghost", theme: "Basic", rarity: "Epic", unreleased: false },
     { id: "ghost_gold", name: "Gold Ghost", theme: "Gold", rarity: "Special", unreleased: false },
@@ -77,8 +76,6 @@ const baseSprites = [
     { id: "fishy_gold", name: "Gold Fishy", theme: "Gold", rarity: "Special", unreleased: false },
     { id: "fishy_candy", name: "Gummy Fishy", theme: "Candy", rarity: "Special", unreleased: false },
     { id: "fishy_galaxy", name: "Galaxy Fishy", theme: "Galaxy", rarity: "Special", unreleased: false },
-    { id: "fishy_gem", name: "Gem Fishy", theme: "Gem", rarity: "Special", unreleased: true },
-    { id: "fishy_holofoil", name: "Holofoil Fishy", theme: "Holofoil", rarity: "Special", unreleased: true },
     { id: "fishy_rift", name: "Cube Fishy", theme: "Cube", rarity: "Special", unreleased: false },
 	
     { id: "striker_basic", name: "Striker", theme: "Basic", rarity: "Epic", unreleased: false },
@@ -94,14 +91,12 @@ const baseSprites = [
     { id: "aura_candy", name: "Gummy Aura", theme: "Candy", rarity: "Special", unreleased: false },
     { id: "aura_galaxy", name: "Galaxy Aura", theme: "Galaxy", rarity: "Special", unreleased: false },
     { id: "aura_gem", name: "Gem Aura", theme: "Gem", rarity: "Special", unreleased: false },
-    { id: "aura_holofoil", name: "Holofoil Aura", theme: "Holofoil", rarity: "Special", unreleased: true },
 
     { id: "boss_basic", name: "Boss", theme: "Basic", rarity: "Legendary", unreleased: false },
     { id: "boss_gold", name: "Gold Boss", theme: "Gold", rarity: "Special", unreleased: false },
     { id: "boss_candy", name: "Gummy Boss", theme: "Candy", rarity: "Special", unreleased: false },
     { id: "boss_galaxy", name: "Galaxy Boss", theme: "Galaxy", rarity: "Special", unreleased: false },
     { id: "boss_gem", name: "Gem Boss", theme: "Gem", rarity: "Special", unreleased: true },
-    { id: "boss_holofoil", name: "Holofoil Boss", theme: "Holofoil", rarity: "Special", unreleased: true },
     { id: "boss_rift", name: "Cube Boss", theme: "Cube", rarity: "Special", unreleased: false },
 
     { id: "grim_basic", name: "Grim", theme: "Basic", rarity: "Mythic", unreleased: false },
@@ -116,21 +111,18 @@ const baseSprites = [
     { id: "air_gold", name: "Gold Air", theme: "Gold", rarity: "Special", unreleased: false },
     { id: "air_candy", name: "Gummy Air", theme: "Candy", rarity: "Special", unreleased: false },
     { id: "air_galaxy", name: "Galaxy Air", theme: "Galaxy", rarity: "Special", unreleased: false },
-    { id: "air_gem", name: "Gem Air", theme: "Gem", rarity: "Special", unreleased: true },
     { id: "air_holofoil", name: "Holofoil Air", theme: "Holofoil", rarity: "Special", unreleased: false },
 	
     { id: "seven_basic", name: "Seven", theme: "Basic", rarity: "Legendary", unreleased: false },
     { id: "seven_gold", name: "Gold Seven", theme: "Gold", rarity: "Special", unreleased: false },
     { id: "seven_candy", name: "Gummy Seven", theme: "Candy", rarity: "Special", unreleased: false },
     { id: "seven_galaxy", name: "Galaxy Seven", theme: "Galaxy", rarity: "Special", unreleased: false },
-    { id: "seven_gem", name: "Gem Seven", theme: "Gem", rarity: "Special", unreleased: true },
     { id: "seven_holofoil", name: "Holofoil Seven", theme: "Holofoil", rarity: "Special", unreleased: false },
 
     { id: "batman_basic", name: "Batman", theme: "Basic", rarity: "Mythic", unreleased: false },
     { id: "batman_gold", name: "Gold Batman", theme: "Gold", rarity: "Special", unreleased: false },
     { id: "batman_candy", name: "Gummy Batman", theme: "Candy", rarity: "Special", unreleased: false },
     { id: "batman_galaxy", name: "Galaxy Batman", theme: "Galaxy", rarity: "Special", unreleased: false },
-    { id: "batman_gem", name: "Gem Batman", theme: "Gem", rarity: "Special", unreleased: true },
     { id: "batman_holofoil", name: "Holofoil Batman", theme: "Holofoil", rarity: "Special", unreleased: false },
     { id: "batman_rift", name: "Cube Batman", theme: "Cube", rarity: "Special", unreleased: false },
 
