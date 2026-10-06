@@ -10,6 +10,10 @@
 
 const SPRITES_DIR = '/sprites/';
 
+// La lista de placeholders vive en spriteAssetMap.js, junto al mapa de rutas: el
+// sincronizador automatico lee la MISMA lista para no bajar arte que no existe todavia.
+import { ART_VECTORIAL } from '../data/spriteAssetMap.js';
+
 // Todos los assets de espiritus son WebP: los PNG que quedaban de gen 1 se convirtieron (los
 // que eran WebP con extension .png se renombraron). Si algun dia conviven dos formatos, la
 // regla se cambia AQUI y no en cada consumidor.
@@ -18,13 +22,9 @@ const SPRITES_DIR = '/sprites/';
 // degradado vectorial de 1,2 KB guardado con extension .png, que ademas se servia con el tipo
 // equivocado y por eso no se pintaba). Rasterizarlos a WebP los haria siete veces mas pesados
 // y borrosos al ampliarlos, asi que se quedan vectoriales.
-const ASSET_VECTORIAL = new Set([
-  'air_gem', 'aura_holofoil', 'batman_gem', 'duck_holofoil', 'peely_candy'
-]);
-
 export function rutaAssetEspiritu(id) {
   if (!id) return '';
-  return `${SPRITES_DIR}${id}.${ASSET_VECTORIAL.has(id) ? 'svg' : 'webp'}`;
+  return `${SPRITES_DIR}${id}.${ART_VECTORIAL.has(id) ? 'svg' : 'webp'}`;
 }
 
 // Segundo intento: el basico de la familia, cuando el espiritu no tiene imagen propia.

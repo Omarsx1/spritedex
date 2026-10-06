@@ -131,8 +131,14 @@ const esEjecucionDirecta = process.argv[1] && path.resolve(process.argv[1]) === 
 
 if (esEjecucionDirecta) {
   const { salida, familias, compuestos, total } = construirCatalogo();
-  const textoCatalogo = JSON.stringify(salida, null, 2) + '\n';
-  const textoFamilias = JSON.stringify(familias, null, 2) + '\n';
+  // Orden fijo por clave. El catalogo se armaba en el orden del catalogo de espiritus, que
+  // cambia con cada sincronizacion, asi que el archivo se reescribia entero solo por mover
+  // lineas de sitio. Con las claves ordenadas, el texto solo cambia si cambia un nombre.
+  const ordenarClaves = (objeto) => Object.fromEntries(
+    Object.keys(objeto).sort().map((clave) => [clave, objeto[clave]])
+  );
+  const textoCatalogo = JSON.stringify(ordenarClaves(salida), null, 2) + '\n';
+  const textoFamilias = JSON.stringify(ordenarClaves(familias), null, 2) + '\n';
   const soloCheck = process.argv.includes('--check');
 
   if (soloCheck) {
