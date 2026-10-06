@@ -189,7 +189,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // v63 guardadas con el marco anterior no valen.
   // v65: el espiritu que falta pasa a monocromo en penumbra (conserva su dibujo) en vez del
   // velo gris que lo aplanaba; las capturas v64 con el velo no valen.
-  return `v65_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v66: el resplandor del titulo sale de las letras y el halo de ambiente deja de ser un
+  // ovalo recortado en seco; las capturas v65 con la mancha no valen.
+  return `v66_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -1148,25 +1150,39 @@ async function renderGlitchOverrideTemplate({
     const logoW = logoMaresListo.w;
     const logoH = logoMaresListo.h;
     const logoY = Math.round(23 * Math.min(1.15, scale));
+    const logoX = (width - logoW) / 2;
 
-    // Halo suave detras del wordmark: profundidad de key art sin ensuciar el dibujo.
+    // Luz de ambiente del encabezado: un degradado radial que se apaga SOLO (llega a cero
+    // antes del borde del lienzo) y se pinta sobre un rectangulo, sin recortarlo con una
+    // forma. El ovalo anterior tenia el degradado cortado en seco por su propia elipse
+    // (el radio horizontal doblaba al vertical), asi que dejaba un borde visible arriba y
+    // abajo y se leia como una mancha sucia encima de la plantilla.
     const haloY = logoY + logoH / 2;
-    const haloR = logoW * 0.62;
-    const gradHalo = ctx.createRadialGradient(width / 2, haloY, 10, width / 2, haloY, haloR);
-    gradHalo.addColorStop(0, 'rgba(232, 121, 249, 0.18)');
-    gradHalo.addColorStop(0.6, 'rgba(147, 51, 234, 0.10)');
-    gradHalo.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    const haloR = Math.max(Math.round(logoW * 0.72), Math.round(logoH * 2.2));
+    const gradHalo = ctx.createRadialGradient(width / 2, haloY, 0, width / 2, haloY, haloR);
+    gradHalo.addColorStop(0, 'rgba(168, 85, 247, 0.16)');
+    gradHalo.addColorStop(0.45, 'rgba(147, 51, 234, 0.08)');
+    gradHalo.addColorStop(0.75, 'rgba(126, 34, 206, 0.03)');
+    gradHalo.addColorStop(1, 'rgba(126, 34, 206, 0)');
     ctx.save();
     ctx.fillStyle = gradHalo;
-    ctx.beginPath();
-    ctx.ellipse(width / 2, haloY, haloR, logoH * 0.65, 0, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(0, 0, width, Math.max(headerH, logoY + logoH + Math.round(40 * scale)));
     ctx.restore();
 
+    // El resplandor de verdad sale de las LETRAS: dos pasadas de sombra construyen la
+    // caida (una ancha y tenue, otra pegada al contorno) y la tercera pinta el wordmark
+    // nitido encima, asi que las letras no se lavan con la suma.
     ctx.save();
+    ctx.shadowColor = 'rgba(192, 38, 211, 0.34)';
+    ctx.shadowBlur = Math.round(logoH * 0.42);
+    ctx.drawImage(logoMaresListo.capa, logoX, logoY);
+    ctx.shadowColor = 'rgba(232, 121, 249, 0.42)';
+    ctx.shadowBlur = Math.round(logoH * 0.2);
+    ctx.drawImage(logoMaresListo.capa, logoX, logoY);
     ctx.shadowColor = 'rgba(232, 121, 249, 0.45)';
     ctx.shadowBlur = 18;
-    ctx.drawImage(logoMaresListo.capa, (width - logoW) / 2, logoY);
+    ctx.drawImage(logoMaresListo.capa, logoX, logoY);
+    ctx.shadowBlur = 0;
     ctx.restore();
     // La capsula se ancla al borde visible de las letras, no al lienzo del SVG.
     titleY = logoY + logoMaresListo.borde;
