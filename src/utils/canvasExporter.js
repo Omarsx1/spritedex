@@ -187,7 +187,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // 0,35 del ancho de celda; las capturas v62 con la URL completa no valen.
   // v64: el QR del pie va desnudo (fuera el fundido radial y las esquinas HUD); las capturas
   // v63 guardadas con el marco anterior no valen.
-  return `v64_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v65: el espiritu que falta pasa a monocromo en penumbra (conserva su dibujo) en vez del
+  // velo gris que lo aplanaba; las capturas v64 con el velo no valen.
+  return `v65_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -818,6 +820,17 @@ const ESPIRITU_FALTANTE_ALPHA = 0.92;
 // brillo a la vez, que es justo lo que se lee como "apagado".
 const ESPIRITU_FALTANTE_VELO = 'rgba(96, 98, 110, 0.7)';
 
+const SOPORTA_MEZCLA_SATURACION = (() => {
+  try {
+    const c = document.createElement('canvas').getContext('2d');
+    c.globalCompositeOperation = 'saturation';
+    return c.globalCompositeOperation === 'saturation';
+  } catch { return false; }
+})();
+// Tono del apagado monocromo: un gris frio que, multiplicado sobre el espiritu ya sin
+// color, lo deja en penumbra conservando todo su dibujo (sombras, volumen, contorno).
+const ESPIRITU_FALTANTE_TINTE = 'rgb(132, 138, 158)';
+
 // Lienzo de trabajo reutilizado para apagar los espiritus que faltan. Se dibuja ahi el
 // espiritu y se le echa el velo recortado a su silueta (source-atop solo pinta donde ya hay
 // espiritu), sin tocar el resto de la ficha.
@@ -834,9 +847,28 @@ function dibujarEspirituApagado(ctx, img, x, y, tamano) {
   const lc = lienzoApagado.getContext('2d');
   lc.clearRect(0, 0, lado, lado);
   lc.drawImage(img, 0, 0, lado, lado);
-  lc.globalCompositeOperation = 'source-atop';
-  lc.fillStyle = ESPIRITU_FALTANTE_VELO;
-  lc.fillRect(0, 0, lado, lado);
+
+  if (SOPORTA_MEZCLA_SATURACION) {
+    // 'saturation' con un gris deja la LUMINOSIDAD del espiritu y le quita el color: la
+    // silueta conserva sombras y volumen. El velo gris plano de antes, en cambio, aplanaba
+    // el dibujo hasta parecer una capa blanquecina puesta encima de la ficha.
+    lc.globalCompositeOperation = 'saturation';
+    lc.fillStyle = 'hsl(0, 0%, 50%)';
+    lc.fillRect(0, 0, lado, lado);
+    // Y 'multiply' lo baja a penumbra sin perder ese dibujo.
+    lc.globalCompositeOperation = 'multiply';
+    lc.fillStyle = ESPIRITU_FALTANTE_TINTE;
+    lc.fillRect(0, 0, lado, lado);
+    // Las dos mezclas pintan tambien el cuadro vacio del lienzo de trabajo, asi que se
+    // recorta otra vez a la silueta: si no, el apagado saldria como un cuadro gris.
+    lc.globalCompositeOperation = 'destination-in';
+    lc.drawImage(img, 0, 0, lado, lado);
+  } else {
+    // Respaldo para navegadores sin mezclas de saturacion: el velo de siempre.
+    lc.globalCompositeOperation = 'source-atop';
+    lc.fillStyle = ESPIRITU_FALTANTE_VELO;
+    lc.fillRect(0, 0, lado, lado);
+  }
   lc.globalCompositeOperation = 'source-over';
   ctx.drawImage(lienzoApagado, x, y, tamano, tamano);
 }
@@ -1325,7 +1357,6 @@ async function renderGlitchOverrideTemplate({
   const qrInnerY = qrCajaY + qrPieHueco;
   const qrSize = qrPieSize;
   const qrCentroX = qrInnerX + qrSize / 2;
-  const qrCentroY = qrInnerY + qrSize / 2;
   // El dominio de debajo entra siempre: el alto del pie se reserva con qrPieCajaH, que ya
   // cuenta esa linea, asi que el codigo nunca se queda sin su texto de referencia.
   const qrConTexto = qrPieCajaH + qrPieMargen * 2 <= footerH + 1;
@@ -1511,7 +1542,9 @@ async function renderGlitchOverrideTemplate({
         ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.globalAlpha = ESPIRITU_FALTANTE_ALPHA;
+        // El monocromo ya va apagado de por si; el respaldo mantiene la transparencia de
+        // antes para que no se vea distinto en quien no tiene mezclas de saturacion.
+        ctx.globalAlpha = SOPORTA_MEZCLA_SATURACION ? 1 : ESPIRITU_FALTANTE_ALPHA;
         dibujarEspirituApagado(ctx, spriteImg, imgX, imgY, imgSize);
       }
       ctx.restore();
