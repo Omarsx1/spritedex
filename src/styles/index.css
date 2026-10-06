@@ -1812,6 +1812,12 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   gap: 14px;
   margin-top: 4px;
   margin-bottom: 28px;
+  /* La barra de filtros es una capa propia y va POR ENCIMA de la grilla. Sus desplegables
+     llevan z-index 91, pero viven dentro de .filter-controls-row, que el translateY de
+     ajuste fino ya convierte en contexto de apilado: sin esta capa el 91 se queda encerrado
+     y las cartas (position: relative; z-index: 2) tapaban el menu abierto. */
+  position: relative;
+  z-index: 20;
 }
 
 /* ===== Generation Switcher Tabs ===== */
