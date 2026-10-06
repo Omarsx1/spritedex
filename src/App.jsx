@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useDeferredValue, useRef, lazy, Suspense } from 'react';
 import { VARIANT_ORDER, FAMILY_NAMES_MAP, pickFamilyName } from './data/spritesData';
 import { t } from './i18n';
+import { leerVista, urlConVista } from './utils/vistaUrl.js';
 
 const getVariantPriority = (v) => {
   if (v === 'Base' || v === 'Basic') return 0;
@@ -215,17 +216,60 @@ export function App() {
   // sesion otra vez ni se encadenan identidades nuevas sin parar.
   const deadSessionHandled = useRef(new Set());
 
-  // Filters matching fortnite.gg
-  const [activeGen, setActiveGen] = useState(2); // 2 = 2ª Generación (GLITCH) by default!
-  const [searchQuery, setSearchQuery] = useState('');
+  // Filters matching fortnite.gg. El estado inicial sale de la URL: asi una recarga, un
+  // enlace compartido o el boton atras devuelven a la misma generacion y los mismos filtros
+  // en vez de saltar siempre a la 2ª generacion con todo limpio.
+  const vistaInicial = useMemo(
+    () => leerVista(typeof window !== 'undefined' ? window.location.search : ''),
+    []
+  );
+  const [activeGen, setActiveGen] = useState(Number(vistaInicial.gen)); // 2 = 2ª Generación (GLITCH) by default!
+  const [searchQuery, setSearchQuery] = useState(vistaInicial.q);
   // La busqueda se difiere: teclear no bloquea el pintado de la grilla.
   const deferredSearch = useDeferredValue(searchQuery);
-  const [baseFilter, setBaseFilter] = useState('all'); // BASE = variant/theme
-  const [spriteFilter, setSpriteFilter] = useState('all'); // SPRITE = family
-  const [statusFilter, setStatusFilter] = useState('all'); // STATUS = all/owned/missing
-  const [sortBy, setSortBy] = useState('default'); // SORT BY
-  const [showUnreleased, setShowUnreleased] = useState(false);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [baseFilter, setBaseFilter] = useState(vistaInicial.tema); // BASE = variant/theme
+  const [spriteFilter, setSpriteFilter] = useState(vistaInicial.familia); // SPRITE = family
+  const [statusFilter, setStatusFilter] = useState(vistaInicial.estado); // STATUS = all/owned/missing
+  const [sortBy, setSortBy] = useState(vistaInicial.orden); // SORT BY
+  const [showUnreleased, setShowUnreleased] = useState(vistaInicial.lanzados === '1');
+  const [viewMode, setViewMode] = useState(vistaInicial.vista); // 'grid' or 'list'
+
+  // La URL sigue a la vista: replaceState (no push) para no llenar el historial en cada tecla,
+  // y sin tocar los parametros que no son de la vista (friend, studio, perf...).
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const destino = urlConVista({
+      gen: String(activeGen),
+      q: searchQuery,
+      tema: baseFilter,
+      familia: spriteFilter,
+      estado: statusFilter,
+      orden: sortBy,
+      lanzados: showUnreleased,
+      vista: viewMode,
+    }, window.location.search, window.location);
+    const actual = window.location.pathname + window.location.search + window.location.hash;
+    if (destino !== actual) window.history.replaceState(window.history.state, '', destino);
+  }, [activeGen, searchQuery, baseFilter, spriteFilter, statusFilter, sortBy, showUnreleased, viewMode]);
+
+  // Atras y adelante del navegador: se pinta la vista que pide la URL, no la que habia en
+  // memoria. Sin esto, volver atras cambiaba la direccion pero dejaba los filtros viejos.
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const alCambiarRuta = () => {
+      const vista = leerVista(window.location.search);
+      setActiveGen(Number(vista.gen));
+      setSearchQuery(vista.q);
+      setBaseFilter(vista.tema);
+      setSpriteFilter(vista.familia);
+      setStatusFilter(vista.estado);
+      setSortBy(vista.orden);
+      setShowUnreleased(vista.lanzados === '1');
+      setViewMode(vista.vista);
+    };
+    window.addEventListener('popstate', alCambiarRuta);
+    return () => window.removeEventListener('popstate', alCambiarRuta);
+  }, []);
 
   // Modals
   const [selectedSprite, setSelectedSprite] = useState(null);
