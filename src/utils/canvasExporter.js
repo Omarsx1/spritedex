@@ -165,7 +165,10 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // v61: el tamano del QR se deriva del ANCHO DE FICHA (cellW) y no del lienzo, para que
   // acompane a la cuadricula; las capturas v60 (QR medido contra el ancho de diseno y
   // desproporcionado en las cuadriculas densas) no valen.
-  return `v61_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v62: con pocas fichas el 0,6 del ancho de celda dejaba el QR enorme (162 px con fichas
+  // de 270); el objetivo baja a 0,45 con techo mas bajo. Las capturas v61 con el QR grande
+  // en las lonas de pocos espiritus no valen.
+  return `v62_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -979,19 +982,19 @@ async function renderGlitchOverrideTemplate({
   let cellW = Math.floor((anchoDiseno - paddingX * 2) / cols);
   if (!isSquare) cellW = Math.min(cellW, CELDA_MAX_VERTICAL);
 
-  // Regla dura de escaneo: px por modulo >= 4. El objetivo acompana a la ficha (0,6 del
-  // ancho de celda: 96 px con fichas de 160, 162 con fichas de 270) y el techo evita que el
-  // codigo llegue a medir como una ficha. El PISO manda SIEMPRE: si la cuadricula es tan
-  // densa que el objetivo cae por debajo del minimo escaneable, el QR se queda en el piso
-  // (102 px con la matriz de 25 modulos) aunque quede mas ancho que una ficha. Eso es
-  // fisica del QR, no diseno.
+  // Regla dura de escaneo: px por modulo >= 4. El objetivo acompana a la ficha (0,45 del
+  // ancho de celda: 72 px con fichas de 160, 122 con fichas de 270) y el techo evita que el
+  // codigo domine el pie. El PISO manda SIEMPRE: si la cuadricula es tan densa que el
+  // objetivo cae por debajo del minimo escaneable, el QR se queda en el piso (102 px con la
+  // matriz de 25 modulos) aunque quede mas ancho que una ficha. Eso es fisica del QR, no
+  // diseno.
   const escalaPie = Math.min(1.15, escFooter);
   const QR_MIN_PX_POR_MODULO = 4;
-  const QR_MAX_PX = 220;
+  const QR_MAX_PX = 170;
   const qrPieModulos = getCachedQR(dominioParaCompartir()).getModuleCount();
   const qrPiePiso = Math.ceil(qrPieModulos * QR_MIN_PX_POR_MODULO) + 2;
-  const qrPieTecho = Math.min(Math.round(cellW * 0.85), QR_MAX_PX);
-  const qrPieObjetivo = Math.round(cellW * 0.6);
+  const qrPieTecho = Math.min(Math.round(cellW * 0.55), QR_MAX_PX);
+  const qrPieObjetivo = Math.round(cellW * 0.45);
   const qrPieSize = Math.max(qrPiePiso, Math.min(qrPieTecho, qrPieObjetivo));
   const qrPieCaptionAlto = Math.round(18 * escalaPie);
   const qrPieHueco = Math.round(qrPieSize * 0.12);
