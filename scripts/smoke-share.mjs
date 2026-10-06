@@ -65,6 +65,7 @@ async function main() {
   const server = await servir();
   const base = 'http://127.0.0.1:' + server.address().port;
   const errores = [];
+  const fallosRed = [];
   let navegador;
   try {
     navegador = await puppeteer.launch({
@@ -74,7 +75,20 @@ async function main() {
     const page = await navegador.newPage();
     page.on('pageerror', (e) => errores.push('pageerror: ' + e.message));
     page.on('console', (m) => { if (m.type() === 'error') errores.push('console: ' + m.text()); });
+    // Peticiones que no llegan: sin esto, una app que no monta por un recurso caido se
+    // reporta como 'no encontre el boton', que suena a fallo de interfaz y no lo es.
+    page.on('requestfailed', (req) => {
+      if (!req.url().includes('supabase')) fallosRed.push(req.url() + ' :: ' + (req.failure() ? req.failure().errorText : '?'));
+    });
     await page.setViewport({ width: 390, height: 700, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+
+    // El runner de GitHub arranca con navigator.languages = ['en-US', ...] y la app elige
+    // idioma con esa etiqueta (idiomaDelNavegador): en CI la interfaz salia en INGLES, el
+    // boton decia 'Share' y la prueba buscaba 'Compartir'. Fallaba siempre, desde el dia que
+    // se anadio al workflow, con un mensaje que parecia un fallo de la app. La prueba fija el
+    // idioma para medir lo que le importa (que la app monte y la modal abra), no el idioma
+    // del runner.
+    await page.evaluateOnNewDocument(() => { try { localStorage.setItem('spritedex_lang', 'es'); } catch {} });
 
     const client = await page.target().createCDPSession();
     await client.send('Network.enable');
@@ -82,7 +96,14 @@ async function main() {
     await client.send('Network.setBlockedURLs', { urls: ['*supabase.co*'] });
 
     await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
-    await esperar(9000);
+    // Plazo activo en lugar de 9 s fijos: en el runner la app puede tardar mas, y un margen
+    // fijo convierte cualquier arranque lento en un 'no encontre el boton' indistinguible de
+    // una app rota.
+    const appMontada = await page.waitForFunction(
+      () => { const raiz = document.getElementById('root'); return !!raiz && raiz.children.length > 0; },
+      { timeout: 45000, polling: 500 }
+    ).then(() => true).catch(() => false);
+    await esperar(1200);
 
     const viva = await page.evaluate(() => !document.body.innerText.includes('Reanudando Spritedex'));
     const abierto = await page.evaluate(async () => {
@@ -122,10 +143,18 @@ async function main() {
 
     const fallos = [];
     if (!viva) fallos.push('la app no monto (cayo en el ErrorBoundary)');
-    if (!abierto) fallos.push('no encontre el boton de compartir');
+    if (!appMontada) fallos.push('la app no monto: #root sigue vacio despues de 45 s');
+    if (!abierto) {
+      const pistas = await page.evaluate(() => [...document.querySelectorAll('button,a')]
+        .map((b) => (b.textContent || '').trim().slice(0, 20))
+        .filter(Boolean)
+        .slice(0, 12));
+      fallos.push('no encontre el boton de compartir. Botones en pantalla: ' + JSON.stringify(pistas));
+    }
     if (abierto && !captura) fallos.push('la modal no mostro la captura');
     if (medidor) fallos.push('el medidor de rendimiento esta visible para los usuarios');
     if (errores.length) fallos.push('errores en la pagina: ' + errores.slice(0, 3).join(' | '));
+    if (fallosRed.length) fallos.push('peticiones que no llegaron: ' + fallosRed.slice(0, 3).join(' | '));
 
     if (fallos.length) {
       console.error('SMOKE FALLO');
@@ -141,4 +170,3 @@ async function main() {
 }
 
 main().catch((e) => { console.error('SMOKE FALLO: ' + (e && e.message)); process.exit(1); });
-
