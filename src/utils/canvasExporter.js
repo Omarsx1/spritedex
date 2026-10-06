@@ -36,6 +36,20 @@ export function dominioParaCompartir() {
 }
 
 /**
+ * Texto que codifica el QR del pie: SOLO el dominio pelado ('spritedex.gg'), sin esquema,
+ * sin barra final y sin 'www.'. La URL completa costaba 20 caracteres (version 2, 25
+ * modulos); el dominio pelado son 12 (version 1, 21 modulos): 4 modulos menos de lado con el
+ * mismo EC M. La leyenda del pie sigue mostrando el dominio con su esquema.
+ */
+export function textoParaQR(url = dominioParaCompartir()) {
+  try {
+    return new URL(url).host.replace(/^www[.]/, '');
+  } catch {
+    return DOMINIO_CANONICO.replace(/^https?:[/]{2}/, '').replace(/[/].*$/, '').replace(/^www[.]/, '');
+  }
+}
+
+/**
  * Fondo de la plantilla de compartir. En temporada la captura sale con el arte de
  * Fortnitemares; el resto del ano usa el de siempre. Si el de temporada no cargara, la
  * captura se hace igual con el de siempre: la plantilla nunca se queda sin fondo.
@@ -168,7 +182,10 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // v62: con pocas fichas el 0,6 del ancho de celda dejaba el QR enorme (162 px con fichas
   // de 270); el objetivo baja a 0,45 con techo mas bajo. Las capturas v61 con el QR grande
   // en las lonas de pocos espiritus no valen.
-  return `v62_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v63: el QR codifica el dominio pelado ('spritedex.gg', 21 modulos) en vez de la URL
+  // completa (25 modulos), asi que baja el piso escaneable de 102 a 86 px y el objetivo al
+  // 0,35 del ancho de celda; las capturas v62 con la URL completa no valen.
+  return `v63_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -982,19 +999,19 @@ async function renderGlitchOverrideTemplate({
   let cellW = Math.floor((anchoDiseno - paddingX * 2) / cols);
   if (!isSquare) cellW = Math.min(cellW, CELDA_MAX_VERTICAL);
 
-  // Regla dura de escaneo: px por modulo >= 4. El objetivo acompana a la ficha (0,45 del
-  // ancho de celda: 72 px con fichas de 160, 122 con fichas de 270) y el techo evita que el
+  // Regla dura de escaneo: px por modulo >= 4. El objetivo acompana a la ficha (0,35 del
+  // ancho de celda: 56 px con fichas de 160, 94 con fichas de 270) y el techo evita que el
   // codigo domine el pie. El PISO manda SIEMPRE: si la cuadricula es tan densa que el
-  // objetivo cae por debajo del minimo escaneable, el QR se queda en el piso (102 px con la
-  // matriz de 25 modulos) aunque quede mas ancho que una ficha. Eso es fisica del QR, no
+  // objetivo cae por debajo del minimo escaneable, el QR se queda en el piso (86 px con la
+  // matriz de 21 modulos) aunque quede mas ancho que una ficha. Eso es fisica del QR, no
   // diseno.
   const escalaPie = Math.min(1.15, escFooter);
   const QR_MIN_PX_POR_MODULO = 4;
-  const QR_MAX_PX = 170;
-  const qrPieModulos = getCachedQR(dominioParaCompartir()).getModuleCount();
+  const QR_MAX_PX = 140;
+  const qrPieModulos = getCachedQR(textoParaQR()).getModuleCount();
   const qrPiePiso = Math.ceil(qrPieModulos * QR_MIN_PX_POR_MODULO) + 2;
-  const qrPieTecho = Math.min(Math.round(cellW * 0.55), QR_MAX_PX);
-  const qrPieObjetivo = Math.round(cellW * 0.45);
+  const qrPieTecho = Math.min(Math.round(cellW * 0.45), QR_MAX_PX);
+  const qrPieObjetivo = Math.round(cellW * 0.35);
   const qrPieSize = Math.max(qrPiePiso, Math.min(qrPieTecho, qrPieObjetivo));
   const qrPieCaptionAlto = Math.round(18 * escalaPie);
   const qrPieHueco = Math.round(qrPieSize * 0.12);
@@ -1357,7 +1374,9 @@ async function renderGlitchOverrideTemplate({
 
   ctx.save();
   const targetUrl = dominioParaCompartir();
-  drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, targetUrl);
+  // El codigo lleva el dominio pelado; la leyenda de abajo sigue mostrando el dominio entero
+  // (hostQr sale de targetUrl), asi que el ojo lee 'spritedex.gg' y el escaner lo completa.
+  drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, textoParaQR(targetUrl));
 
   if (qrConTexto) {
     let hostQr = 'spritedex.gg';
