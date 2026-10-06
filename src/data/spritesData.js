@@ -10,6 +10,7 @@ import catalogEn from './i18n/catalog.en.json';
 import familiasEn from './i18n/familias.en.json';
 import textosJuego from './i18n/textos.juego.json';
 import { getLang, t } from '../i18n/texto.js';
+import { rutaAssetEspiritu, rutaBasicoFamilia } from '../utils/spriteAssets.js';
 
 export const SPRITE_THUMBS = spriteThumbsJson;
 
@@ -836,53 +837,10 @@ export const SUMMON_COST_OVERRIDES = {
 };
 
 // Mapa canónico explícito de imágenes WebP para resolución determinista (garantiza ruta exacta y sin colisiones)
-export const WEBP_MAP = {
-  'ironmouse_basic': '/sprites/ironmouse_basic.webp',
-  'llama_basic': '/sprites/llama_basic.webp',
-  'llama_gold': '/sprites/llama_gold.webp',
-  'llama_candy': '/sprites/llama_gummy.webp',
-  'llama_galaxy': '/sprites/llama_galaxy.webp',
-  'llama_gem': '/sprites/llama_gem.webp',
-  'peely_basic': '/sprites/peely_basic.webp',
-  'peely_gold': '/sprites/peely_gold.webp',
-  'peely_candy': '/sprites/peely_gummy.webp',
-  'peely_galaxy': '/sprites/peely_galaxy.webp',
-  'peely_holofoil': '/sprites/peely_holofoil.webp',
-  'water_quack': '/sprites/water_duck.webp',
-  'earth_quack': '/sprites/earth_duck.webp',
-  'fire_quack': '/sprites/fire_duck.webp',
-  'zeropoint_quack': '/sprites/zeropoint_duck.png',
-  'zeropoint_holofoil': '/sprites/zeropoint_holofoil.webp',
-  'grim_holofoil': '/sprites/grim_holofoil.webp',
-  'grim_gem': '/sprites/grim_gem.webp',
-  // Familia Estanque (Pond) - Resolución explícita inmutable
-  'pond_basic': '/sprites/pond_basic.webp',
-  'pond_gold': '/sprites/pond_gold.webp',
-  'pond_cheatmaster': '/sprites/pond_cheatmaster.webp',
-  'pond_loothacker': '/sprites/pond_loothacker.webp',
-  'pond_bountyhunter': '/sprites/pond_bountyhunter.webp',
-  // Otras familias Gen 2
-  'blinky_basic': '/sprites/blinky_basic.webp',
-  'blinky_gold': '/sprites/blinky_gold.webp',
-  'blinky_cheatmaster': '/sprites/blinky_cheatmaster.webp',
-  'blinky_loothacker': '/sprites/blinky_loothacker.webp',
-  'blinky_bountyhunter': '/sprites/blinky_bountyhunter.webp',
-  'crash_basic': '/sprites/crash_basic.webp',
-  'crash_gold': '/sprites/crash_gold.webp',
-  'crash_cheatmaster': '/sprites/crash_cheatmaster.webp',
-  'crash_loothacker': '/sprites/crash_loothacker.webp',
-  'crash_bountyhunter': '/sprites/crash_bountyhunter.webp',
-  'birthday_basic': '/sprites/birthday_basic.webp',
-  'birthday_gold': '/sprites/birthday_gold.webp',
-  'birthday_cheatmaster': '/sprites/birthday_cheatmaster.webp',
-  'birthday_loothacker': '/sprites/birthday_loothacker.webp',
-  'birthday_bountyhunter': '/sprites/birthday_bountyhunter.webp',
-  'morgana_basic': '/sprites/morgana_basic.webp',
-  'morgana_gold': '/sprites/morgana_gold.webp',
-  'morgana_cheatmaster': '/sprites/morgana_cheatmaster.webp',
-  'morgana_loothacker': '/sprites/morgana_loothacker.webp',
-  'morgana_bountyhunter': '/sprites/morgana_bountyhunter.webp'
-};
+// La tabla de rutas canonicas vive en spriteAssetMap.js: la comparten la app y el
+// sincronizador automatico. Se reexporta para no cambiar los imports que ya existen.
+import { WEBP_MAP } from './spriteAssetMap.js';
+export { WEBP_MAP };
 
 // Format and group official sprites
 export const ALL_SPRITES = officialSpritesJson.map((item) => {
@@ -909,7 +867,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
   let dropChanceNum = parseFloat(dropChance);
 
   // Dynamic image resolution for real webp and png assets
-  let imagePath = WEBP_MAP[item.id] || (item.gen === 2 ? `/sprites/${item.id}.webp` : `/sprites/${item.id}.png`);
+  let imagePath = WEBP_MAP[item.id] || rutaAssetEspiritu(item.id);
 
   const normName = (item.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
   const normTheme = (item.theme || '').toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -1086,7 +1044,7 @@ export const SPRITE_FAMILIES_WITH_IMAGES = [...new Set(ALL_SPRITES.map(s => s.fa
     return {
       name,
       familyId,
-      image: sprite ? sprite.image : `/sprites/${familyId}_basic.png`
+      image: sprite ? sprite.image : rutaBasicoFamilia(familyId)
     };
   });
 

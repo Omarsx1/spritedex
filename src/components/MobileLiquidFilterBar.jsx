@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal, X, RotateCcw } from 'lucide-react';
 import { THEMES_LIST, ALL_SPRITES, pickFamilyName, pickThemeName } from '../data/spritesData';
 import { t } from '../i18n';
 import { safeStorage } from '../utils/safeStorage';
+import { rutaBasicoFamilia } from '../utils/spriteAssets';
 import { contarNovedades, claveAvisoNovedades } from '../utils/novedadesAviso';
 
 const STATUS_OPTIONS = [
@@ -174,7 +175,7 @@ export function MobileLiquidFilterBar({
       return {
         name,
         familyId,
-        image: sprite ? sprite.image : (activeGen === 2 ? `/sprites/${familyId}_basic.webp` : `/sprites/${familyId}_basic.png`)
+        image: sprite ? sprite.image : rutaBasicoFamilia(familyId)
       };
     });
   }, [activeGen, showUnreleased]);

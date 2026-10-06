@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useDeferredValue, useRef, lazy, Suspense } from 'react';
 import { VARIANT_ORDER, FAMILY_NAMES_MAP, pickFamilyName } from './data/spritesData';
 import { t } from './i18n';
+import { leerVista, urlConVista } from './utils/vistaUrl.js';
 
 const getVariantPriority = (v) => {
   if (v === 'Base' || v === 'Basic') return 0;
@@ -35,6 +36,9 @@ import { mergeCollections, sinPerfil } from './utils/mergeCollections';
 import { estadoAlTocarNivel } from './utils/niveles';
 import { setSyncSession, queueCloudSync, clearCloudSync, flushCloudSync } from './utils/pendingSync';
 import { safeStorage } from './utils/safeStorage';
+import { iniciarCalentador } from './utils/spritePrefetch';
+import { hayEnjambreActivo } from './utils/batSwarm';
+import { pausarAnimacionesFueraDePantalla } from './utils/pausaAnimaciones';
 import {
   getMyFriendCode,
   fetchCollectionByFriendCode,
@@ -42,7 +46,10 @@ import {
   saveLastConnectedFriendCode,
   getLastConnectedFriendCode
 } from './utils/friendCode';
+import { buildShareUrl } from './utils/shareUrl';
 import { getLang, conIdioma, rutaSinIdioma } from './i18n';
+import { aplicarSeoRuta } from './seo/head.js';
+import { espirituDeEnlace } from './utils/enlaceEspiritu.js';
 import { codigoFichaEnRuta } from './utils/visitaEnlace';
 import { codigoNormalizado } from './utils/fichaAmigo';
 import { isDeadSessionError } from './utils/deadSession';
@@ -57,7 +64,7 @@ const PRECALCULO_CALMA_MS = 2000;
 
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
 const AdminAuthGate = lazy(() => import('./components/admin/AdminAuthGate').then(m => ({ default: m.AdminAuthGate })));
-const ShareImageModal = lazy(() => import('./components/ShareImageModal').then(m => ({ default: m.ShareImageModal })));
+const SharePage = lazy(() => import('./components/SharePage').then(m => ({ default: m.SharePage })));
 const BackupModal = lazy(() => import('./components/BackupModal').then(m => ({ default: m.BackupModal })));
 const FriendCompareModal = lazy(() => import('./components/FriendCompareModal').then(m => ({ default: m.FriendCompareModal })));
 const AuthModal = lazy(() => import('./components/AuthModal').then(m => ({ default: m.AuthModal })));
@@ -209,21 +216,70 @@ export function App() {
   // sesion otra vez ni se encadenan identidades nuevas sin parar.
   const deadSessionHandled = useRef(new Set());
 
-  // Filters matching fortnite.gg
-  const [activeGen, setActiveGen] = useState(2); // 2 = 2ª Generación (GLITCH) by default!
-  const [searchQuery, setSearchQuery] = useState('');
+  // Filters matching fortnite.gg. El estado inicial sale de la URL: asi una recarga, un
+  // enlace compartido o el boton atras devuelven a la misma generacion y los mismos filtros
+  // en vez de saltar siempre a la 2ª generacion con todo limpio.
+  const vistaInicial = useMemo(
+    () => leerVista(typeof window !== 'undefined' ? window.location.search : ''),
+    []
+  );
+  const [activeGen, setActiveGen] = useState(Number(vistaInicial.gen)); // 2 = 2ª Generación (GLITCH) by default!
+  const [searchQuery, setSearchQuery] = useState(vistaInicial.q);
   // La busqueda se difiere: teclear no bloquea el pintado de la grilla.
   const deferredSearch = useDeferredValue(searchQuery);
-  const [baseFilter, setBaseFilter] = useState('all'); // BASE = variant/theme
-  const [spriteFilter, setSpriteFilter] = useState('all'); // SPRITE = family
-  const [statusFilter, setStatusFilter] = useState('all'); // STATUS = all/owned/missing
-  const [sortBy, setSortBy] = useState('default'); // SORT BY
-  const [showUnreleased, setShowUnreleased] = useState(false);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [baseFilter, setBaseFilter] = useState(vistaInicial.tema); // BASE = variant/theme
+  const [spriteFilter, setSpriteFilter] = useState(vistaInicial.familia); // SPRITE = family
+  const [statusFilter, setStatusFilter] = useState(vistaInicial.estado); // STATUS = all/owned/missing
+  const [sortBy, setSortBy] = useState(vistaInicial.orden); // SORT BY
+  const [showUnreleased, setShowUnreleased] = useState(vistaInicial.lanzados === '1');
+  const [viewMode, setViewMode] = useState(vistaInicial.vista); // 'grid' or 'list'
+
+  // La URL sigue a la vista: replaceState (no push) para no llenar el historial en cada tecla,
+  // y sin tocar los parametros que no son de la vista (friend, studio, perf...).
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const destino = urlConVista({
+      gen: String(activeGen),
+      q: searchQuery,
+      tema: baseFilter,
+      familia: spriteFilter,
+      estado: statusFilter,
+      orden: sortBy,
+      lanzados: showUnreleased,
+      vista: viewMode,
+    }, window.location.search, window.location);
+    const actual = window.location.pathname + window.location.search + window.location.hash;
+    if (destino !== actual) window.history.replaceState(window.history.state, '', destino);
+  }, [activeGen, searchQuery, baseFilter, spriteFilter, statusFilter, sortBy, showUnreleased, viewMode]);
+
+  // Atras y adelante del navegador: se pinta la vista que pide la URL, no la que habia en
+  // memoria. Sin esto, volver atras cambiaba la direccion pero dejaba los filtros viejos.
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const alCambiarRuta = () => {
+      const vista = leerVista(window.location.search);
+      setActiveGen(Number(vista.gen));
+      setSearchQuery(vista.q);
+      setBaseFilter(vista.tema);
+      setSpriteFilter(vista.familia);
+      setStatusFilter(vista.estado);
+      setSortBy(vista.orden);
+      setShowUnreleased(vista.lanzados === '1');
+      setViewMode(vista.vista);
+    };
+    window.addEventListener('popstate', alCambiarRuta);
+    return () => window.removeEventListener('popstate', alCambiarRuta);
+  }, []);
 
   // Modals
   const [selectedSprite, setSelectedSprite] = useState(null);
-  const [showShareModal, setShowShareModal] = useState(false);
+  // La ruta de la app se lee SIN el prefijo de idioma: /en/compartir y /compartir son la misma
+  // pantalla. Vive aqui arriba porque hay efectos que ya la consultan antes de su bloque, y
+  // compartir dejo de ser una modal para ser una vista propia.
+  const rutaActual = typeof window !== 'undefined' ? window.location.pathname : '';
+  const rutaApp = rutaSinIdioma(rutaActual);
+  const [enAmigos, setEnAmigos] = useState(() => rutaApp.indexOf('/amigos') === 0);
+  const [enCompartir, setEnCompartir] = useState(() => rutaApp.indexOf('/compartir') === 0);
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [showFooterPrivacyModal, setShowFooterPrivacyModal] = useState(false);
@@ -286,15 +342,28 @@ export function App() {
     return () => { cancelado = true; };
   }, [shareToken]);
 
-  // Precarga silenciosa no bloqueante en reposo (idle) para que la exportación sea instantánea
+  // Precarga silenciosa no bloqueante para que la exportación sea instantánea, pero SIN competir
+  // con lo que el usuario está mirando. Ya no hay un temporizador fijo de 1500 ms: el
+  // calentamiento arranca con la primera intención (puntero, rueda, teclado) o en el primer hueco
+  // de reposo, y solo con la pestaña visible.
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return undefined;
 
-    const idleTimer = setTimeout(() => {
+    let yaArranco = false;
+    let idleHandle = null;
+    let idleFallbackTimer = null;
+    let quitarListeners = () => {};
+
+    const calentar = () => {
+      if (yaArranco) return;
+      if (document.visibilityState !== 'visible') return;
+      yaArranco = true;
+      quitarListeners();
+
       // 1. Precarga del chunk del modal en la caché del navegador
-      import('./components/ShareImageModal');
+      import('./components/SharePage');
 
-      // 2. Precarga en reposo de las MINIATURAS que usara el export (por lotes de 10),
+      // 2. Precarga en reposo de las MINIATURAS que usara el export (por lotes de 4),
       // para que compartir sea instantaneo. Son ~1,5 MB por generacion, no los 19 MB
       // de originales que se precargaban antes. Se salta con ahorro de datos o 2G.
       const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -314,9 +383,30 @@ export function App() {
           preloadCanvasAssets(preloadList, 4);
         }
       });
-    }, 1500);
+    };
 
-    return () => clearTimeout(idleTimer);
+    // Via 1: la primera intencion del usuario. Si esta scrolleando o tocando algo, esa era su
+    // prioridad: el calentamiento arranca igual, pero el exportador se pausa mientras haya scroll.
+    const eventos = ['pointerdown', 'wheel', 'touchstart', 'keydown'];
+    eventos.forEach((evento) => window.addEventListener(evento, calentar, { once: true, passive: true }));
+    quitarListeners = () => {
+      eventos.forEach((evento) => window.removeEventListener(evento, calentar));
+    };
+
+    // Via 2: el primer hueco de reposo despues de la carga (con tope de 4 s).
+    if (typeof window.requestIdleCallback === 'function') {
+      idleHandle = window.requestIdleCallback(() => calentar(), { timeout: 4000 });
+    } else {
+      idleFallbackTimer = setTimeout(calentar, 4000);
+    }
+
+    return () => {
+      quitarListeners();
+      if (idleHandle !== null && typeof window.cancelIdleCallback === 'function') {
+        window.cancelIdleCallback(idleHandle);
+      }
+      if (idleFallbackTimer !== null) clearTimeout(idleFallbackTimer);
+    };
   }, [dynamicSprites, activeGen]);
 
   // Listen to Supabase Auth State & Sync Cloud Data
@@ -473,7 +563,7 @@ export function App() {
     // produccion que en el tunel (que no tiene Supabase). Al cerrar la modal este
     // efecto vuelve a ejecutarse y sincroniza; si el usuario cierra la pestana antes,
     // lo cubre el flush con keepalive de mas abajo.
-    if (showShareModal) return;
+    if (enCompartir) return;
 
     if (isSupabaseConfigured && user) {
       const timer = setTimeout(async () => {
@@ -557,7 +647,7 @@ export function App() {
       }, 600);
       return () => clearTimeout(timer);
     }
-  }, [userState, user, myFriendCode, showShareModal, handleSignOutCleanup]);
+  }, [userState, user, myFriendCode, enCompartir, handleSignOutCleanup]);
 
   // Salida garantizada: si la pestaña se cierra o pasa a segundo plano con un sync
   // pendiente, se empuja con keepalive en vez de esperar el debounce de 600 ms.
@@ -756,6 +846,22 @@ export function App() {
     });
  }, [dynamicSprites, activeGen, showUnreleased]);
 
+  // Calentador de miniaturas del grid. OJO: va despues de scopedSprites a proposito, porque
+  // filteredSprites (su dependencia) es un useMemo declarado mas arriba; antes seria un TDZ.
+  useEffect(() => {
+    // Calentador aditivo: deja en cache el arte de las tarjetas que estan por entrar al
+    // viewport. Si no corre o falla, la app se comporta igual que sin el.
+    const grid = document.querySelector('.sprites-grid');
+    if (!grid) return undefined;
+    const elementos = Array.from(grid.querySelectorAll('.sprite-card'));
+    const urls = filteredSprites.map((sprite) => sprite.thumb || sprite.image);
+    return iniciarCalentador(elementos, urls);
+  }, [dynamicSprites, activeGen, filteredSprites, viewMode]);
+
+  // Fase 5/T7 (calor en reposo): los bloques que salen del viewport apagan sus animaciones CSS
+  // decorativas. Aditivo y reversible: si el observer no corre, todo se ve como siempre.
+  useEffect(() => pausarAnimacionesFueraDePantalla(), []);
+
   // Precalcula en segundo plano la captura de la modal de compartir. Es lo que hace
   // que la app local se sienta inmediata: alli la modal sale de cache. Sin esto, cada
   // espiritu marcado invalida la captura y la codificacion (4 s en un telefono) se
@@ -763,7 +869,7 @@ export function App() {
   // una sola vez por cambio de progreso.
   // OJO: va despues de scopedSprites a proposito; usarlo antes seria un TDZ.
 useEffect(() => {
-    if (typeof window === 'undefined' || isAdminPortal || showShareModal) return;
+    if (typeof window === 'undefined' || isAdminPortal || enCompartir) return;
     if (!Array.isArray(scopedSprites) || scopedSprites.length === 0) return;
 
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -811,7 +917,12 @@ useEffect(() => {
       if (cancelado) return;
       const demasiadoPronto = Date.now() - ARRANQUE_APP < PRECALCULO_MIN_MS;
       const sigueTocando = Date.now() - ultimaActividad < PRECALCULO_CALMA_MS;
-      if (demasiadoPronto || sigueTocando) {
+      // Una ceremonia de murcielagos (marcar o maxear) corre en su propio canvas con rAF: el
+      // precálculo de la captura es un bloque largo en el hilo principal y la congelaba, que es
+      // el tiron que reporto el usuario. Se espera a que la ceremonia termine; el precálculo no
+      // pierde nada por esperar y el resultado es el mismo.
+      const ceremoniaEnCurso = hayEnjambreActivo();
+      if (demasiadoPronto || sigueTocando || ceremoniaEnCurso) {
         setTimeout(intentar, 600);
         return;
       }
@@ -824,7 +935,7 @@ useEffect(() => {
       clearTimeout(timer);
       EVENTOS.forEach((ev) => window.removeEventListener(ev, marcarActividad));
     };
-  }, [scopedSprites, userState, isAdminPortal, showShareModal]);
+  }, [scopedSprites, userState, isAdminPortal, enCompartir]);
 
   const activeState = activeProfile === 'friend' && friendState ? friendState : userState;
   const totalCount = scopedSprites.length;
@@ -849,22 +960,44 @@ useEffect(() => {
   // Página de amigos (fase 1): ruta propia para tener espacio de verdad. La modal sigue
   // viva en paralelo, así nadie pierde el radar mientras migramos.
   // La ruta de la app se lee SIN el prefijo de idioma: /en/amigos y /amigos son la misma pantalla.
-  const rutaActual = typeof window !== 'undefined' ? window.location.pathname : '';
-  const rutaApp = rutaSinIdioma(rutaActual);
-  const [enAmigos, setEnAmigos] = useState(() => rutaApp.indexOf('/amigos') === 0);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
-    const alVolver = () => setEnAmigos(rutaSinIdioma(window.location.pathname).indexOf('/amigos') === 0);
+    const alVolver = () => {
+      const ruta = rutaSinIdioma(window.location.pathname);
+      setEnAmigos(ruta.indexOf('/amigos') === 0);
+      setEnCompartir(ruta.indexOf('/compartir') === 0);
+    };
     window.addEventListener('popstate', alVolver);
     return () => window.removeEventListener('popstate', alVolver);
   }, []);
+
+  // El <head> de cada ruta lo escribe el build (scripts/prerender-seo.mjs), con su titulo,
+  // su canonical y su hreflang. Esto lo mantiene al dia cuando se navega dentro de la app sin
+  // recargar, y marca noindex mientras el portal de administracion esta abierto.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    aplicarSeoRuta(window.location.pathname, { noindex: isAdminPortal });
+  }, [enAmigos, isAdminPortal]);
+
+  // Enlace profundo a un espiritu: ?s=<slug> (los CTA de las paginas estaticas) o
+  // /espiritu/<slug> (la ruta que ve la app en desarrollo; en produccion la sirve el HTML
+  // estatico). Se resuelve una sola vez, cuando la lista ya esta cargada.
+  const enlaceEspirituResuelto = useRef(false);
+  useEffect(() => {
+    if (enlaceEspirituResuelto.current || typeof window === 'undefined') return;
+    if (!dynamicSprites || !dynamicSprites.length) return;
+    enlaceEspirituResuelto.current = true;
+    const sprite = espirituDeEnlace(window.location.pathname, window.location.search, dynamicSprites);
+    if (sprite) handleOpenDetail(sprite);
+  }, [dynamicSprites, handleOpenDetail]);
 
   // Toda navegacion interna conserva el idioma activo.
   const irA = useCallback((ruta) => {
     if (typeof window === 'undefined') return;
     window.history.pushState({}, '', conIdioma(ruta, getLang()));
     setEnAmigos(ruta.indexOf('/amigos') === 0);
+    setEnCompartir(ruta.indexOf('/compartir') === 0);
   }, []);
 
   // Codigo de amigo que venga en la ruta (/amigos/SDEX-XXXX) o en el enlace actual
@@ -894,7 +1027,7 @@ useEffect(() => {
     // Fuera de produccion no se crean usuarios reales, asi que el aviso no tiene destino.
     if (shouldSkipAnonymousAuth()) return undefined;
     if (safeStorage.getItem(CLAVE_AVISO_RECLAMO) === 'true') return undefined;
-    const hayModalAbierto = Boolean(selectedSprite) || showShareModal || showBackupModal ||
+    const hayModalAbierto = Boolean(selectedSprite) || enCompartir || showBackupModal ||
       showCompareModal || showFooterPrivacyModal || showAuthModal;
     if (hayModalAbierto) return undefined;
     const timer = setTimeout(() => {
@@ -902,7 +1035,7 @@ useEffect(() => {
       setShowAuthModal(true);
     }, AVISO_RECLAMO_RETRASO_MS);
     return () => clearTimeout(timer);
-  }, [mostrarAvisoReclamo, selectedSprite, showShareModal, showBackupModal, showCompareModal, showFooterPrivacyModal, showAuthModal]);
+  }, [mostrarAvisoReclamo, selectedSprite, enCompartir, showBackupModal, showCompareModal, showFooterPrivacyModal, showAuthModal]);
 
   // La modal de autenticacion se dibuja en los dos arboles: la pagina de amigos retorna
   // antes de llegar a los modales de la app, y el aviso de reclamo tiene que poder abrirla
@@ -917,6 +1050,35 @@ useEffect(() => {
       onSignOut={handleSignOutCleanup}
     />
   ) : null;
+
+  if (enCompartir) {
+    return (
+      <div className="app-container">
+        {mostrarAvisoReclamo && (
+          <ClaimAccountBanner onCrearUsuario={() => setShowAuthModal(true)} />
+        )}
+        <SharePage
+          filteredSprites={filteredSprites}
+          allSprites={scopedSprites}
+          userState={userState}
+          activeFiltersLabel={
+            [
+              baseFilter !== 'all' ? t('app.filtroVariante', { valor: baseFilter }) : '',
+              spriteFilter !== 'all' ? t('app.filtroFamilia', { valor: familiaVisible }) : '',
+              searchQuery ? t('app.filtroBusqueda', { valor: searchQuery }) : ''
+            ]
+              .filter(Boolean)
+              .join(' · ') || t('app.sinFiltros')
+          }
+          /* El enlace se arma sobre /amigos a proposito: generateShareUrl usa la ruta actual y
+             aqui estamos en /compartir, asi que el enlace mandaria a esta misma pantalla en vez
+             de a la coleccion de quien lo recibe. */
+          enlaceColeccion={buildShareUrl(window.location.origin + conIdioma('/amigos', getLang()), myShareToken, myFriendCode || 'SDEX-0000')}
+          onBack={() => irA('/')}
+        />
+      </div>
+    );
+  }
 
   if (enAmigos) {
     return (
@@ -1042,7 +1204,7 @@ useEffect(() => {
         isLiveConnected={isLiveConnected}
         connectedFriendCode={connectedFriendCode}
         solicitudesNuevas={solicitudesNuevas}
-        onOpenShareModal={() => setShowShareModal(true)}
+        onOpenShareModal={() => irA('/compartir')}
         onOpenBackupModal={() => setShowBackupModal(true)}
         onOpenCompareModal={() => irA('/amigos')}
         onOpenAuthModal={() => setShowAuthModal(true)}
@@ -1180,25 +1342,6 @@ useEffect(() => {
       )}
 
       <Suspense fallback={null}>
-        {showShareModal && (
-          <ShareImageModal
-            filteredSprites={filteredSprites}
-            allSprites={scopedSprites}
-            userState={userState}
-            activeGen={activeGen}
-            activeFiltersLabel={
-              [
-                baseFilter !== 'all' ? t('app.filtroVariante', { valor: baseFilter }) : '',
-                spriteFilter !== 'all' ? t('app.filtroFamilia', { valor: familiaVisible }) : '',
-                searchQuery ? t('app.filtroBusqueda', { valor: searchQuery }) : ''
-              ]
-                .filter(Boolean)
-                .join(' · ') || t('app.sinFiltros')
-            }
-            onClose={() => setShowShareModal(false)}
-          />
-        )}
-
         {showBackupModal && (
           <BackupModal
             userState={userState}

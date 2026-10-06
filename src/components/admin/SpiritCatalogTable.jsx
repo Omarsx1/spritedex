@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { RARITIES } from '../../data/spritesData';
 import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
+import { rutaFallbackEspiritu } from '../../utils/spriteAssets';
 import { showConfirmDialog, showSuccessAlert } from '../../utils/alert';
 
 export function SpiritCatalogTable({ 
@@ -330,7 +331,7 @@ export function SpiritCatalogTable({
                               border: darkMode ? '1px solid #2E2E2E' : '1px solid #E2E8F0',
                               padding: '2px'
                             }}
-                            onError={(e) => { e.target.src = '/sprites/water_basic.png'; }}
+                            onError={(e) => { e.target.src = rutaFallbackEspiritu(1); }}
                           />
                           <div>
                             <div style={{ fontWeight: 800, color: textPrimary }}>{sprite.fullName}</div>

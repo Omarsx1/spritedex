@@ -1,0 +1,271 @@
+// Prerender del <head> por ruta + sitemap, despues de "vite build".
+//
+// La app es una SPA y todas las URLs servian el mismo HTML: mismo titulo, misma descripcion y
+// el canonical de la home. Con eso, /en se canonicalizaba a la raiz (lo que suprime el ingles
+// y, segun Google, invalida todo el hreflang) y /amigos tampoco se indexaba. Este paso escribe
+// un HTML por ruta con sus etiquetas y genera el sitemap desde la MISMA tabla, de modo que no
+// puedan desincronizarse.
+//
+// No renderiza el cuerpo: la app sigue siendo SPA. Lo que se arregla aqui es el <head>, que es
+// lo que el buscador lee antes de ejecutar nada.
+import fs from 'node:fs';
+import path from 'node:path';
+import { createServer } from 'vite';
+import { RUTAS, SITIO, IMAGEN_REDES, canonicalDe, alternatesDe, etiquetasSeo, jsonLdDe } from '../src/seo/rutas.js';
+import { htmlPaginaEspiritu, htmlHubEspiritus, rutaEspiritu, rutaHubEspiritus, rutaConIdiomaEspiritu, canonicalEspiritu, alternatesDeEspiritu, etiquetasHubEspiritus } from '../src/seo/espiritus.js';
+import { slugDeEspiritu } from '../src/seo/espiritus.js';
+import { htmlGuia, htmlAcerca, htmlNovedades, etiquetasGuia, etiquetasAcerca, etiquetasNovedades } from '../src/seo/contenido.js';
+import { RUTAS_CONTENIDO } from '../src/seo/plantilla.js';
+
+const ROOT = path.resolve(import.meta.dirname, '..');
+const DIST = path.join(ROOT, 'dist');
+
+const LIMPIAR = [
+  /<title>[\s\S]*?<\/title>\s*/g,
+  /<meta name="description"[^>]*>\s*/g,
+  /<link rel="canonical"[^>]*>\s*/g,
+  /<meta name="robots"[^>]*>\s*/g,
+  /<meta property="og:[^"]*"[^>]*>\s*/g,
+  /<meta name="twitter:[^"]*"[^>]*>\s*/g,
+  /<link rel="alternate"[^>]*>\s*/g,
+  /<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/g
+];
+
+const escapar = (texto) => String(texto)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+function bloqueHead(entrada) {
+  const { lang, titulo, descripcion, canonical, alternates } = etiquetasSeo(entrada);
+  const jsonLd = jsonLdDe(entrada);
+  const locale = lang === 'en' ? 'en_US' : 'es_MX';
+  const lineas = [
+    '<title>' + escapar(titulo) + '</title>',
+    '<meta name="description" content="' + escapar(descripcion) + '" />',
+    '<link rel="canonical" href="' + canonical + '" />',
+    '<meta name="robots" content="index, follow, max-image-preview:large" />',
+    ...alternates.map((a) => '<link rel="alternate" hreflang="' + a.hreflang + '" href="' + a.href + '" />'),
+    '<meta property="og:type" content="website" />',
+    '<meta property="og:site_name" content="Spritedex" />',
+    '<meta property="og:url" content="' + canonical + '" />',
+    '<meta property="og:title" content="' + escapar(titulo) + '" />',
+    '<meta property="og:description" content="' + escapar(descripcion) + '" />',
+    '<meta property="og:image" content="' + IMAGEN_REDES + '" />',
+    '<meta property="og:locale" content="' + locale + '" />',
+    alternates.length ? '<meta property="og:locale:alternate" content="' + (lang === 'en' ? 'es_MX' : 'en_US') + '" />' : '',
+    '<meta name="twitter:card" content="summary" />',
+    '<meta name="twitter:title" content="' + escapar(titulo) + '" />',
+    '<meta name="twitter:description" content="' + escapar(descripcion) + '" />',
+    '<meta name="twitter:image" content="' + IMAGEN_REDES + '" />',
+    jsonLd ? '<script type="application/ld+json">' + JSON.stringify(jsonLd) + '</script>' : ''
+  ];
+  return lineas.filter(Boolean).join('\n    ');
+}
+
+// Los 278 espiritus viven en src/data/spritesData.js, que importa JSON y solo Vite sabe
+// cargar. Se usa su mismo pipeline (ssrLoadModule) para no duplicar el enriquecido: nombres
+// en ingles, familia, habilidad traducida (pickTexto) y demas los resuelve la app.
+async function cargarEspiritus() {
+  const servidor = await createServer({
+    server: { middlewareMode: true, hmr: false },
+    appType: 'custom',
+    logLevel: 'silent',
+    optimizeDeps: { noDiscovery: true }
+  });
+  try {
+    const modulo = await servidor.ssrLoadModule('/src/data/spritesData.js');
+    return { sprites: modulo.ALL_SPRITES, pickTexto: modulo.pickTexto };
+  } finally {
+    await servidor.close();
+  }
+}
+
+function construirFichas(sprites, pickTexto) {
+  const porFamilia = new Map();
+  for (const s of sprites) {
+    if (!porFamilia.has(s.familyId)) porFamilia.set(s.familyId, []);
+    porFamilia.get(s.familyId).push(s);
+  }
+  return sprites.map((s) => {
+    // Sin archivo no se pinta <img>: 6 espiritus todavia no tienen arte y una imagen rota se
+    // ve peor que un aviso.
+    const candidato = s.thumb || s.image;
+    const hayImagen = Boolean(candidato) && fs.existsSync(path.join(DIST, candidato));
+    return {
+    id: s.id,
+    rareza: s.rarity,
+    generacion: s.gen,
+    drop: s.dropChanceDisplay,
+    thumb: hayImagen ? candidato : '',
+    lanzamiento: s.releaseDate || '',
+    hermanas: (porFamilia.get(s.familyId) || []).map((h) => ({
+      id: h.id,
+      es: { nombre: h.fullName },
+      en: { nombre: h.fullNameEn }
+    })),
+    es: {
+      nombre: s.fullName,
+      familia: s.familyName,
+      variante: s.variantDisplay,
+      habilidad: s.ability,
+      perk: s.specialPerk,
+      ubicacion: s.location,
+      costo: s.summonCost
+    },
+    en: {
+      nombre: s.fullNameEn,
+      familia: s.familyNameEn,
+      variante: s.variantDisplayEn,
+      habilidad: pickTexto(s.ability, 'en'),
+      perk: pickTexto(s.specialPerk, 'en'),
+      ubicacion: pickTexto(s.location, 'en'),
+      costo: pickTexto(s.summonCost, 'en')
+    }
+    };
+  });
+}
+
+// Numeros reales de la coleccion para la guia: nada inventado, todo contado aqui.
+function datosGuia(sprites) {
+  const cuenta = (clave) => {
+    const mapa = new Map();
+    for (const s of sprites) {
+      const k = s[clave] || '';
+      mapa.set(k, (mapa.get(k) || 0) + 1);
+    }
+    return [...mapa.entries()].map(([nombre, n]) => ({ nombre, n })).sort((a, b) => b.n - a.n);
+  };
+  const numeros = sprites
+    .map((s) => Number(String(s.dropChanceDisplay || '').replace('%', '').replace(',', '.')))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  return {
+    total: sprites.length,
+    familias: new Set(sprites.map((s) => s.familyId)).size,
+    porRareza: cuenta('rarity'),
+    costos: new Set(sprites.map((s) => s.summonCost).filter(Boolean)).size,
+    dropMin: numeros.length ? Math.min(...numeros) : 0,
+    dropMax: numeros.length ? Math.max(...numeros) : 0,
+    fecha: new Date().toISOString().slice(0, 10)
+  };
+}
+
+function ultimosEspiritus(fichas) {
+  return fichas
+    .filter((f) => f.lanzamiento)
+    .slice()
+    .sort((a, b) => String(b.lanzamiento).localeCompare(String(a.lanzamiento)))
+    .slice(0, 16)
+    .map((f) => ({ ...f, slug: slugDeEspiritu(f.id) }));
+}
+
+function sitemap(extras = []) {
+  const filas = [];
+  for (const entrada of RUTAS) {
+    const multilingue = entrada.idiomas.length > 1;
+    for (const lang of entrada.idiomas) {
+      const loc = canonicalDe(entrada.ruta, multilingue ? lang : entrada.idiomas[0]);
+      const alternates = alternatesDe(entrada.ruta);
+      filas.push([
+        '  <url>',
+        '    <loc>' + loc + '</loc>',
+        ...alternates.map((a) => '    <xhtml:link rel="alternate" hreflang="' + a.hreflang + '" href="' + a.href + '" />'),
+        '    <changefreq>' + entrada.frecuencia + '</changefreq>',
+        '    <priority>' + entrada.prioridad.toFixed(1) + '</priority>',
+        '  </url>'
+      ].join('\n'));
+    }
+  }
+  for (const extra of extras) {
+    filas.push([
+      '  <url>',
+      '    <loc>' + extra.loc + '</loc>',
+      ...extra.alternates.map((a) => '    <xhtml:link rel="alternate" hreflang="' + a.hreflang + '" href="' + a.href + '" />'),
+      '    <changefreq>' + extra.frecuencia + '</changefreq>',
+      '    <priority>' + extra.prioridad.toFixed(1) + '</priority>',
+      '  </url>'
+    ].join('\n'));
+  }
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+    ...filas,
+    '</urlset>',
+    ''
+  ].join('\n');
+}
+
+async function main() {
+  const fuente = path.join(DIST, 'index.html');
+  if (!fs.existsSync(fuente)) {
+    console.error('Falta dist/index.html. Corre el build antes: pnpm build');
+    process.exit(1);
+  }
+
+  // Se limpia UNA vez: si no, cada ruta acumularia las etiquetas de la anterior.
+  let base = fs.readFileSync(fuente, 'utf8');
+  for (const re of LIMPIAR) base = base.replace(re, '');
+
+  const escritas = [];
+  for (const entrada of RUTAS) {
+    if (entrada.archivo) continue;
+    for (const lang of entrada.idiomas) {
+      const conIdioma = canonicalDe(entrada.ruta, lang).slice(SITIO.length);
+      const destino = conIdioma === '/' ? fuente : path.join(DIST, conIdioma.slice(1), 'index.html');
+      fs.mkdirSync(path.dirname(destino), { recursive: true });
+      fs.writeFileSync(destino, base.replace('</head>', '    ' + bloqueHead({ ...entrada, lang }) + '\n  </head>'));
+      escritas.push(conIdioma);
+    }
+  }
+
+  // Paginas de espiritu: una por idioma mas el indice.
+  const { sprites, pickTexto } = await cargarEspiritus();
+  const fichas = construirFichas(sprites, pickTexto);
+  const extras = [];
+  let paginas = 0;
+  for (const ficha of fichas) {
+    for (const lang of ['es', 'en']) {
+      const ruta = rutaConIdiomaEspiritu(rutaEspiritu(ficha.id), lang);
+      const destino = path.join(DIST, ruta.slice(1), 'index.html');
+      fs.mkdirSync(path.dirname(destino), { recursive: true });
+      fs.writeFileSync(destino, htmlPaginaEspiritu(ficha, lang));
+      extras.push({ loc: canonicalEspiritu(ficha.id, lang), alternates: alternatesDeEspiritu(ficha.id), frecuencia: 'monthly', prioridad: 0.5 });
+      paginas++;
+    }
+  }
+  for (const lang of ['es', 'en']) {
+    const ruta = rutaConIdiomaEspiritu(rutaHubEspiritus(), lang);
+    const destino = path.join(DIST, ruta.slice(1), 'index.html');
+    fs.mkdirSync(path.dirname(destino), { recursive: true });
+    fs.writeFileSync(destino, htmlHubEspiritus(fichas, lang));
+    const etiquetas = etiquetasHubEspiritus(fichas.length, lang);
+    extras.push({ loc: etiquetas.canonical, alternates: etiquetas.alternates, frecuencia: 'weekly', prioridad: 0.8 });
+    paginas++;
+  }
+
+  // Paginas de contenido: guia, novedades y acerca, en los dos idiomas.
+  const guia = datosGuia(sprites);
+  const novedades = { ultimos: ultimosEspiritus(fichas) };
+  const contenido = [
+    ['guia', etiquetasGuia, () => htmlGuia(guia, 'es'), () => htmlGuia(guia, 'en')],
+    ['novedades', etiquetasNovedades, () => htmlNovedades(novedades, 'es'), () => htmlNovedades(novedades, 'en')],
+    ['acerca', etiquetasAcerca, () => htmlAcerca(guia, 'es'), () => htmlAcerca(guia, 'en')]
+  ];
+  for (const [clave, etiquetasDe, enEspanol, enIngles] of contenido) {
+    const rutaBase = RUTAS_CONTENIDO[clave];
+    for (const lang of ['es', 'en']) {
+      const ruta = rutaConIdiomaEspiritu(rutaBase, lang);
+      const destino = path.join(DIST, ruta.slice(1), 'index.html');
+      fs.mkdirSync(path.dirname(destino), { recursive: true });
+      fs.writeFileSync(destino, lang === 'es' ? enEspanol() : enIngles());
+      const etiquetas = etiquetasDe(lang);
+      extras.push({ loc: etiquetas.canonical, alternates: etiquetas.alternates, frecuencia: 'monthly', prioridad: clave === 'guia' ? 0.9 : 0.6 });
+      paginas++;
+    }
+  }
+
+  fs.writeFileSync(path.join(DIST, 'sitemap.xml'), sitemap(extras));
+  console.log('SEO: HTML por ruta -> ' + escritas.join(', '));
+  console.log('SEO: ' + paginas + ' paginas de espiritu (' + fichas.length + ' fichas x 2 idiomas + indice)');
+  console.log('SEO: sitemap con ' + (RUTAS.reduce((n, r) => n + r.idiomas.length, 0) + extras.length) + ' URLs');
+}
+
+main();

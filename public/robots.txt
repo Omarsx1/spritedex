@@ -1,7 +1,12 @@
 User-agent: *
 Allow: /
-Disallow: /studio
-Disallow: /override
-Disallow: /nexus
+
+# Portal de administracion: App.jsx lo detecta por estas rutas y por ?studio=true, no por
+# /studio, /override ni /nexus (aquellos prefijos no cubrian /portal-override).
+Disallow: /studio-override
+Disallow: /nexus-core
+Disallow: /portal-override
+Disallow: /*?studio=
+Disallow: /*?portal=
 
 Sitemap: https://spritedex.gg/sitemap.xml

@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender-seo.mjs",
     "lint": "oxlint",
+    "perf": "node scripts/perf-budget.mjs",
     "preview": "vite preview",
     "test": "node --test",
     "smoke": "node scripts/smoke-share.mjs",

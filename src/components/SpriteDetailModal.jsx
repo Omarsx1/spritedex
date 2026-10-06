@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Zap, Sparkles } from 'lucide-react';
 import { SPRITE_FAMILIES, getSpriteCardStyle, getRarityInfo, pickName, pickThemeName, pickTexto } from '../data/spritesData';
-import { t } from '../i18n';
+import { t, conIdioma, getLang } from '../i18n';
+import { rutaEspiritu } from '../seo/espiritus.js';
 import { sounds } from '../utils/audio';
+import { rutaBasicoFamilia, rutaFallbackEspiritu } from '../utils/spriteAssets';
 import gsap from 'gsap';
 import { Modal } from './ui/Modal';
 
@@ -54,15 +56,10 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
     if (!e.target.dataset.triedBase) {
       e.target.dataset.triedBase = 'true';
       const baseId = activeSprite.id ? activeSprite.id.split('_')[0] : 'water';
-      const isWebpBase = activeSprite.gen === 2 || ['pond', 'klombo', 'sonic', 'shadow', 'tails', 'crash', 'blinky', 'birthday', 'morgana', '8bit', 'adventure', 'bush', 'jonesy', 'killswitch', 'stormscout', 'onigiri', 'overshield', 'xray', 'peely', 'llama', 'ironmouse'].includes(baseId);
-      if (isWebpBase) {
-        e.target.src = `/sprites/${baseId}_basic.webp`;
-      } else {
-        e.target.src = `/sprites/${baseId}_basic.png`;
-      }
+      e.target.src = rutaBasicoFamilia(baseId);
     } else {
       e.target.onerror = null;
-      e.target.src = activeSprite.gen === 2 ? '/sprites/sonic_basic.webp' : '/sprites/water_basic.png';
+      e.target.src = rutaFallbackEspiritu(activeSprite.gen);
     }
   };
 
@@ -122,6 +119,11 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                 </span>
               )}
             </div>
+            {/* Ficha publica: pagina estatica con los datos del espiritu, URL propia para
+                compartir y la que enlaza el resto del sitio. */}
+            <a className="sdm__ficha" href={conIdioma(rutaEspiritu(activeSprite.id), getLang())}>
+              {t('detalle.verFicha')}
+            </a>
           </div>
         </div>
 

@@ -1,6 +1,19 @@
 {
   "headers": [
     {
+      "source": "/(studio-override|nexus-core|portal-override)(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "query", "key": "studio" }],
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
       "source": "/index.html",
       "headers": [
         {

@@ -31,7 +31,9 @@
   --gold: #facc15;
   --emerald: #10b981;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-heading: 'Outfit', sans-serif;
+  /* Inter va de respaldo a proposito: mientras Outfit llega, los titulos ya salen con una
+     sans parecida en vez del sans del sistema, que es lo que movia el layout al cambiar. */
+  --font-heading: 'Outfit', 'Inter', sans-serif;
   --font-fortnite: 'Burbank Big Condensed', 'FortniteFont', sans-serif;
 }
 
@@ -1089,38 +1091,48 @@ html::after {
 .hero__title-line--glitch::before {
   color: var(--tg-rgb-r, #ff0055);
   /* La franja esta SIEMPRE puesta (como el text-shadow del original) y el glitch
-     es un evento: tres saltos cortos en medio segundo y vuelta a la calma. Antes
-     habia movimiento todo el rato y eso cansa la vista: parece nervioso. */
+     es un evento: un hipo por ciclo y vuelta a la calma. Antes habia movimiento
+     todo el rato y eso cansa la vista: parece nervioso. El hipo es CORTO y SECO
+     (49 ms por salto, ver keyframes) y lo que se alargo fue el ciclo: el efecto
+     se ve poco, pero cuando cae es nitido y no arrastrado. */
   animation: hero-glitch-r steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 1.8);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
 }
 
 .hero__title-line--glitch::after {
   color: var(--tg-rgb-b, #00FFFB);
   animation: hero-glitch-b steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 1.8);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
   /* Un pelo desfasada de la roja: los hipos no caen clavados a la vez. */
   animation-delay: 0.07s;
 }
 
-/* ~5 s de calma y, en el ultimo 12% del ciclo, un hipo: tres golpes y vuelta.
-   Dentro del hipo los saltos son duros (steps) para que se lea digital. */
+/* El hipo ocupa una porcion del ciclo mas grande para que el efecto se note.
+   ANTES: ciclo 2.8s*1.8 = 5.04s; calma 0%-88%, hipo 88%-94.5% (6.5% = ~328 ms,
+   cada golpe ~50-75 ms).
+   DESPUES: ciclo 2.8s*2.2 = 6.16s; calma 0%-70%, hipo 70%-90% (20% = ~1232 ms,
+   cada uno de los cuatro golpes sostenido 4% = ~246 ms).
+   Desplazamientos, colores y saltos duros (steps) son los MISMOS: solo cambia
+   cuanto tiempo queda el efecto en pantalla. */
 @keyframes hero-glitch-r {
-  0%, 88%     { transform: translateX(-0.1rem); opacity: 0.85; }
-  89%         { transform: translateX(-0.65rem); opacity: 1; }
-  90.5%       { transform: translateX(0.2rem) translateY(-0.02rem); opacity: 1; }
-  92%         { transform: translateX(-0.15rem); opacity: 1; }
-  93%         { transform: translateX(-0.85rem); opacity: 1; }
-  94.5%, 100% { transform: translateX(-0.1rem); opacity: 0.85; }
+  /* Hipo corto y seco: los cinco estados del glitch caen en 3,5% del ciclo (245 ms con el
+     ciclo de 7 s), con saltos de 49 ms cada uno. El ciclo se alargo para que el hipo sea un
+     evento raro: nitido y breve en vez de largo y arrastrado. */
+  0%, 90%     { transform: translateX(-0.1rem); opacity: 0.85; }
+  90.7%       { transform: translateX(-0.65rem); opacity: 1; }
+  91.4%       { transform: translateX(0.2rem) translateY(-0.02rem); opacity: 1; }
+  92.1%       { transform: translateX(-0.15rem); opacity: 1; }
+  92.8%       { transform: translateX(-0.85rem); opacity: 1; }
+  93.5%, 100% { transform: translateX(-0.1rem); opacity: 0.85; }
 }
 
 @keyframes hero-glitch-b {
-  0%, 88%     { transform: translateX(0.1rem); opacity: 0.85; }
-  89%         { transform: translateX(0.65rem); opacity: 1; }
-  90.5%       { transform: translateX(-0.2rem) translateY(0.02rem); opacity: 1; }
-  92%         { transform: translateX(0.15rem); opacity: 1; }
-  93%         { transform: translateX(0.85rem); opacity: 1; }
-  94.5%, 100% { transform: translateX(0.1rem); opacity: 0.85; }
+  0%, 90%     { transform: translateX(0.1rem); opacity: 0.85; }
+  90.7%       { transform: translateX(0.65rem); opacity: 1; }
+  91.4%       { transform: translateX(-0.2rem) translateY(0.02rem); opacity: 1; }
+  92.1%       { transform: translateX(0.15rem); opacity: 1; }
+  92.8%       { transform: translateX(0.85rem); opacity: 1; }
+  93.5%, 100% { transform: translateX(0.1rem); opacity: 0.85; }
 }
 
 .hero__title-line--accent {
@@ -1800,6 +1812,12 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   gap: 14px;
   margin-top: 4px;
   margin-bottom: 28px;
+  /* La barra de filtros es una capa propia y va POR ENCIMA de la grilla. Sus desplegables
+     llevan z-index 91, pero viven dentro de .filter-controls-row, que el translateY de
+     ajuste fino ya convierte en contexto de apilado: sin esta capa el 91 se queda encerrado
+     y las cartas (position: relative; z-index: 2) tapaban el menu abierto. */
+  position: relative;
+  z-index: 20;
 }
 
 /* ===== Generation Switcher Tabs ===== */
@@ -3123,9 +3141,11 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 /* ===== Sprite Card (fortnite.gg style) ===== */
 .sprite-card {
-  content-visibility: auto;
-  contain-intrinsic-size: 0 245px;
-  contain: layout style;
+  /* Sin render diferido (content-visibility / contain) a proposito, en TODAS las anchuras: el
+     navegador descarta el render de las tarjetas que salen de pantalla y las vuelve a dibujar al
+     entrar, asi que el contenido YA cargado parpadea al scrollear, sobre todo hacia arriba. Una
+     web normal no hace eso. El coste de layout del primer render se asume: es una grilla de
+     tarjetas, no miles de nodos. */
   border-radius: 14px;
   padding: 22px 14px 14px;
   display: flex;
@@ -3137,13 +3157,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   overflow: hidden;
   border: 0.5px solid rgba(255, 255, 255, 0.1);
   background-color: #161b22;
-}
-
-@media (max-width: 768px) {
-  .sprite-card {
-    content-visibility: visible !important;
-    contain: none !important;
-  }
 }
 
 /* Theme Gradients & Border Colors (Fortnite.gg Exact Design) */
@@ -3650,6 +3663,11 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   transform: scale(1.08);
 }
 
+/* La sombra del estado atrapado vive en la IMAGEN (drop-shadow), no en el contenedor: el
+   contenedor es una banda rectangular que ocupa todo el ancho de la tarjeta, asi que un
+   box-shadow dibuja un rectangulo visible alrededor del espiritu. El drop-shadow sigue la
+   silueta. Es una sola pasada de filtro y solo en las atrapadas: el ahorro real de la cadena
+   estaba en las NO atrapadas, que encadenaban cuatro filtros y ahora tienen uno. */
 /* Card name */
 .card-name {
   font-family: var(--font-heading);
@@ -7775,9 +7793,20 @@ body:has(.modal-overlay) {
 
 .app-footer__content {
   width: 100%;
+  /* border-box: con width 100% MAS su propio padding (10+6 px) y su borde (2 px), la pildora
+     del footer se pasaba EXACTAMENTE 18 px del ancho de la pantalla en movil. Eso hacia que el
+     documento midiera 408 px en un viewport de 390: el navegador mostraba la app desencajada y
+     habia que alejar el zoom para ver los elementos de la esquina. El padre ya era border-box;
+     el hijo no lo era. */
+  box-sizing: border-box;
+  /* Es el containing block del panel de enlaces (bottom: 100% + 8px). */
+  position: relative;
+  /* 48 - 12 (padding vertical) - 2 (borde) = 34 px: el alto interno de la pildora. */
+  --footer-trigger: 34px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   height: 48px;
   padding: 6px 14px 6px 8px;
   border-radius: 9999px;
@@ -7795,6 +7824,7 @@ body:has(.modal-overlay) {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -7814,16 +7844,13 @@ body:has(.modal-overlay) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* Sin min-width: 0 el span no encoge por debajo de su contenido (min-width: auto)
+     y el texto se salia de la pildora en 320 px en vez de cortarse con puntos. */
+  min-width: 0;
 }
 
 .footer-short-text {
   display: none;
-}
-
-.app-footer__actions {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
 }
 
 .app-footer__privacy-btn {
@@ -7848,7 +7875,138 @@ body:has(.modal-overlay) {
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* En Mobile: Mantiene la cápsula horizontal en una sola fila sin apilamiento */
+/* Los enlaces del pie reutilizan la capsula del boton de privacidad. */
+a.app-footer__privacy-btn {
+  text-decoration: none;
+}
+
+/* Boton disparador del panel: vive en la pildora cerrada, en el borde IZQUIERDO
+   (la esquina derecha queda bajo el FAB del hero, que la intercepta el toque).
+   --footer-trigger es el alto interno exacto de la pildora (48 - 12 - 2 = 34). */
+.app-footer__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--footer-trigger);
+  height: var(--footer-trigger);
+  padding: 0;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.app-footer__trigger:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Foco visible: mismo lenguaje que .lang-switch__btn, nunca se quita el outline. */
+.app-footer__trigger:focus-visible {
+  outline: 2px solid #22e6dc;
+  outline-offset: 2px;
+}
+
+.app-footer__chevron {
+  transition: transform 0.22s ease;
+}
+
+.app-footer__trigger[aria-expanded='true'] .app-footer__chevron {
+  transform: rotate(180deg);
+}
+
+/* Panel de enlaces: flota POR ENCIMA de la pildora. Al ser absolute no participa
+   del flujo, asi que abrirlo no cambia el scrollHeight del documento. */
+.app-footer__panel {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  right: auto;
+  width: 100%;
+  box-sizing: border-box;
+  /* En movil (pildora ~296-366 px) el panel ocupa el ancho de la pildora; en escritorio
+     queda anclado al borde izquierdo y topado a 420 px. Nada de right: 0: el disparador
+     ya vive a la izquierda, no en la esquina ocupada por el FAB. */
+  max-width: 420px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  border-radius: 18px;
+  background: rgba(12, 14, 22, 0.65);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  /* vh primero (navegadores sin dvh) y dvh despues: el tope nunca deja el panel
+     fuera de la pantalla, y overflow-y es la salida de emergencia. */
+  max-height: min(60vh, 360px);
+  max-height: min(60dvh, 360px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: appFooterPanelIn 0.16s ease-out;
+}
+
+@keyframes appFooterPanelIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-footer__panel {
+    animation: none;
+  }
+}
+
+/* Las filas del panel reutilizan la capsula de .app-footer__privacy-btn, pero en
+   columna, a lo ancho y con 44 px de alto tactil. */
+.app-footer__panel .app-footer__privacy-btn {
+  width: 100%;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.app-footer__panel-copy {
+  margin: 6px 4px 2px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+
+
+/* Enlace a la ficha publica del espiritu, dentro del detalle. */
+.sdm__ficha {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(0, 240, 232, 0.85);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 240, 232, 0.35);
+}
+
+.sdm__ficha:hover {
+  color: #ffffff;
+  border-bottom-color: #ffffff;
+}
+
+/* En Mobile: la pildora cerrada se queda en UNA fila (logo + copyright + disparador).
+   Crece a 52 px porque 52 - 6 (padding) - 2 (borde) = 44: el alto tactil minimo. */
 @media (max-width: 600px) {
   .app-footer {
     width: calc(100% - 24px);
@@ -7857,8 +8015,9 @@ body:has(.modal-overlay) {
   }
 
   .app-footer__content {
-    height: 44px;
-    padding: 4px 10px 4px 6px;
+    --footer-trigger: 44px;
+    height: 52px;
+    padding: 3px 6px 3px 8px;
     gap: 8px;
   }
 
@@ -7880,10 +8039,24 @@ body:has(.modal-overlay) {
     font-size: 0.72rem;
   }
 
-  .app-footer__privacy-btn {
-    font-size: 0.72rem;
-    padding: 5px 8px;
-    gap: 4px;
+  .app-footer__panel {
+    padding: 6px;
+    border-radius: 16px;
+  }
+
+  .app-footer__panel .app-footer__privacy-btn {
+    padding: 8px 10px;
+  }
+}
+
+/* Tactil de cualquier ancho: el disparador tambien necesita 44x44 (una tablet con
+   dedo no entra en la media query de 600 px). El panel pierde el blur en el bloque
+   T8 de mas abajo, que es quien lo anula; aqui NO se reintroduce backdrop-filter. */
+@media (hover: none) and (pointer: coarse) {
+  .app-footer__content {
+    --footer-trigger: 44px;
+    height: 52px;
+    padding: 3px 6px 3px 8px;
   }
 }
 
@@ -8320,7 +8493,10 @@ body:has(.modal-overlay) {
   min-height: 100vh;
   max-width: 620px;
   margin: 0 auto;
-  padding: max(18px, env(safe-area-inset-top)) 16px max(26px, env(safe-area-inset-bottom));
+  /* El aire lateral crece con la ventana desde los 16px del telefono (donde el contenido tiene
+     que ir a lo ancho) hasta los 48px de escritorio. Ni escalones ni un suelo alto: con suelo
+     de 20px, en un iPhone se perdia ancho util. */
+  padding: max(18px, env(safe-area-inset-top)) clamp(16px, calc(16px + (100vw - 393px) * 0.13), 48px) max(26px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -8853,14 +9029,14 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
      despues del bloom, no de golpe. */
   transition: opacity 600ms ease 380ms;
   animation: hero-glitch-r steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 1.8);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
 }
 
 .hero__title[data-fnm-logo='themed'] .hero__title-fnm-ghost--b {
   opacity: 0.75;
   transition: opacity 600ms ease 460ms;
   animation: hero-glitch-b steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 1.8);
+  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
   animation-delay: 0.07s;
 }
 
@@ -9761,5 +9937,318 @@ body .swal2-container .swal2-toast.swal2-popup {
   body.theme-fortnitemares::after,
   html.theme-fortnitemares::after {
     animation: none !important;
+  }
+}
+
+/* ── Vista de amigos en escritorio ────────────────────────────────────────────────────────
+   Los envoltorios (lateral / principal) no existen para el layout en movil: con
+   display: contents los hijos se colocan igual que antes, asi que la vista movil queda
+   intacta. Desde 1000px la pagina se comporta como una ventana: cabecera y pestañas en la
+   misma fila, y debajo dos columnas que llenan el alto disponible. Asi el fondo de temporada
+   vuelve a ser un marco y no la pared del fondo. */
+.fpage__lateral,
+.fpage__principal {
+  display: contents;
+}
+
+@media (min-width: 1000px) {
+  .fpage {
+    max-width: 1240px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+    grid-template-rows: auto auto;
+    align-items: end;
+    /* Sin esto, las filas se reparten el alto de la pagina (que hereda min-height: 100vh) y la
+       cabecera y las tarjetas acaban pegadas al fondo de su fila. */
+    align-content: start;
+    column-gap: 28px;
+    row-gap: 16px;
+  }
+
+  .fpage__top {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  /* Las pestañas suben a la fila de la cabecera, alineadas con la columna de contenido. */
+  .fpage__tabs {
+    grid-column: 2;
+    grid-row: 1;
+    max-width: none;
+  }
+
+  .fpage__title {
+    font-size: 1.9rem;
+  }
+
+  .fpage__sub {
+    font-size: 0.85rem;
+  }
+
+  .fpage .sdm-friends {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
+    gap: 20px 28px;
+    align-items: start;
+    /* En escritorio se cae el panel contenedor: cada bloque es su propia tarjeta sobre el
+       fondo, como las fichas de la app. El fondo de temporada vuelve a ser el lienzo y no una
+       pared, y no queda un cajon oscuro vacio llenando la pantalla. */
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: 0;
+  }
+
+  .fpage__lateral,
+  .fpage__principal {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+
+  /* Cada bloque, una tarjeta: mismo borde y mismo fondo que las fichas de la app. */
+  .fpage__lateral > .sdm-friends__group,
+  .fpage__principal > .sdm-friends__group,
+  .fpage__bloqueFicha > .sdm-friends__group {
+    background: rgba(8, 12, 24, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 18px;
+  }
+
+  .fpage__bloqueFicha {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+/* ── Vista de compartir ───────────────────────────────────────────────────────────────────
+   Compartir dejo de ser una modal: ahora es una vista propia (/compartir) para poder mirar la
+   lona en grande, que era el motivo del cambio. El layout se resuelve aqui, sobre las clases
+   que ya traia la modal, asi que su logica quedo intacta. */
+.spage {
+  /* Contenedor propio, no .fpage: las reglas de escritorio de la vista de amigos se aplicarian
+     tambien aqui y le dejaban una columna fantasma de 420px. */
+  min-height: 100dvh;
+  max-width: 1240px;
+  margin: 0 auto;
+  /* Mismo criterio que la vista de amigos: 16px en el telefono y creciendo con la ventana. */
+  padding: max(18px, env(safe-area-inset-top)) clamp(16px, calc(16px + (100vw - 393px) * 0.13), 48px) max(26px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* La tarjeta deja de ser tarjeta: cada bloque es su propia pieza sobre el fondo. */
+.spage .sdm-share-pro {
+  max-width: none;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  overflow: visible;
+  display: grid;
+  grid-template-areas: "cabecera" "controles" "vista" "acciones";
+  gap: 14px;
+}
+
+.spage .sdm-share-pro__header { grid-area: cabecera; }
+.spage .sdm-share-pro__controls { grid-area: controles; }
+.spage .sdm-share-pro__preview-wrap { grid-area: vista; }
+.spage .sdm-share-pro__actions { grid-area: acciones; }
+
+.spage .sdm-share-pro__controls,
+.spage .sdm-share-pro__actions {
+  background: rgba(8, 12, 24, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  /* Un poco mas de relleno interno: con 14px los controles quedaban pegados al borde. */
+  padding: 18px;
+}
+
+/* En la vista no hay tope de modal: la lona puede usar el alto de la pantalla. */
+.spage .sdm-share-pro__preview-wrap {
+  max-height: none;
+  min-height: 0;
+  height: 100%;
+}
+
+.spage .sdm-share-pro__preview-img {
+  /* En el telefono la lona es lo que hay que ver: se le da el alto para que llene el ancho de
+     la tarjeta en vez de quedarse corta. */
+  max-height: 82dvh;
+}
+
+@media (min-width: 1000px) {
+  /* Dos columnas: los ajustes a la izquierda y la lona a la derecha, que es la protagonista. */
+  .spage .sdm-share-pro {
+    grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
+    grid-template-areas: "cabecera cabecera" "controles vista" "acciones vista";
+    /* La tercera fila es la que absorbe el alto que sobra, para que el hueco quede debajo de
+       los botones y no entre los ajustes y ellos. */
+    grid-template-rows: auto auto 1fr;
+    align-items: start;
+    column-gap: 24px;
+  }
+
+  /* La columna de ajustes es mas estrecha que la modal (640px): en dos columnas no cabia y la
+     fila de FORMATO se cortaba. Un grupo por fila. */
+  .spage .sdm-share-pro__controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .spage .sdm-share-pro__preview-img {
+    max-height: calc(100dvh - 230px);
+  }
+
+  /* Los botones van pegados a los ajustes, no al fondo de la ventana: con position: sticky
+     quedaban abajo del todo y entre medias quedaba un hueco muerto de casi 400px. */
+  .spage .sdm-share-pro__actions {
+    align-self: start;
+  }
+}
+
+/* ── Vista de compartir en temporada ──────────────────────────────────────────────────────
+   La vista de amigos vira a violeta de noche, pero compartir se quedaba con las superficies
+   azules de fuera de temporada y con el arte de fondo asomando por todas partes: no parecia la
+   misma app. Mismas recetas que arriba, aplicadas a las clases de esta vista. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage {
+  background: radial-gradient(120% 90% at 50% 0%, rgba(28, 14, 46, 0.9) 0%, rgba(10, 5, 18, 0.94) 100%);
+}
+
+/* El envoltorio NO es una tarjeta en la vista: lo son sus piezas (ajustes, lona y botones).
+   Arrastraba la superficie de la modal vieja (rgba(13,7,24,.96), la banda #0E0A18 que se veia
+   detras de la cabecera) y, como su selector tiene mas especificidad que el de .spage, ganaba.
+   Se anula aqui. El degradado violeta de la pagina se queda: ese es el #190A22 que encierra. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__controls,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__actions {
+  background: rgba(22, 11, 36, 0.72);
+  border-color: rgba(168, 85, 247, 0.26);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__preview-wrap {
+  background: rgba(18, 9, 30, 0.82);
+  border-color: rgba(168, 85, 247, 0.24);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__segmented {
+  background: rgba(26, 13, 42, 0.75);
+  border-color: rgba(168, 85, 247, 0.24);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__seg-btn {
+  color: rgba(196, 181, 253, 0.75);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__seg-btn--active {
+  color: #1a0b02;
+  background: linear-gradient(135deg, #ff922b, #f76707);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__input {
+  background: rgba(30, 16, 50, 0.85);
+  border-color: rgba(168, 85, 247, 0.28);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__input:focus {
+  border-color: #d946ef;
+  box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.22);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__seg-label {
+  color: rgba(216, 180, 254, 0.75);
+}
+
+/* ==========================================================================
+   FASE 5 / T7 — CALOR EN REPOSO: pausa de animaciones fuera de pantalla
+   pausaAnimaciones.js (cableado desde App.jsx) pone .is-fuera-de-pantalla en
+   los contenedores (hero, stats, filtro, coachmark) que salen del viewport.
+   Es pausa, no apagado: al volver siguen donde estaban. Si el observer no
+   corre, la clase nunca aparece y todo se ve igual que antes.
+   ========================================================================== */
+.is-fuera-de-pantalla,
+.is-fuera-de-pantalla *,
+.is-fuera-de-pantalla *::before,
+.is-fuera-de-pantalla *::after {
+  animation-play-state: paused !important;
+}
+
+/* ==========================================================================
+   FASE 5 / T8 — TACTIL/MOVIL: sin backdrop-filter
+   Es la propiedad mas cara de la GPU movil antigua. Se conserva el mismo
+   fondo rgba de cada regla (mismo color base y alfa del diseno) y solo se
+   sube la alfa en las tres superficies que dependian del blur para leerse
+   sobre contenido ajeno (.sdm__close y las etiquetas de carta). Escritorio
+   no cambia: esta condicion solo es cierta con puntero grueso y sin hover.
+   ========================================================================== */
+@media (hover: none) and (pointer: coarse) {
+  .app-navbar__item,
+  .app-navbar__menu-btn,
+  .app-navbar__avatar,
+  .app-navbar__logo-mark,
+  .app-navbar__menu-dropdown,
+  .app-navbar__dropdown,
+  .hero__btn,
+  .gen-tab-btn,
+  .status-pill-btn,
+  .search-input-field,
+  .filter-pill-trigger,
+  .variant-grid-dropdown,
+  .sprite-grid-dropdown,
+  .filter-pill-checkbox,
+  .filter-view-toggle,
+  .mobile-new-coachmark__content,
+  .mobile-liquid-sheet-backdrop,
+  .modal-overlay,
+  .glass-panel,
+  .auth-modal__content,
+  .sdm__close,
+  .sdm-share-pro,
+  .sdm-friend-pill,
+  .claim-banner,
+  .sdm-compare__waiting,
+  .privacy-panel,
+  .ms-variant-tag,
+  .ms-level-tag,
+  .app-footer__content,
+  .app-footer__panel,
+  .install-prompt-card,
+  .fnm-skip-btn {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Las dos cortinas animaban el blur en keyframes; con !important queda
+     anulado en todo el ciclo y la opacidad se sigue animando igual. */
+  .mobile-liquid-sheet-backdrop,
+  .modal-overlay {
+    will-change: opacity;
+  }
+
+  /* Alfa ajustada solo donde el blur era lo que daba legibilidad */
+  .sdm__close,
+  .ms-variant-tag,
+  .ms-level-tag {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+
+  /* Sin blur, el panel del pie quedaria translucido sobre el contenido: casi opaco.
+     Aqui NO se reintroduce backdrop-filter, solo se sube la alfa. */
+  .app-footer__panel {
+    background-color: rgba(12, 14, 22, 0.97);
   }
 }

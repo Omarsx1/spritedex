@@ -2127,7 +2127,7 @@
     "rarity": "Rare",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-26",
     "notNew": true
   },
@@ -2138,7 +2138,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-26",
     "notNew": true
   },
@@ -2149,7 +2149,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-26",
     "notNew": true
   },
@@ -2160,7 +2160,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-26",
     "notNew": true
   },
@@ -2171,7 +2171,7 @@
     "rarity": "Special",
     "gen": 2,
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "releaseDate": "2026-09-26",
     "notNew": true
   },

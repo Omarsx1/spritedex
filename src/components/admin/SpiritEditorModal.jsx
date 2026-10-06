@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { RARITIES, THEME_NAMES_ES, FAMILY_NAMES_MAP, getSpriteCardStyle } from '../../data/spritesData';
 import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
+import { rutaAssetEspiritu, rutaBasicoFamilia, rutaFallbackEspiritu } from '../../utils/spriteAssets';
 import { DYNAMIC_SPRITES_CACHE_KEY } from '../../hooks/useDynamicSprites';
 
 // Convierte una fecha ISO (UTC o local) en string YYYY-MM-DDTHH:mm local sin desplazamiento de zona horaria
@@ -70,7 +71,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
     variant: spirit?.variant || 'Base',
     variantDisplay: spirit?.variantDisplay || THEME_NAMES_ES[spirit?.variant] || 'Básico',
     gen: spirit?.gen || 2,
-    image: spirit?.image || (spirit?.id ? `/sprites/${spirit.id}.png` : ''),
+    image: spirit?.image || (spirit?.id ? rutaAssetEspiritu(spirit.id) : ''),
     ability: spirit?.ability || 'Concede bonificaciones pasivas de combate y velocidad.',
     specialPerk: spirit?.specialPerk || spirit?.special_perk || '',
     summonCostNum: initialCostDigits,
@@ -1428,19 +1429,16 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                 position: 'relative'
               }}>
                 <img
-                  src={formData.image || (formData.id ? `/sprites/${formData.id}.png` : '/sprites/water_basic.png')}
+                  src={formData.image || (formData.id ? rutaAssetEspiritu(formData.id) : rutaFallbackEspiritu(1))}
                   alt={formData.fullName}
                   style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.5))' }}
                   onError={(e) => {
-                    const src = e.target.src;
-                    if (src.endsWith('.webp')) {
-                      e.target.src = src.replace('.webp', '.png');
-                    } else if (!e.target.dataset.triedBase) {
+                    if (!e.target.dataset.triedBase) {
                       e.target.dataset.triedBase = 'true';
                       const fam = (formData.familyId || formData.id?.split('_')[0] || 'water').toLowerCase();
-                      e.target.src = `/sprites/${fam}_basic.png`;
+                      e.target.src = rutaBasicoFamilia(fam);
                     } else {
-                      e.target.src = '/sprites/water_basic.png';
+                      e.target.src = rutaFallbackEspiritu(1);
                     }
                   }}
                 />

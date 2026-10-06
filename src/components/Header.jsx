@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { Liquid } from 'liquid-gooey';
 import { allSprites as defaultAllSprites } from '../data/spritesData';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { rutaFallbackEspiritu } from '../utils/spriteAssets';
 import { t } from '../i18n';
 import { hasSeenFortnitemaresIntro, isFortnitemaresActive } from '../config/seasonalEvent';
 import { PumpkinIcon } from './icons/PumpkinIcon';
@@ -303,7 +304,7 @@ export function Header({
 
   const handleImgError = useCallback((e) => {
     e.target.onerror = null;
-    e.target.src = '/sprites/water_basic.png';
+    e.target.src = rutaFallbackEspiritu(1);
   }, []);
 
   return (
@@ -437,10 +438,10 @@ export function Header({
                   className="hero__btn hero__btn--accent"
                   onClick={onOpenShareModal}
                   onMouseEnter={() => {
-                    import('../components/ShareImageModal');
+                    import('../components/SharePage');
                   }}
                   onTouchStart={() => {
-                    import('../components/ShareImageModal');
+                    import('../components/SharePage');
                   }}
                   title={t('header.compartirImagenTitulo')}
                 >
@@ -521,10 +522,10 @@ export function Header({
                     onOpenShareModal();
                   }}
                   onMouseEnter={() => {
-                    import('../components/ShareImageModal');
+                    import('../components/SharePage');
                   }}
                   onTouchStart={() => {
-                    import('../components/ShareImageModal');
+                    import('../components/SharePage');
                   }}
                 >
                   <Share2 size={19} strokeWidth={2.2} />
@@ -601,10 +602,10 @@ export function Header({
                     onOpenShareModal();
                   }}
                   onMouseEnter={() => {
-                    import('../components/ShareImageModal');
+                    import('../components/SharePage');
                   }}
                   onTouchStart={() => {
-                    import('../components/ShareImageModal');
+                    import('../components/SharePage');
                   }}
                 >
                   <span

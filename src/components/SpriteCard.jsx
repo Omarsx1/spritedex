@@ -4,6 +4,7 @@ import { Lock } from 'lucide-react';
 import { RARITIES, getSpriteCardStyle, getRarityInfo, pickName } from '../data/spritesData';
 import { t } from '../i18n';
 import { sounds } from '../utils/audio';
+import { rutaBasicoFamilia, rutaFallbackEspiritu } from '../utils/spriteAssets';
 import { SonicRing } from './SonicRing';
 
 function SpriteCardBase({
@@ -104,20 +105,15 @@ function SpriteCardBase({
             decoding="async"
             onClick={handleImageClick}
             title={t('carta.clicFigura')}
-            style={{ filter: !isOwned ? 'grayscale(80%) opacity(0.5)' : 'none', cursor: 'pointer' }}
+            style={{ filter: !isOwned ? 'grayscale(80%)' : 'none', opacity: !isOwned ? 0.5 : 1, cursor: 'pointer' }}
             onError={(e) => {
               if (!e.target.dataset.triedBase) {
                 e.target.dataset.triedBase = 'true';
                 const baseId = sprite.id ? sprite.id.split('_')[0] : 'water';
-                const isWebpBase = sprite.gen === 2 || ['pond', 'klombo', 'sonic', 'shadow', 'tails', 'crash', 'blinky', 'birthday', 'morgana', '8bit', 'adventure', 'bush', 'jonesy', 'killswitch', 'stormscout', 'onigiri', 'overshield', 'xray', 'peely', 'llama', 'ironmouse'].includes(baseId);
-                if (isWebpBase) {
-                  e.target.src = `/sprites/${baseId}_basic.webp`;
-                } else {
-                  e.target.src = `/sprites/${baseId}_basic.png`;
-                }
+                e.target.src = rutaBasicoFamilia(baseId);
               } else {
                 e.target.onerror = null;
-                e.target.src = sprite.gen === 2 ? '/sprites/sonic_basic.webp' : '/sprites/water_basic.png';
+                e.target.src = rutaFallbackEspiritu(sprite.gen);
               }
             }}
           />
@@ -264,22 +260,18 @@ function SpriteCardBase({
           onClick={handleImageClick}
           title={t('carta.clicFigura')}
           style={{
-            filter: !isOwned ? 'grayscale(55%) opacity(0.68) brightness(1.2) contrast(1.15)' : 'drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
+            filter: !isOwned ? 'grayscale(55%)' : 'drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
+            opacity: !isOwned ? 0.68 : 1,
             cursor: 'pointer'
           }}
           onError={(e) => {
             if (!e.target.dataset.triedBase) {
               e.target.dataset.triedBase = 'true';
               const baseId = sprite.id ? sprite.id.split('_')[0] : 'water';
-              const isWebpBase = sprite.gen === 2 || ['pond', 'klombo', 'sonic', 'shadow', 'tails', 'crash', 'blinky', 'birthday', 'morgana', '8bit', 'adventure', 'bush', 'jonesy', 'killswitch', 'stormscout', 'onigiri', 'overshield', 'xray', 'peely', 'llama', 'ironmouse'].includes(baseId);
-              if (isWebpBase) {
-                e.target.src = `/sprites/${baseId}_basic.webp`;
-              } else {
-                e.target.src = `/sprites/${baseId}_basic.png`;
-              }
+              e.target.src = rutaBasicoFamilia(baseId);
             } else {
               e.target.onerror = null;
-              e.target.src = sprite.gen === 2 ? '/sprites/sonic_basic.webp' : '/sprites/water_basic.png';
+              e.target.src = rutaFallbackEspiritu(sprite.gen);
             }
           }}
         />

@@ -2,6 +2,7 @@ import puppeteer from 'puppeteer-core';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { archivoArteCanonico, ART_VECTORIAL } from '../src/data/spriteAssetMap.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -318,9 +319,22 @@ async function ensureSpriteImage(page, spriteId, imageUrl) {
     fs.mkdirSync(PUBLIC_SPRITES_DIR, { recursive: true });
   }
 
-  const webpPath = path.join(PUBLIC_SPRITES_DIR, `${spriteId}.webp`);
   const pngPath = path.join(PUBLIC_SPRITES_DIR, `${spriteId}.png`);
-  if (fs.existsSync(webpPath) || fs.existsSync(pngPath)) {
+
+  // Se escribe en la ruta CANONICA que lee la app, que no siempre es /sprites/<id>.webp:
+  // peely_candy se sirve desde peely_gummy.webp, llama_candy desde llama_gummy.webp y los
+  // patos desde los *_duck.webp. Mirando solo el id, el sync bajaba un duplicado byte a byte
+  // del archivo que ya estaba en el repo (asi entraron public/sprites/peely_candy.webp y su
+  // miniatura) y lo commiteaba.
+  const destinoPath = path.join(PUBLIC_SPRITES_DIR, archivoArteCanonico(spriteId));
+  if (fs.existsSync(destinoPath) || fs.existsSync(pngPath)) {
+    return;
+  }
+
+  // Placeholder vectorial: el espiritu todavia no tiene arte real. Se avisa en claro para que
+  // el hueco no se confunda con un fallo ni se baje algo que la app no va a leer.
+  if (ART_VECTORIAL.has(spriteId)) {
+    console.log(`⏭️  ${spriteId}: sin arte real todavia (placeholder vectorial), no se descarga`);
     return;
   }
 
@@ -345,11 +359,9 @@ async function ensureSpriteImage(page, spriteId, imageUrl) {
     }, fullUrl);
 
     if (dataUrl && typeof dataUrl === 'string') {
-      const ext = fullUrl.endsWith('.png') ? '.png' : '.webp';
-      const destPath = path.join(PUBLIC_SPRITES_DIR, `${spriteId}${ext}`);
       const base64Data = dataUrl.replace(/^data:image\/\w+;base64,/, '');
-      fs.writeFileSync(destPath, Buffer.from(base64Data, 'base64'));
-      console.log(`📥 Imagen descargada para ${spriteId}: ${path.basename(destPath)}`);
+      fs.writeFileSync(destinoPath, Buffer.from(base64Data, 'base64'));
+      console.log(`📥 Imagen descargada para ${spriteId}: ${path.basename(destinoPath)}`);
     }
   } catch (err) {
     console.warn(`⚠️ Aviso al descargar imagen de ${spriteId}: ${err.message}`);
@@ -646,8 +658,18 @@ async function syncSprites() {
     }
 
     // 1. Guardar archivo fortnite_gg_sprites_complete.json
-    fs.writeFileSync(COMPLETE_SPRITES_PATH, JSON.stringify(fullSprites, null, 2), 'utf-8');
-    console.log(`💾 Guardado catálogo completo en: ${COMPLETE_SPRITES_PATH} (${fullSprites.length} espíritus)`);
+    // El scrapeo devuelve los espiritus en el orden de la pagina, y ese orden cambia entre
+    // corridas: escribirlo tal cual generaba commits que solo reordenaban lineas (ruido puro).
+    // Se ordena por id y solo se escribe si el contenido cambio de verdad.
+    const completoOrdenado = [...fullSprites].sort((a, b) => String(a.id).localeCompare(String(b.id)));
+    const textoCompleto = JSON.stringify(completoOrdenado, null, 2) + '\n';
+    const completoActual = fs.existsSync(COMPLETE_SPRITES_PATH) ? fs.readFileSync(COMPLETE_SPRITES_PATH, 'utf-8') : '';
+    if (textoCompleto !== completoActual) {
+      fs.writeFileSync(COMPLETE_SPRITES_PATH, textoCompleto, 'utf-8');
+      console.log(`💾 Guardado catálogo completo en: ${COMPLETE_SPRITES_PATH} (${fullSprites.length} espíritus)`);
+    } else {
+      console.log(`✅ Catálogo completo sin cambios (${fullSprites.length} espíritus)`);
+    }
 
     // 2. Sincronizar catálogo principal official_sprites.json
     let officialSprites = [];
