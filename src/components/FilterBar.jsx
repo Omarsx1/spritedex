@@ -1,22 +1,19 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Grid, List, ChevronDown, X, GalleryHorizontal } from 'lucide-react';
-import { THEMES_LIST, ALL_SPRITES, pickFamilyName, pickThemeName } from '../data/spritesData';
+import { THEMES_LIST, THEME_STYLES, ALL_SPRITES, pickFamilyName, pickThemeName } from '../data/spritesData';
 import { t } from '../i18n';
 import { MobileLiquidFilterBar } from './MobileLiquidFilterBar';
 import { safeStorage } from '../utils/safeStorage';
 import { rutaBasicoFamilia } from '../utils/spriteAssets';
 import { contarNovedades, claveAvisoNovedades } from '../utils/novedadesAviso';
 
-const VARIANT_COLORS = {
-  Basic:       { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' },
-  Gold:        { gradient: 'linear-gradient(135deg, #9d752a, #d4a23a)', border: '#f5b642' },
-  Cheatmaster: { gradient: 'linear-gradient(135deg, #052e16, #166534)', border: '#22c55e' },
-  Candy:       { gradient: 'linear-gradient(135deg, #9f4540, #d4615b)', border: '#f16f68' },
-  Galaxy:      { gradient: 'linear-gradient(135deg, #4a31bc, #6d4fe0)', border: '#4a35fa' },
-  Cube:        { gradient: 'linear-gradient(135deg, #730974, #a040a2)', border: '#8b008b' },
-  Holofoil:    { gradient: 'linear-gradient(135deg, #cb77be, #e09dd6)', border: '#ec88d8' },
-  Gem:         { gradient: 'linear-gradient(135deg, #0f6c7d, #1a9cb5)', border: '#22d3ee' },
-  Quack:       { gradient: 'linear-gradient(135deg, #cb77be, #d89a4a)', border: '#ec88d8' },
+// El color de cada variante sale de la MISMA paleta que las fichas (THEME_STYLES), no de una
+// tabla aparte: la de aqui era mas corta y 'Bounty Hunter', 'Loot Hacker' y 'Trick or Treat'
+// caian al azul por defecto, asi que el filtro decia azul donde la ficha se ve violeta,
+// indigo y naranja. Ahora hay una sola lista que mantener.
+const colorVariante = (tema) => {
+  const color = (THEME_STYLES[tema] && THEME_STYLES[tema].border) || '#00afff';
+  return { gradient: `linear-gradient(135deg, ${color} 0%, #1b1c23 140%)`, border: color };
 };
 
 const STATUS_OPTIONS = [
@@ -244,9 +241,9 @@ export function FilterBar({
           <button
             className={`filter-pill-trigger ${variantOpen ? 'is-open' : ''} ${baseFilter !== 'all' ? 'has-selection' : ''}`}
             onClick={() => { setVariantOpen(!variantOpen); setSpriteOpen(false); }}
-            style={baseFilter !== 'all' && VARIANT_COLORS[baseFilter] ? {
-              background: VARIANT_COLORS[baseFilter].gradient,
-              borderColor: VARIANT_COLORS[baseFilter].border,
+            style={baseFilter !== 'all' ? {
+              background: colorVariante(baseFilter).gradient,
+              borderColor: colorVariante(baseFilter).border,
               color: '#ffffff'
             } : {}}
           >
@@ -265,7 +262,7 @@ export function FilterBar({
                   {t('filtros.todas')}
                 </button>
                 {availableThemes.map(theme => {
-                  const colors = VARIANT_COLORS[theme] || { gradient: 'linear-gradient(135deg, #104273, #1a6bb5)', border: '#00afff' };
+                  const colors = colorVariante(theme);
                   const isActive = baseFilter === theme;
                   return (
                     <button
