@@ -2097,6 +2097,27 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   to   { opacity: 1; transform: translate(-50%, 0) scale(1); }
 }
 
+/* Solo escritorio: una sola talla para todos los chips y sitio para el texto mas largo
+   ('Cazarrecompensas'). Antes cada fila se estiraba segun el texto que partia en dos lineas
+   y el chip vecino se inflaba: de ahi el HACKER gigante y las alturas desiguales. */
+@media (min-width: 769px) {
+  .variant-grid-dropdown {
+    grid-template-columns: repeat(2, minmax(152px, 1fr));
+    min-width: 344px;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .variant-grid-chip {
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    text-align: center;
+  }
+}
+
 @keyframes popInRight {
   from { opacity: 0; transform: translateY(-6px) scale(0.96); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
