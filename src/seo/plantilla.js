@@ -114,7 +114,7 @@ export function headHtml(etiquetas, ogImage) {
     '<title>' + escapar(etiquetas.titulo) + '</title>',
     '<meta name="description" content="' + escapar(etiquetas.descripcion) + '" />',
     '<link rel="canonical" href="' + etiquetas.canonical + '" />',
-    '<meta name="robots" content="index, follow, max-image-preview:large" />',
+    '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />',
     ...etiquetas.alternates.map((a) => '<link rel="alternate" hreflang="' + a.hreflang + '" href="' + a.href + '" />'),
     '<meta property="og:type" content="website" />',
     '<meta property="og:site_name" content="Spritedex" />',
@@ -122,13 +122,16 @@ export function headHtml(etiquetas, ogImage) {
     '<meta property="og:title" content="' + escapar(etiquetas.titulo) + '" />',
     '<meta property="og:description" content="' + escapar(etiquetas.descripcion) + '" />',
     '<meta property="og:image" content="' + imagen + '" />',
+    '<meta property="og:image:width" content="1200" />',
+    '<meta property="og:image:height" content="630" />',
     '<meta property="og:locale" content="' + (etiquetas.lang === 'en' ? 'en_US' : 'es_MX') + '" />',
     etiquetas.alternates.length > 1 ? '<meta property="og:locale:alternate" content="' + (etiquetas.lang === 'en' ? 'es_MX' : 'en_US') + '" />' : '',
-    '<meta name="twitter:card" content="summary" />',
+    '<meta name="twitter:card" content="summary_large_image" />',
     '<meta name="twitter:title" content="' + escapar(etiquetas.titulo) + '" />',
     '<meta name="twitter:description" content="' + escapar(etiquetas.descripcion) + '" />',
     '<meta name="twitter:image" content="' + imagen + '" />',
     '<link rel="icon" type="image/svg+xml" href="/favicon.svg" />',
+    '<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />',
     '<style>' + CSS + '</style>'
   ].filter(Boolean).join('\n    ');
 }

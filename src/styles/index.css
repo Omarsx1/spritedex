@@ -3300,49 +3300,63 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   animation: none !important;
 }
 
-/* ===== 2. Mastered Cyber GLITCH Season Card Styling (Gen 2) ===== */
+/* ===== 2. Mastered Cyber GLITCH Season Card Styling (Gen 2) =====
+   El pulso ya no anima border-color ni box-shadow. Ninguna de las dos la puede mover el
+   compositor: cada frame obligaba a recalcular estilo y REPINTAR la ficha entera, y con
+   'infinite' eso no paraba nunca. Con varias fichas Gen 2 maxeadas en pantalla el hilo
+   principal se pasaba la vida repintando halos y las demas fichas se quedaban sin pintar
+   al scrollear (aparecian por partes o en blanco). Gen 1 no lo sufre porque su regla dice
+   'animation: none'.
+   Ahora el halo exterior se pinta UNA vez (queda fijo en el cian del primer tramo: no se
+   puede animar desde un hijo, porque la ficha recorta con overflow: hidden) y el pulso de
+   color vive en dos capas que solo mueven OPACITY, que el compositor resuelve sin repintar.
+   El ritmo sigue siendo de 4 s; se pierde el tramo violeta del final. */
 .sprite-card.is-mastered.is-glitch-mastered {
   position: relative;
   overflow: hidden;
   background-color: #161b22 !important;
   border-width: 0.5px !important;
-  animation: glitch-border-pulse 4s ease-in-out infinite alternate;
+  border-color: #00f0ff !important;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.6),
+    0 0 17px rgba(0, 240, 255, 0.6) !important;
+  animation: none !important;
 }
 
 .sprite-card.is-mastered.is-glitch-mastered::before,
 .sprite-card.is-mastered.is-glitch-mastered::after {
-  display: none !important;
+  content: '';
+  display: block !important;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  border: 0.5px solid currentColor;
+  box-shadow: inset 0 0 10px currentColor;
+  opacity: 0;
 }
 
-@keyframes glitch-border-pulse {
-  0% {
-    border-color: #00f0ff !important;
-    box-shadow:
-      0 10px 25px rgba(0, 0, 0, 0.6),
-      0 0 16px rgba(0, 240, 255, 0.6),
-      inset 0 0 10px rgba(0, 240, 255, 0.2) !important;
-  }
-  33% {
-    border-color: #ec4899 !important;
-    box-shadow:
-      0 10px 25px rgba(0, 0, 0, 0.6),
-      0 0 18px rgba(236, 72, 153, 0.65),
-      inset 0 0 10px rgba(236, 72, 153, 0.2) !important;
-  }
-  66% {
-    border-color: #22c55e !important;
-    box-shadow:
-      0 10px 25px rgba(0, 0, 0, 0.6),
-      0 0 16px rgba(34, 197, 94, 0.6),
-      inset 0 0 10px rgba(34, 197, 94, 0.2) !important;
-  }
-  100% {
-    border-color: #a855f7 !important;
-    box-shadow:
-      0 10px 25px rgba(0, 0, 0, 0.6),
-      0 0 18px rgba(168, 85, 247, 0.6),
-      inset 0 0 10px rgba(168, 85, 247, 0.2) !important;
-  }
+.sprite-card.is-mastered.is-glitch-mastered::before {
+  color: rgba(236, 72, 153, 0.65);
+  animation: glitch-pulso-rosa 4s ease-in-out infinite;
+}
+
+.sprite-card.is-mastered.is-glitch-mastered::after {
+  color: rgba(34, 197, 94, 0.6);
+  animation: glitch-pulso-verde 4s ease-in-out infinite;
+}
+
+@keyframes glitch-pulso-rosa {
+  0%, 40% { opacity: 0; }
+  50% { opacity: 1; }
+  60%, 100% { opacity: 0; }
+}
+
+@keyframes glitch-pulso-verde {
+  0%, 6% { opacity: 0; }
+  16% { opacity: 1; }
+  26%, 100% { opacity: 0; }
 }
 
 /* ===== Cyber FX Overlay (Uiverse 00Kubi Glitch Hacker FX) ===== */
@@ -3881,18 +3895,25 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 /* ===== SONIC 3D GOLDEN RINGS (Gen 2) ===== */
+/* ===== SONIC 3D GOLDEN RINGS (Gen 2) ===== */
 .star-btn.is-sonic-ring-btn {
   padding: 1px 0;
   perspective: 500px;
 }
 
+/* Los anillos NO llevan will-change ni contexto 3D permanentes. Son 5 por tarjeta Gen 2:
+   con will-change: transform cada anillo se promovia a su PROPIA capa compuesta (~300
+   capas con 60 tarjetas Gen 2 atrapadas) y con transform-style: preserve-3d ademas abria
+   un contexto 3D por anillo. Eso disparaba el coste de Layerize del frame entero, que en
+   el trace del usuario sale a 19 ms por frame sobre 281 frames = 5,4 s de los 5,6 s de
+   "Rendering". Gen 1 no lo sufre porque usa estrellas normales, sin anillos.
+   El giro (0.55 s) sigue igual: las animaciones de transform se componen solas, no
+   necesitan will-change. */
 .sonic-ring-svg {
   transform-box: fill-box;
   transform-origin: 50% 50%;
-  transform-style: preserve-3d;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
-  will-change: transform;
 }
 
 .star-btn:hover .sonic-ring-svg {

@@ -119,12 +119,31 @@ export function jsonLdDe(entrada) {
       '@context': 'https://schema.org',
       '@graph': [
         {
+          '@type': 'Organization',
+          '@id': SITIO + '/#organization',
+          name: 'Spritedex',
+          url: SITIO + '/',
+          logo: SITIO + '/icon-512.png',
+          description: enIngles
+            ? 'Interactive tracker and database for Fortnite Chapter 7 Sprites.'
+            : 'Rastreador interactivo y catálogo de espíritus de Fortnite Capítulo 7.'
+        },
+        {
           '@type': 'WebSite',
           '@id': SITIO + '/#website',
           url: SITIO + '/',
           name: 'Spritedex',
           inLanguage: lang,
-          description: descripcion
+          description: descripcion,
+          publisher: { '@id': SITIO + '/#organization' },
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: {
+              '@type': 'EntryPoint',
+              urlTemplate: SITIO + (enIngles ? '/en?q={search_term_string}' : '/?q={search_term_string}')
+            },
+            'query-input': 'required name=search_term_string'
+          }
         },
         {
           '@type': 'WebApplication',
@@ -132,9 +151,10 @@ export function jsonLdDe(entrada) {
           name: 'Spritedex',
           url: canonical,
           applicationCategory: 'GameApplication',
-          operatingSystem: 'Web',
+          operatingSystem: 'All',
           inLanguage: lang,
           isAccessibleForFree: true,
+          publisher: { '@id': SITIO + '/#organization' },
           offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
           featureList: enIngles
             ? ['Sprite collection tracker', 'Levels 1 to 5', 'Variant and family filters', 'Friend comparison', 'Shareable image cards']

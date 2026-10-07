@@ -1,0 +1,28 @@
+# Spritedex — Fortnite Sprites Tracker & Catalog
+
+> Spritedex (https://spritedex.gg/) is the interactive web platform to track, catalog, filter, and inspect Fortnite Chapter 7 Sprites (Espíritus), their variants, rarities, drop chances, locations, and mastery levels (1 to 5).
+
+## Core Concepts
+- **Fortnite Sprites / Espíritus**: In-game companion collectibles found during Fortnite matches (introduced in Chapter 7). Sprites grant active and passive gameplay abilities (such as shields, mobility boosts, double jumps, item extraction).
+- **Mastery Levels**: Each Sprite can be leveled from Level 1 up to Level 5. Higher levels amplify ability effectiveness and unlock exclusive perks.
+- **Rarities**: Common, Rare, Epic, Legendary, Mythic, Special.
+- **Families**: Grouped by character archetype or element (Water, Fire, Earth, Air, Batman, Peely, Fishstick, Sonic, Tails, Shadow, Klombo, Zero Point, etc.).
+- **Variants & Styles**: Base, Gold, Gummy, Galaxy, Holofoil, Cube, Gem, Cheat Master, Loot Hacker, Bounty Hunter, Trick or Treat, and seasonal event variants.
+- **Drop Rates & Locations**: Precise drop chances calculated from Sprite Chests and Extraction Zones. Unreleased sprites are classified and hidden until official drop.
+- **Tools**: LocalStorage & Supabase cloud sync, Friend comparison via SDEX codes (`SDEX-XXXX`), PWA offline support, and Canvas card export for Discord/social media.
+
+## Key URLs & Documentation
+- [Spritedex Web App](https://spritedex.gg/): Full interactive checklist and tracker.
+- [All Sprites Catalog (ES)](https://spritedex.gg/espiritus): Complete list of all Fortnite sprites with stats and drop chances.
+- [All Sprites Catalog (EN)](https://spritedex.gg/en/espiritus): English version of the full sprite index.
+- [Fortnite Sprite Guide (ES)](https://spritedex.gg/guia-espiritus): In-depth guide explaining sprite mechanics, drop formulas, costs, and leveling.
+- [Fortnite Sprite Guide (EN)](https://spritedex.gg/en/guia-espiritus): English sprite guide and FAQ.
+- [Latest Updates & New Sprites (ES)](https://spritedex.gg/novedades): Newest spirits added to the Fortnite game files.
+- [Latest Updates & New Sprites (EN)](https://spritedex.gg/en/novedades): Newest spirits in English.
+- [Compare with Friends](https://spritedex.gg/amigos): Tool to compare missing sprites and plan trades with friend codes.
+- [About Spritedex](https://spritedex.gg/acerca): Project methodology, data sources, and disclaimer.
+
+## Technical Details
+- **Stack**: React 19, Vite, Supabase Postgres & Auth, GSAP motion, PWA.
+- **Privacy**: No required account to use the tracker; data is stored securely in the local browser with optional Supabase cloud backup.
+- **Disclaimer**: Spritedex is an independent, fan-made project and is not affiliated with or endorsed by Epic Games, Inc.

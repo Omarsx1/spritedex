@@ -373,6 +373,7 @@ async function analyzeArtifactFrame(payload) {
 function parseArgs(argv) {
   const args = {
     runs: 1,
+    seed: false,
     out: null,
     url: null,
     dir: DIST_DIR,
@@ -413,6 +414,8 @@ function parseArgs(argv) {
       i += 1;
     } else if (flag === '--log-network') {
       args.logNetwork = true;
+    } else if (flag === '--seed') {
+      args.seed = true;
     } else if (flag === '--debug-rects') {
       args.debugRects = true;
     } else if (flag === '--block-urls') {
@@ -1629,6 +1632,23 @@ async function runOnce(cfg, baseUrl, runIndex) {
       await installStartupInstrumentation(page);
     }
 
+    // --seed: siembra una cuenta realista ANTES del goto. Sin esto el arnes media SIEMPRE una
+    // coleccion VACIA: ninguna ficha llevaba is-glitch-mastered ni los anillos Gen 2, asi que
+    // todo el coste que depende del estado del usuario (halos animados, anillos promovidos a
+    // capa) era INVISIBLE. Por eso los A/B de filtros, decode y animaciones no se movian: el
+    // sospechoso no llegaba a existir en la pagina que se estaba midiendo.
+    if (cfg.seed) {
+      const orden = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'src/data/share_sprites_order.json'), 'utf8'));
+      const estado = {};
+      orden.forEach((id, i) => { estado[id] = { owned: true, level: i % 2 === 0 ? 5 : 3 }; });
+      await page.evaluateOnNewDocument((semilla) => {
+        try {
+          localStorage.setItem('spritedex_lang', 'es');
+          localStorage.setItem('fortnite_sprites_pokedex_v3', JSON.stringify(semilla));
+        } catch { /* almacenamiento restringido: se mide la pagina vacia, no se rompe */ }
+      }, estado);
+    }
+
     await page.goto(baseUrl, { waitUntil: 'load' });
     await page.waitForSelector('.sprites-grid .sprite-card');
     await new Promise((resolve) => setTimeout(resolve, SETTLE_MS));
@@ -2138,6 +2158,7 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
   const cfg = {
     dir: args.dir,
+    seed: args.seed,
     offsets: args.offsets,
     stepOffsets: args.scenario === 'scroll' && args.scrollMode !== 'roundtrip' ? args.offsets : [],
     roundtripMax: args.roundtripMax,
