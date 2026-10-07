@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES, SUMMON_COST_OVERRIDES, WEBP_MAP, getSpriteThumb } from '../data/spritesData';
 import catalogEn from '../data/i18n/catalog.en.json';
 import { getSupabase } from '../utils/supabase';
+import { estadoLanzamiento, DIAS_NOVEDAD } from '../utils/lanzamiento.js';
 
 export const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache_v2';
 
@@ -53,28 +54,21 @@ function sanitizeDynamicItem(item) {
   };
 }
 
-// Evaluates whether a scheduled sprite has reached its automatic release time
-export function evaluateReleaseStatus(sprite) {
+// Cuando sale un espiritu y si es nuevo: la regla vive en utils/lanzamiento.js, una sola para
+// toda la app (app publica y CMS incluidos). Aqui solo se le pegan los campos que ya esperaba
+// el resto del panel. La fecha se puede inyectar para probarlo sin tocar el reloj.
+export function evaluateReleaseStatus(sprite, ahora = Date.now()) {
   if (!sprite) return sprite;
-
-  const rawRelDate = sprite.release_date || sprite.releaseDate;
-  const releaseTime = rawRelDate ? new Date(rawRelDate).getTime() : 0;
-  const now = Date.now();
-  const isScheduled = releaseTime > now;
-  const unreleased = sprite.unreleased === true || isScheduled;
-  const isAutoScheduled = isScheduled;
-  const timeUntilRelease = isScheduled ? releaseTime - now : 0;
-  const daysSince = (!unreleased && releaseTime > 0) ? (now - releaseTime) / (1000 * 60 * 60 * 24) : 999;
-  const isNew = unreleased ? false : (daysSince <= 7 ? true : Boolean(sprite.is_new ?? sprite.isNew ?? false));
-
+  const estado = estadoLanzamiento(sprite, ahora);
   return {
     ...sprite,
-    unreleased,
-    isAutoScheduled,
-    timeUntilRelease,
-    daysSince,
-    releaseTime,
-    isNew
+    unreleased: estado.unreleased,
+    isAutoScheduled: estado.programado,
+    timeUntilRelease: estado.programado ? estado.releaseTime - ahora : 0,
+    daysSince: estado.diasDesde,
+    releaseTime: estado.releaseTime,
+    // Sin fecha manda la marca manual; con fecha manda la fecha (y la ventana de 7 dias).
+    isNew: estado.releaseTime > 0 ? estado.nuevo : Boolean(sprite.is_new ?? sprite.isNew ?? false)
   };
 }
 
@@ -86,29 +80,22 @@ export function applyBatchNoveltyRules(spritesList) {
 
   const now = Date.now();
 
-  // 1. Evaluate release timing for each sprite
-  const withTiming = spritesList.map(sprite => {
-    const rawRelDate = sprite.release_date || sprite.releaseDate;
-    const releaseTime = rawRelDate ? new Date(rawRelDate).getTime() : 0;
-    const isScheduled = releaseTime > now;
-    const unreleased = sprite.unreleased === true || isScheduled;
-    const isAutoScheduled = isScheduled;
-    const timeUntilRelease = isScheduled ? releaseTime - now : 0;
-    const daysSince = (!unreleased && releaseTime > 0) ? (now - releaseTime) / (1000 * 60 * 60 * 24) : 999;
-
+  // 1. Estado de cada espiritu (la regla vive en utils/lanzamiento.js)
+  const withTiming = spritesList.map((sprite) => {
+    const estado = estadoLanzamiento(sprite, now);
     return {
       ...sprite,
-      unreleased,
-      isAutoScheduled,
-      timeUntilRelease,
-      daysSince,
-      releaseTime
+      unreleased: estado.unreleased,
+      isAutoScheduled: estado.programado,
+      timeUntilRelease: estado.programado ? estado.releaseTime - now : 0,
+      daysSince: estado.diasDesde,
+      releaseTime: estado.releaseTime
     };
   });
 
   // 2. Identify active Gen 2 released spirits with valid dates
   const releasedGen2 = withTiming.filter(s => !s.unreleased && s.releaseTime > 0 && s.gen === 2);
-  const activeRecent = releasedGen2.filter(s => s.daysSince >= 0 && s.daysSince <= 7);
+  const activeRecent = releasedGen2.filter(s => s.daysSince >= 0 && s.daysSince < DIAS_NOVEDAD);
 
   // 3. Fallback: If no spirits released in the last 7 days, find the latest drop batch date
   let latestBatchTime = 0;
@@ -139,7 +126,7 @@ export function applyBatchNoveltyRules(spritesList) {
 
     // Normal case: We have spirits released in the last 7 days
     if (activeRecent.length > 0) {
-      const isWithin7 = s.daysSince >= 0 && s.daysSince <= 7;
+      const isWithin7 = s.daysSince >= 0 && s.daysSince < DIAS_NOVEDAD;
       return {
         ...s,
         isNew: isWithin7,

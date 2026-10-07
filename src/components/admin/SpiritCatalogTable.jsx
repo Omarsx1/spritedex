@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { estadoLanzamiento, fechaCorta } from '../../utils/lanzamiento.js';
 import { 
   Search, 
   Plus, 
@@ -77,6 +78,9 @@ export function SpiritCatalogTable({
 
       if (statusFilter === 'active' && s.unreleased) return false;
       if (statusFilter === 'unreleased' && !s.unreleased) return false;
+      // Programado = tiene fecha futura. Se calcula con la MISMA regla que la app, no con la
+      // marca 'unreleased': al programar se deja esa marca en falso y manda la fecha.
+      if (statusFilter === 'scheduled' && !estadoLanzamiento(s).programado) return false;
 
       if (genFilter === '1' && s.gen !== 1) return false;
       if (genFilter === '2' && s.gen !== 2) return false;
@@ -229,6 +233,7 @@ export function SpiritCatalogTable({
             <option value="all">Todos los Estados</option>
             <option value="active">Solo Activos</option>
             <option value="unreleased">Solo No Lanzados</option>
+            <option value="scheduled">📅 Solo Programados</option>
           </select>
 
           {/* Gen Filter */}
@@ -311,6 +316,7 @@ export function SpiritCatalogTable({
               {paginatedSprites.length > 0 ? (
                 paginatedSprites.map((sprite) => {
                   const rarityObj = RARITIES[sprite.rarity] || RARITIES.Common;
+                  const estado = estadoLanzamiento(sprite);
                   const rarityLabel = rarityObj.label || rarityObj.name || sprite.rarity;
                   const rarityColor = rarityObj.color === '#000000' ? '#0D9488' : (rarityObj.color || '#3C50E0');
 
@@ -384,10 +390,17 @@ export function SpiritCatalogTable({
                       {/* Status */}
                       <td style={{ padding: '12px 20px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-start' }}>
-                          {sprite.unreleased ? (
+                          {/* Un espiritu con fecha futura esta PROGRAMADO: se ve cuando sale, sin
+                              abrir el editor. La fecha sale de la misma regla que usa la app. */}
+                          {estado.programado ? (
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '8px', background: darkMode ? 'rgba(124, 58, 237, 0.2)' : '#F5F3FF', color: '#A78BFA', fontSize: '0.76rem', fontWeight: 800 }}>
                               <Clock size={13} />
-                              <span>{sprite.release_date ? 'Programado' : 'No Lanzado'}</span>
+                              <span>Programado · {fechaCorta(sprite.release_date || sprite.releaseDate)}</span>
+                            </span>
+                          ) : estado.unreleased ? (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '8px', background: darkMode ? 'rgba(124, 58, 237, 0.2)' : '#F5F3FF', color: '#A78BFA', fontSize: '0.76rem', fontWeight: 800 }}>
+                              <Clock size={13} />
+                              <span>No Lanzado</span>
                             </span>
                           ) : (
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '8px', background: darkMode ? 'rgba(62, 207, 142, 0.15)' : '#ECFDF5', color: '#3ECF8E', fontSize: '0.76rem', fontWeight: 800 }}>
