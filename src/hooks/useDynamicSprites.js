@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES, SUMMON_COST_OVERRIDES, WEBP_MAP, getSpriteThumb } from '../data/spritesData';
 import catalogEn from '../data/i18n/catalog.en.json';
 import { getSupabase } from '../utils/supabase';
-import { estadoLanzamiento, fechaDeLanzamiento, DIAS_NOVEDAD } from '../utils/lanzamiento.js';
+import { estadoLanzamiento, fechaDeLanzamiento, sinEstadoDeLanzamiento, DIAS_NOVEDAD } from '../utils/lanzamiento.js';
 
 export const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache_v2';
 
@@ -162,7 +162,8 @@ export function useDynamicSprites() {
         const dynamicList = JSON.parse(cached);
         const map = new Map(ALL_SPRITES.map(s => [s.id, s]));
         dynamicList.forEach(item => {
-          const sanitized = sanitizeDynamicItem(item);
+          // La copia del navegador no decide fechas ni novedad: entra sin esas claves.
+          const sanitized = sanitizeDynamicItem(sinEstadoDeLanzamiento(item));
           const baseStatic = map.get(sanitized.id);
           const hasRealCustomAbility = sanitized.ability && 
             sanitized.ability !== 'Concede bonificaciones pasivas.' && 
@@ -212,7 +213,8 @@ export function useDynamicSprites() {
         setSprites(() => {
           const map = new Map(ALL_SPRITES.map(s => [s.id, s]));
           dynamicList.forEach(item => {
-            const sanitized = sanitizeDynamicItem(item);
+            // La copia del navegador no decide fechas ni novedad: entra sin esas claves.
+            const sanitized = sanitizeDynamicItem(sinEstadoDeLanzamiento(item));
             const baseStatic = map.get(sanitized.id);
             const hasRealCustomAbility = sanitized.ability && 
               sanitized.ability !== 'Concede bonificaciones pasivas.' && 
@@ -262,10 +264,8 @@ export function useDynamicSprites() {
         // manda el catalogo y, cuando la consulta llega, la base. Una copia vieja con una fecha
         // futura o un is_new apagado ocultaba fichas publicadas y apagaba los "Nuevos" hasta
         // que la consulta se resolvia; si la consulta fallaba, se quedaba asi toda la sesion.
-        const paraCache = data.map((fila) => {
-          const { release_date, releaseDate, unreleased, is_new, isNew, ...resto } = fila;
-          return resto;
-        });
+        // La misma lista de claves que se quita al leer: una sola regla para la copia.
+        const paraCache = data.map(sinEstadoDeLanzamiento);
         localStorage.setItem(DYNAMIC_SPRITES_CACHE_KEY, JSON.stringify(paraCache));
 
         setSprites(() => {
