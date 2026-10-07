@@ -14,9 +14,31 @@ class SoundManager {
     }
   }
 
+  // En iOS el contexto no queda en 'suspended' al apagar la pantalla o salir de la
+  // pagina: queda en 'interrupted' (MDN, BaseAudioContext.state). Mirar solo
+  // 'running' hacia que en el iPhone esto no durmiera nada.
   dormir() {
-    if (this.ctx && this.ctx.state === 'running') {
-      this.ctx.suspend().catch(() => {});
+    const ctx = this.ctx;
+    if (ctx && (ctx.state === 'running' || ctx.state === 'interrupted')) {
+      try {
+        ctx.suspend().catch(() => {});
+      } catch {
+        // el contexto ya no existe: nada que dormir
+      }
+    }
+    this.limpiarSesion();
+  }
+
+  // La sesion de medios la pinta el sistema en la pantalla de bloqueo, no la app.
+  // Quitar el src la cierra en Chrome; en iOS hay que decirlo explicitamente o el
+  // widget "Now Playing" se queda pegado aunque la app ya este cerrada.
+  limpiarSesion() {
+    if (typeof navigator === 'undefined' || !navigator.mediaSession) return;
+    try {
+      navigator.mediaSession.metadata = null;
+      navigator.mediaSession.playbackState = 'none';
+    } catch {
+      // navegador sin soporte: no hay sesion que limpiar
     }
   }
 
@@ -27,8 +49,9 @@ class SoundManager {
         this.ctx = new AudioCtx();
       }
     }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+    // resume() es la salida tambien desde el estado 'interrupted' de iOS.
+    if (this.ctx && (this.ctx.state === 'suspended' || this.ctx.state === 'interrupted')) {
+      this.ctx.resume().catch(() => {});
     }
   }
 
@@ -52,6 +75,7 @@ class SoundManager {
         } catch {
           // el elemento ya no esta: nada que soltar
         }
+        this.limpiarSesion();
       };
       audio.addEventListener('ended', soltar, { once: true });
       audio.addEventListener('error', soltar, { once: true });
