@@ -10058,6 +10058,17 @@ body .swal2-container .swal2-toast.swal2-popup {
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45) !important;
 }
 
+/* El CONTENEDOR del aviso tambien pintaba el fondo oscuro que el aviso hereda de la config del
+   modal (rgba(0, 0, 0, 0.75)). Ese contenedor mide 360px de ancho y todo el alto, asi que se
+   leia como un sidebar derecho pegado al borde. Un aviso no tiene que oscurecer nada: el
+   contenedor va transparente y solo flota la tarjeta. */
+body .swal2-container.swal2-top-end,
+body .swal2-container.swal2-top,
+body .swal2-container.swal2-bottom-end,
+body .swal2-container.swal2-bottom {
+  background: transparent !important;
+}
+
 /* El vampiro pide un poco mas que la calabaza: su cabeza esta todavia mas baja y 6px no
    bastaban. Va al final del archivo a proposito, para ganarle a cualquier regla anterior
    con la misma especificidad. */
