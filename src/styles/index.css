@@ -5518,6 +5518,105 @@ body:has(.modal-overlay) {
   box-sizing: border-box;
 }
 
+/* Desplegables de la pagina de compartir: el boton ocupa su columna y la lista se abre
+   debajo, con ese mismo ancho para no salirse del panel. Mismo lenguaje que los filtros de
+   la app (se cierra al tocar fuera) y el color identifica la variante. */
+.sdm-share-pro__dd {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.sdm-share-pro__dd-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+}
+
+.sdm-share-pro__dd-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #E2E8F0;
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sdm-share-pro__dd-trigger.is-open {
+  border-color: rgba(0, 240, 232, 0.5);
+}
+
+.sdm-share-pro__dd-menu {
+  position: absolute;
+  z-index: 21;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 8px;
+  background: rgba(12, 16, 26, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+.sdm-share-pro__dd-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sdm-share-pro__dd-item:hover {
+  filter: brightness(1.15);
+}
+
+.sdm-share-pro__dd-item.is-active {
+  border-color: #fff;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.25);
+}
+
+.sdm-share-pro__dd-n {
+  font-size: 0.66rem;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+/* El usuario ocupa la fila completa: el resto son cuatro columnas de filtros. */
+.sdm-share-pro__seg-group--ancho {
+  grid-column: 1 / -1;
+}
+
 .sdm-share-pro__seg-btn {
   flex: 1;
   text-align: center;

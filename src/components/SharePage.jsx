@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { ArrowLeft, Download, Share2, Copy, Check } from 'lucide-react';
-import { pickName } from '../data/spritesData';
+import { ArrowLeft, Download, Share2, Copy, Check, ChevronDown } from 'lucide-react';
+import { pickName, THEMES_LIST, THEME_STYLES, pickThemeName, pickFamilyName } from '../data/spritesData';
 import { generateSpritedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, marcarEsperaActiva, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import { safeStorage } from '../utils/safeStorage';
@@ -39,10 +39,56 @@ function leerPerfActivado() {
   return params.has('perf') || window.location.hash.toLowerCase().includes('perf');
 }
 
+// Desplegable de la pagina de compartir. Es el mismo lenguaje que los filtros de la app
+// (la lista se abre bajo el boton y se cierra al tocar fuera), pero con el ancho de su
+// columna para que no se salga del panel. El color identifica la variante, como en la app.
+function Desplegable({ etiqueta, valor, opciones, abierto, onAlternar, onElegir, anchoTodo }) {
+  const actual = opciones.find((o) => o.id === valor);
+  return (
+    <div className={`sdm-share-pro__dd${anchoTodo ? ' sdm-share-pro__dd--ancho' : ''}`}>
+      <span className="sdm-share-pro__seg-label">{etiqueta}</span>
+      <button
+        type="button"
+        className={`sdm-share-pro__dd-trigger${abierto ? ' is-open' : ''}`}
+        onClick={onAlternar}
+        aria-expanded={abierto}
+      >
+        <span>{actual ? actual.nombre : (opciones[0] ? opciones[0].nombre : '')}</span>
+        <ChevronDown size={13} />
+      </button>
+      {abierto && (
+        <>
+          <div className="sdm-share-pro__dd-backdrop" onClick={onAlternar} />
+          <div className="sdm-share-pro__dd-menu">
+            {opciones.map((o) => (
+              <button
+                key={o.id}
+                type="button"
+                className={`sdm-share-pro__dd-item${valor === o.id ? ' is-active' : ''}`}
+                style={o.color ? { background: o.color } : undefined}
+                onClick={() => onElegir(o.id)}
+              >
+                <span>{o.nombre}</span>
+                {o.n ? <span className="sdm-share-pro__dd-n">{o.n}</span> : null}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function SharePage({ filteredSprites, allSprites, userState, activeFiltersLabel, onBack, enlaceColeccion }) {
   const [format, setFormat] = useState(DEFAULT_EXPORT_FORMAT); // 'checklist', 'square'
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
   const [bgStyle] = useState(DEFAULT_EXPORT_BG_STYLE); // 'glitch_override', 'blueprint', 'dark_matrix'
+  // Filtros de la lona: se aplican encima del alcance. Antes habia que volver a la app para
+  // dejar la lista filtrada; ahora la lona se arma aqui mismo.
+  const [familia, setFamilia] = useState('all');
+  const [variante, setVariante] = useState('all');
+  // Solo un desplegable abierto a la vez: formato, familia o variante.
+  const [menuAbierto, setMenuAbierto] = useState('');
   const [fortniteUser, setFortniteUser] = useState(usuarioGuardado);
   const [mostrarUsuario, setMostrarUsuario] = useState(mostrarUsuarioGuardado);
   const firma = mostrarUsuario ? fortniteUser.trim() : '';
@@ -170,25 +216,60 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
     return () => clearTimeout(timer);
   }, []);
 
-  // Determine which sprites to include based on scope
+  // Que espiritus entran en la lona: primero el alcance y encima los filtros de la lona.
+  // Los dos se suman (elegir "Faltantes" y una familia da las que faltan de esa familia).
   const spritesList = useMemo(() => {
-    switch (scope) {
-      case 'all':
-        return allSprites;
-      case 'new':
-        return allSprites.filter(s => s.isNew);
-      case 'filtered':
-        return filteredSprites;
-      case 'owned':
-        return allSprites.filter(s => userState[s.id]?.owned);
-      case 'missing':
-        return allSprites.filter(s => !userState[s.id]?.owned);
-      case 'mastered':
-        return allSprites.filter(s => userState[s.id]?.owned && userState[s.id]?.level === 5);
-      default:
-        return allSprites;
+    const porAlcance = (() => {
+      switch (scope) {
+        case 'all':
+          return allSprites;
+        case 'new':
+          return allSprites.filter(s => s.isNew);
+        case 'filtered':
+          return filteredSprites;
+        case 'owned':
+          return allSprites.filter(s => userState[s.id]?.owned);
+        case 'missing':
+          return allSprites.filter(s => !userState[s.id]?.owned);
+        case 'mastered':
+          return allSprites.filter(s => userState[s.id]?.owned && userState[s.id]?.level === 5);
+        default:
+          return allSprites;
+      }
+    })();
+    return porAlcance.filter((s) =>
+      (familia === 'all' || s.familyId === familia) &&
+      (variante === 'all' || s.variant === variante)
+    );
+  }, [scope, filteredSprites, allSprites, userState, familia, variante]);
+
+  // Opciones de los desplegables. Las familias y variantes salen de lo que hay en la lona,
+  // asi nunca se ofrece algo que dejaria la captura vacia. La familia lleva cuantas fichas
+  // aporta y la variante lleva su color, el mismo que usa el filtro de la app.
+  const opcionesFamilia = useMemo(() => {
+    const cuenta = new Map();
+    for (const s of allSprites) {
+      if (!s.familyId) continue;
+      cuenta.set(s.familyId, (cuenta.get(s.familyId) || 0) + 1);
     }
-  }, [scope, filteredSprites, allSprites, userState]);
+    const lista = [...cuenta.entries()]
+      .map(([id, n]) => ({ id, nombre: pickFamilyName(id) || id, n }))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+    return [{ id: 'all', nombre: t('filtros.todas') }, ...lista];
+  }, [allSprites]);
+
+  const opcionesVariante = useMemo(() => {
+    const presentes = new Set(allSprites.map((s) => s.variant).filter(Boolean));
+    const lista = THEMES_LIST.filter((v) => presentes.has(v)).map((v) => {
+      const color = (THEME_STYLES[v] || {}).border;
+      return {
+        id: v,
+        nombre: pickThemeName(v) || v,
+        color: color ? `linear-gradient(135deg, ${color} 0%, #1b1c23 140%)` : undefined
+      };
+    });
+    return [{ id: 'all', nombre: t('filtros.todas') }, ...lista];
+  }, [allSprites]);
 
   // Scope counts for display
   const counts = useMemo(() => ({
@@ -567,25 +648,39 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
             </div>
           </div>
 
-          <div className="sdm-share-pro__seg-group">
-            <span className="sdm-share-pro__seg-label">{t('compartir.formato')}</span>
-            <div className="sdm-share-pro__segmented">
-              {[
-                { id: 'checklist', label: t('compartir.vertical') },
-                { id: 'square', label: t('compartir.horizontal') }
-              ].map(f => (
-                <button
-                  key={f.id}
-                  className={`sdm-share-pro__seg-btn ${format === f.id ? 'sdm-share-pro__seg-btn--active' : ''}`}
-                  onClick={() => setFormat(f.id)}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <Desplegable
+            etiqueta={t('compartir.familia')}
+            valor={familia}
+            opciones={opcionesFamilia}
+            abierto={menuAbierto === 'familia'}
+            onAlternar={() => setMenuAbierto(menuAbierto === 'familia' ? '' : 'familia')}
+            onElegir={(id) => { setFamilia(id); setMenuAbierto(''); }}
+          />
 
-          <div className="sdm-share-pro__seg-group">
+          <Desplegable
+            etiqueta={t('compartir.variante')}
+            valor={variante}
+            opciones={opcionesVariante}
+            abierto={menuAbierto === 'variante'}
+            onAlternar={() => setMenuAbierto(menuAbierto === 'variante' ? '' : 'variante')}
+            onElegir={(id) => { setVariante(id); setMenuAbierto(''); }}
+          />
+
+          {/* El formato va despues de los filtros: primero se elige QUE entra en la lona y
+              luego como se compone. El desplegable ya trae su etiqueta. */}
+          <Desplegable
+            etiqueta={t('compartir.formato')}
+            valor={format}
+            opciones={[
+              { id: 'checklist', nombre: t('compartir.vertical') },
+              { id: 'square', nombre: t('compartir.horizontal') }
+            ]}
+            abierto={menuAbierto === 'formato'}
+            onAlternar={() => setMenuAbierto(menuAbierto === 'formato' ? '' : 'formato')}
+            onElegir={(id) => { setFormat(id); setMenuAbierto(''); }}
+          />
+
+          <div className="sdm-share-pro__seg-group sdm-share-pro__seg-group--ancho">
             <span className="sdm-share-pro__seg-label">{t('compartir.usuario')}</span>
             <div className="sdm-share-pro__user-row">
               <input
