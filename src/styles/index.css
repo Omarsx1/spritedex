@@ -43,6 +43,26 @@
   padding: 0;
 }
 
+/* Sin barra de scroll a la vista: se puede deslizar sin que asome el riel. La pagina
+   scrollea igual; solo se esconde el indicador. */
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Un movil solo debe tener scroll vertical. `clip` corta el riel lateral sin crear un
+   contenedor de scroll (con `hidden` el sticky de la cabecera dejaria de pegarse). */
+html {
+  overflow-x: clip;
+}
+
 body {
   /* El color del lienzo vive en html (index.html lo trae en linea y el tema lo
      sobreescribe mas abajo). Si el body pintara su propia caja opaca, taparia las
@@ -5620,9 +5640,45 @@ body:has(.modal-overlay) {
 /* Variante y formato, en la misma fila: son los dos ajustes cortos de la columna. */
 .sdm-share-pro__fila {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* El ancho se reparte segun lo que necesita cada uno: variante tiene que hacer entrar
+     CAZARRECOMPENSAS y formato solo lleva dos palabras cortas. */
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
   gap: 10px;
   width: 100%;
+}
+
+/* Nombres largos (Exploratormentas, Cazarrecompensas) en un ancho de movil: en vez de
+   recortarlos con puntos, se parten con guion en un punto valido. `hyphens: auto` usa el
+   diccionario del idioma del documento (el html lleva lang), asi que el guion solo aparece
+   si de verdad hace falta. Fuera de estos menus no se activa la particion. */
+.sdm-share-pro__dd-item span {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  overflow-wrap: break-word;
+}
+
+/* Los menus tampoco muestran su riel: se desliza y no se ve. */
+.sdm-share-pro__dd-menu {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sdm-share-pro__dd-menu::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* En un movil estrecho la variante necesita el ancho que le sobra al formato (que solo lleva
+   dos palabras) y una talla algo menor: asi CAZARRECOMPENSAS entra sin recortarse. */
+@media (max-width: 480px) {
+  .sdm-share-pro__fila {
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  }
+
+  .sdm-share-pro__dd-item:not(.sdm-share-pro__dd-item--rejilla) {
+    padding: 7px 8px;
+    font-size: 0.63rem;
+  }
 }
 
 /* La lista de familias, con la miniatura de cada una y en rejilla: el mismo lenguaje que el
