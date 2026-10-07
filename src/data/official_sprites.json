@@ -1038,10 +1038,10 @@
     "name": "Mapache Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "jonesy_basic",
@@ -1095,10 +1095,10 @@
     "name": "Jonesy Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "adventure_basic",
@@ -1152,10 +1152,10 @@
     "name": "Aventurero Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "bush_basic",
@@ -1209,10 +1209,10 @@
     "name": "Arbustín Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "sonic_basic",
@@ -1266,10 +1266,10 @@
     "name": "Sonic Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "tails_basic",
@@ -1323,10 +1323,10 @@
     "name": "Tails Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "shadow_basic",
@@ -1380,10 +1380,10 @@
     "name": "Shadow Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "8bit_basic",
@@ -1437,10 +1437,10 @@
     "name": "8-Bit Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "jackrabbit_basic",
@@ -1494,10 +1494,10 @@
     "name": "Jackrabbit Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "crown_basic",
@@ -1608,10 +1608,10 @@
     "name": "Killswitch Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "klombo_basic",
@@ -1665,10 +1665,10 @@
     "name": "Klombo Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "megaman_basic",
@@ -1735,10 +1735,10 @@
     "name": "Protector Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "pond_basic",
@@ -1795,10 +1795,10 @@
     "name": "Estanque Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "xray_basic",
@@ -1855,10 +1855,10 @@
     "name": "Rayos X Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "onigiri_basic",
@@ -1915,10 +1915,10 @@
     "name": "Onigiri Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "stormscout_basic",
@@ -1975,10 +1975,10 @@
     "name": "Exploratormentas Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "blinky_basic",
@@ -2035,10 +2035,10 @@
     "name": "Blinky Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "birthday_basic",
@@ -2100,10 +2100,10 @@
     "name": "Pastel de Cumpleaños Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "crash_basic",
@@ -2160,10 +2160,10 @@
     "name": "Crash Bandicoot Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "morgana_basic",
@@ -2220,10 +2220,10 @@
     "name": "Morgana Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "spookydash_basic",
@@ -2280,10 +2280,10 @@
     "name": "Impulso aterrador Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "deer_basic",
@@ -2340,10 +2340,10 @@
     "name": "El Ciervo Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   },
   {
     "id": "vampire_basic",
@@ -2400,9 +2400,9 @@
     "name": "Vampiro Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z"
   }
 ]

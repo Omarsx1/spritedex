@@ -743,10 +743,19 @@ async function syncSprites() {
         } else if (item.unreleased === false && isCardUnreleased === true) {
           // La fuente lo da por no lanzado: se corrige la marca en vez de
           // mantener una publicacion que el juego todavia no ha hecho.
-          console.log(`↩️ ${item.id} (${item.name}) vuelve a marcarse como no lanzado: Fortnite.gg no lo da por publicado.`);
-          item.unreleased = true;
-          item.isNew = false;
-          catalogChanges++;
+          // PERO si la ficha tiene fecha PROGRAMADA (en el futuro), manda la fecha: no se
+          // marca como no lanzada ni se apaga su novedad. Asi un lote programado (desde el CMS
+          // o desde los datos) sale solo el dia que toca, aunque la fuente todavia lo liste
+          // como no lanzado.
+          const programadoHasta = item.releaseDate ? new Date(item.releaseDate).getTime() : 0;
+          if (programadoHasta > Date.now()) {
+            console.log(`⏭️  ${item.id} (${item.name}) esta programado para ${item.releaseDate}: la fuente no manda todavia.`);
+          } else {
+            console.log(`↩️ ${item.id} (${item.name}) vuelve a marcarse como no lanzado: Fortnite.gg no lo da por publicado.`);
+            item.unreleased = true;
+            item.isNew = false;
+            catalogChanges++;
+          }
         }
       } else {
         // Caso: espíritu o variante inédita encontrada en Fortnite.gg

@@ -1,4 +1,5 @@
 import officialSpritesJson from './official_sprites.json';
+import { estadoLanzamiento } from '../utils/lanzamiento.js';
 import fortniteGgJson from './fortnite_gg_index.json';
 
 // Miniaturas WebP para tarjetas, generadas por scripts/generate_sprite_thumbs.js.
@@ -923,22 +924,12 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     ? (official.summonCost.includes('Polvo') ? official.summonCost : `${official.summonCost} Polvo Estelar`)
     : null;
 
-  // Calculate isNew based on explicit flag or releaseDate (1 week / 7 days window)
+  // Cuando sale el espiritu y cuanto dura lo de "nuevo": una sola regla para toda la app
+  // (utils/lanzamiento.js). Con release_date en el futuro queda PROGRAMADO y no se ve; el dia
+  // que llega su fecha sale solo y es nuevo 7 dias completos.
+  const estado = estadoLanzamiento(item);
   let isNew = item.isNew !== undefined ? Boolean(item.isNew) : false;
-  const relDateVal = item.releaseDate || item.release_date;
-  if (relDateVal) {
-    const relDate = new Date(relDateVal);
-    const now = new Date();
-    const daysSince = (now.getTime() - relDate.getTime()) / (1000 * 60 * 60 * 24);
-    if (daysSince >= 0 && daysSince <= 7) {
-      isNew = true;
-    } else if (daysSince > 7) {
-      isNew = false;
-    }
-  }
-  if (item.unreleased) {
-    isNew = false;
-  }
+  if (estado.releaseTime > 0) isNew = estado.nuevo; // con fecha, la fecha manda
   /* Salida manual de la ventana de novedad: un evento que ya termino no debe
      seguir contando como nuevo solo porque su fecha cae dentro de los 7 dias. */
   if (item.notNew) {
@@ -954,14 +945,14 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     variantDisplayEn: THEME_NAMES_EN[item.theme] || item.theme,
     rarity: finalRarity,
     gen: gen,
-    dropChance: item.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
-    dropChanceDisplay: item.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
-    dropChanceNum: item.unreleased ? 0 : dropChanceNum,
-    unreleased: item.unreleased || false,
+    dropChance: estado.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
+    dropChanceDisplay: estado.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
+    dropChanceNum: estado.unreleased ? 0 : dropChanceNum,
+    unreleased: estado.unreleased,
     isNew: isNew,
     notNew: Boolean(item.notNew),
-    releaseDate: relDateVal || null,
-    release_date: relDateVal || null,
+    releaseDate: (item.releaseDate || item.release_date) || null,
+    release_date: (item.releaseDate || item.release_date) || null,
     image: imagePath,
     thumb: getSpriteThumb(item.id),
     familyId: familyId,
