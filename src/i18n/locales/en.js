@@ -270,6 +270,7 @@ export default {
   "comparar.verLista": "View List",
   "compartir.altPreview": "Collection preview",
   "compartir.atrapados": "Caught",
+  "compartir.actualizando": "Updating the template...",
   "compartir.cacheDisco": "disk",
   "compartir.cacheMemoria": "memory",
   "compartir.cacheNo": "none",
