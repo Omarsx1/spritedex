@@ -5617,6 +5617,41 @@ body:has(.modal-overlay) {
   grid-column: 1 / -1;
 }
 
+/* Variante y formato, en la misma fila: son los dos ajustes cortos de la columna. */
+.sdm-share-pro__fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+/* La lista de familias, con la miniatura de cada una y en rejilla: el mismo lenguaje que el
+   filtro de la app, adaptado al ancho de esta columna. La regla va DESPUES de la base para
+   ganarle (misma especificidad) y poder cambiar el flex por rejilla. */
+.sdm-share-pro__dd-menu--rejilla {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.sdm-share-pro__dd-item--rejilla {
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 6px 9px;
+  font-size: 0.68rem;
+}
+
+.sdm-share-pro__dd-item--ancho {
+  grid-column: 1 / -1;
+}
+
+.sdm-share-pro__dd-img {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
 .sdm-share-pro__seg-btn {
   flex: 1;
   text-align: center;
