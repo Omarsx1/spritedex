@@ -3193,17 +3193,17 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-  /* Solo el transform se anima: es lo unico que el compositor puede mover sin repintar.
-     La box-shadow del hover NO se puede animar barato (cada frame de los 200 ms obliga a
-     repintar la tarjeta entera), y con el raton barriendo la rejilla quedan varias a mitad
-     de transicion a la vez. Medido con la sonda de enjambre (GPU, DPR 2): el barrido sobre
-     las tarjetas durante el enjambre hacia 40 fps con 7 frames >50 ms y picos de 250 ms,
-    contra 60 fps y p95 de 17 ms en reposo. El salto del hover se pinta una vez y ya. */
+  /* contain: layout en vez de will-change.
+     El hover da un transform a la tarjeta, y eso la convierte en bloque contenedor: sus
+     elementos absolutos (corona, halos, esquinas) tienen que recolocarse. Medido, eso son
+     ~37-51 reflows por barrido de raton y 330-450 ms de hilo principal.
+     La solucion evidente era will-change: transform, que la hace contenedora SIEMPRE y baja
+     a 1 reflow — pero compone la ficha, y una capa compuesta en pantalla Retina se rasteriza
+     a 1x: el sprite sale borroso y su box-shadow de maestria se ve como una banda alrededor.
+     contain: layout da lo mismo que se buscaba (contenedora fija, sin reflow en hover) SIN
+     componerla: el arte queda nitido y sin halo. */
+  contain: layout;
   transition: transform 0.2s ease;
-  /* La tarjeta se compone para que el levantamiento del hover no reflote: medido, el
-     transform animado disparaba ~50 reflows por barrido (layoutCount 51) y 331-448 ms de
-     hilo principal; con esto baja a 1 reflow y 263 ms. Se paga en capas compuestas. */
-  will-change: transform;
   position: relative;
   overflow: hidden;
   border: 0.5px solid rgba(255, 255, 255, 0.1);
