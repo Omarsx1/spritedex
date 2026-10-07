@@ -7,6 +7,14 @@
 //                  tocar la marca 'unreleased' ni desplegar nada esa madrugada.
 //   nuevo       -> salio y esta dentro de la ventana de novedad: 7 dias COMPLETOS (0..6).
 //
+// El lanzamiento es UN INSTANTE GLOBAL, como los eventos de Fortnite: sale a la MISMA hora en
+// todo el mundo y cada uno lo lee en su reloj. El lote de Dulce o Truco sale el 8 de octubre a
+// las 08:00 UTC, que son las 03:00 en Peru, 02:00 en Mexico y Guatemala, 01:00 en Los Angeles,
+// 04:00 en Nueva York y 10:00 en Madrid: el mismo momento, distinta hora local.
+//
+// Por eso la fecha se guarda completa (con hora y zona) y no como un dia suelto: un dia suelto
+// se lee como medianoche UTC y adelanta el lanzamiento a la noche anterior en toda America.
+//
 // La ventana es menor que 7 y no menor o igual a 7 a proposito: el lote del 1 de octubre
 // seguia contando como nuevo el dia 8, que es justo cuando entra el siguiente, y el aviso
 // flotante anunciaba las dos tandas a la vez. Con 7 dias completos, el 8 el lote viejo se
@@ -44,4 +52,3 @@ export function fechaCorta(valor) {
   if (Number.isNaN(fecha.getTime())) return '';
   return fecha.toLocaleDateString('es', { day: 'numeric', month: 'short' });
 }
-
