@@ -3334,7 +3334,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
      mas. Sin el, manda el diseno de la temporada y el brillo se queda dentro. */
   box-shadow:
     0 10px 25px rgba(0, 0, 0, 0.6),
-    0 0 12px rgba(0, 240, 255, 0.25);
+    inset 0 0 22px rgba(0, 240, 255, 0.16);
   animation: none !important;
 }
 
