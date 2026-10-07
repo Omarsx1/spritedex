@@ -6,6 +6,25 @@ import { estadoLanzamiento, DIAS_NOVEDAD } from '../utils/lanzamiento.js';
 
 export const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache_v2';
 
+// Que fecha de lanzamiento manda: la del catalogo, y la del CMS o de la cache SOLO si la ficha
+// ya venia programada o sin lanzar en el catalogo.
+//
+// Antes la fecha dinamica pisaba siempre a la del catalogo. Una fecha vieja guardada de mas
+// (en el CMS o en la cache del navegador) escondia un espiritu que el catalogo da por
+// publicado: eso oculto fichas que la gente ya tenia atrapadas (El Ciervo, Vampiro) y el
+// candado de "No lanzado" no dejaba ni marcarlas. Con esta regla el CMS sigue pudiendo mover
+// el lanzamiento de lo programado, pero no puede esconder lo que ya salio.
+function fechaDeLanzamiento(baseStatic, dinamico) {
+  const delDinamico = (dinamico && (dinamico.release_date || dinamico.releaseDate)) || null;
+  const delCatalogo = (baseStatic && (baseStatic.releaseDate || baseStatic.release_date)) || null;
+  const catalogoProgramado = Boolean(baseStatic && (
+    baseStatic.unreleased === true ||
+    (delCatalogo && new Date(delCatalogo).getTime() > Date.now())
+  ));
+  if (delDinamico && (catalogoProgramado || !delCatalogo)) return delDinamico;
+  return delCatalogo || delDinamico;
+}
+
 // La tabla del CMS solo guarda el nombre en español. Los estaticos por id sirven para
 // heredar lo que la base no tiene (hoy, el nombre en ingles).
 const ESTATICOS_POR_ID = new Map(ALL_SPRITES.map((s) => [s.id, s]));
@@ -184,7 +203,7 @@ export function useDynamicSprites() {
               ? false
               : (sanitized.unreleased !== undefined ? Boolean(sanitized.unreleased) : (baseStatic?.unreleased || false)),
             isNew: sanitized.is_new !== undefined ? Boolean(sanitized.is_new) : (sanitized.isNew !== undefined ? Boolean(sanitized.isNew) : (baseStatic?.isNew || false)),
-            releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate || null,
+            releaseDate: fechaDeLanzamiento(baseStatic, sanitized),
             ability: (hasRealCustomAbility ? sanitized.ability : null) || override?.ability || baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.',
             specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base')
               ? ''
@@ -300,8 +319,8 @@ export function useDynamicSprites() {
               unreleased: (baseStatic && baseStatic.unreleased === false)
                 ? false
                 : (sanitized.unreleased !== undefined ? Boolean(sanitized.unreleased) : (baseStatic?.unreleased || false)),
-              release_date: sanitized.release_date || baseStatic?.release_date || baseStatic?.releaseDate,
-              releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate,
+              release_date: fechaDeLanzamiento(baseStatic, sanitized),
+              releaseDate: fechaDeLanzamiento(baseStatic, sanitized),
               isNew: sanitized.is_new !== undefined ? Boolean(sanitized.is_new) : (sanitized.isNew !== undefined ? Boolean(sanitized.isNew) : (baseStatic?.isNew || false)),
               is_new: sanitized.is_new !== undefined ? Boolean(sanitized.is_new) : (sanitized.isNew !== undefined ? Boolean(sanitized.isNew) : (baseStatic?.isNew || false))
             };

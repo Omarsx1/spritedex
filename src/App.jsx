@@ -346,6 +346,24 @@ export function App() {
   // con lo que el usuario está mirando. Ya no hay un temporizador fijo de 1500 ms: el
   // calentamiento arranca con la primera intención (puntero, rueda, teclado) o en el primer hueco
   // de reposo, y solo con la pestaña visible.
+  // Un espiritu que el usuario YA atrapo no puede estar sin lanzar: si lo tiene, existe. Esto
+  // blinda la coleccion frente a una programacion mal puesta (una fecha futura en una ficha que
+  // la gente ya tenia marcada). Sin esta regla la ficha desaparecia de la cuadricula y no dejaba
+  // ni marcarla: el candado de "No lanzado" bloquea el clic.
+  const dynamicSpritesVista = useMemo(() => {
+    if (!Array.isArray(dynamicSprites) || dynamicSprites.length === 0) return dynamicSprites;
+    const estado = activeProfile === 'friend' && friendState ? friendState : userState;
+    let tocado = false;
+    const lista = dynamicSprites.map((s) => {
+      if (s.unreleased && estado[s.id]?.owned) {
+        tocado = true;
+        return { ...s, unreleased: false, isAutoScheduled: false };
+      }
+      return s;
+    });
+    return tocado ? lista : dynamicSprites;
+  }, [dynamicSprites, userState, friendState, activeProfile]);
+
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
 
@@ -375,8 +393,8 @@ export function App() {
         // App ya le pasa allSprites filtrado por activeGen. Precargar el catalogo
         // completo eran ~3 MB en movil compitiendo con la generacion de la captura.
         const preloadList = activeGen === 0
-          ? dynamicSprites
-          : dynamicSprites.filter((s) => s.gen === activeGen);
+          ? dynamicSpritesVista
+          : dynamicSpritesVista.filter((s) => s.gen === activeGen);
         if (preloadList && preloadList.length > 0) {
           // Tandas de 4 (antes 30): el objetivo es que la captura este lista cuando el
           // usuario la abra, no bajar 1,8 MB de golpe mientras se pinta la app.
@@ -407,7 +425,7 @@ export function App() {
       }
       if (idleFallbackTimer !== null) clearTimeout(idleFallbackTimer);
     };
-  }, [dynamicSprites, activeGen]);
+  }, [dynamicSpritesVista, activeGen]);
 
   // Listen to Supabase Auth State & Sync Cloud Data
   useEffect(() => {
@@ -730,7 +748,7 @@ export function App() {
   };
 
   const filteredSprites = useMemo(() => {
-    let result = dynamicSprites.filter((sprite) => {
+    let result = dynamicSpritesVista.filter((sprite) => {
       if (!showUnreleased && sprite.unreleased) return false;
 
       // Filter by Generation (activeGen: 2 = Gen 2, 1 = Gen 1, 0 = All)
@@ -822,7 +840,7 @@ export function App() {
 
     return result;
   }, [
-    dynamicSprites,
+    dynamicSpritesVista,
     showUnreleased,
     activeGen,
     deferredSearch,
@@ -839,12 +857,12 @@ export function App() {
   // Se reutiliza como alcance del modal de compartir: al estar memoizada, el modal
   // no se repasa en cada render de la app (en produccion eso pasa con el sync).
   const scopedSprites = useMemo(() => {
-    return dynamicSprites.filter((s) => {
+    return dynamicSpritesVista.filter((s) => {
       if (!showUnreleased && s.unreleased) return false;
       if (activeGen !== 0 && s.gen !== activeGen) return false;
       return true;
     });
- }, [dynamicSprites, activeGen, showUnreleased]);
+ }, [dynamicSpritesVista, activeGen, showUnreleased]);
 
   // Calentador de miniaturas del grid. OJO: va despues de scopedSprites a proposito, porque
   // filteredSprites (su dependencia) es un useMemo declarado mas arriba; antes seria un TDZ.
@@ -856,7 +874,7 @@ export function App() {
     const elementos = Array.from(grid.querySelectorAll('.sprite-card'));
     const urls = filteredSprites.map((sprite) => sprite.thumb || sprite.image);
     return iniciarCalentador(elementos, urls);
-  }, [dynamicSprites, activeGen, filteredSprites, viewMode]);
+  }, [dynamicSpritesVista, activeGen, filteredSprites, viewMode]);
 
   // Fase 5/T7 (calor en reposo): los bloques que salen del viewport apagan sus animaciones CSS
   // decorativas. Aditivo y reversible: si el observer no corre, todo se ve como siempre.
@@ -986,11 +1004,11 @@ useEffect(() => {
   const enlaceEspirituResuelto = useRef(false);
   useEffect(() => {
     if (enlaceEspirituResuelto.current || typeof window === 'undefined') return;
-    if (!dynamicSprites || !dynamicSprites.length) return;
+    if (!dynamicSpritesVista || !dynamicSpritesVista.length) return;
     enlaceEspirituResuelto.current = true;
-    const sprite = espirituDeEnlace(window.location.pathname, window.location.search, dynamicSprites);
+    const sprite = espirituDeEnlace(window.location.pathname, window.location.search, dynamicSpritesVista);
     if (sprite) handleOpenDetail(sprite);
-  }, [dynamicSprites, handleOpenDetail]);
+  }, [dynamicSpritesVista, handleOpenDetail]);
 
   // Toda navegacion interna conserva el idioma activo.
   const irA = useCallback((ruta) => {
