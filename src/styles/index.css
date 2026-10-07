@@ -5600,7 +5600,7 @@ body:has(.modal-overlay) {
 .sdm-share-pro__dd-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 8px;
   width: 100%;
   padding: 8px 10px;
@@ -5672,12 +5672,20 @@ body:has(.modal-overlay) {
    dos palabras) y una talla algo menor: asi CAZARRECOMPENSAS entra sin recortarse. */
 @media (max-width: 480px) {
   .sdm-share-pro__fila {
-    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    /* Variante se queda con lo que necesita CAZARRECOMPENSAS y formato con lo justo para que
+       HORIZONTAL entre en UNA linea (con 1fr se partia con guion: HORIZON-TAL). */
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
   }
 
   .sdm-share-pro__dd-item:not(.sdm-share-pro__dd-item--rejilla) {
     padding: 7px 8px;
     font-size: 0.63rem;
+  }
+
+  /* El emoji del formato se esconde: el texto solo ya dice lo mismo y en una columna
+     estrecha obligaba a partir la etiqueta en dos lineas. */
+  .sdm-share-pro__dd-emoji {
+    display: none;
   }
 }
 
