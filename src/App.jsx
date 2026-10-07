@@ -215,6 +215,8 @@ export function App() {
   // llegar (el reintento del debounce, o dos sincronizaciones a la vez), no se cierra
   // sesion otra vez ni se encadenan identidades nuevas sin parar.
   const deadSessionHandled = useRef(new Set());
+  // Rastreo de existencia de registro previo en user_collections para guardado diferido (Lazy Sync)
+  const hasCloudRecordRef = useRef(false);
 
   // Filters matching fortnite.gg. El estado inicial sale de la URL: asi una recarga, un
   // enlace compartido o el boton atras devuelven a la misma generacion y los mismos filtros
@@ -499,6 +501,8 @@ export function App() {
         return;
       }
 
+      hasCloudRecordRef.current = Boolean(data);
+
       if (data?.friend_code) {
         setMyFriendCode(data.friend_code);
         safeStorage.setItem('spritedex_my_friend_code', data.friend_code);
@@ -542,6 +546,7 @@ export function App() {
     } catch {
       // Sin storage no hay copia posible; se sigue limpiando como antes.
     }
+    hasCloudRecordRef.current = false;
     setUserState({});
     safeStorage.removeItem(LOCAL_STORAGE_KEY);
   }, [userState]);
@@ -592,6 +597,16 @@ export function App() {
             ? `Entrenador #${myFriendCode.replace('SDEX-', '')}`
             : `Entrenador #${user.id.slice(0, 4).toUpperCase()}`;
           const isAnon = user.is_anonymous || (!user.email && !user.user_metadata?.full_name);
+          const tieneCapturas = Boolean(
+            userState && Object.entries(userState).some(([k, v]) => !k.startsWith('_') && Boolean(v?.owned))
+          );
+
+          // Guardado diferido (Lazy Sync): un visitante anónimo sin capturas y sin registro
+          // previo en la nube no debe escribir en user_collections para evitar crear filas fantasma
+          // generadas por bots, spiders o visitantes casuales.
+          if (isAnon && !tieneCapturas && !hasCloudRecordRef.current) {
+            return;
+          }
 
           let countryCode = '';
           let countryFlag = '';
@@ -639,6 +654,10 @@ export function App() {
           const { error: syncError } = await supabase
             .from('user_collections')
             .upsert(payload, { onConflict: 'user_id' });
+
+          if (!syncError) {
+            hasCloudRecordRef.current = true;
+          }
 
           // Identidad borrada en Supabase (clave foranea contra auth.users) o token ya
           // rechazado: la sesion guardada en el navegador apunta a alguien que ya no

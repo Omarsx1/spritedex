@@ -3193,7 +3193,13 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  /* Solo el transform se anima: es lo unico que el compositor puede mover sin repintar.
+     La box-shadow del hover NO se puede animar barato (cada frame de los 200 ms obliga a
+     repintar la tarjeta entera), y con el raton barriendo la rejilla quedan varias a mitad
+     de transicion a la vez. Medido con la sonda de enjambre (GPU, DPR 2): el barrido sobre
+     las tarjetas durante el enjambre hacia 40 fps con 7 frames >50 ms y picos de 250 ms,
+     contra 60 fps y p95 de 17 ms en reposo. El salto del hover se pinta una vez y ya. */
+  transition: transform 0.2s ease;
   position: relative;
   overflow: hidden;
   border: 0.5px solid rgba(255, 255, 255, 0.1);
@@ -3545,9 +3551,12 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   background: radial-gradient(
     circle at center,
     rgba(0, 255, 170, 0.25) 0%,
-    rgba(0, 255, 170, 0) 70%
+    rgba(0, 255, 170, 0.07) 46%,
+    rgba(0, 255, 170, 0) 78%
   );
-  filter: blur(15px);
+  /* El blur ya NO esta: un radial que se apaga solo no necesita filtro, y el filtro promovia
+     cada halo a capa compuesta propia (3 por tarjeta Gen 2 maxeada). El degradado se alarga
+     un poco para conservar la misma suavidad sin el. */
   opacity: 0.6;
   transition: opacity 0.3s ease;
   pointer-events: none;
@@ -9796,8 +9805,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
      desde el componente, y un estilo en linea gana sobre la hoja. */
   filter:
     drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5))
-    drop-shadow(0 0 12px rgba(255, 146, 43, 0.55))
-    drop-shadow(0 0 26px rgba(255, 122, 0, 0.3)) !important;
+    drop-shadow(0 0 14px rgba(255, 140, 40, 0.6)) !important;
 }
 
 /* Ningún pseudo-elemento puede cubrir por encima al espíritu, al nombre o a las monedas */
@@ -9817,8 +9825,10 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-1,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-2,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-3 {
-  background: radial-gradient(circle, rgba(226, 242, 255, 0.46) 0%, rgba(180, 214, 255, 0.14) 44%, transparent 72%);
-  filter: blur(8px);
+  /* Sin blur: el radial ya se apaga solo, y el filtro promovia cada halo a capa compuesta
+     propia (3 por tarjeta Gen 2 maxeada, ~180 capas en un grid lleno). El degradado se
+     alarga para conservar la misma suavidad. */
+  background: radial-gradient(circle, rgba(226, 242, 255, 0.46) 0%, rgba(180, 214, 255, 0.20) 38%, rgba(180, 214, 255, 0.06) 58%, transparent 78%);
   opacity: 0.65;
 }
 

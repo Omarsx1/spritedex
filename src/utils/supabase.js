@@ -40,8 +40,9 @@ export function isPreviewEnvironment() {
 // Rastreadores y auditorias (Lighthouse, PageSpeed, bots, Chrome headless).
 export function isAutomatedClient() {
   if (typeof navigator === 'undefined') return true;
+  if (navigator.webdriver) return true;
   const ua = (navigator.userAgent || '').toLowerCase();
-  return /lighthouse|headlesschrome|pagespeed|gtmetrix|googlebot|bingbot|bot\b|crawler|spider|phantomjs|puppeteer|playwright/.test(ua);
+  return /lighthouse|headlesschrome|pagespeed|gtmetrix|googlebot|bingbot|bot\b|crawler|spider|phantomjs|puppeteer|playwright|bytespider|yandex|duckduckbot|baiduspider|semrush|ahrefs|facebookexternalhit|slackbot|discordbot|twitterbot|whatsapp|telegrambot|vkshare|w3c_validator/.test(ua);
 }
 
 export function isAdminPortalPath() {
