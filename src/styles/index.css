@@ -3327,9 +3327,14 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   background-color: #161b22 !important;
   border-width: 0.5px !important;
   border-color: #00f0ff !important;
+  /* SIN !important, a proposito: el acabado ESCARCHA de Fortnitemares define su propio
+     box-shadow (interior, sin resplandor exterior) y tiene mas especificidad que esta
+     regla, pero NO usa !important. Con !important aqui, esta regla lo pisaba y forzaba
+     un halo cian de 17 px alrededor de la ficha maxeada: el resplandor que se veia de
+     mas. Sin el, manda el diseno de la temporada y el brillo se queda dentro. */
   box-shadow:
     0 10px 25px rgba(0, 0, 0, 0.6),
-    0 0 17px rgba(0, 240, 255, 0.6) !important;
+    0 0 17px rgba(0, 240, 255, 0.6);
   animation: none !important;
 }
 
