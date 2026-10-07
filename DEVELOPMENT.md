@@ -72,6 +72,53 @@ Para registrar un Sprite en estado "Anunciado" sin alterar la experiencia princi
 
 ---
 
+## 🐛 4. Regresión: fichas que desaparecían al arrancar (Total = Atrapados)
+
+**Síntoma (reportado en octubre de 2026):** al abrir la app, el **Total** nacía muy por debajo
+del real (p. ej. 33 en 2ª Generación) o **igual a Atrapados** (116/116, 120/120) y subía a su
+valor correcto (122) unos segundos después, cuando respondía Supabase. Parecía que se ocultaban
+espíritus.
+
+**Causa raíz:** `Array.map` invoca la función con `(elemento, índice)`. En el arranque había:
+
+```js
+ALL_SPRITES.map(evaluateReleaseStatus)   // 'ahora' = 0, 1, 2, ... (¡el índice!)
+```
+
+Y `evaluateReleaseStatus(sprite, ahora = Date.now())` tomaba ese índice como el instante. Con
+`ahora ≈ 0`, la condición `programado = releaseTime > ahora` daba **verdadero para toda ficha con
+fecha** → se marcaba como *no lanzada* y se ocultaba. El error además **se pegaba**, porque
+`estadoLanzamiento` mira primero el flag `unreleased` y ya no vuelve a mirar la fecha. Solo se
+corregía cuando la consulta reconstruía el estado desde cero. El mismo patrón estaba en el
+refresco automático de cada 30 s.
+
+**Arreglo (PR #26):**
+- `src/hooks/useDynamicSprites.js`: los dos `.map(evaluateReleaseStatus)` pasan a
+  `(s) => evaluateReleaseStatus(s)`.
+- `src/utils/lanzamiento.js`: `instanteReal()` ignora un `ahora` que no sea un instante real
+  (un índice, `0`…) y usa el reloj. Así el patrón no puede volver a colarse desde ningún llamador.
+- `tests/lanzamiento-programado.test.js`: regresión (un índice de `Array.map` no oculta; una
+  fecha futura real sí programa).
+
+**Regla para no repetirlo:** una función con `ahora` opcional (`estadoLanzamiento`,
+`evaluateReleaseStatus`, `esNovedad`, `fechaDeLanzamiento`) **nunca** se pasa directa como
+callback de `.map` / `.filter` / `.forEach` / `.some` / `.find` / `.reduce`; siempre envuelta,
+por ejemplo `(s) => fn(s)`.
+
+**Qué cubre la automatización (`.github/workflows/sync-sprites.yml`):** el job corre
+`pnpm test`, `npx oxlint --config .oxlintrc.json --deny=error`, `pnpm run build` y `pnpm smoke`
+**antes** de commitear, y **solo** commitea `src/data/` y `public/sprites/` (nunca código). Por
+eso **no puede reintroducir este bug**: el fallo estaba en el código y el workflow no publica
+código; si un cambio de datos rompiera la regla, los tests tumban el job y no se sube nada.
+
+**Dónde sigue habiendo exposición (es a propósito):** el estado de una ficha vive en los DATOS.
+Poner `"unreleased": true`, o una `"release_date"` en el futuro, **oculta** la ficha: es el
+mecanismo de programación, no un bug. Un dato mal puesto (una fecha futura en una ficha ya
+publicada, o una marca de más) sí oculta una ficha, y **los tests no lo detectan** (validan la
+regla, no cada dato). Por eso el checklist manual de abajo sigue siendo obligatorio.
+
+---
+
 ## 📋 Lista de Verificación (Checklist de Calidad)
 
 Antes de hacer commit de un nuevo Sprite o cambio en los datos:
@@ -79,5 +126,7 @@ Antes de hacer commit de un nuevo Sprite o cambio en los datos:
 - [ ] El `id` sigue la convención `familia_variante` (ej. `batman_gold`).
 - [ ] La imagen está presente en `public/sprites/${id}.png` o `.svg`.
 - [ ] El atributo `unreleased` refleja el estado real (anunciado vs disponible).
+- [ ] Ninguna ficha ya disponible lleva `unreleased: true` ni una `release_date` futura (eso la oculta).
+- [ ] Ninguna función con `ahora` opcional (`estadoLanzamiento`, `evaluateReleaseStatus`, `esNovedad`, `fechaDeLanzamiento`) se pasa directa como callback de `.map` / `.filter` / `.forEach` / `.some` / `.find`; va envuelta: `(s) => fn(s)`.
 - [ ] Los filtros de búsqueda, variante y familia funcionan correctamente en la UI.
 - [ ] El commit utiliza frases cortas en español y sigue la estructura por unidades de trabajo.
