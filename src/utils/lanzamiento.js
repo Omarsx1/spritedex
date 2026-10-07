@@ -74,3 +74,19 @@ export function fechaCorta(valor) {
   if (Number.isNaN(fecha.getTime())) return '';
   return fecha.toLocaleDateString('es', { day: 'numeric', month: 'short' });
 }
+
+// La copia del navegador sirve para pintar rapido, no para decidir un lanzamiento.
+//
+// Al escribirla se le quitan estas claves (que las manda el catalogo o la base); al leerla hay
+// que quitarselas igual. Si no, la copia cruda sobrevive a la mezcla: 'estadoLanzamiento' mira
+// 'release_date' antes que 'releaseDate', asi que una fecha futura guardada de mas ganaba por
+// ese lado y la ficha quedaba programada aunque el catalogo la diera por publicada. Se veia
+// como fichas que desaparecen de la cuadricula (122 -> 119) sin que nadie las tocara.
+export const CAMPOS_DE_LANZAMIENTO = ['release_date', 'releaseDate', 'unreleased', 'is_new', 'isNew'];
+
+export function sinEstadoDeLanzamiento(item) {
+  if (!item) return item;
+  const limpio = { ...item };
+  for (const campo of CAMPOS_DE_LANZAMIENTO) delete limpio[campo];
+  return limpio;
+}
