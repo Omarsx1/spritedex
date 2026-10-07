@@ -302,7 +302,12 @@ function FamilySpotlightRow({
         style={{
           width: `${cardWidth}px`,
           height: `${CARD_HEIGHT}px`,
-          background: styleInfo.background,
+          // En una ficha MAXEADA el fondo va PLANO, igual que la sombra de abajo: las reglas de
+          // maestria ya fuerzan background-color #161b22, pero este degradado va EN LINEA y el
+          // shorthand pisa esa intencion. El resultado era un sombreado calido del tema que el
+          // borde de la ficha corta en seco, muy visible en movil. La maxeada tiene su propio
+          // acabado (fondo plano + su resplandor interior).
+          background: isMastered ? undefined : styleInfo.background,
           borderColor: styleInfo.borderColor,
           // Sin resplandor de color: el halo por rareza se veia como un aro de luz alrededor
           // de la carta. La card activa ya se distingue por tamaño, opacidad y z-index
