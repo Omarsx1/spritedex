@@ -3,6 +3,7 @@ import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES, SUMMON_COST
 import catalogEn from '../data/i18n/catalog.en.json';
 import { getSupabase } from '../utils/supabase';
 import { estadoLanzamiento, fechaDeLanzamiento, sinEstadoDeLanzamiento, DIAS_NOVEDAD } from '../utils/lanzamiento.js';
+import { filtrarCopiaConfirmada } from '../utils/copiaLocal.js';
 
 export const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache_v2';
 
@@ -159,7 +160,9 @@ export function useDynamicSprites() {
     try {
       const cached = localStorage.getItem(DYNAMIC_SPRITES_CACHE_KEY);
       if (cached) {
-        const dynamicList = JSON.parse(cached);
+        // La copia solo pisa fichas que el catalogo ya conoce: una fila de una ficha borrada
+        // se pintaba primero y desaparecia al llegar la base (el total subia y bajaba).
+        const dynamicList = filtrarCopiaConfirmada(JSON.parse(cached), ESTATICOS_POR_ID);
         const map = new Map(ALL_SPRITES.map(s => [s.id, s]));
         dynamicList.forEach(item => {
           // La copia del navegador no decide fechas ni novedad: entra sin esas claves.
@@ -209,7 +212,8 @@ export function useDynamicSprites() {
     try {
       const cached = localStorage.getItem(DYNAMIC_SPRITES_CACHE_KEY);
       if (cached) {
-        const dynamicList = JSON.parse(cached);
+        // Misma regla al releer: la copia solo pisa fichas que el catalogo ya conoce.
+        const dynamicList = filtrarCopiaConfirmada(JSON.parse(cached), ESTATICOS_POR_ID);
         setSprites(() => {
           const map = new Map(ALL_SPRITES.map(s => [s.id, s]));
           dynamicList.forEach(item => {
