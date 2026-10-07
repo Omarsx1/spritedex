@@ -461,7 +461,11 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
     return () => {
       clearTimeout(timer);
     };
-  }, [spritesList, userState, format, bgStyle, ownedInScope, queuePngEncode, showPerf, scope, generalOwned, alcance, progresoGeneral]);
+  // firma entra en las dependencias: sin ella, cambiar de "Con nombre" a "Sin nombre" (o
+  // escribir el nombre) no volvia a dibujar la plantilla, y la vieja se quedaba en pantalla
+  // hasta que otra cosa disparara el efecto. Parecia colgada. El retardo del efecto ya hace de
+  // freno: teclear no dibuja por letra, solo cuando paras.
+  }, [spritesList, userState, format, bgStyle, ownedInScope, queuePngEncode, showPerf, scope, generalOwned, alcance, progresoGeneral, firma]);
 
   // El canvas se inserta a mano para que React no lo recree en cada render.
   useEffect(() => {
@@ -761,7 +765,9 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
           ) : isGenerating ? (
             <div className="sdm-share-pro__loading">
               <div className="sdm-share-pro__spinner" />
-              <span>{t('compartir.generando')}</span>
+              {/* Si ya habia una plantilla en pantalla, el aviso lo dice: se esta ACTUALIZANDO,
+                  no se ha colgado. La primera vez es "generando". */}
+              <span>{(previewCanvas || dataUrl) ? t('compartir.actualizando') : t('compartir.generando')}</span>
             </div>
           ) : previewCanvas ? (
             <div className="sdm-share-pro__canvas-host" ref={previewHostRef} />

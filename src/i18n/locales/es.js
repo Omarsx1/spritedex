@@ -271,6 +271,7 @@ export default {
   "comparar.verLista": "Ver Lista",
   "compartir.altPreview": "Vista previa de la colección",
   "compartir.atrapados": "Atrapados",
+  "compartir.actualizando": "Actualizando la plantilla...",
   "compartir.cacheDisco": "disco",
   "compartir.cacheMemoria": "memoria",
   "compartir.cacheNo": "no",
