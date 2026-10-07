@@ -2,31 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES, SUMMON_COST_OVERRIDES, WEBP_MAP, getSpriteThumb } from '../data/spritesData';
 import catalogEn from '../data/i18n/catalog.en.json';
 import { getSupabase } from '../utils/supabase';
-import { estadoLanzamiento, DIAS_NOVEDAD } from '../utils/lanzamiento.js';
+import { estadoLanzamiento, fechaDeLanzamiento, DIAS_NOVEDAD } from '../utils/lanzamiento.js';
 
 export const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache_v2';
 
-// Que fecha de lanzamiento manda: la del catalogo, y la del CMS o de la cache SOLO si la ficha
-// ya venia programada o sin lanzar en el catalogo.
-//
-// Antes la fecha dinamica pisaba siempre a la del catalogo. Una fecha vieja guardada de mas
-// (en el CMS o en la cache del navegador) escondia un espiritu que el catalogo da por
-// publicado: eso oculto fichas que la gente ya tenia atrapadas (El Ciervo, Vampiro) y el
-// candado de "No lanzado" no dejaba ni marcarlas. Con esta regla el CMS sigue pudiendo mover
-// el lanzamiento de lo programado, pero no puede esconder lo que ya salio.
-function fechaDeLanzamiento(baseStatic, dinamico) {
-  const delDinamico = (dinamico && (dinamico.release_date || dinamico.releaseDate)) || null;
-  const delCatalogo = (baseStatic && (baseStatic.releaseDate || baseStatic.release_date)) || null;
-  const catalogoProgramado = Boolean(baseStatic && (
-    baseStatic.unreleased === true ||
-    (delCatalogo && new Date(delCatalogo).getTime() > Date.now())
-  ));
-  // Si el catalogo da la ficha por no publicada (sin lanzar, o con fecha futura) la fecha del
-  // CMS/cache sirve para ponerle dia. Si el catalogo dice que ya salio, se ignora: aunque no
-  // tenga fecha, una ficha publicada no se puede esconder con una fecha suelta.
-  if (catalogoProgramado) return delDinamico || delCatalogo;
-  return delCatalogo || null;
-}
 
 // La tabla del CMS solo guarda el nombre en español. Los estaticos por id sirven para
 // heredar lo que la base no tiene (hoy, el nombre en ingles).

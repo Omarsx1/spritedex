@@ -45,6 +45,28 @@ export function esNovedad(sprite, ahora = Date.now()) {
   return estadoLanzamiento(sprite, ahora).nuevo;
 }
 
+// Que fecha de lanzamiento manda al mezclar el catalogo con la capa dinamica (la tabla del CMS
+// o la cache del navegador).
+//
+// La fecha dinamica solo vale si el catalogo da la ficha por NO publicada (marcada sin lanzar,
+// o con fecha futura): asi el CMS puede adelantar o retrasar un lanzamiento. Si el catalogo dice
+// que ya salio, manda el catalogo aunque no tenga fecha.
+//
+// Sin esta regla, una fecha vieja guardada de mas (en el CMS o en la cache del navegador)
+// escondia fichas publicadas que la gente ya tenia atrapadas: desaparecian de la cuadricula y
+// el candado de "No lanzado" no dejaba ni marcarlas. Paso con El Ciervo y Vampiro.
+export function fechaDeLanzamiento(baseStatic, dinamico, ahora = Date.now()) {
+  const delDinamico = (dinamico && (dinamico.release_date || dinamico.releaseDate)) || null;
+  const delCatalogo = (baseStatic && (baseStatic.releaseDate || baseStatic.release_date)) || null;
+  const catalogoProgramado = Boolean(baseStatic && (
+    baseStatic.unreleased === true ||
+    (delCatalogo && new Date(delCatalogo).getTime() > ahora)
+  ));
+  if (catalogoProgramado) return delDinamico || delCatalogo;
+  return delCatalogo || null;
+}
+
+
 // "8 oct" para los avisos de la app y del CMS.
 export function fechaCorta(valor) {
   if (!valor) return '';
