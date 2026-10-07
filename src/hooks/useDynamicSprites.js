@@ -21,8 +21,11 @@ function fechaDeLanzamiento(baseStatic, dinamico) {
     baseStatic.unreleased === true ||
     (delCatalogo && new Date(delCatalogo).getTime() > Date.now())
   ));
-  if (delDinamico && (catalogoProgramado || !delCatalogo)) return delDinamico;
-  return delCatalogo || delDinamico;
+  // Si el catalogo da la ficha por no publicada (sin lanzar, o con fecha futura) la fecha del
+  // CMS/cache sirve para ponerle dia. Si el catalogo dice que ya salio, se ignora: aunque no
+  // tenga fecha, una ficha publicada no se puede esconder con una fecha suelta.
+  if (catalogoProgramado) return delDinamico || delCatalogo;
+  return delCatalogo || null;
 }
 
 // La tabla del CMS solo guarda el nombre en español. Los estaticos por id sirven para
