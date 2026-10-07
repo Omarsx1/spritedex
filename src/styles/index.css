@@ -7550,22 +7550,6 @@ body:has(.modal-overlay) {
   contain: layout paint;
 }
 
-/* Sombra de apoyo de la ficha en el swiper: PEQUENA a proposito.
-   El autor ya habia quitado el halo de color con este criterio ("basta una sombra neutra de
-   apoyo"), pero la sombra era de 24-25px de desenfoque y los contenedores del swiper RECORTAN
-   (.ms-family-row con contain: paint, .ms-spotlight-stage con overflow: hidden): la sombra
-   quedaba cortada en recto y se veia un sombreado oscuro con base y esquinas rectas por fuera
-   de la ficha, en maxeadas y no maxeadas. Con 8px de desenfoque no llega al borde del recorte.
-   La maxeada conserva su resplandor INTERIOR, que no sale de la ficha. */
-.ms-spotlight-card.is-active {
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4) !important;
-}
-
-.ms-spotlight-card.is-active.is-mastered {
-  box-shadow:
-    0 3px 8px rgba(0, 0, 0, 0.4),
-    inset 0 0 22px rgba(0, 240, 255, 0.16) !important;
-}
 
 .ms-family-header {
   display: flex;

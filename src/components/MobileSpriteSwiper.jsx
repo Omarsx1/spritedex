@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo, useCallback, useEffect, memo } from 'react';
 import { fireConfetti } from '../utils/confetti';
 import { Lock } from 'lucide-react';
-import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER, pickName } from '../data/spritesData';
+import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER, pickName, tinteInterior } from '../data/spritesData';
 import { t } from '../i18n';
 import { sounds } from '../utils/audio';
 import { rutaBasicoFamilia, rutaFallbackEspiritu } from '../utils/spriteAssets';
@@ -302,17 +302,28 @@ function FamilySpotlightRow({
         style={{
           width: `${cardWidth}px`,
           height: `${CARD_HEIGHT}px`,
-          // En una ficha MAXEADA el fondo va PLANO, igual que la sombra de abajo: las reglas de
-          // maestria ya fuerzan background-color #161b22, pero este degradado va EN LINEA y el
-          // shorthand pisa esa intencion. El resultado era un sombreado calido del tema que el
-          // borde de la ficha corta en seco, muy visible en movil. La maxeada tiene su propio
-          // acabado (fondo plano + su resplandor interior).
+          // La ficha MAXEADA no lleva el degradado del tema (va EN LINEA y el shorthand pisa el
+          // background-color #161b22 que fuerzan las reglas de maestria: quedaba un sombreado
+          // calido cortado en seco por el borde). Pero tampoco puede quedar sin su color: el
+          // diseno pide que una maxeada siga leyendose del color de su carta. Por eso el color
+          // del tema entra teñido por DENTRO, con la misma forma de resplandor interior que ya
+          // usa el acabado de temporada, y asi no hay nada que los contenedores del swiper
+          // puedan recortar.
           background: isMastered ? undefined : styleInfo.background,
           borderColor: styleInfo.borderColor,
-          // Sin resplandor de color: el halo por rareza se veia como un aro de luz alrededor
-          // de la carta. La card activa ya se distingue por tamaño, opacidad y z-index
-          // (.ms-spotlight-card.is-active), asi que basta una sombra neutra de apoyo.
-          boxShadow: isActive && !isMastered ? '0 10px 24px rgba(0, 0, 0, 0.55)' : undefined
+          // El halo de color de fuera se retiro a proposito (se veia como un aro de luz
+          // alrededor de la carta); la activa ya se distingue por tamaño, opacidad y z-index.
+          // Aqui solo queda: una sombra de apoyo PEQUENA para la normal, y el tinte del tema
+          // por dentro para la maxeada. Las dos viven dentro de la ficha o cerca, de modo que
+          // los contenedores que recortan del swiper no las cortan.
+          boxShadow: isActive
+            ? (isMastered
+              // Dos capas del MISMO color del tema: un halo corto que agarra el borde y un velo
+              // amplio que da profundidad. Es la forma de recuperar el degradado del tema por
+              // dentro (que es lo que pedia el diseno) sin que nada salga de la ficha.
+              ? `inset 0 0 24px ${tinteInterior(styleInfo.borderColor, 0.22)}, inset 0 0 64px ${tinteInterior(styleInfo.borderColor, 0.1)}`
+              : '0 3px 8px rgba(0, 0, 0, 0.4)')
+            : undefined
         }}
         onClick={() => {
           if (!isActive) {
