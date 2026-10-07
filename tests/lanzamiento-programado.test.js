@@ -78,3 +78,44 @@ test('sin fecha ni marca nada esta lanzado y no es nuevo', () => {
 test('la ventana son 7 dias completos', () => {
   assert.equal(DIAS_NOVEDAD, 7);
 });
+
+// El lanzamiento es un instante global: el mismo momento para todos. Lo que cambia es el reloj
+// de cada pais, que es exactamente como se sienten los eventos de Fortnite (03:00 en Peru,
+// 02:00 en Mexico y Guatemala, 01:00 en Los Angeles, 10:00 en Madrid).
+function partesLocales(iso, zona) {
+  const partes = new Intl.DateTimeFormat('es', {
+    timeZone: zona, day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false
+  }).formatToParts(new Date(iso));
+  const valor = (tipo) => partes.find((p) => p.type === tipo).value;
+  return { dia: valor('day'), mes: valor('month'), hora: Number(valor('hour')) % 24, minuto: Number(valor('minute')) };
+}
+
+test('el mismo instante cae el 8 en todo el mundo, cada uno a su hora', () => {
+  const suelta = '2026-10-08T08:00:00Z'; // 03:00 en Peru
+  const esperado = [
+    ['America/Lima', 3],
+    ['America/Bogota', 3],
+    ['America/Mexico_City', 2],
+    ['America/Guatemala', 2],
+    ['America/Los_Angeles', 1],
+    ['America/New_York', 4],
+    ['America/Sao_Paulo', 5],
+    ['Europe/Madrid', 10],
+  ];
+  for (const [zona, hora] of esperado) {
+    const local = partesLocales(suelta, zona);
+    assert.equal(local.dia, '8', zona + ': deberia ser el dia 8');
+    assert.equal(local.mes, '10', zona + ': deberia ser octubre');
+    assert.equal(local.hora, hora, zona + ': deberia marcar las ' + hora + ':00');
+    assert.equal(local.minuto, 0, zona + ': minuto en punto');
+  }
+});
+
+test('un dia suelto (medianoche UTC) adelantaria el lanzamiento en America', () => {
+  // La trampa que se evito: guardar solo la fecha y compararla como medianoche UTC pondria el
+  // lote a las 19:00 del dia 7 en Lima y a las 00:00 del 8 en Madrid.
+  const suelta = '2026-10-08T00:00:00Z';
+  assert.equal(partesLocales(suelta, 'America/Lima').dia, '7', 'en Lima seria todavia el 7');
+  assert.equal(partesLocales(suelta, 'Europe/Madrid').dia, '8');
+});
+
