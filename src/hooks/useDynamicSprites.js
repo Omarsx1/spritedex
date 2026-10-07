@@ -258,7 +258,15 @@ export function useDynamicSprites() {
 
       if (data && data.length > 0) {
         setCustomSpiritsCount(data.length);
-        localStorage.setItem(DYNAMIC_SPRITES_CACHE_KEY, JSON.stringify(data));
+        // La cache existe para pintar rapido, pero NO para decidir fechas ni novedad: eso lo
+        // manda el catalogo y, cuando la consulta llega, la base. Una copia vieja con una fecha
+        // futura o un is_new apagado ocultaba fichas publicadas y apagaba los "Nuevos" hasta
+        // que la consulta se resolvia; si la consulta fallaba, se quedaba asi toda la sesion.
+        const paraCache = data.map((fila) => {
+          const { release_date, releaseDate, unreleased, is_new, isNew, ...resto } = fila;
+          return resto;
+        });
+        localStorage.setItem(DYNAMIC_SPRITES_CACHE_KEY, JSON.stringify(paraCache));
 
         setSprites(() => {
           const map = new Map(ALL_SPRITES.map(s => [s.id, s]));
