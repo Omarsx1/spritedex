@@ -42,10 +42,10 @@ function leerPerfActivado() {
 // Desplegable de la pagina de compartir. Es el mismo lenguaje que los filtros de la app
 // (la lista se abre bajo el boton y se cierra al tocar fuera), pero con el ancho de su
 // columna para que no se salga del panel. El color identifica la variante, como en la app.
-function Desplegable({ etiqueta, valor, opciones, abierto, onAlternar, onElegir, anchoTodo }) {
+function Desplegable({ etiqueta, valor, opciones, abierto, onAlternar, onElegir, enRejilla }) {
   const actual = opciones.find((o) => o.id === valor);
   return (
-    <div className={`sdm-share-pro__dd${anchoTodo ? ' sdm-share-pro__dd--ancho' : ''}`}>
+    <div className={`sdm-share-pro__dd${enRejilla ? ' sdm-share-pro__dd--rejilla' : ''}`}>
       <span className="sdm-share-pro__seg-label">{etiqueta}</span>
       <button
         type="button"
@@ -59,17 +59,30 @@ function Desplegable({ etiqueta, valor, opciones, abierto, onAlternar, onElegir,
       {abierto && (
         <>
           <div className="sdm-share-pro__dd-backdrop" onClick={onAlternar} />
-          <div className="sdm-share-pro__dd-menu">
+          <div className={`sdm-share-pro__dd-menu${enRejilla ? ' sdm-share-pro__dd-menu--rejilla' : ''}`}>
             {opciones.map((o) => (
               <button
                 key={o.id}
                 type="button"
-                className={`sdm-share-pro__dd-item${valor === o.id ? ' is-active' : ''}`}
+                className={[
+                  'sdm-share-pro__dd-item',
+                  valor === o.id ? 'is-active' : '',
+                  enRejilla ? 'sdm-share-pro__dd-item--rejilla' : '',
+                  enRejilla && o.id === 'all' ? 'sdm-share-pro__dd-item--ancho' : ''
+                ].filter(Boolean).join(' ')}
                 style={o.color ? { background: o.color } : undefined}
                 onClick={() => onElegir(o.id)}
               >
+                {enRejilla && o.image ? (
+                  <img
+                    className="sdm-share-pro__dd-img"
+                    src={o.image}
+                    alt=""
+                    loading="lazy"
+                    onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }}
+                  />
+                ) : null}
                 <span>{o.nombre}</span>
-                {o.n ? <span className="sdm-share-pro__dd-n">{o.n}</span> : null}
               </button>
             ))}
           </div>
@@ -244,16 +257,26 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
   }, [scope, filteredSprites, allSprites, userState, familia, variante]);
 
   // Opciones de los desplegables. Las familias y variantes salen de lo que hay en la lona,
-  // asi nunca se ofrece algo que dejaria la captura vacia. La familia lleva cuantas fichas
-  // aporta y la variante lleva su color, el mismo que usa el filtro de la app.
+  // asi nunca se ofrece algo que dejaria la captura vacia. La familia va con su miniatura y
+  // la variante con su color, los mismos que usa el filtro de la app.
   const opcionesFamilia = useMemo(() => {
     const cuenta = new Map();
     for (const s of allSprites) {
       if (!s.familyId) continue;
       cuenta.set(s.familyId, (cuenta.get(s.familyId) || 0) + 1);
     }
-    const lista = [...cuenta.entries()]
-      .map(([id, n]) => ({ id, nombre: pickFamilyName(id) || id, n }))
+    const lista = [...cuenta.keys()]
+      .map((id) => {
+        // La imagen de la familia es su variante basica, como en el filtro de la app: la lista
+        // se lee de un vistazo en vez de ser una columna de texto.
+        const basica = allSprites.find((s) => s.familyId === id && s.variant === 'Basic');
+        const cualquiera = basica || allSprites.find((s) => s.familyId === id);
+        return {
+          id,
+          nombre: pickFamilyName(id) || id,
+          image: (cualquiera && (cualquiera.thumb || cualquiera.image)) || undefined
+        };
+      })
       .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
     return [{ id: 'all', nombre: t('filtros.todas') }, ...lista];
   }, [allSprites]);
@@ -652,11 +675,15 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
             etiqueta={t('compartir.familia')}
             valor={familia}
             opciones={opcionesFamilia}
+            enRejilla
             abierto={menuAbierto === 'familia'}
             onAlternar={() => setMenuAbierto(menuAbierto === 'familia' ? '' : 'familia')}
             onElegir={(id) => { setFamilia(id); setMenuAbierto(''); }}
           />
 
+          {/* Variante y formato comparten fila: son los dos ajustes cortos y asi la columna no
+              se estira con dos botones de ancho completo. */}
+          <div className="sdm-share-pro__fila">
           <Desplegable
             etiqueta={t('compartir.variante')}
             valor={variante}
@@ -679,6 +706,7 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
             onAlternar={() => setMenuAbierto(menuAbierto === 'formato' ? '' : 'formato')}
             onElegir={(id) => { setFormat(id); setMenuAbierto(''); }}
           />
+          </div>
 
           <div className="sdm-share-pro__seg-group sdm-share-pro__seg-group--ancho">
             <span className="sdm-share-pro__seg-label">{t('compartir.usuario')}</span>
