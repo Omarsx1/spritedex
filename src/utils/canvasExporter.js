@@ -191,7 +191,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // velo gris que lo aplanaba; las capturas v64 con el velo no valen.
   // v66: el resplandor del titulo sale de las letras y el halo de ambiente deja de ser un
   // ovalo recortado en seco; las capturas v65 con la mancha no valen.
-  return `v66_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v67: la ficha estrena corona de maestria al lado opuesto del estado; las capturas v66
+  // sin corona no valen.
+  return `v67_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -209,6 +211,16 @@ export function srcParaCollage(sprite) {
   if (base && base.indexOf(COLLAGE_DIR) !== -1) return base.replace(COLLAGE_DIR, COLLAGE_DIR_ALT);
   return base || rutaAssetEspiritu(sprite.id);
 }
+
+// Corona de maestria de la lona: el MISMO asset que usa la rejilla de la app, para que la
+// captura y la pantalla cuenten lo mismo. Su caja en CSS (grid/list/swiper) es 28 x 19.
+const CORONA_MAESTRIA = '/img/x/sprites/crown.webp';
+const CORONA_ASPECTO = 28 / 19;
+// El webp de la corona no viene recto: su base baja ~17 grados (medido columna a columna
+// sobre sus 31 x 21 px: el borde inferior recorre 13 -> 20 en 24 columnas y luego sube por
+// la punta). La rejilla lo tapa con su propia rotacion CSS; en la lona se dibuja girada
+// para que salga nivelada.
+const CORONA_INCLINACION = 17 * Math.PI / 180;
 
 export function loadImage(src, bajaPrioridad = false) {
   if (!src) return Promise.resolve(null);
@@ -627,6 +639,12 @@ export async function generateSpritedexCardImage({
     }),
     logoMaresPromise.then((img) => {
       if (img) loadedImagesMap['__logo_mares__'] = img;
+    }),
+    // La corona se pide siempre, aunque no haya ningun espiritu maxeado: pesa menos de
+    // 1 KB y asi la ficha no se queda sin ella porque la peticion llegue tarde. Si no
+    // llega, la ficha sale sin corona en vez de romperse.
+    loadImage(CORONA_MAESTRIA, true).then((img) => {
+      if (img) loadedImagesMap['__corona__'] = img;
     }),
     ...Array.from({ length: Math.min(concurrencia, lista.length) }, cargarSprite)
   ]);
@@ -1641,10 +1659,58 @@ async function renderGlitchOverrideTemplate({
 
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.font = `900 ${Math.max(9, Math.min(13, badgeH * 0.62))}px "Outfit", "Inter", sans-serif`;
     ctx.letterSpacing = '0.6px';
+
+    // El estado y la corona comparten la banda como dos plazas: el estado a la izquierda y
+    // la corona al lado opuesto, para leer de un golpe "lo tengo" y "lo tengo maxeado".
+    // Donde el texto deja hueco, la corona entra sin tocar nada. En las cuadriculas densas
+    // "HACKEADO" se come el 60% de la ficha y no sobra ni un pixel, asi que la corona se
+    // reserva su plaza y SOLO el texto de las maxeadas cede lo justo para dejarla pasar.
+    // Se hace ficha a ficha a proposito: la otra salida era bajar la talla del estado en
+    // TODA la lona, y eso castiga a las 9 de cada 10 fichas que no llevan corona.
+    const inicioEstado = puntoX + puntoR + 7;
+    const derecha = cardX + cardW - 13;
+    const tamanoBase = Math.max(9, Math.min(13, badgeH * 0.62));
+    const coronaImg = loadedImagesMap['__corona__'];
+    const PISO_ESTADO = 7; // Por debajo de esto el estado deja de leerse.
+    const HUECO_ESTADO_CORONA = 5;
+
+    let tamanoEstado = tamanoBase;
+    let anchoCorona = 0;
+    if (isMastered && coronaImg) {
+      ctx.font = `900 ${tamanoBase}px "Outfit", "Inter", sans-serif`;
+      const anchoIdeal = ctx.measureText(estadoTexto).width;
+      anchoCorona = Math.max(9, Math.min(12, badgeH * 0.60)) * CORONA_ASPECTO;
+      const disponible = derecha - inicioEstado;
+      if (anchoIdeal + HUECO_ESTADO_CORONA + anchoCorona > disponible) {
+        tamanoEstado = tamanoBase * Math.max(
+          (disponible - HUECO_ESTADO_CORONA - anchoCorona) / anchoIdeal,
+          PISO_ESTADO / tamanoBase
+        );
+      }
+      // La corona se queda lo que sobre tras el texto ya encogido, y si con eso baja del
+      // minimo reconocible se queda fuera: antes falta la corona que un estado ilegible.
+      ctx.font = `900 ${tamanoEstado}px "Outfit", "Inter", sans-serif`;
+      anchoCorona = Math.min(anchoCorona, disponible - HUECO_ESTADO_CORONA - ctx.measureText(estadoTexto).width);
+    }
+    const altoCorona = anchoCorona / CORONA_ASPECTO;
+
+    ctx.font = `900 ${tamanoEstado}px "Outfit", "Inter", sans-serif`;
     ctx.fillStyle = estadoColor;
-    ctx.fillText(estadoTexto, puntoX + puntoR + 7, estadoY);
+    ctx.fillText(estadoTexto, inicioEstado, estadoY);
+
+    // La llevan solo los maxeados: su ausencia es la respuesta para el resto, igual que en
+    // la rejilla de la app.
+    if (isMastered && coronaImg && altoCorona >= PISO_ESTADO) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+      ctx.shadowBlur = 5;
+      ctx.shadowOffsetY = 2;
+      ctx.translate(derecha - anchoCorona / 2, estadoY);
+      ctx.rotate(-CORONA_INCLINACION);
+      ctx.drawImage(coronaImg, -anchoCorona / 2, -altoCorona / 2, anchoCorona, altoCorona);
+      ctx.restore();
+    }
     ctx.restore();
   }
 
