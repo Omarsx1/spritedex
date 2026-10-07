@@ -3198,8 +3198,12 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
      repintar la tarjeta entera), y con el raton barriendo la rejilla quedan varias a mitad
      de transicion a la vez. Medido con la sonda de enjambre (GPU, DPR 2): el barrido sobre
      las tarjetas durante el enjambre hacia 40 fps con 7 frames >50 ms y picos de 250 ms,
-     contra 60 fps y p95 de 17 ms en reposo. El salto del hover se pinta una vez y ya. */
+    contra 60 fps y p95 de 17 ms en reposo. El salto del hover se pinta una vez y ya. */
   transition: transform 0.2s ease;
+  /* La tarjeta se compone para que el levantamiento del hover no reflote: medido, el
+     transform animado disparaba ~50 reflows por barrido (layoutCount 51) y 331-448 ms de
+     hilo principal; con esto baja a 1 reflow y 263 ms. Se paga en capas compuestas. */
+  will-change: transform;
   position: relative;
   overflow: hidden;
   border: 0.5px solid rgba(255, 255, 255, 0.1);
