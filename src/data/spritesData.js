@@ -171,6 +171,20 @@ export const ELEMENTAL_STYLES = {
 // saturado. Acerca CARD_BORDER_ALPHA a 1 para recuperar el color original.
 const CARD_BORDER_ALPHA = 0.45;
 
+/**
+ * El MISMO color del tema, pero con alfa bajo, para tenirlo por DENTRO de la ficha.
+ *
+ * El borde de la ficha ya usa el color del tema, pero su alfa esta pensada para una linea:
+ * usarla tal cual en un glow interior de 26px lo deja sucio. Esta version mantiene el tono
+ * (es lo que pide el diseno: que una carta maxeada siga leyendose de su color) con la
+ * intensidad de un resplandor suave.
+ */
+export function tinteInterior(color, alpha = 0.16) {
+  const match = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(String(color));
+  if (!match) return color;
+  return 'rgba(' + match[1] + ', ' + match[2] + ', ' + match[3] + ', ' + alpha + ')';
+}
+
 function softenBorderColor(color) {
   if (typeof color !== 'string') return color;
   const match = /^#([0-9a-fA-F]{6})$/.exec(color.trim());
