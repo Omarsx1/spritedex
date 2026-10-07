@@ -82,9 +82,7 @@ const baseSprites = [
     { id: "striker_gold", name: "Gold Striker", theme: "Gold", rarity: "Special", unreleased: false },
     { id: "striker_candy", name: "Gummy Striker", theme: "Candy", rarity: "Special", unreleased: false },
     { id: "striker_galaxy", name: "Galaxy Striker", theme: "Galaxy", rarity: "Special", unreleased: false },
-    { id: "striker_gem", name: "Gem Striker", theme: "Gem", rarity: "Special", unreleased: true },
     { id: "striker_holofoil", name: "Holofoil Striker", theme: "Holofoil", rarity: "Special", unreleased: false },
-    { id: "striker_rift", name: "Cube Striker", theme: "Cube", rarity: "Special", unreleased: true },
 
     { id: "aura_basic", name: "Aura", theme: "Basic", rarity: "Epic", unreleased: false },
     { id: "aura_gold", name: "Gold Aura", theme: "Gold", rarity: "Special", unreleased: false },

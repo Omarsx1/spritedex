@@ -15,7 +15,7 @@ const familias = leer('src/data/i18n/familias.en.json');
 // Holofoil Fishy, Gem Fishy, Holofoil Boss y Gem Seven) se borraron del catalogo.
 const COMPUESTOS = [
   'boss_gem', 'demon_holofoil', 'dream_gem', 'ghost_gem',
-  'king_gem', 'punk_gem', 'striker_gem', 'striker_rift'
+  'king_gem', 'punk_gem'
 ];
 
 test('cada espiritu del catalogo tiene nombre en ingles no vacio', () => {
@@ -38,7 +38,7 @@ test('los nombres son los del juego: variante primero y sin el sufijo " Sprite"'
   assert.equal(generado.jonesy_loothacker, 'Loot Hacker Jonesy');
   assert.equal(generado.jonesy_bountyhunter, 'Bounty Hunter Jonesy');
   assert.equal(generado.crash_basic, 'Crash Bandicoot');
-  assert.equal(generado.striker_rift, 'Cube Striker');
+  assert.equal(generado.boss_gem, 'Gem Boss');
   assert.equal(generado.ghost_gem, 'Gem Ghost');
 });
 

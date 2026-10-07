@@ -592,27 +592,11 @@
     "isNew": false
   },
   {
-    "id": "striker_rift",
-    "name": "Cube Striker",
-    "theme": "Cube",
-    "rarity": "Special",
-    "unreleased": true,
-    "isNew": false
-  },
-  {
     "id": "striker_holofoil",
     "name": "Holofoil Striker",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "striker_gem",
-    "name": "Gem Striker",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true,
     "isNew": false
   },
   {
