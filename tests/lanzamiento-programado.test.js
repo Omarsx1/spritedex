@@ -119,3 +119,19 @@ test('un dia suelto (medianoche UTC) adelantaria el lanzamiento en America', () 
   assert.equal(partesLocales(suelta, 'Europe/Madrid').dia, '8');
 });
 
+// Array.map pasa el INDICE como segundo argumento. Antes, 'catalogo.map(estadoLanzamiento)'
+// mandaba 0,1,2... como 'ahora' y, como 0 es 1970, toda ficha con fecha quedaba programada: el
+// total arrancaba con 89 fichas de menos (33 en vez de 122) y solo subia cuando respondia la
+// base. El piso de instanteReal corta ese indice.
+test('un indice de Array.map no puede colarse como instante', () => {
+  const publicada = { id: 'deer_gold', unreleased: false, releaseDate: '2026-10-01T00:00:00Z' };
+  assert.equal(estadoLanzamiento(publicada, 0).unreleased, false, 'indice 0 no debe ocultar');
+  assert.equal(estadoLanzamiento(publicada, 7).unreleased, false, 'indice 7 no debe ocultar');
+  assert.equal(estadoLanzamiento(publicada, 267).programado, false, 'indice alto no debe ocultar');
+});
+
+test('una fecha futura de verdad sigue programada con el reloj real', () => {
+  const programada = { id: 'vampire_tricktreat', unreleased: false, releaseDate: '2026-10-08T08:00:00Z' };
+  assert.equal(estadoLanzamiento(programada, el('2026-10-07')).programado, true);
+});
+

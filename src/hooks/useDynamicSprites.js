@@ -200,7 +200,7 @@ export function useDynamicSprites() {
         return applyBatchNoveltyRules(Array.from(map.values()));
       }
     } catch {}
-    return applyBatchNoveltyRules(ALL_SPRITES.map(evaluateReleaseStatus));
+    return applyBatchNoveltyRules(ALL_SPRITES.map((s) => evaluateReleaseStatus(s)));
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -353,7 +353,7 @@ export function useDynamicSprites() {
 
     // Interval to check automatic scheduled releases every 30 seconds
     const interval = setInterval(() => {
-      setSprites(prev => applyBatchNoveltyRules(prev.map(evaluateReleaseStatus)));
+      setSprites(prev => applyBatchNoveltyRules(prev.map((s) => evaluateReleaseStatus(s))));
     }, 30000);
 
     return () => {

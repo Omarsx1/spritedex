@@ -30,12 +30,25 @@
 export const DIAS_NOVEDAD = 7;
 const DIA_MS = 24 * 60 * 60 * 1000;
 
+// Un 'ahora' de verdad es un instante en milisegundos. Array.map pasa el INDICE como segundo
+// argumento, asi que 'catalogo.map(estadoLanzamiento)' mandaba 0,1,2... como 'ahora'; y como 0
+// es 1970, toda fecha quedaba en el futuro: la ficha se marcaba sin lanzar y desaparecia de la
+// cuadricula al arrancar. Peor: el error se pegaba, porque estadoLanzamiento mira primero el
+// flag 'unreleased' y ya no volvia a mirar la fecha. Este piso (2000) deja fuera cualquier
+// indice y no toca a ninguna fecha real del juego.
+const INSTANTE_MINIMO_MS = 946684800000; // 2000-01-01T00:00:00Z
+
+function instanteReal(valor) {
+  return Number.isFinite(valor) && valor >= INSTANTE_MINIMO_MS ? valor : Date.now();
+}
+
 export function estadoLanzamiento(sprite, ahora = Date.now()) {
+  const instante = instanteReal(ahora);
   const raw = sprite && (sprite.release_date || sprite.releaseDate);
   const releaseTime = raw ? new Date(raw).getTime() : 0;
-  const programado = releaseTime > ahora;
+  const programado = releaseTime > instante;
   const unreleased = Boolean(sprite && sprite.unreleased) || programado;
-  const diasDesde = (!unreleased && releaseTime > 0) ? (ahora - releaseTime) / DIA_MS : Infinity;
+  const diasDesde = (!unreleased && releaseTime > 0) ? (instante - releaseTime) / DIA_MS : Infinity;
   const nuevo = !unreleased && releaseTime > 0 && diasDesde >= 0 && diasDesde < DIAS_NOVEDAD;
   return { releaseTime, programado, unreleased, diasDesde, nuevo };
 }
@@ -56,11 +69,12 @@ export function esNovedad(sprite, ahora = Date.now()) {
 // escondia fichas publicadas que la gente ya tenia atrapadas: desaparecian de la cuadricula y
 // el candado de "No lanzado" no dejaba ni marcarlas. Paso con El Ciervo y Vampiro.
 export function fechaDeLanzamiento(baseStatic, dinamico, ahora = Date.now()) {
+  const instante = instanteReal(ahora);
   const delDinamico = (dinamico && (dinamico.release_date || dinamico.releaseDate)) || null;
   const delCatalogo = (baseStatic && (baseStatic.releaseDate || baseStatic.release_date)) || null;
   const catalogoProgramado = Boolean(baseStatic && (
     baseStatic.unreleased === true ||
-    (delCatalogo && new Date(delCatalogo).getTime() > ahora)
+    (delCatalogo && new Date(delCatalogo).getTime() > instante)
   ));
   if (catalogoProgramado) return delDinamico || delCatalogo;
   return delCatalogo || null;
