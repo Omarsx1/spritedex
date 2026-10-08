@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { archivoArteCanonico, ART_VECTORIAL } from '../src/data/spriteAssetMap.js';
+import { debeRevertirAUnreleased } from '../src/utils/lanzamiento.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -744,17 +745,21 @@ async function syncSprites() {
           // La fuente lo da por no lanzado: se corrige la marca en vez de
           // mantener una publicacion que el juego todavia no ha hecho.
           // PERO si la ficha tiene fecha PROGRAMADA (en el futuro), manda la fecha: no se
-          // marca como no lanzada ni se apaga su novedad. Asi un lote programado (desde el CMS
-          // o desde los datos) sale solo el dia que toca, aunque la fuente todavia lo liste
+          // marca como no lanzada ni se apaga su novedad. Asi un lote programado (salga del CMS
+          // o salga de los datos) sale solo el dia que toca, aunque la fuente todavia lo liste
           // como no lanzado.
+          // Y si el lanzamiento fue MANUAL (un lote adelantado a proposito), la fecha ya paso
+          // pero la fuente todavia no manda: se respeta la decision y no se toca la ficha.
           const programadoHasta = item.releaseDate ? new Date(item.releaseDate).getTime() : 0;
           if (programadoHasta > Date.now()) {
             console.log(`⏭️  ${item.id} (${item.name}) esta programado para ${item.releaseDate}: la fuente no manda todavia.`);
-          } else {
+          } else if (debeRevertirAUnreleased(item, isCardUnreleased)) {
             console.log(`↩️ ${item.id} (${item.name}) vuelve a marcarse como no lanzado: Fortnite.gg no lo da por publicado.`);
             item.unreleased = true;
             item.isNew = false;
             catalogChanges++;
+          } else {
+            console.log(`🔒 ${item.id} (${item.name}) es lanzamiento manual: se queda publicado aunque Fortnite.gg no lo de por lanzado.`);
           }
         }
       } else {

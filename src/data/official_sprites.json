@@ -1041,7 +1041,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "jonesy_basic",
@@ -1098,7 +1099,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "adventure_basic",
@@ -1155,7 +1157,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "bush_basic",
@@ -1212,7 +1215,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "sonic_basic",
@@ -1269,7 +1273,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "tails_basic",
@@ -1326,7 +1331,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "shadow_basic",
@@ -1383,7 +1389,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "8bit_basic",
@@ -1440,7 +1447,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "jackrabbit_basic",
@@ -1497,7 +1505,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "crown_basic",
@@ -1611,7 +1620,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "klombo_basic",
@@ -1668,7 +1678,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "megaman_basic",
@@ -1738,7 +1749,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "pond_basic",
@@ -1798,7 +1810,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "xray_basic",
@@ -1858,7 +1871,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "onigiri_basic",
@@ -1918,7 +1932,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "stormscout_basic",
@@ -1978,7 +1993,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "blinky_basic",
@@ -2038,7 +2054,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "birthday_basic",
@@ -2103,7 +2120,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "crash_basic",
@@ -2163,7 +2181,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "morgana_basic",
@@ -2223,7 +2242,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "spookydash_basic",
@@ -2283,7 +2303,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "deer_basic",
@@ -2343,7 +2364,8 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "vampire_basic",
@@ -2403,6 +2425,7 @@
     "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   }
 ]

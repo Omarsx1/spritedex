@@ -63,3 +63,18 @@ Publicar el lote "Dulce o Truco" **ya** (el usuario adelanta el lanzamiento prev
 - Aviso flotante real: 23 Nuevos espiritus con boton VER y badge 23.
 - La rejilla muestra 24 tarjetas con Dulce o Truco: las 23 de hoy mas crown_tricktreat (Victorioso, del 1 de octubre), que hoy deja de contar como nuevo.
 - Las 23 imagenes del lote existen en public/sprites/: 0 faltantes.
+
+## Guard de lanzamiento manual
+
+- Campo `lanzamientoManual: true` en las 23 fichas del lote (src/data/official_sprites.json).
+- `esLanzamientoManual()` y `debeRevertirAUnreleased()` en src/utils/lanzamiento.js: la decision vive
+  fuera del script para poder probarse sin red ni navegador.
+- scripts/sync-sprites.js: la transicion publicado -> no lanzado solo revierte si
+  `debeRevertirAUnreleased()` lo autoriza; si la ficha es de lanzamiento manual, registra el
+  candado y no la toca.
+- Prueba: tests/lanzamiento-manual.test.js (primero en rojo, despues en verde). Suite: 232/232.
+- Comprobado sobre los datos reales: con la fuente en contra, 0 de las 23 se revertirian; una
+  ficha normal en la misma situacion si (control: deer_gold).
+- Lo que NO se pudo ejecutar: el sync completo (necesita red y Chrome). Lo probado es la
+  decision, no el script entero; la siguiente pasada del workflow (jueves 10:00Z) lo ejerce de
+  verdad y deja la linea del candado en el log.

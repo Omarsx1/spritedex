@@ -96,11 +96,36 @@ export function fechaCorta(valor) {
 // 'release_date' antes que 'releaseDate', asi que una fecha futura guardada de mas ganaba por
 // ese lado y la ficha quedaba programada aunque el catalogo la diera por publicada. Se veia
 // como fichas que desaparecen de la cuadricula (122 -> 119) sin que nadie las tocara.
-export const CAMPOS_DE_LANZAMIENTO = ['release_date', 'releaseDate', 'unreleased', 'is_new', 'isNew'];
+export const CAMPOS_DE_LANZAMIENTO = ['release_date', 'releaseDate', 'unreleased', 'is_new', 'isNew', 'lanzamientoManual'];
 
 export function sinEstadoDeLanzamiento(item) {
   if (!item) return item;
   const limpio = { ...item };
   for (const campo of CAMPOS_DE_LANZAMIENTO) delete limpio[campo];
   return limpio;
+}
+
+// Lanzamiento manual: la excepcion nombrada que mantiene publicado un lote adelantado.
+//
+// Un lote programado se apoya en una sola cosa para no caerse: que su fecha este en el FUTURO.
+// Con fecha futura el sync respeta la ficha aunque Fortnite.gg la de por no lanzada ("la fuente no
+// manda todavia"). Cuando el lote se adelanta a proposito, esa fecha deja de proteger y la
+// siguiente pasada del workflow volveria a marcarlo como no lanzado: la app lo escondería para
+// todos y el cambio se commitearia solo.
+//
+// 'lanzamientoManual: true' dice, ficha por ficha, que ese lanzamiento lo decidio una persona y
+// que la fuente no manda todavia. No es la regla vieja que forzaba todo el tema "Dulce o Truco" a
+// lanzado —esa se quito porque hacia que el scraper mintiera sobre el dato—: es una excepcion
+// nombrada, visible en el catalogo, con su prueba, y que se quita cuando la fuente confirme.
+export function esLanzamientoManual(item) {
+  return Boolean(item && item.lanzamientoManual === true);
+}
+
+// La transicion del sync: una ficha publicada que la fuente da por no lanzada vuelve atras...
+// salvo que su lanzamiento haya sido manual. Vive aqui, y no dentro del script, para que la
+// decision se pueda probar sin red ni navegador.
+export function debeRevertirAUnreleased(item, isCardUnreleased) {
+  if (!item || item.unreleased !== false) return false;
+  if (isCardUnreleased !== true) return false;
+  return !esLanzamientoManual(item);
 }
