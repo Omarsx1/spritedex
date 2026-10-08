@@ -36,8 +36,12 @@ globalThis.Audio = AudioFalso;
 // se queda pegado en la pantalla de bloqueo hasta que vaciamos el metadata y
 // marcamos playbackState. Esta prueba fija que la limpiemos explicitamente.
 const sesion = { metadata: { title: 'Spritedex' }, playbackState: 'playing' };
+// La categoria de audio: en iOS decide dos cosas a la vez, y son la misma. Si la
+// pagina queda en "playback" los sonidos suenan con el movil en silencio pero
+// Safari se queda con la pantalla de bloqueo; "ambient" respeta el interruptor.
+const audioSession = { type: 'auto' };
 Object.defineProperty(globalThis, 'navigator', {
-  value: { mediaSession: sesion },
+  value: { mediaSession: sesion, audioSession },
   configurable: true,
   writable: true,
 });
@@ -136,4 +140,34 @@ test('un contexto ya dormido no se vuelve a dormir', () => {
   sounds.dormir();
   assert.equal(ctx.vecesDormido, 0);
   sounds.ctx = null;
+});
+
+test('al cargar, la app declara la categoria ambient', async () => {
+  audioSession.type = 'auto';
+  await import('../src/utils/audio.js?declara-ambient');
+  assert.equal(
+    audioSession.type,
+    'ambient',
+    'ambient es la categoria que respeta el interruptor de silencio',
+  );
+});
+
+test('si el navegador no trae Audio Session API no revienta', () => {
+  const guardada = navigator.audioSession;
+  delete navigator.audioSession;
+  assert.doesNotThrow(() => sounds.ponerCategoria('ambient'));
+  navigator.audioSession = guardada;
+});
+
+test('si el navegador rechaza el tipo no revienta', () => {
+  Object.defineProperty(audioSession, 'type', {
+    configurable: true,
+    get: () => 'auto',
+    set: () => {
+      throw new Error('tipo no soportado');
+    },
+  });
+  assert.doesNotThrow(() => sounds.ponerCategoria('ambient'));
+  delete audioSession.type;
+  audioSession.type = 'ambient';
 });
