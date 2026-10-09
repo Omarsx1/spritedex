@@ -137,3 +137,13 @@ Checks after the correction:
 A live pass on a phone: hamburger → "Ayuda y legal" → the three destinations, Escape closing
 the menu and focusing the trigger, and no footer at the end of the grid. Then decide delivery.
 
+
+## Commit identities (evidence)
+
+- S1 `8aa462c` — feat(menu): mueve los enlaces del pie al menu de navegacion
+  (3 files, +78 / -109, includes the Footer deletion).
+- S2 `e8b43d2` — style(menu): borra el CSS del pie que ya no existe
+  (1 file, +16 / -271, includes the sdm__ficha restoration).
+- S3 `8edaf7c` — chore(i18n): mueve el copy del pie a las claves nav
+  (3 files, +149 / -8, includes this document).
+
