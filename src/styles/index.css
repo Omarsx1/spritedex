@@ -5483,35 +5483,6 @@ body:has(.modal-overlay) {
   font-weight: 700;
 }
 
-.sdm-share-pro__close {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  min-height: 32px;
-  max-width: 32px;
-  max-height: 32px;
-  flex-shrink: 0;
-  aspect-ratio: 1 / 1;
-  border-radius: 9999px;
-  padding: 0;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #94a3b8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
-}
-
-.sdm-share-pro__close:hover {
-  background: rgba(255, 0, 85, 0.25);
-  border-color: #ff0055;
-  color: #ffffff;
-  transform: scale(1.05);
-}
-
 /* Controls Toolbar */
 .sdm-share-pro__controls {
   display: grid;
@@ -6271,638 +6242,6 @@ body:has(.modal-overlay) {
   }
   .claim-banner__texto {
     font-size: 0.72rem;
-  }
-}
-
-/* ===== MODAL RADAR DE AMIGOS (ESTILO SDM-SHARE-PRO) ===== */
-.sdm-compare {
-  max-width: 640px;
-  width: 100%;
-  margin: 0 auto;
-  border-radius: 18px;
-  max-height: 90vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  box-sizing: border-box;
-}
-
-.sdm-compare__body {
-  padding-top: 6px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Top Cards Grid */
-.sdm-compare__top-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 14px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.sdm-compare__card {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 10px;
-  transition: border-color 0.2s ease;
-  box-sizing: border-box;
-  width: 100%;
-}
-
-.sdm-compare__card--my-code {
-  border-color: rgba(56, 189, 248, 0.3);
-  background: linear-gradient(145deg, rgba(14, 165, 233, 0.08), rgba(15, 23, 42, 0.8));
-}
-
-.sdm-compare__card--connect {
-  border-color: rgba(168, 85, 247, 0.3);
-  background: linear-gradient(145deg, rgba(168, 85, 247, 0.08), rgba(15, 23, 42, 0.8));
-}
-
-.sdm-compare__card--connected {
-  border-color: rgba(16, 185, 129, 0.4);
-  background: linear-gradient(145deg, rgba(16, 185, 129, 0.08), rgba(15, 23, 42, 0.8));
-}
-
-.sdm-compare__card-title {
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #38bdf8;
-}
-
-.sdm-compare__card--connect .sdm-compare__card-title {
-  color: #c084fc;
-}
-
-.sdm-compare__card-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.sdm-compare__btn-disconnect {
-  background: none;
-  border: none;
-  color: #ef4444;
-  font-size: 0.72rem;
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
-}
-
-.sdm-compare__code-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: nowrap;
-}
-
-.sdm-compare__code-badge {
-  font-family: monospace;
-  font-size: 1.15rem;
-  font-weight: 900;
-  color: #00F0E8;
-  background: rgba(0, 0, 0, 0.55);
-  padding: 6px 14px;
-  border-radius: 7px;
-  border: 1px solid rgba(0, 240, 232, 0.35);
-  letter-spacing: 3px;
-  min-width: 84px;
-  text-align: center;
-  text-shadow: 0 0 8px rgba(0, 240, 232, 0.35);
-  white-space: nowrap !important;
-  flex-shrink: 0;
-}
-
-/* Matricula del codigo: SDEX fijo a la izquierda y la casilla con el codigo al lado. */
-.sdm-compare__code-plate {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}
-
-.sdm-compare__code-prefix {
-  font-family: monospace;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  color: rgba(226, 232, 240, 0.5);
-  text-transform: uppercase;
-  flex-shrink: 0;
-}
-
-.sdm-compare__code-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-  justify-content: flex-end;
-}
-
-.sdm-compare__btn-copy {
-  flex: 1;
-  padding: 6px 10px;
-  border-radius: 7px;
-  background: rgba(14, 165, 233, 0.15);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  font-size: 0.74rem;
-  font-weight: 800;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-.sdm-compare__btn-copy:hover {
-  background: rgba(14, 165, 233, 0.3);
-  border-color: #38bdf8;
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-.sdm-compare__btn-copy--link {
-  background: rgba(0, 240, 232, 0.12);
-  color: #00F0E8;
-  border-color: rgba(0, 240, 232, 0.35);
-}
-
-.sdm-compare__btn-copy--link:hover {
-  background: rgba(0, 240, 232, 0.25);
-  border-color: #00F0E8;
-  color: #fff;
-}
-
-.sdm-compare__btn-copy--done {
-  background: rgba(16, 185, 129, 0.25) !important;
-  border-color: #10b981 !important;
-  color: #4ade80 !important;
-}
-
-.sdm-compare__input-row {
-  display: flex;
-  gap: 8px;
-}
-
-.sdm-compare__input {
-  flex: 1;
-  min-width: 0;
-  padding: 8px 12px;
-  border-radius: 7px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #fff;
-  font-size: 0.78rem;
-  outline: none;
-  transition: border-color 0.2s ease;
-}
-
-.sdm-compare__input:focus {
-  border-color: #a855f7;
-  box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
-}
-
-.sdm-compare__btn-connect {
-  padding: 8px 16px;
-  border-radius: 7px;
-  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-  color: #fff;
-  border: none;
-  font-size: 0.78rem;
-  font-weight: 800;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-.sdm-compare__btn-connect:hover:not(:disabled) {
-  box-shadow: 0 0 14px rgba(139, 92, 246, 0.5);
-  transform: translateY(-1px);
-}
-
-.sdm-compare__connected-info {
-  font-size: 0.8rem;
-  color: #e2e8f0;
-}
-
-.sdm-compare__connected-target {
-  font-weight: 700;
-}
-
-.sdm-compare__connected-target strong {
-  color: #10b981;
-  font-family: monospace;
-  font-size: 0.92rem;
-  letter-spacing: 0.5px;
-}
-
-.sdm-compare__connected-hint {
-  display: block;
-  font-size: 0.70rem;
-  color: #94a3b8;
-  margin-top: 3px;
-}
-
-/* Waiting Card */
-.sdm-compare__waiting {
-  padding: 36px 20px;
-  text-align: center;
-  background: rgba(3, 7, 18, 0.85);
-  border: 1px solid rgba(0, 240, 232, 0.2);
-  border-radius: 14px;
-  backdrop-filter: blur(8px);
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0 auto;
-}
-
-.sdm-compare__radar-icon {
-  margin-bottom: 12px;
-  display: inline-flex;
-  padding: 14px;
-  border-radius: 50%;
-  background: rgba(0, 240, 255, 0.1);
-  border: 1px solid rgba(0, 240, 255, 0.25);
-  box-shadow: 0 0 24px rgba(0, 240, 255, 0.25);
-  animation: radarPulse 2.5s ease-in-out infinite;
-}
-
-@keyframes radarPulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
-  }
-  50% {
-    transform: scale(1.08);
-    box-shadow: 0 0 32px rgba(168, 85, 247, 0.45);
-  }
-}
-
-.sdm-compare__waiting-title {
-  font-size: 1.05rem;
-  font-weight: 900;
-  color: #f1f5f9;
-  margin: 0 0 6px;
-}
-
-.sdm-compare__waiting-text {
-  font-size: 0.8rem;
-  color: #94a3b8;
-  margin: 0 auto;
-  max-width: 440px;
-  line-height: 1.45;
-}
-
-/* Toolbar: Season Filter & Copy Trade Plan */
-.sdm-compare__toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.sdm-compare__season-pills {
-  display: flex;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 3px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.sdm-compare__season-pill {
-  padding: 4px 10px;
-  border-radius: 6px;
-  border: none;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.72rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.sdm-compare__season-pill--active {
-  background: #3b82f6;
-  color: #fff;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
-}
-
-.sdm-compare__btn-trade-plan {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(16, 185, 129, 0.25));
-  border: 1px solid rgba(34, 197, 94, 0.4);
-  color: #4ade80;
-  font-size: 0.74rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.sdm-compare__btn-trade-plan:hover {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(16, 185, 129, 0.35));
-  box-shadow: 0 0 14px rgba(34, 197, 94, 0.3);
-}
-
-/* Tabs */
-.sdm-compare__tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.sdm-compare__tab {
-  flex: 1;
-  padding: 9px 12px;
-  border-radius: 9px;
-  border: none;
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 800;
-  font-size: 0.78rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-}
-
-.sdm-compare__tab:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-.sdm-compare__tab--active-green {
-  background: linear-gradient(135deg, #10b981, #059669) !important;
-  color: #fff !important;
-  box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
-}
-
-.sdm-compare__tab--active-blue {
-  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-  color: #fff !important;
-  box-shadow: 0 0 14px rgba(59, 130, 246, 0.4);
-}
-
-.sdm-compare__tab--active-purple {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
-  color: #fff !important;
-  box-shadow: 0 0 14px rgba(139, 92, 246, 0.4);
-}
-
-.sdm-compare__tab--active-gold {
-  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
-  color: #fff !important;
-  box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
-}
-
-/* Sprites Comparison Grid */
-.sdm-compare__empty {
-  padding: 30px;
-  text-align: center;
-  color: #94a3b8;
-  font-size: 0.84rem;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-}
-
-.sdm-compare__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 10px;
-  max-height: 340px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.sdm-compare__sprite-card {
-  border-radius: 10px;
-  border-width: 1px;
-  border-style: solid;
-  padding: 10px 6px;
-  text-align: center;
-  position: relative;
-  transition: transform 0.15s ease;
-}
-
-.sdm-compare__sprite-card:hover {
-  transform: translateY(-2px);
-}
-
-.sdm-compare__sprite-img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-  margin: 0 auto 4px;
-  display: block;
-}
-
-.sdm-compare__sprite-name {
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sdm-compare__sprite-levels {
-  font-size: 0.64rem;
-  color: rgba(255, 255, 255, 0.75);
-  margin-top: 2px;
-}
-
-.sdm-compare__sprite-mark-btn {
-  margin-top: 6px;
-  width: 100%;
-  padding: 4px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-  border: none;
-  font-size: 0.65rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.sdm-compare__sprite-mark-btn:hover {
-  background: #00F0E8;
-  color: #060714;
-}
-
-.sdm-compare__sprite-mark-btn--owned {
-  background: #10b981 !important;
-  color: #fff !important;
-}
-
-/* ===== Responsivo Mobile para Modal de Intercambio ===== */
-@media (max-width: 600px) {
-  .sdm-compare {
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
-    border-radius: 14px;
-    max-height: 90vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    box-sizing: border-box;
-  }
-
-  .sdm-compare__body {
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  /* Single column cards on mobile to fix clipping */
-  .sdm-compare__top-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    margin-bottom: 12px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .sdm-compare__card {
-    padding: 12px;
-    gap: 8px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .sdm-compare__card-title {
-    font-size: 0.68rem;
-  }
-
-  .sdm-compare__code-badge {
-    font-size: 0.95rem;
-    padding: 5px 8px;
-    white-space: nowrap !important;
-    flex-shrink: 0;
-  }
-
-  .sdm-compare__btn-copy {
-    padding: 6px 10px;
-    font-size: 0.72rem;
-  }
-
-  .sdm-compare__btn-link {
-    font-size: 0.70rem;
-    padding: 6px 8px;
-  }
-
-  .sdm-compare__input {
-    font-size: 0.74rem;
-    padding: 7px 8px;
-  }
-
-  .sdm-compare__btn-connect {
-    padding: 7px 10px;
-    font-size: 0.74rem;
-  }
-
-  .sdm-compare__toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-  }
-
-  .sdm-compare__season-pills {
-    width: 100%;
-  }
-
-  .sdm-compare__season-pill {
-    flex: 1;
-    font-size: 0.66rem;
-    padding: 5px 4px;
-    text-align: center;
-  }
-
-  .sdm-compare__btn-trade-plan {
-    width: 100%;
-    justify-content: center;
-    font-size: 0.70rem;
-    padding: 7px 10px;
-  }
-
-  .sdm-compare__tabs {
-    flex-direction: column;
-    gap: 5px;
-    margin-bottom: 10px;
-  }
-
-  .sdm-compare__tab {
-    padding: 7px 10px;
-    font-size: 0.72rem;
-  }
-
-  .sdm-compare__grid {
-    grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
-    gap: 6px;
-    max-height: 280px;
-  }
-
-  .sdm-compare__sprite-card {
-    padding: 8px 4px;
-  }
-
-  .sdm-compare__sprite-img {
-    width: 40px;
-    height: 40px;
-  }
-
-  .sdm-compare__sprite-name {
-    font-size: 0.66rem;
-  }
-
-  .sdm-compare__sprite-levels {
-    font-size: 0.58rem;
-  }
-
-  .sdm-compare__sprite-mark-btn {
-    font-size: 0.60rem;
-    padding: 3px 2px;
-  }
-
-  .sdm-compare__waiting {
-    padding: 24px 14px;
-  }
-
-  .sdm-compare__waiting-title {
-    font-size: 0.95rem;
-  }
-
-  .sdm-compare__waiting-text {
-    font-size: 0.74rem;
   }
 }
 
@@ -8681,14 +8020,6 @@ a.app-footer__privacy-btn {
   background: rgba(8, 12, 24, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
-.sdm-friends__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.sdm-friends__title { display: inline-flex; align-items: center; gap: 7px; font-size: 0.74rem; font-weight: 800; letter-spacing: 1.4px; color: #00F0E8; }
-.sdm-friends__refresh {
-  display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 9px;
-  font-size: 0.68rem; font-weight: 700; color: rgba(226, 232, 240, 0.75);
-  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); cursor: pointer;
-}
-.sdm-friends__refresh:disabled { opacity: 0.55; cursor: default; }
 .sdm-friends__add { display: flex; gap: 8px; }
 .sdm-friends__input {
   flex: 1; min-width: 0; padding: 8px 11px; border-radius: 10px;
@@ -8734,7 +8065,6 @@ a.app-footer__privacy-btn {
   padding: 11px;
 }
 .sdm-friends__row { padding: 7px 9px; }
-.sdm-friends__title { font-size: 0.7rem; letter-spacing: 1.2px; }
 .sdm-friends__code { font-size: 0.88rem; letter-spacing: 2px; }
 .sdm-friends__input { padding: 7px 10px; font-size: 0.78rem; }
 .sdm-friends__send { padding: 7px 12px; font-size: 0.68rem; }
@@ -8742,9 +8072,6 @@ a.app-footer__privacy-btn {
 .sdm-friends__hint { font-size: 0.67rem; }
 
 @media (max-width: 480px) {
-  .sdm-compare__body {
-    padding-bottom: max(14px, env(safe-area-inset-bottom));
-  }
   .sdm-friends__plate { gap: 5px; }
 }
 
@@ -8816,7 +8143,6 @@ a.app-footer__privacy-btn {
 .sdm-friends__input { font-size: 0.78rem; color: #eef2f8; }
 .sdm-friends__send { font-size: 0.68rem; }
 .sdm-friends__aviso { font-size: 0.7rem; color: #5eead4; }
-.sdm-friends__title { color: #2ee9e0; }
 .fpage__title { font-size: 1.45rem; }
 .fpage__sub { font-size: 0.72rem; color: #9aa5b6; }
 .fpage__chip { font-size: 0.68rem; padding: 4px 9px; color: #a5e4ff; }
@@ -8874,7 +8200,6 @@ a.app-footer__privacy-btn {
   background: linear-gradient(135deg, #22d3ee, #00e0d8);
 }
 .sdm-friends__input { border-color: rgba(255, 255, 255, 0.28); }
-.sdm-friends__refresh { color: #eef3fa; }
 
 /* Segmentado de la pagina de amigos: un bloque a la vez. */
 .fpage__tabs {
@@ -9900,10 +9225,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   border-color: rgba(168, 85, 247, 0.26);
 }
 
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__title {
-  color: #e879f9;
-}
-
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__code {
   color: #e879f9;
   text-shadow: 0 0 10px rgba(217, 70, 239, 0.5);
@@ -9958,7 +9279,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 /* El foco del teclado tambien vira: la senal debe seguir siendo evidente. */
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__refresh:focus-visible,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__send:focus-visible,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tab:focus-visible,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__btn:focus-visible,
@@ -10050,16 +9370,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__preview-wrap {
   border-color: rgba(168, 85, 247, 0.24);
-}
-
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__close {
-  border-color: rgba(168, 85, 247, 0.26);
-  color: rgba(196, 181, 253, 0.9);
-}
-
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__close:hover {
-  border-color: rgba(217, 70, 239, 0.5);
-  color: #ffffff;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn {
@@ -10497,7 +9807,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   .sdm-share-pro,
   .sdm-friend-pill,
   .claim-banner,
-  .sdm-compare__waiting,
   .privacy-panel,
   .ms-variant-tag,
   .ms-level-tag,
