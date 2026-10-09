@@ -66,7 +66,6 @@ const AdminLayout = lazy(() => import('./components/admin/AdminLayout').then(m =
 const AdminAuthGate = lazy(() => import('./components/admin/AdminAuthGate').then(m => ({ default: m.AdminAuthGate })));
 const SharePage = lazy(() => import('./components/SharePage').then(m => ({ default: m.SharePage })));
 const BackupModal = lazy(() => import('./components/BackupModal').then(m => ({ default: m.BackupModal })));
-const FriendCompareModal = lazy(() => import('./components/FriendCompareModal').then(m => ({ default: m.FriendCompareModal })));
 const AuthModal = lazy(() => import('./components/AuthModal').then(m => ({ default: m.AuthModal })));
 const PrivacyPolicyModal = lazy(() => import('./components/PrivacyPolicyModal').then(m => ({ default: m.PrivacyPolicyModal })));
 
@@ -283,7 +282,6 @@ export function App() {
   const [enAmigos, setEnAmigos] = useState(() => rutaApp.indexOf('/amigos') === 0);
   const [enCompartir, setEnCompartir] = useState(() => rutaApp.indexOf('/compartir') === 0);
   const [showBackupModal, setShowBackupModal] = useState(false);
-  const [showCompareModal, setShowCompareModal] = useState(false);
   const [showFooterPrivacyModal, setShowFooterPrivacyModal] = useState(false);
 
   // Update myFriendCode when user logs in
@@ -994,8 +992,8 @@ useEffect(() => {
   })();
   const friendLendableCount = friendState ? scopedSprites.filter((s) => friendState[s.id]?.owned && !userState[s.id]?.owned).length : 0;
 
-  // Página de amigos (fase 1): ruta propia para tener espacio de verdad. La modal sigue
-  // viva en paralelo, así nadie pierde el radar mientras migramos.
+  // Página de amigos (fase 1): ruta propia para tener espacio de verdad. Es el único
+  // hogar del radar de amigos: la modal antigua ya no existe.
   // La ruta de la app se lee SIN el prefijo de idioma: /en/amigos y /amigos son la misma pantalla.
 
   useEffect(() => {
@@ -1065,14 +1063,14 @@ useEffect(() => {
     if (shouldSkipAnonymousAuth()) return undefined;
     if (safeStorage.getItem(CLAVE_AVISO_RECLAMO) === 'true') return undefined;
     const hayModalAbierto = Boolean(selectedSprite) || enCompartir || showBackupModal ||
-      showCompareModal || showFooterPrivacyModal || showAuthModal;
+      showFooterPrivacyModal || showAuthModal;
     if (hayModalAbierto) return undefined;
     const timer = setTimeout(() => {
       safeStorage.setItem(CLAVE_AVISO_RECLAMO, 'true');
       setShowAuthModal(true);
     }, AVISO_RECLAMO_RETRASO_MS);
     return () => clearTimeout(timer);
-  }, [mostrarAvisoReclamo, selectedSprite, enCompartir, showBackupModal, showCompareModal, showFooterPrivacyModal, showAuthModal]);
+  }, [mostrarAvisoReclamo, selectedSprite, enCompartir, showBackupModal, showFooterPrivacyModal, showAuthModal]);
 
   // La modal de autenticacion se dibuja en los dos arboles: la pagina de amigos retorna
   // antes de llegar a los modales de la app, y el aviso de reclamo tiene que poder abrirla
@@ -1159,7 +1157,6 @@ useEffect(() => {
               irA('/');
             }
           }}
-          onAbrirModal={() => setShowCompareModal(true)}
         />
         <Suspense fallback={null}>{modalAuth}</Suspense>
       </div>
@@ -1384,28 +1381,6 @@ useEffect(() => {
             userState={userState}
             setUserState={setUserState}
             onClose={() => setShowBackupModal(false)}
-          />
-        )}
-
-        {showCompareModal && (
-          <FriendCompareModal
-            userState={userState}
-            friendState={friendState}
-            isLiveConnected={isLiveConnected}
-            connectedFriendCode={connectedFriendCode}
-            myFriendCode={myFriendCode}
-            onOpenFriendsPage={() => irA('/amigos')}
-            activeProfile={activeProfile}
-            onSetActiveProfile={setActiveProfile}
-            onConnectFriendCode={handleConnectFriendCode}
-            onDisconnectFriend={handleDisconnectFriend}
-            onLoadFriendState={(state, sourceLabel) => {
-              setFriendState(state);
-              setActiveProfile('friend');
-              if (sourceLabel) setConnectedFriendCode(sourceLabel);
-            }}
-            onToggleOwned={handleToggleOwned}
-            onClose={() => setShowCompareModal(false)}
           />
         )}
 

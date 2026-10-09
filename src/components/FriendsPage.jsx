@@ -11,7 +11,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
 // gestionan personas y en la ficha del amigo se compara la coleccion (fase 2).
 // Reutiliza los estilos .sdm-friends que ya estaban aprobados.
-export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, onAbrirModal, codigoCargado }) {
+export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, codigoCargado }) {
   // Comparación rápida para la ficha: lo que él tiene y yo no, y al revés. Es la misma
   // idea que las listas de la modal, aquí resumida para tenerla en la página.
   const listas = useMemo(() => {
@@ -203,11 +203,6 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
                         todavia tenga como cargarla. */}
                     {!fichaCargada && (
                       <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => verColeccion(codigoFicha)}>{t('amigos.verSuColeccion')}</button>
-                    )}
-                    {onVerEnApp && (
-                      <button type="button" className="sdm-friends__btn" onClick={() => onAbrirModal && onAbrirModal()}>
-                        {t('amigos.comparacionCompleta')}
-                      </button>
                     )}
                       <button type="button" className="sdm-friends__btn" onClick={() => onVerEnApp(codigoFicha)}>
                         {t('amigos.vistaDeAmigo')}
