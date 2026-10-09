@@ -148,3 +148,12 @@ closed as AMR-06.
 A live smoke pass on `/amigos`: the button is gone, the back arrow returns to the main
 screen with no modal, the header radar button still reaches `/amigos`, and "Vista de amigo"
 still switches the profile.
+
+## Commit identities (evidence)
+
+- S1 `ac3f287` — refactor(amigos): retira del radar la modal antigua y su boton
+  (3 files, +5 / -748, includes the FriendCompareModal deletion).
+- S2 `3f4a32e` — style(amigos): borra el CSS que solo servia a la modal antigua
+  (1 file, -691).
+- S3 `47045e2` — chore(amigos): quita las claves de la modal retirada y su export huerfano
+  (4 files, +150 / -155).
