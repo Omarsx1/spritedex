@@ -9583,3 +9583,116 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   }
 
 }
+
+/* ── Guia de espiritus (vista dentro de la aplicacion) ─────────────────
+   El build sirve la misma guia como pagina estatica en dist/guia-espiritus; esto es la
+   version dentro del armazon de la app. Todo sale de los tokens del tema: ni un color nuevo.
+   Va al final del archivo para no pisar ninguna regla compartida. */
+.guia {
+  max-width: 760px;
+  margin: 0 auto;
+  /* La barra de navegacion es absoluta y termina a 64px del borde: el contenido arranca
+     debajo, con el mismo aire que la cabecera del catalogo. El inset del notch lo pone
+     .app-container. */
+  padding: 72px clamp(16px, 4vw, 32px) 80px;
+}
+
+.guia__titulo {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-size: clamp(1.65rem, 5.2vw, 2.35rem);
+  line-height: 1.15;
+  color: var(--text-bright);
+  /* El encabezado recibe el foco al entrar (tabIndex=-1): que no quede bajo la barra. */
+  scroll-margin-top: 78px;
+}
+
+.guia__lead {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.guia__seccion { margin-top: 26px; }
+
+.guia__h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-size: 1.18rem;
+  line-height: 1.25;
+  color: var(--text-bright);
+}
+
+.guia__texto,
+.guia__lista {
+  margin: 0 0 10px;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+.guia__lista { padding-left: 20px; }
+
+/* La tabla de rarezas: la primera celda nombra la fila, asi que se lee como encabezado. */
+.guia__tabla-caja {
+  margin: 12px 0 0;
+  overflow-x: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.guia__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.guia__tabla th,
+.guia__tabla td { padding: 9px 14px; text-align: left; }
+
+.guia__tabla thead th {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.guia__tabla tbody th { font-weight: 600; color: var(--text); }
+.guia__tabla tbody td { text-align: right; font-variant-numeric: tabular-nums; color: var(--text); }
+.guia__tabla tbody tr + tr th,
+.guia__tabla tbody tr + tr td { border-top: 1px solid var(--border); }
+
+/* El FAQ mantiene <details>/<summary> nativos: el triangulo es el indicador de estado. */
+.guia__faq { border-bottom: 1px solid var(--border); }
+
+.guia__resumen {
+  padding: 11px 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text-bright);
+  cursor: pointer;
+}
+
+.guia__resumen:focus-visible {
+  outline: 2px solid var(--nav-accent, #00F0E8);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.guia__faq .guia__texto {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+}
+
+.guia__nota {
+  margin: 28px 0 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--border);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}

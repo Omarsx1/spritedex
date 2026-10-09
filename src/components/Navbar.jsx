@@ -8,6 +8,16 @@ import { usuarioDeSesion, esCorreoSintetico } from '../utils/usuario';
 import { GENERATIONS } from '../data/spritesData';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { t, conIdioma, getLang } from '../i18n';
+import { RUTA_GUIA } from '../utils/rutaGuia.js';
+
+// Un clic normal: boton izquierdo, sin modificadores y sin target. Cualquier otra cosa
+// (cmd/ctrl-clic, clic central, "abrir en pestaña nueva") deja que el navegador siga el href
+// real del enlace, que es lo que mantiene vivos los enlaces del menu.
+function esClicDeNavegacion(evento) {
+  return evento.button === 0
+    && !evento.metaKey && !evento.ctrlKey && !evento.shiftKey && !evento.altKey
+    && !evento.currentTarget.target;
+}
 
 // #rrggbb -> "r,g,b", para poder usar el color de cada generacion con transparencia
 // (rgba) sin depender de color-mix, que aun no esta en todos los navegadores.
@@ -22,6 +32,7 @@ export function Navbar({
   user,
   activeGen = 2,
   onGenChange,
+  onNavegar,
   onOpenAuthModal,
   onLinkGoogle,
   onOpenBackupModal,
@@ -79,6 +90,15 @@ export function Navbar({
 
   const handleToggleAnimations = () => {
     setAnimationsEnabled((prev) => !prev);
+  };
+
+  // Los dos enlaces de ayuda son enlaces de verdad; el clic normal ademas navega dentro de la
+  // app. La ruta viaja sin el prefijo de idioma: conIdioma lo pone al armar el href.
+  const navegarEnApp = (evento, ruta) => {
+    setIsNavMenuOpen(false);
+    if (!onNavegar || !esClicDeNavegacion(evento)) return;
+    evento.preventDefault();
+    onNavegar(ruta);
   };
 
   const fullName = useMemo(() => {
@@ -422,8 +442,8 @@ export function Navbar({
 
                 <a
                   className="app-navbar__menu-action-btn"
-                  href={conIdioma('/guia-espiritus', getLang())}
-                  onClick={() => setIsNavMenuOpen(false)}
+                  href={conIdioma(RUTA_GUIA, getLang())}
+                  onClick={(evento) => navegarEnApp(evento, RUTA_GUIA)}
                 >
                   <div className="action-btn-left">
                     <BookOpen size={15} color="var(--nav-accent, #00F0E8)" />
@@ -431,10 +451,13 @@ export function Navbar({
                   </div>
                 </a>
 
+                {/* Al catalogo y no al listado estatico: dentro de la app un indice sin
+                    filtros repetiria la rejilla que el usuario ya tiene. El listado
+                    prerenderizado sigue enlazado desde el pie de las paginas estaticas. */}
                 <a
                   className="app-navbar__menu-action-btn"
-                  href={conIdioma('/espiritus', getLang())}
-                  onClick={() => setIsNavMenuOpen(false)}
+                  href={conIdioma('/', getLang())}
+                  onClick={(evento) => navegarEnApp(evento, '/')}
                 >
                   <div className="action-btn-left">
                     <Layers size={15} color="var(--nav-accent, #00F0E8)" />

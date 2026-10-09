@@ -20,6 +20,7 @@ import { PrivacyNotice } from './components/PrivacyNotice';
 import { ClaimAccountBanner } from './components/ClaimAccountBanner';
 import { InstallPrompt } from './components/InstallPrompt';
 import { FriendsPage } from './components/FriendsPage';
+import { GuiaPage } from './components/GuiaPage';
 import { MobileSpriteSwiper } from './components/MobileSpriteSwiper';
 import { FortnitemaresTransition } from './components/FortnitemaresTransition';
 import { applySeasonalTheme, isFortnitemaresActive, subscribeSeasonalState } from './config/seasonalEvent';
@@ -48,8 +49,10 @@ import {
 import { buildShareUrl } from './utils/shareUrl';
 import { getLang, conIdioma, rutaSinIdioma } from './i18n';
 import { aplicarSeoRuta } from './seo/head.js';
+import { etiquetasGuia } from './seo/contenido.js';
 import { espirituDeEnlace } from './utils/enlaceEspiritu.js';
 import { codigoFichaEnRuta } from './utils/visitaEnlace';
+import { esRutaGuia } from './utils/rutaGuia.js';
 import { codigoNormalizado } from './utils/fichaAmigo';
 import { isDeadSessionError } from './utils/deadSession';
 import { useFriendRequests } from './hooks/useFriendRequests';
@@ -67,6 +70,47 @@ const SharePage = lazy(() => import('./components/SharePage').then(m => ({ defau
 const BackupModal = lazy(() => import('./components/BackupModal').then(m => ({ default: m.BackupModal })));
 const AuthModal = lazy(() => import('./components/AuthModal').then(m => ({ default: m.AuthModal })));
 const PrivacyPolicyModal = lazy(() => import('./components/PrivacyPolicyModal').then(m => ({ default: m.PrivacyPolicyModal })));
+
+// El <head> de la guia de espiritus, dentro de la aplicacion.
+//
+// aplicarSeoRuta resuelve las etiquetas con la tabla de rutas indexables (src/seo/rutas.js), y
+// la guia no esta ahi: su respaldo la resolveria como la home y le pondria SU titulo, SU
+// canonical y noindex. Sus etiquetas salen del mismo modulo que las escribe el build en el
+// HTML estatico (etiquetasGuia, src/seo/contenido.js) y se aplican encima de las compartidas
+// (imagen social, locale, idioma del documento), asi que ningun titulo se repite aqui.
+function aplicarSeoGuia(lang) {
+  if (typeof document === 'undefined') return;
+  const { titulo, descripcion, canonical, alternates } = etiquetasGuia(lang);
+  const ponerMeta = (atributo, clave, contenido) => {
+    let nodo = document.head.querySelector('meta[' + atributo + '="' + clave + '"]');
+    if (!nodo) {
+      nodo = document.createElement('meta');
+      nodo.setAttribute(atributo, clave);
+      document.head.appendChild(nodo);
+    }
+    nodo.setAttribute('content', contenido);
+  };
+  document.title = titulo;
+  ponerMeta('name', 'description', descripcion);
+  ponerMeta('property', 'og:url', canonical);
+  ponerMeta('property', 'og:title', titulo);
+  ponerMeta('property', 'og:description', descripcion);
+  ponerMeta('name', 'twitter:title', titulo);
+  ponerMeta('name', 'twitter:description', descripcion);
+  const enlace = document.head.querySelector('link[rel="canonical"]');
+  if (enlace) enlace.setAttribute('href', canonical);
+  document.head.querySelectorAll('link[rel="alternate"][hreflang]').forEach((nodo) => nodo.remove());
+  for (const alt of alternates) {
+    const nodo = document.createElement('link');
+    nodo.rel = 'alternate';
+    nodo.hreflang = alt.hreflang;
+    nodo.href = alt.href;
+    document.head.appendChild(nodo);
+  }
+  // La guia si se indexa: fuera el noindex que deja el respaldo de la home.
+  const robots = document.head.querySelector('meta[name="robots"]');
+  if (robots) robots.remove();
+}
 
 const LOCAL_STORAGE_KEY = 'fortnite_sprites_pokedex_v3';
 const LOCAL_STATE_UPDATED_KEY = 'spritedex_state_updated_at_v1';
@@ -280,6 +324,9 @@ export function App() {
   const rutaApp = rutaSinIdioma(rutaActual);
   const [enAmigos, setEnAmigos] = useState(() => rutaApp.indexOf('/amigos') === 0);
   const [enCompartir, setEnCompartir] = useState(() => rutaApp.indexOf('/compartir') === 0);
+  // La guia vive en la misma ruta en los dos idiomas: la decision es sobre la ruta ya sin el
+  // prefijo, la misma que alimenta al catalogo.
+  const [enGuia, setEnGuia] = useState(() => esRutaGuia(rutaApp));
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [showFooterPrivacyModal, setShowFooterPrivacyModal] = useState(false);
 
@@ -1001,6 +1048,7 @@ useEffect(() => {
       const ruta = rutaSinIdioma(window.location.pathname);
       setEnAmigos(ruta.indexOf('/amigos') === 0);
       setEnCompartir(ruta.indexOf('/compartir') === 0);
+      setEnGuia(esRutaGuia(ruta));
     };
     window.addEventListener('popstate', alVolver);
     return () => window.removeEventListener('popstate', alVolver);
@@ -1012,7 +1060,8 @@ useEffect(() => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     aplicarSeoRuta(window.location.pathname, { noindex: isAdminPortal });
-  }, [enAmigos, isAdminPortal]);
+    if (enGuia && !isAdminPortal) aplicarSeoGuia(getLang());
+  }, [enAmigos, enGuia, isAdminPortal]);
 
   // Enlace profundo a un espiritu: ?s=<slug> (los CTA de las paginas estaticas) o
   // /espiritu/<slug> (la ruta que ve la app en desarrollo; en produccion la sirve el HTML
@@ -1032,6 +1081,7 @@ useEffect(() => {
     window.history.pushState({}, '', conIdioma(ruta, getLang()));
     setEnAmigos(ruta.indexOf('/amigos') === 0);
     setEnCompartir(ruta.indexOf('/compartir') === 0);
+    setEnGuia(esRutaGuia(ruta));
   }, []);
 
   // Codigo de amigo que venga en la ruta (/amigos/SDEX-XXXX) o en el enlace actual
@@ -1084,6 +1134,49 @@ useEffect(() => {
       onSignOut={handleSignOutCleanup}
     />
   ) : null;
+
+  // La barra de navegacion se dibuja en la app y en la guia: en una PWA instalada es la unica
+  // salida. Se arma una sola vez para que las dos pantallas no puedan divergir, y lleva irA
+  // para que sus enlaces naveguen dentro de la app.
+  const navbar = (
+    <Navbar
+      user={user}
+      activeGen={activeGen}
+      onGenChange={(newGen) => {
+        setActiveGen(newGen);
+        setBaseFilter('all');
+        setSpriteFilter('all');
+      }}
+      onNavegar={irA}
+      onOpenAuthModal={() => setShowAuthModal(true)}
+      onLinkGoogle={handleLinkGoogle}
+      onOpenBackupModal={() => setShowBackupModal(true)}
+      onSignOut={handleSignOutCleanup}
+      onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
+    />
+  );
+
+  // Los modales se arman una sola vez y se montan en las dos pantallas que llevan la barra
+  // (catalogo y guia): su menu los dispara, asi que dejarlos solo en el catalogo los volvia
+  // inertes en la guia.
+  const modales = (
+    <Suspense fallback={null}>
+      {showBackupModal && (
+        <BackupModal
+          userState={userState}
+          setUserState={setUserState}
+          onClose={() => setShowBackupModal(false)}
+        />
+      )}
+
+      {/* Tambien con sesion anonima: es la unica via para vincular la cuenta. */}
+      {modalAuth}
+
+      {showFooterPrivacyModal && (
+        <PrivacyPolicyModal onClose={() => setShowFooterPrivacyModal(false)} />
+      )}
+    </Suspense>
+  );
 
   if (enCompartir) {
     return (
@@ -1162,6 +1255,19 @@ useEffect(() => {
     );
   }
 
+  // La guia de espiritus: la misma que sirve el build en /guia-espiritus, ahora dentro de la
+  // app. Se queda la barra de navegacion (su menu es la vuelta al catalogo) y no se pinta ni
+  // la cabecera ni la rejilla, que son del catalogo.
+  if (enGuia) {
+    return (
+      <div className="app-container">
+        {navbar}
+        <GuiaPage lang={getLang()} />
+        {modales}
+      </div>
+    );
+  }
+
   // Render Admin Portal if secret path or query parameter is active
   if (isAdminPortal) {
     if (!isAdminAuth) {
@@ -1214,20 +1320,7 @@ useEffect(() => {
       <PrivacyNotice />
       <InstallPrompt />
 
-      <Navbar
-        user={user}
-        activeGen={activeGen}
-        onGenChange={(newGen) => {
-          setActiveGen(newGen);
-          setBaseFilter('all');
-          setSpriteFilter('all');
-        }}
-        onOpenAuthModal={() => setShowAuthModal(true)}
-        onLinkGoogle={handleLinkGoogle}
-        onOpenBackupModal={() => setShowBackupModal(true)}
-        onSignOut={handleSignOutCleanup}
-        onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
-      />
+      {navbar}
 
       <Header
         spritesPool={scopedSprites}
@@ -1375,22 +1468,7 @@ useEffect(() => {
         />
       )}
 
-      <Suspense fallback={null}>
-        {showBackupModal && (
-          <BackupModal
-            userState={userState}
-            setUserState={setUserState}
-            onClose={() => setShowBackupModal(false)}
-          />
-        )}
-
-        {/* Tambien con sesion anonima: es la unica via para vincular la cuenta. */}
-        {modalAuth}
-
-        {showFooterPrivacyModal && (
-          <PrivacyPolicyModal onClose={() => setShowFooterPrivacyModal(false)} />
-        )}
-      </Suspense>
+      {modales}
 
     </div>
   );
