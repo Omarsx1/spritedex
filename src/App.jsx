@@ -19,7 +19,6 @@ import { SpriteDetailModal } from './components/SpriteDetailModal';
 import { PrivacyNotice } from './components/PrivacyNotice';
 import { ClaimAccountBanner } from './components/ClaimAccountBanner';
 import { InstallPrompt } from './components/InstallPrompt';
-import { Footer } from './components/Footer';
 import { FriendsPage } from './components/FriendsPage';
 import { MobileSpriteSwiper } from './components/MobileSpriteSwiper';
 import { FortnitemaresTransition } from './components/FortnitemaresTransition';
@@ -1227,6 +1226,7 @@ useEffect(() => {
         onLinkGoogle={handleLinkGoogle}
         onOpenBackupModal={() => setShowBackupModal(true)}
         onSignOut={handleSignOutCleanup}
+        onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
       />
 
       <Header
@@ -1392,10 +1392,6 @@ useEffect(() => {
         )}
       </Suspense>
 
-      <Footer
-        totalSprites={totalCount}
-        onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
-      />
     </div>
   );
 }

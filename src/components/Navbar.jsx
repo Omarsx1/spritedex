@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Download, User, UserPlus, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone, AlertTriangle, Mail } from 'lucide-react';
+import { Download, User, UserPlus, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone, AlertTriangle, Mail, BookOpen } from 'lucide-react';
 import { Google } from './ui/Google';
 import { getSupabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
@@ -7,7 +7,7 @@ import { safeStorage } from '../utils/safeStorage';
 import { usuarioDeSesion, esCorreoSintetico } from '../utils/usuario';
 import { GENERATIONS } from '../data/spritesData';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { t } from '../i18n';
+import { t, conIdioma, getLang } from '../i18n';
 
 // #rrggbb -> "r,g,b", para poder usar el color de cada generacion con transparencia
 // (rgba) sin depender de color-mix, que aun no esta en todos los navegadores.
@@ -25,7 +25,8 @@ export function Navbar({
   onOpenAuthModal,
   onLinkGoogle,
   onOpenBackupModal,
-  onSignOut
+  onSignOut,
+  onOpenPrivacy
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
@@ -58,6 +59,9 @@ export function Navbar({
   });
   const userDropdownRef = useRef(null);
   const navMenuRef = useRef(null);
+  // Disparadores de cada desplegable: a donde vuelve el foco cuando Escape lo cierra.
+  const userTriggerRef = useRef(null);
+  const navTriggerRef = useRef(null);
 
   // Sincroniza preferencia persistente de animaciones en DOM y localStorage
   useEffect(() => {
@@ -130,6 +134,27 @@ export function Navbar({
     };
   }, []);
 
+  // Escape cierra el desplegable abierto y devuelve el foco a su disparador. Antes solo
+  // se cerraban con clic fuera, asi que por teclado no habia salida (lo cubria el pie).
+  useEffect(() => {
+    if (!isUserMenuOpen && !isNavMenuOpen) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key !== 'Escape') return;
+      if (isUserMenuOpen) {
+        setIsUserMenuOpen(false);
+        userTriggerRef.current?.focus();
+      }
+      if (isNavMenuOpen) {
+        setIsNavMenuOpen(false);
+        navTriggerRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isUserMenuOpen, isNavMenuOpen]);
+
   const handleAvatarClick = () => {
     if (user) {
       setIsUserMenuOpen((prev) => !prev);
@@ -191,6 +216,7 @@ export function Navbar({
         {/* Avatar / Usuario (Solo Foto o Inicial Circular) */}
         <div ref={userDropdownRef} style={{ position: 'relative' }}>
           <button
+            ref={userTriggerRef}
             className={`app-navbar__avatar ${user ? 'is-logged' : ''} ${isUserMenuOpen ? 'is-active' : ''}`}
             onClick={handleAvatarClick}
             title={user ? t('nav.conectadoComo', { nombre: nombreCorto }) : t('nav.iniciarSesionTitulo')}
@@ -294,6 +320,7 @@ export function Navbar({
         {/* Botón Menú Hamburguesa */}
         <div ref={navMenuRef} style={{ position: 'relative' }}>
           <button
+            ref={navTriggerRef}
             className={`app-navbar__menu-btn ${isNavMenuOpen ? 'is-active' : ''}`}
             onClick={() => { setIsNavMenuOpen((prev) => !prev); setIsUserMenuOpen(false); }}
             title={t('nav.menu')}
@@ -380,6 +407,53 @@ export function Navbar({
                 </button>
 
                 </div>
+              </div>
+
+              <div className="app-navbar__dropdown-divider" />
+
+              {/* Sección Ayuda y legal. Los tres enlaces ya no viven en un pie: los lleva
+                  el menu, que existe en ambos breakpoints. El enlazado rastreable de las
+                  paginas prerenderizadas lo sigue dando el pie estatico de seo/plantilla.js. */}
+              <div className="app-navbar__menu-section">
+                <div className="app-navbar__menu-section-label">
+                  <Sparkles size={13} />
+                  <span>{t('nav.ayudaLegal')}</span>
+                </div>
+
+                <a
+                  className="app-navbar__menu-action-btn"
+                  href={conIdioma('/guia-espiritus', getLang())}
+                  onClick={() => setIsNavMenuOpen(false)}
+                >
+                  <div className="action-btn-left">
+                    <BookOpen size={15} color="var(--nav-accent, #00F0E8)" />
+                    <span>{t('nav.guiaEspiritus')}</span>
+                  </div>
+                </a>
+
+                <a
+                  className="app-navbar__menu-action-btn"
+                  href={conIdioma('/espiritus', getLang())}
+                  onClick={() => setIsNavMenuOpen(false)}
+                >
+                  <div className="action-btn-left">
+                    <Layers size={15} color="var(--nav-accent, #00F0E8)" />
+                    <span>{t('nav.todosLosEspiritus')}</span>
+                  </div>
+                </a>
+
+                <button
+                  type="button"
+                  className="app-navbar__menu-action-btn"
+                  onClick={() => { setIsNavMenuOpen(false); onOpenPrivacy?.(); }}
+                >
+                  <div className="action-btn-left">
+                    <ShieldCheck size={15} />
+                    <span>{t('nav.cookiesPrivacidad')}</span>
+                  </div>
+                </button>
+
+                <p className="app-navbar__menu-copy">© {new Date().getFullYear()} {t('nav.copyright')}</p>
               </div>
             </div>
           )}
