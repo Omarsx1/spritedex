@@ -16,6 +16,7 @@ import { htmlPaginaEspiritu, htmlHubEspiritus, rutaEspiritu, rutaHubEspiritus, r
 import { slugDeEspiritu } from '../src/seo/espiritus.js';
 import { htmlGuia, htmlAcerca, htmlNovedades, etiquetasGuia, etiquetasAcerca, etiquetasNovedades } from '../src/seo/contenido.js';
 import { RUTAS_CONTENIDO } from '../src/seo/plantilla.js';
+import { datosGuia } from '../src/seo/guiaDatos.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DIST = path.join(ROOT, 'dist');
@@ -124,30 +125,6 @@ function construirFichas(sprites, pickTexto) {
     }
     };
   });
-}
-
-// Numeros reales de la coleccion para la guia: nada inventado, todo contado aqui.
-function datosGuia(sprites) {
-  const cuenta = (clave) => {
-    const mapa = new Map();
-    for (const s of sprites) {
-      const k = s[clave] || '';
-      mapa.set(k, (mapa.get(k) || 0) + 1);
-    }
-    return [...mapa.entries()].map(([nombre, n]) => ({ nombre, n })).sort((a, b) => b.n - a.n);
-  };
-  const numeros = sprites
-    .map((s) => Number(String(s.dropChanceDisplay || '').replace('%', '').replace(',', '.')))
-    .filter((n) => Number.isFinite(n) && n > 0);
-  return {
-    total: sprites.length,
-    familias: new Set(sprites.map((s) => s.familyId)).size,
-    porRareza: cuenta('rarity'),
-    costos: new Set(sprites.map((s) => s.summonCost).filter(Boolean)).size,
-    dropMin: numeros.length ? Math.min(...numeros) : 0,
-    dropMax: numeros.length ? Math.max(...numeros) : 0,
-    fecha: new Date().toISOString().slice(0, 10)
-  };
 }
 
 function ultimosEspiritus(fichas) {
