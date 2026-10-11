@@ -87,5 +87,6 @@ desktop (y al revés) **sin abrir la app de nuevo ni recargar la web**.
   esperar hasta 10 s.
 
 ## Evidencia
-- Commit de la implementación en la rama `codex/sync-en-vivo` (ver el commit
-  `docs(sync): anota el commit de la implementación`).
+- Implementación: `5d6f077` — feat(sync): el desktop se pone al dia solo, sin recargar (rama
+  `codex/sync-en-vivo-prod`, cherry-pick sobre `origin/main`, subida a producción).
+- Rama de desarrollo original: `codex/sync-en-vivo` (sobre el trabajo sin subir del menú/guía).
