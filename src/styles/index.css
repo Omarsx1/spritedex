@@ -5088,11 +5088,11 @@ body:has(.modal-overlay) {
 
 .sdm__close {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 10px;
+  right: 10px;
   z-index: 10;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(0, 0, 0, 0.5);
@@ -5108,6 +5108,13 @@ body:has(.modal-overlay) {
 .sdm__close:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: rotate(90deg);
+}
+
+.sdm__close:focus-visible,
+.sdm__variant-select:focus-visible,
+.sdm__vlvl:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
 }
 
 /* ── Hero Header ── */
@@ -5142,13 +5149,17 @@ body:has(.modal-overlay) {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.sdm__crown.sdm__crown--jonesy {
+  top: 14px;
+}
+
 .sdm__crown {
   position: absolute;
-  top: 2px;
-  left: 53%;
+  top: 10px;
+  left: 60%;
   transform: translateX(-50%);
-  width: 30px;
-  height: 20px;
+  width: 23px;
+  height: 13px;
   z-index: 5;
   filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
 }
@@ -5156,6 +5167,7 @@ body:has(.modal-overlay) {
 .sdm__hero-img {
   max-width: 88%;
   max-height: 88%;
+  transform: translateY(5px);
   object-fit: contain;
   filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));
   transition: filter 0.3s ease;
@@ -5179,12 +5191,6 @@ body:has(.modal-overlay) {
   margin-bottom: 8px;
 }
 
-.sdm__drop {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.55);
-}
-
 .sdm__name {
   font-family: var(--font-heading);
   font-size: 1.8rem;
@@ -5195,8 +5201,8 @@ body:has(.modal-overlay) {
 }
 
 .sdm__meta {
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.75);
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -5208,10 +5214,6 @@ body:has(.modal-overlay) {
   font-weight: 800;
 }
 
-.sdm__meta-lvl--mastered {
-  color: #facc15;
-  font-weight: 900;
-}
 
 /* ── Body panels ── */
 .sdm__body {
@@ -5229,24 +5231,9 @@ body:has(.modal-overlay) {
   padding: 16px;
 }
 
-.sdm__card-row {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-
-.sdm__icon {
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.sdm__icon--yellow { color: #eab308; }
-.sdm__icon--blue { color: #3b82f6; }
-.sdm__icon--pink { color: #ec4899; }
-
 .sdm__card-label {
   display: block;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 1.5px;
   color: #fde047;
@@ -5254,8 +5241,9 @@ body:has(.modal-overlay) {
 }
 
 .sdm__card-text {
-  font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
   line-height: 1.5;
 }
 
@@ -5328,31 +5316,32 @@ body:has(.modal-overlay) {
 }
 
 .sdm__progress-title {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 1.5px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.78);
   text-transform: uppercase;
 }
 
 .sdm__progress-count {
   margin-left: auto;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .sdm__progress-track {
-  height: 4px;
+  height: 5px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.12);
   overflow: hidden;
 }
 
 .sdm__progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #6366f1, #ec4899);
+  background: linear-gradient(90deg, #22d3ee 0%, #818cf8 55%, #c084fc 100%);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -5366,14 +5355,31 @@ body:has(.modal-overlay) {
   overflow-y: auto;
 }
 
+@media (min-width: 1024px) {
+  .sdm {
+    max-width: 900px;
+  }
+
+  .sdm__variants {
+    gap: 8px;
+    padding: 16px 20px 20px;
+  }
+
+  .sdm__variant {
+    padding: 10px 6px 8px;
+  }
+}
+
 .sdm__variant {
   border-radius: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 10px 8px 8px;
   text-align: center;
   transition: all 0.2s ease;
   position: relative;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
 .sdm__variant:hover {
@@ -5381,9 +5387,9 @@ body:has(.modal-overlay) {
   border-color: rgba(255, 255, 255, 0.4);
 }
 
-.sdm__variant--selected {
-  border-color: #ffffff !important;
-  box-shadow: 0 0 16px rgba(255, 255, 255, 0.25), 0 4px 14px rgba(0, 0, 0, 0.5) !important;
+.sdm__variant.sdm__variant--selected {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px #6C7780, 0 6px 14px rgba(0, 0, 0, 0.45);
 }
 
 .sdm__variant--owned {
@@ -5395,9 +5401,9 @@ body:has(.modal-overlay) {
 }
 
 .sdm__variant-img-wrap {
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 6px;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5407,11 +5413,11 @@ body:has(.modal-overlay) {
 
 .sdm__variant-crown {
   position: absolute;
-  top: -2px;
-  left: 53%;
+  top: 1px;
+  left: 65%;
   transform: translateX(-50%);
-  width: 22px;
-  height: 15px;
+  width: 12px;
+  height: 8px;
   z-index: 5;
   filter: drop-shadow(0 0 3px #000);
 }
@@ -5432,78 +5438,70 @@ body:has(.modal-overlay) {
   transform: scale(1.08);
 }
 
+.sdm__variant-select {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
 .sdm__variant-name {
   display: block;
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: 0.82rem;
+  font-weight: 400;
   color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  line-height: 1.25;
+  min-height: 2.5em;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sdm__variant-drop {
   display: block;
-  font-size: 0.66rem;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
   margin-top: 2px;
-}
-
-.sdm__variant-status {
-  margin-top: 5px;
-  cursor: pointer;
-}
-
-.sdm__pill {
-  display: inline-block;
-  font-size: 0.64rem;
-  font-weight: 800;
-  padding: 2px 7px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.4);
-  transition: all 0.15s ease;
-}
-
-.sdm__pill--green {
-  background: #10b981;
-  color: #fff;
-}
-
-.sdm__pill--gold {
-  background: linear-gradient(135deg, #facc15, #ef4444);
-  color: #000;
-}
-
-.sdm__pill--unreleased {
-  background: rgba(148, 163, 184, 0.12) !important;
-  color: rgba(148, 163, 184, 0.75) !important;
-  border: 1px dashed rgba(148, 163, 184, 0.35) !important;
 }
 
 .sdm__variant-levels {
   display: flex;
-  gap: 2px;
-  margin-top: 5px;
+  gap: 4px;
+  margin-top: 8px;
 }
 
 .sdm__vlvl {
   flex: 1;
-  padding: 3px 0;
+  height: 22px;
+  padding: 0;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.2);
-  font-size: 0.58rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.7rem;
   font-weight: 900;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .sdm__vlvl--active {
-  background: #10b981;
+  background: #047857;
   color: #fff;
-  border-color: #34d399;
+  border-color: #10b981;
 }
 
 .sdm__vlvl--gold {
@@ -5573,8 +5571,8 @@ body:has(.modal-overlay) {
   }
 
   .sdm__variant-img-wrap {
-    width: 44px;
-    height: 44px;
+    width: 56px;
+    height: 56px;
   }
 }
 
@@ -7553,22 +7551,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   50% { opacity: 1; transform: translateX(3px); }
 }
 
-/* Enlace a la ficha publica del espiritu, dentro del detalle. */
-.sdm__ficha {
-  display: inline-block;
-  margin-top: 6px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: rgba(0, 240, 232, 0.85);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(0, 240, 232, 0.35);
-}
-
-.sdm__ficha:hover {
-  color: #ffffff;
-  border-bottom-color: #ffffff;
-}
-
 /* ===== PWA INSTALL PROMPT (CYBER GLITCH BANNER) ===== */
 .install-prompt-overlay {
   position: fixed;
@@ -8584,23 +8566,42 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
   /* Emergen cuando el wordmark ya esta asentandose: el split RGB aterriza
      despues del bloom, no de golpe. */
   transition: opacity 600ms ease 380ms;
-  animation: hero-glitch-r steps(1, end) infinite;
+  animation: fnm-ghost-glitch-r steps(1, end) infinite;
   animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
 }
 
 .hero__title[data-fnm-logo='themed'] .hero__title-fnm-ghost--b {
   opacity: 0.75;
   transition: opacity 600ms ease 460ms;
-  animation: hero-glitch-b steps(1, end) infinite;
+  animation: fnm-ghost-glitch-b steps(1, end) infinite;
   animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
   animation-delay: 0.07s;
 }
 
-/* En movil el desplazamiento del split (fijo en px) es grande frente al logo y
-   deja manchas de color detras; el logo se queda limpio. */
+/* En reposo los fantasmas son invisibles: solo aparecen durante el hipo. */
+@keyframes fnm-ghost-glitch-r {
+  0%, 90%     { transform: translateX(calc(-0.1rem * var(--fnm-ghost-k, 1))); opacity: 0; }
+  90.7%       { transform: translateX(calc(-0.65rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
+  91.4%       { transform: translateX(calc(0.2rem * var(--fnm-ghost-k, 1))) translateY(-0.02rem); opacity: 0.8; }
+  92.1%       { transform: translateX(calc(-0.15rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
+  92.8%       { transform: translateX(calc(-0.85rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
+  93.5%, 100% { transform: translateX(calc(-0.1rem * var(--fnm-ghost-k, 1))); opacity: 0; }
+}
+
+@keyframes fnm-ghost-glitch-b {
+  0%, 90%     { transform: translateX(calc(0.1rem * var(--fnm-ghost-k, 1))); opacity: 0; }
+  90.7%       { transform: translateX(calc(0.65rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
+  91.4%       { transform: translateX(calc(-0.2rem * var(--fnm-ghost-k, 1))) translateY(0.02rem); opacity: 0.8; }
+  92.1%       { transform: translateX(calc(0.15rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
+  92.8%       { transform: translateX(calc(0.85rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
+  93.5%, 100% { transform: translateX(calc(0.1rem * var(--fnm-ghost-k, 1))); opacity: 0; }
+}
+
+/* En movil el logo es mas chico: el desplazamiento del split se reduce a la mitad
+   en vez de ocultarse. */
 @media (max-width: 768px) {
   .hero__title-fnm-ghosts {
-    display: none;
+    --fnm-ghost-k: 0.5;
   }
 }
 
@@ -9560,6 +9561,40 @@ body .swal2-container.swal2-bottom {
 
 .ms-spotlight-card[data-familia="vampire"] .ms-card__crown {
   top: 10px;
+}
+
+/* ==========================================================================
+   MODAL DE ESPIRITU EN TEMPORADA
+   Misma receta que Exportar y Amigos: violeta de noche en superficies, fucsia
+   en acentos. El color de rareza del heroe y de cada variante es identidad del
+   espiritu (va inline) y no se toca; el verde de atrapado y el dorado de
+   maxeado son semanticos y tampoco.
+   ========================================================================== */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm {
+  background: rgba(24, 34, 46, 0.96);
+  border-color: rgba(108, 119, 128, 0.45);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm__close {
+  background: rgba(24, 34, 46, 0.7);
+  border-color: rgba(168, 85, 247, 0.35);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm__meta {
+  color: rgba(221, 214, 254, 0.85);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm__card {
+  background: rgba(24, 34, 46, 0.72);
+  border-color: rgba(108, 119, 128, 0.3);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm__progress-title {
+  color: #c4b5fd;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm__progress-count {
+  color: rgba(196, 181, 253, 0.7);
 }
 
 /* ==========================================================================
