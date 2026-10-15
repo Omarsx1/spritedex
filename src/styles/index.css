@@ -8188,9 +8188,86 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   .lang-switch__btn { min-width: 26px; font-size: 0.62rem; }
 }
 
-/* Selector de idioma en la cabecera de la pagina de amigos */
-.fpage__lang {
-  margin-left: 4px;
+.lang-switch__sep {
+  display: none;
+}
+
+/* Escritorio: capsula de cristal oscuro para que el texto inactivo se lea sobre cualquier fondo. */
+@media (min-width: 769px) {
+  .lang-switch {
+    padding: 3px;
+    border-radius: 9999px;
+    background: rgba(12, 14, 22, 0.62);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 6px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .lang-switch__btn {
+    min-width: 36px;
+    padding: 5px 10px;
+    border-radius: 9999px;
+    color: rgba(226, 232, 240, 0.72);
+    font-size: 0.72rem;
+  }
+
+  .lang-switch__btn:hover {
+    color: #ffffff;
+  }
+
+  .lang-switch__btn.is-active {
+    background: linear-gradient(135deg, #22e6dc, #7dd3fc);
+    color: #06161c;
+    box-shadow: 0 0 12px rgba(34, 230, 220, 0.35);
+  }
+}
+
+/* Movil: texto "ES / EN" dentro de un marco fino; el activo va en cian sin relleno. */
+@media (max-width: 768px) {
+  .lang-switch {
+    gap: 0;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: rgba(12, 14, 22, 0.45);
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+
+  .lang-switch__btn {
+    min-width: 0;
+    padding: 0;
+    color: rgba(203, 213, 225, 0.55);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .lang-switch__btn:hover {
+    color: #e8edf5;
+  }
+
+  .lang-switch__btn.is-active {
+    background: transparent;
+    color: #22e6dc;
+    text-shadow: 0 0 8px rgba(34, 230, 220, 0.45);
+  }
+
+  .lang-switch__sep {
+    display: inline;
+    margin: 0 6px;
+    color: rgba(203, 213, 225, 0.5);
+    font-size: 0.78rem;
+    font-weight: 500;
+  }
+}
+
+/* Refrescar e idioma van juntos a la derecha, con aire propio frente al titulo */
+.fpage__tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .fpage__lang .lang-switch__btn {
@@ -8199,7 +8276,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 /* Aviso de lo que implica compartir el enlace: mismo sitio que el resto de la ficha */
 .sdm-friends__hint--aviso {
-  color: #ffd166;
+  color: #c4b5fd;
 }
 
 /* En la ficha compartida los botones son tres y largos: cuando la fila parte, el grupo se
