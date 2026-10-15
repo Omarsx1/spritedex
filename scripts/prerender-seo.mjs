@@ -206,7 +206,10 @@ async function main() {
       const conIdioma = canonicalDe(entrada.ruta, lang).slice(SITIO.length);
       const destino = conIdioma === '/' ? fuente : path.join(DIST, conIdioma.slice(1), 'index.html');
       fs.mkdirSync(path.dirname(destino), { recursive: true });
-      fs.writeFileSync(destino, base.replace('</head>', '    ' + bloqueHead({ ...entrada, lang }) + '\n  </head>'));
+      const html = base
+        .replace(/<html lang="[^"]*"/, '<html lang="' + lang + '"')
+        .replace('</head>', '    ' + bloqueHead({ ...entrada, lang }) + '\n  </head>');
+      fs.writeFileSync(destino, html);
       escritas.push(conIdioma);
     }
   }
