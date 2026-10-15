@@ -616,6 +616,9 @@ function getSpiritHue(sprite) {
   return '#00F0E8';
 }
 
+// A 1x las fichas (~36 px de lado en la lona) se emborronan al hacer zoom en el movil.
+const EXPORT_SCALE = 2;
+
 export async function generateSpritedexCardImage({
   spritesList,
   userState,
@@ -899,7 +902,7 @@ const ESPIRITU_FALTANTE_TINTE = 'rgb(132, 138, 158)';
 // ~3 ms por espiritu: la lona de 64 fichas pasaba de 241 ms a 829 ms de dibujo.
 let lienzoApagado = null;
 function dibujarEspirituApagado(ctx, img, x, y, tamano) {
-  const lado = Math.max(1, Math.round(tamano));
+  const lado = Math.max(1, Math.round(tamano * EXPORT_SCALE));
   if (!lienzoApagado) lienzoApagado = document.createElement('canvas');
   if (lienzoApagado.width !== lado || lienzoApagado.height !== lado) {
     lienzoApagado.width = lado;
@@ -1137,9 +1140,10 @@ async function renderGlitchOverrideTemplate({
       // el relleno se pierde. Se usa como mascara y se pinta con un degradado claro, asi el
       // wordmark se lee igual que en la key art (que va sobre magenta).
       const capaLogo = document.createElement('canvas');
-      capaLogo.width = logoW;
-      capaLogo.height = logoH;
+      capaLogo.width = logoW * EXPORT_SCALE;
+      capaLogo.height = logoH * EXPORT_SCALE;
       const ctxLogo = capaLogo.getContext('2d');
+      ctxLogo.setTransform(EXPORT_SCALE, 0, 0, EXPORT_SCALE, 0, 0);
       ctxLogo.drawImage(fuenteLogo, 0, 0, logoW, logoH);
       ctxLogo.globalCompositeOperation = 'source-in';
       const gradLogo = ctxLogo.createLinearGradient(0, 0, 0, logoH);
@@ -1179,9 +1183,10 @@ async function renderGlitchOverrideTemplate({
 
   const availH = height - headerH - footerH;
 
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = width * EXPORT_SCALE;
+  canvas.height = height * EXPORT_SCALE;
   const ctx = canvas.getContext('2d');
+  ctx.setTransform(EXPORT_SCALE, 0, 0, EXPORT_SCALE, 0, 0);
 
   // Crear el lienzo de 1280x2515 ya se nota: respiro antes de empezar a pintar.
   await cederTurno();
@@ -1233,14 +1238,14 @@ async function renderGlitchOverrideTemplate({
     // nitido encima, asi que las letras no se lavan con la suma.
     ctx.save();
     ctx.shadowColor = 'rgba(192, 38, 211, 0.34)';
-    ctx.shadowBlur = Math.round(logoH * 0.42);
-    ctx.drawImage(logoMaresListo.capa, logoX, logoY);
+    ctx.shadowBlur = (Math.round(logoH * 0.42)) * EXPORT_SCALE;
+    ctx.drawImage(logoMaresListo.capa, logoX, logoY, logoMaresListo.w, logoMaresListo.h);
     ctx.shadowColor = 'rgba(232, 121, 249, 0.42)';
-    ctx.shadowBlur = Math.round(logoH * 0.2);
-    ctx.drawImage(logoMaresListo.capa, logoX, logoY);
+    ctx.shadowBlur = (Math.round(logoH * 0.2)) * EXPORT_SCALE;
+    ctx.drawImage(logoMaresListo.capa, logoX, logoY, logoMaresListo.w, logoMaresListo.h);
     ctx.shadowColor = 'rgba(232, 121, 249, 0.45)';
-    ctx.shadowBlur = 18;
-    ctx.drawImage(logoMaresListo.capa, logoX, logoY);
+    ctx.shadowBlur = 18 * EXPORT_SCALE;
+    ctx.drawImage(logoMaresListo.capa, logoX, logoY, logoMaresListo.w, logoMaresListo.h);
     ctx.shadowBlur = 0;
     ctx.restore();
     // La capsula se ancla al borde visible de las letras, no al lienzo del SVG.
@@ -1252,7 +1257,7 @@ async function renderGlitchOverrideTemplate({
     ctx.textAlign = 'center';
     ctx.letterSpacing = '3px';
     ctx.shadowColor = acentoCabeceraRgba;
-    ctx.shadowBlur = 8;
+    ctx.shadowBlur = 8 * EXPORT_SCALE;
     const topTextY = Math.round(34 * Math.min(1.15, scale));
     ctx.fillText(enTemporada ? t('lona.arribaMares') : t('lona.arriba'), width / 2, topTextY);
 
@@ -1273,7 +1278,7 @@ async function renderGlitchOverrideTemplate({
 
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
-    ctx.shadowBlur = 14;
+    ctx.shadowBlur = 14 * EXPORT_SCALE;
     ctx.fillText(titleText, width / 2, titleY);
     ctx.shadowBlur = 0;
   }
@@ -1295,7 +1300,7 @@ async function renderGlitchOverrideTemplate({
   capsuleGrad.addColorStop(1, '#d90429');
   ctx.save();
   ctx.shadowColor = 'rgba(255, 0, 85, 0.45)';
-  ctx.shadowBlur = 10;
+  ctx.shadowBlur = 10 * EXPORT_SCALE;
   ctx.fillStyle = capsuleGrad;
   ctx.fill();
   ctx.restore();
@@ -1392,7 +1397,7 @@ async function renderGlitchOverrideTemplate({
     grad.addColorStop(1, '#00F0E8');
     ctx.fillStyle = grad;
     ctx.shadowColor = 'rgba(255, 0, 85, 0.55)';
-    ctx.shadowBlur = 8;
+    ctx.shadowBlur = 8 * EXPORT_SCALE;
     ctx.fill();
     ctx.shadowBlur = 0;
 
@@ -1406,7 +1411,7 @@ async function renderGlitchOverrideTemplate({
     // Remate luminoso: el borde del avance queda encendido, como el cabezal del medidor.
     ctx.save();
     ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-    ctx.shadowBlur = 7;
+    ctx.shadowBlur = 7 * EXPORT_SCALE;
     ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
     ctx.fillRect(barX + fillW - 1.5, barY + 1, 2, barH - 2);
     ctx.restore();
@@ -1600,7 +1605,7 @@ async function renderGlitchOverrideTemplate({
         // Resplandor directo sobre la silueta del espíritu
         const imgShadowBlur = Math.max(8, Math.min(16, Math.round(cardW * 0.07)));
         ctx.shadowColor = hexToRgba(glowColor, isMastered ? 0.80 : 0.65);
-        ctx.shadowBlur = imgShadowBlur;
+        ctx.shadowBlur = (imgShadowBlur) * EXPORT_SCALE;
         ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
         ctx.shadowBlur = 0;
       } else {
@@ -1641,8 +1646,8 @@ async function renderGlitchOverrideTemplate({
     // (la pertenencia ya la cuentan el borde, el badge y el propio espiritu apagado).
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
-    ctx.shadowBlur = 4;
-    ctx.shadowOffsetY = 1;
+    ctx.shadowBlur = 4 * EXPORT_SCALE;
+    ctx.shadowOffsetY = 1 * EXPORT_SCALE;
 
     const nameFit = getSpriteNameLines(
       ctx,
@@ -1745,8 +1750,8 @@ async function renderGlitchOverrideTemplate({
     if (isMastered && coronaImg && altoCorona >= PISO_ESTADO) {
       ctx.save();
       ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
-      ctx.shadowBlur = 5;
-      ctx.shadowOffsetY = 2;
+      ctx.shadowBlur = 5 * EXPORT_SCALE;
+      ctx.shadowOffsetY = 2 * EXPORT_SCALE;
       ctx.translate(derecha - anchoCorona / 2, estadoY);
       ctx.rotate(-CORONA_INCLINACION);
       ctx.drawImage(coronaImg, -anchoCorona / 2, -altoCorona / 2, anchoCorona, altoCorona);
@@ -1784,7 +1789,7 @@ async function renderGlitchOverrideTemplate({
     ctx.font = `800 ${tamanioPie}px "Outfit", "Inter", sans-serif`;
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(0, 240, 232, 0.45)';
-    ctx.shadowBlur = 10;
+    ctx.shadowBlur = 10 * EXPORT_SCALE;
     ctx.fillText(textoFirma, footerPadX, baseFilaY);
   }
   ctx.restore();
