@@ -54,6 +54,7 @@ import { espirituDeEnlace } from './utils/enlaceEspiritu.js';
 import { codigoFichaEnRuta } from './utils/visitaEnlace';
 import { esRutaGuia } from './utils/rutaGuia.js';
 import { codigoNormalizado } from './utils/fichaAmigo';
+import { firmaGuardada } from './utils/firmaUsuario';
 import { isDeadSessionError } from './utils/deadSession';
 import { useFriendRequests } from './hooks/useFriendRequests';
 
@@ -1069,7 +1070,8 @@ useEffect(() => {
           if (document.visibilityState !== 'visible') return;
           const { getCanvasCacheKey, readCachedCapture, writeCachedCapture, generateSpritedexCardImage, getOrStartCapture, globalCanvasCache, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } = await import('./utils/canvasExporter');
           const ownedInScope = scopedSprites.filter((s) => userState[s.id]?.owned).length;
-          const key = getCanvasCacheKey(DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE, scopedSprites.length, ownedInScope, scopedSprites, userState);
+          const firma = firmaGuardada();
+          const key = getCanvasCacheKey(DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE, scopedSprites.length, ownedInScope, scopedSprites, userState, firma);
           // Si esta clave ya esta dibujada en memoria, no hay nada que hacer. Sin esta
           // salida, cada cambio de estado lanzaba otro precálculo y la clave vigente se
           // quedaba a medias: la modal abria con espera en vez de al instante.
@@ -1080,7 +1082,8 @@ useEffect(() => {
             spritesList: scopedSprites,
             userState,
             format: DEFAULT_EXPORT_FORMAT,
-            bgStyle: DEFAULT_EXPORT_BG_STYLE
+            bgStyle: DEFAULT_EXPORT_BG_STYLE,
+            usuario: firma
           }));
           const enc = await res.encode();
           if (enc?.blob) await writeCachedCapture(key, enc.blob);
