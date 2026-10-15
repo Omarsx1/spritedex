@@ -348,7 +348,7 @@ export default {
   "nav.cerrarSesion": "Cerrar Sesión",
   "nav.conectadoComo": "Conectado como {nombre}",
   "nav.cookiesPrivacidad": "Cookies & Privacidad",
-  "nav.copyright": "Spritedex · Colección de Espíritus · Creado para la comunidad",
+  "nav.copyright": "Spritedex. Todos los derechos reservados.",
   "nav.cuentaUsuario": "Cuenta de usuario",
   "nav.desactivarAnimaciones": "Desactivar animaciones",
   "nav.entrarOCrearUsuario": "Entrar o crear usuario",

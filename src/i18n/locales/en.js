@@ -347,7 +347,7 @@ export default {
   "nav.cerrarSesion": "Sign out",
   "nav.conectadoComo": "Signed in as {nombre}",
   "nav.cookiesPrivacidad": "Cookies & Privacy",
-  "nav.copyright": "Spritedex · Spirit Collection · Built for the community",
+  "nav.copyright": "Spritedex. All rights reserved.",
   "nav.cuentaUsuario": "User account",
   "nav.desactivarAnimaciones": "Turn off animations",
   "nav.entrarOCrearUsuario": "Sign in or create account",
