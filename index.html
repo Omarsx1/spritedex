@@ -57,11 +57,8 @@
     <title>Spritedex — Espíritus de Fortnite</title>
   </head>
   <body>
-    <!-- Tema de temporada ANTES del primer pintado.
-         React enciende el tema en un efecto (FortnitemaresTransition), o sea despues del
-         primer fotograma: quien ya vio la cinematica alcanzaba a ver la interfaz antigua
-         durante un parpadeo. Aqui se decide sin esperar al bundle.
-         Las dos fronteras y la clave del intro son las de src/config/seasonalEvent.js, y
+    <!-- Tema de temporada ANTES del primer pintado, sin esperar al bundle.
+         Las dos fronteras son las de src/config/seasonalEvent.js, y
          tests/fnm-arranque.test.js impide que se separen. -->
     <script>
       (function () {
@@ -73,7 +70,6 @@
           if (local) {
             // Espejo del modo desarrollo de seasonalEvent.js: bandera > override > encendido.
             // Asi el parpadeo tampoco se ve en local y las banderas siguen mandando.
-            if (params.has('intro')) return;
             var flag = params.get('halloween');
             if (flag === null) flag = params.get('fortnitemares');
             if (flag === '0' || flag === 'false') return;
@@ -88,23 +84,13 @@
             if (ahora >= new Date('2026-11-04T00:00:00-05:00').getTime()) return;
           }
 
-          // Con la cinematica pendiente el tema lo enciende ella: adelantarlo mostraria el
-          // tema encendido y apagado justo antes de la funcion.
-          var vioIntro = false;
-          try { vioIntro = localStorage.getItem('spritedex_fortnitemares_intro_seen_v1') === 'true'; } catch (e) {}
-          var quieto = false;
-          try { quieto = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
-          if (!vioIntro && !quieto) return;
-
           document.documentElement.classList.add('theme-fortnitemares');
           document.body.classList.add('theme-fortnitemares');
         } catch (e) {}
       })();
     </script>
     <!-- El bosque de la temporada, montado en el armazon y no en React: asi existe ya en
-         el primer fotograma para quien vio la cinematica. Su visibilidad la decide el CSS:
-         sin la clase del tema no se ve, que es lo que mantiene intacta la cinematica de
-         los nuevos (ven la rejilla hasta la parte "ground"). -->
+         el primer fotograma. Su visibilidad la decide el CSS: sin la clase del tema no se ve. -->
     <div class="fnm-forest" aria-hidden="true"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>

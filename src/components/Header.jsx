@@ -7,7 +7,7 @@ import { allSprites as defaultAllSprites } from '../data/spritesData';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { rutaFallbackEspiritu } from '../utils/spriteAssets';
 import { t } from '../i18n';
-import { hasSeenFortnitemaresIntro, isFortnitemaresActive } from '../config/seasonalEvent';
+import { isFortnitemaresActive } from '../config/seasonalEvent';
 import { PumpkinIcon } from './icons/PumpkinIcon';
 
 // Indicador de solicitudes pendientes. Estatico a proposito: sin animacion, sin
@@ -62,12 +62,7 @@ export function Header({
     ? ' · ' + t('header.solicitudesNuevas', { n: solicitudesNuevas })
     : '';
   const [actionsOpen, setActionsOpen] = useState(false);
-  // En la primera visita la cinematica manda el cambio: el wordmark arranca
-  // normal y muta cuando la parte "title" difunda el cambio de temporada.
-  // Los visitantes que ya la vieron entran directamente tematicos.
-  const [isFortnitemares, setIsFortnitemares] = useState(
-    () => isFortnitemaresActive() && hasSeenFortnitemaresIntro()
-  );
+  const [isFortnitemares, setIsFortnitemares] = useState(() => isFortnitemaresActive());
   const seasonRef = useRef(isFortnitemares);
   // El intercambio de espiritus (swapSpirit) vive mas abajo y dispara la
   // aparicion magica tambien cuando la temporada cambie en vivo.

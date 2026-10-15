@@ -22,7 +22,6 @@ import { InstallPrompt } from './components/InstallPrompt';
 import { FriendsPage } from './components/FriendsPage';
 import { GuiaPage } from './components/GuiaPage';
 import { MobileSpriteSwiper } from './components/MobileSpriteSwiper';
-import { FortnitemaresTransition } from './components/FortnitemaresTransition';
 import { applySeasonalTheme, isFortnitemaresActive, subscribeSeasonalState } from './config/seasonalEvent';
 import { useIsMobile } from './hooks/useIsMobile';
 import { useDynamicSprites } from './hooks/useDynamicSprites';
@@ -1316,7 +1315,6 @@ useEffect(() => {
 
   return (
     <div className="app-container">
-      <FortnitemaresTransition />
       <PrivacyNotice />
       <InstallPrompt />
 
