@@ -1061,10 +1061,8 @@ async function renderGlitchOverrideTemplate({
     else if (totalSprites <= 63) cols = 8; // Caso ideal Imagen 2 (8x8 = 64)
     else cols = Math.max(8, Math.ceil(Math.sqrt(totalSlotsNeeded))); // 11x11 para 117
   } else {
-    // Formato Vertical: 9:16 fijo (1080x1920), que es lo que piden las redes (historias,
-    // reels, tiktok). Antes la altura se calculaba con la coleccion, asi que con pocos
-    // espiritus salia un lienzo 4:3 apaisado y con muchos uno de 1:2,2: ninguno servia
-    // tal cual en una red. Ahora el marco es fijo y lo que se adapta es la cuadricula.
+    // Formato Vertical: el ancho sigue a la cuadricula y el alto queda entre 1,25 veces el
+    // ancho y 1920 px, para que sirva en historias, reels y tiktok sin franjas vacias.
     width = 1080;
     height = 1920;
 

@@ -154,7 +154,6 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
   }, [alternarPerf]);
 
   const modalRef = useRef(null);
-  const hasEnteredRef = useRef(false);
   const previewHostRef = useRef(null);
   // Clave vigente del preview. Los pases viejos quedan descartados por CLAVE (antes se
   // comparaba un contador de trabajos y un pase de fondo podia descartar un resultado
@@ -215,22 +214,9 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
     if (modalRef.current) {
       gsap.fromTo(modalRef.current,
         { opacity: 0, scale: 0.95, y: 10 },
-        {
-          opacity: 1,
-          scale: 1,
-          y: 0,
-          duration: 0.22,
-          ease: 'power2.out',
-          onComplete: () => {
-            hasEnteredRef.current = true;
-          }
-        }
+        { opacity: 1, scale: 1, y: 0, duration: 0.22, ease: 'power2.out' }
       );
     }
-    const timer = setTimeout(() => {
-      hasEnteredRef.current = true;
-    }, 220);
-    return () => clearTimeout(timer);
   }, []);
 
   // Que espiritus entran en la lona: primero el alcance y encima los filtros de la lona.
