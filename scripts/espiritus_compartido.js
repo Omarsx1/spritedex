@@ -86,6 +86,8 @@ export const VARIANT_TO_THEME = {
 
 export const FAMILY_NAMES_ES = {
   water: 'Agua',
+  honey: 'Miel',
+  obsession: 'Obsesión',
   earth: 'Tierra',
   fire: 'Fuego',
   air: 'Aire',
