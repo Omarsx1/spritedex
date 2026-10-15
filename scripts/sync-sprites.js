@@ -3,6 +3,17 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { archivoArteCanonico, ART_VECTORIAL } from '../src/data/spriteAssetMap.js';
+import {
+  GEN_1_FAMILIES,
+  PARENT_TO_FAMILY,
+  VARIANT_TO_THEME,
+  FAMILY_NAMES_ES,
+  THEME_NAMES_ES,
+  VARIANT_ORDER,
+  normalizeKey,
+  capitalize
+} from './espiritus_compartido.js';
+
 import { debeRevertirAUnreleased } from '../src/utils/lanzamiento.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -12,13 +23,6 @@ const BASE_URL = 'https://fortnite.gg';
 const PUBLIC_SPRITES_DIR = path.resolve(__dirname, '../public/sprites');
 const OFFICIAL_SPRITES_PATH = path.resolve(__dirname, '../src/data/official_sprites.json');
 const COMPLETE_SPRITES_PATH = path.resolve(__dirname, '../src/data/fortnite_gg_sprites_complete.json');
-
-// Familias de 1ra Generación
-const GEN_1_FAMILIES = new Set([
-  'water', 'earth', 'fire', 'air', 'duck', 'ghost', 'dream', 'demon', 'punk', 'king',
-  'zeropoint', 'theburntpeanut', 'fishy', 'striker', 'aura', 'boss', 'grim', 'seven',
-  'batman', 'pollo', 'vini', 'wick', 'peely', 'llama', 'ironmouse'
-]);
 
 // Detección dinámica de la ruta del ejecutable de Google Chrome / Chromium
 function getChromeExecutablePath() {
@@ -155,171 +159,6 @@ const TRANSLATIONS = {
   }
 };
 
-const PARENT_TO_FAMILY = {
-  water: 'water',
-  earth: 'earth',
-  spitfire: 'fire',
-  duck: 'duck',
-  ghost: 'ghost',
-  sleepy: 'dream',
-  punk: 'punk',
-  king: 'king',
-  zeropoint: 'zeropoint',
-  demon: 'demon',
-  burntpeanut: 'theburntpeanut',
-  air: 'air',
-  boss: 'boss',
-  seven: 'seven',
-  fishy: 'fishy',
-  soccer: 'striker',
-  drifter: 'aura',
-  grim: 'grim',
-  overshield: 'overshield',
-  improvedslide: 'megaman',
-  winnerb: 'xray',
-  winnerc: 'onigiri',
-  cosmicthunderdoublejump: 'jackrabbit',
-  narrowfleamonkey: 'tails',
-  reloadovertime: 'shadow',
-  bushranger: 'bush',
-  killswitch: 'killswitch',
-  dwarf: 'adventure',
-  klombo: 'klombo',
-  jonesy: 'jonesy',
-  narrowflea: 'sonic',
-  crown: 'crown',
-  '8bitblaster': '8bit',
-  eightbitblaster: '8bit',
-  stormscout: 'stormscout',
-  ghostdamage: 'blinky',
-  birthday: 'birthday',
-  bodyslam: 'crash',
-  fillergrunt: 'pollo',
-  batman: 'batman',
-  winnera: 'pond',
-  companystargazer: 'ironmouse',
-  cokeparmesan: 'vini',
-  pedicureantacid: 'wick',
-  llama: 'llama',
-  peely: 'peely',
-  increaseheals: 'morgana',
-  phasedash: 'spookydash',
-  healthsiphon: 'vampire',
-  increasedmelee: 'deer',
-  winnerd: 'dumpsterdive'
-};
-
-const VARIANT_TO_THEME = {
-  base: 'Basic',
-  basic: 'Basic',
-  gold: 'Gold',
-  cheatmaster: 'Cheatmaster',
-  'cheat master': 'Cheatmaster',
-  'loot hacker': 'Loot Hacker',
-  loothacker: 'Loot Hacker',
-  hacker: 'Loot Hacker',
-  'bounty hunter': 'Bounty Hunter',
-  bountyhunter: 'Bounty Hunter',
-  reaper: 'Bounty Hunter',
-  tricktreat: 'Trick or Treat',
-  'trick or treat': 'Trick or Treat',
-  trickortreat: 'Trick or Treat',
-  candy: 'Candy',
-  gummy: 'Candy',
-  galaxy: 'Galaxy',
-  cube: 'Cube',
-  holofoil: 'Holofoil',
-  gem: 'Gem',
-  quack: 'Quack'
-};
-
-const FAMILY_NAMES_ES = {
-  water: 'Agua',
-  earth: 'Tierra',
-  fire: 'Fuego',
-  air: 'Aire',
-  duck: 'Pato',
-  ghost: 'Fantasma',
-  dream: 'Dormilón',
-  demon: 'Demonio',
-  punk: 'Punk',
-  king: 'Monarca',
-  zeropoint: 'Punto Cero',
-  theburntpeanut: 'Cacahuate',
-  fishy: 'Pescado',
-  striker: 'Pelotero',
-  aura: 'Aura',
-  boss: 'Jefe',
-  grim: 'Parca',
-  seven: 'Siete',
-  batman: 'Batman',
-  pollo: 'Pollo',
-  vini: 'Vini Jr.',
-  wick: 'John Wick',
-  peely: 'Bananín',
-  llama: 'Llama',
-  ironmouse: 'La niña',
-  klombo: 'Klombo',
-  crown: 'Victorioso',
-  jackrabbit: 'Jackrabbit',
-  sonic: 'Sonic',
-  shadow: 'Shadow',
-  tails: 'Tails',
-  killswitch: 'Killswitch',
-  bush: 'Arbustín',
-  adventure: 'Aventurero',
-  jonesy: 'Jonesy',
-  '8bit': '8-Bit',
-  stormscout: 'Exploratormentas',
-  overshield: 'Protector',
-  onigiri: 'Onigiri',
-  xray: 'Rayos X',
-  megaman: 'Megaman',
-  crash: 'Crash Bandicoot',
-  morgana: 'Morgana',
-  blinky: 'Blinky',
-  birthday: 'Pastel de Cumpleaños',
-  pond: 'Estanque',
-  spookydash: 'Impulso aterrador',
-  vampire: 'Vampiro',
-  deer: 'El Ciervo',
-  dumpsterdive: 'Mapache'
-};
-
-const THEME_NAMES_ES = {
-  Basic: 'Básico',
-  Gold: 'Dorado',
-  Cheatmaster: 'Hacker',
-  'Loot Hacker': 'Hacker de Botín',
-  'Bounty Hunter': 'Cazarrecompensas',
-  'Trick or Treat': 'Dulce o Truco',
-  Candy: 'Gomita',
-  Galaxy: 'Galáctico',
-  Holofoil: 'Holográfico',
-  Cube: 'Cúbico',
-  Gem: 'Gema',
-  Quack: 'Patito'
-};
-
-const VARIANT_ORDER = [
-  'Basic',
-  'Gold',
-  'Cheatmaster',
-  'Loot Hacker',
-  'Bounty Hunter',
-  'Trick or Treat',
-  'Candy',
-  'Galaxy',
-  'Cube',
-  'Holofoil',
-  'Gem',
-  'Quack'
-];
-
-function normalizeKey(str) {
-  return (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-}
-
 export function translateAbility(text) {
   if (!text) return 'Concede bonificaciones pasivas de combate y exploración.';
   return TRANSLATIONS.abilities[text.trim()] || text.trim();
@@ -335,14 +174,9 @@ export function translateLocation(text) {
   return TRANSLATIONS.locations[text.trim()] || text.trim();
 }
 
-function capitalize(str) {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
 
-
-async function ensureSpriteImage(page, spriteId, imageUrl) {
-  if (!imageUrl || typeof imageUrl !== 'string') return;
+async function ensureSpriteImage(page, spriteId, imageUrl, reemplazar = false) {
+  if (!imageUrl || typeof imageUrl !== 'string') return false;
   if (!fs.existsSync(PUBLIC_SPRITES_DIR)) {
     fs.mkdirSync(PUBLIC_SPRITES_DIR, { recursive: true });
   }
@@ -355,15 +189,15 @@ async function ensureSpriteImage(page, spriteId, imageUrl) {
   // del archivo que ya estaba en el repo (asi entraron public/sprites/peely_candy.webp y su
   // miniatura) y lo commiteaba.
   const destinoPath = path.join(PUBLIC_SPRITES_DIR, archivoArteCanonico(spriteId));
-  if (fs.existsSync(destinoPath) || fs.existsSync(pngPath)) {
-    return;
+  if (!reemplazar && (fs.existsSync(destinoPath) || fs.existsSync(pngPath))) {
+    return false;
   }
 
   // Placeholder vectorial: el espiritu todavia no tiene arte real. Se avisa en claro para que
   // el hueco no se confunda con un fallo ni se baje algo que la app no va a leer.
   if (ART_VECTORIAL.has(spriteId)) {
     console.log(`⏭️  ${spriteId}: sin arte real todavia (placeholder vectorial), no se descarga`);
-    return;
+    return false;
   }
 
   try {
@@ -390,10 +224,12 @@ async function ensureSpriteImage(page, spriteId, imageUrl) {
       const base64Data = dataUrl.replace(/^data:image\/\w+;base64,/, '');
       fs.writeFileSync(destinoPath, Buffer.from(base64Data, 'base64'));
       console.log(`📥 Imagen descargada para ${spriteId}: ${path.basename(destinoPath)}`);
+      return true;
     }
   } catch (err) {
     console.warn(`⚠️ Aviso al descargar imagen de ${spriteId}: ${err.message}`);
   }
+  return false;
 }
 
 async function syncSprites() {
@@ -749,9 +585,18 @@ async function syncSprites() {
 
       const effectiveId = existingKey || expectedId;
 
+      // El arte provisional de spritehelp se reemplaza por el de fortnite.gg en cuanto este lo publica
+      const itemProvisional = existingKey ? officialMap.get(existingKey).item : null;
+      const artePendiente = itemProvisional?.artSource === 'spritehelp';
+
       // Asegurar descarga de imagen si no existe localmente
       if (card.img) {
-        await ensureSpriteImage(page, effectiveId, card.img);
+        const descargada = await ensureSpriteImage(page, effectiveId, card.img, artePendiente);
+        if (descargada && artePendiente) {
+          delete itemProvisional.artSource;
+          catalogChanges++;
+          console.log(`🎨 Arte de fortnite.gg reemplaza al provisional de spritehelp: ${effectiveId}`);
+        }
       }
 
       if (existingKey) {

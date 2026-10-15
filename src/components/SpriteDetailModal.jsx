@@ -144,10 +144,12 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                 <span>{pickTexto(activeSprite.specialPerk)}</span>
               </div>
             )}
-            <div>
-              <span className="sdm__card-label">{t('detalle.habilidadOficial')}</span>
-              <p className="sdm__card-text">{pickTexto(activeSprite.ability)}</p>
-            </div>
+            {Boolean(pickTexto(activeSprite.ability)) && (
+              <div>
+                <span className="sdm__card-label">{t('detalle.habilidadOficial')}</span>
+                <p className="sdm__card-text">{pickTexto(activeSprite.ability)}</p>
+              </div>
+            )}
             <div className="sdm__card-footer">
               <div className="sdm__card-detail" title={t('detalle.costeInvocacion')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <img

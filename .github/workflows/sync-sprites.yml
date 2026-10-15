@@ -47,6 +47,12 @@ jobs:
           PUPPETEER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: node scripts/sync-sprites.js
 
+      # spritehelp publica antes que fortnite.gg: sus espiritus nuevos entran como provisionales
+      # y se reemplazan cuando fortnite.gg los publica. Si spritehelp falla, no detiene el resto.
+      - name: Tomar espiritus nuevos de spritehelp
+        continue-on-error: true
+        run: node scripts/sync-spritehelp.js
+
       # La app lee el indice compacto, no el scrapeo completo: sin regenerarlo, los
       # espiritus nuevos llegan sin habilidad ni perk aunque el scrapeo los tenga.
       - name: Regenerar indice de fortnite.gg

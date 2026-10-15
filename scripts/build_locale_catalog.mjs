@@ -92,6 +92,11 @@ export function construirCatalogo() {
 
   catalogo.forEach((espiritu) => {
     const base = String(espiritu.id).split('_')[0].toLowerCase();
+    if (espiritu.nameEn) {
+      salida[espiritu.id] = espiritu.nameEn;
+      if (norm(espiritu.theme) === 'basic') familias[base] = espiritu.nameEn;
+      return;
+    }
     const familia = FAMILIAS[base];
     if (!familia) {
       problemas.push('familia sin mapear: ' + base + ' (' + espiritu.id + ')');
