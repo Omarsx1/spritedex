@@ -3,16 +3,19 @@
 // fuera de React. Cambiar de idioma recarga la pagina, asi que nunca queda un idioma a medias.
 import { safeStorage } from '../utils/safeStorage.js';
 
-export const IDIOMAS = ['es', 'en'];
+export const IDIOMAS = ['es', 'en', 'pt-BR', 'pt-PT'];
 export const IDIOMA_POR_DEFECTO = 'es';
 export const CLAVE_IDIOMA = 'spritedex_lang';
-export const PREFIJO_EN = '/en';
+export const PREFIJOS = { en: '/en', 'pt-BR': '/pt-br', 'pt-PT': '/pt-pt' };
 
-// 'es-MX' -> 'es', 'en-US' -> 'en', 'fr' -> 'en'. Sin pais, sin IP, sin zona horaria.
+// 'es-MX' -> 'es', 'en-US' -> 'en', 'pt' y 'pt-BR' -> 'pt-BR', 'pt-PT' -> 'pt-PT', 'fr' -> 'en'.
+// Sin pais, sin IP, sin zona horaria.
 export function normalizarIdioma(etiqueta) {
-  const limpio = String(etiqueta || '').trim().toLowerCase();
-  if (!limpio) return null;
-  return limpio.split(/[-_]/)[0] === 'es' ? 'es' : 'en';
+  const partes = String(etiqueta || '').trim().toLowerCase().split(/[-_]/);
+  if (!partes[0]) return null;
+  if (partes[0] === 'es') return 'es';
+  if (partes[0] === 'pt') return partes[1] === 'pt' ? 'pt-PT' : 'pt-BR';
+  return 'en';
 }
 
 export function idiomaGuardado() {
@@ -24,7 +27,7 @@ export function guardarIdioma(lang) {
   safeStorage.setItem(CLAVE_IDIOMA, lang);
 }
 
-// Decide la PRIMERA etiqueta del navegador: es* -> es, cualquier otra cosa -> en.
+// Decide la PRIMERA etiqueta del navegador que sea reconocible (es, pt-BR, pt-PT o en).
 export function idiomaDelNavegador(langs) {
   const lista = Array.isArray(langs) && langs.length
     ? langs
@@ -45,14 +48,19 @@ export function detectarIdioma(langs) {
 
 export function idiomaDeRuta(pathname) {
   const p = String(pathname || '/');
-  return p === PREFIJO_EN || p.startsWith(PREFIJO_EN + '/') ? 'en' : 'es';
+  for (const lang of Object.keys(PREFIJOS)) {
+    const prefijo = PREFIJOS[lang];
+    if (p === prefijo || p.startsWith(prefijo + '/')) return lang;
+  }
+  return IDIOMA_POR_DEFECTO;
 }
 
 export function rutaSinIdioma(pathname) {
   const p = String(pathname || '/');
-  if (p === PREFIJO_EN) return '/';
-  if (p.startsWith(PREFIJO_EN + '/')) return p.slice(PREFIJO_EN.length);
-  return p;
+  const lang = idiomaDeRuta(p);
+  if (lang === IDIOMA_POR_DEFECTO) return p;
+  const prefijo = PREFIJOS[lang];
+  return p === prefijo ? '/' : p.slice(prefijo.length);
 }
 
 // conIdioma('/amigos/SDEX-1', 'en') -> '/en/amigos/SDEX-1'; conIdioma('/en', 'es') -> '/'.
@@ -63,7 +71,8 @@ export function conIdioma(ruta, lang) {
   const pathname = corte === -1 ? s : s.slice(0, corte);
   const cola = corte === -1 ? '' : s.slice(corte);
   const base = rutaSinIdioma(pathname) || '/';
-  const conPrefijo = lang === 'en' ? (base === '/' ? PREFIJO_EN : PREFIJO_EN + base) : base;
+  const prefijo = PREFIJOS[lang];
+  const conPrefijo = prefijo ? (base === '/' ? prefijo : prefijo + base) : base;
   return conPrefijo + cola;
 }
 
@@ -86,12 +95,13 @@ export function traducir(diccionarios, lang, clave, vars) {
 // Un solo lugar decide con que idioma arranca la pagina y si hay que mover la URL.
 // Devuelve { lang, destino }; destino es null cuando no hay que tocar la barra de direcciones.
 export function planDeArranque({ pathname = '/', search = '', hash = '', langs, guardado } = {}) {
-  if (idiomaDeRuta(pathname) === 'en') return { lang: 'en', destino: null };
+  const porRuta = idiomaDeRuta(pathname);
+  if (porRuta !== IDIOMA_POR_DEFECTO) return { lang: porRuta, destino: null };
   const eleccion = guardado === undefined ? idiomaGuardado() : guardado;
   if (eleccion) return { lang: eleccion, destino: null };
   const navegador = idiomaDelNavegador(langs);
-  if (navegador === 'en') {
-    return { lang: 'en', destino: conIdioma(pathname, 'en') + search + hash };
+  if (navegador !== IDIOMA_POR_DEFECTO) {
+    return { lang: navegador, destino: conIdioma(pathname, navegador) + search + hash };
   }
   return { lang: IDIOMA_POR_DEFECTO, destino: null };
 }
