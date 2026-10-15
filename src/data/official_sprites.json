@@ -1103,6 +1103,18 @@
     "lanzamientoManual": true
   },
   {
+    "id": "jonesy_quack",
+    "name": "Jonesy Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Quack Jonesy",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
     "id": "adventure_basic",
     "name": "Aventurero",
     "theme": "Basic",
@@ -1161,6 +1173,18 @@
     "lanzamientoManual": true
   },
   {
+    "id": "adventure_quack",
+    "name": "Aventurero Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Quack Adventure",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
     "id": "bush_basic",
     "name": "Arbustín",
     "theme": "Basic",
@@ -1217,6 +1241,18 @@
     "gen": 2,
     "releaseDate": "2026-10-08T05:00:00.000Z",
     "lanzamientoManual": true
+  },
+  {
+    "id": "bush_quack",
+    "name": "Arbustín Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Quack Bush",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
   },
   {
     "id": "sonic_basic",
@@ -1680,6 +1716,18 @@
     "gen": 2,
     "releaseDate": "2026-10-08T05:00:00.000Z",
     "lanzamientoManual": true
+  },
+  {
+    "id": "klombo_quack",
+    "name": "Klombo Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Quack Klombo",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
   },
   {
     "id": "megaman_basic",
@@ -2307,6 +2355,18 @@
     "lanzamientoManual": true
   },
   {
+    "id": "spookydash_quack",
+    "name": "Impulso aterrador Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Quack Spooky Dash",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
     "id": "deer_basic",
     "name": "El Ciervo",
     "theme": "Basic",
@@ -2427,5 +2487,149 @@
     "gen": 2,
     "releaseDate": "2026-10-08T05:00:00.000Z",
     "lanzamientoManual": true
+  },
+  {
+    "id": "honey_basic",
+    "name": "Miel",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Honey",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "honey_gold",
+    "name": "Miel Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Gold Honey",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "honey_cheat",
+    "name": "Miel Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Cheat Master Honey",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "honey_hacker",
+    "name": "Miel Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Loot Hacker Honey",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "honey_bounty",
+    "name": "Miel Cazarrecompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Bounty Hunter Honey",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "honey_treat",
+    "name": "Miel Dulce o Truco",
+    "theme": "Trick or Treat",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Trick or Treat Honey",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "obsession_basic",
+    "name": "Obsesión",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Obsession",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "obsession_gold",
+    "name": "Obsesión Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Gold Obsession",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "obsession_cheat",
+    "name": "Obsesión Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Cheat Master Obsession",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "obsession_hacker",
+    "name": "Obsesión Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Loot Hacker Obsession",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "obsession_bounty",
+    "name": "Obsesión Cazarrecompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Bounty Hunter Obsession",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "obsession_treat",
+    "name": "Obsesión Dulce o Truco",
+    "theme": "Trick or Treat",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Trick or Treat Obsession",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
   }
 ]
