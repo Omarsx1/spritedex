@@ -9555,8 +9555,13 @@ body .swal2-container.swal2-bottom {
 /* El vampiro pide un poco mas que la calabaza: su cabeza esta todavia mas baja y 6px no
    bastaban. Va al final del archivo a proposito, para ganarle a cualquier regla anterior
    con la misma especificidad. */
+.sprite-card[data-familia="vampire"] .card-image img {
+  position: relative;
+  top: 6px;
+}
+
 .sprite-card[data-familia="vampire"] .card-image__crown {
-  top: -6px;
+  top: 0;
 }
 
 .ms-spotlight-card[data-familia="vampire"] .ms-card__crown {
