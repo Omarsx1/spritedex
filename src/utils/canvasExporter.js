@@ -640,8 +640,7 @@ function getSpiritHue(sprite) {
   return '#00F0E8';
 }
 
-// A 1x las fichas (~36 px de lado en la lona) se emborronan al hacer zoom en el movil.
-const EXPORT_SCALE = 2;
+const EXPORT_SCALE = 1;
 
 export async function generateSpritedexCardImage({
   spritesList,

@@ -384,9 +384,8 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
 
     setIsGenerating(true);
 
-    // Desacoplar la animación de apertura del modal (220ms) para que Android abra a 60/120fps fluidos.
-    // Si el modal ya completó su entrada, usar un debounce suave de 60ms para evitar colisiones entre clics rápidos.
-    const delay = hasEnteredRef.current ? 60 : 180;
+    // Debounce corto: el dibujo arranca durante la animación de apertura (220ms); validar jank en Android.
+    const delay = 60;
 
     const timer = setTimeout(async () => {
       if (activeKeyRef.current !== currentKey) return;
