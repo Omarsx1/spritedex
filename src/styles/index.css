@@ -1936,6 +1936,10 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
     gap: 18px;
   }
 
+  .hero__title-block {
+    margin-top: 20px;
+  }
+
   .hero__title-line {
     /* 3.4rem x 1.12: los dos titulos crecen en la misma proporcion, pero menos que
        el primer intento (1.25), que se veia pasado. */
