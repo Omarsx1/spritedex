@@ -115,8 +115,7 @@ function construirFichas(sprites, pickTexto) {
       id: h.id,
       es: { nombre: h.fullName },
       en: { nombre: h.fullNameEn },
-      'pt-BR': { nombre: h.fullNameEn },
-      'pt-PT': { nombre: h.fullNameEn }
+      'pt-BR': { nombre: h.fullNameEn }
     })),
     es: {
       nombre: s.fullName,
@@ -128,8 +127,7 @@ function construirFichas(sprites, pickTexto) {
       costo: s.summonCost
     },
     en: bloqueEnIngles('en'),
-    'pt-BR': bloqueEnIngles('pt-BR'),
-    'pt-PT': bloqueEnIngles('pt-PT')
+    'pt-BR': bloqueEnIngles('pt-BR')
     };
   });
 }

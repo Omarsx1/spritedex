@@ -10,8 +10,7 @@ import { NOMBRE_IDIOMA, lineasOgLocale, porIdioma } from './idioma.js';
 export const ZONA = {
   es: 'Espíritu de Fortnite',
   en: 'Fortnite Sprite',
-  'pt-BR': 'Espírito de Fortnite',
-  'pt-PT': 'Espírito de Fortnite'
+  'pt-BR': 'Espírito de Fortnite'
 };
 
 export const escapar = (texto) => String(texto === undefined || texto === null ? '' : texto)
@@ -60,16 +59,6 @@ export const TEXTO = {
     otras: 'Outras variantes de', todos: 'Ver todos os espíritos', guia: 'Guia de espíritos',
     cta: 'Acompanhe sua coleção no Spritedex', inicio: 'Início', espiritus: 'Espíritos',
     novedades: 'Novidades', acerca: 'Sobre', aviso: 'Projeto de fãs sem relação com a Epic Games.',
-    privacidad: 'Privacidade (em espanhol)', sinImagen: 'Ainda não temos imagem deste espírito.',
-    idioma: 'Idioma'
-  },
-  'pt-PT': {
-    rareza: 'Raridade', generacion: 'Geração', variante: 'Variante', familia: 'Família',
-    drop: 'Probabilidade (baú de espírito)', costo: 'Custo de invocação', ubicacion: 'Onde aparece',
-    lanzamiento: 'Lançamento', habilidad: 'Habilidade', perk: 'Extra exclusivo',
-    otras: 'Outras variantes de', todos: 'Ver todos os espíritos', guia: 'Guia de espíritos',
-    cta: 'Acompanhe a sua coleção no Spritedex', inicio: 'Início', espiritus: 'Espíritos',
-    novedades: 'Novidades', acerca: 'Sobre', aviso: 'Projeto de fãs sem ligação à Epic Games.',
     privacidad: 'Privacidade (em espanhol)', sinImagen: 'Ainda não temos imagem deste espírito.',
     idioma: 'Idioma'
   }
@@ -178,7 +167,7 @@ export function pieDePagina(lang) {
     { href: conIdiomaRuta('/espiritus', lang), nombre: t.todos },
     { href: RUTA_PRIVACIDAD, nombre: t.privacidad }
   ];
-  return '<footer class="pie"><p>' + escapar(t.aviso) + '</p><nav aria-label="' + escapar(porIdioma(lang, { es: 'Sitio', en: 'Site', 'pt-BR': 'Site', 'pt-PT': 'Sítio' })) + '">'
+  return '<footer class="pie"><p>' + escapar(t.aviso) + '</p><nav aria-label="' + escapar(porIdioma(lang, { es: 'Sitio', en: 'Site', 'pt-BR': 'Site' })) + '">'
     + enlaces.map((e) => '<a href="' + e.href + '">' + escapar(e.nombre) + '</a>').join('') + '</nav></footer>';
 }
 

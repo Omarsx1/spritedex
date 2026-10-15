@@ -7,8 +7,7 @@ import { getLang, cambiarIdioma, t } from '../i18n';
 const OPCIONES = [
   { code: 'es', label: 'ES', nombre: 'Español' },
   { code: 'en', label: 'EN', nombre: 'English' },
-  { code: 'pt-BR', label: 'PT-BR', nombre: 'Português (Brasil)' },
-  { code: 'pt-PT', label: 'PT-PT', nombre: 'Português (Portugal)' }
+  { code: 'pt-BR', label: 'PT-BR', nombre: 'Português (Brasil)' }
 ];
 
 export function LanguageSwitcher({ className = '' }) {

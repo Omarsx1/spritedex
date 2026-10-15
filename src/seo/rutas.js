@@ -16,38 +16,34 @@ export const IMAGEN_REDES = SITIO + '/icon-512.png';
 export const RUTAS = [
   {
     ruta: '/',
-    idiomas: ['es', 'en', 'pt-BR', 'pt-PT'],
+    idiomas: ['es', 'en', 'pt-BR'],
     prioridad: 1.0,
     frecuencia: 'daily',
     titulos: {
       es: 'Spritedex — Espíritus de Fortnite: variantes y niveles',
       en: 'Spritedex — Fortnite Sprites: variants and levels',
-      'pt-BR': 'Spritedex — Espíritos do Fortnite: variantes e níveis',
-      'pt-PT': 'Spritedex: Espíritos do Fortnite, variantes e níveis'
+      'pt-BR': 'Spritedex — Espíritos do Fortnite: variantes e níveis'
     },
     descripciones: {
       es: 'Rastrea tu colección de espíritus de Fortnite: marca tus capturas, sube niveles del 1 al 5, compara con amigos y comparte tu Spritedex.',
       en: 'Track your Fortnite sprite collection: mark your captures, level them from 1 to 5, compare with friends and share your Spritedex.',
-      'pt-BR': 'Acompanhe sua coleção de espíritos do Fortnite: marque o que você capturou, suba os níveis do 1 ao 5, compare com amigos e compartilhe seu Spritedex.',
-      'pt-PT': 'Acompanhe a sua coleção de espíritos do Fortnite: assinale as capturas, suba os níveis do 1 ao 5, compare com amigos e partilhe o seu Spritedex.'
+      'pt-BR': 'Acompanhe sua coleção de espíritos do Fortnite: marque o que você capturou, suba os níveis do 1 ao 5, compare com amigos e compartilhe seu Spritedex.'
     }
   },
   {
     ruta: '/amigos',
-    idiomas: ['es', 'en', 'pt-BR', 'pt-PT'],
+    idiomas: ['es', 'en', 'pt-BR'],
     prioridad: 0.6,
     frecuencia: 'weekly',
     titulos: {
       es: 'Comparar espíritus con amigos — Spritedex',
       en: 'Compare Fortnite sprites with friends — Spritedex',
-      'pt-BR': 'Comparar espíritos com amigos — Spritedex',
-      'pt-PT': 'Comparar espíritos com os amigos — Spritedex'
+      'pt-BR': 'Comparar espíritos com amigos — Spritedex'
     },
     descripciones: {
       es: 'Compara tu lista de espíritus de Fortnite con la de tus amigos: quién tiene más, cuáles te faltan y qué pueden intercambiar.',
       en: 'Compare your Fortnite sprite list with your friends: who has more, what you are missing and what you can trade.',
-      'pt-BR': 'Compare sua lista de espíritos do Fortnite com a dos seus amigos: quem tem mais, quais faltam e o que podem trocar.',
-      'pt-PT': 'Compare a sua lista de espíritos do Fortnite com a dos seus amigos: quem tem mais, quais lhe faltam e o que podem trocar.'
+      'pt-BR': 'Compare sua lista de espíritos do Fortnite com a dos seus amigos: quem tem mais, quais faltam e o que podem trocar.'
     }
   },
   {
@@ -83,12 +79,6 @@ const JSONLD = {
   'pt-BR': {
     organizacion: 'Rastreador interativo e catálogo de espíritos do Fortnite Capítulo 7.',
     caracteristicas: ['Rastreador de coleção de espíritos', 'Níveis do 1 ao 5', 'Filtros por variante e família', 'Comparação com amigos', 'Cartões para compartilhar'],
-    inicio: 'Início',
-    amigos: 'Amigos'
-  },
-  'pt-PT': {
-    organizacion: 'Rastreador interativo e catálogo de espíritos do Fortnite Capítulo 7.',
-    caracteristicas: ['Rastreador de coleção de espíritos', 'Níveis do 1 ao 5', 'Filtros por variante e família', 'Comparação com amigos', 'Cartões para partilhar'],
     inicio: 'Início',
     amigos: 'Amigos'
   }

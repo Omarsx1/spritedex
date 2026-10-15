@@ -116,17 +116,17 @@ test('los diccionarios reales resuelven en los dos idiomas', () => {
   assert.equal(traducir(DICCIONARIOS, 'en', 'lona.progreso', { pct: 42 }), 'PROGRESS 42%');
 });
 
-test('portugues: pt y pt-BR son Brasil, pt-PT es Portugal, fr sigue en ingles', () => {
+test('portugues: pt, pt-BR y pt-PT son Brasil; fr sigue en ingles', () => {
   assert.equal(normalizarIdioma('pt'), 'pt-BR');
   assert.equal(normalizarIdioma('pt-BR'), 'pt-BR');
   assert.equal(normalizarIdioma('pt_br'), 'pt-BR');
-  assert.equal(normalizarIdioma('pt-PT'), 'pt-PT');
-  assert.equal(normalizarIdioma('PT-pt'), 'pt-PT');
+  assert.equal(normalizarIdioma('pt-PT'), 'pt-BR');
+  assert.equal(normalizarIdioma('PT-pt'), 'pt-BR');
   assert.equal(normalizarIdioma('fr'), 'en');
 });
 
-test('idiomaDelNavegador: la primera etiqueta portuguesa decide la variante', () => {
-  assert.equal(idiomaDelNavegador(['pt-PT', 'en-US']), 'pt-PT');
+test('idiomaDelNavegador: cualquier etiqueta portuguesa es pt-BR', () => {
+  assert.equal(idiomaDelNavegador(['pt-PT', 'en-US']), 'pt-BR');
   assert.equal(idiomaDelNavegador(['pt-BR']), 'pt-BR');
 });
 
@@ -134,23 +134,21 @@ test('planDeArranque: navegador portugues va a su prefijo, es y en no cambian', 
   assert.deepEqual(planDeArranque({ pathname: '/', langs: ['pt-BR'], guardado: null }), { lang: 'pt-BR', destino: '/pt-br' });
   assert.deepEqual(
     planDeArranque({ pathname: '/amigos', search: '?code=X', langs: ['pt-PT'], guardado: null }),
-    { lang: 'pt-PT', destino: '/pt-pt/amigos?code=X' }
+    { lang: 'pt-BR', destino: '/pt-br/amigos?code=X' }
   );
   assert.deepEqual(planDeArranque({ pathname: '/', langs: ['pt-BR'], guardado: 'es' }), { lang: 'es', destino: null });
   assert.deepEqual(planDeArranque({ pathname: '/', langs: ['es-MX'], guardado: null }), { lang: 'es', destino: null });
 });
 
-test('planDeArranque: /pt-br y /pt-pt se respetan aunque el navegador o la eleccion digan otra cosa', () => {
+test('planDeArranque: /pt-br se respeta aunque el navegador o la eleccion digan otra cosa', () => {
   assert.deepEqual(planDeArranque({ pathname: '/pt-br/amigos', langs: ['en-US'], guardado: 'es' }), { lang: 'pt-BR', destino: null });
-  assert.deepEqual(planDeArranque({ pathname: '/pt-pt', langs: ['es-MX'], guardado: null }), { lang: 'pt-PT', destino: null });
+  assert.deepEqual(planDeArranque({ pathname: '/pt-pt', langs: ['es-MX'], guardado: null }), { lang: 'es', destino: null });
 });
 
 test('conIdioma y rutaSinIdioma con portugues, sin confundir prefijos parecidos', () => {
   assert.equal(conIdioma('/amigos/SDEX-1', 'pt-BR'), '/pt-br/amigos/SDEX-1');
-  assert.equal(conIdioma('/', 'pt-PT'), '/pt-pt');
-  assert.equal(conIdioma('/pt-br/amigos', 'pt-PT'), '/pt-pt/amigos');
   assert.equal(conIdioma('/pt-br/amigos', 'es'), '/amigos');
-  assert.equal(rutaSinIdioma('/pt-pt'), '/');
+  assert.equal(rutaSinIdioma('/pt-pt'), '/pt-pt');
   assert.equal(rutaSinIdioma('/pt-br/amigos'), '/amigos');
   assert.equal(rutaSinIdioma('/pt-brasil'), '/pt-brasil');
   assert.equal(conIdioma('/pt-brasil', 'es'), '/pt-brasil');

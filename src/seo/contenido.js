@@ -27,11 +27,6 @@ const TITULOS = {
     guia: 'Guia de espíritos do Fortnite — Spritedex',
     acerca: 'Sobre o Spritedex: quem faz e com quais dados',
     novedades: 'Espíritos novos do Fortnite — Spritedex'
-  },
-  'pt-PT': {
-    guia: 'Guia de espíritos do Fortnite — Spritedex',
-    acerca: 'Sobre o Spritedex: quem o faz e com que dados',
-    novedades: 'Espíritos novos do Fortnite — Spritedex'
   }
 };
 
@@ -50,11 +45,6 @@ const DESCRIPCIONES = {
     guia: 'O que são os espíritos do Fortnite, famílias e variantes, raridades, como se conseguem e como sobem de nível do 1 ao 5, com dados da coleção completa.',
     acerca: 'O Spritedex é um rastreador de espíritos do Fortnite feito por fãs: de onde vêm os dados, como seu progresso é guardado e o que este projeto não é.',
     novedades: 'Os últimos espíritos adicionados ao Fortnite com a data, a família, a variante e a probabilidade de obtenção, com link para a ficha de cada um.'
-  },
-  'pt-PT': {
-    guia: 'O que são os espíritos do Fortnite, famílias e variantes, raridades, como se obtêm e como sobem de nível do 1 ao 5, com dados da coleção completa.',
-    acerca: 'O Spritedex é um rastreador de espíritos do Fortnite feito por fãs: de onde vêm os dados, como fica guardado o progresso e o que este projeto não é.',
-    novedades: 'Os últimos espíritos adicionados ao Fortnite com a data, a família, a variante e a probabilidade de obtenção, com ligação para a respetiva ficha.'
   }
 };
 
@@ -155,7 +145,7 @@ export function htmlGuia(datos, lang) {
   const modelo = modeloGuia(lang, datos);
   jsonLd['@graph'].push(jsonLdFaq(modelo.faq));
   const cuerpo = [
-    migasContenido(lang, porIdioma(lang, { es: 'Guía', en: 'Guide', 'pt-BR': 'Guia', 'pt-PT': 'Guia' })),
+    migasContenido(lang, porIdioma(lang, { es: 'Guía', en: 'Guide', 'pt-BR': 'Guia' })),
     '<main>',
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
@@ -172,8 +162,7 @@ export function htmlGuia(datos, lang) {
 const CABECERAS_NOVEDADES = {
   es: ['Lanzamiento', 'Espíritu', 'Familia', 'Variante', 'Probabilidad'],
   en: ['Release', 'Sprite', 'Family', 'Variant', 'Drop'],
-  'pt-BR': ['Lançamento', 'Espírito', 'Família', 'Variante', 'Probabilidade'],
-  'pt-PT': ['Lançamento', 'Espírito', 'Família', 'Variante', 'Probabilidade']
+  'pt-BR': ['Lançamento', 'Espírito', 'Família', 'Variante', 'Probabilidade']
 };
 
 export function htmlNovedades(datos, lang) {
@@ -208,8 +197,7 @@ export function htmlNovedades(datos, lang) {
     '<p class="nota">' + escapar(porIdioma(lang, {
       es: 'Las fechas son las registradas en los datos del juego. El detalle completo está en la ficha de cada espíritu.',
       en: 'Dates are the ones recorded in the game data. The sprite pages carry the full detail.',
-      'pt-BR': 'As datas são as registradas nos dados do jogo. O detalhe completo está na ficha de cada espírito.',
-      'pt-PT': 'As datas são as registadas nos dados do jogo. O detalhe completo está na ficha de cada espírito.'
+      'pt-BR': 'As datas são as registradas nos dados do jogo. O detalhe completo está na ficha de cada espírito.'
     })) + '</p>',
     ctaHtml(lang),
     '</main>'
@@ -217,7 +205,7 @@ export function htmlNovedades(datos, lang) {
   return documento({ lang, etiquetas, jsonLd, cuerpo });
 }
 
-// Acerca en portugues: mismo esquema que los objetos de es/en de abajo. pt-PT evita "você".
+// Acerca en portugues: mismo esquema que los objetos de es/en de abajo.
 const ACERCA_PT = {
   'pt-BR': {
     que: 'O que é o Spritedex',
@@ -233,21 +221,6 @@ const ACERCA_PT = {
     privacidad: 'Privacidade',
     privacidadTexto: 'Seu progresso fica guardado no seu próprio navegador. Não há cadastro e nada é enviado.',
     fecha: (f) => 'Coleção revisada em ' + f + '.'
-  },
-  'pt-PT': {
-    que: 'O que é o Spritedex',
-    queTexto: 'Um registo gratuito de coleções de espíritos do Fortnite. Mostra cada espírito com a respetiva família, variante, raridade, probabilidade, custo de invocação, habilidade e onde aparece, e permite assinalar quais se têm e até que nível foram subidos.',
-    por: 'Porque existe',
-    porTexto: 'Manter a coleção de cabeça deixa de funcionar por volta dos vinte espíritos: esquece-se qual variante falta e qual continua no nível 2. O Spritedex transforma isso numa lista que se pode consultar e num cartão que se pode enviar a quem faz trocas.',
-    datos: 'De onde vêm os dados',
-    datosTexto: 'Nomes, raridades, probabilidades, custos, habilidades e locais de aparição vêm do jogo e de fontes da comunidade. A coleção é revista manualmente e datada a cada atualização, por isso o que aqui se lê pode mudar quando o jogo muda. Pode conter erros.',
-    quien: 'Quem o faz',
-    quienTexto: 'É um projeto pessoal de fãs, não uma empresa. A coleção é mantida manualmente e a aplicação foi feita para ser rápida e funcionar sem conta.',
-    no: 'O que não é',
-    noTexto: 'O Spritedex não tem qualquer relação com a Epic Games e não vende nada. Também não é um site de notícias nem de estatísticas: apenas acompanha espíritos.',
-    privacidad: 'Privacidade',
-    privacidadTexto: 'O progresso fica guardado no próprio navegador. Não há registo e nada é enviado.',
-    fecha: (f) => 'Coleção revista em ' + f + '.'
   }
 };
 
@@ -302,8 +275,7 @@ export function htmlAcerca(datos, lang) {
     '<h2>' + escapar(h.privacidad) + '</h2><p>' + escapar(h.privacidadTexto + ' ') + '<a href="/privacidad">' + escapar(porIdioma(lang, {
       es: 'Política de privacidad',
       en: 'Privacy policy (in Spanish)',
-      'pt-BR': 'Política de privacidade (em espanhol)',
-      'pt-PT': 'Política de privacidade (em espanhol)'
+      'pt-BR': 'Política de privacidade (em espanhol)'
     })) + '</a>.</p>',
     ctaHtml(lang),
     '<p class="nota">' + escapar(h.fecha) + '</p>',

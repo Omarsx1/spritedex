@@ -19,8 +19,7 @@ const RUTA_HUB = '/espiritus';
 const ROTULOS_FICHA = {
   es: { familia: 'Familia', variante: 'Variante', rareza: 'Rareza', generacion: 'Generación', probabilidad: 'Probabilidad', costo: 'Costo de invocación', ubicacion: 'Ubicación', categoria: 'Espíritu de Fortnite' },
   en: { familia: 'Family', variante: 'Variant', rareza: 'Rarity', generacion: 'Generation', probabilidad: 'Drop chance', costo: 'Summon cost', ubicacion: 'Location', categoria: 'Fortnite sprite' },
-  'pt-BR': { familia: 'Família', variante: 'Variante', rareza: 'Raridade', generacion: 'Geração', probabilidad: 'Probabilidade', costo: 'Custo de invocação', ubicacion: 'Localização', categoria: 'Espírito de Fortnite' },
-  'pt-PT': { familia: 'Família', variante: 'Variante', rareza: 'Raridade', generacion: 'Geração', probabilidad: 'Probabilidade', costo: 'Custo de invocação', ubicacion: 'Localização', categoria: 'Espírito de Fortnite' }
+  'pt-BR': { familia: 'Família', variante: 'Variante', rareza: 'Raridade', generacion: 'Geração', probabilidad: 'Probabilidade', costo: 'Custo de invocação', ubicacion: 'Localização', categoria: 'Espírito de Fortnite' }
 };
 
 // El id del catalogo ya es unico y estable: solo hay que cambiar el guion bajo por guion, que
@@ -58,8 +57,7 @@ export function etiquetasEspiritu(ficha, lang) {
   const descripcion = porIdioma(lang, {
     en: recortar('Fortnite sprite ' + datos.nombre + ': ' + datos.familia + ' family, ' + datos.variante + ' variant, ' + rareza + ' rarity, ' + numeroEnIdioma(ficha.drop, lang) + ' drop chance. Where to find it and what it does.', 160),
     es: recortar('Espíritu ' + datos.nombre + ' de Fortnite: familia ' + datos.familia + ', variante ' + datos.variante + ', rareza ' + rareza + ' y ' + numeroEnIdioma(ficha.drop, lang) + ' de probabilidad. Dónde aparece y qué hace.', 160),
-    'pt-BR': recortar('Espírito ' + datos.nombre + ' de Fortnite: família ' + datos.familia + ', variante ' + datos.variante + ', raridade ' + rareza + ' e ' + numeroEnIdioma(ficha.drop, lang) + ' de probabilidade. Onde aparece e o que faz.', 160),
-    'pt-PT': recortar('Espírito ' + datos.nombre + ' de Fortnite: família ' + datos.familia + ', variante ' + datos.variante + ', raridade ' + rareza + ' e ' + numeroEnIdioma(ficha.drop, lang) + ' de probabilidade. Onde se encontra e o que faz.', 160)
+    'pt-BR': recortar('Espírito ' + datos.nombre + ' de Fortnite: família ' + datos.familia + ', variante ' + datos.variante + ', raridade ' + rareza + ' e ' + numeroEnIdioma(ficha.drop, lang) + ' de probabilidade. Onde aparece e o que faz.', 160)
   });
   return {
     lang,
@@ -74,14 +72,12 @@ export function etiquetasHubEspiritus(total, lang) {
   const titulo = porIdioma(lang, {
     en: 'All Fortnite sprites — Spritedex',
     es: 'Todos los espíritus de Fortnite — Spritedex',
-    'pt-BR': 'Todos os espíritos de Fortnite — Spritedex',
-    'pt-PT': 'Todos os espíritos de Fortnite — Spritedex'
+    'pt-BR': 'Todos os espíritos de Fortnite — Spritedex'
   });
   const descripcion = porIdioma(lang, {
     en: recortar('Full list of the ' + total + ' Fortnite sprites by family and variant, with rarity, drop chance and a page for each one.', 160),
     es: recortar('Lista completa de los ' + total + ' espíritus de Fortnite por familia y variante, con rareza, probabilidad de drop y su ficha.', 160),
-    'pt-BR': recortar('Lista completa dos ' + total + ' espíritos de Fortnite por família e variante, com raridade, probabilidade de obtenção e uma ficha para cada um.', 160),
-    'pt-PT': recortar('Lista completa dos ' + total + ' espíritos de Fortnite por família e variante, com raridade, probabilidade de obtenção e uma ficha para cada um.', 160)
+    'pt-BR': recortar('Lista completa dos ' + total + ' espíritos de Fortnite por família e variante, com raridade, probabilidade de obtenção e uma ficha para cada um.', 160)
   });
   return {
     lang,

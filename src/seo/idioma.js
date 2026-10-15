@@ -5,18 +5,16 @@
 // portugues al espanol; aqui cada texto declara sus idiomas y solo cae a espanol si falta la clave.
 import { IDIOMAS, conIdioma } from '../i18n/core.js';
 import ptBR from '../i18n/locales/pt-BR.js';
-import ptPT from '../i18n/locales/pt-PT.js';
 
-export const OG_LOCALE = { es: 'es_MX', en: 'en_US', 'pt-BR': 'pt_BR', 'pt-PT': 'pt_PT' };
+export const OG_LOCALE = { es: 'es_MX', en: 'en_US', 'pt-BR': 'pt_BR' };
 
 export const NOMBRE_IDIOMA = {
   es: 'Español',
   en: 'English',
-  'pt-BR': 'Português (Brasil)',
-  'pt-PT': 'Português (Portugal)'
+  'pt-BR': 'Português (Brasil)'
 };
 
-// porIdioma('pt-PT', { es, en, 'pt-BR', 'pt-PT' }) -> el valor de pt-PT. Solo cae a espanol cuando
+// porIdioma('pt-BR', { es, en, 'pt-BR' }) -> el valor de pt-BR. Solo cae a espanol cuando
 // el idioma no tiene clave propia, nunca porque el idioma sea distinto de 'en'.
 export function porIdioma(lang, opciones) {
   return Object.prototype.hasOwnProperty.call(opciones, lang) ? opciones[lang] : opciones.es;
@@ -40,7 +38,7 @@ export function lineasOgLocale(lang, conAlternos = true) {
   ];
 }
 
-// Juego hreflang completo de una ruta: los cuatro idiomas con autorreferencia y x-default en espanol.
+// Juego hreflang completo de una ruta: los tres idiomas con autorreferencia y x-default en espanol.
 // Si falta cualquiera, Google descarta el cluster.
 export function hreflangsDe(sitio, ruta, idiomas = IDIOMAS) {
   return [
@@ -53,10 +51,10 @@ export function hreflangsDe(sitio, ruta, idiomas = IDIOMAS) {
 // Solo toca digito.digito, asi que no altera nombres ni texto.
 export function numeroEnIdioma(texto, lang) {
   const s = String(texto);
-  return lang === 'pt-BR' || lang === 'pt-PT' ? s.replace(/(\d)\.(\d)/g, '$1,$2') : s;
+  return lang === 'pt-BR' ? s.replace(/(\d)\.(\d)/g, '$1,$2') : s;
 }
 
-const DICCIONARIOS_PT = { 'pt-BR': ptBR, 'pt-PT': ptPT };
+const DICCIONARIOS_PT = { 'pt-BR': ptBR };
 
 // Las raridades llegan como codigo del juego ('Mythic', 'Special'). En portugues se usa la etiqueta
 // de la interfaz; en espanol e ingles se conserva el codigo, como ya hacia la pagina.

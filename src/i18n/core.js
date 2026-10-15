@@ -3,18 +3,18 @@
 // fuera de React. Cambiar de idioma recarga la pagina, asi que nunca queda un idioma a medias.
 import { safeStorage } from '../utils/safeStorage.js';
 
-export const IDIOMAS = ['es', 'en', 'pt-BR', 'pt-PT'];
+export const IDIOMAS = ['es', 'en', 'pt-BR'];
 export const IDIOMA_POR_DEFECTO = 'es';
 export const CLAVE_IDIOMA = 'spritedex_lang';
-export const PREFIJOS = { en: '/en', 'pt-BR': '/pt-br', 'pt-PT': '/pt-pt' };
+export const PREFIJOS = { en: '/en', 'pt-BR': '/pt-br' };
 
-// 'es-MX' -> 'es', 'en-US' -> 'en', 'pt' y 'pt-BR' -> 'pt-BR', 'pt-PT' -> 'pt-PT', 'fr' -> 'en'.
+// 'es-MX' -> 'es', 'en-US' -> 'en', 'pt', 'pt-BR' y 'pt-PT' -> 'pt-BR', 'fr' -> 'en'.
 // Sin pais, sin IP, sin zona horaria.
 export function normalizarIdioma(etiqueta) {
   const partes = String(etiqueta || '').trim().toLowerCase().split(/[-_]/);
   if (!partes[0]) return null;
   if (partes[0] === 'es') return 'es';
-  if (partes[0] === 'pt') return partes[1] === 'pt' ? 'pt-PT' : 'pt-BR';
+  if (partes[0] === 'pt') return 'pt-BR';
   return 'en';
 }
 
@@ -27,7 +27,7 @@ export function guardarIdioma(lang) {
   safeStorage.setItem(CLAVE_IDIOMA, lang);
 }
 
-// Decide la PRIMERA etiqueta del navegador que sea reconocible (es, pt-BR, pt-PT o en).
+// Decide la PRIMERA etiqueta del navegador que sea reconocible (es, pt-BR o en).
 export function idiomaDelNavegador(langs) {
   const lista = Array.isArray(langs) && langs.length
     ? langs

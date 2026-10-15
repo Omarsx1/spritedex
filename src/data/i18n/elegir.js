@@ -1,12 +1,11 @@
 // Eleccion pura de textos y nombres por idioma. Sin imports de JSON para que node --test la
 // cargue directamente: spritesData.js le pasa los diccionarios.
 
-// Idiomas que muestran el nombre oficial en ingles. pt-PT lo hace de forma TEMPORAL:
-// no hay fuente de nombres de pt-PT en el repo. pt-BR tiene su propio catalogo.
-export const IDIOMAS_NOMBRE_EN = ['en', 'pt-PT'];
+// Idiomas que muestran el nombre oficial en ingles. pt-BR tiene su propio catalogo.
+export const IDIOMAS_NOMBRE_EN = ['en'];
 
 // Texto de los datos del juego. El diccionario va por texto en español:
-// { 'Texto es': { en, 'pt-BR', 'pt-PT' } }. Si falta el idioma, se devuelve el español.
+// { 'Texto es': { en, 'pt-BR' } }. Si falta el idioma, se devuelve el español.
 export function elegirTextoJuego(traducciones, valor, lang) {
   if (!valor || lang === 'es') return valor;
   const entrada = traducciones[valor];
