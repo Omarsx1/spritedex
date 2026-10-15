@@ -71,6 +71,8 @@ export default {
   // Componentes de la app publica (extraidos por grupo, en orden alfabetico).
   "amigos.aceptar": "Aceptar",
   "amigos.actualizar": "Actualizar",
+  "amigos.actualizado": "Actualizado",
+  "amigos.noSePudoActualizar": "No pudimos actualizar. Tu lista sigue igual.",
   "amigos.agregarAmigo": "AGREGAR AMIGO",
   "amigos.amigosConteo": "AMIGOS ({n})",
   "amigos.cancelar": "Cancelar",
@@ -91,7 +93,7 @@ export default {
   "amigos.leFaltanConteo": "LE FALTAN ({n})",
   "amigos.leFaltanHint": "Estos le faltan a tu amigo: son tuyos y puedes compartírselos.",
   "amigos.leFaltanVacio": "No necesita nada de lo tuyo.",
-  "amigos.necesitasSesion": "Necesitas sesión para enviar solicitudes: vincula tu cuenta y se activan.",
+  "amigos.necesitasSesion": "Tu sesión aún no está lista. Recarga la página para enviar solicitudes.",
   "amigos.noSePudoLeerRed": "No pudimos leer tu red. Prueba con Actualizar.",
   "amigos.placeholderCodigo": "Su código (ej: 2KD4)",
   "amigos.quitar": "Quitar",

@@ -70,6 +70,8 @@ export default {
   // Public app components (extracted by group, alphabetical).
   "amigos.aceptar": "Accept",
   "amigos.actualizar": "Refresh",
+  "amigos.actualizado": "Updated",
+  "amigos.noSePudoActualizar": "We couldn't update. Your list is unchanged.",
   "amigos.agregarAmigo": "ADD FRIEND",
   "amigos.amigosConteo": "FRIENDS ({n})",
   "amigos.cancelar": "Cancel",
@@ -90,7 +92,7 @@ export default {
   "amigos.leFaltanConteo": "THEY'RE MISSING ({n})",
   "amigos.leFaltanHint": "Your friend is missing these: they're yours and you can share them.",
   "amigos.leFaltanVacio": "They don't need anything of yours.",
-  "amigos.necesitasSesion": "You need an account to send requests: link your account to turn them on.",
+  "amigos.necesitasSesion": "Your session isn't ready yet. Reload the page to send requests.",
   "amigos.noSePudoLeerRed": "We couldn't read your network. Try Refresh.",
   "amigos.placeholderCodigo": "Their code (e.g. 2KD4)",
   "amigos.quitar": "Remove",

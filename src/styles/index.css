@@ -7960,19 +7960,21 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .sdm-friends__pendiente { font-size: 0.66rem; color: rgba(226, 232, 240, 0.5); }
 .sdm-friends__hint { margin: 0; font-size: 0.7rem; color: rgba(226, 232, 240, 0.5); line-height: 1.45; }
 
-/* Radar compacto para iPhone: menos aire, tipografias mas ajustadas y respeto por la
-   barra inferior del sistema. Los campos se quedan en los esenciales. */
+/* Radar compacto para iPhone: tipografias mas ajustadas y respeto por la barra
+   inferior del sistema. Los campos se quedan en los esenciales. */
 .sdm-friends {
-  gap: 8px;
+  gap: 12px;
   margin: 10px 0 12px;
   padding: 11px;
 }
+.sdm-friends__group { gap: 9px; }
 .sdm-friends__row { padding: 7px 9px; }
 .sdm-friends__code { font-size: 0.88rem; letter-spacing: 2px; }
 .sdm-friends__input { padding: 7px 10px; font-size: 0.78rem; }
 .sdm-friends__send { padding: 7px 12px; font-size: 0.68rem; }
 .sdm-friends__btn { padding: 5px 10px; font-size: 0.65rem; }
-.sdm-friends__hint { font-size: 0.67rem; }
+.sdm-friends__hint { font-size: 0.67rem; line-height: 1.6; }
+.sdm-friends__aviso { line-height: 1.5; }
 
 @media (max-width: 480px) {
   .sdm-friends__plate { gap: 5px; }
@@ -7994,7 +7996,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .fpage__top { display: flex; align-items: center; gap: 12px; }
 .fpage__headText { flex: 1; min-width: 0; }
 .fpage__title { margin: 0; font-size: 1.45rem; font-weight: 900; color: #fff; }
-.fpage__sub { margin: 2px 0 0; font-size: 0.72rem; color: rgba(226, 232, 240, 0.55); }
+.fpage__sub { margin: 4px 0 0; font-size: 0.72rem; line-height: 1.4; color: rgba(226, 232, 240, 0.55); }
 .fpage__back, .fpage__refresh {
   display: inline-flex; align-items: center; justify-content: center;
   width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
@@ -8060,6 +8062,13 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   border: 1px solid rgba(255, 255, 255, 0.28);
 }
 .fpage__back:hover, .fpage__refresh:hover { background: rgba(255, 255, 255, 0.18); }
+.fpage__refresh.is-loading svg { animation: fpage-refresh-spin 0.9s linear infinite; }
+@keyframes fpage-refresh-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .fpage__refresh.is-loading svg { animation: none; }
+}
+.fpage__status { margin: 0; font-size: 0.7rem; color: #9df3c0; }
+.fpage__status--error { color: #fca5a5; }
 
 /* Minicards de la comparacion: miniatura del espiritu con su nombre, como en el grid. */
 .fpage__minis { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 7px; }

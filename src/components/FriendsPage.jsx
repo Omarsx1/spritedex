@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ALL_SPRITES, pickName } from '../data/spritesData';
 import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw } from 'lucide-react';
 import { useFriendRequests } from '../hooks/useFriendRequests';
@@ -57,6 +57,26 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
     if (codigoFicha) setVista('comparacion');
   }, [codigoFicha]);
 
+  // Solo el refresco pedido por el usuario muestra confirmacion; la carga inicial no.
+  const refrescoPedido = useRef(false);
+  const [refresco, setRefresco] = useState(null);
+  useEffect(() => {
+    if (radar.cargando || !refrescoPedido.current) return;
+    refrescoPedido.current = false;
+    setRefresco(radar.fallo ? 'error' : 'ok');
+  }, [radar.cargando, radar.fallo]);
+  useEffect(() => {
+    if (!refresco) return;
+    const id = setTimeout(() => setRefresco(null), 2500);
+    return () => clearTimeout(id);
+  }, [refresco]);
+
+  const actualizarRed = () => {
+    refrescoPedido.current = true;
+    setRefresco(null);
+    radar.cargar();
+  };
+
   const codigoCorto = (myFriendCode || '').replace(/^SDEX-/i, '');
   const enlace = generateShareUrl(myShareToken, myFriendCode || 'SDEX-0000');
 
@@ -109,10 +129,12 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
           <h1 className="fpage__title">{t('amigos.titulo')}</h1>
           <p className="fpage__sub">{t('amigos.subtitulo')}</p>
         </div>
-        <button className="fpage__refresh" onClick={() => radar.cargar()} disabled={radar.cargando} aria-label={t('amigos.actualizar')}>
-          <RefreshCw size={15} />
-        </button>
-        <LanguageSwitcher className="fpage__lang" />
+        <div className="fpage__tools">
+          <button className={'fpage__refresh' + (radar.cargando ? ' is-loading' : '')} onClick={actualizarRed} disabled={radar.cargando} aria-label={t('amigos.actualizar')}>
+            <RefreshCw size={15} />
+          </button>
+          <LanguageSwitcher className="fpage__lang" />
+        </div>
       </div>
 
       {/* Un bloque a la vez: la pagina deja de apilar siete secciones y de repetir la
@@ -179,7 +201,7 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
               </button>
             </div>
             {avisoVisible && <p className="sdm-friends__aviso">{avisoVisible}</p>}
-            {!radar.haySesion && (
+            {radar.sesionLista && !radar.haySesion && (
               <p className="sdm-friends__aviso">{t('amigos.necesitasSesion')}</p>
             )}
           </div>
@@ -284,6 +306,11 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
 
           <div className="sdm-friends__group">
             <span className="sdm-friends__label"><Users size={12} /> {t('amigos.amigosConteo', { n: radar.amigos.length })}</span>
+            {refresco && (
+              <p className={'fpage__status fpage__status--' + refresco} role="status">
+                {refresco === 'ok' ? t('amigos.actualizado') : t('amigos.noSePudoActualizar')}
+              </p>
+            )}
             {/* La lista no afirma nada que no haya comprobado: mientras no llegue la respuesta
                 se dice que esta cargando (tambien mientras se resuelve la sesion), si la
                 lectura fallo se dice eso, y "sin amigos" queda para cuando de verdad se sabe. */}

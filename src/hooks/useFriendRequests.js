@@ -28,12 +28,19 @@ export function useFriendRequests() {
 
   // El usuario sale de la sesion (anonima o con cuenta): asi la modal no necesita que
   // App le pase nada nuevo.
+  // La sesion anonima puede llegar DESPUES del montaje (App la crea en segundo plano): por
+  // eso tambien se escuchan los cambios de autenticacion, no solo la lectura inicial.
   useEffect(() => {
     let vivo = true;
+    let suscripcion = null;
     (async () => {
       try {
         const supabase = await getSupabase();
         if (!supabase) return;
+        const { data: escucha } = supabase.auth.onAuthStateChange((_evento, sesion) => {
+          if (vivo) setYo(sesion?.user || null);
+        });
+        suscripcion = escucha.subscription;
         // getSession() lee la sesion local. getUser() validaba el token contra el servidor
         // en cada montaje y retrasaba la lista; aqui solo hace falta el id.
         const { data } = await supabase.auth.getSession();
@@ -45,7 +52,10 @@ export function useFriendRequests() {
         if (vivo) setCargando(false);
       }
     })();
-    return () => { vivo = false; };
+    return () => {
+      vivo = false;
+      suscripcion?.unsubscribe();
+    };
   }, []);
 
   const cargar = useCallback(async ({ silencioso = false } = {}) => {
