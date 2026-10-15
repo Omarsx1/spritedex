@@ -9316,62 +9316,87 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 /* ── Menu hamburguesa ───────────────────────────────────────────────── */
+/* Grafito neutro: el violeta solo marca iconos y estados; el color de cada
+   generacion va como franja lateral en la opcion activa. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__menu-dropdown {
-  /* El acento de los iconos del menu vive aqui: los iconos lo leen por
-     variable, asi que fuera de temporada siguen en cian. */
   --nav-accent: #a78bfa;
-  background: #160b24;
-  border-color: rgba(168, 85, 247, 0.28);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 22px rgba(168, 85, 247, 0.14);
+  background: linear-gradient(180deg, #14151f 0%, #0b0c12 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 14px;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__menu-section-label {
-  color: rgba(196, 181, 253, 0.62);
+  color: #7d8294;
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__dropdown-divider {
-  background: rgba(168, 85, 247, 0.24);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.11), transparent);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__menu-action-btn {
-  background: rgba(168, 85, 247, 0.07);
-  border-color: rgba(168, 85, 247, 0.2);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  color: #e4e4ef;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__menu-action-btn:hover {
-  background: rgba(217, 70, 239, 0.14);
-  border-color: rgba(217, 70, 239, 0.42);
+  background: rgba(167, 139, 250, 0.1);
+  border-color: rgba(167, 139, 250, 0.3);
+  color: #ffffff;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__menu-action-btn .action-btn-sub {
-  color: rgba(196, 181, 253, 0.68);
+  color: #7d8294;
 }
 
-/* El cian generico del menu (el codigo, vincular y la opcion "Todas") vira.
-   Las opciones de generacion conservan su color: ahi el color identifica. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__dropdown-code {
   color: #c4b5fd;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__gen-option {
-  --gen-rgb: 217, 70, 239;
+  --gen-rgb: 167, 139, 250;
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  color: #c4c8d6;
 }
 
-/* El acento de la opcion "Todas" (la unica sin generacion propia) tambien vira.
-   Llega en linea desde el componente, asi que solo se puede mover desde la hoja
-   con !important; las opciones de generacion conservan su color, que identifica. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__gen-option:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(var(--gen-rgb), 0.35);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__gen-option.selected {
+  background: linear-gradient(90deg, rgba(var(--gen-rgb), 0.16), rgba(255, 255, 255, 0.02) 72%);
+  border-color: rgba(var(--gen-rgb), 0.45);
+  box-shadow: inset 3px 0 0 rgb(var(--gen-rgb));
+  color: #f5f5fa;
+}
+
+/* "Todas" no tiene generacion propia: lleva el violeta del acento. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__gen-option[data-gen='0'] {
-  --gen-rgb: 217, 70, 239 !important;
+  --gen-rgb: 167, 139, 250 !important;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__menu-copy {
+  border-top-color: rgba(255, 255, 255, 0.06);
+  color: #6b7080;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__vincular-btn {
-  border-color: rgba(168, 85, 247, 0.3);
-  color: rgba(196, 181, 253, 0.9);
+  border-color: rgba(167, 139, 250, 0.3);
+  color: #c4b5fd;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__vincular-btn:hover {
-  background: rgba(217, 70, 239, 0.12);
-  border-color: rgba(217, 70, 239, 0.45);
+  background: rgba(167, 139, 250, 0.1);
+  border-color: rgba(167, 139, 250, 0.45);
   color: #ffffff;
 }
 
