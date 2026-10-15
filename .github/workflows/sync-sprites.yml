@@ -47,12 +47,6 @@ jobs:
           PUPPETEER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: node scripts/sync-sprites.js
 
-      - name: Diagnóstico ficha 4031827 (temporal)
-        continue-on-error: true
-        env:
-          PUPPETEER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
-        run: node scripts/probe-fgg.mjs "https://fortnite.gg/sprites?id=4031827"
-
       # La app lee el indice compacto, no el scrapeo completo: sin regenerarlo, los
       # espiritus nuevos llegan sin habilidad ni perk aunque el scrapeo los tenga.
       - name: Regenerar indice de fortnite.gg
