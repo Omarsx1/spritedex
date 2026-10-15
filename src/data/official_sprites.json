@@ -989,7 +989,7 @@
     "theme": "Basic",
     "rarity": "Epic",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -999,7 +999,7 @@
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -1009,7 +1009,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -1019,7 +1019,7 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -1029,7 +1029,7 @@
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -1561,7 +1561,7 @@
     "theme": "Trick or Treat",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2251,7 +2251,7 @@
     "theme": "Basic",
     "rarity": "Mythic",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2261,7 +2261,7 @@
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2271,7 +2271,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2281,7 +2281,7 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2291,7 +2291,7 @@
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2312,7 +2312,7 @@
     "theme": "Basic",
     "rarity": "Legendary",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2322,7 +2322,7 @@
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2332,7 +2332,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2342,7 +2342,7 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2352,7 +2352,7 @@
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2373,7 +2373,7 @@
     "theme": "Basic",
     "rarity": "Legendary",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2383,7 +2383,7 @@
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2393,7 +2393,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2403,7 +2403,7 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2413,7 +2413,7 @@
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
