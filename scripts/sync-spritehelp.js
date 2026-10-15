@@ -41,7 +41,6 @@ const RAREZAS_VALIDAS = new Set(['Rare', 'Special', 'Epic', 'Legendary', 'Mythic
 
 // spritehelp da el nombre de la familia para el básico; el juego usa el nombre del espíritu.
 export const NOMBRE_EN_REAL = {
-  honey_basic: 'Honey Sprite',
   obsession_basic: 'One Wish Willow Sprite'
 };
 
