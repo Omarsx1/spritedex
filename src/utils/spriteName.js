@@ -7,7 +7,7 @@ import { IDIOMAS_NOMBRE_EN } from '../data/i18n/elegir.js';
 export function pickName(sprite, lang = getLang()) {
   if (!sprite) return '';
   const espanol = sprite.fullName || sprite.name || '';
-  // pt-BR y pt-PT usan el nombre en ingles de forma temporal (ver IDIOMAS_NOMBRE_EN).
+  if (lang === 'pt-BR') return sprite.fullNamePtBr || sprite.fullNameEn || espanol;
   if (!IDIOMAS_NOMBRE_EN.includes(lang)) return espanol;
   return sprite.fullNameEn || espanol;
 }

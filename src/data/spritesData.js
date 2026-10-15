@@ -10,6 +10,7 @@ import spriteThumbsJson from './sprite_thumbs.json';
 // cruda de fortnite.gg. En ingles el juego invierte el orden: "Gold Jonesy Sprite".
 import catalogEn from './i18n/catalog.en.json';
 import familiasEn from './i18n/familias.en.json';
+import nombresPtBr from './i18n/nombres.pt-BR.json';
 import textosJuego from './i18n/textos.juego.json';
 import { getLang, t } from '../i18n/texto.js';
 import { elegirNombreFamilia, elegirTextoJuego, IDIOMAS_NOMBRE_EN } from './i18n/elegir.js';
@@ -865,6 +866,7 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     id: item.id,
     fullName: fullName,
     fullNameEn: catalogEn[item.id] || fullName,
+    fullNamePtBr: nombresPtBr.espiritu[item.id] || catalogEn[item.id] || fullName,
     variant: item.theme,
     variantDisplay: spanishTheme,
     variantDisplayEn: THEME_NAMES_EN[item.theme] || item.theme,
@@ -900,7 +902,7 @@ export const FAMILY_NAMES_EN = familiasEn;
 export { pickName } from '../utils/spriteName.js';
 
 export function pickFamilyName(familyId, lang = getLang()) {
-  return elegirNombreFamilia(familyId, lang, FAMILY_NAMES_MAP, FAMILY_NAMES_EN);
+  return elegirNombreFamilia(familyId, lang, FAMILY_NAMES_MAP, FAMILY_NAMES_EN, nombresPtBr.familia);
 }
 
 // Texto que viene de los DATOS del juego (habilidad, perk, ubicacion y coste). Se traduce
@@ -912,6 +914,7 @@ export function pickTexto(valor, lang = getLang()) {
 
 export function pickThemeName(theme, lang = getLang()) {
   if (!theme) return '';
+  if (lang === 'pt-BR') return nombresPtBr.tema[theme] || THEME_NAMES_EN[theme] || theme;
   const mapa = IDIOMAS_NOMBRE_EN.includes(lang) ? THEME_NAMES_EN : THEME_NAMES_ES;
   return mapa[theme] || theme;
 }

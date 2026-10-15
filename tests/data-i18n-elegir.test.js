@@ -63,10 +63,12 @@ test('pickFamilyName: es conserva el nombre en español y en ingles el de su cat
   }
 });
 
-test('pickFamilyName: pt-BR y pt-PT devuelven el nombre en ingles, nunca el español', () => {
+test('pickFamilyName: pt-BR usa su mapa; pt-PT sigue en ingles, nunca en español', () => {
   const familias = Object.keys(FAMILY_NAMES_MAP).filter((id) => familiasEn[id]);
+  const ptBr = { honey: 'Mel', klombo: 'Klombo' };
+  assert.equal(elegirNombreFamilia('honey', 'pt-BR', FAMILY_NAMES_MAP, familiasEn, ptBr), 'Mel');
+  assert.equal(elegirNombreFamilia('honey', 'pt-BR', FAMILY_NAMES_MAP, familiasEn), familiasEn.honey);
   for (const id of familias) {
-    assert.equal(elegirNombreFamilia(id, 'pt-BR', FAMILY_NAMES_MAP, familiasEn), familiasEn[id]);
     assert.equal(elegirNombreFamilia(id, 'pt-PT', FAMILY_NAMES_MAP, familiasEn), familiasEn[id]);
   }
 });
@@ -78,15 +80,15 @@ test('pickFamilyName: sin familia devuelve vacio y con familia desconocida devue
   }
 });
 
-test('la lista de idiomas con nombre en ingles es exactamente en, pt-BR y pt-PT', () => {
-  assert.deepEqual(IDIOMAS_NOMBRE_EN, ['en', 'pt-BR', 'pt-PT']);
+test('la lista de idiomas con nombre en ingles es exactamente en y pt-PT', () => {
+  assert.deepEqual(IDIOMAS_NOMBRE_EN, ['en', 'pt-PT']);
 });
 
-test('pickName: pt-BR y pt-PT devuelven el nombre en ingles; es y en no cambian', () => {
-  const sprite = { fullName: 'Oro Jonesy', fullNameEn: 'Gold Jonesy Sprite' };
+test('pickName: pt-BR usa su nombre; pt-PT sigue en ingles; es y en no cambian', () => {
+  const sprite = { fullName: 'Oro Jonesy', fullNameEn: 'Gold Jonesy Sprite', fullNamePtBr: 'Jonesy Dourado' };
   assert.equal(pickName(sprite, 'es'), 'Oro Jonesy');
   assert.equal(pickName(sprite, 'en'), 'Gold Jonesy Sprite');
-  assert.equal(pickName(sprite, 'pt-BR'), 'Gold Jonesy Sprite');
+  assert.equal(pickName(sprite, 'pt-BR'), 'Jonesy Dourado');
   assert.equal(pickName(sprite, 'pt-PT'), 'Gold Jonesy Sprite');
 });
 
