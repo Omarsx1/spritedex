@@ -1388,7 +1388,7 @@ useEffect(() => {
               <span className="stats-bar__spacer" aria-hidden="true" />
               <span className="stats-bar__label">{t('app.total')}</span>
             </div>
-            <div className="stats-bar__col">
+            <div className="stats-bar__col stats-bar__col--caught">
               <span className="stats-bar__value">{ownedCount}</span>
               <span
                 className="stats-bar__track"
@@ -1402,7 +1402,7 @@ useEffect(() => {
               </span>
               <span className="stats-bar__label">{t('app.atrapados')}</span>
             </div>
-            <div className="stats-bar__col">
+            <div className="stats-bar__col stats-bar__col--mastered">
               <span className="stats-bar__value">{masteredCount}</span>
               <span
                 className="stats-bar__track"

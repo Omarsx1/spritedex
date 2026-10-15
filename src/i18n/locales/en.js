@@ -274,6 +274,7 @@ export default {
   "filtros.todas": "All",
   "filtros.todos": "All",
   "filtros.variante": "VARIANT",
+  "filtros.sprite": "FAMILY",
   "filtros.ver": "View",
   "filtros.vistaCuadricula": "Grid view",
   "filtros.vistaLista": "List view",

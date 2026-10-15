@@ -393,7 +393,7 @@ export function Header({
         {/* Stats + Actions bar */}
         <div className="hero__bar" ref={statsRef}>
           <div className="hero__stat-ring">
-            <div className="hero__ring-box">
+            <div className="hero__ring-box" style={{ '--fill': `${ownedPct}%` }}>
               <svg viewBox="0 0 110 110" className="hero__ring-svg">
                 <circle cx="55" cy="55" r={ringRadius} className="hero__ring-track" />
                 <circle
@@ -448,7 +448,7 @@ export function Header({
           </div>
 
           <div className="hero__stat-ring">
-            <div className="hero__ring-box">
+            <div className="hero__ring-box" style={{ '--fill': `${masteredPct}%` }}>
               <svg viewBox="0 0 110 110" className="hero__ring-svg">
                 <circle cx="55" cy="55" r={ringRadius} className="hero__ring-track" />
                 <circle

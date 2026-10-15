@@ -229,7 +229,7 @@ export function FilterBar({
           <Search size={14} className="search-icon" />
           <input
             type="text"
-            placeholder={t('filtros.buscar')}
+            placeholder={t('filtrosMovil.buscarEspiritu')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="search-input-field"
@@ -290,7 +290,7 @@ export function FilterBar({
               <img src={selectedSpriteData.image} alt="" className="trigger-sprite-icon"
                 onError={(e) => { e.target.style.display = 'none'; }} />
             )}
-            <span>{spriteFilter === 'all' ? 'SPRITE' : spriteFilter}</span>
+            <span>{spriteFilter === 'all' ? t('filtros.sprite') : spriteFilter}</span>
             <ChevronDown size={13} className={`trigger-chevron ${spriteOpen ? 'rotated' : ''}`} />
           </button>
 

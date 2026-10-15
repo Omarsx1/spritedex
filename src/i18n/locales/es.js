@@ -275,6 +275,7 @@ export default {
   "filtros.todas": "Todas",
   "filtros.todos": "Todos",
   "filtros.variante": "VARIANTE",
+  "filtros.sprite": "FAMILIA",
   "filtros.ver": "Ver",
   "filtros.vistaCuadricula": "Vista cuadrícula",
   "filtros.vistaLista": "Vista lista",

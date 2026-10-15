@@ -1383,8 +1383,7 @@ html.theme-fortnitemares .hero__smoke {
   filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.5));
 }
 
-/* Parte 3 de la cinematica (glow): hasta los detalles cambian de temporada.
-   Los anillos viran de indigo/rosa a violeta/naranja calabaza. */
+/* Los detalles de temporada: los anillos viran de indigo/rosa a violeta/naranja calabaza. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-fill--caught {
   stroke: #a855f7;
   filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.55));
@@ -1649,6 +1648,149 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   transform: translateY(-2px);
 }
 
+/* Escritorio: espiritu del hero mas grande y anillos/botones con el acabado de temporada. */
+@media (min-width: 769px) {
+  .hero__hero-sprite {
+    width: 240px !important;
+    height: 240px !important;
+    max-width: 240px !important;
+    max-height: 240px !important;
+  }
+
+  .hero__hero-img {
+    width: 230px !important;
+    height: 230px !important;
+    max-width: 230px !important;
+    max-height: 230px !important;
+  }
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-box {
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(24, 34, 46, 0.8) 0%, rgba(24, 34, 46, 0.4) 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 10px 26px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-track {
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--primary,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--accent {
+  gap: 8px;
+  padding: 11px 20px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  background: rgba(24, 34, 46, 0.8);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--primary {
+  color: #c4b5fd;
+  border-color: rgba(167, 139, 250, 0.42);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--accent {
+  color: #67e8f9;
+  border-color: rgba(34, 211, 238, 0.42);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--primary .hero__btn-icon,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--accent .hero__btn-icon {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--primary:hover {
+  background: rgba(30, 41, 56, 0.92);
+  border-color: rgba(167, 139, 250, 0.75);
+  box-shadow: 0 0 24px rgba(167, 139, 250, 0.28);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--accent:hover {
+  background: rgba(30, 41, 56, 0.92);
+  border-color: rgba(34, 211, 238, 0.75);
+  box-shadow: 0 0 24px rgba(34, 211, 238, 0.28);
+}
+
+/* Escritorio: los indicadores son tarjetas rectangulares, como en el movil. */
+@media (min-width: 769px) {
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__bar {
+    max-width: 720px;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__actions {
+    flex-wrap: nowrap;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__stat-ring {
+    width: 164px;
+    gap: 8px;
+    padding: 14px 16px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)), rgba(24, 34, 46, 0.72);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 26px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-box {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 8px;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-svg {
+    display: none;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__stat-inner {
+    position: static;
+    inset: auto;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 6px;
+    text-align: left;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__stat-of {
+    margin-top: 0;
+    font-size: 0.9rem;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__stat-value {
+    font-size: 1.7rem;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-box::after {
+    content: '';
+    display: block;
+    height: 6px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #22d3ee 0%, #818cf8 55%, #c084fc 100%) 0 0 / var(--fill, 0%) 100% no-repeat,
+      rgba(255, 255, 255, 0.12);
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__bar > .hero__stat-ring:last-child .hero__ring-box::after {
+    background: linear-gradient(90deg, #fb923c 0%, #ff922b 100%) 0 0 / var(--fill, 0%) 100% no-repeat,
+      rgba(255, 255, 255, 0.12);
+  }
+}
+
 .hero__spin-icon {
   animation: heroSpin 1s linear infinite;
 }
@@ -1702,17 +1844,17 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   }
 
   .hero__hero-sprite {
-    width: 140px !important;
-    height: 140px !important;
-    max-width: 140px !important;
-    max-height: 140px !important;
+    width: 160px !important;
+    height: 160px !important;
+    max-width: 160px !important;
+    max-height: 160px !important;
   }
 
   .hero__hero-img {
-    width: 140px !important;
-    height: 140px !important;
-    max-width: 140px !important;
-    max-height: 140px !important;
+    width: 160px !important;
+    height: 160px !important;
+    max-width: 160px !important;
+    max-height: 160px !important;
   }
 
   /* El humo acompana al espiritu: en movil escala con el escaparate. */
@@ -1784,7 +1926,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 @media (max-width: 480px) {
   .hero__content {
     padding: 24px 14px 18px;
-    gap: 14px;
+    gap: 18px;
   }
 
   .hero__title-line {
@@ -2016,6 +2158,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .filter-search-box .search-icon {
   position: absolute;
   left: 12px;
+  z-index: 1;
   color: #94a3b8;
   pointer-events: none;
 }
@@ -2023,6 +2166,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .search-input-field {
   padding: 8px 14px 8px 32px;
   width: 160px;
+  text-align: left;
   border-radius: 9999px;
   background: rgba(22, 27, 34, 0.65);
   backdrop-filter: blur(12px);
@@ -2200,11 +2344,12 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   transform: translateX(-50%);
   z-index: 91;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 5px;
   padding: 10px;
-  min-width: 460px;
+  min-width: 580px;
   max-height: 360px;
+  overflow-x: hidden;
   overflow-y: auto;
   background: rgba(15, 20, 28, 0.96);
   backdrop-filter: blur(24px);
@@ -2229,7 +2374,8 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
-  white-space: nowrap;
+  min-width: 0;
+  line-height: 1.2;
 }
 
 .sprite-grid-chip:hover {
@@ -2251,7 +2397,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 .sprite-chip-name {
-  white-space: nowrap;
+  min-width: 0;
 }
 
 /* No Lanzados Checkbox Pill */
@@ -5912,6 +6058,18 @@ body:has(.modal-overlay) {
   transform: translateY(-1px);
 }
 
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__btn--share {
+  background: rgba(167, 139, 250, 0.14);
+  border-color: rgba(167, 139, 250, 0.45);
+  color: #c4b5fd;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__btn--share:hover:not(:disabled) {
+  background: rgba(167, 139, 250, 0.28);
+  border-color: #a78bfa;
+  box-shadow: 0 0 14px rgba(167, 139, 250, 0.5);
+}
+
 /* Descargar con Efecto Glitch Oficial Cyberpunk */
 .sdm-share__glitch-btn {
   position: relative;
@@ -7066,7 +7224,7 @@ body:has(.modal-overlay) {
 }
 
 .ms-spotlight-card.is-inactive {
-  opacity: 0.55;
+  opacity: 0.75;
   transform: scale(0.90);
   z-index: 5;
   cursor: pointer;
@@ -7077,12 +7235,12 @@ body:has(.modal-overlay) {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(6, 7, 14, 0.45);
+  background: rgba(6, 7, 14, 0.25);
   pointer-events: none;
 }
 
 .ms-spotlight-card.is-inactive:hover {
-  opacity: 0.85;
+  opacity: 0.92;
   transform: scale(0.93);
 }
 
@@ -7662,17 +7820,16 @@ body:has(.modal-overlay) {
 
 
 /* ===== INDICADORES DE PROGRESO (Móvil) =====
-   Tres lecturas en una tira compacta y SIN caja: se ve el fondo de la app por
-   detras y eso es lo que da aire. Etiqueta fina, numero tabular y barra de 3 px.
-   En movil sustituye a los dos anillos del hero, que se ocultan. */
+   Tres tarjetas de cristal: cifra, barra con gradiente y etiqueta. Atrapados y
+   Maxeados llevan su color de acento y un punto luminoso en la esquina. En movil
+   sustituye a los dos anillos del hero, que se ocultan. */
 .stats-bar {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  /* Las tres etiquetas arrancan a la misma altura: el total, al no llevar barra,
-     se descentraba unos pixeles y se notaba. */
-  align-items: start;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 8px;
   /* Pegada al buscador (8px) y con aire de sobra antes de la tarjeta (24px). */
-  margin: 8px 16px 24px;
+  margin: 14px 16px 28px;
 }
 
 .stats-bar__col {
@@ -7680,27 +7837,21 @@ body:has(.modal-overlay) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 0 6px;
+  gap: 8px;
+  padding: 12px 8px 10px;
   min-width: 0;
-}
-
-/* Separador corto y centrado, como en una barra de pestanas. */
-.stats-bar__col + .stats-bar__col::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1px;
-  height: 18px;
-  background: rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .stats-bar__label {
-  font-size: 0.6rem;
-  font-weight: 600;
-  color: rgba(226, 232, 240, 0.45);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(226, 232, 240, 0.6);
   white-space: nowrap;
 }
 
@@ -7723,10 +7874,9 @@ body:has(.modal-overlay) {
 .stats-bar__track {
   display: block;
   width: 100%;
-  max-width: 70px;
-  height: 3px;
+  height: 5px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   overflow: hidden;
 }
 
@@ -7735,8 +7885,7 @@ body:has(.modal-overlay) {
 .stats-bar__spacer {
   display: block;
   width: 100%;
-  max-width: 70px;
-  height: 3px;
+  height: 5px;
 }
 
 .stats-bar__fill {
@@ -7747,11 +7896,13 @@ body:has(.modal-overlay) {
 }
 
 .stats-bar__fill--caught {
-  background: #6366f1;
+  background: linear-gradient(90deg, #22d3ee 0%, #818cf8 55%, #c084fc 100%);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
 }
 
 .stats-bar__fill--mastered {
-  background: #ec4899;
+  background: linear-gradient(90deg, #818cf8 0%, #e879f9 100%);
+  box-shadow: 0 0 10px rgba(232, 121, 249, 0.5);
 }
 
 /* En movil los anillos del hero ya no hacen falta: el progreso vive bajo el buscador. */
@@ -8092,16 +8243,8 @@ html.theme-fortnitemares body::before {
   opacity: 0;
 }
 
-/* Fases boot y title: el wordmark todavia no ha mutado (o esta mutando) sobre
-   la rejilla; el suelo no ha cambiado. La clase del tema ya esta puesta, pero
-   la rejilla sigue ahi. */
-html.theme-fortnitemares[data-fnm-phase='boot'] body::before,
-html.theme-fortnitemares[data-fnm-phase='title'] body::before {
-  opacity: 1;
-}
-
-/* El bosque persistente de la temporada: una capa propia (la monta
-   FortnitemaresTransition) para poder CRUZARLO con la rejilla, algo que un
+/* El bosque persistente de la temporada: una capa propia (vive en el armazon
+   de index.html) para poder CRUZARLO con la rejilla, algo que un
    solo pseudo-elemento no puede hacer. Vive debajo del contenido y encima de
    la rejilla (mismo z-index, despues en el DOM). */
 .fnm-forest {
@@ -8109,42 +8252,29 @@ html.theme-fortnitemares[data-fnm-phase='title'] body::before {
   inset: 0;
   z-index: -2;
   pointer-events: none;
-  background-image: url('/fortnitemares-forest.svg');
+  background-image: url('/backwitch.webp');
   background-size: cover;
   background-position: center bottom;
   background-repeat: no-repeat;
+  filter: blur(1.8px);
   transform: translateZ(0);
-  will-change: transform, opacity;
-  /* Respiracion lenta: se anima transform, no background-position (mover el
-     fondo repinta la capa entera en cada frame y eso se nota en el movil). */
-  animation: fnm-forest-breathe 18s ease-in-out infinite alternate;
+  will-change: opacity;
   opacity: 1;
   transition: opacity 1700ms ease;
 }
 
-/* El pulso de luz solo corre fuera de la cinematica: una animacion de opacity
-   pisaria el fundido dirigido por fases. */
+/* Pulso de luz del bosque. */
 html:not([data-fnm-phase]) .fnm-forest {
-  animation:
-    fnm-forest-breathe 18s ease-in-out infinite alternate,
-    fnm-forest-light 9s ease-in-out infinite alternate;
+  animation: fnm-forest-light 9s ease-in-out infinite alternate;
 }
 
-/* Sin la clase del tema, el bosque no existe para el visitante. Es lo que mantiene
-   intacta la cinematica de los nuevos: ven la rejilla hasta la parte "ground". El
-   armazon de index.html monta esta capa antes del primer pintado para que quien ya
-   vio la cinematica entre directo al bosque, sin esperar al bundle. */
+/* Sin la clase del tema, el bosque no se ve. El armazon de index.html monta esta capa
+   antes del primer pintado, sin esperar al bundle. */
 html:not(.theme-fortnitemares) .fnm-forest {
   /* animation: none es obligatorio: fnm-forest-light anima opacity, y una animacion
      gana sobre esta declaracion por mas especifica que sea. Sin esto, el bosque se
-     veia igual antes de la cinematica. */
+     veria fuera de temporada. */
   animation: none;
-  opacity: 0;
-}
-
-/* Parte 1 (boot/title): el bosque todavia no existe para el visitante. */
-html[data-fnm-phase='boot'] .fnm-forest,
-html[data-fnm-phase='title'] .fnm-forest {
   opacity: 0;
 }
 
@@ -8153,13 +8283,21 @@ html[data-fnm-phase='title'] .fnm-forest {
    encantada visible, calabazas protagonistas). Mismos simbolos y paleta. */
 @media (max-width: 768px) {
   .fnm-forest {
-    background-image: url('/fortnitemares-forest-mobile.svg');
+    /* El desenfoque deja un halo transparente en los bordes: el inset negativo lo saca de pantalla. */
+    inset: -8px;
+    background-image:
+      linear-gradient(rgba(12, 70, 60, 0.3), rgba(12, 70, 60, 0.3)),
+      url('/background-1.webp');
+    background-size: cover;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    filter: blur(1px);
   }
-}
 
-@keyframes fnm-forest-breathe {
-  0%   { transform: translate3d(0, 0, 0) scale(1.03); }
-  100% { transform: translate3d(0, -12px, 0) scale(1.03); }
+  html .fnm-forest,
+  html:not([data-fnm-phase]) .fnm-forest {
+    animation: none;
+  }
 }
 
 @keyframes fnm-forest-light {
@@ -8188,14 +8326,9 @@ body.theme-fortnitemares::after {
   height: calc(100vh + 48px);
   height: calc(100dvh + 48px);
   animation: fnm-fog-drift 26s ease-in-out infinite alternate;
-  /* La niebla llega con la parte 2 (ground): cruza junto con el bosque. */
+  /* La niebla cruza junto con el bosque. */
   opacity: 1;
   transition: opacity 1700ms ease;
-}
-
-html[data-fnm-phase='boot'] body.theme-fortnitemares::after,
-html[data-fnm-phase='title'] body.theme-fortnitemares::after {
-  opacity: 0;
 }
 
 /* Slow lateral sway: the mist creeps across the trunks. */
@@ -8205,10 +8338,7 @@ html[data-fnm-phase='title'] body.theme-fortnitemares::after {
 }
 
 /* Fuego de calabazas: html::after queda libre en temporada (la capa de ruido
-   normal se apaga abajo). Lleva el resplandor calido que sube desde el parche.
-   Durante la cinematica su opacidad la marcan las fases; el latido lento solo
-   se engancha cuando la cinematica termino, arrancando desde 1 para que no
-   haya salto. */
+   normal se apaga abajo). Lleva el resplandor calido que sube desde el parche. */
 html.theme-fortnitemares::after {
   background-image:
     radial-gradient(46% 20% at 48% 98%, rgba(255, 130, 40, 0.20) 0%, transparent 72%),
@@ -8216,12 +8346,6 @@ html.theme-fortnitemares::after {
     radial-gradient(28% 12% at 74% 100%, rgba(255, 110, 30, 0.11) 0%, transparent 74%);
   opacity: 1;
   transition: opacity 1200ms ease;
-}
-
-html.theme-fortnitemares[data-fnm-phase='boot']::after,
-html.theme-fortnitemares[data-fnm-phase='title']::after,
-html.theme-fortnitemares[data-fnm-phase='ground']::after {
-  opacity: 0;
 }
 
 /* Parte 3 (glow): el fuego de las calabazas despierta. */
@@ -8240,7 +8364,7 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
 
 /* ==========================================================================
    LOGO: FORTNITE -> FORTNITEMARES
-   Ambos conviven en el DOM; la fase cinematic decide cual se ve. Asi el
+   Ambos conviven en el DOM; el tema decide cual se ve. Asi el
    titulo real de la web se transforma donde ya vive, en vez de que un
    overlay simule la transformacion encima.
    ========================================================================== */
@@ -8286,6 +8410,12 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
 
 @media (max-width: 480px) {
   .hero__title-line-wrap { --fnm-logo-w: 355px; }
+}
+
+@media (min-width: 769px) {
+  .hero__title-line-wrap { --fnm-logo-w: 600px; }
+  .hero__title-fnm-svg { margin-top: -14px; }
+  .filter-bar-container { margin-top: 44px; }
 }
 
 /* Estado normal: solo el texto, y el alto lo marca el propio texto. */
@@ -8379,20 +8509,20 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
 
 @keyframes fnm-logo-pulse {
   0% {
-    filter: drop-shadow(0 0 14px rgba(192, 38, 211, 0.8))
-            drop-shadow(0 0 30px rgba(236, 72, 153, 0.55))
-            drop-shadow(0 0 50px rgba(168, 85, 247, 0.4));
+    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.7))
+            drop-shadow(0 0 26px rgba(118, 28, 132, 0.8))
+            drop-shadow(0 0 50px rgba(118, 28, 132, 0.5));
   }
   100% {
-    filter: drop-shadow(0 0 22px rgba(192, 38, 211, 1))
-            drop-shadow(0 0 44px rgba(236, 72, 153, 0.8))
-            drop-shadow(0 0 78px rgba(168, 85, 247, 0.6));
+    filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.85))
+            drop-shadow(0 0 34px rgba(118, 28, 132, 0.9))
+            drop-shadow(0 0 60px rgba(118, 28, 132, 0.6));
   }
 }
 
 /* Subtítulo SPRITEDEX: violeta -> magenta, el neon de la key art. */
 .hero__title-line--accent-fnm {
-  background: linear-gradient(135deg, #e879f9 0%, #d946ef 38%, #ec4899 72%, #c026d3 100%) !important;
+  background: linear-gradient(135deg, #f5d0fe 0%, #e879f9 45%, #f0abfc 75%, #d8b4fe 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
@@ -8404,68 +8534,6 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
      limpia. */
   filter: drop-shadow(0 3px 7px rgba(6, 2, 14, 0.8)) !important;
   margin-top: -6px !important;
-}
-
-/* ==========================================================================
-   CINEMATICA DE ENTRADA (una vez por navegador)
-   El componente no monta una cortina con su propio titulo: publica
-   data-fnm-phase en <html> y estas reglas transforman las piezas reales de la
-   interfaz, UNA POR UNA. Parte 1 (title): muta el wordmark y cruza el
-   enjambre. Parte 2 (ground): la rejilla cruza al bosque y llega la niebla.
-   Parte 3 (glow): el fuego de las calabazas y los acentos de temporada.
-   Nada cubre la pantalla: el visitante ve la web volverse Fortnitemares pieza
-   a pieza, siempre visible y con transiciones suaves de opacity.
-   ========================================================================== */
-
-.fnm-cinematic {
-  position: fixed;
-  inset: 0;
-  z-index: 55;
-  pointer-events: none;
-}
-
-.fnm-cinematic .fnm-skip-btn {
-  pointer-events: auto;
-}
-
-/* ---- Boton saltar --------------------------------------------------- */
-.fnm-skip-btn {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  z-index: 3;
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(217, 70, 239, 0.5);
-  background: rgba(10, 2, 18, 0.78);
-  color: #f5f0ff;
-  font: 600 12px/1 ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-  transition: transform 160ms ease, background 160ms ease;
-}
-
-.fnm-skip-btn:hover {
-  background: rgba(76, 5, 149, 0.9);
-  transform: translateY(-1px);
-}
-
-.fnm-skip-btn:focus-visible {
-  outline: 2px solid #e879f9;
-  outline-offset: 2px;
-}
-
-/* En movil el dock de la calabaza vive abajo a la derecha (z-index 9999) y
-   taparia el Skip: se sube junto a la barra superior, donde hay aire, para
-   que siga siendo visible y pulsable durante la cinematica. */
-@media (max-width: 768px) {
-  .fnm-skip-btn {
-    top: 68px;
-    right: 12px;
-    bottom: auto;
-  }
 }
 
 /* ==========================================================================
@@ -8485,9 +8553,8 @@ body[data-instalar='on'] .fnm-pumpkin-btn {
   pointer-events: none;
 }
 
-/* El botón principal ES la calabaza: nada de aros ni discos duros. Una poza
-   de sombra suave la separa del arte y su propia luz cálida — como una
-   linterna de verdad en la oscuridad — anuncia que es un botón. */
+/* El botón principal ES la calabaza: nada de aros ni discos duros. Su luz cálida,
+   como una linterna en la oscuridad, la separa del arte y anuncia que es un botón. */
 .fnm-pumpkin-btn {
   position: absolute;
   right: 10px;
@@ -8495,7 +8562,7 @@ body[data-instalar='on'] .fnm-pumpkin-btn {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 44%, rgba(22, 9, 38, 0.85) 0%, rgba(14, 6, 26, 0.5) 52%, rgba(10, 4, 20, 0) 74%);
+  background: radial-gradient(circle at 50% 44%, rgba(255, 146, 43, 0.16) 0%, rgba(255, 110, 30, 0.06) 48%, rgba(255, 110, 30, 0) 72%);
   border: none;
   box-shadow: none;
   padding: 0;
@@ -8543,23 +8610,12 @@ body[data-instalar='on'] .fnm-pumpkin-btn {
   background: radial-gradient(circle, transparent 40%, rgba(255, 146, 43, 0.09) 54%, rgba(255, 146, 43, 0.025) 70%, transparent 82%);
 }
 
-/* Durante la marca, la calabaza entra girando en el eje Y. */
-html[data-fnm-phase='title'] .fnm-pumpkin-btn {
-  animation: fnm-pumpkin-flip 900ms cubic-bezier(0.34, 1.4, 0.5, 1) both;
-}
-
-@keyframes fnm-pumpkin-flip {
-  0%   { transform: perspective(520px) rotateY(-180deg) scale(0.6); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
-  60%  { transform: perspective(520px) rotateY(12deg) scale(1.14); }
-  100% { transform: perspective(520px) rotateY(0deg) scale(1); }
-}
-
 .fnm-pumpkin-svg {
   width: 62px;
   height: 62px;
   filter:
-    drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55))
-    drop-shadow(0 0 8px rgba(255, 146, 43, 0.10));
+    drop-shadow(0 0 8px rgba(255, 146, 43, 0.35))
+    drop-shadow(0 0 16px rgba(247, 103, 7, 0.18));
   transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), filter 300ms ease;
 }
 
@@ -8582,15 +8638,15 @@ html[data-fnm-phase='title'] .fnm-pumpkin-btn {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(30, 10, 50, 0.95), rgba(15, 5, 28, 0.95)) !important;
-  border: 1.5px solid rgba(168, 85, 247, 0.55) !important;
-  color: #f3e8ff !important;
+  background: #18222e !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  color: #e8eef7 !important;
   display: grid;
   place-items: center;
   cursor: pointer;
   padding: 0;
   outline: none;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.65), 0 0 12px rgba(168, 85, 247, 0.35) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
   transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
   -webkit-tap-highlight-color: transparent;
 }
@@ -8626,25 +8682,53 @@ html[data-fnm-phase='title'] .fnm-pumpkin-btn {
 
 /* Movil: capsula de busqueda */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-pill {
-  background: #0d0718;
-  border-color: rgba(168, 85, 247, 0.3);
+  height: 54px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)) padding-box,
+    linear-gradient(180deg, rgba(46, 60, 72, 0.92), rgba(30, 40, 52, 0.92)) padding-box,
+    linear-gradient(135deg, #e879f9 0%, #a78bfa 35%, #7dd3fc 75%, #cffafe 100%) border-box;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.6),
-    0 0 14px rgba(168, 85, 247, 0.14),
-    inset 0 1px 0 rgba(233, 213, 255, 0.08);
+    0 8px 24px rgba(0, 0, 0, 0.5),
+    0 0 14px rgba(232, 121, 249, 0.35),
+    0 0 14px rgba(125, 211, 252, 0.25);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-pill.is-focused {
-  background: #150a26;
-  border-color: rgba(217, 70, 239, 0.65);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)) padding-box,
+    linear-gradient(180deg, rgba(54, 68, 80, 0.94), rgba(36, 48, 60, 0.94)) padding-box,
+    linear-gradient(135deg, #e879f9 0%, #a78bfa 35%, #7dd3fc 75%, #cffafe 100%) border-box;
   box-shadow:
-    0 8px 28px rgba(0, 0, 0, 0.7),
-    0 0 20px rgba(217, 70, 239, 0.3),
-    inset 0 1px 0 rgba(233, 213, 255, 0.12);
+    0 8px 28px rgba(0, 0, 0, 0.55),
+    0 0 20px rgba(232, 121, 249, 0.45),
+    0 0 20px rgba(125, 211, 252, 0.35);
 }
 
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-pill.is-focused .mobile-glass-search-icon {
-  color: #e879f9;
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-pill .mobile-glass-search-icon {
+  width: 18px;
+  height: 18px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-input {
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-input::placeholder {
+  color: rgba(241, 245, 249, 0.72);
+  font-weight: 400;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-divider {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-filter-btn {
+  color: rgba(255, 255, 255, 0.92);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-filter-btn.is-active {
@@ -8687,7 +8771,85 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-search-box .search-icon {
-  color: rgba(196, 181, 253, 0.75);
+  left: 15px;
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Escritorio: filtros con el mismo vidrio que la capsula de busqueda del movil. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-trigger,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-checkbox,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-view-toggle {
+  height: 42px;
+  box-sizing: border-box;
+  border-radius: 9999px;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(24, 34, 46, 0.8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 20px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-trigger,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  color: #f1f5f9;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-trigger:hover,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-checkbox:hover {
+  border-color: rgba(167, 139, 250, 0.6);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-trigger.is-open,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-trigger.has-selection {
+  border-color: #a78bfa;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 16px rgba(167, 139, 250, 0.35);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .status-pill-btn:not(.is-active) {
+  border-color: rgba(167, 139, 250, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
+    rgba(24, 34, 46, 0.7);
+  color: #cbd5e1;
+}
+
+/* Busqueda: capsula con borde degradado, igual que en movil. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .search-input-field {
+  width: 230px;
+  height: 42px;
+  box-sizing: border-box;
+  padding: 0 16px 0 40px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)) padding-box,
+    linear-gradient(180deg, rgba(46, 60, 72, 0.92), rgba(30, 40, 52, 0.92)) padding-box,
+    linear-gradient(135deg, #e879f9 0%, #a78bfa 35%, #7dd3fc 75%, #cffafe 100%) border-box;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 14px rgba(232, 121, 249, 0.35), 0 0 14px rgba(125, 211, 252, 0.25);
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .search-input-field:focus {
+  width: 260px;
+  border-color: transparent;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55), 0 0 20px rgba(232, 121, 249, 0.45), 0 0 20px rgba(125, 211, 252, 0.35);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .search-input-field::placeholder {
+  color: rgba(241, 245, 249, 0.72);
+  font-weight: 400;
 }
 
 /* El badge del pill "Nuevos" en escritorio pasa de cian a naranja calabaza. */
@@ -8706,12 +8868,11 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
    override estacional tambien lo lleva. Sin el, la hoja se queda en cian.
    ========================================================================== */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet {
-  background: #0d0718;
-  border-color: rgba(168, 85, 247, 0.28);
+  border-color: rgba(255, 255, 255, 0.12);
+  background: #18222e;
   box-shadow:
-    0 -16px 40px rgba(0, 0, 0, 0.9),
-    0 0 30px rgba(168, 85, 247, 0.14),
-    inset 0 1px 0 rgba(233, 213, 255, 0.08);
+    0 -16px 40px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet-handle {
@@ -8727,7 +8888,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-icon {
-  color: #e879f9;
+  color: #22d3ee;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-title {
@@ -8735,10 +8896,10 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-count-badge {
-  background: #ff922b;
+  background: #22d3ee;
   border-color: transparent;
-  color: #1a0b02;
-  box-shadow: 0 0 8px rgba(255, 146, 43, 0.55);
+  color: #07131a;
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.55);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-close-btn {
@@ -8748,8 +8909,8 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-close-btn:hover {
-  background: rgba(217, 70, 239, 0.2);
-  border-color: rgba(217, 70, 239, 0.45);
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.45);
   color: #ffffff;
 }
 
@@ -8774,13 +8935,13 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   color: #f5f0ff;
 }
 
-/* Seleccionado: fucsia, igual que el boton de filtros de la capsula. */
+/* Seleccionado: violeta, el acento de la paleta junto al cian. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-status-pill.is-active,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-variant-chip.is-active,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-variant-chip:first-child.is-active,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sprite-chip.is-active {
-  background: rgba(217, 70, 239, 0.16) !important;
-  border: 1px solid rgba(217, 70, 239, 0.45) !important;
+  background: rgba(139, 92, 246, 0.22) !important;
+  border: 1px solid rgba(167, 139, 250, 0.55) !important;
   color: #ffffff !important;
 }
 
@@ -8796,12 +8957,12 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-toggle-switch.is-on {
-  background: #ff922b;
-  box-shadow: 0 0 10px rgba(255, 146, 43, 0.5);
+  background: linear-gradient(90deg, #7c3aed, #22d3ee);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-toggle-switch.is-on .mobile-toggle-thumb {
-  background: #1a0b02;
+  background: #07131a;
 }
 
 /* Limpiar: accion secundaria, violeta tenue. */
@@ -8812,41 +8973,41 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-clear:hover {
-  background: rgba(217, 70, 239, 0.16);
-  border-color: rgba(217, 70, 239, 0.4);
+  background: rgba(139, 92, 246, 0.16);
+  border-color: rgba(167, 139, 250, 0.4);
   color: #ffffff;
 }
 
-/* Aplicar Filtros: la accion principal, en fuego de calabaza. */
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply {
+/* Aplicar Filtros: la accion principal, en cian. Va anclada a la hoja porque
+   comparte .sdm-share__glitch-btn con el boton de compartir, que tiene su
+   propia regla naranja mas adelante y gana por orden. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply {
   background: rgba(255, 146, 43, 0.12);
   border-color: #ff922b;
   color: #ff922b;
   box-shadow: 0 0 12px rgba(255, 146, 43, 0.25);
 }
 
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:hover:not(:disabled),
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:focus:not(:disabled) {
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply:hover:not(:disabled),
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply:focus:not(:disabled) {
   background-color: #ff922b;
   color: #1a0b02;
   border-color: #ff922b;
   box-shadow: 0 0 25px rgba(255, 146, 43, 0.55);
 }
 
-/* El glitch del hover deja de destellar cian. Se ancla al boton de la hoja
-   para no tocar el boton de compartir, que usa la misma .sdm-share__glitch-btn. */
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply::before,
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply::after {
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply::before,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply::after {
   background-color: #ff922b;
 }
 
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:hover:not(:disabled)::before,
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:focus:not(:disabled)::before {
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply:hover:not(:disabled)::before,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply:focus:not(:disabled)::before {
   color: #3b0764;
 }
 
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:hover:not(:disabled)::after,
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:focus:not(:disabled)::after {
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply:hover:not(:disabled)::after,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply:focus:not(:disabled)::after {
   color: #1a0b02;
 }
 
@@ -8969,25 +9130,25 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
    rojo y el verde de exito sigue verde, porque ahi el color significa algo.
    ========================================================================== */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage {
-  background: radial-gradient(120% 90% at 50% 0%, rgba(28, 14, 46, 0.9) 0%, rgba(10, 5, 18, 0.94) 100%);
+  background: rgba(24, 34, 46, 0.78);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends {
-  background: rgba(22, 11, 36, 0.72);
+  background: rgba(24, 34, 46, 0.72);
   border-color: rgba(168, 85, 247, 0.26);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__code {
-  color: #e879f9;
-  text-shadow: 0 0 10px rgba(217, 70, 239, 0.5);
+  color: #c4b5fd;
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__aviso {
-  color: rgba(232, 121, 249, 0.9);
+  color: rgba(196, 181, 253, 0.95);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__input {
-  background: rgba(30, 16, 50, 0.85);
+  background: rgba(24, 34, 46, 0.85);
   border-color: rgba(168, 85, 247, 0.28);
 }
 
@@ -9006,13 +9167,13 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 /* La accion principal y el conmutador de vistas: brasa, igual que la hoja. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__send {
-  color: #1a0b02;
-  background: linear-gradient(135deg, #ff922b, #f76707);
-  box-shadow: 0 0 12px rgba(255, 146, 43, 0.35);
+  color: #ffffff;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tabs {
-  background: rgba(26, 13, 42, 0.75);
+  background: rgba(24, 34, 46, 0.75);
   border-color: rgba(168, 85, 247, 0.24);
 }
 
@@ -9021,13 +9182,42 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tab.is-active {
-  color: #1a0b02;
-  background: linear-gradient(135deg, #ff922b, #f76707);
+  color: #ffffff;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__chip {
-  color: #e879f9;
-  border-color: rgba(217, 70, 239, 0.35);
+  color: #c4b5fd;
+  border-color: rgba(167, 139, 250, 0.35);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__sub {
+  color: rgba(226, 232, 240, 0.88);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tab {
+  color: #ddd6fe;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tab:disabled {
+  opacity: 0.7;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__label {
+  color: rgba(226, 232, 240, 0.92);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__hint,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__pendiente {
+  color: rgba(226, 232, 240, 0.9);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__prefix {
+  color: rgba(226, 232, 240, 0.8);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__send:disabled {
+  opacity: 0.75;
 }
 
 /* El foco del teclado tambien vira: la senal debe seguir siendo evidente. */
@@ -9035,7 +9225,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tab:focus-visible,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__btn:focus-visible,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__chip:focus-visible {
-  outline: 2px solid #e879f9;
+  outline: 2px solid #a78bfa;
   outline-offset: 2px;
 }
 
@@ -9074,7 +9264,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 /* El cian generico del menu (el codigo, vincular y la opcion "Todas") vira.
    Las opciones de generacion conservan su color: ahi el color identifica. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__dropdown-code {
-  color: #e879f9;
+  color: #c4b5fd;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__gen-option {
@@ -9101,7 +9291,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 /* ── Exportar Coleccion ─────────────────────────────────────────────── */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro {
-  background: rgba(13, 7, 24, 0.96);
+  background: rgba(24, 34, 46, 0.96);
   border-color: rgba(168, 85, 247, 0.32);
 }
 
@@ -9110,14 +9300,14 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__segmented {
-  background: rgba(26, 13, 42, 0.8);
+  background: rgba(24, 34, 46, 0.8);
   border-color: rgba(168, 85, 247, 0.24);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__seg-btn--active {
-  background: #ff922b;
-  color: #1a0b02;
-  box-shadow: 0 0 12px rgba(255, 146, 43, 0.45);
+  background: #7c3aed;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.45);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__preview-wrap {
@@ -9157,19 +9347,17 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 /* Seasonal animations must respect the visitor's motion preference. */
 @media (prefers-reduced-motion: reduce) {
   .hero__title-fnm-svg,
-  .hero__title-fnm-ghost,
-  .fnm-skip-btn {
+.hero__title-fnm-ghost {
     animation: none;
   }
 
-  /* El fuego de las calabazas y el pulso de luz se quedan fijos; el bosque
-     conserva solo su respiracion de transform. */
+  /* El fuego de las calabazas y el pulso de luz se quedan fijos. */
   html.theme-fortnitemares::after {
     animation: none;
   }
 
   .fnm-forest {
-    animation: fnm-forest-breathe 18s ease-in-out infinite alternate;
+    animation: none;
   }
 
   .fnm-pumpkin-btn::after {
@@ -9186,8 +9374,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 /* The in-app "motion disabled" preference covers the seasonal layers too. */
 .motion-disabled .hero__title-fnm-svg,
-.motion-disabled .hero__title-fnm-ghost,
-.motion-disabled .fnm-skip-btn {
+.motion-disabled .hero__title-fnm-ghost {
   animation: none;
 }
 
@@ -9458,7 +9645,7 @@ body .swal2-container.swal2-bottom {
    azules de fuera de temporada y con el arte de fondo asomando por todas partes: no parecia la
    misma app. Mismas recetas que arriba, aplicadas a las clases de esta vista. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage {
-  background: radial-gradient(120% 90% at 50% 0%, rgba(28, 14, 46, 0.9) 0%, rgba(10, 5, 18, 0.94) 100%);
+  background: rgba(24, 34, 46, 0.78);
 }
 
 /* El envoltorio NO es una tarjeta en la vista: lo son sus piezas (ajustes, lona y botones).
@@ -9475,17 +9662,17 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__controls,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__actions {
-  background: rgba(22, 11, 36, 0.72);
+  background: rgba(24, 34, 46, 0.72);
   border-color: rgba(168, 85, 247, 0.26);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__preview-wrap {
-  background: rgba(18, 9, 30, 0.82);
+  background: rgba(24, 34, 46, 0.82);
   border-color: rgba(168, 85, 247, 0.24);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__segmented {
-  background: rgba(26, 13, 42, 0.75);
+  background: rgba(24, 34, 46, 0.75);
   border-color: rgba(168, 85, 247, 0.24);
 }
 
@@ -9494,12 +9681,12 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__seg-btn--active {
-  color: #1a0b02;
-  background: linear-gradient(135deg, #ff922b, #f76707);
+  color: #ffffff;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__input {
-  background: rgba(30, 16, 50, 0.85);
+  background: rgba(24, 34, 46, 0.85);
   border-color: rgba(168, 85, 247, 0.28);
 }
 
@@ -9536,34 +9723,33 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
    ========================================================================== */
 @media (hover: none) and (pointer: coarse) {
   .app-navbar__item,
-  .app-navbar__menu-btn,
-  .app-navbar__avatar,
-  .app-navbar__logo-mark,
-  .app-navbar__menu-dropdown,
-  .app-navbar__dropdown,
-  .hero__btn,
-  .gen-tab-btn,
-  .status-pill-btn,
-  .search-input-field,
-  .filter-pill-trigger,
-  .variant-grid-dropdown,
-  .sprite-grid-dropdown,
-  .filter-pill-checkbox,
-  .filter-view-toggle,
-  .mobile-new-coachmark__content,
-  .mobile-liquid-sheet-backdrop,
-  .modal-overlay,
-  .glass-panel,
-  .auth-modal__content,
-  .sdm__close,
-  .sdm-share-pro,
-  .sdm-friend-pill,
-  .claim-banner,
-  .privacy-panel,
-  .ms-variant-tag,
-  .ms-level-tag,
-  .install-prompt-card,
-  .fnm-skip-btn {
+.app-navbar__menu-btn,
+.app-navbar__avatar,
+.app-navbar__logo-mark,
+.app-navbar__menu-dropdown,
+.app-navbar__dropdown,
+.hero__btn,
+.gen-tab-btn,
+.status-pill-btn,
+.search-input-field,
+.filter-pill-trigger,
+.variant-grid-dropdown,
+.sprite-grid-dropdown,
+.filter-pill-checkbox,
+.filter-view-toggle,
+.mobile-new-coachmark__content,
+.mobile-liquid-sheet-backdrop,
+.modal-overlay,
+.glass-panel,
+.auth-modal__content,
+.sdm__close,
+.sdm-share-pro,
+.sdm-friend-pill,
+.claim-banner,
+.privacy-panel,
+.ms-variant-tag,
+.ms-level-tag,
+.install-prompt-card {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
@@ -9695,4 +9881,29 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   font-size: 0.85rem;
   line-height: 1.6;
   color: var(--text-muted);
+}
+
+/* Movil: el texto pequeno no baja de 0.75rem y la temporada no tiene animaciones de
+   ambiente (niebla y pulso de fuego). El glitch y el ruido digital se quedan. */
+@media (max-width: 768px) {
+  .stats-bar__label,
+  .sdm-share-pro__btn,
+  .sdm-friend-pill__tag,
+  .sdm-friend-pill__exit,
+  .filter-pill-checkbox,
+  .owned-btn-sm,
+  .sdm-friends__label,
+  .sdm-friends__prefix,
+  .sdm-friends__pendiente,
+  .sdm-friends__btn,
+  .sdm-friends__hint,
+  .sdm-friends__send,
+  .fpage__chip {
+    font-size: 0.75rem;
+  }
+
+  body.theme-fortnitemares::after,
+  html.theme-fortnitemares:not([data-fnm-phase])::after {
+    animation: none;
+  }
 }
