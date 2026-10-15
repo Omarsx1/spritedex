@@ -1111,7 +1111,6 @@
     "isNew": true,
     "nameEn": "Quack Jonesy",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -1181,7 +1180,6 @@
     "isNew": true,
     "nameEn": "Quack Adventure",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -1251,7 +1249,6 @@
     "isNew": true,
     "nameEn": "Quack Bush",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -1726,7 +1723,6 @@
     "isNew": true,
     "nameEn": "Quack Klombo",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -2363,7 +2359,6 @@
     "isNew": true,
     "nameEn": "Quack Spooky Dash",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -2497,7 +2492,6 @@
     "isNew": true,
     "nameEn": "Honey",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -2509,7 +2503,6 @@
     "isNew": true,
     "nameEn": "Gold Honey",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -2521,7 +2514,6 @@
     "isNew": true,
     "nameEn": "Cheat Master Honey",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -2533,7 +2525,6 @@
     "isNew": true,
     "nameEn": "Loot Hacker Honey",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -2545,7 +2536,6 @@
     "isNew": true,
     "nameEn": "Bounty Hunter Honey",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -2557,7 +2547,6 @@
     "isNew": true,
     "nameEn": "Trick or Treat Honey",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -2569,7 +2558,6 @@
     "isNew": true,
     "nameEn": "One Wish Willow Sprite",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -2581,7 +2569,6 @@
     "isNew": true,
     "nameEn": "Gold Obsession",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -2593,7 +2580,6 @@
     "isNew": true,
     "nameEn": "Cheat Master Obsession",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -2605,7 +2591,6 @@
     "isNew": true,
     "nameEn": "Loot Hacker Obsession",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -2617,7 +2602,6 @@
     "isNew": true,
     "nameEn": "Bounty Hunter Obsession",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   },
   {
@@ -2629,7 +2613,6 @@
     "isNew": true,
     "nameEn": "Trick or Treat Obsession",
     "releaseDate": "2026-10-15T08:00:00.000Z",
-    "artSource": "spritehelp",
     "gen": 2
   }
 ]

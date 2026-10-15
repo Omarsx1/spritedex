@@ -59,7 +59,10 @@ export const PARENT_TO_FAMILY = {
   phasedash: 'spookydash',
   healthsiphon: 'vampire',
   increasedmelee: 'deer',
-  winnerd: 'dumpsterdive'
+  winnerd: 'dumpsterdive',
+  // fortnite.gg los publica con estos codenames; ya existen como honey_* y obsession_* (spritehelp).
+  winnere: 'honey',
+  cargolying: 'obsession'
 };
 
 export const VARIANT_TO_THEME = {

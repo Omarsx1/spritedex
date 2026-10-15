@@ -175,23 +175,24 @@ export function translateLocation(text) {
 }
 
 
-async function ensureSpriteImage(page, spriteId, imageUrl, reemplazar = false) {
+function arteLocalExiste(spriteId) {
+  return fs.existsSync(path.join(PUBLIC_SPRITES_DIR, archivoArteCanonico(spriteId))) ||
+    fs.existsSync(path.join(PUBLIC_SPRITES_DIR, `${spriteId}.png`));
+}
+
+async function ensureSpriteImage(page, spriteId, imageUrl) {
   if (!imageUrl || typeof imageUrl !== 'string') return false;
   if (!fs.existsSync(PUBLIC_SPRITES_DIR)) {
     fs.mkdirSync(PUBLIC_SPRITES_DIR, { recursive: true });
   }
-
-  const pngPath = path.join(PUBLIC_SPRITES_DIR, `${spriteId}.png`);
 
   // Se escribe en la ruta CANONICA que lee la app, que no siempre es /sprites/<id>.webp:
   // peely_candy se sirve desde peely_gummy.webp, llama_candy desde llama_gummy.webp y los
   // patos desde los *_duck.webp. Mirando solo el id, el sync bajaba un duplicado byte a byte
   // del archivo que ya estaba en el repo (asi entraron public/sprites/peely_candy.webp y su
   // miniatura) y lo commiteaba.
+  if (arteLocalExiste(spriteId)) return false;
   const destinoPath = path.join(PUBLIC_SPRITES_DIR, archivoArteCanonico(spriteId));
-  if (!reemplazar && (fs.existsSync(destinoPath) || fs.existsSync(pngPath))) {
-    return false;
-  }
 
   // Placeholder vectorial: el espiritu todavia no tiene arte real. Se avisa en claro para que
   // el hueco no se confunda con un fallo ni se baje algo que la app no va a leer.
@@ -585,18 +586,17 @@ async function syncSprites() {
 
       const effectiveId = existingKey || expectedId;
 
-      // El arte provisional de spritehelp se reemplaza por el de fortnite.gg en cuanto este lo publica
+      // En cuanto fortnite.gg publica un espiritu que estaba como provisional de spritehelp, ese
+      // espiritu deja de ser provisional. El arte que ya esta en disco se conserva: puede estar
+      // normalizado (tamaño e inclinacion) y bajar el de fortnite.gg lo desharia.
       const itemProvisional = existingKey ? officialMap.get(existingKey).item : null;
       const artePendiente = itemProvisional?.artSource === 'spritehelp';
 
-      // Asegurar descarga de imagen si no existe localmente
-      if (card.img) {
-        const descargada = await ensureSpriteImage(page, effectiveId, card.img, artePendiente);
-        if (descargada && artePendiente) {
-          delete itemProvisional.artSource;
-          catalogChanges++;
-          console.log(`🎨 Arte de fortnite.gg reemplaza al provisional de spritehelp: ${effectiveId}`);
-        }
+      if (card.img) await ensureSpriteImage(page, effectiveId, card.img);
+      if (artePendiente && arteLocalExiste(effectiveId)) {
+        delete itemProvisional.artSource;
+        catalogChanges++;
+        console.log(`🎨 fortnite.gg publica el provisional de spritehelp: ${effectiveId}`);
       }
 
       if (existingKey) {
