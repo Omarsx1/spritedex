@@ -5,7 +5,9 @@ import { getLang, cambiarIdioma, t } from '../i18n';
 // es una apuesta: el usuario manda. Cambiar de idioma recarga en la ruta equivalente.
 const OPCIONES = [
   { code: 'es', label: 'ES', nombre: 'Español' },
-  { code: 'en', label: 'EN', nombre: 'English' }
+  { code: 'en', label: 'EN', nombre: 'English' },
+  { code: 'pt-BR', label: 'PT-BR', nombre: 'Português (Brasil)' },
+  { code: 'pt-PT', label: 'PT-PT', nombre: 'Português (Portugal)' }
 ];
 
 export function LanguageSwitcher({ className = '' }) {

@@ -4,6 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   conIdioma,
+  IDIOMAS,
   idiomaDelNavegador,
   normalizarIdioma,
   planDeArranque,
@@ -94,6 +95,17 @@ test('el bloque base tiene ingles de verdad, no español copiado', () => {
   ];
   const copiadas = debenDiferir.filter((clave) => DICCIONARIOS.en[clave] === DICCIONARIOS.es[clave]);
   assert.deepEqual(copiadas, [], 'quedaron sin traducir: ' + copiadas.join(', '));
+});
+
+test('cada idioma soportado tiene exactamente las claves de es, con los mismos marcadores', () => {
+  const claves = Object.keys(DICCIONARIOS.es).sort();
+  const marcadores = (texto) => String(texto).match(/\{\w+\}/g)?.sort().join() ?? '';
+  for (const lang of IDIOMAS) {
+    assert.ok(DICCIONARIOS[lang], 'falta el diccionario ' + lang);
+    assert.deepEqual(Object.keys(DICCIONARIOS[lang]).sort(), claves, 'claves de ' + lang);
+    const malos = claves.filter((k) => marcadores(DICCIONARIOS[lang][k]) !== marcadores(DICCIONARIOS.es[k]));
+    assert.deepEqual(malos, [], 'marcadores distintos en ' + lang);
+  }
 });
 
 test('los diccionarios reales resuelven en los dos idiomas', () => {
