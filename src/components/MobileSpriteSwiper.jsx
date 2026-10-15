@@ -6,6 +6,7 @@ import { t } from '../i18n';
 import { sounds } from '../utils/audio';
 import { rutaBasicoFamilia, rutaFallbackEspiritu } from '../utils/spriteAssets';
 import { SonicRing } from './SonicRing';
+import spriteMobileScale from '../data/sprite_mobile_scale.json';
 import { safeStorage } from '../utils/safeStorage';
 import { trackEvent } from '../utils/telemetry';
 
@@ -408,7 +409,8 @@ function FamilySpotlightRow({
               style={{
                 filter: !isOwned ? 'grayscale(55%)' : 'drop-shadow(0 6px 14px rgba(0,0,0,0.5))',
                 opacity: !isOwned ? 0.68 : 1,
-                cursor: isActive ? 'pointer' : 'default'
+                cursor: isActive ? 'pointer' : 'default',
+                '--sprite-scale': spriteMobileScale[sprite.id] ?? 1
               }}
               onError={(e) => {
                 if (!e.target.dataset.triedBase) {

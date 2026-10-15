@@ -7474,6 +7474,20 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   transform: scale(0.95);
 }
 
+@media (max-width: 600px) {
+  .ms-spotlight-card .ms-card__image {
+    top: 7px;
+  }
+
+  .ms-card__image img:not(.ms-card__crown) {
+    transform: scale(var(--sprite-scale, 1));
+  }
+
+  .ms-card__image img:not(.ms-card__crown):active {
+    transform: scale(calc(var(--sprite-scale, 1) * 0.95));
+  }
+}
+
 /* ── Card Footer Group (Gestalt Proximity: Name + Action) ── */
 .ms-card__footer {
   width: 100%;
