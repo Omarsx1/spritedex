@@ -5,8 +5,9 @@
 -- Esta migracion cierra esas dos puertas con public.es_admin() (migracion 2026-10-02).
 -- La insercion no cambia: las visitas siguen registrandose para todos.
 --
--- ANTES DE APLICAR: en el SQL Editor ejecuta `select public.es_admin();` logueada con tu
--- cuenta de Google; debe devolver true. Si no, no apliques esto (el panel se quedaria vacio).
+-- ANTES DE APLICAR: confirma que tu correo esta en public.admins con
+--   select a.user_id, u.email from public.admins a join auth.users u on u.id = a.user_id;
+-- (es_admin() no sirve en el SQL Editor: alli no hay sesion y devuelve false.)
 -- COMO APLICARLO: pega todo esto en el SQL Editor y dale a Run.
 -- Es idempotente: se puede volver a ejecutar sin miedo.
 -- ============================================================================
