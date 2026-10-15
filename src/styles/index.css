@@ -8166,120 +8166,100 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .fpage__bloqueFicha .sdm-friends__fichaHead .sdm-friends__label { margin-top: 0; }
 .fpage__bloqueFicha .sdm-friends__fichaHead .sdm-friends__plate { margin-left: auto; }
 
-/* Selector de idioma de la barra superior */
+/* Selector de idioma: disparador compacto con icono y menu desplegable con cada idioma en su lengua */
 .lang-switch {
+  position: relative;
+  display: inline-flex;
+}
+
+.lang-switch__disparador {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  padding: 2px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-
-.lang-switch__btn {
-  min-width: 30px;
-  padding: 4px 6px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: #b9c2d0;
-  font-size: 0.68rem;
-  font-weight: 800;
+  gap: 6px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 9999px;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  background: rgba(12, 14, 22, 0.62);
+  color: rgba(226, 232, 240, 0.9);
+  font-size: 0.72rem;
+  font-weight: 700;
   letter-spacing: 0.06em;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 6px 16px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.15s ease, color 0.15s ease;
 }
 
-.lang-switch__btn:hover {
-  color: #e8edf5;
+.lang-switch__disparador:hover,
+.lang-switch.is-open .lang-switch__disparador {
+  border-color: rgba(34, 230, 220, 0.6);
+  color: #ffffff;
 }
 
-.lang-switch__btn.is-active {
-  background: #22e6dc;
-  color: #07131a;
-}
-
-.lang-switch__btn:focus-visible {
+.lang-switch__disparador:focus-visible,
+.lang-switch__opcion:focus-visible {
   outline: 2px solid #22e6dc;
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 
-@media (max-width: 420px) {
-  .lang-switch__btn { min-width: 26px; font-size: 0.62rem; }
+.lang-switch.is-open {
+  z-index: 1000;
 }
 
-.lang-switch__sep {
-  display: none;
+.lang-switch__disparador svg {
+  flex-shrink: 0;
 }
 
-/* Escritorio: capsula de cristal oscuro para que el texto inactivo se lea sobre cualquier fondo. */
-@media (min-width: 769px) {
-  .lang-switch {
-    padding: 3px;
-    border-radius: 9999px;
-    background: rgba(12, 14, 22, 0.62);
-    border: 1px solid rgba(167, 139, 250, 0.3);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 6px 16px rgba(0, 0, 0, 0.35);
-  }
-
-  .lang-switch__btn {
-    min-width: 36px;
-    padding: 5px 10px;
-    border-radius: 9999px;
-    color: rgba(226, 232, 240, 0.72);
-    font-size: 0.72rem;
-  }
-
-  .lang-switch__btn:hover {
-    color: #ffffff;
-  }
-
-  .lang-switch__btn.is-active {
-    background: linear-gradient(135deg, #22e6dc, #7dd3fc);
-    color: #06161c;
-    box-shadow: 0 0 12px rgba(34, 230, 220, 0.35);
-  }
+.lang-switch__flecha {
+  opacity: 0.7;
+  transition: transform 0.2s ease;
 }
 
-/* Movil: texto "ES / EN" dentro de un marco fino; el activo va en cian sin relleno. */
-@media (max-width: 768px) {
-  .lang-switch {
-    gap: 0;
-    padding: 5px 10px;
-    border-radius: 8px;
-    background: rgba(12, 14, 22, 0.45);
-    border-color: rgba(255, 255, 255, 0.22);
-  }
+.lang-switch.is-open .lang-switch__flecha {
+  transform: rotate(180deg);
+}
 
-  .lang-switch__btn {
-    min-width: 0;
-    padding: 0;
-    color: rgba(203, 213, 225, 0.55);
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-  }
+.lang-switch__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 1000;
+  min-width: 210px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border-radius: 12px;
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  background: #0c0e16;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+}
 
-  .lang-switch__btn:hover {
-    color: #e8edf5;
-  }
+.lang-switch__opcion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
 
-  .lang-switch__btn.is-active {
-    background: transparent;
-    color: #22e6dc;
-    text-shadow: 0 0 8px rgba(34, 230, 220, 0.45);
-  }
+.lang-switch__opcion:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
 
-  .lang-switch__sep {
-    display: inline;
-    margin: 0 6px;
-    color: rgba(203, 213, 225, 0.5);
-    font-size: 0.78rem;
-    font-weight: 500;
-  }
+.lang-switch__opcion[aria-current='true'] {
+  color: #22e6dc;
 }
 
 /* Refrescar e idioma van juntos a la derecha, con aire propio frente al titulo */
@@ -8289,10 +8269,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   gap: 8px;
   margin-left: auto;
   flex-shrink: 0;
-}
-
-.fpage__lang .lang-switch__btn {
-  min-width: 28px;
 }
 
 /* Aviso de lo que implica compartir el enlace: mismo sitio que el resto de la ficha */
