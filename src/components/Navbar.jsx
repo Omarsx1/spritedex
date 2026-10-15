@@ -223,7 +223,7 @@ export function Navbar({
           title={t('nav.actualizarAyuda')}
           aria-label={t('nav.actualizarApp')}
         >
-          F
+          <img className="app-navbar__logo-img" src="/logoSF.webp" alt="" draggable="false" />
         </button>
       </div>
 

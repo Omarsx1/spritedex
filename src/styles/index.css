@@ -373,15 +373,16 @@ html::after {
   align-items: center;
 }
 
-/* --- Logo mark (F) --- */
+/* --- Logo mark --- */
 .app-navbar__logo-mark {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 0;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: transparent;
   font-family: var(--font-fortnite);
   font-size: 1.15rem;
   font-weight: 900;
@@ -392,6 +393,14 @@ html::after {
   transition: all 0.2s ease;
   user-select: none;
   cursor: pointer;
+}
+
+.app-navbar__logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px rgba(0, 240, 232, 0.45)) drop-shadow(0 0 6px rgba(236, 72, 153, 0.35));
 }
 
 .app-navbar__logo-mark:hover {
@@ -970,19 +979,17 @@ a.app-navbar__menu-action-btn {
     box-shadow: none !important;
   }
   .app-navbar__logo-mark {
-    width: 34px;
-    height: 34px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(12, 14, 22, 0.65) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: transparent !important;
+    border: 0;
     border-radius: 9999px;
     font-size: 1.15rem;
     font-weight: 900;
     color: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     box-shadow: none !important;
     padding: 0;
     cursor: pointer;
