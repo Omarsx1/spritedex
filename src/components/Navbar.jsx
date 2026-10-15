@@ -477,6 +477,7 @@ export function Navbar({
                 </button>
 
                 <p className="app-navbar__menu-copy">© {new Date().getFullYear()} {t('nav.copyright')}</p>
+                <p className="app-navbar__menu-copy">{t('nav.disclaimer')}</p>
               </div>
             </div>
           )}

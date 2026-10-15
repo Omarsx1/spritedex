@@ -348,6 +348,7 @@ export default {
   "nav.conectadoComo": "Signed in as {nombre}",
   "nav.cookiesPrivacidad": "Cookies & Privacy",
   "nav.copyright": "Spritedex. All rights reserved.",
+  "nav.disclaimer": "Spritedex is an independent fan project. It is not affiliated with or endorsed by Epic Games. Fortnite is a trademark of Epic Games, Inc.",
   "nav.cuentaUsuario": "User account",
   "nav.desactivarAnimaciones": "Turn off animations",
   "nav.entrarOCrearUsuario": "Sign in or create account",
