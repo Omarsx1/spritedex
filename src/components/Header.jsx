@@ -27,6 +27,7 @@ export function Header({
   connectedFriendCode,
   solicitudesNuevas = 0,
   onOpenShareModal,
+  onPrecalentarCompartir,
   onOpenBackupModal,
   onOpenCompareModal,
   onOpenAuthModal
@@ -432,6 +433,7 @@ export function Header({
                 <button
                   className="hero__btn hero__btn--accent"
                   onClick={onOpenShareModal}
+                  onPointerDown={onPrecalentarCompartir}
                   onMouseEnter={() => {
                     import('../components/SharePage');
                   }}
@@ -516,6 +518,7 @@ export function Header({
                     toggleActions();
                     onOpenShareModal();
                   }}
+                  onPointerDown={onPrecalentarCompartir}
                   onMouseEnter={() => {
                     import('../components/SharePage');
                   }}
@@ -596,6 +599,7 @@ export function Header({
                     toggleActions();
                     onOpenShareModal();
                   }}
+                  onPointerDown={onPrecalentarCompartir}
                   onMouseEnter={() => {
                     import('../components/SharePage');
                   }}
