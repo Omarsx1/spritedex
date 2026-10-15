@@ -1,3 +1,5 @@
+import { FAMILY_NAMES_MAP as FAMILY_NAMES_ES, THEME_NAMES_ES } from '../src/data/nombresEspiritus.js';
+export { FAMILY_NAMES_ES, THEME_NAMES_ES };
 // Catálogos de nombres y temas de espíritus compartidos por los sincronizadores.
 // Familias de 1ra Generación
 export const GEN_1_FAMILIES = new Set([
@@ -84,75 +86,9 @@ export const VARIANT_TO_THEME = {
   quack: 'Quack'
 };
 
-export const FAMILY_NAMES_ES = {
-  water: 'Agua',
-  honey: 'Miel',
-  obsession: 'Obsesión',
-  earth: 'Tierra',
-  fire: 'Fuego',
-  air: 'Aire',
-  duck: 'Pato',
-  ghost: 'Fantasma',
-  dream: 'Dormilón',
-  demon: 'Demonio',
-  punk: 'Punk',
-  king: 'Monarca',
-  zeropoint: 'Punto Cero',
-  theburntpeanut: 'Cacahuate',
-  fishy: 'Pescado',
-  striker: 'Pelotero',
-  aura: 'Aura',
-  boss: 'Jefe',
-  grim: 'Parca',
-  seven: 'Siete',
-  batman: 'Batman',
-  pollo: 'Pollo',
-  vini: 'Vini Jr.',
-  wick: 'John Wick',
-  peely: 'Bananín',
-  llama: 'Llama',
-  ironmouse: 'La niña',
-  klombo: 'Klombo',
-  crown: 'Victorioso',
-  jackrabbit: 'Jackrabbit',
-  sonic: 'Sonic',
-  shadow: 'Shadow',
-  tails: 'Tails',
-  killswitch: 'Killswitch',
-  bush: 'Arbustín',
-  adventure: 'Aventurero',
-  jonesy: 'Jonesy',
-  '8bit': '8-Bit',
-  stormscout: 'Exploratormentas',
-  overshield: 'Protector',
-  onigiri: 'Onigiri',
-  xray: 'Rayos X',
-  megaman: 'Megaman',
-  crash: 'Crash Bandicoot',
-  morgana: 'Morgana',
-  blinky: 'Blinky',
-  birthday: 'Pastel de Cumpleaños',
-  pond: 'Estanque',
-  spookydash: 'Impulso aterrador',
-  vampire: 'Vampiro',
-  deer: 'El Ciervo',
-  dumpsterdive: 'Mapache'
-};
 
-export const THEME_NAMES_ES = {
-  Basic: 'Básico',
-  Gold: 'Dorado',
-  Cheatmaster: 'Hacker',
-  'Loot Hacker': 'Hacker de Botín',
-  'Bounty Hunter': 'Cazarrecompensas',
-  'Trick or Treat': 'Dulce o Truco',
-  Candy: 'Gomita',
-  Galaxy: 'Galáctico',
-  Holofoil: 'Holográfico',
-  Cube: 'Cúbico',
-  Gem: 'Gema',
-  Quack: 'Patito'
-};
+
+
 
 export const VARIANT_ORDER = [
   'Basic',

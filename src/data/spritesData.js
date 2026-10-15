@@ -1,4 +1,5 @@
 import officialSpritesJson from './official_sprites.json';
+import { FAMILY_NAMES_MAP, THEME_NAMES_ES } from './nombresEspiritus.js';
 import { estadoLanzamiento } from '../utils/lanzamiento.js';
 import fortniteGgJson from './fortnite_gg_index.json';
 
@@ -233,26 +234,7 @@ export function getSpriteCardStyle(sprite) {
   return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: softenBorderColor('#00afff') };
 }
 
-export const THEME_NAMES_ES = {
-  Basic: 'Básico',
-  Gold: 'Dorado',
-  Cheatmaster: 'Hacker',
-  'Cheat Master': 'Hacker',
-  'Loot Hacker': 'Hacker de Botín',
-  'LootHacker': 'Hacker de Botín',
-  'Bounty Hunter': 'Cazarrecompensas',
-  'BountyHunter': 'Cazarrecompensas',
-  reaper: 'Cazarrecompensas',
-  'Trick or Treat': 'Dulce o Truco',
-  tricktreat: 'Dulce o Truco',
-  Candy: 'Gomita',
-  Gummy: 'Gomita',
-  Galaxy: 'Galáctico',
-  Holofoil: 'Holográfico',
-  Cube: 'Cúbico',
-  Gem: 'Gema',
-  Quack: 'Patito'
-};
+export { THEME_NAMES_ES } from './nombresEspiritus.js';
 
 export const THEME_NAMES_EN = {
   Basic: 'Basic',
@@ -278,61 +260,7 @@ export const THEME_NAMES_EN = {
 export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
 export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
 
-export const FAMILY_NAMES_MAP = {
-  honey: 'Miel',
-  obsession: 'Obsesión',
-  water: 'Agua',
-  earth: 'Tierra',
-  fire: 'Fuego',
-  air: 'Aire',
-  duck: 'Pato',
-  ghost: 'Fantasma',
-  dream: 'Dormilón',
-  demon: 'Demonio',
-  punk: 'Punk',
-  king: 'Monarca',
-  zeropoint: 'Punto Cero',
-  theburntpeanut: 'Cacahuate',
-  fishy: 'Pescado',
-  striker: 'Pelotero',
-  aura: 'Aura',
-  boss: 'Jefe',
-  grim: 'Parca',
-  seven: 'Siete',
-  batman: 'Batman',
-  pollo: 'Pollo',
-  vini: 'Vini Jr.',
-  wick: 'John Wick',
-  peely: 'Bananín',
-  llama: 'Llama',
-  ironmouse: 'La niña',
-  // Gen 2
-  klombo: 'Klombo',
-  crown: 'Victorioso',
-  jackrabbit: 'Jackrabbit',
-  sonic: 'Sonic',
-  shadow: 'Shadow',
-  tails: 'Tails',
-  killswitch: 'Killswitch',
-  bush: 'Arbustín',
-  adventure: 'Aventurero',
-  jonesy: 'Jonesy',
-  '8bit': '8-Bit',
-  stormscout: 'Exploratormentas',
-  overshield: 'Protector',
-  onigiri: 'Onigiri',
-  xray: 'Rayos X',
-  megaman: 'Megaman',
-  crash: 'Crash Bandicoot',
-  morgana: 'Morgana',
-  blinky: 'Blinky',
-  birthday: 'Pastel de Cumpleaños',
-  pond: 'Estanque',
-  spookydash: 'Impulso aterrador',
-  vampire: 'Vampiro',
-  deer: 'El Ciervo',
-  dumpsterdive: 'Mapache'
-};
+export { FAMILY_NAMES_MAP } from './nombresEspiritus.js';
 
 const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails', 'megaman', 'crash', 'morgana', 'blinky'];
 
