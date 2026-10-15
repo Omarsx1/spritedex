@@ -121,8 +121,32 @@ function drawModernDotQR(ctx, qrX, qrY, qrSize, url = dominioParaCompartir()) {
 // Caché global en memoria para acelerar la generación instantánea de imágenes
 const globalImageCache = new Map();
 
-// Caché global persistente de plantillas renderizadas para carga 0ms instantánea
-export const globalCanvasCache = new Map();
+// Cada captura es un lienzo de 1280x2515 (~13 MB en memoria): se guardan pocas y se olvidan
+// las mas viejas. Lo que sale de aqui se vuelve a dibujar o se lee del Cache Storage.
+export function crearCacheAcotada(maximo, alOlvidar = () => {}) {
+  const entradas = new Map();
+  return {
+    has: (clave) => entradas.has(clave),
+    get(clave) {
+      if (!entradas.has(clave)) return undefined;
+      const valor = entradas.get(clave);
+      entradas.delete(clave);
+      entradas.set(clave, valor);
+      return valor;
+    },
+    set(clave, valor) {
+      entradas.delete(clave);
+      entradas.set(clave, valor);
+      while (entradas.size > maximo) {
+        const [claveVieja, valorViejo] = entradas.entries().next().value;
+        entradas.delete(claveVieja);
+        alOlvidar(valorViejo);
+      }
+    }
+  };
+}
+
+export const globalCanvasCache = crearCacheAcotada(3);
 
 // Contrato del export por defecto. Lo comparten la modal y el precalculo en reposo de
 // App.jsx: si van como texto suelto en cada sitio, cambiar uno deja al otro sin acertar
@@ -1808,27 +1832,15 @@ async function renderGlitchOverrideTemplate({
 export const EXPORT_IMAGE_TYPE = 'image/jpeg';
 export const EXPORT_IMAGE_QUALITY = 0.92;
 
+// Devuelve el blob sin crear su URL de objeto: quien la guarda es quien la libera.
 export function encodeCanvasToImage(canvas) {
   return new Promise((resolve) => {
     canvas.toBlob((blob) => {
-      const filename = `spritedex_${Date.now()}.jpg`;
       if (blob) {
-        const file = new File([blob], filename, { type: EXPORT_IMAGE_TYPE });
-        const blobUrl = URL.createObjectURL(blob);
-        resolve({
-          dataUrl: blobUrl,
-          blobUrl,
-          blob,
-          file
-        });
+        const file = new File([blob], `spritedex_${Date.now()}.jpg`, { type: EXPORT_IMAGE_TYPE });
+        resolve({ blob, file, dataUrl: '' });
       } else {
-        const dataUrl = canvas.toDataURL(EXPORT_IMAGE_TYPE, EXPORT_IMAGE_QUALITY);
-        resolve({
-          dataUrl,
-          blobUrl: dataUrl,
-          blob: null,
-          file: null
-        });
+        resolve({ blob: null, file: null, dataUrl: canvas.toDataURL(EXPORT_IMAGE_TYPE, EXPORT_IMAGE_QUALITY) });
       }
     }, EXPORT_IMAGE_TYPE, EXPORT_IMAGE_QUALITY);
   });
@@ -1868,8 +1880,7 @@ export async function readCachedCapture(key) {
     if (!blob || blob.size === 0) return null;
     return {
       blob,
-      file: new File([blob], `spritedex_${Date.now()}.jpg`, { type: EXPORT_IMAGE_TYPE }),
-      url: URL.createObjectURL(blob)
+      file: new File([blob], `spritedex_${Date.now()}.jpg`, { type: EXPORT_IMAGE_TYPE })
     };
   } catch {
     return null;
