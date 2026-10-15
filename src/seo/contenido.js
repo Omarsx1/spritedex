@@ -7,6 +7,7 @@
 
 import { SITIO } from './rutas.js';
 import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, RUTAS_CONTENIDO } from './plantilla.js';
+import { modeloGuia, formatearFecha } from './guia.js';
 
 const CLAVES = { guia: 'guia', acerca: 'acerca', novedades: 'novedades' };
 
@@ -69,51 +70,33 @@ function tabla(cabeceras, filas) {
     + '</tbody></table>';
 }
 
-// La fecha va en el texto y en el idioma de la pagina: "4 de octubre de 2026" / "October 4, 2026".
-function formatearFecha(iso, lang) {
-  if (!iso) return '';
-  try {
-    return new Intl.DateTimeFormat(lang === 'en' ? 'en-US' : 'es-ES', { dateStyle: 'long', timeZone: 'UTC' })
-      .format(new Date(iso + 'T00:00:00Z'));
-  } catch {
-    return iso;
+// Un bloque del modelo segun se pinta aqui: parrafo o lista. El modelo no trae HTML.
+function bloqueHtml(bloque) {
+  if (bloque.tipo === 'lista') {
+    return '<ul>' + bloque.items.map((i) => '<li>' + escapar(i) + '</li>').join('') + '</ul>';
   }
+  return '<p>' + escapar(bloque.texto) + '</p>';
 }
 
-// Preguntas frecuentes. Son las mismas que se ven en la pagina y las que van al JSON-LD: si
-// divergieran, el marcado diria algo que el usuario no lee.
-function preguntas(lang, datos) {
-  const t = datos;
-  if (lang === 'en') {
-    return [
-      ['What are Fortnite sprites?', 'Sprites are companions you find during a match. Each one grants an ability while you carry it, from extra shields to a double jump, and it gets stronger as you level it up.'],
-      ['How many sprites are there?', 'Spritedex tracks ' + t.total + ' sprites: ' + t.familias + ' families with their variants.'],
-      ['How do you get a sprite?', 'They appear in sprite chests and extraction zones, and some have specific spawn spots. Each page lists where that sprite is found and its drop chance, from ' + t.dropMin + '% to ' + t.dropMax + '%.'],
-      ['How do sprite levels work?', 'Each sprite goes from level 1 to 5 and its ability scales with the level. Tracking them here is how you see which ones still need leveling.'],
-      ['Do I need an account?', 'No. Your progress is stored in your own browser, so nothing is uploaded and no sign-up is required.'],
-      ['Is Spritedex official?', 'No. It is a fan project with no relation to Epic Games.']
-    ];
-  }
-  return [
-    ['¿Qué son los espíritus de Fortnite?', 'Son compañeros que aparecen durante la partida. Cada uno concede una habilidad mientras lo llevas, desde escudo extra hasta un salto doble, y se vuelve más fuerte según sube de nivel.'],
-    ['¿Cuántos espíritus hay?', 'El Spritedex sigue ' + t.total + ' espíritus: ' + t.familias + ' familias con sus variantes.'],
-    ['¿Cómo se consigue un espíritu?', 'Aparecen en cofres de espíritu y zonas de extracción, y algunos tienen sitios concretos. Cada ficha dice dónde aparece el suyo y su probabilidad, que va del ' + t.dropMin + '% al ' + t.dropMax + '%.'],
-    ['¿Cómo funcionan los niveles?', 'Cada espíritu va del nivel 1 al 5 y su habilidad mejora con cada subida. Aquí es donde se ve cuáles te faltan por subir.'],
-    ['¿Necesito una cuenta?', 'No. Tu progreso se guarda en tu propio navegador, así que no se sube nada y no hay que registrarse.'],
-    ['¿Spritedex es oficial?', 'No. Es un proyecto de fans sin relación con Epic Games.']
-  ];
+// Una seccion ocupa una linea (titulo y bloques seguidos) y su tabla, si la lleva, va en la
+// linea siguiente. Es la forma que ya tenia la pagina, que esta indexada.
+function seccionHtml(seccion) {
+  const linea = '<h2>' + escapar(seccion.titulo) + '</h2>' + seccion.bloques.map(bloqueHtml).join('');
+  return seccion.tabla ? [linea, tabla(seccion.tabla.cabeceras, seccion.tabla.filas)] : [linea];
 }
 
-function faqHtml(lang, datos) {
-  return preguntas(lang, datos).map(([p, r]) => (
+// El FAQ visible sale de los mismos pares que el JSON-LD: si divergieran, el marcado diria algo
+// que el usuario no lee.
+function faqHtml(entradas) {
+  return entradas.map(([p, r]) => (
     '<details class="faq"><summary>' + escapar(p) + '</summary><p>' + escapar(r) + '</p></details>'
   )).join('');
 }
 
-function jsonLdFaq(lang, datos) {
+function jsonLdFaq(faq) {
   return {
     '@type': 'FAQPage',
-    mainEntity: preguntas(lang, datos).map(([p, r]) => ({
+    mainEntity: faq.entradas.map(([p, r]) => ({
       '@type': 'Question',
       name: p,
       acceptedAnswer: { '@type': 'Answer', text: r }
@@ -151,71 +134,21 @@ function jsonLdPagina(tipo, etiquetas, lang, extra = {}) {
 export function htmlGuia(datos, lang) {
   const etiquetas = etiquetasGuia(lang);
   const enIngles = lang === 'en';
-  const fecha = formatearFecha(datos.fecha, lang);
   // El FAQPage va como nodo del grafo, una sola vez: si ademas fuera mainEntity, las preguntas
   // viajarian duplicadas en el marcado.
   const jsonLd = jsonLdPagina('WebPage', etiquetas, lang);
-  jsonLd['@graph'].push(jsonLdFaq(lang, datos));
-  // Hay drops de una entre cien mil: decir "del 0.00001%" es cierto pero no se lee. Por debajo
-  // del 0.01% se redacta como "menos del 0.01%", que sigue siendo verdad.
-  const bajo = datos.dropMin > 0 && datos.dropMin < 0.01 ? null : datos.dropMin;
-  const fraseDrop = enIngles
-    ? (bajo === null ? 'goes from less than 0.01% to ' : 'goes from ' + bajo + '% to ') + datos.dropMax + '%'
-    : (bajo === null ? 'va de menos del 0.01% al ' : 'va del ' + bajo + '% al ') + datos.dropMax + '%';
-  const h = enIngles
-    ? {
-        que: 'What a sprite is',
-        queTexto: 'A sprite is a companion you pick up during a match. While you carry it, it works on its own: it gives you shields, reloads your weapons, lets you double jump, drops loot. Its power grows with its level, so the same sprite is worth much more at 5 than at 1.',
-        familias: 'Families and variants',
-        familiasTexto: 'Sprites are grouped by family (Water, Fire, Ghost, Jonesy, Peely…) and each family has variants that change how it looks: Basic, Gold, Hacker, Loot Hacker, Bounty Hunter, Trick or Treat, Quack and a few more. Spritedex tracks ' + datos.total + ' sprites across ' + datos.familias + ' families.',
-        rarezas: 'Rarities',
-        rarezasTexto: 'Rarity describes how hard a sprite is to find. These are the rarities in the current collection:',
-        conseguir: 'How to get them',
-        conseguirTexto: 'They show up in sprite chests and extraction zones, and some have their own spawn spots (rivers, forests, cities, at night…). The drop chance changes a lot from one sprite to another: in this collection it ' + fraseDrop + '. Each sprite page says where that one is found.',
-        niveles: 'Levels 1 to 5',
-        nivelesTexto: 'Every sprite levels up and its ability scales with it. Levelling is what turns a sprite you already have into a better one, so a collection tracker is really two lists: what you own and what you still have to level.',
-        costo: 'Summon cost',
-        costoTexto: 'Summoning a sprite costs Stardust, and the amount depends on the sprite. This collection has ' + datos.costos + ' different costs.',
-        coleccion: 'Tracking the collection',
-        coleccionTexto: 'Spritedex keeps the whole list with family, variant, rarity and drop chance, marks what you own, levels from 1 to 5, compares with friends and exports a card to share. No account and no install: everything is stored in your browser.',
-        faq: 'Frequent questions',
-        datos: 'Data revised on ' + fecha + ' from the game and community sources. It can contain mistakes: if you see one, it is worth telling us.'
-      }
-    : {
-        que: 'Qué es un espíritu',
-        queTexto: 'Un espíritu es un compañero que recoges durante la partida. Mientras lo llevas, trabaja solo: te da escudo, recarga tus armas, te deja hacer un salto doble, suelta botín. Su poder crece con el nivel, así que el mismo espíritu vale mucho más en el 5 que en el 1.',
-        familias: 'Familias y variantes',
-        familiasTexto: 'Los espíritus se agrupan por familia (Agua, Fuego, Fantasma, Jonesy, Peely…) y cada familia tiene variantes que cambian su aspecto: Básico, Dorado, Hacker, Hacker de Botín, Cazarrecompensas, Dulce o Truco, Patito y algunas más. El Spritedex sigue ' + datos.total + ' espíritus repartidos en ' + datos.familias + ' familias.',
-        rarezas: 'Rarezas',
-        rarezasTexto: 'La rareza indica lo difícil que es encontrar un espíritu. Estas son las de la colección actual:',
-        conseguir: 'Cómo conseguirlos',
-        conseguirTexto: 'Aparecen en cofres de espíritu y zonas de extracción, y algunos tienen sitios propios (ríos, bosques, ciudades, de noche…). La probabilidad cambia mucho de uno a otro: en esta colección ' + fraseDrop + '. La ficha de cada espíritu dice dónde aparece el suyo.',
-        niveles: 'Niveles del 1 al 5',
-        nivelesTexto: 'Todos los espíritus suben de nivel y su habilidad mejora con cada subida. Subir de nivel es lo que convierte un espíritu que ya tienes en uno mejor, así que un rastreador de colección son en realidad dos listas: lo que tienes y lo que te falta subir.',
-        costo: 'Costo de invocación',
-        costoTexto: 'Invocar un espíritu cuesta Polvo Estelar, y la cantidad depende del espíritu. En esta colección hay ' + datos.costos + ' costos distintos.',
-        coleccion: 'Seguir la colección',
-        coleccionTexto: 'El Spritedex tiene la lista completa con familia, variante, rareza y probabilidad, marca lo que tienes, los niveles del 1 al 5, compara con amigos y exporta una tarjeta para compartir. Sin cuenta y sin instalar: todo se guarda en tu navegador.',
-        faq: 'Preguntas frecuentes',
-        datos: 'Datos revisados el ' + fecha + ' a partir del juego y de fuentes de la comunidad. Pueden tener errores: si ves uno, merece la pena avisar.'
-      };
+  const modelo = modeloGuia(lang, datos);
+  jsonLd['@graph'].push(jsonLdFaq(modelo.faq));
   const cuerpo = [
-    migasContenido(lang, h.familias === 'Families and variants' ? 'Guide' : 'Guía'),
+    migasContenido(lang, enIngles ? 'Guide' : 'Guía'),
     '<main>',
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
-    '<h2>' + escapar(h.que) + '</h2><p>' + escapar(h.queTexto) + '</p>',
-    '<h2>' + escapar(h.familias) + '</h2><p>' + escapar(h.familiasTexto) + '</p>',
-    '<h2>' + escapar(h.rarezas) + '</h2><p>' + escapar(h.rarezasTexto) + '</p>',
-    tabla([enIngles ? 'Rarity' : 'Rareza', enIngles ? 'Sprites' : 'Espíritus'], datos.porRareza.map((r) => [r.nombre, String(r.n)])),
-    '<h2>' + escapar(h.conseguir) + '</h2><p>' + escapar(h.conseguirTexto) + '</p>',
-    '<h2>' + escapar(h.niveles) + '</h2><p>' + escapar(h.nivelesTexto) + '</p>',
-    '<h2>' + escapar(h.costo) + '</h2><p>' + escapar(h.costoTexto) + '</p>',
-    '<h2>' + escapar(h.coleccion) + '</h2><p>' + escapar(h.coleccionTexto) + '</p>',
+    ...modelo.secciones.flatMap(seccionHtml),
     ctaHtml(lang),
-    '<h2>' + escapar(h.faq) + '</h2>',
-    faqHtml(lang, datos),
-    '<p class="nota">' + escapar(h.datos) + '</p>',
+    '<h2>' + escapar(modelo.faq.titulo) + '</h2>',
+    faqHtml(modelo.faq.entradas),
+    '<p class="nota">' + escapar(modelo.nota) + '</p>',
     '</main>'
   ].join('\n');
   return documento({ lang, etiquetas, jsonLd, cuerpo });

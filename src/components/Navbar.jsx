@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Download, User, UserPlus, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone, AlertTriangle, Mail } from 'lucide-react';
+import { Download, User, UserPlus, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone, AlertTriangle, Mail, BookOpen, Globe } from 'lucide-react';
 import { Google } from './ui/Google';
 import { getSupabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
@@ -7,7 +7,17 @@ import { safeStorage } from '../utils/safeStorage';
 import { usuarioDeSesion, esCorreoSintetico } from '../utils/usuario';
 import { GENERATIONS } from '../data/spritesData';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { t } from '../i18n';
+import { t, conIdioma, getLang } from '../i18n';
+import { RUTA_GUIA } from '../utils/rutaGuia.js';
+
+// Un clic normal: boton izquierdo, sin modificadores y sin target. Cualquier otra cosa
+// (cmd/ctrl-clic, clic central, "abrir en pestaña nueva") deja que el navegador siga el href
+// real del enlace, que es lo que mantiene vivos los enlaces del menu.
+function esClicDeNavegacion(evento) {
+  return evento.button === 0
+    && !evento.metaKey && !evento.ctrlKey && !evento.shiftKey && !evento.altKey
+    && !evento.currentTarget.target;
+}
 
 // #rrggbb -> "r,g,b", para poder usar el color de cada generacion con transparencia
 // (rgba) sin depender de color-mix, que aun no esta en todos los navegadores.
@@ -22,10 +32,12 @@ export function Navbar({
   user,
   activeGen = 2,
   onGenChange,
+  onNavegar,
   onOpenAuthModal,
   onLinkGoogle,
   onOpenBackupModal,
-  onSignOut
+  onSignOut,
+  onOpenPrivacy
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
@@ -40,7 +52,7 @@ export function Navbar({
     return [
       { id: 2, badge: '2', nombre: gen2?.title || 'Override', detalle: '2ª Generación', color: gen2?.badgeColor || '#ec4899' },
       { id: 1, badge: '1', nombre: gen1?.title || 'Runners', detalle: '1ª Generación', color: gen1?.badgeColor || '#3b82f6' },
-      { id: 0, badge: '🌐', nombre: t('nav.todas'), detalle: 'Catálogo completo', color: '#00f0e8' }
+      { id: 0, badge: <Globe size={16} strokeWidth={2.4} aria-hidden="true" />, nombre: t('nav.todas'), detalle: 'Catálogo completo', color: '#00f0e8' }
     ];
   }, []);
   const myFriendCode = useMemo(() => getMyFriendCode(user?.id), [user]);
@@ -58,6 +70,9 @@ export function Navbar({
   });
   const userDropdownRef = useRef(null);
   const navMenuRef = useRef(null);
+  // Disparadores de cada desplegable: a donde vuelve el foco cuando Escape lo cierra.
+  const userTriggerRef = useRef(null);
+  const navTriggerRef = useRef(null);
 
   // Sincroniza preferencia persistente de animaciones en DOM y localStorage
   useEffect(() => {
@@ -75,6 +90,15 @@ export function Navbar({
 
   const handleToggleAnimations = () => {
     setAnimationsEnabled((prev) => !prev);
+  };
+
+  // Los dos enlaces de ayuda son enlaces de verdad; el clic normal ademas navega dentro de la
+  // app. La ruta viaja sin el prefijo de idioma: conIdioma lo pone al armar el href.
+  const navegarEnApp = (evento, ruta) => {
+    setIsNavMenuOpen(false);
+    if (!onNavegar || !esClicDeNavegacion(evento)) return;
+    evento.preventDefault();
+    onNavegar(ruta);
   };
 
   const fullName = useMemo(() => {
@@ -129,6 +153,27 @@ export function Navbar({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // Escape cierra el desplegable abierto y devuelve el foco a su disparador. Antes solo
+  // se cerraban con clic fuera, asi que por teclado no habia salida (lo cubria el pie).
+  useEffect(() => {
+    if (!isUserMenuOpen && !isNavMenuOpen) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key !== 'Escape') return;
+      if (isUserMenuOpen) {
+        setIsUserMenuOpen(false);
+        userTriggerRef.current?.focus();
+      }
+      if (isNavMenuOpen) {
+        setIsNavMenuOpen(false);
+        navTriggerRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isUserMenuOpen, isNavMenuOpen]);
 
   const handleAvatarClick = () => {
     if (user) {
@@ -191,6 +236,7 @@ export function Navbar({
         {/* Avatar / Usuario (Solo Foto o Inicial Circular) */}
         <div ref={userDropdownRef} style={{ position: 'relative' }}>
           <button
+            ref={userTriggerRef}
             className={`app-navbar__avatar ${user ? 'is-logged' : ''} ${isUserMenuOpen ? 'is-active' : ''}`}
             onClick={handleAvatarClick}
             title={user ? t('nav.conectadoComo', { nombre: nombreCorto }) : t('nav.iniciarSesionTitulo')}
@@ -294,6 +340,7 @@ export function Navbar({
         {/* Botón Menú Hamburguesa */}
         <div ref={navMenuRef} style={{ position: 'relative' }}>
           <button
+            ref={navTriggerRef}
             className={`app-navbar__menu-btn ${isNavMenuOpen ? 'is-active' : ''}`}
             onClick={() => { setIsNavMenuOpen((prev) => !prev); setIsUserMenuOpen(false); }}
             title={t('nav.menu')}
@@ -380,6 +427,57 @@ export function Navbar({
                 </button>
 
                 </div>
+              </div>
+
+              <div className="app-navbar__dropdown-divider" />
+
+              {/* Sección Ayuda y legal. Los tres enlaces ya no viven en un pie: los lleva
+                  el menu, que existe en ambos breakpoints. El enlazado rastreable de las
+                  paginas prerenderizadas lo sigue dando el pie estatico de seo/plantilla.js. */}
+              <div className="app-navbar__menu-section">
+                <div className="app-navbar__menu-section-label">
+                  <Sparkles size={13} />
+                  <span>{t('nav.ayudaLegal')}</span>
+                </div>
+
+                <a
+                  className="app-navbar__menu-action-btn"
+                  href={conIdioma(RUTA_GUIA, getLang())}
+                  onClick={(evento) => navegarEnApp(evento, RUTA_GUIA)}
+                >
+                  <div className="action-btn-left">
+                    <BookOpen size={15} color="var(--nav-accent, #00F0E8)" />
+                    <span>{t('nav.guiaEspiritus')}</span>
+                  </div>
+                </a>
+
+                {/* Al catalogo y no al listado estatico: dentro de la app un indice sin
+                    filtros repetiria la rejilla que el usuario ya tiene. El listado
+                    prerenderizado sigue enlazado desde el pie de las paginas estaticas. */}
+                <a
+                  className="app-navbar__menu-action-btn"
+                  href={conIdioma('/', getLang())}
+                  onClick={(evento) => navegarEnApp(evento, '/')}
+                >
+                  <div className="action-btn-left">
+                    <Layers size={15} color="var(--nav-accent, #00F0E8)" />
+                    <span>{t('nav.todosLosEspiritus')}</span>
+                  </div>
+                </a>
+
+                <button
+                  type="button"
+                  className="app-navbar__menu-action-btn"
+                  onClick={() => { setIsNavMenuOpen(false); onOpenPrivacy?.(); }}
+                >
+                  <div className="action-btn-left">
+                    <ShieldCheck size={15} />
+                    <span>{t('nav.cookiesPrivacidad')}</span>
+                  </div>
+                </button>
+
+                <p className="app-navbar__menu-copy">© {new Date().getFullYear()} {t('nav.copyright')}</p>
+                <p className="app-navbar__menu-copy">{t('nav.disclaimer')}</p>
               </div>
             </div>
           )}

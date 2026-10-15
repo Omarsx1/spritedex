@@ -43,6 +43,26 @@
   padding: 0;
 }
 
+/* Sin barra de scroll a la vista: se puede deslizar sin que asome el riel. La pagina
+   scrollea igual; solo se esconde el indicador. */
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Un movil solo debe tener scroll vertical. `clip` corta el riel lateral sin crear un
+   contenedor de scroll (con `hidden` el sticky de la cabecera dejaria de pegarse). */
+html {
+  overflow-x: clip;
+}
+
 body {
   /* El color del lienzo vive en html (index.html lo trae en linea y el tema lo
      sobreescribe mas abajo). Si el body pintara su propia caja opaca, taparia las
@@ -624,6 +644,22 @@ html::after {
   font-size: 0.7rem;
   color: #94a3b8;
   font-weight: 500;
+}
+
+/* Las entradas de Ayuda y legal son enlaces reales: sin esto heredan el subrayado. */
+a.app-navbar__menu-action-btn {
+  text-decoration: none;
+}
+
+/* Copyright: una linea tenue, separada por un filete, que no compite con los enlaces. */
+.app-navbar__menu-copy {
+  margin: 6px 4px 2px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.45);
 }
 
 /* --- User avatar (inside navbar, right side) --- */
@@ -1347,8 +1383,7 @@ html.theme-fortnitemares .hero__smoke {
   filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.5));
 }
 
-/* Parte 3 de la cinematica (glow): hasta los detalles cambian de temporada.
-   Los anillos viran de indigo/rosa a violeta/naranja calabaza. */
+/* Los detalles de temporada: los anillos viran de indigo/rosa a violeta/naranja calabaza. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-fill--caught {
   stroke: #a855f7;
   filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.55));
@@ -1613,6 +1648,149 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   transform: translateY(-2px);
 }
 
+/* Escritorio: espiritu del hero mas grande y anillos/botones con el acabado de temporada. */
+@media (min-width: 769px) {
+  .hero__hero-sprite {
+    width: 240px !important;
+    height: 240px !important;
+    max-width: 240px !important;
+    max-height: 240px !important;
+  }
+
+  .hero__hero-img {
+    width: 230px !important;
+    height: 230px !important;
+    max-width: 230px !important;
+    max-height: 230px !important;
+  }
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-box {
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(24, 34, 46, 0.8) 0%, rgba(24, 34, 46, 0.4) 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 10px 26px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-track {
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--primary,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--accent {
+  gap: 8px;
+  padding: 11px 20px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  background: rgba(24, 34, 46, 0.8);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--primary {
+  color: #c4b5fd;
+  border-color: rgba(167, 139, 250, 0.42);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--accent {
+  color: #67e8f9;
+  border-color: rgba(34, 211, 238, 0.42);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--primary .hero__btn-icon,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--accent .hero__btn-icon {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--primary:hover {
+  background: rgba(30, 41, 56, 0.92);
+  border-color: rgba(167, 139, 250, 0.75);
+  box-shadow: 0 0 24px rgba(167, 139, 250, 0.28);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__btn--accent:hover {
+  background: rgba(30, 41, 56, 0.92);
+  border-color: rgba(34, 211, 238, 0.75);
+  box-shadow: 0 0 24px rgba(34, 211, 238, 0.28);
+}
+
+/* Escritorio: los indicadores son tarjetas rectangulares, como en el movil. */
+@media (min-width: 769px) {
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__bar {
+    max-width: 720px;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__actions {
+    flex-wrap: nowrap;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__stat-ring {
+    width: 164px;
+    gap: 8px;
+    padding: 14px 16px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)), rgba(24, 34, 46, 0.72);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 26px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-box {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 8px;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-svg {
+    display: none;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__stat-inner {
+    position: static;
+    inset: auto;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 6px;
+    text-align: left;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__stat-of {
+    margin-top: 0;
+    font-size: 0.9rem;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__stat-value {
+    font-size: 1.7rem;
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__ring-box::after {
+    content: '';
+    display: block;
+    height: 6px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #22d3ee 0%, #818cf8 55%, #c084fc 100%) 0 0 / var(--fill, 0%) 100% no-repeat,
+      rgba(255, 255, 255, 0.12);
+  }
+
+  html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .hero__bar > .hero__stat-ring:last-child .hero__ring-box::after {
+    background: linear-gradient(90deg, #fb923c 0%, #ff922b 100%) 0 0 / var(--fill, 0%) 100% no-repeat,
+      rgba(255, 255, 255, 0.12);
+  }
+}
+
 .hero__spin-icon {
   animation: heroSpin 1s linear infinite;
 }
@@ -1666,17 +1844,17 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   }
 
   .hero__hero-sprite {
-    width: 140px !important;
-    height: 140px !important;
-    max-width: 140px !important;
-    max-height: 140px !important;
+    width: 160px !important;
+    height: 160px !important;
+    max-width: 160px !important;
+    max-height: 160px !important;
   }
 
   .hero__hero-img {
-    width: 140px !important;
-    height: 140px !important;
-    max-width: 140px !important;
-    max-height: 140px !important;
+    width: 160px !important;
+    height: 160px !important;
+    max-width: 160px !important;
+    max-height: 160px !important;
   }
 
   /* El humo acompana al espiritu: en movil escala con el escaparate. */
@@ -1748,7 +1926,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 @media (max-width: 480px) {
   .hero__content {
     padding: 24px 14px 18px;
-    gap: 14px;
+    gap: 18px;
   }
 
   .hero__title-line {
@@ -1980,6 +2158,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .filter-search-box .search-icon {
   position: absolute;
   left: 12px;
+  z-index: 1;
   color: #94a3b8;
   pointer-events: none;
 }
@@ -1987,6 +2166,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .search-input-field {
   padding: 8px 14px 8px 32px;
   width: 160px;
+  text-align: left;
   border-radius: 9999px;
   background: rgba(22, 27, 34, 0.65);
   backdrop-filter: blur(12px);
@@ -2097,6 +2277,27 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   to   { opacity: 1; transform: translate(-50%, 0) scale(1); }
 }
 
+/* Solo escritorio: una sola talla para todos los chips y sitio para el texto mas largo
+   ('Cazarrecompensas'). Antes cada fila se estiraba segun el texto que partia en dos lineas
+   y el chip vecino se inflaba: de ahi el HACKER gigante y las alturas desiguales. */
+@media (min-width: 769px) {
+  .variant-grid-dropdown {
+    grid-template-columns: repeat(2, minmax(152px, 1fr));
+    min-width: 344px;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .variant-grid-chip {
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    text-align: center;
+  }
+}
+
 @keyframes popInRight {
   from { opacity: 0; transform: translateY(-6px) scale(0.96); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -2143,11 +2344,12 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   transform: translateX(-50%);
   z-index: 91;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 5px;
   padding: 10px;
-  min-width: 460px;
+  min-width: 580px;
   max-height: 360px;
+  overflow-x: hidden;
   overflow-y: auto;
   background: rgba(15, 20, 28, 0.96);
   backdrop-filter: blur(24px);
@@ -2172,7 +2374,8 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
-  white-space: nowrap;
+  min-width: 0;
+  line-height: 1.2;
 }
 
 .sprite-grid-chip:hover {
@@ -2194,7 +2397,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 .sprite-chip-name {
-  white-space: nowrap;
+  min-width: 0;
 }
 
 /* No Lanzados Checkbox Pill */
@@ -3152,7 +3355,17 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  /* contain: layout en vez de will-change.
+     El hover da un transform a la tarjeta, y eso la convierte en bloque contenedor: sus
+     elementos absolutos (corona, halos, esquinas) tienen que recolocarse. Medido, eso son
+     ~37-51 reflows por barrido de raton y 330-450 ms de hilo principal.
+     La solucion evidente era will-change: transform, que la hace contenedora SIEMPRE y baja
+     a 1 reflow — pero compone la ficha, y una capa compuesta en pantalla Retina se rasteriza
+     a 1x: el sprite sale borroso y su box-shadow de maestria se ve como una banda alrededor.
+     contain: layout da lo mismo que se buscaba (contenedora fija, sin reflow en hover) SIN
+     componerla: el arte queda nitido y sin halo. */
+  contain: layout;
+  transition: transform 0.2s ease;
   position: relative;
   overflow: hidden;
   border: 0.5px solid rgba(255, 255, 255, 0.1);
@@ -3259,49 +3472,68 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   animation: none !important;
 }
 
-/* ===== 2. Mastered Cyber GLITCH Season Card Styling (Gen 2) ===== */
+/* ===== 2. Mastered Cyber GLITCH Season Card Styling (Gen 2) =====
+   El pulso ya no anima border-color ni box-shadow. Ninguna de las dos la puede mover el
+   compositor: cada frame obligaba a recalcular estilo y REPINTAR la ficha entera, y con
+   'infinite' eso no paraba nunca. Con varias fichas Gen 2 maxeadas en pantalla el hilo
+   principal se pasaba la vida repintando halos y las demas fichas se quedaban sin pintar
+   al scrollear (aparecian por partes o en blanco). Gen 1 no lo sufre porque su regla dice
+   'animation: none'.
+   Ahora el halo exterior se pinta UNA vez (queda fijo en el cian del primer tramo: no se
+   puede animar desde un hijo, porque la ficha recorta con overflow: hidden) y el pulso de
+   color vive en dos capas que solo mueven OPACITY, que el compositor resuelve sin repintar.
+   El ritmo sigue siendo de 4 s; se pierde el tramo violeta del final. */
 .sprite-card.is-mastered.is-glitch-mastered {
   position: relative;
   overflow: hidden;
   background-color: #161b22 !important;
   border-width: 0.5px !important;
-  animation: glitch-border-pulse 4s ease-in-out infinite alternate;
+  border-color: #00f0ff !important;
+  /* SIN !important, a proposito: el acabado ESCARCHA de Fortnitemares define su propio
+     box-shadow (interior, sin resplandor exterior) y tiene mas especificidad que esta
+     regla, pero NO usa !important. Con !important aqui, esta regla lo pisaba y forzaba
+     un halo cian de 17 px alrededor de la ficha maxeada: el resplandor que se veia de
+     mas. Sin el, manda el diseno de la temporada y el brillo se queda dentro. */
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.6),
+    inset 0 0 22px rgba(0, 240, 255, 0.16);
+  animation: none !important;
 }
 
 .sprite-card.is-mastered.is-glitch-mastered::before,
 .sprite-card.is-mastered.is-glitch-mastered::after {
-  display: none !important;
+  content: '';
+  display: block !important;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  border: 0.5px solid currentColor;
+  box-shadow: inset 0 0 10px currentColor;
+  opacity: 0;
 }
 
-@keyframes glitch-border-pulse {
-  0% {
-    border-color: #00f0ff !important;
-    box-shadow:
-      0 10px 25px rgba(0, 0, 0, 0.6),
-      0 0 16px rgba(0, 240, 255, 0.6),
-      inset 0 0 10px rgba(0, 240, 255, 0.2) !important;
-  }
-  33% {
-    border-color: #ec4899 !important;
-    box-shadow:
-      0 10px 25px rgba(0, 0, 0, 0.6),
-      0 0 18px rgba(236, 72, 153, 0.65),
-      inset 0 0 10px rgba(236, 72, 153, 0.2) !important;
-  }
-  66% {
-    border-color: #22c55e !important;
-    box-shadow:
-      0 10px 25px rgba(0, 0, 0, 0.6),
-      0 0 16px rgba(34, 197, 94, 0.6),
-      inset 0 0 10px rgba(34, 197, 94, 0.2) !important;
-  }
-  100% {
-    border-color: #a855f7 !important;
-    box-shadow:
-      0 10px 25px rgba(0, 0, 0, 0.6),
-      0 0 18px rgba(168, 85, 247, 0.6),
-      inset 0 0 10px rgba(168, 85, 247, 0.2) !important;
-  }
+.sprite-card.is-mastered.is-glitch-mastered::before {
+  color: rgba(236, 72, 153, 0.65);
+  animation: glitch-pulso-rosa 4s ease-in-out infinite;
+}
+
+.sprite-card.is-mastered.is-glitch-mastered::after {
+  color: rgba(34, 197, 94, 0.6);
+  animation: glitch-pulso-verde 4s ease-in-out infinite;
+}
+
+@keyframes glitch-pulso-rosa {
+  0%, 40% { opacity: 0; }
+  50% { opacity: 1; }
+  60%, 100% { opacity: 0; }
+}
+
+@keyframes glitch-pulso-verde {
+  0%, 6% { opacity: 0; }
+  16% { opacity: 1; }
+  26%, 100% { opacity: 0; }
 }
 
 /* ===== Cyber FX Overlay (Uiverse 00Kubi Glitch Hacker FX) ===== */
@@ -3490,9 +3722,12 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   background: radial-gradient(
     circle at center,
     rgba(0, 255, 170, 0.25) 0%,
-    rgba(0, 255, 170, 0) 70%
+    rgba(0, 255, 170, 0.07) 46%,
+    rgba(0, 255, 170, 0) 78%
   );
-  filter: blur(15px);
+  /* El blur ya NO esta: un radial que se apaga solo no necesita filtro, y el filtro promovia
+     cada halo a capa compuesta propia (3 por tarjeta Gen 2 maxeada). El degradado se alarga
+     un poco para conservar la misma suavidad sin el. */
   opacity: 0.6;
   transition: opacity 0.3s ease;
   pointer-events: none;
@@ -3829,7 +4064,8 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   background: transparent !important;
   border: none !important;
   color: #facc15;
-  filter: drop-shadow(0 0 5px rgba(250, 204, 21, 0.75));
+  /* Resplandor de la moneda bajado: a 0.75 y 5px el aro dorado pesaba mas que la moneda. */
+  filter: drop-shadow(0 0 3px rgba(250, 204, 21, 0.35));
 }
 
 .star-btn.mastered-star {
@@ -3840,18 +4076,25 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 /* ===== SONIC 3D GOLDEN RINGS (Gen 2) ===== */
+/* ===== SONIC 3D GOLDEN RINGS (Gen 2) ===== */
 .star-btn.is-sonic-ring-btn {
   padding: 1px 0;
   perspective: 500px;
 }
 
+/* Los anillos NO llevan will-change ni contexto 3D permanentes. Son 5 por tarjeta Gen 2:
+   con will-change: transform cada anillo se promovia a su PROPIA capa compuesta (~300
+   capas con 60 tarjetas Gen 2 atrapadas) y con transform-style: preserve-3d ademas abria
+   un contexto 3D por anillo. Eso disparaba el coste de Layerize del frame entero, que en
+   el trace del usuario sale a 19 ms por frame sobre 281 frames = 5,4 s de los 5,6 s de
+   "Rendering". Gen 1 no lo sufre porque usa estrellas normales, sin anillos.
+   El giro (0.55 s) sigue igual: las animaciones de transform se componen solas, no
+   necesitan will-change. */
 .sonic-ring-svg {
   transform-box: fill-box;
   transform-origin: 50% 50%;
-  transform-style: preserve-3d;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
-  will-change: transform;
 }
 
 .star-btn:hover .sonic-ring-svg {
@@ -4213,7 +4456,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   background: transparent !important;
   border: none !important;
   color: #facc15;
-  filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.75));
+  filter: drop-shadow(0 0 3px rgba(250, 204, 21, 0.35));
 }
 
 .owned-btn-sm {
@@ -4845,11 +5088,11 @@ body:has(.modal-overlay) {
 
 .sdm__close {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 10px;
+  right: 10px;
   z-index: 10;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(0, 0, 0, 0.5);
@@ -4865,6 +5108,13 @@ body:has(.modal-overlay) {
 .sdm__close:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: rotate(90deg);
+}
+
+.sdm__close:focus-visible,
+.sdm__variant-select:focus-visible,
+.sdm__vlvl:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
 }
 
 /* ── Hero Header ── */
@@ -4899,13 +5149,17 @@ body:has(.modal-overlay) {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.sdm__crown.sdm__crown--jonesy {
+  top: 14px;
+}
+
 .sdm__crown {
   position: absolute;
-  top: 2px;
-  left: 53%;
+  top: 10px;
+  left: 60%;
   transform: translateX(-50%);
-  width: 30px;
-  height: 20px;
+  width: 23px;
+  height: 13px;
   z-index: 5;
   filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
 }
@@ -4913,6 +5167,7 @@ body:has(.modal-overlay) {
 .sdm__hero-img {
   max-width: 88%;
   max-height: 88%;
+  transform: translateY(5px);
   object-fit: contain;
   filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));
   transition: filter 0.3s ease;
@@ -4936,12 +5191,6 @@ body:has(.modal-overlay) {
   margin-bottom: 8px;
 }
 
-.sdm__drop {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.55);
-}
-
 .sdm__name {
   font-family: var(--font-heading);
   font-size: 1.8rem;
@@ -4952,8 +5201,8 @@ body:has(.modal-overlay) {
 }
 
 .sdm__meta {
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.75);
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -4965,10 +5214,6 @@ body:has(.modal-overlay) {
   font-weight: 800;
 }
 
-.sdm__meta-lvl--mastered {
-  color: #facc15;
-  font-weight: 900;
-}
 
 /* ── Body panels ── */
 .sdm__body {
@@ -4986,24 +5231,9 @@ body:has(.modal-overlay) {
   padding: 16px;
 }
 
-.sdm__card-row {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-
-.sdm__icon {
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.sdm__icon--yellow { color: #eab308; }
-.sdm__icon--blue { color: #3b82f6; }
-.sdm__icon--pink { color: #ec4899; }
-
 .sdm__card-label {
   display: block;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 1.5px;
   color: #fde047;
@@ -5011,8 +5241,9 @@ body:has(.modal-overlay) {
 }
 
 .sdm__card-text {
-  font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
   line-height: 1.5;
 }
 
@@ -5085,31 +5316,32 @@ body:has(.modal-overlay) {
 }
 
 .sdm__progress-title {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 1.5px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.78);
   text-transform: uppercase;
 }
 
 .sdm__progress-count {
   margin-left: auto;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .sdm__progress-track {
-  height: 4px;
+  height: 5px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.12);
   overflow: hidden;
 }
 
 .sdm__progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #6366f1, #ec4899);
+  background: linear-gradient(90deg, #22d3ee 0%, #818cf8 55%, #c084fc 100%);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -5123,14 +5355,31 @@ body:has(.modal-overlay) {
   overflow-y: auto;
 }
 
+@media (min-width: 1024px) {
+  .sdm {
+    max-width: 900px;
+  }
+
+  .sdm__variants {
+    gap: 8px;
+    padding: 16px 20px 20px;
+  }
+
+  .sdm__variant {
+    padding: 10px 6px 8px;
+  }
+}
+
 .sdm__variant {
   border-radius: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 10px 8px 8px;
   text-align: center;
   transition: all 0.2s ease;
   position: relative;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
 .sdm__variant:hover {
@@ -5138,9 +5387,9 @@ body:has(.modal-overlay) {
   border-color: rgba(255, 255, 255, 0.4);
 }
 
-.sdm__variant--selected {
-  border-color: #ffffff !important;
-  box-shadow: 0 0 16px rgba(255, 255, 255, 0.25), 0 4px 14px rgba(0, 0, 0, 0.5) !important;
+.sdm__variant.sdm__variant--selected {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px #6C7780, 0 6px 14px rgba(0, 0, 0, 0.45);
 }
 
 .sdm__variant--owned {
@@ -5152,9 +5401,9 @@ body:has(.modal-overlay) {
 }
 
 .sdm__variant-img-wrap {
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 6px;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5164,11 +5413,11 @@ body:has(.modal-overlay) {
 
 .sdm__variant-crown {
   position: absolute;
-  top: -2px;
-  left: 53%;
+  top: 1px;
+  left: 65%;
   transform: translateX(-50%);
-  width: 22px;
-  height: 15px;
+  width: 12px;
+  height: 8px;
   z-index: 5;
   filter: drop-shadow(0 0 3px #000);
 }
@@ -5189,78 +5438,70 @@ body:has(.modal-overlay) {
   transform: scale(1.08);
 }
 
+.sdm__variant-select {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
 .sdm__variant-name {
   display: block;
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: 0.82rem;
+  font-weight: 400;
   color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  line-height: 1.25;
+  min-height: 2.5em;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sdm__variant-drop {
   display: block;
-  font-size: 0.66rem;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
   margin-top: 2px;
-}
-
-.sdm__variant-status {
-  margin-top: 5px;
-  cursor: pointer;
-}
-
-.sdm__pill {
-  display: inline-block;
-  font-size: 0.64rem;
-  font-weight: 800;
-  padding: 2px 7px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.4);
-  transition: all 0.15s ease;
-}
-
-.sdm__pill--green {
-  background: #10b981;
-  color: #fff;
-}
-
-.sdm__pill--gold {
-  background: linear-gradient(135deg, #facc15, #ef4444);
-  color: #000;
-}
-
-.sdm__pill--unreleased {
-  background: rgba(148, 163, 184, 0.12) !important;
-  color: rgba(148, 163, 184, 0.75) !important;
-  border: 1px dashed rgba(148, 163, 184, 0.35) !important;
 }
 
 .sdm__variant-levels {
   display: flex;
-  gap: 2px;
-  margin-top: 5px;
+  gap: 4px;
+  margin-top: 8px;
 }
 
 .sdm__vlvl {
   flex: 1;
-  padding: 3px 0;
+  height: 22px;
+  padding: 0;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.2);
-  font-size: 0.58rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.7rem;
   font-weight: 900;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .sdm__vlvl--active {
-  background: #10b981;
+  background: #047857;
   color: #fff;
-  border-color: #34d399;
+  border-color: #10b981;
 }
 
 .sdm__vlvl--gold {
@@ -5330,8 +5571,8 @@ body:has(.modal-overlay) {
   }
 
   .sdm__variant-img-wrap {
-    width: 44px;
-    height: 44px;
+    width: 56px;
+    height: 56px;
   }
 }
 
@@ -5402,35 +5643,6 @@ body:has(.modal-overlay) {
   font-weight: 700;
 }
 
-.sdm-share-pro__close {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  min-height: 32px;
-  max-width: 32px;
-  max-height: 32px;
-  flex-shrink: 0;
-  aspect-ratio: 1 / 1;
-  border-radius: 9999px;
-  padding: 0;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #94a3b8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
-}
-
-.sdm-share-pro__close:hover {
-  background: rgba(255, 0, 85, 0.25);
-  border-color: #ff0055;
-  color: #ffffff;
-  transform: scale(1.05);
-}
-
 /* Controls Toolbar */
 .sdm-share-pro__controls {
   display: grid;
@@ -5495,6 +5707,184 @@ body:has(.modal-overlay) {
   gap: 2px;
   width: 100%;
   box-sizing: border-box;
+}
+
+/* Desplegables de la pagina de compartir: el boton ocupa su columna y la lista se abre
+   debajo, con ese mismo ancho para no salirse del panel. Mismo lenguaje que los filtros de
+   la app (se cierra al tocar fuera) y el color identifica la variante. */
+.sdm-share-pro__dd {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.sdm-share-pro__dd-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+}
+
+.sdm-share-pro__dd-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #E2E8F0;
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sdm-share-pro__dd-trigger.is-open {
+  border-color: rgba(0, 240, 232, 0.5);
+}
+
+.sdm-share-pro__dd-menu {
+  position: absolute;
+  z-index: 21;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 8px;
+  background: rgba(12, 16, 26, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+.sdm-share-pro__dd-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sdm-share-pro__dd-item:hover {
+  filter: brightness(1.15);
+}
+
+.sdm-share-pro__dd-item.is-active {
+  border-color: #fff;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.25);
+}
+
+.sdm-share-pro__dd-n {
+  font-size: 0.66rem;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+/* El usuario ocupa la fila completa: el resto son cuatro columnas de filtros. */
+.sdm-share-pro__seg-group--ancho {
+  grid-column: 1 / -1;
+}
+
+/* Variante y formato, en la misma fila: son los dos ajustes cortos de la columna. */
+.sdm-share-pro__fila {
+  display: grid;
+  /* El ancho se reparte segun lo que necesita cada uno: variante tiene que hacer entrar
+     CAZARRECOMPENSAS y formato solo lleva dos palabras cortas. */
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+/* Nombres largos (Exploratormentas, Cazarrecompensas) en un ancho de movil: en vez de
+   recortarlos con puntos, se parten con guion en un punto valido. `hyphens: auto` usa el
+   diccionario del idioma del documento (el html lleva lang), asi que el guion solo aparece
+   si de verdad hace falta. Fuera de estos menus no se activa la particion. */
+.sdm-share-pro__dd-item span {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  overflow-wrap: break-word;
+}
+
+/* Los menus tampoco muestran su riel: se desliza y no se ve. */
+.sdm-share-pro__dd-menu {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sdm-share-pro__dd-menu::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* En un movil estrecho la variante necesita el ancho que le sobra al formato (que solo lleva
+   dos palabras) y una talla algo menor: asi CAZARRECOMPENSAS entra sin recortarse. */
+@media (max-width: 480px) {
+  .sdm-share-pro__fila {
+    /* Variante se queda con lo que necesita CAZARRECOMPENSAS y formato con lo justo para que
+       HORIZONTAL entre en UNA linea (con 1fr se partia con guion: HORIZON-TAL). */
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  }
+
+  .sdm-share-pro__dd-item:not(.sdm-share-pro__dd-item--rejilla) {
+    padding: 7px 8px;
+    font-size: 0.63rem;
+  }
+
+  /* El emoji del formato se esconde: el texto solo ya dice lo mismo y en una columna
+     estrecha obligaba a partir la etiqueta en dos lineas. */
+  .sdm-share-pro__dd-emoji {
+    display: none;
+  }
+}
+
+/* La lista de familias, con la miniatura de cada una y en rejilla: el mismo lenguaje que el
+   filtro de la app, adaptado al ancho de esta columna. La regla va DESPUES de la base para
+   ganarle (misma especificidad) y poder cambiar el flex por rejilla. */
+.sdm-share-pro__dd-menu--rejilla {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.sdm-share-pro__dd-item--rejilla {
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 6px 9px;
+  font-size: 0.68rem;
+}
+
+.sdm-share-pro__dd-item--ancho {
+  grid-column: 1 / -1;
+}
+
+.sdm-share-pro__dd-img {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  object-fit: contain;
 }
 
 .sdm-share-pro__seg-btn {
@@ -5664,6 +6054,18 @@ body:has(.modal-overlay) {
   color: #ffffff;
   box-shadow: 0 0 14px rgba(255, 0, 85, 0.5);
   transform: translateY(-1px);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__btn--share {
+  background: rgba(167, 139, 250, 0.14);
+  border-color: rgba(167, 139, 250, 0.45);
+  color: #c4b5fd;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__btn--share:hover:not(:disabled) {
+  background: rgba(167, 139, 250, 0.28);
+  border-color: #a78bfa;
+  box-shadow: 0 0 14px rgba(167, 139, 250, 0.5);
 }
 
 /* Descargar con Efecto Glitch Oficial Cyberpunk */
@@ -6012,638 +6414,6 @@ body:has(.modal-overlay) {
   }
   .claim-banner__texto {
     font-size: 0.72rem;
-  }
-}
-
-/* ===== MODAL RADAR DE AMIGOS (ESTILO SDM-SHARE-PRO) ===== */
-.sdm-compare {
-  max-width: 640px;
-  width: 100%;
-  margin: 0 auto;
-  border-radius: 18px;
-  max-height: 90vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  box-sizing: border-box;
-}
-
-.sdm-compare__body {
-  padding-top: 6px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Top Cards Grid */
-.sdm-compare__top-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 14px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.sdm-compare__card {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 10px;
-  transition: border-color 0.2s ease;
-  box-sizing: border-box;
-  width: 100%;
-}
-
-.sdm-compare__card--my-code {
-  border-color: rgba(56, 189, 248, 0.3);
-  background: linear-gradient(145deg, rgba(14, 165, 233, 0.08), rgba(15, 23, 42, 0.8));
-}
-
-.sdm-compare__card--connect {
-  border-color: rgba(168, 85, 247, 0.3);
-  background: linear-gradient(145deg, rgba(168, 85, 247, 0.08), rgba(15, 23, 42, 0.8));
-}
-
-.sdm-compare__card--connected {
-  border-color: rgba(16, 185, 129, 0.4);
-  background: linear-gradient(145deg, rgba(16, 185, 129, 0.08), rgba(15, 23, 42, 0.8));
-}
-
-.sdm-compare__card-title {
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #38bdf8;
-}
-
-.sdm-compare__card--connect .sdm-compare__card-title {
-  color: #c084fc;
-}
-
-.sdm-compare__card-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.sdm-compare__btn-disconnect {
-  background: none;
-  border: none;
-  color: #ef4444;
-  font-size: 0.72rem;
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
-}
-
-.sdm-compare__code-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: nowrap;
-}
-
-.sdm-compare__code-badge {
-  font-family: monospace;
-  font-size: 1.15rem;
-  font-weight: 900;
-  color: #00F0E8;
-  background: rgba(0, 0, 0, 0.55);
-  padding: 6px 14px;
-  border-radius: 7px;
-  border: 1px solid rgba(0, 240, 232, 0.35);
-  letter-spacing: 3px;
-  min-width: 84px;
-  text-align: center;
-  text-shadow: 0 0 8px rgba(0, 240, 232, 0.35);
-  white-space: nowrap !important;
-  flex-shrink: 0;
-}
-
-/* Matricula del codigo: SDEX fijo a la izquierda y la casilla con el codigo al lado. */
-.sdm-compare__code-plate {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}
-
-.sdm-compare__code-prefix {
-  font-family: monospace;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  color: rgba(226, 232, 240, 0.5);
-  text-transform: uppercase;
-  flex-shrink: 0;
-}
-
-.sdm-compare__code-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-  justify-content: flex-end;
-}
-
-.sdm-compare__btn-copy {
-  flex: 1;
-  padding: 6px 10px;
-  border-radius: 7px;
-  background: rgba(14, 165, 233, 0.15);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  font-size: 0.74rem;
-  font-weight: 800;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-.sdm-compare__btn-copy:hover {
-  background: rgba(14, 165, 233, 0.3);
-  border-color: #38bdf8;
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-.sdm-compare__btn-copy--link {
-  background: rgba(0, 240, 232, 0.12);
-  color: #00F0E8;
-  border-color: rgba(0, 240, 232, 0.35);
-}
-
-.sdm-compare__btn-copy--link:hover {
-  background: rgba(0, 240, 232, 0.25);
-  border-color: #00F0E8;
-  color: #fff;
-}
-
-.sdm-compare__btn-copy--done {
-  background: rgba(16, 185, 129, 0.25) !important;
-  border-color: #10b981 !important;
-  color: #4ade80 !important;
-}
-
-.sdm-compare__input-row {
-  display: flex;
-  gap: 8px;
-}
-
-.sdm-compare__input {
-  flex: 1;
-  min-width: 0;
-  padding: 8px 12px;
-  border-radius: 7px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #fff;
-  font-size: 0.78rem;
-  outline: none;
-  transition: border-color 0.2s ease;
-}
-
-.sdm-compare__input:focus {
-  border-color: #a855f7;
-  box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
-}
-
-.sdm-compare__btn-connect {
-  padding: 8px 16px;
-  border-radius: 7px;
-  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-  color: #fff;
-  border: none;
-  font-size: 0.78rem;
-  font-weight: 800;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-.sdm-compare__btn-connect:hover:not(:disabled) {
-  box-shadow: 0 0 14px rgba(139, 92, 246, 0.5);
-  transform: translateY(-1px);
-}
-
-.sdm-compare__connected-info {
-  font-size: 0.8rem;
-  color: #e2e8f0;
-}
-
-.sdm-compare__connected-target {
-  font-weight: 700;
-}
-
-.sdm-compare__connected-target strong {
-  color: #10b981;
-  font-family: monospace;
-  font-size: 0.92rem;
-  letter-spacing: 0.5px;
-}
-
-.sdm-compare__connected-hint {
-  display: block;
-  font-size: 0.70rem;
-  color: #94a3b8;
-  margin-top: 3px;
-}
-
-/* Waiting Card */
-.sdm-compare__waiting {
-  padding: 36px 20px;
-  text-align: center;
-  background: rgba(3, 7, 18, 0.85);
-  border: 1px solid rgba(0, 240, 232, 0.2);
-  border-radius: 14px;
-  backdrop-filter: blur(8px);
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0 auto;
-}
-
-.sdm-compare__radar-icon {
-  margin-bottom: 12px;
-  display: inline-flex;
-  padding: 14px;
-  border-radius: 50%;
-  background: rgba(0, 240, 255, 0.1);
-  border: 1px solid rgba(0, 240, 255, 0.25);
-  box-shadow: 0 0 24px rgba(0, 240, 255, 0.25);
-  animation: radarPulse 2.5s ease-in-out infinite;
-}
-
-@keyframes radarPulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
-  }
-  50% {
-    transform: scale(1.08);
-    box-shadow: 0 0 32px rgba(168, 85, 247, 0.45);
-  }
-}
-
-.sdm-compare__waiting-title {
-  font-size: 1.05rem;
-  font-weight: 900;
-  color: #f1f5f9;
-  margin: 0 0 6px;
-}
-
-.sdm-compare__waiting-text {
-  font-size: 0.8rem;
-  color: #94a3b8;
-  margin: 0 auto;
-  max-width: 440px;
-  line-height: 1.45;
-}
-
-/* Toolbar: Season Filter & Copy Trade Plan */
-.sdm-compare__toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.sdm-compare__season-pills {
-  display: flex;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 3px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.sdm-compare__season-pill {
-  padding: 4px 10px;
-  border-radius: 6px;
-  border: none;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.72rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.sdm-compare__season-pill--active {
-  background: #3b82f6;
-  color: #fff;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
-}
-
-.sdm-compare__btn-trade-plan {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(16, 185, 129, 0.25));
-  border: 1px solid rgba(34, 197, 94, 0.4);
-  color: #4ade80;
-  font-size: 0.74rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.sdm-compare__btn-trade-plan:hover {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(16, 185, 129, 0.35));
-  box-shadow: 0 0 14px rgba(34, 197, 94, 0.3);
-}
-
-/* Tabs */
-.sdm-compare__tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.sdm-compare__tab {
-  flex: 1;
-  padding: 9px 12px;
-  border-radius: 9px;
-  border: none;
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 800;
-  font-size: 0.78rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-}
-
-.sdm-compare__tab:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-.sdm-compare__tab--active-green {
-  background: linear-gradient(135deg, #10b981, #059669) !important;
-  color: #fff !important;
-  box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
-}
-
-.sdm-compare__tab--active-blue {
-  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-  color: #fff !important;
-  box-shadow: 0 0 14px rgba(59, 130, 246, 0.4);
-}
-
-.sdm-compare__tab--active-purple {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
-  color: #fff !important;
-  box-shadow: 0 0 14px rgba(139, 92, 246, 0.4);
-}
-
-.sdm-compare__tab--active-gold {
-  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
-  color: #fff !important;
-  box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
-}
-
-/* Sprites Comparison Grid */
-.sdm-compare__empty {
-  padding: 30px;
-  text-align: center;
-  color: #94a3b8;
-  font-size: 0.84rem;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-}
-
-.sdm-compare__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 10px;
-  max-height: 340px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.sdm-compare__sprite-card {
-  border-radius: 10px;
-  border-width: 1px;
-  border-style: solid;
-  padding: 10px 6px;
-  text-align: center;
-  position: relative;
-  transition: transform 0.15s ease;
-}
-
-.sdm-compare__sprite-card:hover {
-  transform: translateY(-2px);
-}
-
-.sdm-compare__sprite-img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-  margin: 0 auto 4px;
-  display: block;
-}
-
-.sdm-compare__sprite-name {
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sdm-compare__sprite-levels {
-  font-size: 0.64rem;
-  color: rgba(255, 255, 255, 0.75);
-  margin-top: 2px;
-}
-
-.sdm-compare__sprite-mark-btn {
-  margin-top: 6px;
-  width: 100%;
-  padding: 4px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-  border: none;
-  font-size: 0.65rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.sdm-compare__sprite-mark-btn:hover {
-  background: #00F0E8;
-  color: #060714;
-}
-
-.sdm-compare__sprite-mark-btn--owned {
-  background: #10b981 !important;
-  color: #fff !important;
-}
-
-/* ===== Responsivo Mobile para Modal de Intercambio ===== */
-@media (max-width: 600px) {
-  .sdm-compare {
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
-    border-radius: 14px;
-    max-height: 90vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    box-sizing: border-box;
-  }
-
-  .sdm-compare__body {
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  /* Single column cards on mobile to fix clipping */
-  .sdm-compare__top-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    margin-bottom: 12px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .sdm-compare__card {
-    padding: 12px;
-    gap: 8px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .sdm-compare__card-title {
-    font-size: 0.68rem;
-  }
-
-  .sdm-compare__code-badge {
-    font-size: 0.95rem;
-    padding: 5px 8px;
-    white-space: nowrap !important;
-    flex-shrink: 0;
-  }
-
-  .sdm-compare__btn-copy {
-    padding: 6px 10px;
-    font-size: 0.72rem;
-  }
-
-  .sdm-compare__btn-link {
-    font-size: 0.70rem;
-    padding: 6px 8px;
-  }
-
-  .sdm-compare__input {
-    font-size: 0.74rem;
-    padding: 7px 8px;
-  }
-
-  .sdm-compare__btn-connect {
-    padding: 7px 10px;
-    font-size: 0.74rem;
-  }
-
-  .sdm-compare__toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-  }
-
-  .sdm-compare__season-pills {
-    width: 100%;
-  }
-
-  .sdm-compare__season-pill {
-    flex: 1;
-    font-size: 0.66rem;
-    padding: 5px 4px;
-    text-align: center;
-  }
-
-  .sdm-compare__btn-trade-plan {
-    width: 100%;
-    justify-content: center;
-    font-size: 0.70rem;
-    padding: 7px 10px;
-  }
-
-  .sdm-compare__tabs {
-    flex-direction: column;
-    gap: 5px;
-    margin-bottom: 10px;
-  }
-
-  .sdm-compare__tab {
-    padding: 7px 10px;
-    font-size: 0.72rem;
-  }
-
-  .sdm-compare__grid {
-    grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
-    gap: 6px;
-    max-height: 280px;
-  }
-
-  .sdm-compare__sprite-card {
-    padding: 8px 4px;
-  }
-
-  .sdm-compare__sprite-img {
-    width: 40px;
-    height: 40px;
-  }
-
-  .sdm-compare__sprite-name {
-    font-size: 0.66rem;
-  }
-
-  .sdm-compare__sprite-levels {
-    font-size: 0.58rem;
-  }
-
-  .sdm-compare__sprite-mark-btn {
-    font-size: 0.60rem;
-    padding: 3px 2px;
-  }
-
-  .sdm-compare__waiting {
-    padding: 24px 14px;
-  }
-
-  .sdm-compare__waiting-title {
-    font-size: 0.95rem;
-  }
-
-  .sdm-compare__waiting-text {
-    font-size: 0.74rem;
   }
 }
 
@@ -7291,6 +7061,7 @@ body:has(.modal-overlay) {
   contain: layout paint;
 }
 
+
 .ms-family-header {
   display: flex;
   align-items: center;
@@ -7451,7 +7222,7 @@ body:has(.modal-overlay) {
 }
 
 .ms-spotlight-card.is-inactive {
-  opacity: 0.55;
+  opacity: 0.75;
   transform: scale(0.90);
   z-index: 5;
   cursor: pointer;
@@ -7462,12 +7233,12 @@ body:has(.modal-overlay) {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(6, 7, 14, 0.45);
+  background: rgba(6, 7, 14, 0.25);
   pointer-events: none;
 }
 
 .ms-spotlight-card.is-inactive:hover {
-  opacity: 0.85;
+  opacity: 0.92;
   transform: scale(0.93);
 }
 
@@ -7780,286 +7551,6 @@ body:has(.modal-overlay) {
   50% { opacity: 1; transform: translateX(3px); }
 }
 
-/* ===== APP FOOTER (Glassmorphic Floating Capsule) ===== */
-.app-footer {
-  width: 100%;
-  max-width: 1400px;
-  margin: 40px auto 24px;
-  padding: 0 24px max(16px, env(safe-area-inset-bottom));
-  box-sizing: border-box;
-  position: relative;
-  z-index: 10;
-}
-
-.app-footer__content {
-  width: 100%;
-  /* border-box: con width 100% MAS su propio padding (10+6 px) y su borde (2 px), la pildora
-     del footer se pasaba EXACTAMENTE 18 px del ancho de la pantalla en movil. Eso hacia que el
-     documento midiera 408 px en un viewport de 390: el navegador mostraba la app desencajada y
-     habia que alejar el zoom para ver los elementos de la esquina. El padre ya era border-box;
-     el hijo no lo era. */
-  box-sizing: border-box;
-  /* Es el containing block del panel de enlaces (bottom: 100% + 8px). */
-  position: relative;
-  /* 48 - 12 (padding vertical) - 2 (borde) = 34 px: el alto interno de la pildora. */
-  --footer-trigger: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  height: 48px;
-  padding: 6px 14px 6px 8px;
-  border-radius: 9999px;
-  background: rgba(12, 14, 22, 0.65);
-  backdrop-filter: blur(24px) saturate(1.8);
-  -webkit-backdrop-filter: blur(24px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  box-sizing: border-box;
-}
-
-.app-footer__brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.app-footer__logo {
-  width: 28px;
-  height: 28px;
-  font-size: 0.95rem;
-  flex-shrink: 0;
-}
-
-.app-footer__copyright {
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.55);
-  font-weight: 500;
-  font-family: var(--font-sans);
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  /* Sin min-width: 0 el span no encoge por debajo de su contenido (min-width: auto)
-     y el texto se salia de la pildora en 320 px en vez de cortarse con puntos. */
-  min-width: 0;
-}
-
-.footer-short-text {
-  display: none;
-}
-
-.app-footer__privacy-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 9999px;
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.55);
-  font-family: var(--font-sans);
-  font-size: 0.76rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.app-footer__privacy-btn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* Los enlaces del pie reutilizan la capsula del boton de privacidad. */
-a.app-footer__privacy-btn {
-  text-decoration: none;
-}
-
-/* Boton disparador del panel: vive en la pildora cerrada, en el borde IZQUIERDO
-   (la esquina derecha queda bajo el FAB del hero, que la intercepta el toque).
-   --footer-trigger es el alto interno exacto de la pildora (48 - 12 - 2 = 34). */
-.app-footer__trigger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: var(--footer-trigger);
-  height: var(--footer-trigger);
-  padding: 0;
-  border: none;
-  border-radius: 9999px;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.app-footer__trigger:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* Foco visible: mismo lenguaje que .lang-switch__btn, nunca se quita el outline. */
-.app-footer__trigger:focus-visible {
-  outline: 2px solid #22e6dc;
-  outline-offset: 2px;
-}
-
-.app-footer__chevron {
-  transition: transform 0.22s ease;
-}
-
-.app-footer__trigger[aria-expanded='true'] .app-footer__chevron {
-  transform: rotate(180deg);
-}
-
-/* Panel de enlaces: flota POR ENCIMA de la pildora. Al ser absolute no participa
-   del flujo, asi que abrirlo no cambia el scrollHeight del documento. */
-.app-footer__panel {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 0;
-  right: auto;
-  width: 100%;
-  box-sizing: border-box;
-  /* En movil (pildora ~296-366 px) el panel ocupa el ancho de la pildora; en escritorio
-     queda anclado al borde izquierdo y topado a 420 px. Nada de right: 0: el disparador
-     ya vive a la izquierda, no en la esquina ocupada por el FAB. */
-  max-width: 420px;
-  z-index: 20;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 8px;
-  border-radius: 18px;
-  background: rgba(12, 14, 22, 0.65);
-  backdrop-filter: blur(24px) saturate(1.8);
-  -webkit-backdrop-filter: blur(24px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  /* vh primero (navegadores sin dvh) y dvh despues: el tope nunca deja el panel
-     fuera de la pantalla, y overflow-y es la salida de emergencia. */
-  max-height: min(60vh, 360px);
-  max-height: min(60dvh, 360px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  animation: appFooterPanelIn 0.16s ease-out;
-}
-
-@keyframes appFooterPanelIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .app-footer__panel {
-    animation: none;
-  }
-}
-
-/* Las filas del panel reutilizan la capsula de .app-footer__privacy-btn, pero en
-   columna, a lo ancho y con 44 px de alto tactil. */
-.app-footer__panel .app-footer__privacy-btn {
-  width: 100%;
-  justify-content: flex-start;
-  box-sizing: border-box;
-  min-height: 44px;
-  padding: 9px 12px;
-  font-size: 0.85rem;
-  text-align: left;
-}
-
-.app-footer__panel-copy {
-  margin: 6px 4px 2px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
-  line-height: 1.45;
-  color: rgba(255, 255, 255, 0.45);
-}
-
-
-
-/* Enlace a la ficha publica del espiritu, dentro del detalle. */
-.sdm__ficha {
-  display: inline-block;
-  margin-top: 6px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: rgba(0, 240, 232, 0.85);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(0, 240, 232, 0.35);
-}
-
-.sdm__ficha:hover {
-  color: #ffffff;
-  border-bottom-color: #ffffff;
-}
-
-/* En Mobile: la pildora cerrada se queda en UNA fila (logo + copyright + disparador).
-   Crece a 52 px porque 52 - 6 (padding) - 2 (borde) = 44: el alto tactil minimo. */
-@media (max-width: 600px) {
-  .app-footer {
-    width: calc(100% - 24px);
-    margin: 28px auto 16px;
-    padding: 0;
-  }
-
-  .app-footer__content {
-    --footer-trigger: 44px;
-    height: 52px;
-    padding: 3px 6px 3px 8px;
-    gap: 8px;
-  }
-
-  .app-footer__logo {
-    width: 24px;
-    height: 24px;
-    font-size: 0.85rem;
-  }
-
-  .footer-full-text {
-    display: none;
-  }
-
-  .footer-short-text {
-    display: inline;
-  }
-
-  .app-footer__copyright {
-    font-size: 0.72rem;
-  }
-
-  .app-footer__panel {
-    padding: 6px;
-    border-radius: 16px;
-  }
-
-  .app-footer__panel .app-footer__privacy-btn {
-    padding: 8px 10px;
-  }
-}
-
-/* Tactil de cualquier ancho: el disparador tambien necesita 44x44 (una tablet con
-   dedo no entra en la media query de 600 px). El panel pierde el blur en el bloque
-   T8 de mas abajo, que es quien lo anula; aqui NO se reintroduce backdrop-filter. */
-@media (hover: none) and (pointer: coarse) {
-  .app-footer__content {
-    --footer-trigger: 44px;
-    height: 52px;
-    padding: 3px 6px 3px 8px;
-  }
-}
-
 /* ===== PWA INSTALL PROMPT (CYBER GLITCH BANNER) ===== */
 .install-prompt-overlay {
   position: fixed;
@@ -8311,17 +7802,16 @@ a.app-footer__privacy-btn {
 
 
 /* ===== INDICADORES DE PROGRESO (Móvil) =====
-   Tres lecturas en una tira compacta y SIN caja: se ve el fondo de la app por
-   detras y eso es lo que da aire. Etiqueta fina, numero tabular y barra de 3 px.
-   En movil sustituye a los dos anillos del hero, que se ocultan. */
+   Tres tarjetas de cristal: cifra, barra con gradiente y etiqueta. Atrapados y
+   Maxeados llevan su color de acento y un punto luminoso en la esquina. En movil
+   sustituye a los dos anillos del hero, que se ocultan. */
 .stats-bar {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  /* Las tres etiquetas arrancan a la misma altura: el total, al no llevar barra,
-     se descentraba unos pixeles y se notaba. */
-  align-items: start;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 8px;
   /* Pegada al buscador (8px) y con aire de sobra antes de la tarjeta (24px). */
-  margin: 8px 16px 24px;
+  margin: 14px 16px 28px;
 }
 
 .stats-bar__col {
@@ -8329,27 +7819,21 @@ a.app-footer__privacy-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 0 6px;
+  gap: 8px;
+  padding: 12px 8px 10px;
   min-width: 0;
-}
-
-/* Separador corto y centrado, como en una barra de pestanas. */
-.stats-bar__col + .stats-bar__col::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1px;
-  height: 18px;
-  background: rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .stats-bar__label {
-  font-size: 0.6rem;
-  font-weight: 600;
-  color: rgba(226, 232, 240, 0.45);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(226, 232, 240, 0.6);
   white-space: nowrap;
 }
 
@@ -8372,10 +7856,9 @@ a.app-footer__privacy-btn {
 .stats-bar__track {
   display: block;
   width: 100%;
-  max-width: 70px;
-  height: 3px;
+  height: 5px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   overflow: hidden;
 }
 
@@ -8384,8 +7867,7 @@ a.app-footer__privacy-btn {
 .stats-bar__spacer {
   display: block;
   width: 100%;
-  max-width: 70px;
-  height: 3px;
+  height: 5px;
 }
 
 .stats-bar__fill {
@@ -8396,11 +7878,13 @@ a.app-footer__privacy-btn {
 }
 
 .stats-bar__fill--caught {
-  background: #6366f1;
+  background: linear-gradient(90deg, #22d3ee 0%, #818cf8 55%, #c084fc 100%);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
 }
 
 .stats-bar__fill--mastered {
-  background: #ec4899;
+  background: linear-gradient(90deg, #818cf8 0%, #e879f9 100%);
+  box-shadow: 0 0 10px rgba(232, 121, 249, 0.5);
 }
 
 /* En movil los anillos del hero ya no hacen falta: el progreso vive bajo el buscador. */
@@ -8421,14 +7905,6 @@ a.app-footer__privacy-btn {
   background: rgba(8, 12, 24, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
-.sdm-friends__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.sdm-friends__title { display: inline-flex; align-items: center; gap: 7px; font-size: 0.74rem; font-weight: 800; letter-spacing: 1.4px; color: #00F0E8; }
-.sdm-friends__refresh {
-  display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 9px;
-  font-size: 0.68rem; font-weight: 700; color: rgba(226, 232, 240, 0.75);
-  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); cursor: pointer;
-}
-.sdm-friends__refresh:disabled { opacity: 0.55; cursor: default; }
 .sdm-friends__add { display: flex; gap: 8px; }
 .sdm-friends__input {
   flex: 1; min-width: 0; padding: 8px 11px; border-radius: 10px;
@@ -8466,25 +7942,23 @@ a.app-footer__privacy-btn {
 .sdm-friends__pendiente { font-size: 0.66rem; color: rgba(226, 232, 240, 0.5); }
 .sdm-friends__hint { margin: 0; font-size: 0.7rem; color: rgba(226, 232, 240, 0.5); line-height: 1.45; }
 
-/* Radar compacto para iPhone: menos aire, tipografias mas ajustadas y respeto por la
-   barra inferior del sistema. Los campos se quedan en los esenciales. */
+/* Radar compacto para iPhone: tipografias mas ajustadas y respeto por la barra
+   inferior del sistema. Los campos se quedan en los esenciales. */
 .sdm-friends {
-  gap: 8px;
+  gap: 12px;
   margin: 10px 0 12px;
   padding: 11px;
 }
+.sdm-friends__group { gap: 9px; }
 .sdm-friends__row { padding: 7px 9px; }
-.sdm-friends__title { font-size: 0.7rem; letter-spacing: 1.2px; }
 .sdm-friends__code { font-size: 0.88rem; letter-spacing: 2px; }
 .sdm-friends__input { padding: 7px 10px; font-size: 0.78rem; }
 .sdm-friends__send { padding: 7px 12px; font-size: 0.68rem; }
 .sdm-friends__btn { padding: 5px 10px; font-size: 0.65rem; }
-.sdm-friends__hint { font-size: 0.67rem; }
+.sdm-friends__hint { font-size: 0.67rem; line-height: 1.6; }
+.sdm-friends__aviso { line-height: 1.5; }
 
 @media (max-width: 480px) {
-  .sdm-compare__body {
-    padding-bottom: max(14px, env(safe-area-inset-bottom));
-  }
   .sdm-friends__plate { gap: 5px; }
 }
 
@@ -8504,7 +7978,7 @@ a.app-footer__privacy-btn {
 .fpage__top { display: flex; align-items: center; gap: 12px; }
 .fpage__headText { flex: 1; min-width: 0; }
 .fpage__title { margin: 0; font-size: 1.45rem; font-weight: 900; color: #fff; }
-.fpage__sub { margin: 2px 0 0; font-size: 0.72rem; color: rgba(226, 232, 240, 0.55); }
+.fpage__sub { margin: 4px 0 0; font-size: 0.72rem; line-height: 1.4; color: rgba(226, 232, 240, 0.55); }
 .fpage__back, .fpage__refresh {
   display: inline-flex; align-items: center; justify-content: center;
   width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
@@ -8556,7 +8030,6 @@ a.app-footer__privacy-btn {
 .sdm-friends__input { font-size: 0.78rem; color: #eef2f8; }
 .sdm-friends__send { font-size: 0.68rem; }
 .sdm-friends__aviso { font-size: 0.7rem; color: #5eead4; }
-.sdm-friends__title { color: #2ee9e0; }
 .fpage__title { font-size: 1.45rem; }
 .fpage__sub { font-size: 0.72rem; color: #9aa5b6; }
 .fpage__chip { font-size: 0.68rem; padding: 4px 9px; color: #a5e4ff; }
@@ -8571,6 +8044,13 @@ a.app-footer__privacy-btn {
   border: 1px solid rgba(255, 255, 255, 0.28);
 }
 .fpage__back:hover, .fpage__refresh:hover { background: rgba(255, 255, 255, 0.18); }
+.fpage__refresh.is-loading svg { animation: fpage-refresh-spin 0.9s linear infinite; }
+@keyframes fpage-refresh-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .fpage__refresh.is-loading svg { animation: none; }
+}
+.fpage__status { margin: 0; font-size: 0.7rem; color: #9df3c0; }
+.fpage__status--error { color: #fca5a5; }
 
 /* Minicards de la comparacion: miniatura del espiritu con su nombre, como en el grid. */
 .fpage__minis { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 7px; }
@@ -8614,7 +8094,6 @@ a.app-footer__privacy-btn {
   background: linear-gradient(135deg, #22d3ee, #00e0d8);
 }
 .sdm-friends__input { border-color: rgba(255, 255, 255, 0.28); }
-.sdm-friends__refresh { color: #eef3fa; }
 
 /* Segmentado de la pagina de amigos: un bloque a la vez. */
 .fpage__tabs {
@@ -8700,9 +8179,86 @@ a.app-footer__privacy-btn {
   .lang-switch__btn { min-width: 26px; font-size: 0.62rem; }
 }
 
-/* Selector de idioma en la cabecera de la pagina de amigos */
-.fpage__lang {
-  margin-left: 4px;
+.lang-switch__sep {
+  display: none;
+}
+
+/* Escritorio: capsula de cristal oscuro para que el texto inactivo se lea sobre cualquier fondo. */
+@media (min-width: 769px) {
+  .lang-switch {
+    padding: 3px;
+    border-radius: 9999px;
+    background: rgba(12, 14, 22, 0.62);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 6px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .lang-switch__btn {
+    min-width: 36px;
+    padding: 5px 10px;
+    border-radius: 9999px;
+    color: rgba(226, 232, 240, 0.72);
+    font-size: 0.72rem;
+  }
+
+  .lang-switch__btn:hover {
+    color: #ffffff;
+  }
+
+  .lang-switch__btn.is-active {
+    background: linear-gradient(135deg, #22e6dc, #7dd3fc);
+    color: #06161c;
+    box-shadow: 0 0 12px rgba(34, 230, 220, 0.35);
+  }
+}
+
+/* Movil: texto "ES / EN" dentro de un marco fino; el activo va en cian sin relleno. */
+@media (max-width: 768px) {
+  .lang-switch {
+    gap: 0;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: rgba(12, 14, 22, 0.45);
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+
+  .lang-switch__btn {
+    min-width: 0;
+    padding: 0;
+    color: rgba(203, 213, 225, 0.55);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .lang-switch__btn:hover {
+    color: #e8edf5;
+  }
+
+  .lang-switch__btn.is-active {
+    background: transparent;
+    color: #22e6dc;
+    text-shadow: 0 0 8px rgba(34, 230, 220, 0.45);
+  }
+
+  .lang-switch__sep {
+    display: inline;
+    margin: 0 6px;
+    color: rgba(203, 213, 225, 0.5);
+    font-size: 0.78rem;
+    font-weight: 500;
+  }
+}
+
+/* Refrescar e idioma van juntos a la derecha, con aire propio frente al titulo */
+.fpage__tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .fpage__lang .lang-switch__btn {
@@ -8711,7 +8267,7 @@ a.app-footer__privacy-btn {
 
 /* Aviso de lo que implica compartir el enlace: mismo sitio que el resto de la ficha */
 .sdm-friends__hint--aviso {
-  color: #ffd166;
+  color: #c4b5fd;
 }
 
 /* En la ficha compartida los botones son tres y largos: cuando la fila parte, el grupo se
@@ -8755,16 +8311,8 @@ html.theme-fortnitemares body::before {
   opacity: 0;
 }
 
-/* Fases boot y title: el wordmark todavia no ha mutado (o esta mutando) sobre
-   la rejilla; el suelo no ha cambiado. La clase del tema ya esta puesta, pero
-   la rejilla sigue ahi. */
-html.theme-fortnitemares[data-fnm-phase='boot'] body::before,
-html.theme-fortnitemares[data-fnm-phase='title'] body::before {
-  opacity: 1;
-}
-
-/* El bosque persistente de la temporada: una capa propia (la monta
-   FortnitemaresTransition) para poder CRUZARLO con la rejilla, algo que un
+/* El bosque persistente de la temporada: una capa propia (vive en el armazon
+   de index.html) para poder CRUZARLO con la rejilla, algo que un
    solo pseudo-elemento no puede hacer. Vive debajo del contenido y encima de
    la rejilla (mismo z-index, despues en el DOM). */
 .fnm-forest {
@@ -8772,42 +8320,29 @@ html.theme-fortnitemares[data-fnm-phase='title'] body::before {
   inset: 0;
   z-index: -2;
   pointer-events: none;
-  background-image: url('/fortnitemares-forest.svg');
+  background-image: url('/backwitch.webp');
   background-size: cover;
   background-position: center bottom;
   background-repeat: no-repeat;
+  filter: blur(1.8px);
   transform: translateZ(0);
-  will-change: transform, opacity;
-  /* Respiracion lenta: se anima transform, no background-position (mover el
-     fondo repinta la capa entera en cada frame y eso se nota en el movil). */
-  animation: fnm-forest-breathe 18s ease-in-out infinite alternate;
+  will-change: opacity;
   opacity: 1;
   transition: opacity 1700ms ease;
 }
 
-/* El pulso de luz solo corre fuera de la cinematica: una animacion de opacity
-   pisaria el fundido dirigido por fases. */
+/* Pulso de luz del bosque. */
 html:not([data-fnm-phase]) .fnm-forest {
-  animation:
-    fnm-forest-breathe 18s ease-in-out infinite alternate,
-    fnm-forest-light 9s ease-in-out infinite alternate;
+  animation: fnm-forest-light 9s ease-in-out infinite alternate;
 }
 
-/* Sin la clase del tema, el bosque no existe para el visitante. Es lo que mantiene
-   intacta la cinematica de los nuevos: ven la rejilla hasta la parte "ground". El
-   armazon de index.html monta esta capa antes del primer pintado para que quien ya
-   vio la cinematica entre directo al bosque, sin esperar al bundle. */
+/* Sin la clase del tema, el bosque no se ve. El armazon de index.html monta esta capa
+   antes del primer pintado, sin esperar al bundle. */
 html:not(.theme-fortnitemares) .fnm-forest {
   /* animation: none es obligatorio: fnm-forest-light anima opacity, y una animacion
      gana sobre esta declaracion por mas especifica que sea. Sin esto, el bosque se
-     veia igual antes de la cinematica. */
+     veria fuera de temporada. */
   animation: none;
-  opacity: 0;
-}
-
-/* Parte 1 (boot/title): el bosque todavia no existe para el visitante. */
-html[data-fnm-phase='boot'] .fnm-forest,
-html[data-fnm-phase='title'] .fnm-forest {
   opacity: 0;
 }
 
@@ -8816,13 +8351,21 @@ html[data-fnm-phase='title'] .fnm-forest {
    encantada visible, calabazas protagonistas). Mismos simbolos y paleta. */
 @media (max-width: 768px) {
   .fnm-forest {
-    background-image: url('/fortnitemares-forest-mobile.svg');
+    /* El desenfoque deja un halo transparente en los bordes: el inset negativo lo saca de pantalla. */
+    inset: -8px;
+    background-image:
+      linear-gradient(rgba(12, 70, 60, 0.3), rgba(12, 70, 60, 0.3)),
+      url('/background-1.webp');
+    background-size: cover;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    filter: blur(1px);
   }
-}
 
-@keyframes fnm-forest-breathe {
-  0%   { transform: translate3d(0, 0, 0) scale(1.03); }
-  100% { transform: translate3d(0, -12px, 0) scale(1.03); }
+  html .fnm-forest,
+  html:not([data-fnm-phase]) .fnm-forest {
+    animation: none;
+  }
 }
 
 @keyframes fnm-forest-light {
@@ -8851,14 +8394,9 @@ body.theme-fortnitemares::after {
   height: calc(100vh + 48px);
   height: calc(100dvh + 48px);
   animation: fnm-fog-drift 26s ease-in-out infinite alternate;
-  /* La niebla llega con la parte 2 (ground): cruza junto con el bosque. */
+  /* La niebla cruza junto con el bosque. */
   opacity: 1;
   transition: opacity 1700ms ease;
-}
-
-html[data-fnm-phase='boot'] body.theme-fortnitemares::after,
-html[data-fnm-phase='title'] body.theme-fortnitemares::after {
-  opacity: 0;
 }
 
 /* Slow lateral sway: the mist creeps across the trunks. */
@@ -8868,23 +8406,17 @@ html[data-fnm-phase='title'] body.theme-fortnitemares::after {
 }
 
 /* Fuego de calabazas: html::after queda libre en temporada (la capa de ruido
-   normal se apaga abajo). Lleva el resplandor calido que sube desde el parche.
-   Durante la cinematica su opacidad la marcan las fases; el latido lento solo
-   se engancha cuando la cinematica termino, arrancando desde 1 para que no
-   haya salto. */
+   normal se apaga abajo). Lleva el resplandor calido que sube desde el parche. */
 html.theme-fortnitemares::after {
   background-image:
     radial-gradient(46% 20% at 48% 98%, rgba(255, 130, 40, 0.20) 0%, transparent 72%),
     radial-gradient(30% 13% at 26% 100%, rgba(255, 160, 70, 0.10) 0%, transparent 74%),
     radial-gradient(28% 12% at 74% 100%, rgba(255, 110, 30, 0.11) 0%, transparent 74%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: 0 0;
   opacity: 1;
   transition: opacity 1200ms ease;
-}
-
-html.theme-fortnitemares[data-fnm-phase='boot']::after,
-html.theme-fortnitemares[data-fnm-phase='title']::after,
-html.theme-fortnitemares[data-fnm-phase='ground']::after {
-  opacity: 0;
 }
 
 /* Parte 3 (glow): el fuego de las calabazas despierta. */
@@ -8903,7 +8435,7 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
 
 /* ==========================================================================
    LOGO: FORTNITE -> FORTNITEMARES
-   Ambos conviven en el DOM; la fase cinematic decide cual se ve. Asi el
+   Ambos conviven en el DOM; el tema decide cual se ve. Asi el
    titulo real de la web se transforma donde ya vive, en vez de que un
    overlay simule la transformacion encima.
    ========================================================================== */
@@ -8949,6 +8481,12 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
 
 @media (max-width: 480px) {
   .hero__title-line-wrap { --fnm-logo-w: 355px; }
+}
+
+@media (min-width: 769px) {
+  .hero__title-line-wrap { --fnm-logo-w: 600px; }
+  .hero__title-fnm-svg { margin-top: -14px; }
+  .filter-bar-container { margin-top: 44px; }
 }
 
 /* Estado normal: solo el texto, y el alto lo marca el propio texto. */
@@ -9028,34 +8566,61 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
   /* Emergen cuando el wordmark ya esta asentandose: el split RGB aterriza
      despues del bloom, no de golpe. */
   transition: opacity 600ms ease 380ms;
-  animation: hero-glitch-r steps(1, end) infinite;
+  animation: fnm-ghost-glitch-r steps(1, end) infinite;
   animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
 }
 
 .hero__title[data-fnm-logo='themed'] .hero__title-fnm-ghost--b {
   opacity: 0.75;
   transition: opacity 600ms ease 460ms;
-  animation: hero-glitch-b steps(1, end) infinite;
+  animation: fnm-ghost-glitch-b steps(1, end) infinite;
   animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
   animation-delay: 0.07s;
 }
 
+/* En reposo los fantasmas son invisibles: solo aparecen durante el hipo. */
+@keyframes fnm-ghost-glitch-r {
+  0%, 90%     { transform: translateX(calc(-0.1rem * var(--fnm-ghost-k, 1))); opacity: 0; }
+  90.7%       { transform: translateX(calc(-0.65rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
+  91.4%       { transform: translateX(calc(0.2rem * var(--fnm-ghost-k, 1))) translateY(-0.02rem); opacity: 0.8; }
+  92.1%       { transform: translateX(calc(-0.15rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
+  92.8%       { transform: translateX(calc(-0.85rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
+  93.5%, 100% { transform: translateX(calc(-0.1rem * var(--fnm-ghost-k, 1))); opacity: 0; }
+}
+
+@keyframes fnm-ghost-glitch-b {
+  0%, 90%     { transform: translateX(calc(0.1rem * var(--fnm-ghost-k, 1))); opacity: 0; }
+  90.7%       { transform: translateX(calc(0.65rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
+  91.4%       { transform: translateX(calc(-0.2rem * var(--fnm-ghost-k, 1))) translateY(0.02rem); opacity: 0.8; }
+  92.1%       { transform: translateX(calc(0.15rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
+  92.8%       { transform: translateX(calc(0.85rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
+  93.5%, 100% { transform: translateX(calc(0.1rem * var(--fnm-ghost-k, 1))); opacity: 0; }
+}
+
+/* En movil el logo es mas chico: el desplazamiento del split se reduce a la mitad
+   en vez de ocultarse. */
+@media (max-width: 768px) {
+  .hero__title-fnm-ghosts {
+    --fnm-ghost-k: 0.5;
+  }
+}
+
 @keyframes fnm-logo-pulse {
   0% {
-    filter: drop-shadow(0 0 14px rgba(192, 38, 211, 0.8))
-            drop-shadow(0 0 30px rgba(236, 72, 153, 0.55))
-            drop-shadow(0 0 50px rgba(168, 85, 247, 0.4));
+    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.7))
+            drop-shadow(0 0 26px rgba(118, 28, 132, 0.8))
+            drop-shadow(0 0 50px rgba(118, 28, 132, 0.5));
   }
   100% {
-    filter: drop-shadow(0 0 22px rgba(192, 38, 211, 1))
-            drop-shadow(0 0 44px rgba(236, 72, 153, 0.8))
-            drop-shadow(0 0 78px rgba(168, 85, 247, 0.6));
+    filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.85))
+            drop-shadow(0 0 34px rgba(118, 28, 132, 0.9))
+            drop-shadow(0 0 60px rgba(118, 28, 132, 0.6));
   }
 }
 
 /* Subtítulo SPRITEDEX: violeta -> magenta, el neon de la key art. */
 .hero__title-line--accent-fnm {
-  background: linear-gradient(135deg, #e879f9 0%, #d946ef 38%, #ec4899 72%, #c026d3 100%) !important;
+  background: linear-gradient(135deg, #f5d0fe 0%, #e879f9 45%, #f0abfc 75%, #d8b4fe 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
@@ -9067,68 +8632,6 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
      limpia. */
   filter: drop-shadow(0 3px 7px rgba(6, 2, 14, 0.8)) !important;
   margin-top: -6px !important;
-}
-
-/* ==========================================================================
-   CINEMATICA DE ENTRADA (una vez por navegador)
-   El componente no monta una cortina con su propio titulo: publica
-   data-fnm-phase en <html> y estas reglas transforman las piezas reales de la
-   interfaz, UNA POR UNA. Parte 1 (title): muta el wordmark y cruza el
-   enjambre. Parte 2 (ground): la rejilla cruza al bosque y llega la niebla.
-   Parte 3 (glow): el fuego de las calabazas y los acentos de temporada.
-   Nada cubre la pantalla: el visitante ve la web volverse Fortnitemares pieza
-   a pieza, siempre visible y con transiciones suaves de opacity.
-   ========================================================================== */
-
-.fnm-cinematic {
-  position: fixed;
-  inset: 0;
-  z-index: 55;
-  pointer-events: none;
-}
-
-.fnm-cinematic .fnm-skip-btn {
-  pointer-events: auto;
-}
-
-/* ---- Boton saltar --------------------------------------------------- */
-.fnm-skip-btn {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  z-index: 3;
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(217, 70, 239, 0.5);
-  background: rgba(10, 2, 18, 0.78);
-  color: #f5f0ff;
-  font: 600 12px/1 ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-  transition: transform 160ms ease, background 160ms ease;
-}
-
-.fnm-skip-btn:hover {
-  background: rgba(76, 5, 149, 0.9);
-  transform: translateY(-1px);
-}
-
-.fnm-skip-btn:focus-visible {
-  outline: 2px solid #e879f9;
-  outline-offset: 2px;
-}
-
-/* En movil el dock de la calabaza vive abajo a la derecha (z-index 9999) y
-   taparia el Skip: se sube junto a la barra superior, donde hay aire, para
-   que siga siendo visible y pulsable durante la cinematica. */
-@media (max-width: 768px) {
-  .fnm-skip-btn {
-    top: 68px;
-    right: 12px;
-    bottom: auto;
-  }
 }
 
 /* ==========================================================================
@@ -9148,9 +8651,8 @@ body[data-instalar='on'] .fnm-pumpkin-btn {
   pointer-events: none;
 }
 
-/* El botón principal ES la calabaza: nada de aros ni discos duros. Una poza
-   de sombra suave la separa del arte y su propia luz cálida — como una
-   linterna de verdad en la oscuridad — anuncia que es un botón. */
+/* El botón principal ES la calabaza: nada de aros ni discos duros. Su luz cálida,
+   como una linterna en la oscuridad, la separa del arte y anuncia que es un botón. */
 .fnm-pumpkin-btn {
   position: absolute;
   right: 10px;
@@ -9158,7 +8660,7 @@ body[data-instalar='on'] .fnm-pumpkin-btn {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 44%, rgba(22, 9, 38, 0.85) 0%, rgba(14, 6, 26, 0.5) 52%, rgba(10, 4, 20, 0) 74%);
+  background: radial-gradient(circle at 50% 44%, rgba(255, 146, 43, 0.16) 0%, rgba(255, 110, 30, 0.06) 48%, rgba(255, 110, 30, 0) 72%);
   border: none;
   box-shadow: none;
   padding: 0;
@@ -9206,23 +8708,12 @@ body[data-instalar='on'] .fnm-pumpkin-btn {
   background: radial-gradient(circle, transparent 40%, rgba(255, 146, 43, 0.09) 54%, rgba(255, 146, 43, 0.025) 70%, transparent 82%);
 }
 
-/* Durante la marca, la calabaza entra girando en el eje Y. */
-html[data-fnm-phase='title'] .fnm-pumpkin-btn {
-  animation: fnm-pumpkin-flip 900ms cubic-bezier(0.34, 1.4, 0.5, 1) both;
-}
-
-@keyframes fnm-pumpkin-flip {
-  0%   { transform: perspective(520px) rotateY(-180deg) scale(0.6); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
-  60%  { transform: perspective(520px) rotateY(12deg) scale(1.14); }
-  100% { transform: perspective(520px) rotateY(0deg) scale(1); }
-}
-
 .fnm-pumpkin-svg {
   width: 62px;
   height: 62px;
   filter:
-    drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55))
-    drop-shadow(0 0 8px rgba(255, 146, 43, 0.10));
+    drop-shadow(0 0 8px rgba(255, 146, 43, 0.35))
+    drop-shadow(0 0 16px rgba(247, 103, 7, 0.18));
   transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), filter 300ms ease;
 }
 
@@ -9245,15 +8736,15 @@ html[data-fnm-phase='title'] .fnm-pumpkin-btn {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(30, 10, 50, 0.95), rgba(15, 5, 28, 0.95)) !important;
-  border: 1.5px solid rgba(168, 85, 247, 0.55) !important;
-  color: #f3e8ff !important;
+  background: #18222e !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  color: #e8eef7 !important;
   display: grid;
   place-items: center;
   cursor: pointer;
   padding: 0;
   outline: none;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.65), 0 0 12px rgba(168, 85, 247, 0.35) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
   transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
   -webkit-tap-highlight-color: transparent;
 }
@@ -9289,25 +8780,53 @@ html[data-fnm-phase='title'] .fnm-pumpkin-btn {
 
 /* Movil: capsula de busqueda */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-pill {
-  background: #0d0718;
-  border-color: rgba(168, 85, 247, 0.3);
+  height: 54px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)) padding-box,
+    linear-gradient(180deg, rgba(46, 60, 72, 0.92), rgba(30, 40, 52, 0.92)) padding-box,
+    linear-gradient(135deg, #e879f9 0%, #a78bfa 35%, #7dd3fc 75%, #cffafe 100%) border-box;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.6),
-    0 0 14px rgba(168, 85, 247, 0.14),
-    inset 0 1px 0 rgba(233, 213, 255, 0.08);
+    0 8px 24px rgba(0, 0, 0, 0.5),
+    0 0 14px rgba(232, 121, 249, 0.35),
+    0 0 14px rgba(125, 211, 252, 0.25);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-pill.is-focused {
-  background: #150a26;
-  border-color: rgba(217, 70, 239, 0.65);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)) padding-box,
+    linear-gradient(180deg, rgba(54, 68, 80, 0.94), rgba(36, 48, 60, 0.94)) padding-box,
+    linear-gradient(135deg, #e879f9 0%, #a78bfa 35%, #7dd3fc 75%, #cffafe 100%) border-box;
   box-shadow:
-    0 8px 28px rgba(0, 0, 0, 0.7),
-    0 0 20px rgba(217, 70, 239, 0.3),
-    inset 0 1px 0 rgba(233, 213, 255, 0.12);
+    0 8px 28px rgba(0, 0, 0, 0.55),
+    0 0 20px rgba(232, 121, 249, 0.45),
+    0 0 20px rgba(125, 211, 252, 0.35);
 }
 
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-pill.is-focused .mobile-glass-search-icon {
-  color: #e879f9;
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-pill .mobile-glass-search-icon {
+  width: 18px;
+  height: 18px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-input {
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-search-input::placeholder {
+  color: rgba(241, 245, 249, 0.72);
+  font-weight: 400;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-divider {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-filter-btn {
+  color: rgba(255, 255, 255, 0.92);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-glass-filter-btn.is-active {
@@ -9350,7 +8869,85 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-search-box .search-icon {
-  color: rgba(196, 181, 253, 0.75);
+  left: 15px;
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Escritorio: filtros con el mismo vidrio que la capsula de busqueda del movil. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-trigger,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-checkbox,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-view-toggle {
+  height: 42px;
+  box-sizing: border-box;
+  border-radius: 9999px;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(24, 34, 46, 0.8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 20px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-trigger,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  color: #f1f5f9;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-trigger:hover,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-checkbox:hover {
+  border-color: rgba(167, 139, 250, 0.6);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-trigger.is-open,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .filter-pill-trigger.has-selection {
+  border-color: #a78bfa;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 16px rgba(167, 139, 250, 0.35);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .status-pill-btn:not(.is-active) {
+  border-color: rgba(167, 139, 250, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
+    rgba(24, 34, 46, 0.7);
+  color: #cbd5e1;
+}
+
+/* Busqueda: capsula con borde degradado, igual que en movil. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .search-input-field {
+  width: 230px;
+  height: 42px;
+  box-sizing: border-box;
+  padding: 0 16px 0 40px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)) padding-box,
+    linear-gradient(180deg, rgba(46, 60, 72, 0.92), rgba(30, 40, 52, 0.92)) padding-box,
+    linear-gradient(135deg, #e879f9 0%, #a78bfa 35%, #7dd3fc 75%, #cffafe 100%) border-box;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 14px rgba(232, 121, 249, 0.35), 0 0 14px rgba(125, 211, 252, 0.25);
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .search-input-field:focus {
+  width: 260px;
+  border-color: transparent;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55), 0 0 20px rgba(232, 121, 249, 0.45), 0 0 20px rgba(125, 211, 252, 0.35);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .search-input-field::placeholder {
+  color: rgba(241, 245, 249, 0.72);
+  font-weight: 400;
 }
 
 /* El badge del pill "Nuevos" en escritorio pasa de cian a naranja calabaza. */
@@ -9369,12 +8966,11 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
    override estacional tambien lo lleva. Sin el, la hoja se queda en cian.
    ========================================================================== */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet {
-  background: #0d0718;
-  border-color: rgba(168, 85, 247, 0.28);
+  border-color: rgba(255, 255, 255, 0.12);
+  background: #18222e;
   box-shadow:
-    0 -16px 40px rgba(0, 0, 0, 0.9),
-    0 0 30px rgba(168, 85, 247, 0.14),
-    inset 0 1px 0 rgba(233, 213, 255, 0.08);
+    0 -16px 40px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet-handle {
@@ -9390,7 +8986,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-icon {
-  color: #e879f9;
+  color: #22d3ee;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-title {
@@ -9398,10 +8994,10 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-count-badge {
-  background: #ff922b;
+  background: #22d3ee;
   border-color: transparent;
-  color: #1a0b02;
-  box-shadow: 0 0 8px rgba(255, 146, 43, 0.55);
+  color: #07131a;
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.55);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-close-btn {
@@ -9411,8 +9007,8 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-close-btn:hover {
-  background: rgba(217, 70, 239, 0.2);
-  border-color: rgba(217, 70, 239, 0.45);
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.45);
   color: #ffffff;
 }
 
@@ -9437,13 +9033,13 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   color: #f5f0ff;
 }
 
-/* Seleccionado: fucsia, igual que el boton de filtros de la capsula. */
+/* Seleccionado: violeta, el acento de la paleta junto al cian. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-status-pill.is-active,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-variant-chip.is-active,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-variant-chip:first-child.is-active,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sprite-chip.is-active {
-  background: rgba(217, 70, 239, 0.16) !important;
-  border: 1px solid rgba(217, 70, 239, 0.45) !important;
+  background: rgba(139, 92, 246, 0.22) !important;
+  border: 1px solid rgba(167, 139, 250, 0.55) !important;
   color: #ffffff !important;
 }
 
@@ -9459,12 +9055,12 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-toggle-switch.is-on {
-  background: #ff922b;
-  box-shadow: 0 0 10px rgba(255, 146, 43, 0.5);
+  background: linear-gradient(90deg, #7c3aed, #22d3ee);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-toggle-switch.is-on .mobile-toggle-thumb {
-  background: #1a0b02;
+  background: #07131a;
 }
 
 /* Limpiar: accion secundaria, violeta tenue. */
@@ -9475,41 +9071,41 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-clear:hover {
-  background: rgba(217, 70, 239, 0.16);
-  border-color: rgba(217, 70, 239, 0.4);
+  background: rgba(139, 92, 246, 0.16);
+  border-color: rgba(167, 139, 250, 0.4);
   color: #ffffff;
 }
 
-/* Aplicar Filtros: la accion principal, en fuego de calabaza. */
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply {
+/* Aplicar Filtros: la accion principal, en cian. Va anclada a la hoja porque
+   comparte .sdm-share__glitch-btn con el boton de compartir, que tiene su
+   propia regla naranja mas adelante y gana por orden. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply {
   background: rgba(255, 146, 43, 0.12);
   border-color: #ff922b;
   color: #ff922b;
   box-shadow: 0 0 12px rgba(255, 146, 43, 0.25);
 }
 
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:hover:not(:disabled),
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:focus:not(:disabled) {
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply:hover:not(:disabled),
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply:focus:not(:disabled) {
   background-color: #ff922b;
   color: #1a0b02;
   border-color: #ff922b;
   box-shadow: 0 0 25px rgba(255, 146, 43, 0.55);
 }
 
-/* El glitch del hover deja de destellar cian. Se ancla al boton de la hoja
-   para no tocar el boton de compartir, que usa la misma .sdm-share__glitch-btn. */
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply::before,
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply::after {
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply::before,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply::after {
   background-color: #ff922b;
 }
 
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:hover:not(:disabled)::before,
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:focus:not(:disabled)::before {
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply:hover:not(:disabled)::before,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply:focus:not(:disabled)::before {
   color: #3b0764;
 }
 
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:hover:not(:disabled)::after,
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-sheet-btn-apply:focus:not(:disabled)::after {
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply:hover:not(:disabled)::after,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply:focus:not(:disabled)::after {
   color: #1a0b02;
 }
 
@@ -9556,8 +9152,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
      desde el componente, y un estilo en linea gana sobre la hoja. */
   filter:
     drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5))
-    drop-shadow(0 0 12px rgba(255, 146, 43, 0.55))
-    drop-shadow(0 0 26px rgba(255, 122, 0, 0.3)) !important;
+    drop-shadow(0 0 14px rgba(255, 140, 40, 0.6)) !important;
 }
 
 /* Ningún pseudo-elemento puede cubrir por encima al espíritu, al nombre o a las monedas */
@@ -9577,8 +9172,10 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-1,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-2,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sprite-card.is-glitch-mastered .glowing-elements .glow-3 {
-  background: radial-gradient(circle, rgba(226, 242, 255, 0.46) 0%, rgba(180, 214, 255, 0.14) 44%, transparent 72%);
-  filter: blur(8px);
+  /* Sin blur: el radial ya se apaga solo, y el filtro promovia cada halo a capa compuesta
+     propia (3 por tarjeta Gen 2 maxeada, ~180 capas en un grid lleno). El degradado se
+     alarga para conservar la misma suavidad. */
+  background: radial-gradient(circle, rgba(226, 242, 255, 0.46) 0%, rgba(180, 214, 255, 0.20) 38%, rgba(180, 214, 255, 0.06) 58%, transparent 78%);
   opacity: 0.65;
 }
 
@@ -9631,29 +9228,25 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
    rojo y el verde de exito sigue verde, porque ahi el color significa algo.
    ========================================================================== */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage {
-  background: radial-gradient(120% 90% at 50% 0%, rgba(28, 14, 46, 0.9) 0%, rgba(10, 5, 18, 0.94) 100%);
+  background: rgba(24, 34, 46, 0.78);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends {
-  background: rgba(22, 11, 36, 0.72);
+  background: rgba(24, 34, 46, 0.72);
   border-color: rgba(168, 85, 247, 0.26);
 }
 
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__title {
-  color: #e879f9;
-}
-
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__code {
-  color: #e879f9;
-  text-shadow: 0 0 10px rgba(217, 70, 239, 0.5);
+  color: #c4b5fd;
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__aviso {
-  color: rgba(232, 121, 249, 0.9);
+  color: rgba(196, 181, 253, 0.95);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__input {
-  background: rgba(30, 16, 50, 0.85);
+  background: rgba(24, 34, 46, 0.85);
   border-color: rgba(168, 85, 247, 0.28);
 }
 
@@ -9672,13 +9265,13 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 /* La accion principal y el conmutador de vistas: brasa, igual que la hoja. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__send {
-  color: #1a0b02;
-  background: linear-gradient(135deg, #ff922b, #f76707);
-  box-shadow: 0 0 12px rgba(255, 146, 43, 0.35);
+  color: #ffffff;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tabs {
-  background: rgba(26, 13, 42, 0.75);
+  background: rgba(24, 34, 46, 0.75);
   border-color: rgba(168, 85, 247, 0.24);
 }
 
@@ -9687,88 +9280,146 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tab.is-active {
-  color: #1a0b02;
-  background: linear-gradient(135deg, #ff922b, #f76707);
+  color: #ffffff;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__chip {
-  color: #e879f9;
-  border-color: rgba(217, 70, 239, 0.35);
+  color: #c4b5fd;
+  border-color: rgba(167, 139, 250, 0.35);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__sub {
+  color: rgba(226, 232, 240, 0.88);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tab {
+  color: #ddd6fe;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tab:disabled {
+  opacity: 0.7;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__label {
+  color: rgba(226, 232, 240, 0.92);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__hint,
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__pendiente {
+  color: rgba(226, 232, 240, 0.9);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__prefix {
+  color: rgba(226, 232, 240, 0.8);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__send:disabled {
+  opacity: 0.75;
 }
 
 /* El foco del teclado tambien vira: la senal debe seguir siendo evidente. */
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__refresh:focus-visible,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__send:focus-visible,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__tab:focus-visible,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-friends__btn:focus-visible,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .fpage__chip:focus-visible {
-  outline: 2px solid #e879f9;
+  outline: 2px solid #a78bfa;
   outline-offset: 2px;
 }
 
 /* ── Menu hamburguesa ───────────────────────────────────────────────── */
+/* Grafito neutro: el violeta solo marca iconos y estados; el color de cada
+   generacion va como franja lateral en la opcion activa. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__menu-dropdown {
-  /* El acento de los iconos del menu vive aqui: los iconos lo leen por
-     variable, asi que fuera de temporada siguen en cian. */
-  --nav-accent: #e879f9;
-  background: rgba(22, 11, 36, 0.96);
-  border-color: rgba(168, 85, 247, 0.28);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 22px rgba(168, 85, 247, 0.14);
+  --nav-accent: #a78bfa;
+  background: linear-gradient(180deg, rgba(46, 60, 72, 0.96), rgba(30, 40, 52, 0.96));
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: 20px;
+  padding: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 14px rgba(232, 121, 249, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__menu-section-label {
-  color: rgba(196, 181, 253, 0.62);
+  color: #7d8294;
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__dropdown-divider {
-  background: rgba(168, 85, 247, 0.24);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.11), transparent);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__menu-action-btn {
-  background: rgba(168, 85, 247, 0.07);
-  border-color: rgba(168, 85, 247, 0.2);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(24, 34, 46, 0.8);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: 14px;
+  color: #f1f5f9;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__menu-action-btn:hover {
-  background: rgba(217, 70, 239, 0.14);
-  border-color: rgba(217, 70, 239, 0.42);
+  border-color: rgba(167, 139, 250, 0.6);
+  box-shadow: 0 0 14px rgba(167, 139, 250, 0.25);
+  color: #ffffff;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__menu-action-btn .action-btn-sub {
-  color: rgba(196, 181, 253, 0.68);
+  color: #7d8294;
 }
 
-/* El cian generico del menu (el codigo, vincular y la opcion "Todas") vira.
-   Las opciones de generacion conservan su color: ahi el color identifica. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__dropdown-code {
-  color: #e879f9;
+  color: #c4b5fd;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__gen-option {
-  --gen-rgb: 217, 70, 239;
+  --gen-rgb: 167, 139, 250;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(24, 34, 46, 0.8);
+  border-color: rgba(167, 139, 250, 0.3);
+  border-radius: 14px;
+  color: #c4c8d6;
 }
 
-/* El acento de la opcion "Todas" (la unica sin generacion propia) tambien vira.
-   Llega en linea desde el componente, asi que solo se puede mover desde la hoja
-   con !important; las opciones de generacion conservan su color, que identifica. */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__gen-option:hover {
+  border-color: rgba(167, 139, 250, 0.6);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__gen-option.selected {
+  background:
+    linear-gradient(90deg, rgba(var(--gen-rgb), 0.16), rgba(255, 255, 255, 0.02) 72%),
+    rgba(24, 34, 46, 0.8);
+  border-color: rgba(var(--gen-rgb), 0.5);
+  box-shadow: inset 3px 0 0 rgb(var(--gen-rgb));
+  color: #f5f5fa;
+}
+
+/* "Todas" no tiene generacion propia: lleva el violeta del acento. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__gen-option[data-gen='0'] {
-  --gen-rgb: 217, 70, 239 !important;
+  --gen-rgb: 167, 139, 250 !important;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__menu-copy {
+  border-top-color: rgba(255, 255, 255, 0.06);
+  color: #6b7080;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__vincular-btn {
-  border-color: rgba(168, 85, 247, 0.3);
-  color: rgba(196, 181, 253, 0.9);
+  border-color: rgba(167, 139, 250, 0.3);
+  color: #c4b5fd;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__vincular-btn:hover {
-  background: rgba(217, 70, 239, 0.12);
-  border-color: rgba(217, 70, 239, 0.45);
+  background: rgba(167, 139, 250, 0.1);
+  border-color: rgba(167, 139, 250, 0.45);
   color: #ffffff;
 }
 
 /* ── Exportar Coleccion ─────────────────────────────────────────────── */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro {
-  background: rgba(13, 7, 24, 0.96);
+  background: rgba(24, 34, 46, 0.96);
   border-color: rgba(168, 85, 247, 0.32);
 }
 
@@ -9777,28 +9428,18 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__segmented {
-  background: rgba(26, 13, 42, 0.8);
+  background: rgba(24, 34, 46, 0.8);
   border-color: rgba(168, 85, 247, 0.24);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__seg-btn--active {
-  background: #ff922b;
-  color: #1a0b02;
-  box-shadow: 0 0 12px rgba(255, 146, 43, 0.45);
+  background: #7c3aed;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.45);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__preview-wrap {
   border-color: rgba(168, 85, 247, 0.24);
-}
-
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__close {
-  border-color: rgba(168, 85, 247, 0.26);
-  color: rgba(196, 181, 253, 0.9);
-}
-
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__close:hover {
-  border-color: rgba(217, 70, 239, 0.5);
-  color: #ffffff;
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn {
@@ -9834,19 +9475,17 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 /* Seasonal animations must respect the visitor's motion preference. */
 @media (prefers-reduced-motion: reduce) {
   .hero__title-fnm-svg,
-  .hero__title-fnm-ghost,
-  .fnm-skip-btn {
+.hero__title-fnm-ghost {
     animation: none;
   }
 
-  /* El fuego de las calabazas y el pulso de luz se quedan fijos; el bosque
-     conserva solo su respiracion de transform. */
+  /* El fuego de las calabazas y el pulso de luz se quedan fijos. */
   html.theme-fortnitemares::after {
     animation: none;
   }
 
   .fnm-forest {
-    animation: fnm-forest-breathe 18s ease-in-out infinite alternate;
+    animation: none;
   }
 
   .fnm-pumpkin-btn::after {
@@ -9863,8 +9502,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 /* The in-app "motion disabled" preference covers the seasonal layers too. */
 .motion-disabled .hero__title-fnm-svg,
-.motion-disabled .hero__title-fnm-ghost,
-.motion-disabled .fnm-skip-btn {
+.motion-disabled .hero__title-fnm-ghost {
   animation: none;
 }
 
@@ -9891,11 +9529,27 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
    version suave no bastaba: el aviso seguia pegado a los bordes como un panel lateral. */
 body .swal2-container .swal2-toast.swal2-popup {
   margin: 16px !important;
-  width: auto !important;
+  /* SweetAlert2 mete el aviso en una rejilla a pantalla completa (grid-column y grid-row con
+     !important). Con width:auto la CELDA lo estiraba y salia ese bloque enorme con sombra:
+     el aviso tiene que medir su contenido y quedarse en su esquina. */
+  width: fit-content !important;
   max-width: min(92vw, 420px) !important;
+  justify-self: end !important;
+  align-self: start !important;
   border-radius: 16px !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* El CONTENEDOR del aviso tambien pintaba el fondo oscuro que el aviso hereda de la config del
+   modal (rgba(0, 0, 0, 0.75)). Ese contenedor mide 360px de ancho y todo el alto, asi que se
+   leia como un sidebar derecho pegado al borde. Un aviso no tiene que oscurecer nada: el
+   contenedor va transparente y solo flota la tarjeta. */
+body .swal2-container.swal2-top-end,
+body .swal2-container.swal2-top,
+body .swal2-container.swal2-bottom-end,
+body .swal2-container.swal2-bottom {
+  background: transparent !important;
 }
 
 /* El vampiro pide un poco mas que la calabaza: su cabeza esta todavia mas baja y 6px no
@@ -9907,6 +9561,40 @@ body .swal2-container .swal2-toast.swal2-popup {
 
 .ms-spotlight-card[data-familia="vampire"] .ms-card__crown {
   top: 10px;
+}
+
+/* ==========================================================================
+   MODAL DE ESPIRITU EN TEMPORADA
+   Misma receta que Exportar y Amigos: violeta de noche en superficies, fucsia
+   en acentos. El color de rareza del heroe y de cada variante es identidad del
+   espiritu (va inline) y no se toca; el verde de atrapado y el dorado de
+   maxeado son semanticos y tampoco.
+   ========================================================================== */
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm {
+  background: rgba(24, 34, 46, 0.96);
+  border-color: rgba(108, 119, 128, 0.45);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm__close {
+  background: rgba(24, 34, 46, 0.7);
+  border-color: rgba(168, 85, 247, 0.35);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm__meta {
+  color: rgba(221, 214, 254, 0.85);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm__card {
+  background: rgba(24, 34, 46, 0.72);
+  border-color: rgba(108, 119, 128, 0.3);
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm__progress-title {
+  color: #c4b5fd;
+}
+
+html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm__progress-count {
+  color: rgba(196, 181, 253, 0.7);
 }
 
 /* ==========================================================================
@@ -10119,7 +9807,7 @@ body .swal2-container .swal2-toast.swal2-popup {
    azules de fuera de temporada y con el arte de fondo asomando por todas partes: no parecia la
    misma app. Mismas recetas que arriba, aplicadas a las clases de esta vista. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage {
-  background: radial-gradient(120% 90% at 50% 0%, rgba(28, 14, 46, 0.9) 0%, rgba(10, 5, 18, 0.94) 100%);
+  background: rgba(24, 34, 46, 0.78);
 }
 
 /* El envoltorio NO es una tarjeta en la vista: lo son sus piezas (ajustes, lona y botones).
@@ -10136,17 +9824,17 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__controls,
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__actions {
-  background: rgba(22, 11, 36, 0.72);
+  background: rgba(24, 34, 46, 0.72);
   border-color: rgba(168, 85, 247, 0.26);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__preview-wrap {
-  background: rgba(18, 9, 30, 0.82);
+  background: rgba(24, 34, 46, 0.82);
   border-color: rgba(168, 85, 247, 0.24);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__segmented {
-  background: rgba(26, 13, 42, 0.75);
+  background: rgba(24, 34, 46, 0.75);
   border-color: rgba(168, 85, 247, 0.24);
 }
 
@@ -10155,12 +9843,12 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__seg-btn--active {
-  color: #1a0b02;
-  background: linear-gradient(135deg, #ff922b, #f76707);
+  color: #ffffff;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
 }
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .spage .sdm-share-pro__input {
-  background: rgba(30, 16, 50, 0.85);
+  background: rgba(24, 34, 46, 0.85);
   border-color: rgba(168, 85, 247, 0.28);
 }
 
@@ -10197,37 +9885,33 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
    ========================================================================== */
 @media (hover: none) and (pointer: coarse) {
   .app-navbar__item,
-  .app-navbar__menu-btn,
-  .app-navbar__avatar,
-  .app-navbar__logo-mark,
-  .app-navbar__menu-dropdown,
-  .app-navbar__dropdown,
-  .hero__btn,
-  .gen-tab-btn,
-  .status-pill-btn,
-  .search-input-field,
-  .filter-pill-trigger,
-  .variant-grid-dropdown,
-  .sprite-grid-dropdown,
-  .filter-pill-checkbox,
-  .filter-view-toggle,
-  .mobile-new-coachmark__content,
-  .mobile-liquid-sheet-backdrop,
-  .modal-overlay,
-  .glass-panel,
-  .auth-modal__content,
-  .sdm__close,
-  .sdm-share-pro,
-  .sdm-friend-pill,
-  .claim-banner,
-  .sdm-compare__waiting,
-  .privacy-panel,
-  .ms-variant-tag,
-  .ms-level-tag,
-  .app-footer__content,
-  .app-footer__panel,
-  .install-prompt-card,
-  .fnm-skip-btn {
+.app-navbar__menu-btn,
+.app-navbar__avatar,
+.app-navbar__logo-mark,
+.app-navbar__menu-dropdown,
+.app-navbar__dropdown,
+.hero__btn,
+.gen-tab-btn,
+.status-pill-btn,
+.search-input-field,
+.filter-pill-trigger,
+.variant-grid-dropdown,
+.sprite-grid-dropdown,
+.filter-pill-checkbox,
+.filter-view-toggle,
+.mobile-new-coachmark__content,
+.mobile-liquid-sheet-backdrop,
+.modal-overlay,
+.glass-panel,
+.auth-modal__content,
+.sdm__close,
+.sdm-share-pro,
+.sdm-friend-pill,
+.claim-banner,
+.privacy-panel,
+.ms-variant-tag,
+.ms-level-tag,
+.install-prompt-card {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
@@ -10246,9 +9930,142 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
     background-color: rgba(0, 0, 0, 0.7);
   }
 
-  /* Sin blur, el panel del pie quedaria translucido sobre el contenido: casi opaco.
-     Aqui NO se reintroduce backdrop-filter, solo se sube la alfa. */
-  .app-footer__panel {
-    background-color: rgba(12, 14, 22, 0.97);
+}
+
+/* ── Guia de espiritus (vista dentro de la aplicacion) ─────────────────
+   El build sirve la misma guia como pagina estatica en dist/guia-espiritus; esto es la
+   version dentro del armazon de la app. Todo sale de los tokens del tema: ni un color nuevo.
+   Va al final del archivo para no pisar ninguna regla compartida. */
+.guia {
+  max-width: 760px;
+  margin: 0 auto;
+  /* La barra de navegacion es absoluta y termina a 64px del borde: el contenido arranca
+     debajo, con el mismo aire que la cabecera del catalogo. El inset del notch lo pone
+     .app-container. */
+  padding: 72px clamp(16px, 4vw, 32px) 80px;
+}
+
+.guia__titulo {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-size: clamp(1.65rem, 5.2vw, 2.35rem);
+  line-height: 1.15;
+  color: var(--text-bright);
+  /* El encabezado recibe el foco al entrar (tabIndex=-1): que no quede bajo la barra. */
+  scroll-margin-top: 78px;
+}
+
+.guia__lead {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.guia__seccion { margin-top: 26px; }
+
+.guia__h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-size: 1.18rem;
+  line-height: 1.25;
+  color: var(--text-bright);
+}
+
+.guia__texto,
+.guia__lista {
+  margin: 0 0 10px;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+.guia__lista { padding-left: 20px; }
+
+/* La tabla de rarezas: la primera celda nombra la fila, asi que se lee como encabezado. */
+.guia__tabla-caja {
+  margin: 12px 0 0;
+  overflow-x: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.guia__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.guia__tabla th,
+.guia__tabla td { padding: 9px 14px; text-align: left; }
+
+.guia__tabla thead th {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.guia__tabla tbody th { font-weight: 600; color: var(--text); }
+.guia__tabla tbody td { text-align: right; font-variant-numeric: tabular-nums; color: var(--text); }
+.guia__tabla tbody tr + tr th,
+.guia__tabla tbody tr + tr td { border-top: 1px solid var(--border); }
+
+/* El FAQ mantiene <details>/<summary> nativos: el triangulo es el indicador de estado. */
+.guia__faq { border-bottom: 1px solid var(--border); }
+
+.guia__resumen {
+  padding: 11px 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text-bright);
+  cursor: pointer;
+}
+
+.guia__resumen:focus-visible {
+  outline: 2px solid var(--nav-accent, #00F0E8);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.guia__faq .guia__texto {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+}
+
+.guia__nota {
+  margin: 28px 0 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--border);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+/* Movil: el texto pequeno no baja de 0.75rem y la temporada no tiene animaciones de
+   ambiente (niebla y pulso de fuego). El glitch y el ruido digital se quedan. */
+@media (max-width: 768px) {
+  .stats-bar__label,
+  .sdm-share-pro__btn,
+  .sdm-friend-pill__tag,
+  .sdm-friend-pill__exit,
+  .filter-pill-checkbox,
+  .owned-btn-sm,
+  .sdm-friends__label,
+  .sdm-friends__prefix,
+  .sdm-friends__pendiente,
+  .sdm-friends__btn,
+  .sdm-friends__hint,
+  .sdm-friends__send,
+  .fpage__chip {
+    font-size: 0.75rem;
+  }
+
+  body.theme-fortnitemares::after,
+  html.theme-fortnitemares:not([data-fnm-phase])::after {
+    animation: none;
   }
 }

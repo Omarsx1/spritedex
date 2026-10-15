@@ -2,11 +2,13 @@
 // sincronizador automatico.
 //
 // Vive fuera de spritesData.js a proposito: ese modulo importa JSON y un script de Node no
-// puede cargarlo tal cual. El sincronizador necesita exactamente la misma tabla para no
-// volver a bajar (ni duplicar) arte que ya existe con otro nombre de archivo: peely_candy
-// se sirve desde peely_gummy.webp, llama_candy desde llama_gummy.webp y los patos desde
-// los ficheros *_duck.webp. Sin esto, el sync escribia /sprites/peely_candy.webp, un
-// duplicado byte a byte del que ya estaba, y lo commiteaba.
+// puede cargarlo tal cual. El sincronizador lee la MISMA tabla, asi que escribe en la ruta
+// que la app va a leer.
+//
+// Ya no hay nombres alternativos: cada espiritu se sirve desde /sprites/<id>.webp. Los seis
+// que quedaban (peely_candy, llama_candy y los cuatro *_quack) se bajaron con su id correcto
+// y se borraron los archivos viejos: por esa diferencia de nombre el sync volvia a bajar arte
+// que ya estaba y lo commiteaba como duplicado.
 //
 // Toda ruta de este mapa tiene que existir en public/: si falta, el sync la baja a ese
 // mismo nombre (la app lee esa ruta, no el id).
@@ -15,18 +17,12 @@ export const WEBP_MAP = {
   'ironmouse_basic': '/sprites/ironmouse_basic.webp',
   'llama_basic': '/sprites/llama_basic.webp',
   'llama_gold': '/sprites/llama_gold.webp',
-  'llama_candy': '/sprites/llama_gummy.webp',
   'llama_galaxy': '/sprites/llama_galaxy.webp',
   'llama_gem': '/sprites/llama_gem.webp',
   'peely_basic': '/sprites/peely_basic.webp',
   'peely_gold': '/sprites/peely_gold.webp',
-  'peely_candy': '/sprites/peely_gummy.webp',
   'peely_galaxy': '/sprites/peely_galaxy.webp',
   'peely_holofoil': '/sprites/peely_holofoil.webp',
-  'water_quack': '/sprites/water_duck.webp',
-  'earth_quack': '/sprites/earth_duck.webp',
-  'fire_quack': '/sprites/fire_duck.webp',
-  'zeropoint_quack': '/sprites/zeropoint_duck.webp',
   'zeropoint_holofoil': '/sprites/zeropoint_holofoil.webp',
   'grim_holofoil': '/sprites/grim_holofoil.webp',
   'grim_gem': '/sprites/grim_gem.webp',
@@ -63,7 +59,8 @@ export const WEBP_MAP = {
 // esta lista Y descargarlo con el nombre de arriba; mientras siga aqui, la app pedira el .svg
 // aunque exista un .webp.
 export const ART_VECTORIAL = new Set([
-  'air_gem', 'aura_holofoil', 'batman_gem', 'duck_holofoil', 'peely_candy'
+  // Nadie ahora mismo: el ultimo era peely_candy, que ya tiene arte real. La lista se
+  // queda como red para el proximo espiritu que salga sin arte.
 ]);
 
 export const DIRECTORIO_ARTE = '/sprites/';

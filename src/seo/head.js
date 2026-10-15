@@ -47,6 +47,7 @@ export function aplicarSeoRuta(pathname, { noindex = false } = {}) {
   ponerMeta('property', 'og:description', descripcion);
   ponerMeta('property', 'og:image', IMAGEN_REDES);
   ponerMeta('property', 'og:locale', lang === 'en' ? 'en_US' : 'es_MX');
+  ponerMeta('name', 'twitter:card', 'summary_large_image');
   ponerMeta('name', 'twitter:title', titulo);
   ponerMeta('name', 'twitter:description', descripcion);
   ponerMeta('name', 'twitter:image', IMAGEN_REDES);

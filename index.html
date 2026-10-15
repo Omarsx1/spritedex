@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Spritedex de Fortnite: Rastrear capturas, variantes, niveles 1 al 5, clasificar por generaciones y exportar tarjetas para compartir en redes sociales." />
     <link rel="canonical" href="https://spritedex.gg/" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
     <!-- Idiomas: la raiz es la version española y /en la inglesa -->
     <link rel="alternate" hreflang="es" href="https://spritedex.gg/" />
@@ -23,7 +24,9 @@
     <meta property="og:title" content="Spritedex — Espíritus de Fortnite" />
     <meta property="og:description" content="Rastrea tus espíritus de Fortnite: capturas, variantes, niveles del 1 al 5, comparación con amigos y tarjetas listas para compartir." />
     <meta property="og:image" content="https://spritedex.gg/icon-512.png" />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Spritedex — Espíritus de Fortnite" />
     <meta name="twitter:description" content="Rastrea tus espíritus de Fortnite: capturas, variantes, niveles del 1 al 5, comparación con amigos y tarjetas listas para compartir." />
     <meta name="twitter:image" content="https://spritedex.gg/icon-512.png" />
@@ -45,6 +48,7 @@
          navegador alcanza a pintar antes de que llegue la hoja de estilos y se ve un
          fogonazo blanco al recargar. El tema de temporada lo sobreescribe por clase. -->
     <style>html { background-color: #060714; }</style>
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png" />
@@ -53,11 +57,8 @@
     <title>Spritedex — Espíritus de Fortnite</title>
   </head>
   <body>
-    <!-- Tema de temporada ANTES del primer pintado.
-         React enciende el tema en un efecto (FortnitemaresTransition), o sea despues del
-         primer fotograma: quien ya vio la cinematica alcanzaba a ver la interfaz antigua
-         durante un parpadeo. Aqui se decide sin esperar al bundle.
-         Las dos fronteras y la clave del intro son las de src/config/seasonalEvent.js, y
+    <!-- Tema de temporada ANTES del primer pintado, sin esperar al bundle.
+         Las dos fronteras son las de src/config/seasonalEvent.js, y
          tests/fnm-arranque.test.js impide que se separen. -->
     <script>
       (function () {
@@ -69,7 +70,6 @@
           if (local) {
             // Espejo del modo desarrollo de seasonalEvent.js: bandera > override > encendido.
             // Asi el parpadeo tampoco se ve en local y las banderas siguen mandando.
-            if (params.has('intro')) return;
             var flag = params.get('halloween');
             if (flag === null) flag = params.get('fortnitemares');
             if (flag === '0' || flag === 'false') return;
@@ -84,23 +84,13 @@
             if (ahora >= new Date('2026-11-04T00:00:00-05:00').getTime()) return;
           }
 
-          // Con la cinematica pendiente el tema lo enciende ella: adelantarlo mostraria el
-          // tema encendido y apagado justo antes de la funcion.
-          var vioIntro = false;
-          try { vioIntro = localStorage.getItem('spritedex_fortnitemares_intro_seen_v1') === 'true'; } catch (e) {}
-          var quieto = false;
-          try { quieto = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
-          if (!vioIntro && !quieto) return;
-
           document.documentElement.classList.add('theme-fortnitemares');
           document.body.classList.add('theme-fortnitemares');
         } catch (e) {}
       })();
     </script>
     <!-- El bosque de la temporada, montado en el armazon y no en React: asi existe ya en
-         el primer fotograma para quien vio la cinematica. Su visibilidad la decide el CSS:
-         sin la clase del tema no se ve, que es lo que mantiene intacta la cinematica de
-         los nuevos (ven la rejilla hasta la parte "ground"). -->
+         el primer fotograma. Su visibilidad la decide el CSS: sin la clase del tema no se ve. -->
     <div class="fnm-forest" aria-hidden="true"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>

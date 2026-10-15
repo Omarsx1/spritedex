@@ -193,11 +193,6 @@ export function generateShareUrl(token, friendCode) {
   return buildShareUrl(window.location.origin + window.location.pathname, token, friendCode);
 }
 
-// Enlace por codigo: se mantiene para quien todavia no tiene token.
-export function generatePermanentFriendUrl(friendCode) {
-  return buildShareUrl(window.location.origin + window.location.pathname, null, friendCode);
-}
-
 /**
  * Lee una coleccion a partir de su token de compartir.
  * Va por funcion del servidor: la tabla ya no es publica y esa funcion solo devuelve

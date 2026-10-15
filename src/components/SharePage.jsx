@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { ArrowLeft, Download, Share2, Copy, Check } from 'lucide-react';
-import { pickName } from '../data/spritesData';
+import { ArrowLeft, Download, Share2, Copy, Check, ChevronDown } from 'lucide-react';
+import { pickName, THEMES_LIST, THEME_STYLES, pickThemeName, pickFamilyName } from '../data/spritesData';
 import { generateSpritedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, marcarEsperaActiva, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import { safeStorage } from '../utils/safeStorage';
@@ -39,10 +39,74 @@ function leerPerfActivado() {
   return params.has('perf') || window.location.hash.toLowerCase().includes('perf');
 }
 
+// Desplegable de la pagina de compartir. Es el mismo lenguaje que los filtros de la app
+// (la lista se abre bajo el boton y se cierra al tocar fuera), pero con el ancho de su
+// columna para que no se salga del panel. El color identifica la variante, como en la app.
+// "📱 Vertical" -> { emoji: '📱', nombre: 'Vertical' }. El emoji se pinta aparte para poder
+// esconderlo en pantallas estrechas: con el texto solo, la etiqueta ya dice lo mismo y no
+// obliga a partirla en dos lineas dentro de una columna estrecha.
+function Desplegable({ etiqueta, valor, opciones, abierto, onAlternar, onElegir, enRejilla }) {
+  const actual = opciones.find((o) => o.id === valor);
+  return (
+    <div className={`sdm-share-pro__dd${enRejilla ? ' sdm-share-pro__dd--rejilla' : ''}`}>
+      <span className="sdm-share-pro__seg-label">{etiqueta}</span>
+      <button
+        type="button"
+        className={`sdm-share-pro__dd-trigger${abierto ? ' is-open' : ''}`}
+        onClick={onAlternar}
+        aria-expanded={abierto}
+      >
+        <span>
+          {actual ? actual.nombre : (opciones[0] ? opciones[0].nombre : '')}
+        </span>
+        <ChevronDown size={13} />
+      </button>
+      {abierto && (
+        <>
+          <div className="sdm-share-pro__dd-backdrop" onClick={onAlternar} />
+          <div className={`sdm-share-pro__dd-menu${enRejilla ? ' sdm-share-pro__dd-menu--rejilla' : ''}`}>
+            {opciones.map((o) => (
+              <button
+                key={o.id}
+                type="button"
+                className={[
+                  'sdm-share-pro__dd-item',
+                  valor === o.id ? 'is-active' : '',
+                  enRejilla ? 'sdm-share-pro__dd-item--rejilla' : '',
+                  enRejilla && o.id === 'all' ? 'sdm-share-pro__dd-item--ancho' : ''
+                ].filter(Boolean).join(' ')}
+                style={o.color ? { background: o.color } : undefined}
+                onClick={() => onElegir(o.id)}
+              >
+                {enRejilla && o.image ? (
+                  <img
+                    className="sdm-share-pro__dd-img"
+                    src={o.image}
+                    alt=""
+                    loading="lazy"
+                    onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }}
+                  />
+                ) : null}
+                <span>{o.nombre}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function SharePage({ filteredSprites, allSprites, userState, activeFiltersLabel, onBack, enlaceColeccion }) {
   const [format, setFormat] = useState(DEFAULT_EXPORT_FORMAT); // 'checklist', 'square'
   const [scope, setScope] = useState('all'); // Default to 'all' of current active generation
   const [bgStyle] = useState(DEFAULT_EXPORT_BG_STYLE); // 'glitch_override', 'blueprint', 'dark_matrix'
+  // Filtros de la lona: se aplican encima del alcance. Antes habia que volver a la app para
+  // dejar la lista filtrada; ahora la lona se arma aqui mismo.
+  const [familia, setFamilia] = useState('all');
+  const [variante, setVariante] = useState('all');
+  // Solo un desplegable abierto a la vez: formato, familia o variante.
+  const [menuAbierto, setMenuAbierto] = useState('');
   const [fortniteUser, setFortniteUser] = useState(usuarioGuardado);
   const [mostrarUsuario, setMostrarUsuario] = useState(mostrarUsuarioGuardado);
   const firma = mostrarUsuario ? fortniteUser.trim() : '';
@@ -170,25 +234,70 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
     return () => clearTimeout(timer);
   }, []);
 
-  // Determine which sprites to include based on scope
+  // Que espiritus entran en la lona: primero el alcance y encima los filtros de la lona.
+  // Los dos se suman (elegir "Faltantes" y una familia da las que faltan de esa familia).
   const spritesList = useMemo(() => {
-    switch (scope) {
-      case 'all':
-        return allSprites;
-      case 'new':
-        return allSprites.filter(s => s.isNew);
-      case 'filtered':
-        return filteredSprites;
-      case 'owned':
-        return allSprites.filter(s => userState[s.id]?.owned);
-      case 'missing':
-        return allSprites.filter(s => !userState[s.id]?.owned);
-      case 'mastered':
-        return allSprites.filter(s => userState[s.id]?.owned && userState[s.id]?.level === 5);
-      default:
-        return allSprites;
+    const porAlcance = (() => {
+      switch (scope) {
+        case 'all':
+          return allSprites;
+        case 'new':
+          return allSprites.filter(s => s.isNew);
+        case 'filtered':
+          return filteredSprites;
+        case 'owned':
+          return allSprites.filter(s => userState[s.id]?.owned);
+        case 'missing':
+          return allSprites.filter(s => !userState[s.id]?.owned);
+        case 'mastered':
+          return allSprites.filter(s => userState[s.id]?.owned && userState[s.id]?.level === 5);
+        default:
+          return allSprites;
+      }
+    })();
+    return porAlcance.filter((s) =>
+      (familia === 'all' || s.familyId === familia) &&
+      (variante === 'all' || s.variant === variante)
+    );
+  }, [scope, filteredSprites, allSprites, userState, familia, variante]);
+
+  // Opciones de los desplegables. Las familias y variantes salen de lo que hay en la lona,
+  // asi nunca se ofrece algo que dejaria la captura vacia. La familia va con su miniatura y
+  // la variante con su color, los mismos que usa el filtro de la app.
+  const opcionesFamilia = useMemo(() => {
+    const cuenta = new Map();
+    for (const s of allSprites) {
+      if (!s.familyId) continue;
+      cuenta.set(s.familyId, (cuenta.get(s.familyId) || 0) + 1);
     }
-  }, [scope, filteredSprites, allSprites, userState]);
+    const lista = [...cuenta.keys()]
+      .map((id) => {
+        // La imagen de la familia es su variante basica, como en el filtro de la app: la lista
+        // se lee de un vistazo en vez de ser una columna de texto.
+        const basica = allSprites.find((s) => s.familyId === id && s.variant === 'Basic');
+        const cualquiera = basica || allSprites.find((s) => s.familyId === id);
+        return {
+          id,
+          nombre: pickFamilyName(id) || id,
+          image: (cualquiera && (cualquiera.thumb || cualquiera.image)) || undefined
+        };
+      })
+      .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+    return [{ id: 'all', nombre: t('filtros.todas') }, ...lista];
+  }, [allSprites]);
+
+  const opcionesVariante = useMemo(() => {
+    const presentes = new Set(allSprites.map((s) => s.variant).filter(Boolean));
+    const lista = THEMES_LIST.filter((v) => presentes.has(v)).map((v) => {
+      const color = (THEME_STYLES[v] || {}).border;
+      return {
+        id: v,
+        nombre: pickThemeName(v) || v,
+        color: color ? `linear-gradient(135deg, ${color} 0%, #1b1c23 140%)` : undefined
+      };
+    });
+    return [{ id: 'all', nombre: t('filtros.todas') }, ...lista];
+  }, [allSprites]);
 
   // Scope counts for display
   const counts = useMemo(() => ({
@@ -344,7 +453,11 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
     return () => {
       clearTimeout(timer);
     };
-  }, [spritesList, userState, format, bgStyle, ownedInScope, queuePngEncode, showPerf, scope, generalOwned, alcance, progresoGeneral]);
+  // firma entra en las dependencias: sin ella, cambiar de "Con nombre" a "Sin nombre" (o
+  // escribir el nombre) no volvia a dibujar la plantilla, y la vieja se quedaba en pantalla
+  // hasta que otra cosa disparara el efecto. Parecia colgada. El retardo del efecto ya hace de
+  // freno: teclear no dibuja por letra, solo cuando paras.
+  }, [spritesList, userState, format, bgStyle, ownedInScope, queuePngEncode, showPerf, scope, generalOwned, alcance, progresoGeneral, firma]);
 
   // El canvas se inserta a mano para que React no lo recree en cada render.
   useEffect(() => {
@@ -567,25 +680,44 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
             </div>
           </div>
 
-          <div className="sdm-share-pro__seg-group">
-            <span className="sdm-share-pro__seg-label">{t('compartir.formato')}</span>
-            <div className="sdm-share-pro__segmented">
-              {[
-                { id: 'checklist', label: t('compartir.vertical') },
-                { id: 'square', label: t('compartir.horizontal') }
-              ].map(f => (
-                <button
-                  key={f.id}
-                  className={`sdm-share-pro__seg-btn ${format === f.id ? 'sdm-share-pro__seg-btn--active' : ''}`}
-                  onClick={() => setFormat(f.id)}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
+          <Desplegable
+            etiqueta={t('compartir.familia')}
+            valor={familia}
+            opciones={opcionesFamilia}
+            enRejilla
+            abierto={menuAbierto === 'familia'}
+            onAlternar={() => setMenuAbierto(menuAbierto === 'familia' ? '' : 'familia')}
+            onElegir={(id) => { setFamilia(id); setMenuAbierto(''); }}
+          />
+
+          {/* Variante y formato comparten fila: son los dos ajustes cortos y asi la columna no
+              se estira con dos botones de ancho completo. */}
+          <div className="sdm-share-pro__fila">
+          <Desplegable
+            etiqueta={t('compartir.variante')}
+            valor={variante}
+            opciones={opcionesVariante}
+            abierto={menuAbierto === 'variante'}
+            onAlternar={() => setMenuAbierto(menuAbierto === 'variante' ? '' : 'variante')}
+            onElegir={(id) => { setVariante(id); setMenuAbierto(''); }}
+          />
+
+          {/* El formato va despues de los filtros: primero se elige QUE entra en la lona y
+              luego como se compone. El desplegable ya trae su etiqueta. */}
+          <Desplegable
+            etiqueta={t('compartir.formato')}
+            valor={format}
+            opciones={[
+              { id: 'checklist', nombre: t('compartir.vertical') },
+              { id: 'square', nombre: t('compartir.horizontal') }
+            ]}
+            abierto={menuAbierto === 'formato'}
+            onAlternar={() => setMenuAbierto(menuAbierto === 'formato' ? '' : 'formato')}
+            onElegir={(id) => { setFormat(id); setMenuAbierto(''); }}
+          />
           </div>
 
-          <div className="sdm-share-pro__seg-group">
+          <div className="sdm-share-pro__seg-group sdm-share-pro__seg-group--ancho">
             <span className="sdm-share-pro__seg-label">{t('compartir.usuario')}</span>
             <div className="sdm-share-pro__user-row">
               <input
@@ -625,7 +757,9 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
           ) : isGenerating ? (
             <div className="sdm-share-pro__loading">
               <div className="sdm-share-pro__spinner" />
-              <span>{t('compartir.generando')}</span>
+              {/* Si ya habia una plantilla en pantalla, el aviso lo dice: se esta ACTUALIZANDO,
+                  no se ha colgado. La primera vez es "generando". */}
+              <span>{(previewCanvas || dataUrl) ? t('compartir.actualizando') : t('compartir.generando')}</span>
             </div>
           ) : previewCanvas ? (
             <div className="sdm-share-pro__canvas-host" ref={previewHostRef} />

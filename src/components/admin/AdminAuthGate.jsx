@@ -3,7 +3,7 @@ import { ShieldCheck, ArrowRight, AlertCircle } from 'lucide-react';
 import { Google } from '../ui/Google';
 import { getSupabase, isSupabaseConfigured } from '../../utils/supabase';
 import { conGoogle } from '../../utils/authActions';
-import { ADMIN_AUTH_KEY } from '../../utils/adminAuth';
+import { marcarAdminAutenticado } from '../../utils/adminAuth';
 
 // La puerta del CMS.
 //
@@ -79,6 +79,14 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
     setErrorMsg('');
   };
 
+  // Entrar con la sesion ya abierta: deja la MISMA marca que el formulario. Sin esto la marca
+  // vivia solo en memoria y cualquier recarga volvia a pedir el clic aunque la sesion siguiera
+  // abierta: eso era el salto a esta pantalla al recargar dentro del CMS.
+  const entrarConSesion = () => {
+    marcarAdminAutenticado(sesionAdmin ? sesionAdmin.email : '');
+    onAuthenticated();
+  };
+
   // Entrar con Google: es la vía del dueño. Se usa un inicio de sesión real (no vinculación)
   // porque el acceso depende de la cuenta, no del invitado del navegador.
   const handleGoogle = async () => {
@@ -119,11 +127,7 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
           return;
         }
 
-        sessionStorage.setItem(ADMIN_AUTH_KEY, JSON.stringify({
-          mode: 'supabase',
-          email: data.user.email,
-          authenticatedAt: Date.now()
-        }));
+        marcarAdminAutenticado(data.user.email);
         onAuthenticated();
       }
     } catch (err) {
@@ -258,7 +262,7 @@ export function AdminAuthGate({ onAuthenticated, onExit }) {
 
             <button
               type="button"
-              onClick={onAuthenticated}
+              onClick={entrarConSesion}
               style={{
                 width: '100%',
                 padding: '12px',

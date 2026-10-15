@@ -12,7 +12,6 @@ import { safeStorage } from '../utils/safeStorage.js';
  */
 
 // Storage keys
-export const INTRO_SEEN_KEY = 'spritedex_fortnitemares_intro_seen_v1';
 export const SEASON_OVERRIDE_KEY = 'spritedex_halloween_override';
 
 // Deterministic boundaries: explicit UTC offset, never parsed as local time.
@@ -26,9 +25,6 @@ export const IS_DEV_BUILD = Boolean(import.meta.env && import.meta.env.DEV);
 
 // Idle re-check ceiling: setTimeout overflows past ~24.8 days.
 const MAX_SCHEDULER_DELAY_MS = 6 * 60 * 60 * 1000;
-
-// One-time cinematic pacing lives in fortnitemaresTimeline.js (FNM_PHASES),
-// which is what the component and the tests consume.
 
 /**
  * Pure seasonal resolver: no globals, so it can be unit tested directly.
@@ -80,39 +76,6 @@ export function isFortnitemaresActive(now = new Date()) {
   }
 
   return resolveSeasonalState({ now, isDev: IS_DEV_BUILD, search, storedOverride });
-}
-
-/**
- * Whether this browser already saw the one-time cinematic.
- */
-export function hasSeenFortnitemaresIntro() {
-  try {
-    return safeStorage.getItem(INTRO_SEEN_KEY) === 'true';
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Remembers that the one-time cinematic was shown.
- */
-export function markFortnitemaresIntroSeen() {
-  try {
-    safeStorage.setItem(INTRO_SEEN_KEY, 'true');
-  } catch {
-    // storage unavailable: nothing to persist
-  }
-}
-
-/**
- * Forgets the cinematic flag so it can be replayed.
- */
-export function resetFortnitemaresIntro() {
-  try {
-    safeStorage.removeItem(INTRO_SEEN_KEY);
-  } catch {
-    // storage unavailable: nothing to clear
-  }
 }
 
 /**
@@ -201,11 +164,5 @@ if (IS_DEV_BUILD && typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('spritedex:season-change', { detail: { active: next } }));
     console.info('Fortnitemares ' + (next ? 'enabled' : 'disabled') + ' for local development.');
     return next;
-  };
-
-  window.replayFortnitemaresIntro = () => {
-    resetFortnitemaresIntro();
-    window.dispatchEvent(new CustomEvent('spritedex:replay-fortnitemares'));
-    console.info('Fortnitemares intro reset.');
   };
 }

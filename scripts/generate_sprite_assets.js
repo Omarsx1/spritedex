@@ -131,7 +131,6 @@ const spriteDefinitions = [
   { id: 'batman_galaxy', name: 'Batman', variant: 'Galaxy', p: '#c084fc', s: '#1e1b4b', a: '#a855f7' },
   { id: 'batman_holofoil', name: 'Batman', variant: 'Holofoil', p: '#38bdf8', s: '#ec4899', a: '#e0e7ff' },
   { id: 'batman_cube', name: 'Batman', variant: 'Cube', p: '#a855f7', s: '#3b0764', a: '#d8b4fe' },
-  { id: 'batman_gem', name: 'Batman', variant: 'Gem', p: '#22d3ee', s: '#0e7490', a: '#67e8f9' },
   { id: 'batman_quack', name: 'Batman', variant: 'Quack', p: '#fde047', s: '#ca8a04', a: '#facc15' },
 
   // Water Family

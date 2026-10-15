@@ -5,18 +5,59 @@ class SoundManager {
     this.ctx = null;
     this.enabled = true;
     this.audioPool = {};
+    // Los sonidos tienen que respetar el interruptor de silencio, como cualquier
+    // aviso del sistema: eso es la categoria "ambient" en iOS. Dejandolo en "auto"
+    // la pagina entera se declara "playback" — gana el HTMLMediaElement de
+    // playSample por prioridad — y "playback" es justo la categoria con la que iOS
+    // le entrega a Safari el reproductor de la pantalla de bloqueo.
+    this.ponerCategoria('ambient');
     // Con la pagina oculta no hay nada que sonar: dormir el contexto evita que el
-    // navegador mantenga una sesion de audio viva. En el movil eso se ve como un
-    // reproductor en la pantalla de bloqueo, incluso con la app cerrada.
+    // navegador mantenga una sesion de audio viva.
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', () => this.dormir());
       window.addEventListener('pagehide', () => this.dormir());
     }
   }
 
+  // Declara el tipo de audio de la pagina (iOS Safari 16.4+). Sin declararlo queda
+  // en "auto" y el navegador lo deduce de las APIs de audio que ve.
+  // "transient" seria el nombre ideal para efectos cortos, pero WebKit lo mapea a
+  // la misma categoria que "ambient" (bug 264473), asi que no cambia nada.
+  ponerCategoria(tipo) {
+    if (typeof navigator === 'undefined') return;
+    try {
+      if (!navigator.audioSession) return;
+      navigator.audioSession.type = tipo;
+    } catch {
+      // sin Audio Session API, o el navegador rechaza el tipo: se queda en "auto"
+    }
+  }
+
+  // En iOS el contexto no queda en 'suspended' al apagar la pantalla o salir de la
+  // pagina: queda en 'interrupted' (MDN, BaseAudioContext.state). Mirar solo
+  // 'running' hacia que en el iPhone esto no durmiera nada.
   dormir() {
-    if (this.ctx && this.ctx.state === 'running') {
-      this.ctx.suspend().catch(() => {});
+    const ctx = this.ctx;
+    if (ctx && (ctx.state === 'running' || ctx.state === 'interrupted')) {
+      try {
+        ctx.suspend().catch(() => {});
+      } catch {
+        // el contexto ya no existe: nada que dormir
+      }
+    }
+    this.limpiarSesion();
+  }
+
+  // La sesion de medios la pinta el sistema en la pantalla de bloqueo, no la app.
+  // Quitar el src la cierra en Chrome; en iOS hay que decirlo explicitamente o el
+  // widget "Now Playing" se queda pegado aunque la app ya este cerrada.
+  limpiarSesion() {
+    if (typeof navigator === 'undefined' || !navigator.mediaSession) return;
+    try {
+      navigator.mediaSession.metadata = null;
+      navigator.mediaSession.playbackState = 'none';
+    } catch {
+      // navegador sin soporte: no hay sesion que limpiar
     }
   }
 
@@ -27,8 +68,9 @@ class SoundManager {
         this.ctx = new AudioCtx();
       }
     }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+    // resume() es la salida tambien desde el estado 'interrupted' de iOS.
+    if (this.ctx && (this.ctx.state === 'suspended' || this.ctx.state === 'interrupted')) {
+      this.ctx.resume().catch(() => {});
     }
   }
 
@@ -52,6 +94,7 @@ class SoundManager {
         } catch {
           // el elemento ya no esta: nada que soltar
         }
+        this.limpiarSesion();
       };
       audio.addEventListener('ended', soltar, { once: true });
       audio.addEventListener('error', soltar, { once: true });

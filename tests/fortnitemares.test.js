@@ -1,7 +1,7 @@
 // Seasonal Fortnitemares behaviour is driven by time, storage and canvas work.
 // Those are exactly the seams that break silently, so they are pinned here:
-// window boundaries, developer-preview isolation, the intro phase order and
-// the guarantee that the seasonal effect can never fall back to confetti.
+// window boundaries, developer-preview isolation and the guarantee that the
+// seasonal effect can never fall back to confetti.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -10,13 +10,9 @@ import {
   FORTNITEMARES_END,
   resolveSeasonalState,
   getNextSeasonalBoundary,
-  hasSeenFortnitemaresIntro,
-  markFortnitemaresIntroSeen,
-  resetFortnitemaresIntro,
   applySeasonalTheme,
   subscribeSeasonalState
 } from '../src/config/seasonalEvent.js';
-import { FNM_PHASES, FNM_SWARM_COUNT, FNM_BOOT_DELAY } from '../src/config/fortnitemaresTimeline.js';
 import { HALLOWEEN_COLORS, isBatSwarmActive, batBurstFor } from '../src/utils/confetti.js';
 import { rutaFondoPlantilla } from '../src/utils/canvasExporter.js';
 import { createBatSwarm, fireFlyingBats } from '../src/utils/batSwarm.js';
@@ -27,40 +23,6 @@ const AFTER = new Date('2027-01-01T00:00:00-05:00');
 test('event boundaries are offset-anchored, so they cannot drift with the browser timezone', () => {
   assert.equal(FORTNITEMARES_START.toISOString(), '2026-10-01T05:00:00.000Z');
   assert.equal(FORTNITEMARES_END.toISOString(), '2026-11-04T05:00:00.000Z');
-});
-
-test('the entrance runs as an ordered season-launch sequence, not a stall', () => {
-  const ids = FNM_PHASES.map((p) => p.id);
-  assert.deepEqual(ids, ['title', 'ground', 'glow', 'settle', 'done']);
-
-  for (let i = 1; i < FNM_PHASES.length; i += 1) {
-    assert.ok(
-      FNM_PHASES[i].at > FNM_PHASES[i - 1].at,
-      `phase ${FNM_PHASES[i].id} must start after ${FNM_PHASES[i - 1].id}`
-    );
-  }
-
-  const total = FNM_PHASES[FNM_PHASES.length - 1].at;
-  assert.ok(total >= 3500, 'the cinematic must be a real moment, not a 1.9s sting');
-  assert.ok(total <= 7000, 'but it must not overstay its welcome');
-});
-
-// The entrance must arrive AFTER the visitor has seen the normal app, never on
-// top of the first paint: seen immediately it reads as a loading screen instead
-// of a moment worth watching.
-test('the entrance waits before it starts, so the visitor sees the normal app first', () => {
-  assert.ok(FNM_BOOT_DELAY >= 4000, 'starting sooner robs the transition of its surprise');
-  assert.ok(FNM_BOOT_DELAY <= 8000, 'waiting longer than this makes the app feel broken');
-});
-
-test('the entrance transforms the interface by parts, in order', () => {
-  const title = FNM_PHASES.find((p) => p.id === 'title');
-  const ground = FNM_PHASES.find((p) => p.id === 'ground');
-  const glow = FNM_PHASES.find((p) => p.id === 'glow');
-  const settle = FNM_PHASES.find((p) => p.id === 'settle');
-  assert.ok(title.at < ground.at, 'part 1: the wordmark mutates before the ground');
-  assert.ok(ground.at < glow.at, 'part 2: the ground crossfades before the firelight');
-  assert.ok(glow.at < settle.at, 'part 3: the details wake before the interface settles');
 });
 
 test('production resolves strictly from the event window', () => {
@@ -98,15 +60,6 @@ test('the next boundary points at the start, then the end, then nothing', () => 
   assert.equal(getNextSeasonalBoundary(AFTER), null);
 });
 
-test('the intro flag is remembered once and can be replayed', () => {
-  resetFortnitemaresIntro();
-  assert.equal(hasSeenFortnitemaresIntro(), false);
-  markFortnitemaresIntroSeen();
-  assert.equal(hasSeenFortnitemaresIntro(), true);
-  resetFortnitemaresIntro();
-  assert.equal(hasSeenFortnitemaresIntro(), false);
-});
-
 test('the seasonal palette stays inside the key-art night range', () => {
   assert.ok(Array.isArray(HALLOWEEN_COLORS) && HALLOWEEN_COLORS.length > 0);
   for (const color of HALLOWEEN_COLORS) {
@@ -126,10 +79,6 @@ test('the bat swarm refuses to run without a DOM instead of throwing', () => {
   assert.equal(createBatSwarm(), null);
   assert.equal(fireFlyingBats(), null);
   assert.equal(createBatSwarm({ count: 4, mode: 'burst' }), null);
-});
-
-test('the entrance releases enough bats to cross the whole viewport', () => {
-  assert.ok(FNM_SWARM_COUNT >= 20, 'a thin swarm reads as confetti, not a flight');
 });
 
 // The original defect: a tab left open kept the theme forever, because the

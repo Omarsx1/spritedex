@@ -2,8 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES, SUMMON_COST_OVERRIDES, WEBP_MAP, getSpriteThumb } from '../data/spritesData';
 import catalogEn from '../data/i18n/catalog.en.json';
 import { getSupabase } from '../utils/supabase';
+import { estadoLanzamiento, fechaDeLanzamiento, sinEstadoDeLanzamiento, DIAS_NOVEDAD } from '../utils/lanzamiento.js';
+import { filtrarCopiaConfirmada } from '../utils/copiaLocal.js';
 
 export const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache_v2';
+
 
 // La tabla del CMS solo guarda el nombre en español. Los estaticos por id sirven para
 // heredar lo que la base no tiene (hoy, el nombre en ingles).
@@ -53,28 +56,21 @@ function sanitizeDynamicItem(item) {
   };
 }
 
-// Evaluates whether a scheduled sprite has reached its automatic release time
-export function evaluateReleaseStatus(sprite) {
+// Cuando sale un espiritu y si es nuevo: la regla vive en utils/lanzamiento.js, una sola para
+// toda la app (app publica y CMS incluidos). Aqui solo se le pegan los campos que ya esperaba
+// el resto del panel. La fecha se puede inyectar para probarlo sin tocar el reloj.
+export function evaluateReleaseStatus(sprite, ahora = Date.now()) {
   if (!sprite) return sprite;
-
-  const rawRelDate = sprite.release_date || sprite.releaseDate;
-  const releaseTime = rawRelDate ? new Date(rawRelDate).getTime() : 0;
-  const now = Date.now();
-  const isScheduled = releaseTime > now;
-  const unreleased = sprite.unreleased === true || isScheduled;
-  const isAutoScheduled = isScheduled;
-  const timeUntilRelease = isScheduled ? releaseTime - now : 0;
-  const daysSince = (!unreleased && releaseTime > 0) ? (now - releaseTime) / (1000 * 60 * 60 * 24) : 999;
-  const isNew = unreleased ? false : (daysSince <= 7 ? true : Boolean(sprite.is_new ?? sprite.isNew ?? false));
-
+  const estado = estadoLanzamiento(sprite, ahora);
   return {
     ...sprite,
-    unreleased,
-    isAutoScheduled,
-    timeUntilRelease,
-    daysSince,
-    releaseTime,
-    isNew
+    unreleased: estado.unreleased,
+    isAutoScheduled: estado.programado,
+    timeUntilRelease: estado.programado ? estado.releaseTime - ahora : 0,
+    daysSince: estado.diasDesde,
+    releaseTime: estado.releaseTime,
+    // Sin fecha manda la marca manual; con fecha manda la fecha (y la ventana de 7 dias).
+    isNew: estado.releaseTime > 0 ? estado.nuevo : Boolean(sprite.is_new ?? sprite.isNew ?? false)
   };
 }
 
@@ -86,29 +82,22 @@ export function applyBatchNoveltyRules(spritesList) {
 
   const now = Date.now();
 
-  // 1. Evaluate release timing for each sprite
-  const withTiming = spritesList.map(sprite => {
-    const rawRelDate = sprite.release_date || sprite.releaseDate;
-    const releaseTime = rawRelDate ? new Date(rawRelDate).getTime() : 0;
-    const isScheduled = releaseTime > now;
-    const unreleased = sprite.unreleased === true || isScheduled;
-    const isAutoScheduled = isScheduled;
-    const timeUntilRelease = isScheduled ? releaseTime - now : 0;
-    const daysSince = (!unreleased && releaseTime > 0) ? (now - releaseTime) / (1000 * 60 * 60 * 24) : 999;
-
+  // 1. Estado de cada espiritu (la regla vive en utils/lanzamiento.js)
+  const withTiming = spritesList.map((sprite) => {
+    const estado = estadoLanzamiento(sprite, now);
     return {
       ...sprite,
-      unreleased,
-      isAutoScheduled,
-      timeUntilRelease,
-      daysSince,
-      releaseTime
+      unreleased: estado.unreleased,
+      isAutoScheduled: estado.programado,
+      timeUntilRelease: estado.programado ? estado.releaseTime - now : 0,
+      daysSince: estado.diasDesde,
+      releaseTime: estado.releaseTime
     };
   });
 
   // 2. Identify active Gen 2 released spirits with valid dates
   const releasedGen2 = withTiming.filter(s => !s.unreleased && s.releaseTime > 0 && s.gen === 2);
-  const activeRecent = releasedGen2.filter(s => s.daysSince >= 0 && s.daysSince <= 7);
+  const activeRecent = releasedGen2.filter(s => s.daysSince >= 0 && s.daysSince < DIAS_NOVEDAD);
 
   // 3. Fallback: If no spirits released in the last 7 days, find the latest drop batch date
   let latestBatchTime = 0;
@@ -139,7 +128,7 @@ export function applyBatchNoveltyRules(spritesList) {
 
     // Normal case: We have spirits released in the last 7 days
     if (activeRecent.length > 0) {
-      const isWithin7 = s.daysSince >= 0 && s.daysSince <= 7;
+      const isWithin7 = s.daysSince >= 0 && s.daysSince < DIAS_NOVEDAD;
       return {
         ...s,
         isNew: isWithin7,
@@ -171,10 +160,13 @@ export function useDynamicSprites() {
     try {
       const cached = localStorage.getItem(DYNAMIC_SPRITES_CACHE_KEY);
       if (cached) {
-        const dynamicList = JSON.parse(cached);
+        // La copia solo pisa fichas que el catalogo ya conoce: una fila de una ficha borrada
+        // se pintaba primero y desaparecia al llegar la base (el total subia y bajaba).
+        const dynamicList = filtrarCopiaConfirmada(JSON.parse(cached), ESTATICOS_POR_ID);
         const map = new Map(ALL_SPRITES.map(s => [s.id, s]));
         dynamicList.forEach(item => {
-          const sanitized = sanitizeDynamicItem(item);
+          // La copia del navegador no decide fechas ni novedad: entra sin esas claves.
+          const sanitized = sanitizeDynamicItem(sinEstadoDeLanzamiento(item));
           const baseStatic = map.get(sanitized.id);
           const hasRealCustomAbility = sanitized.ability && 
             sanitized.ability !== 'Concede bonificaciones pasivas.' && 
@@ -197,7 +189,7 @@ export function useDynamicSprites() {
               ? false
               : (sanitized.unreleased !== undefined ? Boolean(sanitized.unreleased) : (baseStatic?.unreleased || false)),
             isNew: sanitized.is_new !== undefined ? Boolean(sanitized.is_new) : (sanitized.isNew !== undefined ? Boolean(sanitized.isNew) : (baseStatic?.isNew || false)),
-            releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate || null,
+            releaseDate: fechaDeLanzamiento(baseStatic, sanitized),
             ability: (hasRealCustomAbility ? sanitized.ability : null) || override?.ability || baseStatic?.ability || sanitized.ability || 'Concede bonificaciones pasivas.',
             specialPerk: (sanitized.variant === 'Basic' || sanitized.variant === 'Base')
               ? ''
@@ -208,7 +200,7 @@ export function useDynamicSprites() {
         return applyBatchNoveltyRules(Array.from(map.values()));
       }
     } catch {}
-    return applyBatchNoveltyRules(ALL_SPRITES.map(evaluateReleaseStatus));
+    return applyBatchNoveltyRules(ALL_SPRITES.map((s) => evaluateReleaseStatus(s)));
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -220,11 +212,13 @@ export function useDynamicSprites() {
     try {
       const cached = localStorage.getItem(DYNAMIC_SPRITES_CACHE_KEY);
       if (cached) {
-        const dynamicList = JSON.parse(cached);
+        // Misma regla al releer: la copia solo pisa fichas que el catalogo ya conoce.
+        const dynamicList = filtrarCopiaConfirmada(JSON.parse(cached), ESTATICOS_POR_ID);
         setSprites(() => {
           const map = new Map(ALL_SPRITES.map(s => [s.id, s]));
           dynamicList.forEach(item => {
-            const sanitized = sanitizeDynamicItem(item);
+            // La copia del navegador no decide fechas ni novedad: entra sin esas claves.
+            const sanitized = sanitizeDynamicItem(sinEstadoDeLanzamiento(item));
             const baseStatic = map.get(sanitized.id);
             const hasRealCustomAbility = sanitized.ability && 
               sanitized.ability !== 'Concede bonificaciones pasivas.' && 
@@ -270,7 +264,13 @@ export function useDynamicSprites() {
 
       if (data && data.length > 0) {
         setCustomSpiritsCount(data.length);
-        localStorage.setItem(DYNAMIC_SPRITES_CACHE_KEY, JSON.stringify(data));
+        // La cache existe para pintar rapido, pero NO para decidir fechas ni novedad: eso lo
+        // manda el catalogo y, cuando la consulta llega, la base. Una copia vieja con una fecha
+        // futura o un is_new apagado ocultaba fichas publicadas y apagaba los "Nuevos" hasta
+        // que la consulta se resolvia; si la consulta fallaba, se quedaba asi toda la sesion.
+        // La misma lista de claves que se quita al leer: una sola regla para la copia.
+        const paraCache = data.map(sinEstadoDeLanzamiento);
+        localStorage.setItem(DYNAMIC_SPRITES_CACHE_KEY, JSON.stringify(paraCache));
 
         setSprites(() => {
           const map = new Map(ALL_SPRITES.map(s => [s.id, s]));
@@ -313,8 +313,8 @@ export function useDynamicSprites() {
               unreleased: (baseStatic && baseStatic.unreleased === false)
                 ? false
                 : (sanitized.unreleased !== undefined ? Boolean(sanitized.unreleased) : (baseStatic?.unreleased || false)),
-              release_date: sanitized.release_date || baseStatic?.release_date || baseStatic?.releaseDate,
-              releaseDate: sanitized.releaseDate || sanitized.release_date || baseStatic?.releaseDate,
+              release_date: fechaDeLanzamiento(baseStatic, sanitized),
+              releaseDate: fechaDeLanzamiento(baseStatic, sanitized),
               isNew: sanitized.is_new !== undefined ? Boolean(sanitized.is_new) : (sanitized.isNew !== undefined ? Boolean(sanitized.isNew) : (baseStatic?.isNew || false)),
               is_new: sanitized.is_new !== undefined ? Boolean(sanitized.is_new) : (sanitized.isNew !== undefined ? Boolean(sanitized.isNew) : (baseStatic?.isNew || false))
             };
@@ -353,7 +353,7 @@ export function useDynamicSprites() {
 
     // Interval to check automatic scheduled releases every 30 seconds
     const interval = setInterval(() => {
-      setSprites(prev => applyBatchNoveltyRules(prev.map(evaluateReleaseStatus)));
+      setSprites(prev => applyBatchNoveltyRules(prev.map((s) => evaluateReleaseStatus(s))));
     }, 30000);
 
     return () => {

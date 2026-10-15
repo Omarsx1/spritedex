@@ -200,14 +200,6 @@
     "isNew": false
   },
   {
-    "id": "duck_holofoil",
-    "name": "Holofoil Duck",
-    "theme": "Holofoil",
-    "rarity": "Special",
-    "unreleased": true,
-    "isNew": false
-  },
-  {
     "id": "duck_gem",
     "name": "Gem Duck",
     "theme": "Gem",
@@ -568,22 +560,6 @@
     "isNew": false
   },
   {
-    "id": "fishy_holofoil",
-    "name": "Holofoil Fishy",
-    "theme": "Holofoil",
-    "rarity": "Special",
-    "unreleased": true,
-    "isNew": false
-  },
-  {
-    "id": "fishy_gem",
-    "name": "Gem Fishy",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true,
-    "isNew": false
-  },
-  {
     "id": "striker_basic",
     "name": "Striker",
     "theme": "Basic",
@@ -616,27 +592,11 @@
     "isNew": false
   },
   {
-    "id": "striker_rift",
-    "name": "Cube Striker",
-    "theme": "Cube",
-    "rarity": "Special",
-    "unreleased": true,
-    "isNew": false
-  },
-  {
     "id": "striker_holofoil",
     "name": "Holofoil Striker",
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "striker_gem",
-    "name": "Gem Striker",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true,
     "isNew": false
   },
   {
@@ -669,14 +629,6 @@
     "theme": "Galaxy",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "aura_holofoil",
-    "name": "Holofoil Aura",
-    "theme": "Holofoil",
-    "rarity": "Special",
-    "unreleased": true,
     "isNew": false
   },
   {
@@ -725,14 +677,6 @@
     "theme": "Cube",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "boss_holofoil",
-    "name": "Holofoil Boss",
-    "theme": "Holofoil",
-    "rarity": "Special",
-    "unreleased": true,
     "isNew": false
   },
   {
@@ -840,14 +784,6 @@
     "isNew": false
   },
   {
-    "id": "air_gem",
-    "name": "Gem Air",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true,
-    "isNew": false
-  },
-  {
     "id": "seven_basic",
     "name": "Seven",
     "theme": "Basic",
@@ -885,14 +821,6 @@
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "seven_gem",
-    "name": "Gem Seven",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true,
     "isNew": false
   },
   {
@@ -941,14 +869,6 @@
     "theme": "Holofoil",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": false
-  },
-  {
-    "id": "batman_gem",
-    "name": "Gem Batman",
-    "theme": "Gem",
-    "rarity": "Special",
-    "unreleased": true,
     "isNew": false
   },
   {
@@ -1069,7 +989,7 @@
     "theme": "Basic",
     "rarity": "Epic",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -1079,7 +999,7 @@
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -1089,7 +1009,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -1099,7 +1019,7 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -1109,7 +1029,7 @@
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -1118,10 +1038,11 @@
     "name": "Mapache Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "jonesy_basic",
@@ -1175,10 +1096,23 @@
     "name": "Jonesy Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "jonesy_quack",
+    "name": "Jonesy Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Quack Jonesy",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
   },
   {
     "id": "adventure_basic",
@@ -1232,10 +1166,23 @@
     "name": "Aventurero Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "adventure_quack",
+    "name": "Aventurero Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Quack Adventure",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
   },
   {
     "id": "bush_basic",
@@ -1289,10 +1236,23 @@
     "name": "Arbustín Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "bush_quack",
+    "name": "Arbustín Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Quack Bush",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
   },
   {
     "id": "sonic_basic",
@@ -1346,10 +1306,11 @@
     "name": "Sonic Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "tails_basic",
@@ -1403,10 +1364,11 @@
     "name": "Tails Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "shadow_basic",
@@ -1460,10 +1422,11 @@
     "name": "Shadow Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "8bit_basic",
@@ -1517,10 +1480,11 @@
     "name": "8-Bit Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "jackrabbit_basic",
@@ -1574,10 +1538,11 @@
     "name": "Jackrabbit Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "crown_basic",
@@ -1632,7 +1597,7 @@
     "theme": "Trick or Treat",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -1688,10 +1653,11 @@
     "name": "Killswitch Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "klombo_basic",
@@ -1745,10 +1711,23 @@
     "name": "Klombo Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "klombo_quack",
+    "name": "Klombo Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Quack Klombo",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
   },
   {
     "id": "megaman_basic",
@@ -1815,10 +1794,11 @@
     "name": "Protector Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "pond_basic",
@@ -1875,10 +1855,11 @@
     "name": "Estanque Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "xray_basic",
@@ -1935,10 +1916,11 @@
     "name": "Rayos X Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "onigiri_basic",
@@ -1995,10 +1977,11 @@
     "name": "Onigiri Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "stormscout_basic",
@@ -2055,10 +2038,11 @@
     "name": "Exploratormentas Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "blinky_basic",
@@ -2115,10 +2099,11 @@
     "name": "Blinky Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "birthday_basic",
@@ -2180,10 +2165,11 @@
     "name": "Pastel de Cumpleaños Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "crash_basic",
@@ -2240,10 +2226,11 @@
     "name": "Crash Bandicoot Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "morgana_basic",
@@ -2300,10 +2287,11 @@
     "name": "Morgana Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "spookydash_basic",
@@ -2311,7 +2299,7 @@
     "theme": "Basic",
     "rarity": "Mythic",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2321,7 +2309,7 @@
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2331,7 +2319,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2341,7 +2329,7 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2351,7 +2339,7 @@
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2360,10 +2348,23 @@
     "name": "Impulso aterrador Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "spookydash_quack",
+    "name": "Impulso aterrador Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Quack Spooky Dash",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
   },
   {
     "id": "deer_basic",
@@ -2371,7 +2372,7 @@
     "theme": "Basic",
     "rarity": "Legendary",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2381,7 +2382,7 @@
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2391,7 +2392,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2401,7 +2402,7 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2411,7 +2412,7 @@
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2420,10 +2421,11 @@
     "name": "El Ciervo Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "vampire_basic",
@@ -2431,7 +2433,7 @@
     "theme": "Basic",
     "rarity": "Legendary",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2441,7 +2443,7 @@
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2451,7 +2453,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2461,7 +2463,7 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2471,7 +2473,7 @@
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 2,
     "releaseDate": "2026-10-01"
   },
@@ -2480,9 +2482,154 @@
     "name": "Vampiro Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
-    "unreleased": true,
+    "unreleased": false,
     "isNew": false,
     "gen": 2,
-    "releaseDate": "2026-10-01"
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "honey_basic",
+    "name": "Miel",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Honey",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "honey_gold",
+    "name": "Miel Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Gold Honey",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "honey_cheat",
+    "name": "Miel Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Cheat Master Honey",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "honey_hacker",
+    "name": "Miel Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Loot Hacker Honey",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "honey_bounty",
+    "name": "Miel Cazarrecompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Bounty Hunter Honey",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "honey_treat",
+    "name": "Miel Dulce o Truco",
+    "theme": "Trick or Treat",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Trick or Treat Honey",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "obsession_basic",
+    "name": "Obsesión",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Obsession",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "obsession_gold",
+    "name": "Obsesión Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Gold Obsession",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "obsession_cheat",
+    "name": "Obsesión Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Cheat Master Obsession",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "obsession_hacker",
+    "name": "Obsesión Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Loot Hacker Obsession",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "obsession_bounty",
+    "name": "Obsesión Cazarrecompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Bounty Hunter Obsession",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
+    "id": "obsession_treat",
+    "name": "Obsesión Dulce o Truco",
+    "theme": "Trick or Treat",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Trick or Treat Obsession",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
   }
 ]

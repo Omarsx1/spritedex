@@ -1,4 +1,6 @@
 import officialSpritesJson from './official_sprites.json';
+import { FAMILY_NAMES_MAP, THEME_NAMES_ES } from './nombresEspiritus.js';
+import { estadoLanzamiento } from '../utils/lanzamiento.js';
 import fortniteGgJson from './fortnite_gg_index.json';
 
 // Miniaturas WebP para tarjetas, generadas por scripts/generate_sprite_thumbs.js.
@@ -170,6 +172,20 @@ export const ELEMENTAL_STYLES = {
 // saturado. Acerca CARD_BORDER_ALPHA a 1 para recuperar el color original.
 const CARD_BORDER_ALPHA = 0.45;
 
+/**
+ * El MISMO color del tema, pero con alfa bajo, para tenirlo por DENTRO de la ficha.
+ *
+ * El borde de la ficha ya usa el color del tema, pero su alfa esta pensada para una linea:
+ * usarla tal cual en un glow interior de 26px lo deja sucio. Esta version mantiene el tono
+ * (es lo que pide el diseno: que una carta maxeada siga leyendose de su color) con la
+ * intensidad de un resplandor suave.
+ */
+export function tinteInterior(color, alpha = 0.16) {
+  const match = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(String(color));
+  if (!match) return color;
+  return 'rgba(' + match[1] + ', ' + match[2] + ', ' + match[3] + ', ' + alpha + ')';
+}
+
 function softenBorderColor(color) {
   if (typeof color !== 'string') return color;
   const match = /^#([0-9a-fA-F]{6})$/.exec(color.trim());
@@ -218,26 +234,7 @@ export function getSpriteCardStyle(sprite) {
   return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: softenBorderColor('#00afff') };
 }
 
-export const THEME_NAMES_ES = {
-  Basic: 'Básico',
-  Gold: 'Dorado',
-  Cheatmaster: 'Hacker',
-  'Cheat Master': 'Hacker',
-  'Loot Hacker': 'Hacker de Botín',
-  'LootHacker': 'Hacker de Botín',
-  'Bounty Hunter': 'Cazarrecompensas',
-  'BountyHunter': 'Cazarrecompensas',
-  reaper: 'Cazarrecompensas',
-  'Trick or Treat': 'Dulce o Truco',
-  tricktreat: 'Dulce o Truco',
-  Candy: 'Gomita',
-  Gummy: 'Gomita',
-  Galaxy: 'Galáctico',
-  Holofoil: 'Holográfico',
-  Cube: 'Cúbico',
-  Gem: 'Gema',
-  Quack: 'Patito'
-};
+export { THEME_NAMES_ES } from './nombresEspiritus.js';
 
 export const THEME_NAMES_EN = {
   Basic: 'Basic',
@@ -263,59 +260,7 @@ export const THEME_NAMES_EN = {
 export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
 export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
 
-export const FAMILY_NAMES_MAP = {
-  water: 'Agua',
-  earth: 'Tierra',
-  fire: 'Fuego',
-  air: 'Aire',
-  duck: 'Pato',
-  ghost: 'Fantasma',
-  dream: 'Dormilón',
-  demon: 'Demonio',
-  punk: 'Punk',
-  king: 'Monarca',
-  zeropoint: 'Punto Cero',
-  theburntpeanut: 'Cacahuate',
-  fishy: 'Pescado',
-  striker: 'Pelotero',
-  aura: 'Aura',
-  boss: 'Jefe',
-  grim: 'Parca',
-  seven: 'Siete',
-  batman: 'Batman',
-  pollo: 'Pollo',
-  vini: 'Vini Jr.',
-  wick: 'John Wick',
-  peely: 'Bananín',
-  llama: 'Llama',
-  ironmouse: 'La niña',
-  // Gen 2
-  klombo: 'Klombo',
-  crown: 'Victorioso',
-  jackrabbit: 'Jackrabbit',
-  sonic: 'Sonic',
-  shadow: 'Shadow',
-  tails: 'Tails',
-  killswitch: 'Killswitch',
-  bush: 'Arbustín',
-  adventure: 'Aventurero',
-  jonesy: 'Jonesy',
-  '8bit': '8-Bit',
-  stormscout: 'Exploratormentas',
-  overshield: 'Protector',
-  onigiri: 'Onigiri',
-  xray: 'Rayos X',
-  megaman: 'Megaman',
-  crash: 'Crash Bandicoot',
-  morgana: 'Morgana',
-  blinky: 'Blinky',
-  birthday: 'Pastel de Cumpleaños',
-  pond: 'Estanque',
-  spookydash: 'Impulso aterrador',
-  vampire: 'Vampiro',
-  deer: 'El Ciervo',
-  dumpsterdive: 'Mapache'
-};
+export { FAMILY_NAMES_MAP } from './nombresEspiritus.js';
 
 const CROSSOVER_KEYS = ['batman', 'wick', 'vini', 'pollo', 'theburntpeanut', 'ironmouse', 'sonic', 'shadow', 'tails', 'megaman', 'crash', 'morgana', 'blinky'];
 
@@ -355,7 +300,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   klombo_loothacker: {
     ability: 'Otorga objetos aleatorios en cada nivel y solo sube de nivel al consumir objetos. ¡La calidad de los objetos aumenta con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Jackrabbit
@@ -373,7 +317,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   jackrabbit_loothacker: {
     ability: '(Activa - Salto en el aire) Salto doble. ¡El tiempo de recarga entre saltos disminuye con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Shadow
@@ -391,7 +334,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   shadow_loothacker: {
     ability: 'Recarga automáticamente las armas no equipadas a lo largo del tiempo. Recarga el arma equipada al nivel máximo. ¡La recarga automática se vuelve más rápida con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Arbustín
@@ -409,7 +351,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   bush_loothacker: {
     ability: 'Te otorga un arbusto tras cierta duración; obtén un arbusto al realizar una eliminación en el nivel máximo. ¡El tiempo de activación del arbusto disminuye con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Tails
@@ -427,7 +368,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   tails_loothacker: {
     ability: '¡Otorga la habilidad de flotar en el aire con la ayuda de Tails! ¡La velocidad al flotar aumenta con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Killswitch
@@ -446,7 +386,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   killswitch_loothacker: {
     ability: '(Activa - Apuntar en el aire) Entra en tiempo de suspensión en el aire con precisión mejorada. ¡La precisión aumenta con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Aventurero
@@ -464,7 +403,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   adventure_loothacker: {
     ability: '¡Mejora un objeto aleatorio en el inventario del jugador con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Jonesy
@@ -482,7 +420,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   jonesy_loothacker: {
     ability: 'Recupera algo de salud o escudo tras recibir daño después de un breve período. ¡La cantidad curada aumenta con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Sonic
@@ -500,7 +437,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   sonic_loothacker: {
     ability: '¡Hay que ir rápido! ¡Esprinta más rápido con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Victorioso
@@ -518,7 +454,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   crown_loothacker: {
     ability: 'Solo sube de nivel al ganar partidas. Sube de nivel más rápido con victorias con corona. ¡Nuevas variantes desbloqueadas tras dominarlo!',
-    specialPerk: 'Sin confirmar.'
   },
   crown_bountyhunter: {
     ability: 'Solo sube de nivel al ganar partidas. Sube de nivel más rápido con victorias con corona. ¡Nuevas variantes desbloqueadas tras dominarlo!',
@@ -540,7 +475,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   '8bit_loothacker': {
     ability: 'Encuentra una escopeta de 8 bits en tu primer cofre y obtén un multiplicador de puntuación para ella.',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Exploratormentas
@@ -559,7 +493,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   stormscout_loothacker: {
     ability: 'Aplica Sobrecarga tras recibir cierta cantidad de daño de la tormenta. ¡Aumenta la duración de la sobrecarga con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Protector
@@ -578,7 +511,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   overshield_loothacker: {
     ability: 'Otorga sobreescudo, aumentando según el nivel.',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Rayos X
@@ -597,7 +529,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   xray_loothacker: {
     ability: 'Marca periódicamente a los enemigos en un área a tu alrededor. ¡Marca con más frecuencia y en un radio mayor con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Onigiri
@@ -615,7 +546,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   onigiri_loothacker: {
     ability: 'Aplica Sobrecarga tras comer o beber un consumible. ¡La sobrecarga dura más tiempo con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Megaman
@@ -640,7 +570,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   crash_loothacker: {
     ability: 'Otorga un ataque de torbellino en el aire que inflige daño y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!',
-    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
   },
   crash_bountyhunter: {
     ability: 'Otorga un ataque de torbellino en el aire que inflige daño y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!',
@@ -663,7 +592,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   blinky_loothacker: {
     ability: 'Otorga invisibilidad tras recibir daño. ¡La duración de la invisibilidad aumenta con cada subida de nivel!',
-    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
   },
   blinky_bountyhunter: {
     ability: 'Otorga invisibilidad tras recibir daño. ¡La duración de la invisibilidad aumenta con cada subida de nivel!',
@@ -686,7 +614,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   pond_loothacker: {
     ability: 'Permite realizar un supersalto al acumular cargas a lo largo del tiempo, emitiendo una onda de choque al aterrizar. ¡La fuerza del salto aumenta y la recarga disminuye por nivel!',
-    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
   },
   pond_bountyhunter: {
     ability: 'Permite realizar un supersalto al acumular cargas a lo largo del tiempo, emitiendo una onda de choque al aterrizar. ¡La fuerza del salto aumenta y la recarga disminuye por nivel!',
@@ -709,7 +636,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   birthday_loothacker: {
     ability: 'Al abrir cofres o eliminar enemigos, existe la posibilidad de generar porciones de pastel que restauran salud y escudo.',
-    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
   },
   birthday_bountyhunter: {
     ability: 'Al abrir cofres o eliminar enemigos, existe la posibilidad de generar porciones de pastel que restauran salud y escudo.',
@@ -732,7 +658,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   morgana_loothacker: {
     ability: 'Aumenta la efectividad de los objetos de curación consumibles. ¡La efectividad de curación aumenta con cada subida de nivel!',
-    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
   },
   morgana_bountyhunter: {
     ability: 'Aumenta la efectividad de los objetos de curación consumibles. ¡La efectividad de curación aumenta con cada subida de nivel!',
@@ -923,22 +848,12 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     ? (official.summonCost.includes('Polvo') ? official.summonCost : `${official.summonCost} Polvo Estelar`)
     : null;
 
-  // Calculate isNew based on explicit flag or releaseDate (1 week / 7 days window)
+  // Cuando sale el espiritu y cuanto dura lo de "nuevo": una sola regla para toda la app
+  // (utils/lanzamiento.js). Con release_date en el futuro queda PROGRAMADO y no se ve; el dia
+  // que llega su fecha sale solo y es nuevo 7 dias completos.
+  const estado = estadoLanzamiento(item);
   let isNew = item.isNew !== undefined ? Boolean(item.isNew) : false;
-  const relDateVal = item.releaseDate || item.release_date;
-  if (relDateVal) {
-    const relDate = new Date(relDateVal);
-    const now = new Date();
-    const daysSince = (now.getTime() - relDate.getTime()) / (1000 * 60 * 60 * 24);
-    if (daysSince >= 0 && daysSince <= 7) {
-      isNew = true;
-    } else if (daysSince > 7) {
-      isNew = false;
-    }
-  }
-  if (item.unreleased) {
-    isNew = false;
-  }
+  if (estado.releaseTime > 0) isNew = estado.nuevo; // con fecha, la fecha manda
   /* Salida manual de la ventana de novedad: un evento que ya termino no debe
      seguir contando como nuevo solo porque su fecha cae dentro de los 7 dias. */
   if (item.notNew) {
@@ -954,14 +869,14 @@ export const ALL_SPRITES = officialSpritesJson.map((item) => {
     variantDisplayEn: THEME_NAMES_EN[item.theme] || item.theme,
     rarity: finalRarity,
     gen: gen,
-    dropChance: item.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
-    dropChanceDisplay: item.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
-    dropChanceNum: item.unreleased ? 0 : dropChanceNum,
-    unreleased: item.unreleased || false,
+    dropChance: estado.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
+    dropChanceDisplay: estado.unreleased ? '0%' : (official?.dropChance && official.dropChance !== '0%' ? official.dropChance : dropChance),
+    dropChanceNum: estado.unreleased ? 0 : dropChanceNum,
+    unreleased: estado.unreleased,
     isNew: isNew,
     notNew: Boolean(item.notNew),
-    releaseDate: relDateVal || null,
-    release_date: relDateVal || null,
+    releaseDate: (item.releaseDate || item.release_date) || null,
+    release_date: (item.releaseDate || item.release_date) || null,
     image: imagePath,
     thumb: getSpriteThumb(item.id),
     familyId: familyId,

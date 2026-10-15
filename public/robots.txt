@@ -1,12 +1,37 @@
 User-agent: *
 Allow: /
 
-# Portal de administracion: App.jsx lo detecta por estas rutas y por ?studio=true, no por
-# /studio, /override ni /nexus (aquellos prefijos no cubrian /portal-override).
+# Motores de búsqueda y rastreadores de IA bienvenidos (Google, Bing, OpenAI, Perplexity, Claude, Apple)
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Portal de administracion y rutas privadas:
 Disallow: /studio-override
 Disallow: /nexus-core
 Disallow: /portal-override
 Disallow: /*?studio=
 Disallow: /*?portal=
 
+Host: https://spritedex.gg
 Sitemap: https://spritedex.gg/sitemap.xml

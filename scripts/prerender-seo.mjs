@@ -16,6 +16,7 @@ import { htmlPaginaEspiritu, htmlHubEspiritus, rutaEspiritu, rutaHubEspiritus, r
 import { slugDeEspiritu } from '../src/seo/espiritus.js';
 import { htmlGuia, htmlAcerca, htmlNovedades, etiquetasGuia, etiquetasAcerca, etiquetasNovedades } from '../src/seo/contenido.js';
 import { RUTAS_CONTENIDO } from '../src/seo/plantilla.js';
+import { datosGuia } from '../src/seo/guiaDatos.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DIST = path.join(ROOT, 'dist');
@@ -42,7 +43,7 @@ function bloqueHead(entrada) {
     '<title>' + escapar(titulo) + '</title>',
     '<meta name="description" content="' + escapar(descripcion) + '" />',
     '<link rel="canonical" href="' + canonical + '" />',
-    '<meta name="robots" content="index, follow, max-image-preview:large" />',
+    '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />',
     ...alternates.map((a) => '<link rel="alternate" hreflang="' + a.hreflang + '" href="' + a.href + '" />'),
     '<meta property="og:type" content="website" />',
     '<meta property="og:site_name" content="Spritedex" />',
@@ -50,9 +51,11 @@ function bloqueHead(entrada) {
     '<meta property="og:title" content="' + escapar(titulo) + '" />',
     '<meta property="og:description" content="' + escapar(descripcion) + '" />',
     '<meta property="og:image" content="' + IMAGEN_REDES + '" />',
+    '<meta property="og:image:width" content="1200" />',
+    '<meta property="og:image:height" content="630" />',
     '<meta property="og:locale" content="' + locale + '" />',
     alternates.length ? '<meta property="og:locale:alternate" content="' + (lang === 'en' ? 'es_MX' : 'en_US') + '" />' : '',
-    '<meta name="twitter:card" content="summary" />',
+    '<meta name="twitter:card" content="summary_large_image" />',
     '<meta name="twitter:title" content="' + escapar(titulo) + '" />',
     '<meta name="twitter:description" content="' + escapar(descripcion) + '" />',
     '<meta name="twitter:image" content="' + IMAGEN_REDES + '" />',
@@ -124,30 +127,6 @@ function construirFichas(sprites, pickTexto) {
   });
 }
 
-// Numeros reales de la coleccion para la guia: nada inventado, todo contado aqui.
-function datosGuia(sprites) {
-  const cuenta = (clave) => {
-    const mapa = new Map();
-    for (const s of sprites) {
-      const k = s[clave] || '';
-      mapa.set(k, (mapa.get(k) || 0) + 1);
-    }
-    return [...mapa.entries()].map(([nombre, n]) => ({ nombre, n })).sort((a, b) => b.n - a.n);
-  };
-  const numeros = sprites
-    .map((s) => Number(String(s.dropChanceDisplay || '').replace('%', '').replace(',', '.')))
-    .filter((n) => Number.isFinite(n) && n > 0);
-  return {
-    total: sprites.length,
-    familias: new Set(sprites.map((s) => s.familyId)).size,
-    porRareza: cuenta('rarity'),
-    costos: new Set(sprites.map((s) => s.summonCost).filter(Boolean)).size,
-    dropMin: numeros.length ? Math.min(...numeros) : 0,
-    dropMax: numeros.length ? Math.max(...numeros) : 0,
-    fecha: new Date().toISOString().slice(0, 10)
-  };
-}
-
 function ultimosEspiritus(fichas) {
   return fichas
     .filter((f) => f.lanzamiento)
@@ -158,6 +137,7 @@ function ultimosEspiritus(fichas) {
 }
 
 function sitemap(extras = []) {
+  const hoy = new Date().toISOString().slice(0, 10);
   const filas = [];
   for (const entrada of RUTAS) {
     const multilingue = entrada.idiomas.length > 1;
@@ -167,6 +147,7 @@ function sitemap(extras = []) {
       filas.push([
         '  <url>',
         '    <loc>' + loc + '</loc>',
+        '    <lastmod>' + hoy + '</lastmod>',
         ...alternates.map((a) => '    <xhtml:link rel="alternate" hreflang="' + a.hreflang + '" href="' + a.href + '" />'),
         '    <changefreq>' + entrada.frecuencia + '</changefreq>',
         '    <priority>' + entrada.prioridad.toFixed(1) + '</priority>',
@@ -178,15 +159,22 @@ function sitemap(extras = []) {
     filas.push([
       '  <url>',
       '    <loc>' + extra.loc + '</loc>',
+      '    <lastmod>' + (extra.lastmod || hoy) + '</lastmod>',
       ...extra.alternates.map((a) => '    <xhtml:link rel="alternate" hreflang="' + a.hreflang + '" href="' + a.href + '" />'),
       '    <changefreq>' + extra.frecuencia + '</changefreq>',
       '    <priority>' + extra.prioridad.toFixed(1) + '</priority>',
+      ...(extra.imagen ? [
+        '    <image:image>',
+        '      <image:loc>' + extra.imagen.loc + '</image:loc>',
+        '      <image:title>' + escapar(extra.imagen.titulo) + '</image:title>',
+        '    </image:image>'
+      ] : []),
       '  </url>'
     ].join('\n'));
   }
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
     ...filas,
     '</urlset>',
     ''
@@ -221,13 +209,21 @@ async function main() {
   const fichas = construirFichas(sprites, pickTexto);
   const extras = [];
   let paginas = 0;
+  const hoy = new Date().toISOString().slice(0, 10);
   for (const ficha of fichas) {
     for (const lang of ['es', 'en']) {
       const ruta = rutaConIdiomaEspiritu(rutaEspiritu(ficha.id), lang);
       const destino = path.join(DIST, ruta.slice(1), 'index.html');
       fs.mkdirSync(path.dirname(destino), { recursive: true });
       fs.writeFileSync(destino, htmlPaginaEspiritu(ficha, lang));
-      extras.push({ loc: canonicalEspiritu(ficha.id, lang), alternates: alternatesDeEspiritu(ficha.id), frecuencia: 'monthly', prioridad: 0.5 });
+      extras.push({
+        loc: canonicalEspiritu(ficha.id, lang),
+        alternates: alternatesDeEspiritu(ficha.id),
+        frecuencia: 'monthly',
+        prioridad: 0.5,
+        lastmod: ficha.lanzamiento ? String(ficha.lanzamiento).slice(0, 10) : hoy,
+        imagen: ficha.thumb ? { loc: SITIO + ficha.thumb, titulo: ficha[lang].nombre } : null
+      });
       paginas++;
     }
   }

@@ -1,0 +1,60 @@
+# Spritedex — Comprehensive Knowledge Base for LLMs & AI Agents
+
+Spritedex (https://spritedex.gg/) is the definitive community tracker, database, and encyclopedia for Fortnite Chapter 7 Sprites (Espíritus).
+
+## 1. What are Fortnite Sprites?
+In Fortnite Chapter 7, "Sprites" (Espíritus in Spanish) are collectibles and companion entities that players find and summon on the battle island. 
+
+### Key Characteristics
+- **Functionality**: Sprites provide passive combat and utility bonuses (e.g., bonus shields, double jumps, weapon auto-reload, radar scanning, or resource harvesting boosts).
+- **Mastery System**: Sprites feature a leveling system ranging from Level 1 to Level 5. As players master a Sprite, its effects and passive traits scale upwards.
+- **Rarity Hierarchy**: Common, Rare, Epic, Legendary, Mythic, and Special.
+- **Drop Chances & Spawns**: Drop chances vary by rarity and variant from over 5% down to less than 0.01% for mythic and secret variants. Sprites spawn in Sprite Chests, Extraction Zones, and designated POI locations.
+- **Summon Cost**: Summoning sprites in-game requires Stardust (Polvo Estelar).
+
+## 2. Sprite Families & Variants
+Spritedex indexes all known sprites organized by generation and family:
+- **Core Elements**: Water, Earth, Fire, Air.
+- **Characters & Collaborations**: Peely, Fishstick, Batman, Jonesy, Sonic, Tails, Shadow, Klombo, Mega Man, Crash Bandicoot, John Wick, Vini Jr., Ironmouse, Morgana.
+- **Variant Finishes**:
+  - Base / Basic
+  - Gold
+  - Gummy
+  - Galaxy
+  - Holofoil
+  - Cube
+  - Gem
+  - Cheat Master
+  - Loot Hacker
+  - Bounty Hunter
+  - Trick or Treat (Fortnitemares event)
+
+## 3. Spritedex Features
+- **Collection Checklist**: Real-time tracker storing owned items, skipped items, and levels 1–5.
+- **Zero-Friction Privacy**: Works 100% offline via local storage; no login or signup mandatory.
+- **Cloud Sync**: Optional cloud synchronization via Supabase authentication.
+- **Friend Code Comparison (`SDEX-XXXX`)**: Compare collections directly against friends to determine who has what and identify trade opportunities.
+- **Canvas Infographics & Social Sharing**: Generate shareable social cards formatted for Discord, Twitter, and TikTok with integrated QR codes.
+- **Bilingual Support**: Fully localized in Spanish (`es`) and English (`en`).
+
+## 4. Canonical Site Architecture & Endpoints
+- Homepage (ES): `https://spritedex.gg/`
+- Homepage (EN): `https://spritedex.gg/en`
+- Sprites Hub: `https://spritedex.gg/espiritus` (EN: `https://spritedex.gg/en/espiritus`)
+- Individual Sprite Pages: `https://spritedex.gg/espiritu/[sprite-id-slug]` (EN: `https://spritedex.gg/en/espiritu/[sprite-id-slug]`)
+- Mechanics Guide & FAQ: `https://spritedex.gg/guia-espiritus` (EN: `https://spritedex.gg/en/guia-espiritus`)
+- Updates & Patch Additions: `https://spritedex.gg/novedades` (EN: `https://spritedex.gg/en/novedades`)
+- About & Methodology: `https://spritedex.gg/acerca` (EN: `https://spritedex.gg/en/acerca`)
+- Privacy Policy: `https://spritedex.gg/privacidad`
+- Friend Comparison: `https://spritedex.gg/amigos` (EN: `https://spritedex.gg/en/amigos`)
+
+## 5. Frequently Asked Questions (FAQ)
+
+### How do I complete my Fortnite Sprite collection?
+Open Spritedex (https://spritedex.gg/), tap each sprite card to mark it as owned, and adjust its level (1-5). Use the "Filtros" bar to view remaining needed variants and share your friend code (`SDEX-XXXX`) to find trade partners.
+
+### What is the rarest Sprite in Fortnite?
+Mythic and special event variants, such as Crown, Zero Point, and Golden collaboration variants, have drop rates below 0.01% in standard chests.
+
+### Is Spritedex affiliated with Epic Games?
+No. Spritedex is a fan-created utility and open catalog. Fortnite is a registered trademark of Epic Games, Inc.

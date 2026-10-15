@@ -25,29 +25,29 @@ test('el mapa siempre es arte real, nunca un placeholder vectorial', () => {
   assert.deepEqual(svg, [], 'el mapa no debe apuntar a .svg: ' + JSON.stringify(svg));
 });
 
-test('un id con arte bajo otro nombre resuelve al archivo real', () => {
-  assert.equal(rutaArteCanonica('peely_candy'), '/sprites/peely_gummy.webp');
-  assert.equal(rutaArteCanonica('llama_candy'), '/sprites/llama_gummy.webp');
-  assert.equal(rutaArteCanonica('water_quack'), '/sprites/water_duck.webp');
-  assert.equal(rutaArteCanonica('fire_quack'), '/sprites/fire_duck.webp');
+test('cada id resuelve a su propio archivo: ya no hay nombres alternativos', () => {
+  // Los seis que quedaban (peely_candy, llama_candy y los cuatro *_quack) se bajaron con su
+  // id correcto y se borraron los archivos viejos. Una tabla aparte era lo que hacia que el
+  // sync volviera a bajar arte que ya estaba.
+  for (const id of ['peely_candy', 'llama_candy', 'water_quack', 'fire_quack', 'earth_quack', 'zeropoint_quack']) {
+    assert.equal(rutaArteCanonica(id), '/sprites/' + id + '.webp');
+  }
+});
+
+test('el mapa no apunta a ningun nombre distinto del id', () => {
+  const alternativos = Object.entries(WEBP_MAP).filter(([id, ruta]) => ruta !== '/sprites/' + id + '.webp');
+  assert.deepEqual(alternativos, [], 'rutas con nombre alternativo: ' + JSON.stringify(alternativos));
 });
 
 test('un espiritu normal resuelve a su propio webp', () => {
   assert.equal(rutaArteCanonica('vampire_basic'), '/sprites/vampire_basic.webp');
 });
 
-test('un placeholder sin arte real resuelve al svg, y ese svg existe', () => {
-  for (const id of ['air_gem', 'aura_holofoil', 'batman_gem', 'duck_holofoil']) {
-    assert.equal(rutaArteCanonica(id), DIRECTORIO_ARTE + id + '.svg');
-    assert.ok(fs.existsSync(path.join(RAIZ_PUBLICA, 'sprites', id + '.svg')), 'falta el placeholder de ' + id);
-  }
-});
-
-test('peely_candy tiene arte real por el mapa, asi que el mapa manda sobre el placeholder', () => {
-  // Sigue en ART_VECTORIAL como red para las rutas que no leen el mapa (rutaAssetEspiritu),
-  // pero la ruta canonica, la que pide la app, es la real.
-  assert.ok(ART_VECTORIAL.has('peely_candy'));
-  assert.equal(rutaArteCanonica('peely_candy'), '/sprites/peely_gummy.webp');
+test('ningun espiritu depende ya de un placeholder vectorial', () => {
+  // El ultimo era peely_candy, que ya tiene su arte real. Los otros cuatro (Gem Air, Holofoil
+  // Aura, Gem Batman, Holofoil Duck) no existen en el juego y salieron del catalogo. La lista
+  // se queda vacia como red para el proximo espiritu que salga sin arte.
+  assert.deepEqual([...ART_VECTORIAL], []);
 });
 
 test('para todo placeholder, el archivo que pide la app existe', () => {
@@ -58,9 +58,8 @@ test('para todo placeholder, el archivo que pide la app existe', () => {
 });
 
 test('el nombre de archivo canonico es el que el sync tiene que mirar en disco', () => {
-  assert.equal(archivoArteCanonico('peely_candy'), 'peely_gummy.webp');
+  assert.equal(archivoArteCanonico('peely_candy'), 'peely_candy.webp');
   assert.equal(archivoArteCanonico('vampire_basic'), 'vampire_basic.webp');
-  assert.equal(archivoArteCanonico('air_gem'), 'air_gem.svg');
 });
 
 test('sin id no se inventa ruta', () => {

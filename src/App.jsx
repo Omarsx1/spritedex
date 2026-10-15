@@ -19,10 +19,9 @@ import { SpriteDetailModal } from './components/SpriteDetailModal';
 import { PrivacyNotice } from './components/PrivacyNotice';
 import { ClaimAccountBanner } from './components/ClaimAccountBanner';
 import { InstallPrompt } from './components/InstallPrompt';
-import { Footer } from './components/Footer';
 import { FriendsPage } from './components/FriendsPage';
+import { GuiaPage } from './components/GuiaPage';
 import { MobileSpriteSwiper } from './components/MobileSpriteSwiper';
-import { FortnitemaresTransition } from './components/FortnitemaresTransition';
 import { applySeasonalTheme, isFortnitemaresActive, subscribeSeasonalState } from './config/seasonalEvent';
 import { useIsMobile } from './hooks/useIsMobile';
 import { useDynamicSprites } from './hooks/useDynamicSprites';
@@ -33,6 +32,7 @@ import { fetchCollectionByShareToken } from './utils/friendCode';
 import { getSupabase, warmSupabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from './utils/supabase';
 import { conGoogle } from './utils/authActions';
 import { mergeCollections, sinPerfil } from './utils/mergeCollections';
+import { debeRefrescarAlVolver, mismoEstado } from './utils/syncPolicy';
 import { estadoAlTocarNivel } from './utils/niveles';
 import { setSyncSession, queueCloudSync, clearCloudSync, flushCloudSync } from './utils/pendingSync';
 import { safeStorage } from './utils/safeStorage';
@@ -49,8 +49,10 @@ import {
 import { buildShareUrl } from './utils/shareUrl';
 import { getLang, conIdioma, rutaSinIdioma } from './i18n';
 import { aplicarSeoRuta } from './seo/head.js';
+import { etiquetasGuia } from './seo/contenido.js';
 import { espirituDeEnlace } from './utils/enlaceEspiritu.js';
 import { codigoFichaEnRuta } from './utils/visitaEnlace';
+import { esRutaGuia } from './utils/rutaGuia.js';
 import { codigoNormalizado } from './utils/fichaAmigo';
 import { isDeadSessionError } from './utils/deadSession';
 import { useFriendRequests } from './hooks/useFriendRequests';
@@ -66,9 +68,49 @@ const AdminLayout = lazy(() => import('./components/admin/AdminLayout').then(m =
 const AdminAuthGate = lazy(() => import('./components/admin/AdminAuthGate').then(m => ({ default: m.AdminAuthGate })));
 const SharePage = lazy(() => import('./components/SharePage').then(m => ({ default: m.SharePage })));
 const BackupModal = lazy(() => import('./components/BackupModal').then(m => ({ default: m.BackupModal })));
-const FriendCompareModal = lazy(() => import('./components/FriendCompareModal').then(m => ({ default: m.FriendCompareModal })));
 const AuthModal = lazy(() => import('./components/AuthModal').then(m => ({ default: m.AuthModal })));
 const PrivacyPolicyModal = lazy(() => import('./components/PrivacyPolicyModal').then(m => ({ default: m.PrivacyPolicyModal })));
+
+// El <head> de la guia de espiritus, dentro de la aplicacion.
+//
+// aplicarSeoRuta resuelve las etiquetas con la tabla de rutas indexables (src/seo/rutas.js), y
+// la guia no esta ahi: su respaldo la resolveria como la home y le pondria SU titulo, SU
+// canonical y noindex. Sus etiquetas salen del mismo modulo que las escribe el build en el
+// HTML estatico (etiquetasGuia, src/seo/contenido.js) y se aplican encima de las compartidas
+// (imagen social, locale, idioma del documento), asi que ningun titulo se repite aqui.
+function aplicarSeoGuia(lang) {
+  if (typeof document === 'undefined') return;
+  const { titulo, descripcion, canonical, alternates } = etiquetasGuia(lang);
+  const ponerMeta = (atributo, clave, contenido) => {
+    let nodo = document.head.querySelector('meta[' + atributo + '="' + clave + '"]');
+    if (!nodo) {
+      nodo = document.createElement('meta');
+      nodo.setAttribute(atributo, clave);
+      document.head.appendChild(nodo);
+    }
+    nodo.setAttribute('content', contenido);
+  };
+  document.title = titulo;
+  ponerMeta('name', 'description', descripcion);
+  ponerMeta('property', 'og:url', canonical);
+  ponerMeta('property', 'og:title', titulo);
+  ponerMeta('property', 'og:description', descripcion);
+  ponerMeta('name', 'twitter:title', titulo);
+  ponerMeta('name', 'twitter:description', descripcion);
+  const enlace = document.head.querySelector('link[rel="canonical"]');
+  if (enlace) enlace.setAttribute('href', canonical);
+  document.head.querySelectorAll('link[rel="alternate"][hreflang]').forEach((nodo) => nodo.remove());
+  for (const alt of alternates) {
+    const nodo = document.createElement('link');
+    nodo.rel = 'alternate';
+    nodo.hreflang = alt.hreflang;
+    nodo.href = alt.href;
+    document.head.appendChild(nodo);
+  }
+  // La guia si se indexa: fuera el noindex que deja el respaldo de la home.
+  const robots = document.head.querySelector('meta[name="robots"]');
+  if (robots) robots.remove();
+}
 
 const LOCAL_STORAGE_KEY = 'fortnite_sprites_pokedex_v3';
 const LOCAL_STATE_UPDATED_KEY = 'spritedex_state_updated_at_v1';
@@ -215,6 +257,15 @@ export function App() {
   // llegar (el reintento del debounce, o dos sincronizaciones a la vez), no se cierra
   // sesion otra vez ni se encadenan identidades nuevas sin parar.
   const deadSessionHandled = useRef(new Set());
+  // Rastreo de existencia de registro previo en user_collections para guardado diferido (Lazy Sync)
+  const hasCloudRecordRef = useRef(false);
+  // Blindaje del arranque (sync en vivo): el primer empuje espera a que termine la primera
+  // lectura de la nube, y despues se garantiza uno aunque el merge no cambie el estado.
+  // Asi un dispositivo con datos viejos no puede pisar la nube con menos de lo que hay.
+  const lecturaInicialLista = useRef(false);
+  // Marca del ultimo pull al volver a la pestana: limita la frecuencia de las lecturas.
+  const ultimoRefrescoRef = useRef(0);
+  const [pushTick, setPushTick] = useState(0);
 
   // Filters matching fortnite.gg. El estado inicial sale de la URL: asi una recarga, un
   // enlace compartido o el boton atras devuelven a la misma generacion y los mismos filtros
@@ -280,8 +331,10 @@ export function App() {
   const rutaApp = rutaSinIdioma(rutaActual);
   const [enAmigos, setEnAmigos] = useState(() => rutaApp.indexOf('/amigos') === 0);
   const [enCompartir, setEnCompartir] = useState(() => rutaApp.indexOf('/compartir') === 0);
+  // La guia vive en la misma ruta en los dos idiomas: la decision es sobre la ruta ya sin el
+  // prefijo, la misma que alimenta al catalogo.
+  const [enGuia, setEnGuia] = useState(() => esRutaGuia(rutaApp));
   const [showBackupModal, setShowBackupModal] = useState(false);
-  const [showCompareModal, setShowCompareModal] = useState(false);
   const [showFooterPrivacyModal, setShowFooterPrivacyModal] = useState(false);
 
   // Update myFriendCode when user logs in
@@ -346,6 +399,24 @@ export function App() {
   // con lo que el usuario está mirando. Ya no hay un temporizador fijo de 1500 ms: el
   // calentamiento arranca con la primera intención (puntero, rueda, teclado) o en el primer hueco
   // de reposo, y solo con la pestaña visible.
+  // Un espiritu que el usuario YA atrapo no puede estar sin lanzar: si lo tiene, existe. Esto
+  // blinda la coleccion frente a una programacion mal puesta (una fecha futura en una ficha que
+  // la gente ya tenia marcada). Sin esta regla la ficha desaparecia de la cuadricula y no dejaba
+  // ni marcarla: el candado de "No lanzado" bloquea el clic.
+  const dynamicSpritesVista = useMemo(() => {
+    if (!Array.isArray(dynamicSprites) || dynamicSprites.length === 0) return dynamicSprites;
+    const estado = activeProfile === 'friend' && friendState ? friendState : userState;
+    let tocado = false;
+    const lista = dynamicSprites.map((s) => {
+      if (s.unreleased && estado[s.id]?.owned) {
+        tocado = true;
+        return { ...s, unreleased: false, isAutoScheduled: false };
+      }
+      return s;
+    });
+    return tocado ? lista : dynamicSprites;
+  }, [dynamicSprites, userState, friendState, activeProfile]);
+
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
 
@@ -375,8 +446,8 @@ export function App() {
         // App ya le pasa allSprites filtrado por activeGen. Precargar el catalogo
         // completo eran ~3 MB en movil compitiendo con la generacion de la captura.
         const preloadList = activeGen === 0
-          ? dynamicSprites
-          : dynamicSprites.filter((s) => s.gen === activeGen);
+          ? dynamicSpritesVista
+          : dynamicSpritesVista.filter((s) => s.gen === activeGen);
         if (preloadList && preloadList.length > 0) {
           // Tandas de 4 (antes 30): el objetivo es que la captura este lista cuando el
           // usuario la abra, no bajar 1,8 MB de golpe mientras se pinta la app.
@@ -407,7 +478,7 @@ export function App() {
       }
       if (idleFallbackTimer !== null) clearTimeout(idleFallbackTimer);
     };
-  }, [dynamicSprites, activeGen]);
+  }, [dynamicSpritesVista, activeGen]);
 
   // Listen to Supabase Auth State & Sync Cloud Data
   useEffect(() => {
@@ -464,12 +535,19 @@ export function App() {
       cancelled = true;
       if (subscription) subscription.unsubscribe();
     };
+    // El arranque corre una sola vez. loadUserCollectionFromCloud se declara mas abajo, asi
+    // que no puede listarse aqui como dependencia: seria usarlo antes de inicializarse.
   }, []);
 
-  const loadUserCollectionFromCloud = async (userId) => {
-    const supabase = await getSupabase();
-    if (!supabase) return;
+  // Estable a proposito (useCallback sin dependencias): la comparten el arranque, el cambio
+  // de sesion y el pull al volver a la pestana. Solo usa setters, refs e imports, asi que no
+  // captura nada que pueda quedar viejo. El finally marca la primera lectura terminada por
+  // CUALQUIER camino de salida (sin fila, con error, con datos).
+  const loadUserCollectionFromCloud = useCallback(async (userId) => {
     try {
+      const supabase = await getSupabase();
+      if (!supabase) return;
+
       const { data, error } = await supabase
         .from('user_collections')
         .select('user_state, friend_code, share_token')
@@ -480,6 +558,8 @@ export function App() {
         console.error('Error fetching cloud collection:', error);
         return;
       }
+
+      hasCloudRecordRef.current = Boolean(data);
 
       if (data?.friend_code) {
         setMyFriendCode(data.friend_code);
@@ -503,8 +583,15 @@ export function App() {
       });
     } catch (err) {
       console.error('Failed to load collection from cloud:', err);
+    } finally {
+      if (!lecturaInicialLista.current) {
+        lecturaInicialLista.current = true;
+        // Con la primera lectura hecha ya se puede empujar. El contador garantiza ese
+        // primer empuje aunque la fusion no llegue a cambiar el estado local.
+        setPushTick((t) => t + 1);
+      }
     }
-  };
+  }, []);
 
   // Vincular con Google directamente desde el menu del invitado, sin abrir la modal.
   const handleLinkGoogle = async () => {
@@ -524,6 +611,7 @@ export function App() {
     } catch {
       // Sin storage no hay copia posible; se sigue limpiando como antes.
     }
+    hasCloudRecordRef.current = false;
     setUserState({});
     safeStorage.removeItem(LOCAL_STORAGE_KEY);
   }, [userState]);
@@ -565,6 +653,10 @@ export function App() {
     // lo cubre el flush con keepalive de mas abajo.
     if (enCompartir) return;
 
+    // El primer empuje espera a que termine la primera lectura: un dispositivo con estado
+    // viejo que escriba antes de leer reemplazaria la nube con menos datos.
+    if (!lecturaInicialLista.current) return;
+
     if (isSupabaseConfigured && user) {
       const timer = setTimeout(async () => {
         try {
@@ -574,6 +666,16 @@ export function App() {
             ? `Entrenador #${myFriendCode.replace('SDEX-', '')}`
             : `Entrenador #${user.id.slice(0, 4).toUpperCase()}`;
           const isAnon = user.is_anonymous || (!user.email && !user.user_metadata?.full_name);
+          const tieneCapturas = Boolean(
+            userState && Object.entries(userState).some(([k, v]) => !k.startsWith('_') && Boolean(v?.owned))
+          );
+
+          // Guardado diferido (Lazy Sync): un visitante anónimo sin capturas y sin registro
+          // previo en la nube no debe escribir en user_collections para evitar crear filas fantasma
+          // generadas por bots, spiders o visitantes casuales.
+          if (isAnon && !tieneCapturas && !hasCloudRecordRef.current) {
+            return;
+          }
 
           let countryCode = '';
           let countryFlag = '';
@@ -622,6 +724,10 @@ export function App() {
             .from('user_collections')
             .upsert(payload, { onConflict: 'user_id' });
 
+          if (!syncError) {
+            hasCloudRecordRef.current = true;
+          }
+
           // Identidad borrada en Supabase (clave foranea contra auth.users) o token ya
           // rechazado: la sesion guardada en el navegador apunta a alguien que ya no
           // existe, asi que cada guardado falla en silencio y el usuario pierde lo que
@@ -644,13 +750,15 @@ export function App() {
         } catch (err) {
           console.error('Failed to sync to Supabase:', err);
         }
-      }, 600);
+      }, 250);
       return () => clearTimeout(timer);
     }
-  }, [userState, user, myFriendCode, enCompartir, handleSignOutCleanup]);
+    // pushTick entra a proposito: cambia cuando termina la primera lectura y garantiza el
+    // primer empuje aunque la fusion no llegue a cambiar el estado.
+  }, [userState, user, myFriendCode, enCompartir, handleSignOutCleanup, pushTick]);
 
   // Salida garantizada: si la pestaña se cierra o pasa a segundo plano con un sync
-  // pendiente, se empuja con keepalive en vez de esperar el debounce de 600 ms.
+  // pendiente, se empuja con keepalive en vez de esperar el debounce de 250 ms.
   useEffect(() => {
     const flush = () => flushCloudSync();
     const onVisibilityChange = () => {
@@ -663,6 +771,86 @@ export function App() {
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, []);
+
+  // Pull al volver: recuperar el foco, volver a la pestana o volver online trae lo que se
+  // marco en otro dispositivo, sin recargar. Con limite de frecuencia para no disparar una
+  // lectura por cada parpadeo de la ventana.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const refrescar = () => {
+      if (!user) return;
+      if (!debeRefrescarAlVolver({
+        haySesion: true,
+        compartiendo: enCompartir,
+        visible: document.visibilityState === 'visible',
+        ahora: Date.now(),
+        ultimoRefresco: ultimoRefrescoRef.current
+      })) return;
+      ultimoRefrescoRef.current = Date.now();
+      loadUserCollectionFromCloud(user.id);
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') refrescar();
+    };
+    window.addEventListener('focus', refrescar);
+    window.addEventListener('online', refrescar);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      window.removeEventListener('focus', refrescar);
+      window.removeEventListener('online', refrescar);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [user, enCompartir, loadUserCollectionFromCloud]);
+
+  // Realtime de la propia fila: cuando esta cuenta cambia en la nube (lo marco el celular),
+  // la web se pone al dia sin recargar. Solo cuentas reales: el invitado no tiene otra
+  // superficie con la misma identidad con la que intercambiar.
+  useEffect(() => {
+    if (!isSupabaseConfigured || !user || user.is_anonymous) return;
+    let channel = null;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const supabase = await getSupabase();
+        if (!supabase || cancelled) return;
+        // El sufijo de tiempo es el mismo patron que subscribeToFriendCollection: sin el,
+        // un cambio de identidad del usuario (por ejemplo TOKEN_REFRESHED) reusaria el
+        // nombre del canal viejo, que todavia se esta cerrando.
+        channel = supabase
+          .channel('realtime-yo-' + user.id.slice(0, 8) + '-' + Date.now())
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'user_collections',
+              filter: 'user_id=eq.' + user.id
+            },
+            (payload) => {
+              const nube = sinPerfil(payload?.new?.user_state);
+              if (!nube || Object.keys(nube).length === 0) return;
+              // La guarda de igualdad corta el eco de la propia escritura: sin ella, cada
+              // upsert volveria a fusionar lo mismo y dispararia otra subida sin fin.
+              setUserState((prev) => {
+                const fusion = mergeCollections(prev, nube);
+                return mismoEstado(prev, fusion) ? prev : fusion;
+              });
+            }
+          )
+          .subscribe();
+      } catch (err) {
+        console.error('Failed to setup Realtime own-row channel:', err);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      if (channel) {
+        getSupabase().then((sb) => sb && sb.removeChannel(channel));
+      }
+    };
+  }, [user]);
 
   const ensureCloudSessionForAction = useCallback(async () => {
     if (user || !isSupabaseConfigured || shouldSkipAnonymousAuth()) return;
@@ -730,7 +918,7 @@ export function App() {
   };
 
   const filteredSprites = useMemo(() => {
-    let result = dynamicSprites.filter((sprite) => {
+    let result = dynamicSpritesVista.filter((sprite) => {
       if (!showUnreleased && sprite.unreleased) return false;
 
       // Filter by Generation (activeGen: 2 = Gen 2, 1 = Gen 1, 0 = All)
@@ -822,7 +1010,7 @@ export function App() {
 
     return result;
   }, [
-    dynamicSprites,
+    dynamicSpritesVista,
     showUnreleased,
     activeGen,
     deferredSearch,
@@ -839,12 +1027,12 @@ export function App() {
   // Se reutiliza como alcance del modal de compartir: al estar memoizada, el modal
   // no se repasa en cada render de la app (en produccion eso pasa con el sync).
   const scopedSprites = useMemo(() => {
-    return dynamicSprites.filter((s) => {
+    return dynamicSpritesVista.filter((s) => {
       if (!showUnreleased && s.unreleased) return false;
       if (activeGen !== 0 && s.gen !== activeGen) return false;
       return true;
     });
- }, [dynamicSprites, activeGen, showUnreleased]);
+ }, [dynamicSpritesVista, activeGen, showUnreleased]);
 
   // Calentador de miniaturas del grid. OJO: va despues de scopedSprites a proposito, porque
   // filteredSprites (su dependencia) es un useMemo declarado mas arriba; antes seria un TDZ.
@@ -856,7 +1044,7 @@ export function App() {
     const elementos = Array.from(grid.querySelectorAll('.sprite-card'));
     const urls = filteredSprites.map((sprite) => sprite.thumb || sprite.image);
     return iniciarCalentador(elementos, urls);
-  }, [dynamicSprites, activeGen, filteredSprites, viewMode]);
+  }, [dynamicSpritesVista, activeGen, filteredSprites, viewMode]);
 
   // Fase 5/T7 (calor en reposo): los bloques que salen del viewport apagan sus animaciones CSS
   // decorativas. Aditivo y reversible: si el observer no corre, todo se ve como siempre.
@@ -957,8 +1145,8 @@ useEffect(() => {
   })();
   const friendLendableCount = friendState ? scopedSprites.filter((s) => friendState[s.id]?.owned && !userState[s.id]?.owned).length : 0;
 
-  // Página de amigos (fase 1): ruta propia para tener espacio de verdad. La modal sigue
-  // viva en paralelo, así nadie pierde el radar mientras migramos.
+  // Página de amigos (fase 1): ruta propia para tener espacio de verdad. Es el único
+  // hogar del radar de amigos: la modal antigua ya no existe.
   // La ruta de la app se lee SIN el prefijo de idioma: /en/amigos y /amigos son la misma pantalla.
 
   useEffect(() => {
@@ -967,6 +1155,7 @@ useEffect(() => {
       const ruta = rutaSinIdioma(window.location.pathname);
       setEnAmigos(ruta.indexOf('/amigos') === 0);
       setEnCompartir(ruta.indexOf('/compartir') === 0);
+      setEnGuia(esRutaGuia(ruta));
     };
     window.addEventListener('popstate', alVolver);
     return () => window.removeEventListener('popstate', alVolver);
@@ -978,7 +1167,8 @@ useEffect(() => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     aplicarSeoRuta(window.location.pathname, { noindex: isAdminPortal });
-  }, [enAmigos, isAdminPortal]);
+    if (enGuia && !isAdminPortal) aplicarSeoGuia(getLang());
+  }, [enAmigos, enGuia, isAdminPortal]);
 
   // Enlace profundo a un espiritu: ?s=<slug> (los CTA de las paginas estaticas) o
   // /espiritu/<slug> (la ruta que ve la app en desarrollo; en produccion la sirve el HTML
@@ -986,11 +1176,11 @@ useEffect(() => {
   const enlaceEspirituResuelto = useRef(false);
   useEffect(() => {
     if (enlaceEspirituResuelto.current || typeof window === 'undefined') return;
-    if (!dynamicSprites || !dynamicSprites.length) return;
+    if (!dynamicSpritesVista || !dynamicSpritesVista.length) return;
     enlaceEspirituResuelto.current = true;
-    const sprite = espirituDeEnlace(window.location.pathname, window.location.search, dynamicSprites);
+    const sprite = espirituDeEnlace(window.location.pathname, window.location.search, dynamicSpritesVista);
     if (sprite) handleOpenDetail(sprite);
-  }, [dynamicSprites, handleOpenDetail]);
+  }, [dynamicSpritesVista, handleOpenDetail]);
 
   // Toda navegacion interna conserva el idioma activo.
   const irA = useCallback((ruta) => {
@@ -998,6 +1188,7 @@ useEffect(() => {
     window.history.pushState({}, '', conIdioma(ruta, getLang()));
     setEnAmigos(ruta.indexOf('/amigos') === 0);
     setEnCompartir(ruta.indexOf('/compartir') === 0);
+    setEnGuia(esRutaGuia(ruta));
   }, []);
 
   // Codigo de amigo que venga en la ruta (/amigos/SDEX-XXXX) o en el enlace actual
@@ -1028,14 +1219,14 @@ useEffect(() => {
     if (shouldSkipAnonymousAuth()) return undefined;
     if (safeStorage.getItem(CLAVE_AVISO_RECLAMO) === 'true') return undefined;
     const hayModalAbierto = Boolean(selectedSprite) || enCompartir || showBackupModal ||
-      showCompareModal || showFooterPrivacyModal || showAuthModal;
+      showFooterPrivacyModal || showAuthModal;
     if (hayModalAbierto) return undefined;
     const timer = setTimeout(() => {
       safeStorage.setItem(CLAVE_AVISO_RECLAMO, 'true');
       setShowAuthModal(true);
     }, AVISO_RECLAMO_RETRASO_MS);
     return () => clearTimeout(timer);
-  }, [mostrarAvisoReclamo, selectedSprite, enCompartir, showBackupModal, showCompareModal, showFooterPrivacyModal, showAuthModal]);
+  }, [mostrarAvisoReclamo, selectedSprite, enCompartir, showBackupModal, showFooterPrivacyModal, showAuthModal]);
 
   // La modal de autenticacion se dibuja en los dos arboles: la pagina de amigos retorna
   // antes de llegar a los modales de la app, y el aviso de reclamo tiene que poder abrirla
@@ -1050,6 +1241,49 @@ useEffect(() => {
       onSignOut={handleSignOutCleanup}
     />
   ) : null;
+
+  // La barra de navegacion se dibuja en la app y en la guia: en una PWA instalada es la unica
+  // salida. Se arma una sola vez para que las dos pantallas no puedan divergir, y lleva irA
+  // para que sus enlaces naveguen dentro de la app.
+  const navbar = (
+    <Navbar
+      user={user}
+      activeGen={activeGen}
+      onGenChange={(newGen) => {
+        setActiveGen(newGen);
+        setBaseFilter('all');
+        setSpriteFilter('all');
+      }}
+      onNavegar={irA}
+      onOpenAuthModal={() => setShowAuthModal(true)}
+      onLinkGoogle={handleLinkGoogle}
+      onOpenBackupModal={() => setShowBackupModal(true)}
+      onSignOut={handleSignOutCleanup}
+      onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
+    />
+  );
+
+  // Los modales se arman una sola vez y se montan en las dos pantallas que llevan la barra
+  // (catalogo y guia): su menu los dispara, asi que dejarlos solo en el catalogo los volvia
+  // inertes en la guia.
+  const modales = (
+    <Suspense fallback={null}>
+      {showBackupModal && (
+        <BackupModal
+          userState={userState}
+          setUserState={setUserState}
+          onClose={() => setShowBackupModal(false)}
+        />
+      )}
+
+      {/* Tambien con sesion anonima: es la unica via para vincular la cuenta. */}
+      {modalAuth}
+
+      {showFooterPrivacyModal && (
+        <PrivacyPolicyModal onClose={() => setShowFooterPrivacyModal(false)} />
+      )}
+    </Suspense>
+  );
 
   if (enCompartir) {
     return (
@@ -1122,9 +1356,21 @@ useEffect(() => {
               irA('/');
             }
           }}
-          onAbrirModal={() => setShowCompareModal(true)}
         />
         <Suspense fallback={null}>{modalAuth}</Suspense>
+      </div>
+    );
+  }
+
+  // La guia de espiritus: la misma que sirve el build en /guia-espiritus, ahora dentro de la
+  // app. Se queda la barra de navegacion (su menu es la vuelta al catalogo) y no se pinta ni
+  // la cabecera ni la rejilla, que son del catalogo.
+  if (enGuia) {
+    return (
+      <div className="app-container">
+        {navbar}
+        <GuiaPage lang={getLang()} />
+        {modales}
       </div>
     );
   }
@@ -1177,23 +1423,10 @@ useEffect(() => {
 
   return (
     <div className="app-container">
-      <FortnitemaresTransition />
       <PrivacyNotice />
       <InstallPrompt />
 
-      <Navbar
-        user={user}
-        activeGen={activeGen}
-        onGenChange={(newGen) => {
-          setActiveGen(newGen);
-          setBaseFilter('all');
-          setSpriteFilter('all');
-        }}
-        onOpenAuthModal={() => setShowAuthModal(true)}
-        onLinkGoogle={handleLinkGoogle}
-        onOpenBackupModal={() => setShowBackupModal(true)}
-        onSignOut={handleSignOutCleanup}
-      />
+      {navbar}
 
       <Header
         spritesPool={scopedSprites}
@@ -1263,7 +1496,7 @@ useEffect(() => {
               <span className="stats-bar__spacer" aria-hidden="true" />
               <span className="stats-bar__label">{t('app.total')}</span>
             </div>
-            <div className="stats-bar__col">
+            <div className="stats-bar__col stats-bar__col--caught">
               <span className="stats-bar__value">{ownedCount}</span>
               <span
                 className="stats-bar__track"
@@ -1277,7 +1510,7 @@ useEffect(() => {
               </span>
               <span className="stats-bar__label">{t('app.atrapados')}</span>
             </div>
-            <div className="stats-bar__col">
+            <div className="stats-bar__col stats-bar__col--mastered">
               <span className="stats-bar__value">{masteredCount}</span>
               <span
                 className="stats-bar__track"
@@ -1341,49 +1574,8 @@ useEffect(() => {
         />
       )}
 
-      <Suspense fallback={null}>
-        {showBackupModal && (
-          <BackupModal
-            userState={userState}
-            setUserState={setUserState}
-            onClose={() => setShowBackupModal(false)}
-          />
-        )}
+      {modales}
 
-        {showCompareModal && (
-          <FriendCompareModal
-            userState={userState}
-            friendState={friendState}
-            isLiveConnected={isLiveConnected}
-            connectedFriendCode={connectedFriendCode}
-            myFriendCode={myFriendCode}
-            onOpenFriendsPage={() => irA('/amigos')}
-            activeProfile={activeProfile}
-            onSetActiveProfile={setActiveProfile}
-            onConnectFriendCode={handleConnectFriendCode}
-            onDisconnectFriend={handleDisconnectFriend}
-            onLoadFriendState={(state, sourceLabel) => {
-              setFriendState(state);
-              setActiveProfile('friend');
-              if (sourceLabel) setConnectedFriendCode(sourceLabel);
-            }}
-            onToggleOwned={handleToggleOwned}
-            onClose={() => setShowCompareModal(false)}
-          />
-        )}
-
-        {/* Tambien con sesion anonima: es la unica via para vincular la cuenta. */}
-        {modalAuth}
-
-        {showFooterPrivacyModal && (
-          <PrivacyPolicyModal onClose={() => setShowFooterPrivacyModal(false)} />
-        )}
-      </Suspense>
-
-      <Footer
-        totalSprites={totalCount}
-        onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
-      />
     </div>
   );
 }

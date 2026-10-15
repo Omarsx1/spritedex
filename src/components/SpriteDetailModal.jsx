@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Zap, Sparkles } from 'lucide-react';
+import { X } from 'lucide-react';
 import { SPRITE_FAMILIES, getSpriteCardStyle, getRarityInfo, pickName, pickThemeName, pickTexto } from '../data/spritesData';
-import { t, conIdioma, getLang } from '../i18n';
-import { rutaEspiritu } from '../seo/espiritus.js';
+import { t } from '../i18n';
 import { sounds } from '../utils/audio';
 import { rutaBasicoFamilia, rutaFallbackEspiritu } from '../utils/spriteAssets';
 import gsap from 'gsap';
@@ -79,8 +78,8 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
     >
 
         {/* Close */}
-        <button className="sdm__close" onClick={onClose}>
-          <X size={18} />
+        <button type="button" className="sdm__close" onClick={onClose} aria-label={t('detalle.cerrar')}>
+          <X size={18} aria-hidden="true" />
         </button>
 
         {/* ═══ Hero header with themed gradient ═══ */}
@@ -93,7 +92,7 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
 
           <div className="sdm__hero-img-wrap">
             {isMastered && (
-              <img src="/img/x/sprites/crown.webp" alt="Crown" className="sdm__crown" />
+              <img src="/img/x/sprites/crown.webp" alt="" className={`sdm__crown ${activeSprite.familyId === 'jonesy' ? 'sdm__crown--jonesy' : ''}`} />
             )}
             <img
               src={activeSprite.image}
@@ -108,22 +107,16 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
               <span className={`sprite-pill rarity-badge ${rarityInfo.classKey ? `sprite-rarity-${rarityInfo.classKey}` : ''}`}>
                 {rarityInfo.name}
               </span>
-              <span className="sdm__drop">{activeSprite.unreleased ? t('detalle.noLanzadoMayus') : activeSprite.dropChance}</span>
             </div>
             <h2 className="sdm__name">{pickName(activeSprite)}</h2>
             <div className="sdm__meta">
               <span>{pickThemeName(activeSprite.variant)} · Gen {activeSprite.gen}</span>
-              {currentState.owned && !activeSprite.unreleased && (
-                <span className={`sdm__meta-lvl ${isMastered ? 'sdm__meta-lvl--mastered' : ''}`}>
-                  {' · '}{isMastered ? t('detalle.maxeadoMayus') : t('detalle.nivelDe5', { n: currentState.level })}
+              {currentState.owned && !activeSprite.unreleased && !isMastered && (
+                <span className="sdm__meta-lvl">
+                  {' · '}{t('detalle.nivelDe5', { n: currentState.level })}
                 </span>
               )}
             </div>
-            {/* Ficha publica: pagina estatica con los datos del espiritu, URL propia para
-                compartir y la que enlaza el resto del sitio. */}
-            <a className="sdm__ficha" href={conIdioma(rutaEspiritu(activeSprite.id), getLang())}>
-              {t('detalle.verFicha')}
-            </a>
           </div>
         </div>
 
@@ -151,13 +144,12 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                 <span>{pickTexto(activeSprite.specialPerk)}</span>
               </div>
             )}
-            <div className="sdm__card-row">
-              <Zap size={16} className="sdm__icon sdm__icon--yellow" />
+            {Boolean(pickTexto(activeSprite.ability)) && (
               <div>
                 <span className="sdm__card-label">{t('detalle.habilidadOficial')}</span>
                 <p className="sdm__card-text">{pickTexto(activeSprite.ability)}</p>
               </div>
-            </div>
+            )}
             <div className="sdm__card-footer">
               <div className="sdm__card-detail" title={t('detalle.costeInvocacion')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <img
@@ -181,7 +173,6 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
           {/* Family progress bar */}
           <div className="sdm__progress-wrap">
             <div className="sdm__progress-header">
-              <Sparkles size={14} className="sdm__icon sdm__icon--pink" />
               <span className="sdm__progress-title">
                 {familySprites.length > 1 ? t('detalle.variantes') : t('detalle.coleccion')}
               </span>
@@ -209,51 +200,40 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
                 className={`sdm__variant ${isSelected ? 'sdm__variant--selected' : ''} ${vOwned ? 'sdm__variant--owned' : ''} ${vMastered ? 'sdm__variant--mastered' : ''}`}
                 style={{
                   background: vStyle.background,
-                  borderColor: isSelected ? '#ffffff' : vStyle.borderColor
+                  borderColor: vStyle.borderColor
                 }}
-                onClick={() => setActiveSprite(v)}
               >
-                {/* Image + select */}
-                <div className="sdm__variant-img-wrap">
-                  {vMastered && (
-                    <img src="/img/x/sprites/crown.webp" alt="" className="sdm__variant-crown" />
-                  )}
-                  <img
-                    src={v.image}
-                    alt={pickName(v)}
-                    className={`sdm__variant-img ${!vOwned ? 'sdm__variant-img--locked' : ''}`}
-                    onError={(e) => { e.target.style.display = 'none'; }}
-                  />
-                </div>
-
-                <span className="sdm__variant-name">{pickThemeName(v.variant)}</span>
-                <span className="sdm__variant-drop">{v.unreleased ? t('detalle.noLanzadoMayus') : v.dropChance}</span>
-
-                {/* Status pill */}
-                <div
-                  className="sdm__variant-status"
-                  onClick={readOnly ? undefined : (e) => {
-                    e.stopPropagation();
-                    if (v.unreleased) return;
-                    onToggleOwned(v.id);
-                    sounds.playToggle(!vOwned, v.gen);
-                  }}
-                  style={{ cursor: readOnly ? 'default' : (v.unreleased ? 'not-allowed' : 'pointer') }}
+                <button
+                  type="button"
+                  className="sdm__variant-select"
+                  aria-current={isSelected ? 'true' : undefined}
+                  onClick={() => setActiveSprite(v)}
                 >
-                  <span className={`sdm__pill ${v.unreleased ? 'sdm__pill--unreleased' : vMastered ? 'sdm__pill--gold' : vOwned ? 'sdm__pill--green' : ''}`}>
-                    {v.unreleased ? t('detalle.noLanzadoCandado') : vMastered ? '⭐ MAX' : vOwned ? t('detalle.atrapado') : t('detalle.faltante')}
+                  <span className="sdm__variant-img-wrap">
+                    {vMastered && (
+                      <img src="/img/x/sprites/crown.webp" alt="" className="sdm__variant-crown" />
+                    )}
+                    <img
+                      src={v.image}
+                      alt=""
+                      className={`sdm__variant-img ${!vOwned ? 'sdm__variant-img--locked' : ''}`}
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
                   </span>
-                </div>
+                  <span className="sdm__variant-name">{pickThemeName(v.variant)}</span>
+                  {v.unreleased && <span className="sdm__variant-drop">{t('detalle.noLanzadoMayus')}</span>}
+                </button>
 
-                {/* Level selectors */}
                 {vOwned && !v.unreleased && !readOnly && (
                   <div className="sdm__variant-levels">
                     {[1, 2, 3, 4, 5].map((lvl) => (
                       <button
                         key={lvl}
+                        type="button"
+                        aria-label={t('detalle.nivelAria', { n: lvl })}
+                        aria-pressed={vLevel >= lvl}
                         className={`sdm__vlvl ${vLevel >= lvl ? (vMastered ? 'sdm__vlvl--gold' : 'sdm__vlvl--active') : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
+                        onClick={() => {
                           onSetLevel(v.id, lvl);
                           sounds.playLevelUp(lvl, v.gen);
                         }}
