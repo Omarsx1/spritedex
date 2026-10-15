@@ -8430,6 +8430,9 @@ html.theme-fortnitemares::after {
     radial-gradient(46% 20% at 48% 98%, rgba(255, 130, 40, 0.20) 0%, transparent 72%),
     radial-gradient(30% 13% at 26% 100%, rgba(255, 160, 70, 0.10) 0%, transparent 74%),
     radial-gradient(28% 12% at 74% 100%, rgba(255, 110, 30, 0.11) 0%, transparent 74%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: 0 0;
   opacity: 1;
   transition: opacity 1200ms ease;
 }
