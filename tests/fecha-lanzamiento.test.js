@@ -19,7 +19,7 @@ test('tampoco oculta una publicada SIN fecha en el catalogo', () => {
 });
 
 test('el CMS si puede mover el lanzamiento de lo que el catalogo da por no publicado', () => {
-  assert.equal(fechaDeLanzamiento({ unreleased: false, releaseDate: '2026-10-08T08:00:00.000Z' }, { release_date: FUTURO }), FUTURO);
+  assert.equal(fechaDeLanzamiento({ unreleased: false, releaseDate: '2026-10-08T08:00:00.000Z' }, { release_date: FUTURO }, Date.parse('2026-10-05T00:00:00Z')), FUTURO);
   assert.equal(fechaDeLanzamiento({ unreleased: true, releaseDate: null }, { release_date: FUTURO }), FUTURO);
 });
 
