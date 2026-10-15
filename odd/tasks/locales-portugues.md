@@ -21,9 +21,9 @@ Rama: `feat/locales-pt` (desde `main` 9c61807). Entrega: `ask-on-risk`. Pruebas:
 - T1 [inline] Núcleo: `IDIOMAS`, `normalizarIdioma` (pt-* ya no cae a en), `planDeArranque`, prefijos `/pt-br` y `/pt-pt`, pruebas. Specs S4, S5, S6. Commit: `da6e5e7`.
 - T2 [delegado, escritor] `src/i18n/locales/pt-BR.js` completo, paridad con `es.js`. Specs S1, S8. Commit: `ea78287`. Evidencia: 428 claves, faltan/sobran 0, marcadores iguales.
 - T3 [delegado, escritor] `src/i18n/locales/pt-PT.js` completo, paridad con `es.js`, portugués europeo. Specs S2, S8. Commit: `abbc34b`. Evidencia: 428 claves, faltan/sobran 0, marcadores iguales; se corrigió "Recarregar" por "Recarregue" en `amigos.necesitasSesion`.
-- T4 [inline] Registro en `locales/index.js`, selector de cuatro opciones (S7), prueba de paridad. Commit: este mismo commit. Evidencia: `npm test` 266/266, `npm run build` ok, `npm run lint` sin errores.
-- T5 [pendiente] SEO para pt-BR y pt-PT (S9).
-- T6 [pendiente] Textos del juego y nombres de espíritus en pt (S10).
+- T4 [inline] Registro en `locales/index.js`, selector de cuatro opciones (S7), prueba de paridad. Commit: `7703efe`. Evidencia: `npm test` 266/266, `npm run build` ok, `npm run lint` sin errores.
+- T5 [delegado, escritor en paralelo con T6] SEO para pt-BR y pt-PT (S9). Superficie: `src/seo/**`, `scripts/prerender-seo.mjs`, `tests/seo-*.test.js`. Commit: pendiente.
+- T6 [delegado, escritor en paralelo con T5] Textos del juego y nombres de espíritus en pt (S10). Superficie: `src/data/i18n/**`, `src/data/spritesData.js`, `tests/data-i18n*`. Commit: pendiente.
 - T7 [pendiente] Verificación en navegador: golden path pt-BR, pt-PT, y que es/en no cambian.
 
 ## Log
@@ -34,4 +34,7 @@ Rama: `feat/locales-pt` (desde `main` 9c61807). Entrega: `ask-on-risk`. Pruebas:
 - L4: `normalizarIdioma` hoy convierte todo lo que no es `es` en `en`; por eso pt-BR caería a inglés sin cambio.
 - L5 (corrección): el "388 claves" de L3 es la cifra de `multilenguaje.md`, no de hoy. `es.js` tiene 428 claves.
 - L6: pendiente de verificar en T7: los escritores afirman que "Poeira Estelar" es el término oficial de Fortnite en pt-BR. No está comprobado en esta sesión.
-- L7: pendiente de decisión para T6: fuente de los nombres de espíritus en portugués (glosario propio con revisión, o fuente oficial).
+- L7: decisión tomada para T6 (reversible): no hay fuente de nombres de espíritus en portugués en el repo (el catálogo sale de una captura de fortnite.gg en inglés). pt-BR y pt-PT usan el nombre oficial en inglés del catálogo hasta tener una fuente en portugués. Pendiente de confirmar con el usuario.
+- L9: T6 terminado. `textos.juego.json` tiene 99 entradas, no 83. Los nombres de tema (`pickThemeName`) usan la misma decisión temporal que espíritus y familias: pt usa el inglés. Pruebas de datos en `tests/data-i18n-*.test.js`. Revisar: formato numérico ("2.000" pt-BR, "2 000" pt-PT), "saque"/"pilhagem" para botín, "tempestade" para tormenta.
+- L10: T5 terminado (escritor). Pruebas: 299/299 tras corregir tres pruebas existentes: dos esperaban 3 hreflang (ahora son 5: es, en, pt-BR, pt-PT, x-default) y una tenía un helper local que solo conocía /en (ahora usa `rutaSinIdioma` de core.js). Build: 1165 HTML (583 es/en + pt-BR/pt-PT). Revisado: en es/en solo cambian hashes de assets, hreflang pt, og:locale:alternate pt y el conmutador de cuatro idiomas. Guía y novedades pt sin texto en español. Revisar: títulos pt-PT de / y /amigos distintos de pt-BR para evitar duplicados.
+- L8: hallazgo: las ramas `lang === 'en'` de SEO tratan pt como español (53 sitios en src/seo y prerender). T5 las reemplaza por un helper de idioma. Invariante: es y en deben producir el mismo HTML que la línea base de build antes de los cambios.
