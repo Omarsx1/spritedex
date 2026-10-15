@@ -46,7 +46,7 @@ import {
   getLastConnectedFriendCode
 } from './utils/friendCode';
 import { buildShareUrl } from './utils/shareUrl';
-import { getLang, conIdioma, rutaSinIdioma } from './i18n';
+import { getLang, conIdioma, rutaSinIdioma, rutaDeArranque } from './i18n';
 import { aplicarSeoRuta } from './seo/head.js';
 import { etiquetasGuia } from './seo/contenido.js';
 import { espirituDeEnlace } from './utils/enlaceEspiritu.js';
@@ -1119,7 +1119,7 @@ export function App() {
   // recargar, y marca noindex mientras el portal de administracion esta abierto.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    aplicarSeoRuta(window.location.pathname, { noindex: isAdminPortal });
+    aplicarSeoRuta(rutaDeArranque(), { noindex: isAdminPortal });
     if (enGuia && !isAdminPortal) aplicarSeoGuia(getLang());
   }, [enAmigos, enGuia, isAdminPortal]);
 

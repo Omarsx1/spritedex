@@ -23,6 +23,14 @@ function resolverPlan() {
   return planInicial;
 }
 
+// Ruta a la que quedara la URL tras el arranque: el efecto de SEO corre antes que el
+// replaceState del proveedor y, sin esto, titulo y canonical quedan en el idioma de '/'.
+export function rutaDeArranque() {
+  if (typeof window === 'undefined') return '/';
+  const destino = resolverPlan().destino;
+  return destino ? destino.split(/[?#]/)[0] : window.location.pathname;
+}
+
 const LanguageContext = createContext({ lang: 'es', setLang, cambiarIdioma, t });
 
 export function LanguageProvider({ children }) {
