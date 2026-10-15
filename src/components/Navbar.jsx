@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Download, User, UserPlus, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone, AlertTriangle, Mail, BookOpen } from 'lucide-react';
+import { Download, User, UserPlus, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone, AlertTriangle, Mail, BookOpen, Globe } from 'lucide-react';
 import { Google } from './ui/Google';
 import { getSupabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
@@ -52,7 +52,7 @@ export function Navbar({
     return [
       { id: 2, badge: '2', nombre: gen2?.title || 'Override', detalle: '2ª Generación', color: gen2?.badgeColor || '#ec4899' },
       { id: 1, badge: '1', nombre: gen1?.title || 'Runners', detalle: '1ª Generación', color: gen1?.badgeColor || '#3b82f6' },
-      { id: 0, badge: '🌐', nombre: t('nav.todas'), detalle: 'Catálogo completo', color: '#00f0e8' }
+      { id: 0, badge: <Globe size={16} strokeWidth={2.4} aria-hidden="true" />, nombre: t('nav.todas'), detalle: 'Catálogo completo', color: '#00f0e8' }
     ];
   }, []);
   const myFriendCode = useMemo(() => getMyFriendCode(user?.id), [user]);

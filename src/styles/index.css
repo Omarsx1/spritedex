@@ -9043,8 +9043,8 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .app-navbar__menu-dropdown {
   /* El acento de los iconos del menu vive aqui: los iconos lo leen por
      variable, asi que fuera de temporada siguen en cian. */
-  --nav-accent: #e879f9;
-  background: rgba(22, 11, 36, 0.96);
+  --nav-accent: #a78bfa;
+  background: #160b24;
   border-color: rgba(168, 85, 247, 0.28);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 22px rgba(168, 85, 247, 0.14);
 }
