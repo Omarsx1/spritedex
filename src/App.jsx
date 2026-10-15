@@ -32,6 +32,7 @@ import { fetchCollectionByShareToken } from './utils/friendCode';
 import { getSupabase, warmSupabase, isSupabaseConfigured, shouldSkipAnonymousAuth } from './utils/supabase';
 import { conGoogle } from './utils/authActions';
 import { mergeCollections, sinPerfil } from './utils/mergeCollections';
+import { debeRefrescarAlVolver, mismoEstado } from './utils/syncPolicy';
 import { estadoAlTocarNivel } from './utils/niveles';
 import { setSyncSession, queueCloudSync, clearCloudSync, flushCloudSync } from './utils/pendingSync';
 import { safeStorage } from './utils/safeStorage';
@@ -258,6 +259,13 @@ export function App() {
   const deadSessionHandled = useRef(new Set());
   // Rastreo de existencia de registro previo en user_collections para guardado diferido (Lazy Sync)
   const hasCloudRecordRef = useRef(false);
+  // Blindaje del arranque (sync en vivo): el primer empuje espera a que termine la primera
+  // lectura de la nube, y despues se garantiza uno aunque el merge no cambie el estado.
+  // Asi un dispositivo con datos viejos no puede pisar la nube con menos de lo que hay.
+  const lecturaInicialLista = useRef(false);
+  // Marca del ultimo pull al volver a la pestana: limita la frecuencia de las lecturas.
+  const ultimoRefrescoRef = useRef(0);
+  const [pushTick, setPushTick] = useState(0);
 
   // Filters matching fortnite.gg. El estado inicial sale de la URL: asi una recarga, un
   // enlace compartido o el boton atras devuelven a la misma generacion y los mismos filtros
@@ -527,12 +535,19 @@ export function App() {
       cancelled = true;
       if (subscription) subscription.unsubscribe();
     };
+    // El arranque corre una sola vez. loadUserCollectionFromCloud se declara mas abajo, asi
+    // que no puede listarse aqui como dependencia: seria usarlo antes de inicializarse.
   }, []);
 
-  const loadUserCollectionFromCloud = async (userId) => {
-    const supabase = await getSupabase();
-    if (!supabase) return;
+  // Estable a proposito (useCallback sin dependencias): la comparten el arranque, el cambio
+  // de sesion y el pull al volver a la pestana. Solo usa setters, refs e imports, asi que no
+  // captura nada que pueda quedar viejo. El finally marca la primera lectura terminada por
+  // CUALQUIER camino de salida (sin fila, con error, con datos).
+  const loadUserCollectionFromCloud = useCallback(async (userId) => {
     try {
+      const supabase = await getSupabase();
+      if (!supabase) return;
+
       const { data, error } = await supabase
         .from('user_collections')
         .select('user_state, friend_code, share_token')
@@ -568,8 +583,15 @@ export function App() {
       });
     } catch (err) {
       console.error('Failed to load collection from cloud:', err);
+    } finally {
+      if (!lecturaInicialLista.current) {
+        lecturaInicialLista.current = true;
+        // Con la primera lectura hecha ya se puede empujar. El contador garantiza ese
+        // primer empuje aunque la fusion no llegue a cambiar el estado local.
+        setPushTick((t) => t + 1);
+      }
     }
-  };
+  }, []);
 
   // Vincular con Google directamente desde el menu del invitado, sin abrir la modal.
   const handleLinkGoogle = async () => {
@@ -630,6 +652,10 @@ export function App() {
     // efecto vuelve a ejecutarse y sincroniza; si el usuario cierra la pestana antes,
     // lo cubre el flush con keepalive de mas abajo.
     if (enCompartir) return;
+
+    // El primer empuje espera a que termine la primera lectura: un dispositivo con estado
+    // viejo que escriba antes de leer reemplazaria la nube con menos datos.
+    if (!lecturaInicialLista.current) return;
 
     if (isSupabaseConfigured && user) {
       const timer = setTimeout(async () => {
@@ -724,13 +750,15 @@ export function App() {
         } catch (err) {
           console.error('Failed to sync to Supabase:', err);
         }
-      }, 600);
+      }, 250);
       return () => clearTimeout(timer);
     }
-  }, [userState, user, myFriendCode, enCompartir, handleSignOutCleanup]);
+    // pushTick entra a proposito: cambia cuando termina la primera lectura y garantiza el
+    // primer empuje aunque la fusion no llegue a cambiar el estado.
+  }, [userState, user, myFriendCode, enCompartir, handleSignOutCleanup, pushTick]);
 
   // Salida garantizada: si la pestaña se cierra o pasa a segundo plano con un sync
-  // pendiente, se empuja con keepalive en vez de esperar el debounce de 600 ms.
+  // pendiente, se empuja con keepalive en vez de esperar el debounce de 250 ms.
   useEffect(() => {
     const flush = () => flushCloudSync();
     const onVisibilityChange = () => {
@@ -743,6 +771,86 @@ export function App() {
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, []);
+
+  // Pull al volver: recuperar el foco, volver a la pestana o volver online trae lo que se
+  // marco en otro dispositivo, sin recargar. Con limite de frecuencia para no disparar una
+  // lectura por cada parpadeo de la ventana.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const refrescar = () => {
+      if (!user) return;
+      if (!debeRefrescarAlVolver({
+        haySesion: true,
+        compartiendo: enCompartir,
+        visible: document.visibilityState === 'visible',
+        ahora: Date.now(),
+        ultimoRefresco: ultimoRefrescoRef.current
+      })) return;
+      ultimoRefrescoRef.current = Date.now();
+      loadUserCollectionFromCloud(user.id);
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') refrescar();
+    };
+    window.addEventListener('focus', refrescar);
+    window.addEventListener('online', refrescar);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      window.removeEventListener('focus', refrescar);
+      window.removeEventListener('online', refrescar);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [user, enCompartir, loadUserCollectionFromCloud]);
+
+  // Realtime de la propia fila: cuando esta cuenta cambia en la nube (lo marco el celular),
+  // la web se pone al dia sin recargar. Solo cuentas reales: el invitado no tiene otra
+  // superficie con la misma identidad con la que intercambiar.
+  useEffect(() => {
+    if (!isSupabaseConfigured || !user || user.is_anonymous) return;
+    let channel = null;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const supabase = await getSupabase();
+        if (!supabase || cancelled) return;
+        // El sufijo de tiempo es el mismo patron que subscribeToFriendCollection: sin el,
+        // un cambio de identidad del usuario (por ejemplo TOKEN_REFRESHED) reusaria el
+        // nombre del canal viejo, que todavia se esta cerrando.
+        channel = supabase
+          .channel('realtime-yo-' + user.id.slice(0, 8) + '-' + Date.now())
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'user_collections',
+              filter: 'user_id=eq.' + user.id
+            },
+            (payload) => {
+              const nube = sinPerfil(payload?.new?.user_state);
+              if (!nube || Object.keys(nube).length === 0) return;
+              // La guarda de igualdad corta el eco de la propia escritura: sin ella, cada
+              // upsert volveria a fusionar lo mismo y dispararia otra subida sin fin.
+              setUserState((prev) => {
+                const fusion = mergeCollections(prev, nube);
+                return mismoEstado(prev, fusion) ? prev : fusion;
+              });
+            }
+          )
+          .subscribe();
+      } catch (err) {
+        console.error('Failed to setup Realtime own-row channel:', err);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      if (channel) {
+        getSupabase().then((sb) => sb && sb.removeChannel(channel));
+      }
+    };
+  }, [user]);
 
   const ensureCloudSessionForAction = useCallback(async () => {
     if (user || !isSupabaseConfigured || shouldSkipAnonymousAuth()) return;
