@@ -298,6 +298,45 @@ export function loadImage(src, bajaPrioridad = false) {
   });
 }
 
+// Los sprites se guardan como ImageBitmap: createImageBitmap decodifica fuera del hilo
+// principal. Dibujar un HTMLImageElement obliga al navegador a decodificarlo ahi mismo la
+// primera vez, y eso es lo que traba la lona en gama media.
+const globalBitmapCache = new Map();
+const bitmapsEnCurso = new Map();
+const TIEMPO_MAX_BITMAP_MS = 1200;
+
+async function descargarBitmap(src, bajaPrioridad) {
+  const res = await fetch(src, { priority: bajaPrioridad ? 'low' : 'auto' });
+  if (!res.ok) throw new Error(`HTTP ${res.status} al cargar ${src}`);
+  const bitmap = await createImageBitmap(await res.blob());
+  globalBitmapCache.set(src, bitmap);
+  return bitmap;
+}
+
+function conTiempoMaximo(promesa, ms) {
+  let temporizador;
+  const limite = new Promise((resolve) => {
+    temporizador = setTimeout(() => resolve(null), ms);
+  });
+  return Promise.race([promesa, limite]).finally(() => clearTimeout(temporizador));
+}
+
+export function loadBitmap(src, bajaPrioridad = false) {
+  if (!src) return Promise.resolve(null);
+  if (globalBitmapCache.has(src)) return Promise.resolve(globalBitmapCache.get(src));
+  if (bitmapsEnCurso.has(src)) return bitmapsEnCurso.get(src);
+  if (typeof createImageBitmap !== 'function' || typeof fetch !== 'function') {
+    return loadImage(src, bajaPrioridad);
+  }
+
+  const pendiente = conTiempoMaximo(descargarBitmap(src, bajaPrioridad), TIEMPO_MAX_BITMAP_MS)
+    .catch(() => null)
+    .then((bitmap) => bitmap || loadImage(src, bajaPrioridad))
+    .finally(() => bitmapsEnCurso.delete(src));
+  bitmapsEnCurso.set(src, pendiente);
+  return pendiente;
+}
+
 // Precarga anticipada de recursos por lotes en reposo (idle) sin saturar la red ni bloquear el hilo.
 let turnoPrecarga = 0;
 // Pausa del calentamiento mientras el usuario scrollea: primero ve el arte de las tarjetas que
@@ -343,7 +382,7 @@ export function preloadCanvasAssets(spritesList = [], batchSize = 4) {
       slice.forEach(s => {
         // Las mismas imagenes que usa el export: la derivada del collage.
         const src = srcParaCollage(s);
-        if (src) loadImage(src, true);
+        if (src) loadBitmap(src, true);
       });
       if (index < spritesList.length) {
         // Con la modal de compartir abierta hay alguien esperando: se acelera para
@@ -629,8 +668,8 @@ export async function generateSpritedexCardImage({
       const s = lista[siguiente++];
       // El collage dibuja el sprite a ~90-110 px: se usa la derivada de 256 px y, si
       // no existe, se cae a la miniatura de las tarjetas para no dejar el hueco.
-      let img = await loadImage(srcParaCollage(s));
-      if (!img && s.thumb) img = await loadImage(s.thumb);
+      let img = await loadBitmap(srcParaCollage(s));
+      if (!img && s.thumb) img = await loadBitmap(s.thumb);
       if (img) loadedImagesMap[s.id] = img;
     }
   };
