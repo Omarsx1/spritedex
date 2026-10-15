@@ -4,8 +4,15 @@
 // que la cabecera, las migas, el pie y los estilos sean los mismos en todas. Sin dependencias.
 
 import { SITIO, IMAGEN_REDES } from './rutas.js';
+import { conIdioma, IDIOMAS } from '../i18n/core.js';
+import { NOMBRE_IDIOMA, lineasOgLocale, porIdioma } from './idioma.js';
 
-export const ZONA = { es: 'Espíritu de Fortnite', en: 'Fortnite Sprite' };
+export const ZONA = {
+  es: 'Espíritu de Fortnite',
+  en: 'Fortnite Sprite',
+  'pt-BR': 'Espírito de Fortnite',
+  'pt-PT': 'Espírito de Fortnite'
+};
 
 export const escapar = (texto) => String(texto === undefined || texto === null ? '' : texto)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -31,7 +38,8 @@ export const TEXTO = {
     otras: 'Otras variantes de', todos: 'Ver todos los espíritus', guia: 'Guía de espíritus',
     cta: 'Rastrea tu colección en Spritedex', inicio: 'Inicio', espiritus: 'Espíritus',
     novedades: 'Novedades', acerca: 'Acerca de', aviso: 'Proyecto de fans sin relación con Epic Games.',
-    privacidad: 'Privacidad', sinImagen: 'Todavía no tenemos imagen de este espíritu.'
+    privacidad: 'Privacidad', sinImagen: 'Todavía no tenemos imagen de este espíritu.',
+    idioma: 'Idioma'
   },
   en: {
     rareza: 'Rarity', generacion: 'Generation', variante: 'Variant', familia: 'Family',
@@ -42,7 +50,28 @@ export const TEXTO = {
     novedades: 'Updates', acerca: 'About', aviso: 'Fan project, not affiliated with Epic Games.',
     // La politica de privacidad solo existe en español: se dice, en vez de enlazar a una
     // traduccion que no hay.
-    privacidad: 'Privacy (Spanish)', sinImagen: 'We do not have an image for this sprite yet.'
+    privacidad: 'Privacy (Spanish)', sinImagen: 'We do not have an image for this sprite yet.',
+    idioma: 'Language'
+  },
+  'pt-BR': {
+    rareza: 'Raridade', generacion: 'Geração', variante: 'Variante', familia: 'Família',
+    drop: 'Probabilidade (baú de espírito)', costo: 'Custo de invocação', ubicacion: 'Onde aparece',
+    lanzamiento: 'Lançamento', habilidad: 'Habilidade', perk: 'Extra exclusivo',
+    otras: 'Outras variantes de', todos: 'Ver todos os espíritos', guia: 'Guia de espíritos',
+    cta: 'Acompanhe sua coleção no Spritedex', inicio: 'Início', espiritus: 'Espíritos',
+    novedades: 'Novidades', acerca: 'Sobre', aviso: 'Projeto de fãs sem relação com a Epic Games.',
+    privacidad: 'Privacidade (em espanhol)', sinImagen: 'Ainda não temos imagem deste espírito.',
+    idioma: 'Idioma'
+  },
+  'pt-PT': {
+    rareza: 'Raridade', generacion: 'Geração', variante: 'Variante', familia: 'Família',
+    drop: 'Probabilidade (baú de espírito)', costo: 'Custo de invocação', ubicacion: 'Onde aparece',
+    lanzamiento: 'Lançamento', habilidad: 'Habilidade', perk: 'Extra exclusivo',
+    otras: 'Outras variantes de', todos: 'Ver todos os espíritos', guia: 'Guia de espíritos',
+    cta: 'Acompanhe a sua coleção no Spritedex', inicio: 'Início', espiritus: 'Espíritos',
+    novedades: 'Novidades', acerca: 'Sobre', aviso: 'Projeto de fãs sem ligação à Epic Games.',
+    privacidad: 'Privacidade (em espanhol)', sinImagen: 'Ainda não temos imagem deste espírito.',
+    idioma: 'Idioma'
   }
 };
 
@@ -54,11 +83,10 @@ export const RUTAS_CONTENIDO = {
   novedades: '/novedades'
 };
 
+// La raiz no lleva barra final: /en, no /en/ (que seria otra URL para el mismo contenido). La
+// forma de cada prefijo la decide i18n/core.js, igual que en la app.
 export function conIdiomaRuta(ruta, lang) {
-  // La raiz no lleva barra final: /en, no /en/ (que seria otra URL para el mismo contenido).
-  const limpia = ruta === '/' ? '' : ruta;
-  if (lang === 'en') return '/en' + limpia;
-  return limpia || '/';
+  return conIdioma(ruta, lang);
 }
 
 const CSS = [
@@ -71,6 +99,8 @@ const CSS = [
   'header.marca a { font-weight: 800; letter-spacing: .12em; text-decoration: none; text-transform: uppercase; }',
   'header.marca span { display: inline-flex; align-items: baseline; gap: 14px; }',
   'header.marca span a:last-child { color: var(--apagado); font-weight: 600; }',
+  'nav.idiomas { display: flex; flex-wrap: wrap; gap: 10px; font-size: 14px; }',
+  'nav.idiomas [aria-current] { color: var(--apagado); font-weight: 700; }',
   'nav.migas { font-size: 13px; color: var(--apagado); margin-bottom: 14px; }',
   'nav.migas ol { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; }',
   'nav.migas li + li::before { content: "›"; margin-right: 6px; color: var(--apagado); }',
@@ -124,8 +154,7 @@ export function headHtml(etiquetas, ogImage) {
     '<meta property="og:image" content="' + imagen + '" />',
     '<meta property="og:image:width" content="1200" />',
     '<meta property="og:image:height" content="630" />',
-    '<meta property="og:locale" content="' + (etiquetas.lang === 'en' ? 'en_US' : 'es_MX') + '" />',
-    etiquetas.alternates.length > 1 ? '<meta property="og:locale:alternate" content="' + (etiquetas.lang === 'en' ? 'es_MX' : 'en_US') + '" />' : '',
+    ...lineasOgLocale(etiquetas.lang, etiquetas.alternates.length > 1),
     '<meta name="twitter:card" content="summary_large_image" />',
     '<meta name="twitter:title" content="' + escapar(etiquetas.titulo) + '" />',
     '<meta name="twitter:description" content="' + escapar(etiquetas.descripcion) + '" />',
@@ -149,22 +178,32 @@ export function pieDePagina(lang) {
     { href: conIdiomaRuta('/espiritus', lang), nombre: t.todos },
     { href: RUTA_PRIVACIDAD, nombre: t.privacidad }
   ];
-  return '<footer class="pie"><p>' + escapar(t.aviso) + '</p><nav aria-label="' + (lang === 'en' ? 'Site' : 'Sitio') + '">'
+  return '<footer class="pie"><p>' + escapar(t.aviso) + '</p><nav aria-label="' + escapar(porIdioma(lang, { es: 'Sitio', en: 'Site', 'pt-BR': 'Site', 'pt-PT': 'Sítio' })) + '">'
     + enlaces.map((e) => '<a href="' + e.href + '">' + escapar(e.nombre) + '</a>').join('') + '</nav></footer>';
+}
+
+// Conmutador de idioma: el hreflang le dice a Google cual es cada version, pero quien lee la
+// pagina tambien tiene derecho a cambiarla sin volver a la home. Ofrece las versiones del
+// cluster; la actual va sin enlace.
+export function conmutadorIdioma(etiquetas, lang) {
+  const alternos = etiquetas.alternates || [];
+  if (alternos.length < 2) return '';
+  const opciones = IDIOMAS.filter((l) => alternos.some((a) => a.hreflang === l)).map((l) => {
+    const nombre = escapar(NOMBRE_IDIOMA[l]);
+    if (l === lang) return '<span aria-current="true">' + nombre + '</span>';
+    const alterno = alternos.find((a) => a.hreflang === l);
+    return '<a href="' + alterno.href.replace(SITIO, '') + '" hreflang="' + l + '">' + nombre + '</a>';
+  });
+  return '<nav class="idiomas" aria-label="' + escapar(TEXTO[lang].idioma) + '">' + opciones.join('') + '</nav>';
 }
 
 export function documento({ lang, etiquetas, jsonLd, cuerpo, ogImage, conCabecera = true }) {
   const inicio = conIdiomaRuta('/', lang);
   const t = TEXTO[lang];
-  // Conmutador de idioma: el hreflang le dice a Google cual es la otra version, pero quien
-  // esta leyendo la ficha tambien tiene derecho a cambiarla sin volver a la home.
-  const otro = (etiquetas.alternates || []).find((a) => a.hreflang === (lang === 'en' ? 'es' : 'en'));
-  const enlaceIdioma = otro
-    ? '<a href="' + otro.href.replace(SITIO, '') + '" hreflang="' + otro.hreflang + '">' + (lang === 'en' ? 'Español' : 'English') + '</a>'
-    : '';
   const cabecera = conCabecera
     ? '<header class="marca"><a href="' + inicio + '">Spritedex</a><span>'
-      + '<a href="' + conIdiomaRuta('/espiritus', lang) + '">' + escapar(t.todos) + '</a> ' + enlaceIdioma + '</span></header>'
+      + '<a href="' + conIdiomaRuta('/espiritus', lang) + '">' + escapar(t.todos) + '</a></span>'
+      + conmutadorIdioma(etiquetas, lang) + '</header>'
     : '';
   return [
     '<!doctype html>',

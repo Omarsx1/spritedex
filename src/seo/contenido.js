@@ -8,6 +8,7 @@
 import { SITIO } from './rutas.js';
 import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, RUTAS_CONTENIDO } from './plantilla.js';
 import { modeloGuia, formatearFecha } from './guia.js';
+import { hreflangsDe, porIdioma } from './idioma.js';
 
 const CLAVES = { guia: 'guia', acerca: 'acerca', novedades: 'novedades' };
 
@@ -21,6 +22,16 @@ const TITULOS = {
     guia: 'Fortnite sprite guide — Spritedex',
     acerca: 'About Spritedex: who makes it and with what data',
     novedades: 'New Fortnite sprites — Spritedex'
+  },
+  'pt-BR': {
+    guia: 'Guia de espíritos do Fortnite — Spritedex',
+    acerca: 'Sobre o Spritedex: quem faz e com quais dados',
+    novedades: 'Espíritos novos do Fortnite — Spritedex'
+  },
+  'pt-PT': {
+    guia: 'Guia de espíritos do Fortnite — Spritedex',
+    acerca: 'Sobre o Spritedex: quem o faz e com que dados',
+    novedades: 'Espíritos novos do Fortnite — Spritedex'
   }
 };
 
@@ -34,6 +45,16 @@ const DESCRIPCIONES = {
     guia: 'What Fortnite sprites are: families, variants, rarities, how to get them and how they level from 1 to 5, with data from the full collection.',
     acerca: 'Spritedex is a fan-made Fortnite sprite tracker: where the data comes from, how your progress is stored and what this project is not.',
     novedades: 'The latest sprites added to Fortnite with their release date, family, variant and drop chance, linked to their page.'
+  },
+  'pt-BR': {
+    guia: 'O que são os espíritos do Fortnite, famílias e variantes, raridades, como se conseguem e como sobem de nível do 1 ao 5, com dados da coleção completa.',
+    acerca: 'O Spritedex é um rastreador de espíritos do Fortnite feito por fãs: de onde vêm os dados, como seu progresso é guardado e o que este projeto não é.',
+    novedades: 'Os últimos espíritos adicionados ao Fortnite com a data, a família, a variante e a probabilidade de obtenção, com link para a ficha de cada um.'
+  },
+  'pt-PT': {
+    guia: 'O que são os espíritos do Fortnite, famílias e variantes, raridades, como se obtêm e como sobem de nível do 1 ao 5, com dados da coleção completa.',
+    acerca: 'O Spritedex é um rastreador de espíritos do Fortnite feito por fãs: de onde vêm os dados, como fica guardado o progresso e o que este projeto não é.',
+    novedades: 'Os últimos espíritos adicionados ao Fortnite com a data, a família, a variante e a probabilidade de obtenção, com ligação para a respetiva ficha.'
   }
 };
 
@@ -44,11 +65,7 @@ function etiquetasDe(clave, lang, extras = {}) {
     titulo: TITULOS[lang][clave],
     descripcion: recortar(extras.descripcion || DESCRIPCIONES[lang][clave], 160),
     canonical: SITIO + conIdiomaRuta(ruta, lang),
-    alternates: [
-      { hreflang: 'es', href: SITIO + conIdiomaRuta(ruta, 'es') },
-      { hreflang: 'en', href: SITIO + conIdiomaRuta(ruta, 'en') },
-      { hreflang: 'x-default', href: SITIO + conIdiomaRuta(ruta, 'es') }
-    ]
+    alternates: hreflangsDe(SITIO, ruta)
   };
 }
 
@@ -105,7 +122,6 @@ function jsonLdFaq(faq) {
 }
 
 function jsonLdPagina(tipo, etiquetas, lang, extra = {}) {
-  const enIngles = lang === 'en';
   return {
     '@context': 'https://schema.org',
     '@graph': [
@@ -122,8 +138,8 @@ function jsonLdPagina(tipo, etiquetas, lang, extra = {}) {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: enIngles ? 'Home' : 'Inicio', item: SITIO + conIdiomaRuta('/', lang) },
-          { '@type': 'ListItem', position: 2, name: enIngles ? 'Sprites' : 'Espíritus', item: SITIO + conIdiomaRuta('/espiritus', lang) },
+          { '@type': 'ListItem', position: 1, name: TEXTO[lang].inicio, item: SITIO + conIdiomaRuta('/', lang) },
+          { '@type': 'ListItem', position: 2, name: TEXTO[lang].espiritus, item: SITIO + conIdiomaRuta('/espiritus', lang) },
           { '@type': 'ListItem', position: 3, name: etiquetas.titulo.replace(' — Spritedex', ''), item: etiquetas.canonical }
         ]
       }
@@ -133,14 +149,13 @@ function jsonLdPagina(tipo, etiquetas, lang, extra = {}) {
 
 export function htmlGuia(datos, lang) {
   const etiquetas = etiquetasGuia(lang);
-  const enIngles = lang === 'en';
   // El FAQPage va como nodo del grafo, una sola vez: si ademas fuera mainEntity, las preguntas
   // viajarian duplicadas en el marcado.
   const jsonLd = jsonLdPagina('WebPage', etiquetas, lang);
   const modelo = modeloGuia(lang, datos);
   jsonLd['@graph'].push(jsonLdFaq(modelo.faq));
   const cuerpo = [
-    migasContenido(lang, enIngles ? 'Guide' : 'Guía'),
+    migasContenido(lang, porIdioma(lang, { es: 'Guía', en: 'Guide', 'pt-BR': 'Guia', 'pt-PT': 'Guia' })),
     '<main>',
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
@@ -154,9 +169,15 @@ export function htmlGuia(datos, lang) {
   return documento({ lang, etiquetas, jsonLd, cuerpo });
 }
 
+const CABECERAS_NOVEDADES = {
+  es: ['Lanzamiento', 'Espíritu', 'Familia', 'Variante', 'Probabilidad'],
+  en: ['Release', 'Sprite', 'Family', 'Variant', 'Drop'],
+  'pt-BR': ['Lançamento', 'Espírito', 'Família', 'Variante', 'Probabilidade'],
+  'pt-PT': ['Lançamento', 'Espírito', 'Família', 'Variante', 'Probabilidade']
+};
+
 export function htmlNovedades(datos, lang) {
   const etiquetas = etiquetasNovedades(lang);
-  const enIngles = lang === 'en';
   const jsonLd = jsonLdPagina('CollectionPage', etiquetas, lang);
   jsonLd['@graph'].push({
     '@type': 'ItemList',
@@ -176,32 +197,68 @@ export function htmlNovedades(datos, lang) {
     f.drop
   ]);
   const cuerpo = [
-    migasContenido(lang, enIngles ? 'Updates' : 'Novedades'),
+    migasContenido(lang, TEXTO[lang].novedades),
     '<main>',
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
     tabla(
-      [enIngles ? 'Release' : 'Lanzamiento', enIngles ? 'Sprite' : 'Espíritu', enIngles ? 'Family' : 'Familia', enIngles ? 'Variant' : 'Variante', enIngles ? 'Drop' : 'Probabilidad'],
+      CABECERAS_NOVEDADES[lang],
       filas
     ),
-    '<p class="nota">' + escapar(enIngles
-      ? 'Dates are the ones recorded in the game data. The sprite pages carry the full detail.'
-      : 'Las fechas son las registradas en los datos del juego. El detalle completo está en la ficha de cada espíritu.') + '</p>',
+    '<p class="nota">' + escapar(porIdioma(lang, {
+      es: 'Las fechas son las registradas en los datos del juego. El detalle completo está en la ficha de cada espíritu.',
+      en: 'Dates are the ones recorded in the game data. The sprite pages carry the full detail.',
+      'pt-BR': 'As datas são as registradas nos dados do jogo. O detalhe completo está na ficha de cada espírito.',
+      'pt-PT': 'As datas são as registadas nos dados do jogo. O detalhe completo está na ficha de cada espírito.'
+    })) + '</p>',
     ctaHtml(lang),
     '</main>'
   ].join('\n');
   return documento({ lang, etiquetas, jsonLd, cuerpo });
 }
 
+// Acerca en portugues: mismo esquema que los objetos de es/en de abajo. pt-PT evita "você".
+const ACERCA_PT = {
+  'pt-BR': {
+    que: 'O que é o Spritedex',
+    queTexto: 'Um rastreador gratuito de coleções de espíritos do Fortnite. Mostra cada espírito com sua família, variante, raridade, probabilidade, custo de invocação, habilidade e onde aparece, e deixa você marcar quais já tem e até que nível os subiu.',
+    por: 'Por que existe',
+    porTexto: 'Guardar a coleção de cabeça deixa de funcionar lá pelos vinte espíritos: você esquece qual variante falta e qual ainda está no nível 2. O Spritedex transforma isso em uma lista que você pode consultar e em um cartão que pode enviar para quem troca com você.',
+    datos: 'De onde vêm os dados',
+    datosTexto: 'Nomes, raridades, probabilidades, custos, habilidades e locais de aparição vêm do jogo e de fontes da comunidade. A coleção é revisada à mão e datada a cada atualização, então o que você lê aqui pode mudar quando o jogo muda. Pode conter erros.',
+    quien: 'Quem faz',
+    quienTexto: 'É um projeto pessoal de fãs, não uma empresa. A coleção é mantida à mão e o aplicativo foi feito para ser rápido e funcionar sem conta.',
+    no: 'O que não é',
+    noTexto: 'O Spritedex não tem relação com a Epic Games e não vende nada. Também não é um site de notícias nem de estatísticas: só acompanha espíritos.',
+    privacidad: 'Privacidade',
+    privacidadTexto: 'Seu progresso fica guardado no seu próprio navegador. Não há cadastro e nada é enviado.',
+    fecha: (f) => 'Coleção revisada em ' + f + '.'
+  },
+  'pt-PT': {
+    que: 'O que é o Spritedex',
+    queTexto: 'Um registo gratuito de coleções de espíritos do Fortnite. Mostra cada espírito com a respetiva família, variante, raridade, probabilidade, custo de invocação, habilidade e onde aparece, e permite assinalar quais se têm e até que nível foram subidos.',
+    por: 'Porque existe',
+    porTexto: 'Manter a coleção de cabeça deixa de funcionar por volta dos vinte espíritos: esquece-se qual variante falta e qual continua no nível 2. O Spritedex transforma isso numa lista que se pode consultar e num cartão que se pode enviar a quem faz trocas.',
+    datos: 'De onde vêm os dados',
+    datosTexto: 'Nomes, raridades, probabilidades, custos, habilidades e locais de aparição vêm do jogo e de fontes da comunidade. A coleção é revista manualmente e datada a cada atualização, por isso o que aqui se lê pode mudar quando o jogo muda. Pode conter erros.',
+    quien: 'Quem o faz',
+    quienTexto: 'É um projeto pessoal de fãs, não uma empresa. A coleção é mantida manualmente e a aplicação foi feita para ser rápida e funcionar sem conta.',
+    no: 'O que não é',
+    noTexto: 'O Spritedex não tem qualquer relação com a Epic Games e não vende nada. Também não é um site de notícias nem de estatísticas: apenas acompanha espíritos.',
+    privacidad: 'Privacidade',
+    privacidadTexto: 'O progresso fica guardado no próprio navegador. Não há registo e nada é enviado.',
+    fecha: (f) => 'Coleção revista em ' + f + '.'
+  }
+};
+
 export function htmlAcerca(datos, lang) {
   const etiquetas = etiquetasAcerca(lang);
-  const enIngles = lang === 'en';
   const fecha = formatearFecha(datos.fecha, lang);
   const jsonLd = jsonLdPagina('AboutPage', etiquetas, lang, {
     about: { '@type': 'VideoGame', name: 'Fortnite' }
   });
-  const h = enIngles
-    ? {
+  const h = ACERCA_PT[lang] ? { ...ACERCA_PT[lang], fecha: ACERCA_PT[lang].fecha(fecha) } : porIdioma(lang, {
+    en: {
         que: 'What Spritedex is',
         queTexto: 'A free tracker for Fortnite sprite collections. It shows every sprite with its family, variant, rarity, drop chance, summon cost, ability and where it is found, and lets you mark what you own and how far you have levelled it.',
         por: 'Why it exists',
@@ -215,8 +272,8 @@ export function htmlAcerca(datos, lang) {
         privacidad: 'Privacy',
         privacidadTexto: 'Your progress is stored in your own browser. There is no sign-up and nothing is uploaded.',
         fecha: 'Collection revised on ' + fecha + '.'
-      }
-    : {
+      },
+    es: {
         que: 'Qué es Spritedex',
         queTexto: 'Un rastreador gratuito de colecciones de espíritus de Fortnite. Muestra cada espíritu con su familia, variante, rareza, probabilidad, costo de invocación, habilidad y dónde aparece, y te deja marcar cuáles tienes y hasta qué nivel los subiste.',
         por: 'Por qué existe',
@@ -230,9 +287,10 @@ export function htmlAcerca(datos, lang) {
         privacidad: 'Privacidad',
         privacidadTexto: 'Tu progreso se guarda en tu propio navegador. No hay registro y no se sube nada.',
         fecha: 'Colección revisada el ' + fecha + '.'
-      };
+      }
+    });
   const cuerpo = [
-    migasContenido(lang, enIngles ? 'About' : 'Acerca de'),
+    migasContenido(lang, TEXTO[lang].acerca),
     '<main>',
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
@@ -241,7 +299,12 @@ export function htmlAcerca(datos, lang) {
     '<h2>' + escapar(h.datos) + '</h2><p>' + escapar(h.datosTexto) + '</p>',
     '<h2>' + escapar(h.quien) + '</h2><p>' + escapar(h.quienTexto) + '</p>',
     '<h2>' + escapar(h.no) + '</h2><p>' + escapar(h.noTexto) + '</p>',
-    '<h2>' + escapar(h.privacidad) + '</h2><p>' + escapar(h.privacidadTexto + ' ') + '<a href="/privacidad">' + escapar(enIngles ? 'Privacy policy (in Spanish)' : 'Política de privacidad') + '</a>.</p>',
+    '<h2>' + escapar(h.privacidad) + '</h2><p>' + escapar(h.privacidadTexto + ' ') + '<a href="/privacidad">' + escapar(porIdioma(lang, {
+      es: 'Política de privacidad',
+      en: 'Privacy policy (in Spanish)',
+      'pt-BR': 'Política de privacidade (em espanhol)',
+      'pt-PT': 'Política de privacidade (em espanhol)'
+    })) + '</a>.</p>',
     ctaHtml(lang),
     '<p class="nota">' + escapar(h.fecha) + '</p>',
     '</main>'

@@ -4,22 +4,49 @@
 // (src/seo/contenido.js, que lo renderiza) y la vista dentro de la aplicacion. Aqui solo hay
 // datos: ni <h2>, ni class, ni escapado. Cada renderer decide como se pinta. Sin dependencias:
 // se prueba con node --test.
+import { porIdioma, rarezaEnIdioma, numeroEnIdioma } from './idioma.js';
 
 // La fecha va en el texto y en el idioma de la pagina: "4 de octubre de 2026" / "October 4, 2026".
 export function formatearFecha(iso, lang) {
   if (!iso) return '';
   try {
-    return new Intl.DateTimeFormat(lang === 'en' ? 'en-US' : 'es-ES', { dateStyle: 'long', timeZone: 'UTC' })
+    const locale = porIdioma(lang, { es: 'es-ES', en: 'en-US', 'pt-BR': 'pt-BR', 'pt-PT': 'pt-PT' });
+    return new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' })
       .format(new Date(iso + 'T00:00:00Z'));
   } catch {
     return iso;
   }
 }
 
+// Los decimales en portugues llevan coma (0,5%); en es e ingles se conserva el punto de siempre.
+function decimal(lang, n) {
+  return numeroEnIdioma(n, lang);
+}
+
 // Preguntas frecuentes, como pares [pregunta, respuesta]: la pagina las pinta y el JSON-LD las
 // marca desde esta misma lista. Si divergieran, el marcado diria algo que el usuario no lee.
 function preguntas(lang, datos) {
   const t = datos;
+  if (lang === 'pt-BR') {
+    return [
+      ['O que são os espíritos do Fortnite?', 'São companheiros que aparecem durante a partida. Cada um concede uma habilidade enquanto você o carrega, de escudo extra a pulo duplo, e fica mais forte conforme sobe de nível.'],
+      ['Quantos espíritos existem?', 'O Spritedex acompanha ' + t.total + ' espíritos: ' + t.familias + ' famílias com suas variantes.'],
+      ['Como se consegue um espírito?', 'Eles aparecem em baús de espírito e zonas de extração, e alguns têm locais específicos. Cada ficha mostra onde aquele espírito aparece e sua probabilidade, que vai de ' + decimal(lang, t.dropMin) + '% a ' + decimal(lang, t.dropMax) + '%.'],
+      ['Como funcionam os níveis?', 'Cada espírito vai do nível 1 ao 5 e sua habilidade cresce com o nível. Acompanhar isso aqui é o jeito de ver quais ainda precisam subir.'],
+      ['Preciso de uma conta?', 'Não. Seu progresso fica guardado no seu próprio navegador, então nada é enviado e não é preciso se cadastrar.'],
+      ['O Spritedex é oficial?', 'Não. É um projeto de fãs sem relação com a Epic Games.']
+    ];
+  }
+  if (lang === 'pt-PT') {
+    return [
+      ['O que são os espíritos do Fortnite?', 'São companheiros que aparecem durante o jogo. Cada um concede uma habilidade enquanto está equipado, desde um escudo extra até um salto duplo, e fica mais forte à medida que sobe de nível.'],
+      ['Quantos espíritos existem?', 'O Spritedex regista ' + t.total + ' espíritos: ' + t.familias + ' famílias com as respetivas variantes.'],
+      ['Como se obtém um espírito?', 'Aparecem em baús de espírito e zonas de extração, e alguns têm locais específicos. Cada ficha indica onde aparece e a respetiva probabilidade, que vai de ' + decimal(lang, t.dropMin) + '% a ' + decimal(lang, t.dropMax) + '%.'],
+      ['Como funcionam os níveis?', 'Cada espírito vai do nível 1 ao 5 e a habilidade melhora com o nível. Aqui vê-se quais ainda precisam de subir.'],
+      ['Preciso de conta?', 'Não. O progresso fica guardado no próprio navegador, por isso não se envia nada e não é preciso registar-se.'],
+      ['O Spritedex é oficial?', 'Não. É um projeto de fãs sem ligação à Epic Games.']
+    ];
+  }
   if (lang === 'en') {
     return [
       ['What are Fortnite sprites?', 'Sprites are companions you find during a match. Each one grants an ability while you carry it, from extra shields to a double jump, and it gets stronger as you level it up.'],
@@ -62,6 +89,46 @@ function copia(lang, datos, fraseDrop, fecha) {
       datos: 'Data revised on ' + fecha + ' from the game and community sources. It can contain mistakes: if you see one, it is worth telling us.'
     };
   }
+  if (lang === 'pt-BR') {
+    return {
+      que: 'O que é um espírito',
+      queTexto: 'Um espírito é um companheiro que você pega durante a partida. Enquanto você o carrega, ele trabalha sozinho: dá escudo, recarrega suas armas, permite um pulo duplo, deixa itens cair. O poder dele cresce com o nível, então o mesmo espírito vale muito mais no 5 do que no 1.',
+      familias: 'Famílias e variantes',
+      familiasTexto: 'Os espíritos são agrupados por família (Água, Fogo, Fantasma, Jonesy, Peely…) e cada família tem variantes que mudam o visual: Básico, Dourado, Hacker, Hacker de Loot, Caçador de Recompensas, Doces ou Travessuras, Patinho e algumas outras. O Spritedex acompanha ' + datos.total + ' espíritos em ' + datos.familias + ' famílias.',
+      rarezas: 'Raridades',
+      rarezasTexto: 'A raridade indica o quão difícil é encontrar um espírito. Estas são as raridades da coleção atual:',
+      conseguir: 'Como conseguir',
+      conseguirTexto: 'Eles aparecem em baús de espírito e zonas de extração, e alguns têm locais próprios (rios, florestas, cidades, à noite…). A probabilidade muda muito de um para outro: nesta coleção ' + fraseDrop + '. A ficha de cada espírito mostra onde ele aparece.',
+      niveles: 'Níveis do 1 ao 5',
+      nivelesTexto: 'Todos os espíritos sobem de nível e a habilidade melhora a cada subida. Subir de nível é o que transforma um espírito que você já tem em um melhor, então um rastreador de coleção são, na prática, duas listas: o que você tem e o que ainda falta subir.',
+      costo: 'Custo de invocação',
+      costoTexto: 'Invocar um espírito custa Poeira Estelar, e a quantidade depende do espírito. Nesta coleção há ' + datos.costos + ' custos diferentes.',
+      coleccion: 'Acompanhar a coleção',
+      coleccionTexto: 'O Spritedex guarda a lista completa com família, variante, raridade e probabilidade, marca o que você tem, os níveis do 1 ao 5, compara com amigos e exporta um cartão para compartilhar. Sem conta e sem instalar: tudo fica guardado no seu navegador.',
+      faq: 'Perguntas frequentes',
+      datos: 'Dados revisados em ' + fecha + ' a partir do jogo e de fontes da comunidade. Podem ter erros: se você encontrar algum, vale avisar.'
+    };
+  }
+  if (lang === 'pt-PT') {
+    return {
+      que: 'O que é um espírito',
+      queTexto: 'Um espírito é um companheiro que se apanha durante o jogo. Enquanto está equipado, funciona sozinho: dá escudo, recarrega as armas, permite um salto duplo, deixa cair saque. O poder cresce com o nível, por isso o mesmo espírito vale muito mais no 5 do que no 1.',
+      familias: 'Famílias e variantes',
+      familiasTexto: 'Os espíritos agrupam-se por família (Água, Fogo, Fantasma, Jonesy, Peely…) e cada família tem variantes que mudam o aspeto: Básico, Dourado, Hacker, Hacker de Saque, Caçador de Recompensas, Doçuras ou Travessuras, Patinho e algumas mais. O Spritedex acompanha ' + datos.total + ' espíritos repartidos por ' + datos.familias + ' famílias.',
+      rarezas: 'Raridades',
+      rarezasTexto: 'A raridade indica a dificuldade de encontrar um espírito. Estas são as raridades da coleção atual:',
+      conseguir: 'Como os obter',
+      conseguirTexto: 'Aparecem em baús de espírito e zonas de extração, e alguns têm locais próprios (rios, florestas, cidades, de noite…). A probabilidade varia muito de um para outro: nesta coleção ' + fraseDrop + '. A ficha de cada espírito indica onde aparece.',
+      niveles: 'Níveis do 1 ao 5',
+      nivelesTexto: 'Todos os espíritos sobem de nível e a habilidade melhora com cada subida. Subir de nível é o que transforma um espírito que já se tem num melhor, por isso um registo de coleção são, na prática, duas listas: o que se tem e o que ainda falta subir.',
+      costo: 'Custo de invocação',
+      costoTexto: 'Invocar um espírito custa Pó Estelar, e a quantidade depende do espírito. Nesta coleção há ' + datos.costos + ' custos diferentes.',
+      coleccion: 'Acompanhar a coleção',
+      coleccionTexto: 'O Spritedex mantém a lista completa com família, variante, raridade e probabilidade, assinala o que se tem, os níveis do 1 ao 5, compara com amigos e exporta um cartão para partilhar. Sem conta e sem instalar: tudo fica guardado no navegador.',
+      faq: 'Perguntas frequentes',
+      datos: 'Dados revistos em ' + fecha + ' a partir do jogo e de fontes da comunidade. Podem conter erros: se encontrar algum, vale a pena avisar.'
+    };
+  }
   return {
     que: 'Qué es un espíritu',
     queTexto: 'Un espíritu es un compañero que recoges durante la partida. Mientras lo llevas, trabaja solo: te da escudo, recarga tus armas, te deja hacer un salto doble, suelta botín. Su poder crece con el nivel, así que el mismo espíritu vale mucho más en el 5 que en el 1.',
@@ -85,14 +152,17 @@ function copia(lang, datos, fraseDrop, fecha) {
 // El cuerpo de la guia en un idioma: secciones con titulo y bloques (parrafos, listas, tablas),
 // el FAQ y la nota de revision. Los pares del FAQ son los mismos que marca el JSON-LD.
 export function modeloGuia(lang, datos) {
-  const enIngles = lang === 'en';
   const fecha = formatearFecha(datos.fecha, lang);
   // Hay drops de una entre cien mil: decir "del 0.00001%" es cierto pero no se lee. Por debajo
   // del 0.01% se redacta como "menos del 0.01%", que sigue siendo verdad.
   const bajo = datos.dropMin > 0 && datos.dropMin < 0.01 ? null : datos.dropMin;
-  const fraseDrop = enIngles
-    ? (bajo === null ? 'goes from less than 0.01% to ' : 'goes from ' + bajo + '% to ') + datos.dropMax + '%'
-    : (bajo === null ? 'va de menos del 0.01% al ' : 'va del ' + bajo + '% al ') + datos.dropMax + '%';
+  const max = decimal(lang, datos.dropMax);
+  const fraseDrop = porIdioma(lang, {
+    en: (bajo === null ? 'goes from less than 0.01% to ' : 'goes from ' + bajo + '% to ') + datos.dropMax + '%',
+    es: (bajo === null ? 'va de menos del 0.01% al ' : 'va del ' + bajo + '% al ') + datos.dropMax + '%',
+    'pt-BR': (bajo === null ? 'vai de menos de 0,01% a ' : 'vai de ' + decimal(lang, bajo) + '% a ') + max + '%',
+    'pt-PT': (bajo === null ? 'varia entre menos de 0,01% e ' : 'varia entre ' + decimal(lang, bajo) + '% e ') + max + '%'
+  });
   const t = copia(lang, datos, fraseDrop, fecha);
   const parrafo = (texto) => ({ tipo: 'parrafo', texto });
   return {
@@ -104,8 +174,13 @@ export function modeloGuia(lang, datos) {
         titulo: t.rarezas,
         bloques: [parrafo(t.rarezasTexto)],
         tabla: {
-          cabeceras: [enIngles ? 'Rarity' : 'Rareza', enIngles ? 'Sprites' : 'Espíritus'],
-          filas: datos.porRareza.map((r) => [r.nombre, r.n])
+          cabeceras: porIdioma(lang, {
+            es: ['Rareza', 'Espíritus'],
+            en: ['Rarity', 'Sprites'],
+            'pt-BR': ['Raridade', 'Espíritos'],
+            'pt-PT': ['Raridade', 'Espíritos']
+          }),
+          filas: datos.porRareza.map((r) => [rarezaEnIdioma(r.nombre, lang), r.n])
         }
       },
       { titulo: t.conseguir, bloques: [parrafo(t.conseguirTexto)] },

@@ -37,8 +37,8 @@ test('etiquetas en rango y canonical autorreferente en las tres paginas y dos id
       const html = htmlDe(lang);
       assert.equal((html.match(/<h1>/g) || []).length, 1, nombre + '/' + lang + ': un solo h1');
       assert.ok(html.includes('<link rel="canonical" href="' + e.canonical + '" />'));
-      // Tres alternates en el head; el conmutador de idioma visible lleva su propio hreflang.
-      assert.equal((html.match(/<link rel="alternate" hreflang=/g) || []).length, 3, nombre + '/' + lang + ': tres hreflang en el head');
+      // Cinco alternates en el head (es, en, pt-BR, pt-PT, x-default); el conmutador visible lleva su propio hreflang.
+      assert.equal((html.match(/<link rel="alternate" hreflang=/g) || []).length, 5, nombre + '/' + lang + ': cinco hreflang en el head');
       assert.ok(html.includes('hreflang="' + (lang === 'en' ? 'es' : 'en') + '"'), nombre + '/' + lang + ': falta el enlace al otro idioma');
       assert.equal((html.match(/application\/ld\+json/g) || []).length, 1, nombre + '/' + lang + ': un JSON-LD');
       assert.ok(html.includes('<html lang="' + lang + '">'));

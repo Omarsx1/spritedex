@@ -6,6 +6,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { RUTAS, SITIO, canonicalDe, alternatesDe, entradaSeo, rutaConIdioma } from '../src/seo/rutas.js';
+import { rutaSinIdioma as rutaSinPrefijo } from '../src/i18n/core.js';
 
 test('cada ruta tiene titulo y descripcion propios, en rango y sin repetir', () => {
   const titulos = new Set();
@@ -83,7 +84,3 @@ test('rutaConIdioma reproduce el mismo esquema que usa la app', () => {
   assert.equal(rutaConIdioma('/amigos', 'es'), '/amigos');
 });
 
-function rutaSinPrefijo(p) {
-  if (p === '/en') return '/';
-  return p.startsWith('/en/') ? p.slice(3) : (p === '' ? '/' : p);
-}

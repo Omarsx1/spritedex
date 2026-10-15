@@ -4,6 +4,7 @@
 // /amigos y /en/amigos con su titulo y su canonical). Esto es para despues: al pasar de la
 // home a Amigos sin recargar, el <head> se quedaba el de la home.
 import { SITIO, IMAGEN_REDES, entradaSeo, etiquetasSeo, jsonLdDe } from './rutas.js';
+import { ogLocale, ogLocalesAlternos } from './idioma.js';
 
 function ponerMeta(atributo, clave, contenido) {
   let nodo = document.head.querySelector('meta[' + atributo + '="' + clave + '"]');
@@ -46,7 +47,14 @@ export function aplicarSeoRuta(pathname, { noindex = false } = {}) {
   ponerMeta('property', 'og:title', titulo);
   ponerMeta('property', 'og:description', descripcion);
   ponerMeta('property', 'og:image', IMAGEN_REDES);
-  ponerMeta('property', 'og:locale', lang === 'en' ? 'en_US' : 'es_MX');
+  ponerMeta('property', 'og:locale', ogLocale(lang));
+  document.head.querySelectorAll('meta[property="og:locale:alternate"]').forEach((n) => n.remove());
+  for (const alterno of alternates.length > 1 ? ogLocalesAlternos(lang) : []) {
+    const nodo = document.createElement('meta');
+    nodo.setAttribute('property', 'og:locale:alternate');
+    nodo.setAttribute('content', alterno);
+    document.head.appendChild(nodo);
+  }
   ponerMeta('name', 'twitter:card', 'summary_large_image');
   ponerMeta('name', 'twitter:title', titulo);
   ponerMeta('name', 'twitter:description', descripcion);
@@ -72,7 +80,7 @@ export function aplicarSeoRuta(pathname, { noindex = false } = {}) {
     ponerJsonLd(jsonLdDe(entrada));
   }
 
-  // El sitio es el mismo en los dos idiomas: se lo decimos tambien al <html>.
+  // El sitio es el mismo en todos los idiomas: se lo decimos tambien al <html>.
   document.documentElement.setAttribute('lang', lang);
   document.documentElement.setAttribute('data-sitio', SITIO);
   return { lang, titulo, canonical };
