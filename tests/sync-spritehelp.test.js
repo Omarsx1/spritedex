@@ -47,3 +47,11 @@ test('construye el provisional con la familia de la app y arte de spritehelp', (
   assert.equal(espiritu.unreleased, false);
   assert.equal(espiritu.gen, 2);
 });
+
+test('el básico usa el nombre real del juego en inglés', () => {
+  const espiritu = construirProvisional(
+    { id: 'obsession_basic', name: 'Obsession', base: 'obsession', theme: 'Basic', rarity: 'Rare' },
+    '2026-10-15T08:00:00.000Z'
+  );
+  assert.equal(espiritu.nameEn, 'One Wish Willow Sprite');
+});

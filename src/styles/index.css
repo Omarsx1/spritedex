@@ -3885,6 +3885,11 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   pointer-events: none !important;
 }
 
+.sprite-card .card-image {
+  margin-top: 17px;
+  margin-bottom: 1px;
+}
+
 .card-image img,
 .list-item-image img {
   max-width: 100%;
@@ -9555,8 +9560,13 @@ body .swal2-container.swal2-bottom {
 /* El vampiro pide un poco mas que la calabaza: su cabeza esta todavia mas baja y 6px no
    bastaban. Va al final del archivo a proposito, para ganarle a cualquier regla anterior
    con la misma especificidad. */
+.sprite-card[data-familia="vampire"] .card-image img:not(.card-image__crown) {
+  position: relative;
+  top: 6px;
+}
+
 .sprite-card[data-familia="vampire"] .card-image__crown {
-  top: -6px;
+  top: 0;
 }
 
 .ms-spotlight-card[data-familia="vampire"] .ms-card__crown {

@@ -4,6 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { construirCatalogo } from '../scripts/build_locale_catalog.mjs';
+import { NOMBRE_EN_REAL } from '../scripts/sync-spritehelp.js';
 
 const leer = (ruta) => JSON.parse(fs.readFileSync(ruta, 'utf8'));
 const catalogo = leer('src/data/official_sprites.json');
@@ -44,7 +45,7 @@ test('los nombres son los del juego: variante primero y sin el sufijo " Sprite"'
 
 test('ningun nombre arrastra el sufijo " Sprite" ni el id tecnico', () => {
   const raros = Object.entries(generado)
-    .filter(([id, nombre]) => /Sprite/i.test(nombre) || nombre.includes(id) || nombre.includes('_'))
+    .filter(([id, nombre]) => (/Sprite/i.test(nombre) && !Object.values(NOMBRE_EN_REAL).includes(nombre)) || nombre.includes(id) || nombre.includes('_'))
     .map(([id]) => id);
   assert.deepEqual(raros, []);
 });

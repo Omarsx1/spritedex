@@ -39,7 +39,7 @@ const FAMILIAS = {
   overshield: 'Overshield', onigiri: 'WinnerC', xray: 'WinnerB', megaman: 'ImprovedSlide',
   crash: 'BodySlam', morgana: 'IncreaseHeals', blinky: 'GhostDamage', birthday: 'Birthday',
   pond: 'WinnerA', spookydash: 'PhaseDash', vampire: 'HealthSiphon', deer: 'IncreasedMelee',
-  dumpsterdive: 'WinnerD'
+  dumpsterdive: 'WinnerD', honey: 'WinnerE', obsession: 'CargoLying'
 };
 
 // tema de nuestro catalogo -> variante de la captura cruda, y su etiqueta en ingles
