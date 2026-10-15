@@ -39,6 +39,12 @@ const FAMILIA_SPRITEHELP_A_APP = { spooky: 'spookydash' };
 
 const RAREZAS_VALIDAS = new Set(['Rare', 'Special', 'Epic', 'Legendary', 'Mythic']);
 
+// spritehelp da el nombre de la familia para el básico; el juego usa el nombre del espíritu.
+export const NOMBRE_EN_REAL = {
+  honey_basic: 'Honey Sprite',
+  obsession_basic: 'One Wish Willow Sprite'
+};
+
 export function extraerChunks(html) {
   const rutas = [...html.matchAll(/\/_next\/static\/chunks\/[^"'\s]+\.js/g)].map((m) => m[0]);
   return [...new Set(rutas)].map((ruta) => `${SPRITEHELP_URL}${ruta}`);
@@ -98,14 +104,15 @@ export function construirProvisional(entrada, fechaLanzamiento) {
   const temaEs = THEME_NAMES_ES[tema] || tema;
   const rareza = esBase ? (RAREZAS_VALIDAS.has(entrada.rarity) ? entrada.rarity : 'Rare') : 'Special';
 
+  const id = `${familia}_${sufijo}`;
   const espiritu = {
-    id: `${familia}_${sufijo}`,
+    id,
     name: esBase ? familiaEs : `${familiaEs} ${temaEs}`,
     theme: tema,
     rarity: rareza,
     unreleased: false,
     isNew: true,
-    nameEn: entrada.name,
+    nameEn: NOMBRE_EN_REAL[id] || entrada.name,
     releaseDate: fechaLanzamiento,
     artSource: 'spritehelp'
   };
@@ -157,6 +164,15 @@ async function main() {
   const completo = JSON.parse(fs.readFileSync(COMPLETE_SPRITES_PATH, 'utf-8'));
   const nombresFortnite = new Set(completo.map((s) => normalizeKey(s.name)));
 
+  let corregidos = 0;
+  for (const oficial of oficiales) {
+    const real = NOMBRE_EN_REAL[oficial.id];
+    if (oficial.artSource === 'spritehelp' && real && oficial.nameEn !== real) {
+      oficial.nameEn = real;
+      corregidos++;
+    }
+  }
+
   let agregados = 0;
   for (const entrada of entradas) {
     if (entrada.unreleased) continue;
@@ -171,10 +187,10 @@ async function main() {
     console.log(`🆕 spritehelp: ${espiritu.id} (${espiritu.name}) lanzado ${espiritu.releaseDate}`);
   }
 
-  if (agregados > 0) {
+  if (agregados > 0 || corregidos > 0) {
     fs.writeFileSync(OFFICIAL_SPRITES_PATH, JSON.stringify(oficiales, null, 2), 'utf-8');
   }
-  console.log(`spritehelp: ${entradas.length} espíritus leídos, ${agregados} agregados provisionalmente.`);
+  console.log(`spritehelp: ${entradas.length} espíritus leídos, ${agregados} agregados provisionalmente, ${corregidos} nombres en inglés corregidos.`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
