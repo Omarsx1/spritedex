@@ -3885,6 +3885,11 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   pointer-events: none !important;
 }
 
+.sprite-card .card-image {
+  margin-top: 17px;
+  margin-bottom: 1px;
+}
+
 .card-image img,
 .list-item-image img {
   max-width: 100%;
