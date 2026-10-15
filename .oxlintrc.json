@@ -24,7 +24,7 @@
   },
   "overrides": [
     {
-      "files": ["scripts/**", "tests/**", "vite.config.js"],
+      "files": ["scripts/**", "tests/**", "assets-src/**", "vite.config.js"],
       "env": {
         "node": true
       }

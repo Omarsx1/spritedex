@@ -56,6 +56,32 @@ function getChromeExecutablePath() {
 // Diccionario de traducción oficial inglés -> español
 const TRANSLATIONS = {
   abilities: {
+    '(Active - Jump In Air) Spooky Dash lets you phase through some objects.':
+      '(Activa - Salto en el aire) Spooky Dash te permite atravesar algunos objetos.',
+    'Increases chances of spawning items from your Loot Hacks. (Active - Jump In Air) Spooky Dash lets you phase through some objects.':
+      'Aumenta las probabilidades de que aparezcan objetos de tus Hackeos de botín. (Activa - Salto en el aire) Spooky Dash te permite atravesar algunos objetos.',
+    '(Active - Jump In Air) Double Jump. Cooldown between jumps decreases with each Level Up!':
+      '(Activa - Salto en el aire) Salto doble. ¡El tiempo de recarga entre saltos disminuye con cada subida de nivel!',
+    'Health recovered percent increases with each Level Up!':
+      '¡El porcentaje de salud recuperada aumenta con cada subida de nivel!',
+    'Increases chances of spawning items from your Loot Hacks. Health recovered percent increases with each Level Up!':
+      'Aumenta las probabilidades de que aparezcan objetos de tus Hackeos de botín. ¡El porcentaje de salud recuperada aumenta con cada subida de nivel!',
+    'Grants cloak for a duration when you take damage.':
+      'Te otorga camuflaje durante un tiempo al recibir daño.',
+    'Grants overshield, scaling with level.':
+      'Otorga sobreescudo, aumentando según el nivel.',
+    '(Active - Jump In Air) Triggers a whirlwind attack, damaging and knocking back nearby enemies. Damage increases and cooldown decreases with each Level Up!':
+      '(Activa - Salto en el aire) Activa un ataque torbellino que daña y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!',
+    '(Active) - Jump shortly after landing to trigger a Super Jump, if charges are present.':
+      '(Activa) - Salta poco después de aterrizar para activar un Supersalto, si hay cargas disponibles.',
+    '(Active - Jump In Air) Hover with the help of Tails!':
+      '(Activa - Salto en el aire) ¡Flota con la ayuda de Tails!',
+    'Increases Overdrive duration with each Level Up!':
+      '¡Aumenta la duración de la sobremarcha con cada subida de nivel!',
+    'Increases the effectiveness of healing items.':
+      'Aumenta la efectividad de los objetos curativos.',
+    'Increases chances of spawning items from your Loot Hacks.':
+      'Aumenta las probabilidades de que aparezcan objetos de tus Hackeos de botín.',
     'Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!':
       '¡Otorga la habilidad de realizar un salto adicional en el aire! El tiempo de recarga disminuye con cada subida de nivel.',
     'Grants a bush on you after a duration, gain a bush on elimination at max level.':
@@ -100,6 +126,7 @@ const TRANSLATIONS = {
       'El límite de salud regenerada aumenta por nivel: 60 de salud -> 70 -> 80 -> 90 -> 100 de salud.'
   },
   perks: {
+    'Gain charges over time.': 'Gana cargas con el tiempo.',
     'Gain 3x bonus XP from eliminations':
       'Gana el triple (3x) de PE de bonificación por eliminaciones',
     'Button mash! All inputs are correct when entering cheat codes found in the world':

@@ -370,7 +370,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   klombo_loothacker: {
     ability: 'Otorga objetos aleatorios en cada nivel y solo sube de nivel al consumir objetos. ¡La calidad de los objetos aumenta con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Jackrabbit
@@ -388,7 +387,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   jackrabbit_loothacker: {
     ability: '(Activa - Salto en el aire) Salto doble. ¡El tiempo de recarga entre saltos disminuye con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Shadow
@@ -406,7 +404,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   shadow_loothacker: {
     ability: 'Recarga automáticamente las armas no equipadas a lo largo del tiempo. Recarga el arma equipada al nivel máximo. ¡La recarga automática se vuelve más rápida con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Arbustín
@@ -424,7 +421,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   bush_loothacker: {
     ability: 'Te otorga un arbusto tras cierta duración; obtén un arbusto al realizar una eliminación en el nivel máximo. ¡El tiempo de activación del arbusto disminuye con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Tails
@@ -442,7 +438,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   tails_loothacker: {
     ability: '¡Otorga la habilidad de flotar en el aire con la ayuda de Tails! ¡La velocidad al flotar aumenta con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Killswitch
@@ -461,7 +456,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   killswitch_loothacker: {
     ability: '(Activa - Apuntar en el aire) Entra en tiempo de suspensión en el aire con precisión mejorada. ¡La precisión aumenta con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Aventurero
@@ -479,7 +473,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   adventure_loothacker: {
     ability: '¡Mejora un objeto aleatorio en el inventario del jugador con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Jonesy
@@ -497,7 +490,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   jonesy_loothacker: {
     ability: 'Recupera algo de salud o escudo tras recibir daño después de un breve período. ¡La cantidad curada aumenta con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Sonic
@@ -515,7 +507,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   sonic_loothacker: {
     ability: '¡Hay que ir rápido! ¡Esprinta más rápido con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Victorioso
@@ -533,7 +524,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   crown_loothacker: {
     ability: 'Solo sube de nivel al ganar partidas. Sube de nivel más rápido con victorias con corona. ¡Nuevas variantes desbloqueadas tras dominarlo!',
-    specialPerk: 'Sin confirmar.'
   },
   crown_bountyhunter: {
     ability: 'Solo sube de nivel al ganar partidas. Sube de nivel más rápido con victorias con corona. ¡Nuevas variantes desbloqueadas tras dominarlo!',
@@ -555,7 +545,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   '8bit_loothacker': {
     ability: 'Encuentra una escopeta de 8 bits en tu primer cofre y obtén un multiplicador de puntuación para ella.',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Exploratormentas
@@ -574,7 +563,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   stormscout_loothacker: {
     ability: 'Aplica Sobrecarga tras recibir cierta cantidad de daño de la tormenta. ¡Aumenta la duración de la sobrecarga con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Protector
@@ -593,7 +581,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   overshield_loothacker: {
     ability: 'Otorga sobreescudo, aumentando según el nivel.',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Rayos X
@@ -612,7 +599,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   xray_loothacker: {
     ability: 'Marca periódicamente a los enemigos en un área a tu alrededor. ¡Marca con más frecuencia y en un radio mayor con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Onigiri
@@ -630,7 +616,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   onigiri_loothacker: {
     ability: 'Aplica Sobrecarga tras comer o beber un consumible. ¡La sobrecarga dura más tiempo con cada subida de nivel!',
-    specialPerk: 'Sin confirmar.'
   },
 
   // Espíritu Megaman
@@ -655,7 +640,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   crash_loothacker: {
     ability: 'Otorga un ataque de torbellino en el aire que inflige daño y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!',
-    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
   },
   crash_bountyhunter: {
     ability: 'Otorga un ataque de torbellino en el aire que inflige daño y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!',
@@ -678,7 +662,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   blinky_loothacker: {
     ability: 'Otorga invisibilidad tras recibir daño. ¡La duración de la invisibilidad aumenta con cada subida de nivel!',
-    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
   },
   blinky_bountyhunter: {
     ability: 'Otorga invisibilidad tras recibir daño. ¡La duración de la invisibilidad aumenta con cada subida de nivel!',
@@ -701,7 +684,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   pond_loothacker: {
     ability: 'Permite realizar un supersalto al acumular cargas a lo largo del tiempo, emitiendo una onda de choque al aterrizar. ¡La fuerza del salto aumenta y la recarga disminuye por nivel!',
-    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
   },
   pond_bountyhunter: {
     ability: 'Permite realizar un supersalto al acumular cargas a lo largo del tiempo, emitiendo una onda de choque al aterrizar. ¡La fuerza del salto aumenta y la recarga disminuye por nivel!',
@@ -724,7 +706,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   birthday_loothacker: {
     ability: 'Al abrir cofres o eliminar enemigos, existe la posibilidad de generar porciones de pastel que restauran salud y escudo.',
-    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
   },
   birthday_bountyhunter: {
     ability: 'Al abrir cofres o eliminar enemigos, existe la posibilidad de generar porciones de pastel que restauran salud y escudo.',
@@ -747,7 +728,6 @@ export const SPIRIT_DATA_OVERRIDES = {
   },
   morgana_loothacker: {
     ability: 'Aumenta la efectividad de los objetos de curación consumibles. ¡La efectividad de curación aumenta con cada subida de nivel!',
-    specialPerk: 'Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'
   },
   morgana_bountyhunter: {
     ability: 'Aumenta la efectividad de los objetos de curación consumibles. ¡La efectividad de curación aumenta con cada subida de nivel!',
