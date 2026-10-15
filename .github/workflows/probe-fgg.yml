@@ -1,0 +1,24 @@
+name: Diagnóstico fortnite.gg (temporal)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 11.21.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - id: setup-chrome
+        uses: browser-actions/setup-chrome@latest
+      - run: pnpm install --frozen-lockfile
+      - name: Probar ficha 4031827
+        env:
+          PUPPETEER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: node scripts/probe-fgg.mjs "https://fortnite.gg/sprites?id=4031827"

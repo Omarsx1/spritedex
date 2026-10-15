@@ -1,0 +1,13 @@
+import puppeteer from 'puppeteer-core';
+const url = process.argv[2];
+const browser = await puppeteer.launch({ executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, headless: true, args: ['--no-sandbox'] });
+const page = await browser.newPage();
+await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36');
+await page.goto(url, { waitUntil: 'networkidle2', timeout: 90000 });
+await new Promise(r => setTimeout(r, 15000));
+console.log('TITLE', await page.title());
+const text = await page.evaluate(() => document.body.innerText);
+console.log('LEN', text.length);
+console.log(text.slice(0, 3000));
+console.log('HAS HONEY', /honey/i.test(text));
+await browser.close();
