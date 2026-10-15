@@ -1,7 +1,7 @@
 // Nombres en español de familias y temas. Fuente única: la app y los scripts la leen de aquí.
 export const FAMILY_NAMES_MAP = {
   honey: 'Miel',
-  obsession: 'Obsesión',
+  obsession: 'Un Deseo',
   water: 'Agua',
   earth: 'Tierra',
   fire: 'Fuego',

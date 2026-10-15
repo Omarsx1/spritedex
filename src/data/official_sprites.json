@@ -2562,7 +2562,7 @@
   },
   {
     "id": "obsession_basic",
-    "name": "Obsesión",
+    "name": "Un Deseo",
     "theme": "Basic",
     "rarity": "Rare",
     "unreleased": false,
@@ -2574,7 +2574,7 @@
   },
   {
     "id": "obsession_gold",
-    "name": "Obsesión Dorado",
+    "name": "Un Deseo Dorado",
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
@@ -2586,7 +2586,7 @@
   },
   {
     "id": "obsession_cheat",
-    "name": "Obsesión Hacker",
+    "name": "Un Deseo Hacker",
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
@@ -2598,7 +2598,7 @@
   },
   {
     "id": "obsession_hacker",
-    "name": "Obsesión Hacker de Botín",
+    "name": "Un Deseo Hacker de Botín",
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
@@ -2610,7 +2610,7 @@
   },
   {
     "id": "obsession_bounty",
-    "name": "Obsesión Cazarrecompensas",
+    "name": "Un Deseo Cazarrecompensas",
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
@@ -2622,7 +2622,7 @@
   },
   {
     "id": "obsession_treat",
-    "name": "Obsesión Dulce o Truco",
+    "name": "Un Deseo Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
     "unreleased": false,
