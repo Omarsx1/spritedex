@@ -12,6 +12,7 @@ import catalogEn from './i18n/catalog.en.json';
 import familiasEn from './i18n/familias.en.json';
 import textosJuego from './i18n/textos.juego.json';
 import { getLang, t } from '../i18n/texto.js';
+import { elegirNombreFamilia, elegirTextoJuego, IDIOMAS_NOMBRE_EN } from './i18n/elegir.js';
 import { rutaAssetEspiritu, rutaBasicoFamilia } from '../utils/spriteAssets.js';
 
 export const SPRITE_THUMBS = spriteThumbsJson;
@@ -899,23 +900,19 @@ export const FAMILY_NAMES_EN = familiasEn;
 export { pickName } from '../utils/spriteName.js';
 
 export function pickFamilyName(familyId, lang = getLang()) {
-  if (!familyId) return '';
-  if (lang === 'en') return FAMILY_NAMES_EN[familyId] || FAMILY_NAMES_MAP[familyId] || familyId;
-  return FAMILY_NAMES_MAP[familyId] || familyId;
+  return elegirNombreFamilia(familyId, lang, FAMILY_NAMES_MAP, FAMILY_NAMES_EN);
 }
 
 // Texto que viene de los DATOS del juego (habilidad, perk, ubicacion y coste). Se traduce
 // por catalogo, con el texto en español como clave; si falta una traduccion se muestra el
 // original en lugar de una clave rota.
 export function pickTexto(valor, lang = getLang()) {
-  if (!valor) return valor;
-  if (lang !== 'en') return valor;
-  return textosJuego[valor] || valor;
+  return elegirTextoJuego(textosJuego, valor, lang);
 }
 
 export function pickThemeName(theme, lang = getLang()) {
   if (!theme) return '';
-  const mapa = lang === 'en' ? THEME_NAMES_EN : THEME_NAMES_ES;
+  const mapa = IDIOMAS_NOMBRE_EN.includes(lang) ? THEME_NAMES_EN : THEME_NAMES_ES;
   return mapa[theme] || theme;
 }
 
