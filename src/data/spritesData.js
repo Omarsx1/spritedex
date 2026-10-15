@@ -279,6 +279,8 @@ export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bo
 export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
 
 export const FAMILY_NAMES_MAP = {
+  honey: 'Miel',
+  obsession: 'Obsesión',
   water: 'Agua',
   earth: 'Tierra',
   fire: 'Fuego',
