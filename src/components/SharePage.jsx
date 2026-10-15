@@ -45,12 +45,6 @@ function leerPerfActivado() {
 // "📱 Vertical" -> { emoji: '📱', nombre: 'Vertical' }. El emoji se pinta aparte para poder
 // esconderlo en pantallas estrechas: con el texto solo, la etiqueta ya dice lo mismo y no
 // obliga a partirla en dos lineas dentro de una columna estrecha.
-function partirEtiqueta(texto) {
-  const partes = String(texto || '').trim().split(/\s+/);
-  if (partes.length < 2) return { emoji: '', nombre: String(texto || '') };
-  return { emoji: partes[0], nombre: partes.slice(1).join(' ') };
-}
-
 function Desplegable({ etiqueta, valor, opciones, abierto, onAlternar, onElegir, enRejilla }) {
   const actual = opciones.find((o) => o.id === valor);
   return (
@@ -63,7 +57,6 @@ function Desplegable({ etiqueta, valor, opciones, abierto, onAlternar, onElegir,
         aria-expanded={abierto}
       >
         <span>
-          {actual && actual.emoji ? <span className="sdm-share-pro__dd-emoji">{actual.emoji}</span> : null}
           {actual ? actual.nombre : (opciones[0] ? opciones[0].nombre : '')}
         </span>
         <ChevronDown size={13} />
@@ -94,7 +87,6 @@ function Desplegable({ etiqueta, valor, opciones, abierto, onAlternar, onElegir,
                     onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }}
                   />
                 ) : null}
-                {o.emoji ? <span className="sdm-share-pro__dd-emoji">{o.emoji}</span> : null}
                 <span>{o.nombre}</span>
               </button>
             ))}
@@ -716,8 +708,8 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
             etiqueta={t('compartir.formato')}
             valor={format}
             opciones={[
-              { id: 'checklist', ...partirEtiqueta(t('compartir.vertical')) },
-              { id: 'square', ...partirEtiqueta(t('compartir.horizontal')) }
+              { id: 'checklist', nombre: t('compartir.vertical') },
+              { id: 'square', nombre: t('compartir.horizontal') }
             ]}
             abierto={menuAbierto === 'formato'}
             onAlternar={() => setMenuAbierto(menuAbierto === 'formato' ? '' : 'formato')}

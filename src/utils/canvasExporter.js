@@ -193,7 +193,9 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // ovalo recortado en seco; las capturas v65 con la mancha no valen.
   // v67: la ficha estrena corona de maestria al lado opuesto del estado; las capturas v66
   // sin corona no valen.
-  return `v67_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v68: la firma del pie sube a 42 px; las capturas v67 con la firma de 30 px no valen.
+  // v69: la firma del pie baja a 39 px; las capturas v68 con la firma de 42 px no valen.
+  return `v69_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -1030,7 +1032,7 @@ async function renderGlitchOverrideTemplate({
   // que el pie es tipografia limpia con aire alrededor. Todo lo del pie
   // escala junto.
   const escFooter = anchoDiseno / 1200;
-  const firmaAlto = Math.round(30 * escFooter);
+  const firmaAlto = Math.round(39 * escFooter);
   const baseFila = Math.round(60 * escFooter);
 
   // El QR ya no vive en la grilla: baja al pie, a la esquina inferior derecha que ocupaba
