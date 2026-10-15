@@ -8593,6 +8593,14 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
   animation-delay: 0.07s;
 }
 
+/* En movil el desplazamiento del split (fijo en px) es grande frente al logo y
+   deja manchas de color detras; el logo se queda limpio. */
+@media (max-width: 768px) {
+  .hero__title-fnm-ghosts {
+    display: none;
+  }
+}
+
 @keyframes fnm-logo-pulse {
   0% {
     filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.7))
