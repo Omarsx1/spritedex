@@ -5,7 +5,7 @@
 // donde salen los datos y por que). Sin dependencias: reciben los numeros ya calculados y
 // devuelven HTML, asi que se prueban con node --test.
 
-import { SITIO } from './rutas.js';
+import { SITIO, TITULO_SITIO } from './rutas.js';
 import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, RUTAS_CONTENIDO } from './plantilla.js';
 import { modeloGuia, formatearFecha } from './guia.js';
 import { hreflangsDe, porIdioma } from './idioma.js';
@@ -53,6 +53,7 @@ function etiquetasDe(clave, lang, extras = {}) {
   return {
     lang,
     titulo: TITULOS[lang][clave],
+    tituloDocumento: TITULO_SITIO,
     descripcion: recortar(extras.descripcion || DESCRIPCIONES[lang][clave], 160),
     canonical: SITIO + conIdiomaRuta(ruta, lang),
     alternates: hreflangsDe(SITIO, ruta)

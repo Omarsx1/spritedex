@@ -75,7 +75,7 @@ const PrivacyPolicyModal = lazy(() => import('./components/PrivacyPolicyModal').
 // (imagen social, locale, idioma del documento), asi que ningun titulo se repite aqui.
 function aplicarSeoGuia(lang) {
   if (typeof document === 'undefined') return;
-  const { titulo, descripcion, canonical, alternates } = etiquetasGuia(lang);
+  const { titulo, tituloDocumento, descripcion, canonical, alternates } = etiquetasGuia(lang);
   const ponerMeta = (atributo, clave, contenido) => {
     let nodo = document.head.querySelector('meta[' + atributo + '="' + clave + '"]');
     if (!nodo) {
@@ -85,7 +85,7 @@ function aplicarSeoGuia(lang) {
     }
     nodo.setAttribute('content', contenido);
   };
-  document.title = titulo;
+  document.title = tituloDocumento || titulo;
   ponerMeta('name', 'description', descripcion);
   ponerMeta('property', 'og:url', canonical);
   ponerMeta('property', 'og:title', titulo);

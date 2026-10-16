@@ -130,7 +130,7 @@ export function headHtml(etiquetas, ogImage) {
   return [
     '<meta charset="utf-8" />',
     '<meta name="viewport" content="width=device-width, initial-scale=1.0" />',
-    '<title>' + escapar(etiquetas.titulo) + '</title>',
+    '<title>' + escapar(etiquetas.tituloDocumento || etiquetas.titulo) + '</title>',
     '<meta name="description" content="' + escapar(etiquetas.descripcion) + '" />',
     '<link rel="canonical" href="' + etiquetas.canonical + '" />',
     '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />',

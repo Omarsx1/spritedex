@@ -11,6 +11,7 @@ import { conIdioma, idiomaDeRuta, rutaSinIdioma } from '../i18n/core.js';
 import { hreflangsDe, porIdioma } from './idioma.js';
 
 export const SITIO = 'https://spritedex.gg';
+export const TITULO_SITIO = 'Spritedex';
 export const IMAGEN_REDES = SITIO + '/icon-512.png';
 
 export const RUTAS = [
@@ -126,6 +127,7 @@ export function etiquetasSeo(entrada) {
   return {
     lang,
     titulo: entrada.titulos[lang],
+    tituloDocumento: TITULO_SITIO,
     descripcion: entrada.descripciones[lang],
     canonical: canonicalDe(entrada.ruta, entrada.idiomas.length > 1 ? lang : 'es'),
     alternates: entrada.noindex ? [] : alternatesDe(entrada.ruta)

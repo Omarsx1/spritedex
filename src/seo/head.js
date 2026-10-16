@@ -38,9 +38,9 @@ function ponerJsonLd(datos) {
 export function aplicarSeoRuta(pathname, { noindex = false } = {}) {
   if (typeof document === 'undefined') return null;
   const entrada = entradaSeo(pathname);
-  const { lang, titulo, descripcion, canonical, alternates } = etiquetasSeo(entrada);
+  const { lang, titulo, tituloDocumento, descripcion, canonical, alternates } = etiquetasSeo(entrada);
 
-  document.title = titulo;
+  document.title = tituloDocumento || titulo;
   ponerMeta('name', 'description', descripcion);
   ponerCanonical(canonical);
   ponerMeta('property', 'og:url', canonical);

@@ -38,10 +38,10 @@ const escapar = (texto) => String(texto)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
 function bloqueHead(entrada) {
-  const { lang, titulo, descripcion, canonical, alternates } = etiquetasSeo(entrada);
+  const { lang, titulo, tituloDocumento, descripcion, canonical, alternates } = etiquetasSeo(entrada);
   const jsonLd = jsonLdDe(entrada);
   const lineas = [
-    '<title>' + escapar(titulo) + '</title>',
+    '<title>' + escapar(tituloDocumento || titulo) + '</title>',
     '<meta name="description" content="' + escapar(descripcion) + '" />',
     '<link rel="canonical" href="' + canonical + '" />',
     '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />',

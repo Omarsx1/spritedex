@@ -8,7 +8,7 @@
 // Por que existe: los 278 espiritus solo vivian dentro de la SPA (el detalle se abria en un
 // modal por estado, sin URL). Todo su contenido unico era invisible para un buscador.
 
-import { SITIO } from './rutas.js';
+import { SITIO, TITULO_SITIO } from './rutas.js';
 import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, ZONA } from './plantilla.js';
 import { porIdioma, hreflangsDe, rarezaEnIdioma, numeroEnIdioma } from './idioma.js';
 
@@ -82,6 +82,7 @@ export function etiquetasHubEspiritus(total, lang) {
   return {
     lang,
     titulo,
+    tituloDocumento: TITULO_SITIO,
     descripcion,
     canonical: SITIO + rutaConIdiomaEspiritu(RUTA_HUB, lang),
     alternates: hreflangsDe(SITIO, RUTA_HUB)
