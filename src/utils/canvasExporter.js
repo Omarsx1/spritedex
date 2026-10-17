@@ -239,14 +239,10 @@ export function srcParaCollage(sprite) {
 }
 
 // Corona de maestria de la lona: el MISMO asset que usa la rejilla de la app, para que la
-// captura y la pantalla cuenten lo mismo. Su caja en CSS (grid/list/swiper) es 28 x 19.
+// captura y la pantalla cuenten lo mismo. Su caja en CSS (grid) es 28 x 19 sobre una ficha
+// de 234 px de ancho, o sea el 12% del ancho de ficha; el mismo cociente se usa aqui.
 const CORONA_MAESTRIA = '/img/x/sprites/crown.webp';
 const CORONA_ASPECTO = 28 / 19;
-// El webp de la corona no viene recto: su base baja ~17 grados (medido columna a columna
-// sobre sus 31 x 21 px: el borde inferior recorre 13 -> 20 en 24 columnas y luego sube por
-// la punta). La rejilla lo tapa con su propia rotacion CSS; en la lona se dibuja girada
-// para que salga nivelada.
-const CORONA_INCLINACION = 17 * Math.PI / 180;
 
 export function loadImage(src, bajaPrioridad = false) {
   if (!src) return Promise.resolve(null);
@@ -708,8 +704,7 @@ export async function generateSpritedexCardImage({
       if (img) loadedImagesMap['__logo_mares__'] = img;
     }),
     // La corona se pide siempre, aunque no haya ningun espiritu maxeado: pesa menos de
-    // 1 KB y asi la ficha no se queda sin ella porque la peticion llegue tarde. Si no
-    // llega, la ficha sale sin corona en vez de romperse.
+    // 1 KB y asi la ficha no se queda sin ella porque la peticion llegue tarde.
     loadImage(CORONA_MAESTRIA, true).then((img) => {
       if (img) loadedImagesMap['__corona__'] = img;
     }),
@@ -869,15 +864,31 @@ export function getSpriteNameLines(ctx, fullName, maxAncho, maxAlto, objetivo, f
 // Geometria interna de una ficha (relativa a su esquina): badge de estado abajo, banda
 // del nombre encima y zona del espiritu arriba. Una sola fuente para que el precálculo
 // de la talla unica de nombres use EXACTAMENTE la misma cadena que el dibujo.
-function geometriaFichaNombre(cardW, cardH, conImagen) {
+// Ajustes de ficha que dependen del formato de la lona. El vertical tiene celdas mas altas:
+// se lleva aire extra bajo el pie y el espiritu ocupa una porcion mayor de su zona para que
+// apretar las filas no encoja el arte. El cuadrado se queda con los valores de siempre.
+function ajustesFicha(cardH, isSquare) {
+  return isSquare
+    ? { airePie: 0, factorEspiritu: 0.80 }
+    : { airePie: Math.round(cardH * 0.10), factorEspiritu: 0.88 };
+}
+
+function geometriaFichaNombre(cardW, cardH, conImagen, { airePie = 0, factorEspiritu = 0.80 } = {}) {
   const badgeH = Math.max(16, Math.min(28, Math.round(cardH * 0.15)));
   const bottomGutter = Math.max(8, Math.min(13, Math.round(cardH * 0.045)));
-  const badgeY = cardH - badgeH - bottomGutter;
+  // El pie no cuelga del borde inferior: se sube con el bloque del nombre/debajo. El aire
+  // sale del fondo de la ficha, no del espacio del nombre, asi que la ficha respira abajo
+  // en vez de terminar justo donde acaba HACKEADO. Lo pasa quien dibuja: en el formato
+  // cuadrado las celdas son mas bajas y ese hueco no existe (la linea acababa pegada al
+  // nombre, como un subrayado).
+  const badgeY = cardH - badgeH - bottomGutter - airePie;
   const gapNameBadge = Math.max(3, Math.min(5, Math.round(cardH * 0.018)));
   const nameZoneH = Math.max(28, Math.min(64, Math.round(cardH * 0.24)));
   const nameZoneTop = badgeY - gapNameBadge - nameZoneH;
-  const spriteZoneH = Math.max(36, nameZoneTop);
-  const imgSize = Math.max(36, Math.min(Math.floor(cardW * 0.62), Math.floor(spriteZoneH * 0.80)));
+  // La zona del espiritu se mide con el aire devuelto: subir el pie no debe encoger el
+  // arte, que es lo primero que se mira de la ficha.
+  const spriteZoneH = Math.max(36, nameZoneTop + airePie);
+  const imgSize = Math.max(36, Math.min(Math.floor(cardW * 0.62), Math.floor(spriteZoneH * factorEspiritu)));
   const imgY = Math.floor((spriteZoneH - imgSize) / 2);
   const aireBanda = Math.max(4, Math.min(18, Math.round(cardH * 0.028)));
   const bandaTop = (conImagen ? imgY + imgSize : nameZoneTop) + aireBanda;
@@ -903,9 +914,10 @@ const TARJETAS_POR_TANDA_ESPERANDO = 25;
 // distincion no es "resaltar el que tienes" sino lo contrario: brilla el que ya es tuyo y
 // el que falta se queda mate.
 const ESPIRITU_FALTANTE_ALPHA = 0.92;
-// Velo gris oscuro: al mezclarse con el espiritu le quita color (se acerca al gris) y
-// brillo a la vez, que es justo lo que se lee como "apagado".
-const ESPIRITU_FALTANTE_VELO = 'rgba(96, 98, 110, 0.7)';
+// Velo gris: al mezclarse con el espiritu le quita color (se acerca al gris) y brillo a la
+// vez. Solo se usa donde el navegador no soporta la mezcla 'saturation'; va claro para que
+// el faltante no se hunda en el fondo de temporada.
+const ESPIRITU_FALTANTE_VELO = 'rgba(158, 164, 184, 0.68)';
 
 const SOPORTA_MEZCLA_SATURACION = (() => {
   try {
@@ -916,7 +928,14 @@ const SOPORTA_MEZCLA_SATURACION = (() => {
 })();
 // Tono del apagado monocromo: un gris frio que, multiplicado sobre el espiritu ya sin
 // color, lo deja en penumbra conservando todo su dibujo (sombras, volumen, contorno).
-const ESPIRITU_FALTANTE_TINTE = 'rgb(132, 138, 158)';
+// Se subio de 132 a 196 porque en la lona el fondo de temporada es oscuro y rojizo: con el
+// gris bajo el espiritu que falta se hundia en el fondo. Sigue leyendose como apagado
+// (sin color, sin corona) pero ya no se pierde.
+const ESPIRITU_FALTANTE_TINTE = 'rgb(166, 172, 190)';
+// Levante de sombras para el apagado. El multiply del tinte SOLO puede oscurecer, asi que
+// los espiritus de arte oscuro (tierra, roca) se hundian en el fondo aunque el tinte fuera
+// claro. El screen con un gris frio a media alpha sube los negros sin tocar las luces.
+const ESPIRITU_FALTANTE_LEVANTE = 'rgba(112, 118, 138, 0.42)';
 
 // Lienzo de trabajo reutilizado para apagar los espiritus que faltan. Se dibuja ahi el
 // espiritu y se le echa el velo recortado a su silueta (source-atop solo pinta donde ya hay
@@ -945,6 +964,11 @@ function dibujarEspirituApagado(ctx, img, x, y, tamano) {
     // Y 'multiply' lo baja a penumbra sin perder ese dibujo.
     lc.globalCompositeOperation = 'multiply';
     lc.fillStyle = ESPIRITU_FALTANTE_TINTE;
+    lc.fillRect(0, 0, lado, lado);
+    // 'screen' devuelve el dibujo de los espiritus oscuros: sin este paso, el arte casi
+    // negro quedaba por debajo del brillo del fondo y la ficha "desaparecia".
+    lc.globalCompositeOperation = 'screen';
+    lc.fillStyle = ESPIRITU_FALTANTE_LEVANTE;
     lc.fillRect(0, 0, lado, lado);
     // Las dos mezclas pintan tambien el cuadro vacio del lienzo de trabajo, asi que se
     // recorta otra vez a la silueta: si no, el apagado saldria como un cuadro gris.
@@ -1006,6 +1030,12 @@ async function renderGlitchOverrideTemplate({
   const totalSprites = spritesList.length;
   const ownedCount = spritesList.filter(s => userState[s.id]?.owned).length;
   const pctOwned = totalSprites > 0 ? Math.round((ownedCount / totalSprites) * 100) : 0;
+
+  // Con pocas fichas la lona queda holgada y el HUD se veia pequeno y pegado a la capsula:
+  // se agranda un 30% y se separa del titulo. En las rejillas densas el alto ya esta
+  // ocupado por las fichas, asi que ahi el HUD se queda como estaba.
+  const hudGrande = totalSprites <= 24;
+  const factorHud = hudGrande ? 1.3 : 1;
 
   // Progreso real de la coleccion. Con una lista parcial (Nuevos, Faltantes, Atrapados)
   // el % contra ESA lista enganna: "0 de 3 nuevos" pintaba "PROGRESO 0%" aunque la
@@ -1183,6 +1213,13 @@ async function renderGlitchOverrideTemplate({
     headerH = Math.max(headerH, altoNecesario);
   }
 
+  // El HUD de pocas fichas ocupa mas alto y se separa de la capsula: se reserva ese extra
+  // en el encabezado para que la primera fila no se le venga encima.
+  if (hudGrande) {
+    const u = Math.min(1.15, anchoDiseno / 1200);
+    headerH += Math.round(36 * u * (factorHud - 1)) + Math.round(16 * u * 0.9);
+  }
+
   const rows = Math.max(1, Math.ceil(totalSlotsNeeded / cols));
   if (!isSquare) {
     // El lienzo se encoge a lo que ocupa la cuadricula (el fondo se recorta solo, porque
@@ -1194,8 +1231,11 @@ async function renderGlitchOverrideTemplate({
   // La celda se reparte el alto disponible para llenar el marco, en los dos formatos.
   cellH = Math.floor((height - headerH - footerH) / rows);
   if (!isSquare) {
-    // En vertical lleva techo: una celda mucho mas alta que ancha deforma la ficha.
-    cellH = Math.min(cellH, Math.floor(cellW * 1.25));
+    // En vertical lleva techo: una celda mucho mas alta que ancha deforma la ficha y, con
+    // pocos espiritus, reparte el alto sobrante en aire entre filas. El techo bajo de 1,25
+    // a 1,12 aprieta un poco las filas (17 espiritus: paso de 299 a 282 px) sin tocar la
+    // rejilla densa, donde la celda la manda el numero de filas y no el techo.
+    cellH = Math.min(cellH, Math.floor(cellW * 1.12));
 
     // El alto tambien encoge a lo que ocupa el contenido, para no dejar franjas vacias.
     const altoContenido = headerH + rows * cellH + footerH;
@@ -1337,10 +1377,14 @@ async function renderGlitchOverrideTemplate({
   // HUD Status Bar: la izquierda dice QUE lista es y la derecha el progreso de la
   // coleccion. Antes ambas hablaban de la lista exportada y con "Nuevos"/"Faltantes"
   // el % salia engannoso (0 de 3 nuevos = "PROGRESO 0%" con la coleccion al 79%).
-  const hudW = Math.min(width - paddingX * 2 - 30, Math.round(580 * Math.min(1.25, scale)));
-  const hudH = Math.round(36 * Math.min(1.15, scale));
+  // Escala propia del HUD: todo lo que vive dentro (alto, tipografia, barra y margenes)
+  // crece junto, para que agrandar con pocas fichas no descuadre el conjunto.
+  const hudS = Math.min(1.15, scale) * factorHud;
+  const hudW = Math.min(width - paddingX * 2 - 30, Math.round(580 * Math.min(1.25, scale) * factorHud));
+  const hudH = Math.round(36 * hudS);
   const hudX = (width - hudW) / 2;
-  const hudY = capsuleY + capsuleH + Math.round(16 * Math.min(1.1, scale));
+  const hudY = capsuleY + capsuleH + Math.round(16 * Math.min(1.1, scale) * (hudGrande ? 1.9 : 1));
+  const hudPadX = Math.round(14 * factorHud);
 
   // HUD Frame: una base oscura tenue garantiza que el texto se lea sobre cualquier fondo
   // (el arte de temporada tiene zonas claras donde el gris del alcance se perdia).
@@ -1352,15 +1396,17 @@ async function renderGlitchOverrideTemplate({
   ctx.stroke();
 
   // Corner brackets on HUD
+  const brazoHud = Math.round(6 * factorHud);
+  const grosorHud = Math.max(2, Math.round(2 * factorHud));
   ctx.fillStyle = '#00F0E8';
-  ctx.fillRect(hudX - 1, hudY - 1, 6, 2);
-  ctx.fillRect(hudX - 1, hudY - 1, 2, 6);
-  ctx.fillRect(hudX + hudW - 5, hudY - 1, 6, 2);
-  ctx.fillRect(hudX + hudW - 1, hudY - 1, 2, 6);
-  ctx.fillRect(hudX - 1, hudY + hudH - 1, 6, 2);
-  ctx.fillRect(hudX - 1, hudY + hudH - 5, 2, 6);
-  ctx.fillRect(hudX + hudW - 5, hudY + hudH - 1, 6, 2);
-  ctx.fillRect(hudX + hudW - 1, hudY + hudH - 5, 2, 6);
+  ctx.fillRect(hudX - 1, hudY - 1, brazoHud, grosorHud);
+  ctx.fillRect(hudX - 1, hudY - 1, grosorHud, brazoHud);
+  ctx.fillRect(hudX + hudW - brazoHud + 1, hudY - 1, brazoHud, grosorHud);
+  ctx.fillRect(hudX + hudW - 1, hudY - 1, grosorHud, brazoHud);
+  ctx.fillRect(hudX - 1, hudY + hudH - 1, brazoHud, grosorHud);
+  ctx.fillRect(hudX - 1, hudY + hudH - brazoHud + 1, grosorHud, brazoHud);
+  ctx.fillRect(hudX + hudW - brazoHud + 1, hudY + hudH - 1, brazoHud, grosorHud);
+  ctx.fillRect(hudX + hudW - 1, hudY + hudH - brazoHud + 1, grosorHud, brazoHud);
 
   // HUD Text: numero + etiqueta del alcance. En "Atrapados"/"Faltantes" el numero es el
   // tamano de la lista; el "owned" del alcance no aporta (seria 26/26 o 0/26).
@@ -1369,27 +1415,27 @@ async function renderGlitchOverrideTemplate({
     : alcance === 'missing' ? t('lona.faltantes')
     : t('lona.atrapados');
 
-  const hudTextY = hudY + Math.round(18 * Math.min(1.15, scale));
+  const hudTextY = hudY + Math.round(18 * hudS);
   ctx.textAlign = 'left';
   // Numero en blanco y etiqueta clara: el alcance es informacion, no decoracion.
-  ctx.font = `900 ${Math.round(13 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
+  ctx.font = `900 ${Math.round(13 * hudS)}px "Outfit", "Inter", sans-serif`;
   ctx.fillStyle = '#ffffff';
   const numeroHudW = ctx.measureText(numeroHud).width;
-  ctx.fillText(numeroHud, hudX + 14, hudTextY);
-  ctx.font = `700 ${Math.round(11 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
+  ctx.fillText(numeroHud, hudX + hudPadX, hudTextY);
+  ctx.font = `700 ${Math.round(11 * hudS)}px "Outfit", "Inter", sans-serif`;
   ctx.fillStyle = '#cbd5e1';
-  ctx.fillText(etiquetaHud, hudX + 14 + numeroHudW + 4, hudTextY);
+  ctx.fillText(etiquetaHud, hudX + hudPadX + numeroHudW + Math.round(4 * factorHud), hudTextY);
 
   ctx.textAlign = 'right';
-  ctx.font = `900 ${Math.round(11 * Math.min(1.15, scale))}px "Outfit", "Inter", sans-serif`;
+  ctx.font = `900 ${Math.round(11 * hudS)}px "Outfit", "Inter", sans-serif`;
   ctx.fillStyle = '#00F0E8';
-  ctx.fillText(usaGeneral ? t('lona.progresoGeneral', { pct: pctBarra }) : t('lona.progreso', { pct: pctBarra }), hudX + hudW - 14, hudTextY);
+  ctx.fillText(usaGeneral ? t('lona.progresoGeneral', { pct: pctBarra }) : t('lona.progreso', { pct: pctBarra }), hudX + hudW - hudPadX, hudTextY);
 
   // Barra neon del HUD: riel con borde, marcas de cuarto y remate encendido en el avance.
-  const barX = hudX + 14;
-  const barH = Math.round(8 * Math.min(1.15, scale));
-  const barY = hudY + hudH - barH - 5;
-  const barW = hudW - 28;
+  const barX = hudX + hudPadX;
+  const barH = Math.round(8 * hudS);
+  const barY = hudY + hudH - barH - Math.round(5 * factorHud);
+  const barW = hudW - hudPadX * 2;
   const barRadio = barH / 2;
 
   roundRect(ctx, barX, barY, barW, barH, barRadio);
@@ -1487,7 +1533,7 @@ async function renderGlitchOverrideTemplate({
   const nombreUniforme = (() => {
     const refW = cellW - Math.max(4, Math.round(cellW * 0.035)) * 2;
     const refH = cellH - Math.max(4, Math.round(cellH * 0.035)) * 2;
-    const geoRef = geometriaFichaNombre(refW, refH, true);
+    const geoRef = geometriaFichaNombre(refW, refH, true, ajustesFicha(refH, isSquare));
     let talla = Infinity;
     for (const sprite of spritesList) {
       const fit = getSpriteNameLines(
@@ -1535,53 +1581,58 @@ async function renderGlitchOverrideTemplate({
     const cardH = cellH - cardMarginY * 2;
     const cornerRadius = Math.min(10, Math.max(5, Math.round(cardW * 0.055)));
 
-    // A. Cyber Tile Container (Renderizado vectorial ultrarrápido sin shadowBlur)
-    ctx.save();
-    roundRect(ctx, cardX, cardY, cardW, cardH, cornerRadius);
+    // A. Cyber Tile Container. La ficha va SIN marco: ni panel, ni filo, ni borde, ni
+    // esquinas HUD. Quedan el espiritu con su corona, el nombre y el pie de estado, que son
+    // los que cuentan la historia; el arte de temporada pasa detras y la ficha respira.
+    const LONA_SIN_MARCO = true;
+    if (!LONA_SIN_MARCO) {
+      ctx.save();
+      roundRect(ctx, cardX, cardY, cardW, cardH, cornerRadius);
 
-    // Base oscura con profundidad: mas clara arriba y casi negra abajo. Antes el panel era
-    // solo un tinte translucido y, con el arte de temporada detras, se veia sucio.
-    const fondoFicha = ctx.createLinearGradient(0, cardY, 0, cardY + cardH);
-    fondoFicha.addColorStop(0, 'rgba(16, 19, 36, 0.98)');
-    fondoFicha.addColorStop(0.55, 'rgba(8, 10, 22, 0.98)');
-    fondoFicha.addColorStop(1, 'rgba(4, 5, 12, 0.98)');
-    ctx.fillStyle = fondoFicha;
-    ctx.fill();
+      // Base oscura con profundidad: mas clara arriba y casi negra abajo. Antes el panel era
+      // solo un tinte translucido y, con el arte de temporada detras, se veia sucio.
+      const fondoFicha = ctx.createLinearGradient(0, cardY, 0, cardY + cardH);
+      fondoFicha.addColorStop(0, 'rgba(16, 19, 36, 0.98)');
+      fondoFicha.addColorStop(0.55, 'rgba(8, 10, 22, 0.98)');
+      fondoFicha.addColorStop(1, 'rgba(4, 5, 12, 0.98)');
+      ctx.fillStyle = fondoFicha;
+      ctx.fill();
 
-    // Un solo color de estado para borde, filo y esquinas: nada de tintes por espiritu, que
-    // eran los que hacian parecer cada ficha un cuadro de color distinto.
-    const colorEstado = isOwned ? '#00F0E8' : '#EF4444';
+      // Un solo color de estado para borde, filo y esquinas: nada de tintes por espiritu, que
+      // eran los que hacian parecer cada ficha un cuadro de color distinto.
+      const colorEstado = isOwned ? '#00F0E8' : '#EF4444';
 
-    // Filo de luz en el borde superior: le da volumen sin ensuciar el contenido.
-    ctx.fillStyle = hexToRgba(colorEstado, 0.32);
-    ctx.fillRect(cardX + cornerRadius, cardY + 1, cardW - cornerRadius * 2, 1);
+      // Filo de luz en el borde superior: le da volumen sin ensuciar el contenido.
+      ctx.fillStyle = hexToRgba(colorEstado, 0.32);
+      ctx.fillRect(cardX + cornerRadius, cardY + 1, cardW - cornerRadius * 2, 1);
 
-    ctx.strokeStyle = hexToRgba(colorEstado, isOwned ? 0.55 : 0.42);
-    ctx.lineWidth = isMastered ? 1.5 : 1;
-    ctx.stroke();
+      ctx.strokeStyle = hexToRgba(colorEstado, isOwned ? 0.55 : 0.42);
+      ctx.lineWidth = isMastered ? 1.5 : 1;
+      ctx.stroke();
 
-    // Esquinas tipo HUD: dos trazos en L por esquina, en el color del estado. Sustituyen a
-    // los cuatro cuadraditos; mismo coste y la ficha gana caracter.
-    const brazo = Math.max(6, Math.min(10, Math.round(cardW * 0.07)));
-    const grosorEsquina = Math.max(1.5, Math.min(2.5, cardW * 0.012));
-    const margenEsquina = 2;
-    ctx.strokeStyle = hexToRgba(colorEstado, isOwned ? 0.80 : 0.55);
-    ctx.lineWidth = grosorEsquina;
-    ctx.beginPath();
-    ctx.moveTo(cardX + margenEsquina, cardY + margenEsquina + brazo);
-    ctx.lineTo(cardX + margenEsquina, cardY + margenEsquina);
-    ctx.lineTo(cardX + margenEsquina + brazo, cardY + margenEsquina);
-    ctx.moveTo(cardX + cardW - margenEsquina - brazo, cardY + margenEsquina);
-    ctx.lineTo(cardX + cardW - margenEsquina, cardY + margenEsquina);
-    ctx.lineTo(cardX + cardW - margenEsquina, cardY + margenEsquina + brazo);
-    ctx.moveTo(cardX + margenEsquina, cardY + cardH - margenEsquina - brazo);
-    ctx.lineTo(cardX + margenEsquina, cardY + cardH - margenEsquina);
-    ctx.lineTo(cardX + margenEsquina + brazo, cardY + cardH - margenEsquina);
-    ctx.moveTo(cardX + cardW - margenEsquina - brazo, cardY + cardH - margenEsquina);
-    ctx.lineTo(cardX + cardW - margenEsquina, cardY + cardH - margenEsquina);
-    ctx.lineTo(cardX + cardW - margenEsquina, cardY + cardH - margenEsquina - brazo);
-    ctx.stroke();
-    ctx.restore();
+      // Esquinas tipo HUD: dos trazos en L por esquina, en el color del estado. Sustituyen a
+      // los cuatro cuadraditos; mismo coste y la ficha gana caracter.
+      const brazo = Math.max(6, Math.min(10, Math.round(cardW * 0.07)));
+      const grosorEsquina = Math.max(1.5, Math.min(2.5, cardW * 0.012));
+      const margenEsquina = 2;
+      ctx.strokeStyle = hexToRgba(colorEstado, isOwned ? 0.80 : 0.55);
+      ctx.lineWidth = grosorEsquina;
+      ctx.beginPath();
+      ctx.moveTo(cardX + margenEsquina, cardY + margenEsquina + brazo);
+      ctx.lineTo(cardX + margenEsquina, cardY + margenEsquina);
+      ctx.lineTo(cardX + margenEsquina + brazo, cardY + margenEsquina);
+      ctx.moveTo(cardX + cardW - margenEsquina - brazo, cardY + margenEsquina);
+      ctx.lineTo(cardX + cardW - margenEsquina, cardY + margenEsquina);
+      ctx.lineTo(cardX + cardW - margenEsquina, cardY + margenEsquina + brazo);
+      ctx.moveTo(cardX + margenEsquina, cardY + cardH - margenEsquina - brazo);
+      ctx.lineTo(cardX + margenEsquina, cardY + cardH - margenEsquina);
+      ctx.lineTo(cardX + margenEsquina + brazo, cardY + cardH - margenEsquina);
+      ctx.moveTo(cardX + cardW - margenEsquina - brazo, cardY + cardH - margenEsquina);
+      ctx.lineTo(cardX + cardW - margenEsquina, cardY + cardH - margenEsquina);
+      ctx.lineTo(cardX + cardW - margenEsquina, cardY + cardH - margenEsquina - brazo);
+      ctx.stroke();
+      ctx.restore();
+    }
 
     // B. Proporciones y Geometría Interna Adaptativa (Distribución vertical simétrica y centrada)
     // Tamaños proporcionales a la celda, sin escalones: asi todas las pestañas y cualquier
@@ -1590,7 +1641,7 @@ async function renderGlitchOverrideTemplate({
     // La cadena de medidas vive en geometriaFichaNombre: la MISMA que midio nombreUniforme
     // antes de dibujar. Aqui solo se ancla a la posicion de la ficha.
     const spriteImg = loadedImagesMap[sprite.id];
-    const geo = geometriaFichaNombre(cardW, cardH, !!spriteImg);
+    const geo = geometriaFichaNombre(cardW, cardH, !!spriteImg, ajustesFicha(cardH, isSquare));
     const badgeH = geo.badgeH;
     const badgeY = cardY + geo.badgeY;
     const imgSize = geo.imgSize;
@@ -1599,34 +1650,40 @@ async function renderGlitchOverrideTemplate({
 
     if (spriteImg) {
       ctx.save();
+      // El espiritu va limpio: sin aura radial detras ni halo de sombra sobre la silueta.
+      // El atrapado queda a color pleno y el faltante con su velo gris; el brillo se lo
+      // dejan al arte, que sobre la plantilla de temporada ya tiene el suyo.
+      const LONA_SIN_RESPLANDOR = true;
       const centerX = imgX + imgSize / 2;
       const centerY = imgY + imgSize / 2;
       const auraRadius = Math.round(imgSize * 0.58);
-      const auraGrad = ctx.createRadialGradient(
-        centerX,
-        centerY,
-        Math.round(imgSize * 0.08),
-        centerX,
-        centerY,
-        auraRadius
-      );
 
       if (isOwned) {
         // En atrapados: resplandor en su color, contenido para que acompanie sin gritar.
         const glowColor = isMastered ? '#facc15' : spiritHue;
-        auraGrad.addColorStop(0, isMastered ? 'rgba(250, 204, 21, 0.38)' : hexToRgba(glowColor, 0.30));
-        auraGrad.addColorStop(0.55, isMastered ? 'rgba(250, 204, 21, 0.14)' : hexToRgba(glowColor, 0.12));
-        auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        if (!LONA_SIN_RESPLANDOR) {
+          const auraGrad = ctx.createRadialGradient(
+            centerX,
+            centerY,
+            Math.round(imgSize * 0.08),
+            centerX,
+            centerY,
+            auraRadius
+          );
+          auraGrad.addColorStop(0, isMastered ? 'rgba(250, 204, 21, 0.38)' : hexToRgba(glowColor, 0.30));
+          auraGrad.addColorStop(0.55, isMastered ? 'rgba(250, 204, 21, 0.14)' : hexToRgba(glowColor, 0.12));
+          auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-        ctx.fillStyle = auraGrad;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
-        ctx.fill();
+          ctx.fillStyle = auraGrad;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
+          ctx.fill();
 
-        // Resplandor directo sobre la silueta del espíritu
-        const imgShadowBlur = Math.max(8, Math.min(16, Math.round(cardW * 0.07)));
-        ctx.shadowColor = hexToRgba(glowColor, isMastered ? 0.80 : 0.65);
-        ctx.shadowBlur = (imgShadowBlur) * EXPORT_SCALE;
+          // Resplandor directo sobre la silueta del espíritu
+          const imgShadowBlur = Math.max(8, Math.min(16, Math.round(cardW * 0.07)));
+          ctx.shadowColor = hexToRgba(glowColor, isMastered ? 0.80 : 0.65);
+          ctx.shadowBlur = (imgShadowBlur) * EXPORT_SCALE;
+        }
         ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
         ctx.shadowBlur = 0;
       } else {
@@ -1634,19 +1691,51 @@ async function renderGlitchOverrideTemplate({
         // color al panel) y el espiritu apagado. Antes solo bajaba la opacidad al 85% y casi
         // no se notaba: ahora se le quita el color y el brillo, asi que la ficha se lee como
         // "me falta" de un solo vistazo, sin mirar el borde ni la etiqueta.
-        auraGrad.addColorStop(0, hexToRgba(spiritHue, 0.12));
-        auraGrad.addColorStop(0.55, hexToRgba(spiritHue, 0.05));
-        auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        if (!LONA_SIN_RESPLANDOR) {
+          const auraGrad = ctx.createRadialGradient(
+            centerX,
+            centerY,
+            Math.round(imgSize * 0.08),
+            centerX,
+            centerY,
+            auraRadius
+          );
+          auraGrad.addColorStop(0, hexToRgba(spiritHue, 0.12));
+          auraGrad.addColorStop(0.55, hexToRgba(spiritHue, 0.05));
+          auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-        ctx.fillStyle = auraGrad;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
-        ctx.fill();
+          ctx.fillStyle = auraGrad;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
+          ctx.fill();
+        }
 
         // El monocromo ya va apagado de por si; el respaldo mantiene la transparencia de
         // antes para que no se vea distinto en quien no tiene mezclas de saturacion.
         ctx.globalAlpha = SOPORTA_MEZCLA_SATURACION ? 1 : ESPIRITU_FALTANTE_ALPHA;
         dibujarEspirituApagado(ctx, spriteImg, imgX, imgY, imgSize);
+      }
+
+      // Corona de maestria SOBRE el espiritu, como en la rejilla de la app: su caja es el 12%
+      // del ancho de ficha (28 px sobre 234 en la app), con la punta apoyada en la cabeza y
+      // una sombra dura que la despega del arte. Se dibuja aqui, despues del espiritu, para
+      // que quede encima.
+      const coronaImg = loadedImagesMap['__corona__'];
+      if (isMastered && coronaImg) {
+        const coronaW = Math.max(14, Math.round(cardW * 0.12));
+        const coronaH = coronaW / CORONA_ASPECTO;
+        // El CSS de la app dice 49%, pero alli la caja del arte ocupa el ancho de la ficha
+        // y aqui el espiritu va centrado: 2% mas (unos 5 px sobre una ficha de 234) deja la
+        // corona centrada sobre la cabeza.
+        const coronaX = cardX + cardW * 0.51;
+        // La cabeza del espiritu empieza ~14% abajo del cuadrado del arte.
+        const coronaY = imgY + imgSize * 0.14 - coronaH;
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+        ctx.shadowBlur = 5 * EXPORT_SCALE;
+        ctx.shadowOffsetY = 2 * EXPORT_SCALE;
+        ctx.drawImage(coronaImg, coronaX, coronaY, coronaW, coronaH);
+        ctx.restore();
       }
       ctx.restore();
     }
@@ -1697,87 +1786,58 @@ async function renderGlitchOverrideTemplate({
     }
     ctx.restore();
 
-    // D. Pie de ficha: una linea fina, un punto de estado y el texto en su color. Antes
-    // era una pildora rellena que parecia un boton y se comia la tarjeta. El punto va
-    // relleno cuando lo tienes y en anillo cuando te falta, para que el estado tambien se
-    // distinga sin depender del color.
-    const estadoColor = isOwned ? '#00F0E8' : '#EF4444';
+    // D. Pie de ficha: una linea fina y el estado debajo del nombre, CENTRADO en el eje de
+    // la ficha igual que el nombre. Sin viñeta: el punto que iba delante no aportaba nada
+    // (la propia palabra dice HACKEADO o FALTANTE) y empujaba el texto fuera del eje.
+    // Accesibilidad del pie de estado:
+    // - El rojo de FALTANTE sobre el arte de temporada solo daba 4.2:1 en el fondo tipico y
+    //   bajaba a 2.7:1 en las zonas claras (luna, destellos), por debajo del 4.5:1 que pide
+    //   AA para texto normal. Se aclara a #FF6B6B (5.7:1 en el fondo tipico) y ademas el
+    //   texto lleva contorno oscuro, que lo separa de CUALQUIER fondo sin tocar el color de
+    //   marca.
+    // - MAXEADO ya no cambia el color del texto: lo dice la CORONA sobre el espiritu, igual
+    //   que en la rejilla de la app.
+    const estadoColor = isOwned ? '#00F0E8' : '#FF6B6B';
     const estadoTexto = isOwned ? t('lona.hackeado') : t('lona.faltante');
     // El texto va por debajo del centro de la banda: centrado quedaba a 5px de la linea
     // y se leia pegada a ella.
     const estadoY = badgeY + badgeH * 0.68;
 
     ctx.save();
-    ctx.fillStyle = isOwned ? 'rgba(0, 240, 232, 0.30)' : 'rgba(239, 68, 68, 0.30)';
-    ctx.fillRect(cardX + 6, badgeY, cardW - 12, 1);
 
-    const puntoX = cardX + 13;
-    const puntoR = Math.max(2.8, badgeH * 0.18);
-    ctx.beginPath();
-    ctx.arc(puntoX, estadoY, puntoR, 0, Math.PI * 2);
-    if (isOwned) {
-      ctx.fillStyle = estadoColor;
-      ctx.fill();
-    } else {
-      ctx.strokeStyle = estadoColor;
-      ctx.lineWidth = 1.7;
-      ctx.stroke();
-    }
-
-    ctx.textAlign = 'left';
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.letterSpacing = '0.6px';
 
-    // El estado y la corona comparten la banda como dos plazas: el estado a la izquierda y
-    // la corona al lado opuesto, para leer de un golpe "lo tengo" y "lo tengo maxeado".
-    // Donde el texto deja hueco, la corona entra sin tocar nada. En las cuadriculas densas
-    // "HACKEADO" se come el 60% de la ficha y no sobra ni un pixel, asi que la corona se
-    // reserva su plaza y SOLO el texto de las maxeadas cede lo justo para dejarla pasar.
-    // Se hace ficha a ficha a proposito: la otra salida era bajar la talla del estado en
-    // TODA la lona, y eso castiga a las 9 de cada 10 fichas que no llevan corona.
-    const inicioEstado = puntoX + puntoR + 7;
-    const derecha = cardX + cardW - 13;
-    const tamanoBase = Math.max(9, Math.min(13, badgeH * 0.62));
-    const coronaImg = loadedImagesMap['__corona__'];
-    const PISO_ESTADO = 7; // Por debajo de esto el estado deja de leerse.
-    const HUECO_ESTADO_CORONA = 5;
-
-    let tamanoEstado = tamanoBase;
-    let anchoCorona = 0;
-    if (isMastered && coronaImg) {
-      ctx.font = `900 ${tamanoBase}px "Outfit", "Inter", sans-serif`;
-      const anchoIdeal = ctx.measureText(estadoTexto).width;
-      anchoCorona = Math.max(9, Math.min(12, badgeH * 0.60)) * CORONA_ASPECTO;
-      const disponible = derecha - inicioEstado;
-      if (anchoIdeal + HUECO_ESTADO_CORONA + anchoCorona > disponible) {
-        tamanoEstado = tamanoBase * Math.max(
-          (disponible - HUECO_ESTADO_CORONA - anchoCorona) / anchoIdeal,
-          PISO_ESTADO / tamanoBase
-        );
-      }
-      // La corona se queda lo que sobre tras el texto ya encogido, y si con eso baja del
-      // minimo reconocible se queda fuera: antes falta la corona que un estado ilegible.
-      ctx.font = `900 ${tamanoEstado}px "Outfit", "Inter", sans-serif`;
-      anchoCorona = Math.min(anchoCorona, disponible - HUECO_ESTADO_CORONA - ctx.measureText(estadoTexto).width);
-    }
-    const altoCorona = anchoCorona / CORONA_ASPECTO;
+    const centroFicha = cardX + cardW / 2;
+    // Talla del pie: minima legible de verdad. Antes iba de 9 a 13 px sobre una lona de
+    // 1080 px de ancho, o sea 3-5 px cuando la imagen se ve a tamano de telefono. Ahora va
+    // de 11 a 17 px: sigue entrando de sobra en la ficha (FALTANTE ocupa ~90 px de los ~198
+    // disponibles en la rejilla de 4 columnas) y se lee sin ampliar.
+    const tamanoEstado = Math.max(11, Math.min(17, badgeH * 0.64));
 
     ctx.font = `900 ${tamanoEstado}px "Outfit", "Inter", sans-serif`;
-    ctx.fillStyle = estadoColor;
-    ctx.fillText(estadoTexto, inicioEstado, estadoY);
+    const anchoTextoEstado = ctx.measureText(estadoTexto).width;
 
-    // La llevan solo los maxeados: su ausencia es la respuesta para el resto, igual que en
-    // la rejilla de la app.
-    if (isMastered && coronaImg && altoCorona >= PISO_ESTADO) {
-      ctx.save();
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
-      ctx.shadowBlur = 5 * EXPORT_SCALE;
-      ctx.shadowOffsetY = 2 * EXPORT_SCALE;
-      ctx.translate(derecha - anchoCorona / 2, estadoY);
-      ctx.rotate(-CORONA_INCLINACION);
-      ctx.drawImage(coronaImg, -anchoCorona / 2, -altoCorona / 2, anchoCorona, altoCorona);
-      ctx.restore();
-    }
+    // La linea del pie ya no cruza la ficha entera: mide el texto del estado mas un respiro
+    // y va centrada con el, asi que se lee como un subrayado de la etiqueta y no como un
+    // borde de tarjeta. Se dibuja aqui, no antes, porque hasta ahora no se sabia su ancho.
+    const anchoLinea = Math.min(
+      cardW - 24,
+      anchoTextoEstado + Math.max(18, badgeH * 1.1)
+    );
+    ctx.fillStyle = isOwned ? 'rgba(0, 240, 232, 0.55)' : 'rgba(255, 107, 107, 0.55)';
+    ctx.fillRect(centroFicha - anchoLinea / 2, badgeY, anchoLinea, 1);
+
+    // Contorno antes del relleno: sobre la luna y los destellos de la plantilla el texto
+    // suelto se perdia. El trazo no cambia el color del estado, solo le da un borde oscuro.
+    ctx.lineJoin = 'round';
+    ctx.miterLimit = 2;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.78)';
+    ctx.lineWidth = Math.max(2.4, tamanoEstado * 0.26);
+    ctx.strokeText(estadoTexto, centroFicha, estadoY);
+    ctx.fillStyle = estadoColor;
+    ctx.fillText(estadoTexto, centroFicha, estadoY);
     ctx.restore();
   }
 
@@ -1847,7 +1907,11 @@ export function encodeCanvasToImage(canvas) {
 // Cache en disco (Cache Storage) de la captura ya codificada. Asi la segunda
 // visita no redibuja ni recodifica: la captura esta lista al abrir la modal.
 // ---------------------------------------------------------------------------
-const EXPORT_CACHE_NAME = 'spritedex-export-v1';
+// v2: el nombre del cache lleva version A PROPOSITO. La clave de captura no incluye la
+// version del codigo que dibuja la lona, asi que sin bumpear esto cada cambio de diseno
+// se quedaba invisible para quien ya tenia una captura guardada: la modal servia el JPEG
+// viejo desde Cache Storage y parecia que el cambio no se habia aplicado.
+const EXPORT_CACHE_NAME = 'spritedex-export-v18';
 const EXPORT_CACHE_MAX = 8;
 
 // Generaciones en vuelo, por clave. La precarga en reposo y la modal piden la misma
