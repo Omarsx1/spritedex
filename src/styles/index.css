@@ -10113,20 +10113,23 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .guia__tabla tbody tr + tr td { border-top: 1px solid var(--border); }
 .guia__tabla tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
 
-/* Special no es un color: en las tarjetas es la banda de arcoiris. La cadena es la MISMA que
-   .sprite-rarity-special y la del mapa compartido (src/data/rarezaColores.js); una prueba impide
-   que las dos se separen. Se pinta sobre el propio texto, y lleva respaldo porque sin el recorte
-   del fondo el texto quedaria transparente, que es peor que un color plano. */
-.rareza-arcoiris {
-  background: linear-gradient(15deg, #5dffe4 0, #8dff9a 8%, #fff36a 16%, #60dfff 24%, #7b7cff 32%, #ff77d8 40%, #ffc45f 48%, #5dffe4 56%, #8dff9a 64%, #fff36a 72%, #60dfff 80%, #7b7cff 88%, #ff77d8 96%, #ffc45f 100%);
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
-  .rareza-arcoiris { background: none; color: #5dffe4; }
+/* El badge de rareza de la tabla: misma forma y mismas medidas que .rarity-badge-sm de las
+   tarjetas. Aqui solo vive la geometria; el color va en linea desde el mapa compartido
+   (src/data/rarezaColores.js), porque reutilizar las clases de color de las tarjetas no vale: esas
+   llevan `!important` y una regla de mas especificidad de la tabla pisaba el `color` y el badge
+   salia con el texto en blanco. */
+.rareza-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 /* El FAQ mantiene <details>/<summary> nativos (sin JS, contenido en el DOM y con paridad con

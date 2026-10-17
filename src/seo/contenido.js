@@ -6,7 +6,8 @@
 // devuelven HTML, asi que se prueban con node --test.
 
 import { SITIO, TITULO_SITIO } from './rutas.js';
-import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, RUTAS_CONTENIDO, ABRIR_MAIN } from './plantilla.js';
+import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, RUTAS_CONTENIDO, ABRIR_MAIN, estiloACss } from './plantilla.js';
+import { estiloBadgeRareza } from '../data/rarezaColores.js';
 import { modeloGuia, formatearFecha } from './guia.js';
 import { hreflangsDe, porIdioma } from './idioma.js';
 
@@ -72,19 +73,17 @@ function migasContenido(lang, nombre) {
   ], lang);
 }
 
-// Una celda puede ser un texto suelto o un objeto { texto, color, degradado }: la rareza de la
-// guia lleva el color de su rareza, el mismo que muestran las tarjetas de la app.
+// Una celda puede ser un texto suelto o un objeto { texto, clave }: la rareza de la guia se pinta
+// como el badge de las tarjetas, con los colores del mapa compartido.
 function celdaHtml(valor, esEncabezadoDeFila) {
   const esObjeto = valor !== null && typeof valor === 'object';
   const texto = escapar(esObjeto ? valor.texto : valor);
-  // Degradado y color plano son excluyentes: con la banda, el color va transparente y pintarlo
-  // ademas como color dejaria el texto o invisible o sin banda.
-  let atributos = '';
-  if (esObjeto && valor.degradado) atributos = ' class="rareza-arcoiris"';
-  else if (esObjeto && valor.color) atributos = ' style="color: ' + valor.color + '"';
-  return esEncabezadoDeFila
-    ? '<th scope="row"' + atributos + '>' + texto + '</th>'
-    : '<td>' + texto + '</td>';
+  if (!esEncabezadoDeFila) return '<td>' + texto + '</td>';
+  // El badge va DENTRO del <th scope="row">: la celda sigue siendo el encabezado de la fila (lo que
+  // lee el lector de pantalla) y el badge es solo la piel.
+  const estilo = esObjeto && valor.clave ? estiloBadgeRareza(valor.clave) : null;
+  if (!estilo) return '<th scope="row">' + texto + '</th>';
+  return '<th scope="row"><span class="rareza-badge" style="' + escapar(estiloACss(estilo)) + '">' + texto + '</span></th>';
 }
 
 // Una tabla de datos necesita titulo y encabezados con scope: sin ellos, el lector de pantalla

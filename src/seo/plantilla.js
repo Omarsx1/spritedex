@@ -6,7 +6,6 @@
 import { SITIO, IMAGEN_REDES } from './rutas.js';
 import { conIdioma, IDIOMAS } from '../i18n/core.js';
 import { NOMBRE_IDIOMA, lineasOgLocale, porIdioma } from './idioma.js';
-import { COLORES_RAREZA } from '../data/rarezaColores.js';
 
 export const ZONA = {
   es: 'Espíritu de Fortnite',
@@ -16,6 +15,13 @@ export const ZONA = {
 
 export const escapar = (texto) => String(texto === undefined || texto === null ? '' : texto)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+// React recibe un objeto de estilo tal cual ({ background, color }); el HTML estatico necesita la
+// cadena. El estilo lo produce un unico modulo (src/data/rarezaColores.js) y aqui solo se serializa,
+// asi que las dos caras no pueden pintar distinto.
+export const estiloACss = (estilo) => Object.entries(estilo)
+  .map(([clave, valor]) => clave.replace(/[A-Z]/g, (letra) => '-' + letra.toLowerCase()) + ':' + valor)
+  .join(';');
 
 // Un nombre con "</script>" dentro del JSON-LD cerraria la etiqueta antes de tiempo y romperia
 // la pagina. En JSON, \u003c es el mismo caracter y el consumidor lo lee igual.
@@ -159,11 +165,10 @@ const CSS = [
   'table.tabla tbody tr:hover { background: rgba(255,255,255,.03); }',
   'table.tabla td:not(:first-child) { font-variant-numeric: tabular-nums; }',
 
-  // Special no es un color: en las tarjetas es la banda de arcoiris. Se pinta sobre el propio
-  // texto con background-clip, y lleva respaldo por si el navegador no recorta el fondo (sin el,
-  // el texto quedaria transparente, que es peor que un color plano).
-  '.rareza-arcoiris { background: ' + COLORES_RAREZA.special.degradadoTexto + '; background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }',
-  '@supports not ((-webkit-background-clip: text) or (background-clip: text)) { .rareza-arcoiris { background: none; color: ' + COLORES_RAREZA.special.color + '; } }',
+  // El badge de rareza: MISMA forma y mismas medidas que .rarity-badge-sm de las tarjetas
+  // (height 22px, padding 0 8px, radio 6px, 11px/800). Aqui solo vive la geometria; el color va en
+  // linea desde el mapa compartido, para que las dos caras no puedan pintar distinto.
+  '.rareza-badge { display: inline-flex; align-items: center; justify-content: center; min-height: 22px; padding: 0 8px; border-radius: 6px; font-size: 11px; font-weight: 800; line-height: 1; letter-spacing: .02em; white-space: nowrap; }',
 
   // FAQ: sigue siendo <details> nativo y sin JS. El triangulo del navegador se cambia por un
   // signo propio, que se lee mejor y no depende del motor.

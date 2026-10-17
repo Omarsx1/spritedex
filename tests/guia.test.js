@@ -5,6 +5,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { modeloGuia, formatearFecha } from '../src/seo/guia.js';
+import { nombreRareza } from '../src/seo/idioma.js';
 
 const datos = {
   total: 278,
@@ -47,11 +48,11 @@ test('los numeros de la coleccion entran en la copia', () => {
     assert.ok(plano.includes(formatearFecha(datos.fecha, lang)), lang + ': falta la fecha de revision');
     const rareza = modelo.secciones.find((s) => s.tabla);
     assert.equal(rareza.tabla.filas.length, datos.porRareza.length, lang + ': filas de la tabla de rareza');
-    // La primera celda lleva el nombre y el color que le toca; el color sale del mapa compartido
-    // con las tarjetas de la app, no de una lista copiada aqui.
-    assert.equal(rareza.tabla.filas[0][0].texto, datos.porRareza[0].nombre);
+    // La primera celda lleva la etiqueta localizada en mayusculas —la misma que el badge de la
+    // tarjeta— y la clave del codigo del juego, de donde cada renderer saca los colores.
+    assert.equal(rareza.tabla.filas[0][0].texto, nombreRareza(datos.porRareza[0].nombre, lang));
+    assert.equal(rareza.tabla.filas[0][0].clave, datos.porRareza[0].nombre);
     assert.equal(rareza.tabla.filas[0][1], datos.porRareza[0].n);
-    assert.match(rareza.tabla.filas[0][0].color, /^#[0-9a-f]{6}$/i);
   }
 });
 

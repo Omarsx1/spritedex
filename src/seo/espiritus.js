@@ -10,7 +10,7 @@
 
 import { SITIO, TITULO_SITIO } from './rutas.js';
 import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, ZONA, ABRIR_MAIN } from './plantilla.js';
-import { porIdioma, hreflangsDe, rarezaEnIdioma, numeroEnIdioma } from './idioma.js';
+import { porIdioma, hreflangsDe, nombreRareza, numeroEnIdioma } from './idioma.js';
 
 const RUTA_HUB = '/espiritus';
 
@@ -53,7 +53,7 @@ export function etiquetasEspiritu(ficha, lang) {
   const datos = ficha[lang];
   const completo = datos.nombre + ' — ' + ZONA[lang] + ' | Spritedex';
   const titulo = completo.length <= 60 ? completo : recortar(datos.nombre + ' — ' + ZONA[lang], 60);
-  const rareza = rarezaEnIdioma(ficha.rareza, lang);
+  const rareza = nombreRareza(ficha.rareza, lang);
   const descripcion = porIdioma(lang, {
     en: recortar('Fortnite sprite ' + datos.nombre + ': ' + datos.familia + ' family, ' + datos.variante + ' variant, ' + rareza + ' rarity, ' + numeroEnIdioma(ficha.drop, lang) + ' drop chance. Where to find it and what it does.', 160),
     es: recortar('Espíritu ' + datos.nombre + ' de Fortnite: familia ' + datos.familia + ', variante ' + datos.variante + ', rareza ' + rareza + ' y ' + numeroEnIdioma(ficha.drop, lang) + ' de probabilidad. Dónde aparece y qué hace.', 160),
@@ -100,7 +100,7 @@ export function jsonLdEspiritu(ficha, lang) {
   const propiedades = [
     propiedad(r.familia, datos.familia),
     propiedad(r.variante, datos.variante),
-    propiedad(r.rareza, rarezaEnIdioma(ficha.rareza, lang)),
+    propiedad(r.rareza, nombreRareza(ficha.rareza, lang)),
     propiedad(r.generacion, String(ficha.generacion)),
     propiedad(r.probabilidad, numeroEnIdioma(ficha.drop, lang))
   ];
@@ -180,7 +180,7 @@ export function htmlPaginaEspiritu(ficha, lang) {
   const base = conIdiomaRuta('/', lang);
   const hub = conIdiomaRuta(RUTA_HUB, lang);
   const filas = [
-    [t.rareza, rarezaEnIdioma(ficha.rareza, lang)],
+    [t.rareza, nombreRareza(ficha.rareza, lang)],
     [t.generacion, String(ficha.generacion)],
     [t.variante, d.variante],
     [t.familia, d.familia],

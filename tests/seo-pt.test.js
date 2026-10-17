@@ -59,7 +59,8 @@ test('el texto pt-BR no arrastra signos de apertura del español', () => {
 test('la ficha pt-BR traduce la rareza, usa coma decimal y su JSON-LD lleva inLanguage pt-BR', () => {
   const ficha = fichaDePrueba();
   const html = htmlPaginaEspiritu(ficha, 'pt-BR');
-  assert.match(html, /<dt>Raridade<\/dt><dd>Mítico<\/dd>/);
+  // La etiqueta es la misma que usan los badges de las tarjetas (rareza.<clase>.nombre, en mayusculas).
+  assert.match(html, /<dt>Raridade<\/dt><dd>MÍTICO<\/dd>/);
   assert.match(html, /<dd>1,50%<\/dd>/);
   const json = jsonLdEspiritu(ficha, 'pt-BR');
   const pagina = json['@graph'][0];
@@ -91,5 +92,5 @@ test('la guia pt-BR lleva sus preguntas en portugues sin signos de apertura y co
   assert.doesNotMatch(textos, /[¡¿]/);
   assert.match(textos, /0,5% a 12,5%/);
   assert.equal(guia.secciones[2].tabla.cabeceras[0], 'Raridade');
-  assert.equal(guia.secciones[2].tabla.filas[0][0].texto, 'Mítico');
+  assert.equal(guia.secciones[2].tabla.filas[0][0].texto, 'MÍTICO');
 });

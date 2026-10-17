@@ -10,6 +10,7 @@ import { ALL_SPRITES } from '../data/spritesData';
 import { modeloGuia } from '../seo/guia.js';
 import { datosGuia } from '../seo/guiaDatos.js';
 import { etiquetasGuia } from '../seo/contenido.js';
+import { estiloBadgeRareza } from '../data/rarezaColores.js';
 
 // Un bloque del modelo: parrafo o lista. El modelo no trae marcado, asi que el renderer decide
 // (aqui, como en el generador estatico).
@@ -24,12 +25,17 @@ function Bloque({ bloque }) {
   return <p className="guia__texto">{bloque.texto}</p>;
 }
 
-// La celda de la rareza llega del modelo como { texto, color } o { texto, degradado } —Special es
-// arcoiris, no un color—; las demas son valores sueltos.
+// La celda de la rareza llega del modelo como { texto, clave }. Se pinta como el badge de las
+// tarjetas: la forma la pone .rareza-badge y el color el mapa compartido, el mismo que usan ellas.
 function CeldaRareza({ celda }) {
   if (celda === null || typeof celda !== 'object') return <th scope="row">{celda}</th>;
-  if (celda.degradado) return <th scope="row" className="rareza-arcoiris">{celda.texto}</th>;
-  return <th scope="row" style={celda.color ? { color: celda.color } : undefined}>{celda.texto}</th>;
+  const estilo = estiloBadgeRareza(celda.clave);
+  if (!estilo) return <th scope="row">{celda.texto}</th>;
+  return (
+    <th scope="row">
+      <span className="rareza-badge" style={estilo}>{celda.texto}</span>
+    </th>
+  );
 }
 
 export function GuiaPage({ lang }) {

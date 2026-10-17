@@ -11,13 +11,19 @@
 //   border         borde de la pastilla (a veces distinto del fondo)
 //   classKey       sufijo de las clases .sprite-rarity-<classKey>
 //   cardGradient   degradado de la tarjeta. NO se deriva de bg: Shadow tiene uno propio.
+//
+// DOS COLORES SE ACLARARON PARA CUMPLIR AA. El texto del badge mide 11 px y va en negrita, o sea
+// que cuenta como texto normal y necesita 4.5:1 sobre su propio fondo. Medido: Epic daba 3.64:1
+// (#ec27ff sobre #4c197b) y Common 4.04:1 (#94a3b8 sobre #334155). Ahora dan 5.08:1 y 5.21:1.
+// El arreglo vive aqui, y no en la guia, porque el color es el mismo para los badges de las
+// tarjetas y para la tabla: si se separaran, volveriamos a tener dos verdades.
 export const COLORES_RAREZA = {
   mythic: { color: '#fff0a6', bg: '#7c5d26', border: '#7c5d26', classKey: 'mythic', cardGradient: 'linear-gradient(180deg, #7c5d26 0%, #1b1c23 100%)' },
   legendary: { color: '#fbc363', bg: '#8a3c1e', border: '#8a3c1e', classKey: 'legendary', cardGradient: 'linear-gradient(180deg, #8a3c1e 0%, #1b1c23 100%)' },
-  epic: { color: '#ec27ff', bg: '#4c197b', border: '#4c197b', classKey: 'epic', cardGradient: 'linear-gradient(180deg, #4c197b 0%, #1b1c23 100%)' },
+  epic: { color: '#ff6bff', bg: '#4c197b', border: '#4c197b', classKey: 'epic', cardGradient: 'linear-gradient(180deg, #4c197b 0%, #1b1c23 100%)' },
   rare: { color: '#00fffb', bg: '#00458a', border: '#00458a', classKey: 'rare', cardGradient: 'linear-gradient(180deg, #00458a 0%, #1b1c23 100%)' },
   uncommon: { color: '#4ade80', bg: '#14532d', border: '#4ade80', classKey: 'uncommon', cardGradient: 'linear-gradient(180deg, #14532d 0%, #1b1c23 100%)' },
-  common: { color: '#94a3b8', bg: '#334155', border: '#94a3b8', classKey: 'common', cardGradient: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)' },
+  common: { color: '#adb9c9', bg: '#334155', border: '#adb9c9', classKey: 'common', cardGradient: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)' },
   special: { color: '#5dffe4', bg: '#134e4a', border: '#5dffe4', classKey: 'special', cardGradient: 'linear-gradient(180deg, #134e4a 0%, #1b1c23 100%)',
     // Special no es un color: en las tarjetas es la banda de arcoiris. La misma cadena exacta
     // que usa .sprite-rarity-special (src/styles/index.css), para que la guia no invente otra.
@@ -57,17 +63,27 @@ export function coloresDeRareza(nombre) {
   return COLORES_RAREZA[sinSignos] || null;
 }
 
+/**
+ * El estilo inline del badge de una rareza, para que la pagina estatica y la app pinten EXACTAMENTE
+ * lo mismo. Va inline y no por clase a proposito: las clases de color de las tarjetas llevan
+ * `!important` y, al reutilizarlas en una celda de tabla, una regla de mas especificidad pisaba el
+ * `color` y el badge salia con el texto en blanco.
+ *
+ * El ancho, el alto y el radio los pone la clase .rareza-badge, que es geometria y no color.
+ */
+export function estiloBadgeRareza(nombre) {
+  const entrada = coloresDeRareza(nombre);
+  if (!entrada) return null;
+  // Special no lleva fondo plano: lleva la banda de arcoiris de las tarjetas, con el texto negro
+  // como en ellas.
+  if (entrada.degradadoTexto) {
+    return { background: entrada.degradadoTexto, backgroundSize: '200% 100%', color: '#000' };
+  }
+  return { background: entrada.bg, color: entrada.color };
+}
+
 /** El color de texto de una rareza, o `null` si no se conoce. */
 export function colorDeRareza(nombre) {
   const entrada = coloresDeRareza(nombre);
   return entrada ? entrada.color : null;
-}
-
-/**
- * El degradado de texto de una rareza, o `null` si se pinta con un color plano. Hoy solo Special,
- * que en las tarjetas es la banda de arcoiris.
- */
-export function degradadoDeRareza(nombre) {
-  const entrada = coloresDeRareza(nombre);
-  return entrada && entrada.degradadoTexto ? entrada.degradadoTexto : null;
 }

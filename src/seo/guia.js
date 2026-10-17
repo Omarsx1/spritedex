@@ -4,8 +4,7 @@
 // (src/seo/contenido.js, que lo renderiza) y la vista dentro de la aplicacion. Aqui solo hay
 // datos: ni <h2>, ni class, ni escapado. Cada renderer decide como se pinta. Sin dependencias:
 // se prueba con node --test.
-import { porIdioma, rarezaEnIdioma, numeroEnIdioma } from './idioma.js';
-import { colorDeRareza, degradadoDeRareza } from '../data/rarezaColores.js';
+import { porIdioma, nombreRareza, numeroEnIdioma } from './idioma.js';
 
 // La fecha va en el texto y en el idioma de la pagina: "4 de octubre de 2026" / "October 4, 2026".
 export function formatearFecha(iso, lang) {
@@ -164,15 +163,11 @@ export function modeloGuia(lang, datos) {
             en: ['Rarity', 'Sprites'],
             'pt-BR': ['Raridade', 'Espíritos']
           }),
-          // La celda de la rareza viaja como { texto, color, degradado }: los colores salen del
-          // mismo mapa que usan las tarjetas de la app, asi que la tabla y la rejilla no pueden
-          // discrepar. Special no trae color sino degradado: es la banda de arcoiris.
+          // La celda de la rareza viaja como { texto, clave }: el texto ya es la etiqueta localizada
+          // en mayusculas —la misma que muestran los badges de las tarjetas— y la clave es el codigo
+          // del juego, de donde cada renderer saca los colores del badge con el mapa compartido.
           filas: datos.porRareza.map((r) => [
-            {
-              texto: rarezaEnIdioma(r.nombre, lang),
-              color: colorDeRareza(r.nombre),
-              degradado: degradadoDeRareza(r.nombre)
-            },
+            { texto: nombreRareza(r.nombre, lang), clave: r.nombre },
             r.n
           ])
         }
