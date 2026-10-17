@@ -38,7 +38,7 @@ export const TEXTO = {
     cta: 'Rastrea tu colección en Spritedex', inicio: 'Inicio', espiritus: 'Espíritus',
     novedades: 'Novedades', acerca: 'Acerca de', aviso: 'Proyecto de fans sin relación con Epic Games.',
     privacidad: 'Privacidad', sinImagen: 'Todavía no tenemos imagen de este espíritu.',
-    idioma: 'Idioma'
+    idioma: 'Idioma', ruta: 'Ruta de navegación', saltar: 'Saltar al contenido'
   },
   en: {
     rareza: 'Rarity', generacion: 'Generation', variante: 'Variant', familia: 'Family',
@@ -50,7 +50,7 @@ export const TEXTO = {
     // La politica de privacidad solo existe en español: se dice, en vez de enlazar a una
     // traduccion que no hay.
     privacidad: 'Privacy (Spanish)', sinImagen: 'We do not have an image for this sprite yet.',
-    idioma: 'Language'
+    idioma: 'Language', ruta: 'Breadcrumb', saltar: 'Skip to content'
   },
   'pt-BR': {
     rareza: 'Raridade', generacion: 'Geração', variante: 'Variante', familia: 'Família',
@@ -59,10 +59,14 @@ export const TEXTO = {
     otras: 'Outras variantes de', todos: 'Ver todos os espíritos', guia: 'Guia de espíritos',
     cta: 'Acompanhe sua coleção no Spritedex', inicio: 'Início', espiritus: 'Espíritos',
     novedades: 'Novidades', acerca: 'Sobre', aviso: 'Projeto de fãs sem relação com a Epic Games.',
-    privacidad: 'Privacidade (em espanhol)', sinImagen: 'Ainda não temos imagem deste espírito.',
-    idioma: 'Idioma'
+    privacidad: 'Privacidade (em espanhol)', sinImagem: 'Ainda não temos imagem deste espírito.',
+    idioma: 'Idioma', ruta: 'Navegação estrutural', saltar: 'Pular para o conteúdo'
   }
 };
+
+// El destino del enlace de salto. tabindex="-1" deja caer el foco en el main sin sumarlo al
+// recorrido del tabulador, y el id es la misma ancla en las 570 paginas.
+export const ABRIR_MAIN = '<main id="contenido" tabindex="-1">';
 
 export const RUTA_PRIVACIDAD = '/privacidad';
 
@@ -122,7 +126,22 @@ const CSS = [
   '.cta a.principal { background: var(--acento); color: #04121a; }',
   '.cta a.secundario { border: 1px solid var(--borde); }',
   'footer.pie { border-top: 1px solid rgba(255,255,255,.08); margin-top: 40px; padding-top: 16px; color: var(--apagado); font-size: 13px; }',
-  'footer.pie nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }'
+  'footer.pie nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }',
+  // Accesibilidad. El foco se pinta con el acento sobre el fondo oscuro (contraste 13.96:1) y
+  // con separacion del borde, para que se vea tanto en enlaces como en el summary del FAQ.
+  ':focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; border-radius: 4px; }',
+  // Enlace de salto: fuera de pantalla hasta que recibe foco (criterio 2.4.1). Asi quien navega
+  // con teclado no atraviesa la cabecera y el conmutador de idioma en cada pagina.
+  '.saltar { position: absolute; top: 0; left: -9999px; z-index: 20; }',
+  '.saltar:focus { position: fixed; top: 12px; left: 12px; background: var(--acento); color: #04121a; padding: 10px 16px; border-radius: 10px; font-weight: 700; text-decoration: none; box-shadow: 0 10px 30px rgba(0,0,0,.45); }',
+  'html { scroll-behavior: smooth; }',
+  '@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }',
+  // 2.4.11: el encabezado enfocado no queda pegado al borde superior.
+  ':target { scroll-margin-top: 24px; }',
+  // 2.5.8: los enlaces del conmutador de idioma son objetivos reales y llegan a 24x24 px.
+  'nav.idiomas a, nav.idiomas span { display: inline-flex; align-items: center; min-height: 24px; padding: 4px 10px; border-radius: 8px; text-decoration: none; }',
+  'nav.idiomas a { transition: background-color .2s ease, color .2s ease; }',
+  'nav.idiomas a:hover { background: rgba(0,240,232,.12); color: #7ef7f2; }'
 ].join('\n');
 
 export function headHtml(etiquetas, ogImage) {
@@ -154,8 +173,11 @@ export function headHtml(etiquetas, ogImage) {
   ].filter(Boolean).join('\n    ');
 }
 
-export function migas(items) {
-  return '<nav class="migas" aria-label="Ruta"><ol>' + items.map((i) => (
+// El aria-label viaja en el idioma de la pagina. Con "Ruta" fijo, las versiones inglesa y
+// portuguesa anunciaban al lector de pantalla una palabra en español (criterio 3.1.2). Recibe el
+// idioma y no la etiqueta ya resuelta, para que una llamada nueva no pueda olvidarla.
+export function migas(items, lang) {
+  return '<nav class="migas" aria-label="' + escapar(TEXTO[lang].ruta) + '"><ol>' + items.map((i) => (
     i.href ? '<li><a href="' + i.href + '">' + escapar(i.nombre) + '</a></li>' : '<li>' + escapar(i.nombre) + '</li>'
   )).join('') + '</ol></nav>';
 }
@@ -202,6 +224,8 @@ export function documento({ lang, etiquetas, jsonLd, cuerpo, ogImage, conCabecer
     jsonLd ? '    <script type="application/ld+json">' + jsonSeguro(jsonLd) + '</script>' : '',
     '</head>',
     '<body>',
+    // Lo primero del body: el destino es el main de la propia pagina (ABRIR_MAIN).
+    '<a class="saltar" href="#contenido">' + escapar(TEXTO[lang].saltar) + '</a>',
     '<div class="envoltura">',
     cabecera,
     cuerpo,

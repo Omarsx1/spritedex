@@ -143,6 +143,11 @@ export function modeloGuia(lang, datos) {
         titulo: t.rarezas,
         bloques: [parrafo(t.rarezasTexto)],
         tabla: {
+          titulo: porIdioma(lang, {
+            es: 'Espíritus por rareza en la colección actual',
+            en: 'Sprites per rarity in the current collection',
+            'pt-BR': 'Espíritos por raridade na coleção atual'
+          }),
           cabeceras: porIdioma(lang, {
             es: ['Rareza', 'Espíritus'],
             en: ['Rarity', 'Sprites'],

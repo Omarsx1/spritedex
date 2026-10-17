@@ -6,7 +6,7 @@
 // devuelven HTML, asi que se prueban con node --test.
 
 import { SITIO, TITULO_SITIO } from './rutas.js';
-import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, RUTAS_CONTENIDO } from './plantilla.js';
+import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, RUTAS_CONTENIDO, ABRIR_MAIN } from './plantilla.js';
 import { modeloGuia, formatearFecha } from './guia.js';
 import { hreflangsDe, porIdioma } from './idioma.js';
 
@@ -69,12 +69,21 @@ function migasContenido(lang, nombre) {
     { nombre: TEXTO[lang].inicio, href: conIdiomaRuta('/', lang) },
     { nombre: TEXTO[lang].espiritus, href: conIdiomaRuta('/espiritus', lang) },
     { nombre }
-  ]);
+  ], lang);
 }
 
-function tabla(cabeceras, filas) {
-  return '<table class="tabla"><thead><tr>' + cabeceras.map((c) => '<th>' + escapar(c) + '</th>').join('')
-    + '</tr></thead><tbody>' + filas.map((f) => '<tr>' + f.map((c) => '<td>' + escapar(c) + '</td>').join('') + '</tr>').join('')
+// Una tabla de datos necesita titulo y encabezados con scope: sin ellos, el lector de pantalla
+// recorre una rejilla de numeros sin saber que es cada columna (criterio 1.3.1). La primera celda
+// de cada fila pasa a ser encabezado de fila cuando nombra la fila, igual que en la vista de la app.
+function tabla(cabeceras, filas, { titulo, primeraEsEncabezado = false } = {}) {
+  return '<table class="tabla">'
+    + (titulo ? '<caption>' + escapar(titulo) + '</caption>' : '')
+    + '<thead><tr>' + cabeceras.map((c) => '<th scope="col">' + escapar(c) + '</th>').join('')
+    + '</tr></thead><tbody>' + filas.map((f) => '<tr>' + f.map((c, i) => (
+      primeraEsEncabezado && i === 0
+        ? '<th scope="row">' + escapar(c) + '</th>'
+        : '<td>' + escapar(c) + '</td>'
+    )).join('') + '</tr>').join('')
     + '</tbody></table>';
 }
 
@@ -90,7 +99,12 @@ function bloqueHtml(bloque) {
 // linea siguiente. Es la forma que ya tenia la pagina, que esta indexada.
 function seccionHtml(seccion) {
   const linea = '<h2>' + escapar(seccion.titulo) + '</h2>' + seccion.bloques.map(bloqueHtml).join('');
-  return seccion.tabla ? [linea, tabla(seccion.tabla.cabeceras, seccion.tabla.filas)] : [linea];
+  return seccion.tabla
+    ? [linea, tabla(seccion.tabla.cabeceras, seccion.tabla.filas, {
+      titulo: seccion.tabla.titulo,
+      primeraEsEncabezado: true
+    })]
+    : [linea];
 }
 
 // El FAQ visible sale de los mismos pares que el JSON-LD: si divergieran, el marcado diria algo
@@ -147,7 +161,7 @@ export function htmlGuia(datos, lang) {
   jsonLd['@graph'].push(jsonLdFaq(modelo.faq));
   const cuerpo = [
     migasContenido(lang, porIdioma(lang, { es: 'Guía', en: 'Guide', 'pt-BR': 'Guia' })),
-    '<main>',
+    ABRIR_MAIN,
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
     ...modelo.secciones.flatMap(seccionHtml),
@@ -164,6 +178,13 @@ const CABECERAS_NOVEDADES = {
   es: ['Lanzamiento', 'Espíritu', 'Familia', 'Variante', 'Probabilidad'],
   en: ['Release', 'Sprite', 'Family', 'Variant', 'Drop'],
   'pt-BR': ['Lançamento', 'Espírito', 'Família', 'Variante', 'Probabilidade']
+};
+
+// Titulo de la tabla de novedades. No repite el h1: describe que hay dentro (criterio 1.3.1).
+const CAPTIONS_NOVEDADES = {
+  es: 'Últimos espíritus añadidos, con su fecha de lanzamiento y su probabilidad',
+  en: 'Latest sprites added, with their release date and drop chance',
+  'pt-BR': 'Últimos espíritos adicionados, com data de lançamento e probabilidade'
 };
 
 export function htmlNovedades(datos, lang) {
@@ -188,12 +209,13 @@ export function htmlNovedades(datos, lang) {
   ]);
   const cuerpo = [
     migasContenido(lang, TEXTO[lang].novedades),
-    '<main>',
+    ABRIR_MAIN,
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
     tabla(
       CABECERAS_NOVEDADES[lang],
-      filas
+      filas,
+      { titulo: CAPTIONS_NOVEDADES[lang] }
     ),
     '<p class="nota">' + escapar(porIdioma(lang, {
       es: 'Las fechas son las registradas en los datos del juego. El detalle completo está en la ficha de cada espíritu.',
@@ -265,7 +287,7 @@ export function htmlAcerca(datos, lang) {
     });
   const cuerpo = [
     migasContenido(lang, TEXTO[lang].acerca),
-    '<main>',
+    ABRIR_MAIN,
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
     '<h2>' + escapar(h.que) + '</h2><p>' + escapar(h.queTexto) + '</p>',

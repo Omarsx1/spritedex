@@ -9,7 +9,7 @@
 // modal por estado, sin URL). Todo su contenido unico era invisible para un buscador.
 
 import { SITIO, TITULO_SITIO } from './rutas.js';
-import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, ZONA } from './plantilla.js';
+import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, ZONA, ABRIR_MAIN } from './plantilla.js';
 import { porIdioma, hreflangsDe, rarezaEnIdioma, numeroEnIdioma } from './idioma.js';
 
 const RUTA_HUB = '/espiritus';
@@ -195,8 +195,8 @@ export function htmlPaginaEspiritu(ficha, lang) {
       : '<li><a href="' + conIdiomaRuta(rutaEspiritu(h.id), lang) + '">' + escapar(h[lang].nombre) + '</a></li>'
   )).join('');
   const cuerpo = [
-    migas([{ nombre: t.inicio, href: base }, { nombre: t.espiritus, href: hub }, { nombre: d.nombre }]),
-    '<main>',
+    migas([{ nombre: t.inicio, href: base }, { nombre: t.espiritus, href: hub }, { nombre: d.nombre }], lang),
+    ABRIR_MAIN,
     '<h1>' + escapar(d.nombre) + '</h1>',
     '<p class="lead">' + escapar(ZONA[lang] + ' · ' + d.familia + ' · ' + d.variante) + '</p>',
     '<div class="ficha">',
@@ -233,8 +233,8 @@ export function htmlHubEspiritus(fichas, lang) {
     )).join('') + '</ul>'
   )).join('');
   const cuerpo = [
-    migas([{ nombre: t.inicio, href: base }, { nombre: t.espiritus }]),
-    '<main>',
+    migas([{ nombre: t.inicio, href: base }, { nombre: t.espiritus }], lang),
+    ABRIR_MAIN,
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
     bloques,
