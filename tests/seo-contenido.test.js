@@ -37,8 +37,8 @@ test('etiquetas en rango y canonical autorreferente en las tres paginas y dos id
       const html = htmlDe(lang);
       assert.equal((html.match(/<h1>/g) || []).length, 1, nombre + '/' + lang + ': un solo h1');
       assert.ok(html.includes('<link rel="canonical" href="' + e.canonical + '" />'));
-      // Tres alternates en el head; el conmutador de idioma visible lleva su propio hreflang.
-      assert.equal((html.match(/<link rel="alternate" hreflang=/g) || []).length, 3, nombre + '/' + lang + ': tres hreflang en el head');
+      // Cuatro alternates en el head (es, en, pt-BR, x-default); el conmutador visible lleva su propio hreflang.
+      assert.equal((html.match(/<link rel="alternate" hreflang=/g) || []).length, 4, nombre + '/' + lang + ': cuatro hreflang en el head');
       assert.ok(html.includes('hreflang="' + (lang === 'en' ? 'es' : 'en') + '"'), nombre + '/' + lang + ': falta el enlace al otro idioma');
       assert.equal((html.match(/application\/ld\+json/g) || []).length, 1, nombre + '/' + lang + ': un JSON-LD');
       assert.ok(html.includes('<html lang="' + lang + '">'));
@@ -92,4 +92,31 @@ test('un nombre con etiquetas en las novedades se escapa', () => {
   const html = htmlNovedades(raro, 'es');
   assert.ok(!html.includes('<script>alert(1)</script>'));
   assert.ok(html.includes('&lt;script&gt;'));
+});
+
+test('la tabla de rarezas pinta cada rareza como el badge de las tarjetas', () => {
+  for (const lang of ['es', 'en', 'pt-BR']) {
+    const html = htmlGuia(guia, lang);
+    // El badge lleva el fondo y el color de SU rareza, tomados del mapa compartido.
+    assert.ok(html.includes('class="rareza-badge"'), lang + ': falta el badge de rareza');
+    for (const [rareza, fondo, color] of [
+      ['Rare', '#00458a', '#00fffb'],
+      ['Legendary', '#8a3c1e', '#fbc363'],
+      ['Epic', '#4c197b', '#ff6bff'],
+      ['Mythic', '#7c5d26', '#fff0a6']
+    ]) {
+      assert.ok(
+        html.includes('background:#' + fondo.slice(1) + ';color:' + color),
+        lang + ': el badge de ' + rareza + ' deberia llevar su fondo y su color'
+      );
+    }
+    // Special no lleva fondo plano: lleva la banda de arcoiris de las tarjetas y el texto negro.
+    assert.ok(html.includes('background:linear-gradient(15deg'), lang + ': Special deberia llevar la banda de arcoiris');
+    assert.ok(
+      /rareza-badge" style="background:linear-gradient\(15deg[^"]*color:#000"/.test(html),
+      lang + ': la banda de Special deberia llevar el texto negro'
+    );
+    // El badge va dentro del encabezado de fila: el nombre no puede haber sustituido a la celda.
+    assert.match(html, /<th scope="row"><span class="rareza-badge"/);
+  }
 });

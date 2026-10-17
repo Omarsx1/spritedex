@@ -198,7 +198,14 @@ export function Navbar({
     if (onSignOut) onSignOut();
   };
 
-  const handleLogoClick = async () => {
+  // El logo hace las dos cosas que se esperan de un logo: es un enlace al inicio (convencion que
+  // da por hecha cualquiera, y camino de vuelta desde la guia) y ademas trae la ultima version,
+  // que era su unico trabajo antes. Recarga de verdad: limpiar los caches sin recargar no cambia
+  // lo que ya esta cargado en memoria.
+  const handleLogoClick = async (evento) => {
+    // Cmd/clic central o "abrir en pestaña nueva": manda el navegador y no se toca nada.
+    if (!esClicDeNavegacion(evento)) return;
+    evento.preventDefault();
     try {
       if ('caches' in window) {
         const keys = await caches.keys();
@@ -207,24 +214,26 @@ export function Navbar({
     } catch (err) {
       console.warn('Error al limpiar caché:', err);
     }
-    const url = new URL(window.location.href);
-    url.searchParams.set('v', Date.now().toString());
-    window.location.replace(url.toString());
+    // Al inicio del idioma activo, no a la ruta donde estuviera: eso es lo que promete el logo.
+    const destino = new URL(conIdioma('/', getLang()), window.location.origin);
+    destino.searchParams.set('v', Date.now().toString());
+    window.location.replace(destino.toString());
   };
 
   return (
     <nav className="app-navbar">
-      {/* Logo con actualización forzada */}
+      {/* Logo: vuelve al inicio y de paso trae la ultima version. Es un enlace de verdad, para
+          que cmd/clic central sigan funcionando como en cualquier otro enlace. */}
       <div className="app-navbar__left">
-        <button
-          type="button"
+        <a
           className="app-navbar__logo-mark"
+          href={conIdioma('/', getLang())}
           onClick={handleLogoClick}
-          title={t('nav.actualizarAyuda')}
-          aria-label={t('nav.actualizarApp')}
+          title={t('nav.inicioAyuda')}
+          aria-label={t('nav.inicio')}
         >
-          F
-        </button>
+          <img className="app-navbar__logo-img" src="/logoSF.webp" alt="" draggable="false" />
+        </a>
       </div>
 
       {/* Acciones derechas: Idioma + Avatar + Menú Hamburguesa. El interruptor de

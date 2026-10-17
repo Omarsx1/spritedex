@@ -5,9 +5,11 @@
 // donde salen los datos y por que). Sin dependencias: reciben los numeros ya calculados y
 // devuelven HTML, asi que se prueban con node --test.
 
-import { SITIO } from './rutas.js';
-import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, RUTAS_CONTENIDO } from './plantilla.js';
+import { SITIO, TITULO_SITIO } from './rutas.js';
+import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, RUTAS_CONTENIDO, ABRIR_MAIN, estiloACss } from './plantilla.js';
+import { estiloBadgeRareza } from '../data/rarezaColores.js';
 import { modeloGuia, formatearFecha } from './guia.js';
+import { hreflangsDe, porIdioma } from './idioma.js';
 
 const CLAVES = { guia: 'guia', acerca: 'acerca', novedades: 'novedades' };
 
@@ -21,6 +23,11 @@ const TITULOS = {
     guia: 'Fortnite sprite guide — Spritedex',
     acerca: 'About Spritedex: who makes it and with what data',
     novedades: 'New Fortnite sprites — Spritedex'
+  },
+  'pt-BR': {
+    guia: 'Guia de espíritos do Fortnite — Spritedex',
+    acerca: 'Sobre o Spritedex: quem faz e com quais dados',
+    novedades: 'Espíritos novos do Fortnite — Spritedex'
   }
 };
 
@@ -34,6 +41,11 @@ const DESCRIPCIONES = {
     guia: 'What Fortnite sprites are: families, variants, rarities, how to get them and how they level from 1 to 5, with data from the full collection.',
     acerca: 'Spritedex is a fan-made Fortnite sprite tracker: where the data comes from, how your progress is stored and what this project is not.',
     novedades: 'The latest sprites added to Fortnite with their release date, family, variant and drop chance, linked to their page.'
+  },
+  'pt-BR': {
+    guia: 'O que são os espíritos do Fortnite, famílias e variantes, raridades, como se conseguem e como sobem de nível do 1 ao 5, com dados da coleção completa.',
+    acerca: 'O Spritedex é um rastreador de espíritos do Fortnite feito por fãs: de onde vêm os dados, como seu progresso é guardado e o que este projeto não é.',
+    novedades: 'Os últimos espíritos adicionados ao Fortnite com a data, a família, a variante e a probabilidade de obtenção, com link para a ficha de cada um.'
   }
 };
 
@@ -42,13 +54,10 @@ function etiquetasDe(clave, lang, extras = {}) {
   return {
     lang,
     titulo: TITULOS[lang][clave],
+    tituloDocumento: TITULO_SITIO,
     descripcion: recortar(extras.descripcion || DESCRIPCIONES[lang][clave], 160),
     canonical: SITIO + conIdiomaRuta(ruta, lang),
-    alternates: [
-      { hreflang: 'es', href: SITIO + conIdiomaRuta(ruta, 'es') },
-      { hreflang: 'en', href: SITIO + conIdiomaRuta(ruta, 'en') },
-      { hreflang: 'x-default', href: SITIO + conIdiomaRuta(ruta, 'es') }
-    ]
+    alternates: hreflangsDe(SITIO, ruta)
   };
 }
 
@@ -61,12 +70,32 @@ function migasContenido(lang, nombre) {
     { nombre: TEXTO[lang].inicio, href: conIdiomaRuta('/', lang) },
     { nombre: TEXTO[lang].espiritus, href: conIdiomaRuta('/espiritus', lang) },
     { nombre }
-  ]);
+  ], lang);
 }
 
-function tabla(cabeceras, filas) {
-  return '<table class="tabla"><thead><tr>' + cabeceras.map((c) => '<th>' + escapar(c) + '</th>').join('')
-    + '</tr></thead><tbody>' + filas.map((f) => '<tr>' + f.map((c) => '<td>' + escapar(c) + '</td>').join('') + '</tr>').join('')
+// Una celda puede ser un texto suelto o un objeto { texto, clave }: la rareza de la guia se pinta
+// como el badge de las tarjetas, con los colores del mapa compartido.
+function celdaHtml(valor, esEncabezadoDeFila) {
+  const esObjeto = valor !== null && typeof valor === 'object';
+  const texto = escapar(esObjeto ? valor.texto : valor);
+  if (!esEncabezadoDeFila) return '<td>' + texto + '</td>';
+  // El badge va DENTRO del <th scope="row">: la celda sigue siendo el encabezado de la fila (lo que
+  // lee el lector de pantalla) y el badge es solo la piel.
+  const estilo = esObjeto && valor.clave ? estiloBadgeRareza(valor.clave) : null;
+  if (!estilo) return '<th scope="row">' + texto + '</th>';
+  return '<th scope="row"><span class="rareza-badge" style="' + escapar(estiloACss(estilo)) + '">' + texto + '</span></th>';
+}
+
+// Una tabla de datos necesita titulo y encabezados con scope: sin ellos, el lector de pantalla
+// recorre una rejilla de numeros sin saber que es cada columna (criterio 1.3.1). La primera celda
+// de cada fila pasa a ser encabezado de fila cuando nombra la fila, igual que en la vista de la app.
+function tabla(cabeceras, filas, { titulo, primeraEsEncabezado = false } = {}) {
+  return '<table class="tabla">'
+    + (titulo ? '<caption>' + escapar(titulo) + '</caption>' : '')
+    + '<thead><tr>' + cabeceras.map((c) => '<th scope="col">' + escapar(c) + '</th>').join('')
+    + '</tr></thead><tbody>' + filas.map((f) => '<tr>' + f.map((c, i) => (
+      celdaHtml(c, primeraEsEncabezado && i === 0)
+    )).join('') + '</tr>').join('')
     + '</tbody></table>';
 }
 
@@ -78,11 +107,30 @@ function bloqueHtml(bloque) {
   return '<p>' + escapar(bloque.texto) + '</p>';
 }
 
-// Una seccion ocupa una linea (titulo y bloques seguidos) y su tabla, si la lleva, va en la
-// linea siguiente. Es la forma que ya tenia la pagina, que esta indexada.
+// Cada seccion es una region navegable: `aria-labelledby` apunta a su propio encabezado y el id
+// de ese encabezado es tambien el ancla del indice. El id viene del modelo —no se deriva del
+// titulo— para que sea el mismo en los tres idiomas y un enlace con ancla no se rompa al cambiar
+// de version.
 function seccionHtml(seccion) {
-  const linea = '<h2>' + escapar(seccion.titulo) + '</h2>' + seccion.bloques.map(bloqueHtml).join('');
-  return seccion.tabla ? [linea, tabla(seccion.tabla.cabeceras, seccion.tabla.filas)] : [linea];
+  const idTitulo = seccion.id + '-titulo';
+  const contenido = '<h2 id="' + idTitulo + '">' + escapar(seccion.titulo) + '</h2>'
+    + seccion.bloques.map(bloqueHtml).join('')
+    + (seccion.tabla
+      ? tabla(seccion.tabla.cabeceras, seccion.tabla.filas, {
+        titulo: seccion.tabla.titulo,
+        primeraEsEncabezado: true
+      })
+      : '');
+  return '<section id="' + seccion.id + '" aria-labelledby="' + idTitulo + '">' + contenido + '</section>';
+}
+
+// Ocho secciones de lectura larga sin navegacion interna obligan a desplazarse a ciegas. El
+// indice sale de los mismos ids que usan las secciones, asi que no pueden desincronizarse.
+function indiceHtml(modelo) {
+  const enlaces = modelo.secciones.concat([modelo.faq]).map((s) => (
+    '<li><a href="#' + s.id + '">' + escapar(s.titulo) + '</a></li>'
+  )).join('');
+  return '<nav class="indice" aria-label="' + escapar(modelo.indice) + '"><ol>' + enlaces + '</ol></nav>';
 }
 
 // El FAQ visible sale de los mismos pares que el JSON-LD: si divergieran, el marcado diria algo
@@ -105,7 +153,6 @@ function jsonLdFaq(faq) {
 }
 
 function jsonLdPagina(tipo, etiquetas, lang, extra = {}) {
-  const enIngles = lang === 'en';
   return {
     '@context': 'https://schema.org',
     '@graph': [
@@ -122,8 +169,8 @@ function jsonLdPagina(tipo, etiquetas, lang, extra = {}) {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: enIngles ? 'Home' : 'Inicio', item: SITIO + conIdiomaRuta('/', lang) },
-          { '@type': 'ListItem', position: 2, name: enIngles ? 'Sprites' : 'Espíritus', item: SITIO + conIdiomaRuta('/espiritus', lang) },
+          { '@type': 'ListItem', position: 1, name: TEXTO[lang].inicio, item: SITIO + conIdiomaRuta('/', lang) },
+          { '@type': 'ListItem', position: 2, name: TEXTO[lang].espiritus, item: SITIO + conIdiomaRuta('/espiritus', lang) },
           { '@type': 'ListItem', position: 3, name: etiquetas.titulo.replace(' — Spritedex', ''), item: etiquetas.canonical }
         ]
       }
@@ -133,30 +180,44 @@ function jsonLdPagina(tipo, etiquetas, lang, extra = {}) {
 
 export function htmlGuia(datos, lang) {
   const etiquetas = etiquetasGuia(lang);
-  const enIngles = lang === 'en';
   // El FAQPage va como nodo del grafo, una sola vez: si ademas fuera mainEntity, las preguntas
   // viajarian duplicadas en el marcado.
   const jsonLd = jsonLdPagina('WebPage', etiquetas, lang);
   const modelo = modeloGuia(lang, datos);
   jsonLd['@graph'].push(jsonLdFaq(modelo.faq));
   const cuerpo = [
-    migasContenido(lang, enIngles ? 'Guide' : 'Guía'),
-    '<main>',
+    migasContenido(lang, porIdioma(lang, { es: 'Guía', en: 'Guide', 'pt-BR': 'Guia' })),
+    ABRIR_MAIN,
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
-    ...modelo.secciones.flatMap(seccionHtml),
+    indiceHtml(modelo),
+    ...modelo.secciones.map(seccionHtml),
     ctaHtml(lang),
-    '<h2>' + escapar(modelo.faq.titulo) + '</h2>',
+    '<section id="' + modelo.faq.id + '" aria-labelledby="' + modelo.faq.id + '-titulo">',
+    '<h2 id="' + modelo.faq.id + '-titulo">' + escapar(modelo.faq.titulo) + '</h2>',
     faqHtml(modelo.faq.entradas),
+    '</section>',
     '<p class="nota">' + escapar(modelo.nota) + '</p>',
     '</main>'
   ].join('\n');
   return documento({ lang, etiquetas, jsonLd, cuerpo });
 }
 
+const CABECERAS_NOVEDADES = {
+  es: ['Lanzamiento', 'Espíritu', 'Familia', 'Variante', 'Probabilidad'],
+  en: ['Release', 'Sprite', 'Family', 'Variant', 'Drop'],
+  'pt-BR': ['Lançamento', 'Espírito', 'Família', 'Variante', 'Probabilidade']
+};
+
+// Titulo de la tabla de novedades. No repite el h1: describe que hay dentro (criterio 1.3.1).
+const CAPTIONS_NOVEDADES = {
+  es: 'Últimos espíritus añadidos, con su fecha de lanzamiento y su probabilidad',
+  en: 'Latest sprites added, with their release date and drop chance',
+  'pt-BR': 'Últimos espíritos adicionados, com data de lançamento e probabilidade'
+};
+
 export function htmlNovedades(datos, lang) {
   const etiquetas = etiquetasNovedades(lang);
-  const enIngles = lang === 'en';
   const jsonLd = jsonLdPagina('CollectionPage', etiquetas, lang);
   jsonLd['@graph'].push({
     '@type': 'ItemList',
@@ -176,32 +237,53 @@ export function htmlNovedades(datos, lang) {
     f.drop
   ]);
   const cuerpo = [
-    migasContenido(lang, enIngles ? 'Updates' : 'Novedades'),
-    '<main>',
+    migasContenido(lang, TEXTO[lang].novedades),
+    ABRIR_MAIN,
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
     tabla(
-      [enIngles ? 'Release' : 'Lanzamiento', enIngles ? 'Sprite' : 'Espíritu', enIngles ? 'Family' : 'Familia', enIngles ? 'Variant' : 'Variante', enIngles ? 'Drop' : 'Probabilidad'],
-      filas
+      CABECERAS_NOVEDADES[lang],
+      filas,
+      { titulo: CAPTIONS_NOVEDADES[lang] }
     ),
-    '<p class="nota">' + escapar(enIngles
-      ? 'Dates are the ones recorded in the game data. The sprite pages carry the full detail.'
-      : 'Las fechas son las registradas en los datos del juego. El detalle completo está en la ficha de cada espíritu.') + '</p>',
+    '<p class="nota">' + escapar(porIdioma(lang, {
+      es: 'Las fechas son las registradas en los datos del juego. El detalle completo está en la ficha de cada espíritu.',
+      en: 'Dates are the ones recorded in the game data. The sprite pages carry the full detail.',
+      'pt-BR': 'As datas são as registradas nos dados do jogo. O detalhe completo está na ficha de cada espírito.'
+    })) + '</p>',
     ctaHtml(lang),
     '</main>'
   ].join('\n');
   return documento({ lang, etiquetas, jsonLd, cuerpo });
 }
 
+// Acerca en portugues: mismo esquema que los objetos de es/en de abajo.
+const ACERCA_PT = {
+  'pt-BR': {
+    que: 'O que é o Spritedex',
+    queTexto: 'Um rastreador gratuito de coleções de espíritos do Fortnite. Mostra cada espírito com sua família, variante, raridade, probabilidade, custo de invocação, habilidade e onde aparece, e deixa você marcar quais já tem e até que nível os subiu.',
+    por: 'Por que existe',
+    porTexto: 'Guardar a coleção de cabeça deixa de funcionar lá pelos vinte espíritos: você esquece qual variante falta e qual ainda está no nível 2. O Spritedex transforma isso em uma lista que você pode consultar e em um cartão que pode enviar para quem troca com você.',
+    datos: 'De onde vêm os dados',
+    datosTexto: 'Nomes, raridades, probabilidades, custos, habilidades e locais de aparição vêm do jogo e de fontes da comunidade. A coleção é revisada à mão e datada a cada atualização, então o que você lê aqui pode mudar quando o jogo muda. Pode conter erros.',
+    quien: 'Quem faz',
+    quienTexto: 'É um projeto pessoal de fãs, não uma empresa. A coleção é mantida à mão e o aplicativo foi feito para ser rápido e funcionar sem conta.',
+    no: 'O que não é',
+    noTexto: 'O Spritedex não tem relação com a Epic Games e não vende nada. Também não é um site de notícias nem de estatísticas: só acompanha espíritos.',
+    privacidad: 'Privacidade',
+    privacidadTexto: 'Seu progresso fica guardado no seu próprio navegador. Não há cadastro e nada é enviado.',
+    fecha: (f) => 'Coleção revisada em ' + f + '.'
+  }
+};
+
 export function htmlAcerca(datos, lang) {
   const etiquetas = etiquetasAcerca(lang);
-  const enIngles = lang === 'en';
   const fecha = formatearFecha(datos.fecha, lang);
   const jsonLd = jsonLdPagina('AboutPage', etiquetas, lang, {
     about: { '@type': 'VideoGame', name: 'Fortnite' }
   });
-  const h = enIngles
-    ? {
+  const h = ACERCA_PT[lang] ? { ...ACERCA_PT[lang], fecha: ACERCA_PT[lang].fecha(fecha) } : porIdioma(lang, {
+    en: {
         que: 'What Spritedex is',
         queTexto: 'A free tracker for Fortnite sprite collections. It shows every sprite with its family, variant, rarity, drop chance, summon cost, ability and where it is found, and lets you mark what you own and how far you have levelled it.',
         por: 'Why it exists',
@@ -215,8 +297,8 @@ export function htmlAcerca(datos, lang) {
         privacidad: 'Privacy',
         privacidadTexto: 'Your progress is stored in your own browser. There is no sign-up and nothing is uploaded.',
         fecha: 'Collection revised on ' + fecha + '.'
-      }
-    : {
+      },
+    es: {
         que: 'Qué es Spritedex',
         queTexto: 'Un rastreador gratuito de colecciones de espíritus de Fortnite. Muestra cada espíritu con su familia, variante, rareza, probabilidad, costo de invocación, habilidad y dónde aparece, y te deja marcar cuáles tienes y hasta qué nivel los subiste.',
         por: 'Por qué existe',
@@ -230,10 +312,11 @@ export function htmlAcerca(datos, lang) {
         privacidad: 'Privacidad',
         privacidadTexto: 'Tu progreso se guarda en tu propio navegador. No hay registro y no se sube nada.',
         fecha: 'Colección revisada el ' + fecha + '.'
-      };
+      }
+    });
   const cuerpo = [
-    migasContenido(lang, enIngles ? 'About' : 'Acerca de'),
-    '<main>',
+    migasContenido(lang, TEXTO[lang].acerca),
+    ABRIR_MAIN,
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
     '<h2>' + escapar(h.que) + '</h2><p>' + escapar(h.queTexto) + '</p>',
@@ -241,7 +324,11 @@ export function htmlAcerca(datos, lang) {
     '<h2>' + escapar(h.datos) + '</h2><p>' + escapar(h.datosTexto) + '</p>',
     '<h2>' + escapar(h.quien) + '</h2><p>' + escapar(h.quienTexto) + '</p>',
     '<h2>' + escapar(h.no) + '</h2><p>' + escapar(h.noTexto) + '</p>',
-    '<h2>' + escapar(h.privacidad) + '</h2><p>' + escapar(h.privacidadTexto + ' ') + '<a href="/privacidad">' + escapar(enIngles ? 'Privacy policy (in Spanish)' : 'Política de privacidad') + '</a>.</p>',
+    '<h2>' + escapar(h.privacidad) + '</h2><p>' + escapar(h.privacidadTexto + ' ') + '<a href="/privacidad">' + escapar(porIdioma(lang, {
+      es: 'Política de privacidad',
+      en: 'Privacy policy (in Spanish)',
+      'pt-BR': 'Política de privacidade (em espanhol)'
+    })) + '</a>.</p>',
     ctaHtml(lang),
     '<p class="nota">' + escapar(h.fecha) + '</p>',
     '</main>'

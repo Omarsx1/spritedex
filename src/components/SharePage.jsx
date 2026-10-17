@@ -1,27 +1,24 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { ArrowLeft, Download, Share2, Copy, Check, ChevronDown } from 'lucide-react';
 import { pickName, THEMES_LIST, THEME_STYLES, pickThemeName, pickFamilyName } from '../data/spritesData';
-import { generateSpritedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, marcarEsperaActiva, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
+import { generateSpritedexCardImage, encodeCanvasToImage, globalCanvasCache, getCanvasCacheKey, readCachedCapture, writeCachedCapture, getOrStartCapture, marcarEsperaActiva, crearCacheAcotada, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } from '../utils/canvasExporter';
 import { sounds } from '../utils/audio';
 import { safeStorage } from '../utils/safeStorage';
+import { CLAVE_USUARIO, CLAVE_MOSTRAR_USUARIO, LARGO_USUARIO, usuarioGuardado, mostrarUsuarioGuardado } from '../utils/firmaUsuario';
 import gsap from 'gsap';
 import { t } from '../i18n';
 
-// Caché persistente global para previews de plantillas generadas (0ms instantáneo entre aperturas y formatos)
-const globalTemplatePreviewCache = new Map();
+// Previews ya codificadas (blob + URL) para volver a abrirlas al instante. Al olvidar una
+// entrada se libera su URL de objeto, que de otro modo se queda viva para siempre.
+const globalTemplatePreviewCache = crearCacheAcotada(8, (entrada) => {
+  if (entrada?.url?.startsWith('blob:')) URL.revokeObjectURL(entrada.url);
+});
 
-// Firma del dueño: se recuerda en el dispositivo y decide si aparece en la lona.
-const CLAVE_USUARIO = 'spritedex_fortnite_user';
-const CLAVE_MOSTRAR_USUARIO = 'spritedex_fortnite_user_visible';
-const LARGO_USUARIO = 24;
-
-function usuarioGuardado() {
-  const valor = safeStorage.getItem(CLAVE_USUARIO);
-  return typeof valor === 'string' ? valor : '';
-}
-
-function mostrarUsuarioGuardado() {
-  return safeStorage.getItem(CLAVE_MOSTRAR_USUARIO) !== 'false';
+// Registra en la cache una captura leida del disco y devuelve la entrada con su URL.
+function capturaDesdeDisco(clave, guardada) {
+  const entrada = { url: URL.createObjectURL(guardada.blob), blob: guardada.blob, file: guardada.file };
+  globalTemplatePreviewCache.set(clave, entrada);
+  return entrada;
 }
 
 // Estado del medidor de diagnostico. Apagado por defecto (no aparece para nadie) y
@@ -157,7 +154,6 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
   }, [alternarPerf]);
 
   const modalRef = useRef(null);
-  const hasEnteredRef = useRef(false);
   const previewHostRef = useRef(null);
   // Clave vigente del preview. Los pases viejos quedan descartados por CLAVE (antes se
   // comparaba un contador de trabajos y un pase de fondo podia descartar un resultado
@@ -181,9 +177,11 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
       const inicioCodificacion = Date.now();
       encodeCanvasToImage(canvasToEncode).then((enc) => {
         if (activeKeyRef.current !== key) return;
-        const prev = globalTemplatePreviewCache.get(key) || {};
-        globalTemplatePreviewCache.set(key, { ...prev, canvas: canvasToEncode, url: enc.dataUrl, blob: enc.blob, file: enc.file });
-        setDataUrl(enc.dataUrl);
+        // Ya codificada no hace falta el lienzo en la cache: la vista previa sigue mostrando el
+        // que tiene en pantalla y la proxima apertura usa el blob.
+        const url = enc.blob ? URL.createObjectURL(enc.blob) : enc.dataUrl;
+        globalTemplatePreviewCache.set(key, { url, blob: enc.blob, file: enc.file });
+        setDataUrl(url);
         setCachedBlob(enc.blob);
         setCachedFile(enc.file);
         // Persiste para que la proxima visita no tenga que dibujar ni codificar nada.
@@ -216,22 +214,9 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
     if (modalRef.current) {
       gsap.fromTo(modalRef.current,
         { opacity: 0, scale: 0.95, y: 10 },
-        {
-          opacity: 1,
-          scale: 1,
-          y: 0,
-          duration: 0.22,
-          ease: 'power2.out',
-          onComplete: () => {
-            hasEnteredRef.current = true;
-          }
-        }
+        { opacity: 1, scale: 1, y: 0, duration: 0.22, ease: 'power2.out' }
       );
     }
-    const timer = setTimeout(() => {
-      hasEnteredRef.current = true;
-    }, 220);
-    return () => clearTimeout(timer);
   }, []);
 
   // Que espiritus entran en la lona: primero el alcance y encima los filtros de la lona.
@@ -370,9 +355,10 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
         readCachedCapture(currentKey).then((guardada) => {
           if (activeKeyRef.current !== paseKey) return;
           if (guardada) {
-            setDataUrl(guardada.url);
-            setCachedBlob(guardada.blob);
-            setCachedFile(guardada.file);
+            const entrada = capturaDesdeDisco(paseKey, guardada);
+            setDataUrl(entrada.url);
+            setCachedBlob(entrada.blob);
+            setCachedFile(entrada.file);
           } else {
             queuePngEncode(cachedCanvas, currentKey);
           }
@@ -384,9 +370,8 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
 
     setIsGenerating(true);
 
-    // Desacoplar la animación de apertura del modal (220ms) para que Android abra a 60/120fps fluidos.
-    // Si el modal ya completó su entrada, usar un debounce suave de 60ms para evitar colisiones entre clics rápidos.
-    const delay = hasEnteredRef.current ? 60 : 180;
+    // Debounce corto: el dibujo arranca durante la animación de apertura (220ms); validar jank en Android.
+    const delay = 60;
 
     const timer = setTimeout(async () => {
       if (activeKeyRef.current !== currentKey) return;
@@ -399,10 +384,10 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
       ]);
       if (activeKeyRef.current !== currentKey) return;
       if (guardada) {
-        globalTemplatePreviewCache.set(currentKey, { canvas: null, url: guardada.url, blob: guardada.blob, file: guardada.file });
-        setDataUrl(guardada.url);
-        setCachedBlob(guardada.blob);
-        setCachedFile(guardada.file);
+        const entrada = capturaDesdeDisco(currentKey, guardada);
+        setDataUrl(entrada.url);
+        setCachedBlob(entrada.blob);
+        setCachedFile(entrada.file);
         setIsGenerating(false);
         if (showPerf) setPerf((previo) => ({ ...(previo || {}), cache: t('compartir.cacheDisco'), pasadaMs: Date.now() - inicioPase, revisitas: (previo?.revisitas || 0) + 1 }));
         return;

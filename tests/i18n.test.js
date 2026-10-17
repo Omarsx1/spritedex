@@ -4,6 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   conIdioma,
+  IDIOMAS,
   idiomaDelNavegador,
   normalizarIdioma,
   planDeArranque,
@@ -96,10 +97,59 @@ test('el bloque base tiene ingles de verdad, no español copiado', () => {
   assert.deepEqual(copiadas, [], 'quedaron sin traducir: ' + copiadas.join(', '));
 });
 
+test('cada idioma soportado tiene exactamente las claves de es, con los mismos marcadores', () => {
+  const claves = Object.keys(DICCIONARIOS.es).sort();
+  const marcadores = (texto) => String(texto).match(/\{\w+\}/g)?.sort().join() ?? '';
+  for (const lang of IDIOMAS) {
+    assert.ok(DICCIONARIOS[lang], 'falta el diccionario ' + lang);
+    assert.deepEqual(Object.keys(DICCIONARIOS[lang]).sort(), claves, 'claves de ' + lang);
+    const malos = claves.filter((k) => marcadores(DICCIONARIOS[lang][k]) !== marcadores(DICCIONARIOS.es[k]));
+    assert.deepEqual(malos, [], 'marcadores distintos en ' + lang);
+  }
+});
+
 test('los diccionarios reales resuelven en los dos idiomas', () => {
   assert.equal(traducir(DICCIONARIOS, 'es', 'rareza.mythic.etiqueta'), 'Mítico');
   assert.equal(traducir(DICCIONARIOS, 'en', 'rareza.mythic.etiqueta'), 'Mythic');
   assert.equal(traducir(DICCIONARIOS, 'es', 'lona.lema'), 'ROMPE LAS REGLAS • CAMBIA EL JUEGO');
   assert.equal(traducir(DICCIONARIOS, 'en', 'lona.lema'), 'BREAK THE RULES • CHANGE THE GAME');
   assert.equal(traducir(DICCIONARIOS, 'en', 'lona.progreso', { pct: 42 }), 'PROGRESS 42%');
+});
+
+test('portugues: pt, pt-BR y pt-PT son Brasil; fr sigue en ingles', () => {
+  assert.equal(normalizarIdioma('pt'), 'pt-BR');
+  assert.equal(normalizarIdioma('pt-BR'), 'pt-BR');
+  assert.equal(normalizarIdioma('pt_br'), 'pt-BR');
+  assert.equal(normalizarIdioma('pt-PT'), 'pt-BR');
+  assert.equal(normalizarIdioma('PT-pt'), 'pt-BR');
+  assert.equal(normalizarIdioma('fr'), 'en');
+});
+
+test('idiomaDelNavegador: cualquier etiqueta portuguesa es pt-BR', () => {
+  assert.equal(idiomaDelNavegador(['pt-PT', 'en-US']), 'pt-BR');
+  assert.equal(idiomaDelNavegador(['pt-BR']), 'pt-BR');
+});
+
+test('planDeArranque: navegador portugues va a su prefijo, es y en no cambian', () => {
+  assert.deepEqual(planDeArranque({ pathname: '/', langs: ['pt-BR'], guardado: null }), { lang: 'pt-BR', destino: '/pt-br' });
+  assert.deepEqual(
+    planDeArranque({ pathname: '/amigos', search: '?code=X', langs: ['pt-PT'], guardado: null }),
+    { lang: 'pt-BR', destino: '/pt-br/amigos?code=X' }
+  );
+  assert.deepEqual(planDeArranque({ pathname: '/', langs: ['pt-BR'], guardado: 'es' }), { lang: 'es', destino: null });
+  assert.deepEqual(planDeArranque({ pathname: '/', langs: ['es-MX'], guardado: null }), { lang: 'es', destino: null });
+});
+
+test('planDeArranque: /pt-br se respeta aunque el navegador o la eleccion digan otra cosa', () => {
+  assert.deepEqual(planDeArranque({ pathname: '/pt-br/amigos', langs: ['en-US'], guardado: 'es' }), { lang: 'pt-BR', destino: null });
+  assert.deepEqual(planDeArranque({ pathname: '/pt-pt', langs: ['es-MX'], guardado: null }), { lang: 'es', destino: null });
+});
+
+test('conIdioma y rutaSinIdioma con portugues, sin confundir prefijos parecidos', () => {
+  assert.equal(conIdioma('/amigos/SDEX-1', 'pt-BR'), '/pt-br/amigos/SDEX-1');
+  assert.equal(conIdioma('/pt-br/amigos', 'es'), '/amigos');
+  assert.equal(rutaSinIdioma('/pt-pt'), '/pt-pt');
+  assert.equal(rutaSinIdioma('/pt-br/amigos'), '/amigos');
+  assert.equal(rutaSinIdioma('/pt-brasil'), '/pt-brasil');
+  assert.equal(conIdioma('/pt-brasil', 'es'), '/pt-brasil');
 });

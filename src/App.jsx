@@ -37,7 +37,6 @@ import { estadoAlTocarNivel } from './utils/niveles';
 import { setSyncSession, queueCloudSync, clearCloudSync, flushCloudSync } from './utils/pendingSync';
 import { safeStorage } from './utils/safeStorage';
 import { iniciarCalentador } from './utils/spritePrefetch';
-import { hayEnjambreActivo } from './utils/batSwarm';
 import { pausarAnimacionesFueraDePantalla } from './utils/pausaAnimaciones';
 import {
   getMyFriendCode,
@@ -47,22 +46,18 @@ import {
   getLastConnectedFriendCode
 } from './utils/friendCode';
 import { buildShareUrl } from './utils/shareUrl';
-import { getLang, conIdioma, rutaSinIdioma } from './i18n';
+import { getLang, conIdioma, rutaSinIdioma, rutaDeArranque } from './i18n';
 import { aplicarSeoRuta } from './seo/head.js';
 import { etiquetasGuia } from './seo/contenido.js';
 import { espirituDeEnlace } from './utils/enlaceEspiritu.js';
 import { codigoFichaEnRuta } from './utils/visitaEnlace';
 import { esRutaGuia } from './utils/rutaGuia.js';
 import { codigoNormalizado } from './utils/fichaAmigo';
+import { firmaGuardada } from './utils/firmaUsuario';
 import { isDeadSessionError } from './utils/deadSession';
 import { useFriendRequests } from './hooks/useFriendRequests';
 
 // Carga diferida (code splitting) para modales secundarios y suite administrativa
-// El precalculo de la captura no arranca antes de este margen desde que se abre la app,
-// ni mientras el usuario lleve menos de PRECALCULO_CALMA_MS sin tocar nada.
-const ARRANQUE_APP = Date.now();
-const PRECALCULO_MIN_MS = 4000;
-const PRECALCULO_CALMA_MS = 2000;
 
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
 const AdminAuthGate = lazy(() => import('./components/admin/AdminAuthGate').then(m => ({ default: m.AdminAuthGate })));
@@ -80,7 +75,7 @@ const PrivacyPolicyModal = lazy(() => import('./components/PrivacyPolicyModal').
 // (imagen social, locale, idioma del documento), asi que ningun titulo se repite aqui.
 function aplicarSeoGuia(lang) {
   if (typeof document === 'undefined') return;
-  const { titulo, descripcion, canonical, alternates } = etiquetasGuia(lang);
+  const { titulo, tituloDocumento, descripcion, canonical, alternates } = etiquetasGuia(lang);
   const ponerMeta = (atributo, clave, contenido) => {
     let nodo = document.head.querySelector('meta[' + atributo + '="' + clave + '"]');
     if (!nodo) {
@@ -90,7 +85,7 @@ function aplicarSeoGuia(lang) {
     }
     nodo.setAttribute('content', contenido);
   };
-  document.title = titulo;
+  document.title = tituloDocumento || titulo;
   ponerMeta('name', 'description', descripcion);
   ponerMeta('property', 'og:url', canonical);
   ponerMeta('property', 'og:title', titulo);
@@ -1050,13 +1045,10 @@ export function App() {
   // decorativas. Aditivo y reversible: si el observer no corre, todo se ve como siempre.
   useEffect(() => pausarAnimacionesFueraDePantalla(), []);
 
-  // Precalcula en segundo plano la captura de la modal de compartir. Es lo que hace
-  // que la app local se sienta inmediata: alli la modal sale de cache. Sin esto, cada
-  // espiritu marcado invalida la captura y la codificacion (4 s en un telefono) se
-  // paga con la modal abierta. Aqui se paga mientras el usuario navega, en reposo y
-  // una sola vez por cambio de progreso.
-  // OJO: va despues de scopedSprites a proposito; usarlo antes seria un TDZ.
-useEffect(() => {
+  // Precalcula la captura al tocar el boton de compartir, no en reposo: el dibujo es un
+  // bloque largo en el hilo principal y, si corria mientras el usuario navegaba, la app
+  // se congelaba unos segundos. La modal reutiliza esta captura en vuelo o ya dibujada.
+  const precalentarCompartir = useCallback(async () => {
     if (typeof window === 'undefined' || isAdminPortal || enCompartir) return;
     if (!Array.isArray(scopedSprites) || scopedSprites.length === 0) return;
 
@@ -1064,65 +1056,26 @@ useEffect(() => {
     const slowConnection = Boolean(connection && (connection.saveData || /(^|-)2g$/.test(connection.effectiveType || '')));
     if (slowConnection || document.visibilityState !== 'visible') return;
 
-    const run = async () => {
-        try {
-          if (document.visibilityState !== 'visible') return;
-          const { getCanvasCacheKey, readCachedCapture, writeCachedCapture, generateSpritedexCardImage, getOrStartCapture, globalCanvasCache, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } = await import('./utils/canvasExporter');
-          const ownedInScope = scopedSprites.filter((s) => userState[s.id]?.owned).length;
-          const key = getCanvasCacheKey(DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE, scopedSprites.length, ownedInScope, scopedSprites, userState);
-          // Si esta clave ya esta dibujada en memoria, no hay nada que hacer. Sin esta
-          // salida, cada cambio de estado lanzaba otro precálculo y la clave vigente se
-          // quedaba a medias: la modal abria con espera en vez de al instante.
-          if (globalCanvasCache.has(key)) return;
-          if (await readCachedCapture(key)) return;
-          // getOrStartCapture comparte el trabajo con la modal si esta pidio lo mismo.
-          const res = await getOrStartCapture(key, () => generateSpritedexCardImage({
-            spritesList: scopedSprites,
-            userState,
-            format: DEFAULT_EXPORT_FORMAT,
-            bgStyle: DEFAULT_EXPORT_BG_STYLE
-          }));
-          const enc = await res.encode();
-          if (enc?.blob) await writeCachedCapture(key, enc.blob);
-        } catch (err) {
-          // Un fallo del precalculo no puede romper nada: la modal generara al abrirse.
-          console.warn('Precalculo de la captura fallido:', err);
-        }
-    };
-
-    // La captura se prepara cuando la app lleva unos segundos quieta. Durante los
-    // primeros segundos la conexion y el hilo son del primer pintado, del hero y de
-    // las tarjetas: arrancar el precalculo a los 1,2 s ponia ~700 KB de miniaturas a
-    // competir con eso (medido: el sprite del hero tardaba 6 s en aparecer con Slow 4G).
-    // Si el usuario esta tocando o haciendo scroll, se pospone hasta que pare.
-    let ultimaActividad = Date.now();
-    const marcarActividad = () => { ultimaActividad = Date.now(); };
-    const EVENTOS = ['pointerdown', 'keydown', 'wheel', 'touchstart'];
-    EVENTOS.forEach((ev) => window.addEventListener(ev, marcarActividad, { passive: true }));
-
-    let cancelado = false;
-    const intentar = () => {
-      if (cancelado) return;
-      const demasiadoPronto = Date.now() - ARRANQUE_APP < PRECALCULO_MIN_MS;
-      const sigueTocando = Date.now() - ultimaActividad < PRECALCULO_CALMA_MS;
-      // Una ceremonia de murcielagos (marcar o maxear) corre en su propio canvas con rAF: el
-      // precálculo de la captura es un bloque largo en el hilo principal y la congelaba, que es
-      // el tiron que reporto el usuario. Se espera a que la ceremonia termine; el precálculo no
-      // pierde nada por esperar y el resultado es el mismo.
-      const ceremoniaEnCurso = hayEnjambreActivo();
-      if (demasiadoPronto || sigueTocando || ceremoniaEnCurso) {
-        setTimeout(intentar, 600);
-        return;
-      }
-      run();
-    };
-    const timer = setTimeout(intentar, 1500);
-
-    return () => {
-      cancelado = true;
-      clearTimeout(timer);
-      EVENTOS.forEach((ev) => window.removeEventListener(ev, marcarActividad));
-    };
+    try {
+      const { getCanvasCacheKey, readCachedCapture, writeCachedCapture, generateSpritedexCardImage, getOrStartCapture, globalCanvasCache, DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE } = await import('./utils/canvasExporter');
+      const ownedInScope = scopedSprites.filter((s) => userState[s.id]?.owned).length;
+      const firma = firmaGuardada();
+      const key = getCanvasCacheKey(DEFAULT_EXPORT_FORMAT, DEFAULT_EXPORT_BG_STYLE, scopedSprites.length, ownedInScope, scopedSprites, userState, firma);
+      if (globalCanvasCache.has(key)) return;
+      if (await readCachedCapture(key)) return;
+      const res = await getOrStartCapture(key, () => generateSpritedexCardImage({
+        spritesList: scopedSprites,
+        userState,
+        format: DEFAULT_EXPORT_FORMAT,
+        bgStyle: DEFAULT_EXPORT_BG_STYLE,
+        usuario: firma
+      }));
+      const enc = await res.encode();
+      if (enc?.blob) await writeCachedCapture(key, enc.blob);
+    } catch (err) {
+      // Un fallo del precalculo no puede romper nada: la modal generara al abrirse.
+      console.warn('Precalculo de la captura fallido:', err);
+    }
   }, [scopedSprites, userState, isAdminPortal, enCompartir]);
 
   const activeState = activeProfile === 'friend' && friendState ? friendState : userState;
@@ -1166,7 +1119,7 @@ useEffect(() => {
   // recargar, y marca noindex mientras el portal de administracion esta abierto.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    aplicarSeoRuta(window.location.pathname, { noindex: isAdminPortal });
+    aplicarSeoRuta(rutaDeArranque(), { noindex: isAdminPortal });
     if (enGuia && !isAdminPortal) aplicarSeoGuia(getLang());
   }, [enAmigos, enGuia, isAdminPortal]);
 
@@ -1438,6 +1391,7 @@ useEffect(() => {
         connectedFriendCode={connectedFriendCode}
         solicitudesNuevas={solicitudesNuevas}
         onOpenShareModal={() => irA('/compartir')}
+        onPrecalentarCompartir={precalentarCompartir}
         onOpenBackupModal={() => setShowBackupModal(true)}
         onOpenCompareModal={() => irA('/amigos')}
         onOpenAuthModal={() => setShowAuthModal(true)}

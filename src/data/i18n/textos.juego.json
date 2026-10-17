@@ -1,101 +1,398 @@
 {
-  "(Activa - Apuntar en el aire) Entra en tiempo de suspensión en el aire con precisión mejorada. ¡La precisión aumenta con cada subida de nivel!": "(Active - Aim in mid-air) Hover in mid-air with improved accuracy. Accuracy increases with every level up!",
-  "(Activa - Salto en el aire) Salto doble. ¡El tiempo de recarga entre saltos disminuye con cada subida de nivel!": "(Active - Jump In Air) Double Jump. Cooldown between jumps decreases with each Level Up!",
-  "1,250 Polvo Estelar": "1,250 Stardust",
-  "1,500 Polvo Estelar": "1,500 Stardust",
-  "1,750 Polvo Estelar": "1,750 Stardust",
-  "1,800 Polvo Estelar": "1,800 Stardust",
-  "10,000 Polvo Estelar": "10,000 Stardust",
-  "100 Polvo Estelar": "100 Stardust",
-  "2,000 Polvo Estelar": "2,000 Stardust",
-  "2,250 Polvo Estelar": "2,250 Stardust",
-  "2,400 Polvo Estelar": "2,400 Stardust",
-  "2,500 Polvo Estelar": "2,500 Stardust",
-  "2,700 Polvo Estelar": "2,700 Stardust",
-  "4,000 Polvo Estelar": "4,000 Stardust",
-  "4,500 Polvo Estelar": "4,500 Stardust",
-  "5,000 Polvo Estelar": "5,000 Stardust",
-  "6,750 Polvo Estelar": "6,750 Stardust",
-  "A veces se le encuentra durmiendo en cajas de almacenamiento": "Sometimes found sleeping in storage boxes",
-  "Al abrir cofres o eliminar enemigos, existe la posibilidad de generar porciones de pastel que restauran salud y escudo.": "Opening chests or eliminating enemies can spawn cake slices that restore health and shield.",
-  "Aparición poco común en Cofres de Sprite": "Uncommon spawn in Sprite Chests",
-  "Aplica Sobrecarga tras comer o beber un consumible. ¡La sobrecarga dura más tiempo con cada subida de nivel!": "Applies Overdrive after eating or drinking a consumable. Overdrive lasts longer with every level up!",
-  "Aplica Sobrecarga tras consumir objetos del mundo. ¡La sobrecarga dura más tiempo con cada subida de nivel!": "Applies Overdrive after consuming world items. Overdrive lasts longer with every level up!",
-  "Aplica Sobrecarga tras recibir cierta cantidad de daño de la tormenta. Revela futuros círculos de la tormenta al nivel máximo. ¡Reduce el daño necesario para activar la sobrecarga con cada subida de nivel!": "Applies Overdrive after taking a set amount of storm damage, and reveals future storm circles at max level. Reduces the damage needed to trigger Overdrive with every level up!",
-  "Aplica Sobrecarga tras recibir cierta cantidad de daño de la tormenta. ¡Aumenta la duración de la sobrecarga con cada subida de nivel!": "Applies Overdrive after taking a set amount of storm damage. Overdrive lasts longer with every level up!",
-  "Aumenta el daño en cada nivel: 30 -> 40 -> 60 -> 80 -> 120 de daño adicional.": "Increases damage per level: 30 -> 40 -> 60 -> 80 -> 120 extra damage.",
-  "Aumenta en cada nivel: +25% nado / +10% mov. -> +50%/+20% -> +100%/+30% -> +150%/+40% -> +200% velocidad de nado / +50% velocidad de movimiento.": "Grows with every level: +25% swim / +10% move -> +50%/+20% -> +100%/+30% -> +150%/+40% -> +200% swim speed / +50% movement speed.",
-  "Aumenta la efectividad de los objetos de curación consumibles. ¡La efectividad de curación aumenta con cada subida de nivel!": "Increases the effect of consumable healing items. Healing effectiveness increases with every level up!",
-  "Aumenta la velocidad de esprint y la altura de salto. ¡La altura de salto aumenta con cada subida de nivel!": "Increases sprint speed and jump height. Jump height increases with every level up!",
-  "Aumenta la velocidad y distancia del deslizamiento, otorgando un impulso al disparar deslizándote.": "Increases slide speed and distance, and gives a boost when shooting while sliding.",
-  "Aumenta su poder en cada nivel: 10 de curación -> 15 -> 20 -> 25 -> 30 de salud por eliminación.": "Grows stronger with every level: 10 healing -> 15 -> 20 -> 25 -> 30 health per elimination.",
-  "Aumenta su poder en cada subida de nivel: 2 de escudo -> 3 -> 4 -> 5 -> 6 de escudo por pulso.": "Grows stronger with every level up: 2 shield -> 3 -> 4 -> 5 -> 6 shield per pulse.",
-  "Aumenta su poder en cada subida de nivel: 2 de escudo -> 3 -> 4 -> 6 -> 8 de escudo por pulso.": "Grows stronger with every level up: 2 shield -> 3 -> 4 -> 6 -> 8 shield per pulse.",
-  "Aumenta tu salud máxima y escudo. Aumenta por nivel: +5 salud/escudo -> +10 -> +15 -> +20 -> +25 de salud y escudo máximos.": "Increases your max health and shield. Grows per level: +5 health/shield -> +10 -> +15 -> +20 -> +25 max health and shield.",
-  "Avistado cerca de ríos y playas": "Spotted near rivers and beaches",
-  "Avistado cerca de zonas altas y montañosas": "Spotted near high, mountainous areas",
-  "Cazador de recompensas: rastrea y otorga bonificaciones adicionales al eliminar objetivos marcados.": "Bounty hunter: tracks targets and grants extra bonuses for eliminating marked ones.",
-  "Cofres de Sprite & Zonas de Extracción": "Sprite Chests & Extraction Zones",
-  "Concede bonificaciones pasivas de combate y exploración.": "Grants passive combat and exploration bonuses.",
-  "Concede bonificaciones pasivas de combate, velocidad y recolección de botín.": "Grants passive combat, speed and loot-collection bonuses.",
-  "Deslízate con fricción reducida al deslizarte. ¡Deslízate más lejos con cada subida de nivel!": "Slide with reduced friction. Slide farther with every level up!",
-  "Distribuido por la isla de Fortnite": "Distributed across the Fortnite island",
-  "El daño requerido para activarse disminuye por nivel: 150 de daño -> 125 -> 100 -> 75 -> 50 de daño.": "The damage needed to activate it drops per level: 150 damage -> 125 -> 100 -> 75 -> 50 damage.",
-  "El daño requerido para activarse disminuye por nivel: 175 de daño -> 150 -> 125 -> 100 -> 75 de daño.": "The damage needed to activate it drops per level: 175 damage -> 150 -> 125 -> 100 -> 75 damage.",
-  "El límite de salud regenerada aumenta por nivel: 60 de salud -> 70 -> 80 -> 90 -> 100 de salud.": "The regenerated health cap grows per level: 60 health -> 70 -> 80 -> 90 -> 100 health.",
-  "Encontrado en la bóveda de cierto magnate de negocios": "Found in a certain business tycoon's vault",
-  "Encuentra una escopeta de 8 bits en tu primer cofre y obtén un multiplicador de puntuación para ella.": "Find an 8-bit shotgun in your first chest and get a score multiplier for it.",
-  "Entra en tiempo de suspensión en el aire con precisión mejorada al apuntar mientras saltas y caes. ¡La precisión aumenta con cada subida de nivel!": "Hover in mid-air with improved accuracy when aiming while jumping and falling. Accuracy increases with every level up!",
-  "Esprintar brevemente vuelve tu deslizamiento destructivo. Aumenta por nivel: 40 daño / 10% cadencia -> 45/20% -> 50/30% -> 55/40% -> 60 daño / 50% cadencia.": "Sprinting briefly turns your slide destructive. Grows per level: 40 damage / 10% fire rate -> 45/20% -> 50/30% -> 55/40% -> 60 damage / 50% fire rate.",
-  "Gana un 20% más de Polvo de Sprite al completar la extracción": "Earn 20% more Sprite Dust when you complete the extraction",
-  "Genera una Burbuja de Escudo Jr. al usar un objeto de curación en ti mismo. La duración aumenta por nivel: 6s -> 7s -> 8s -> 9s -> 10s.": "Spawns a Jr. Shield Bubble when you use a healing item on yourself. Duration grows per level: 6s -> 7s -> 8s -> 9s -> 10s.",
-  "Gana cargas con el tiempo.": "Gains charges over time.",
-  "Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.": "Loot hack: improves the quality of nearby chests and supply drops.",
-  "La duración aumenta con cada subida de nivel: 3 segundos -> 3.5s -> 4s -> 4.5s -> 5 segundos.": "Duration increases with every level up: 3 seconds -> 3.5s -> 4s -> 4.5s -> 5 seconds.",
-  "Marca periódicamente a los enemigos en un área a tu alrededor. ¡Marca con más frecuencia y en un radio mayor con cada subida de nivel!": "Periodically marks enemies in an area around you. Marks more often and over a wider radius with every level up!",
-  "Obtén PE de bonificación x3 con eliminaciones": "Get x3 bonus XP from eliminations",
-  "Obtén PE de bonificación x3 con eliminaciones.": "Get x3 bonus XP from eliminations.",
-  "Obtén el efecto Sobremarcha al trepar, saltar obstáculos o escalar muros": "Get the Overdrive effect when climbing, vaulting obstacles or scaling walls",
-  "Obtén un 30% más de munición al recogerla en la isla": "Get 30% more ammo when picking it up on the island",
-  "Otorga invisibilidad (camuflaje) temporal al recargar. La duración aumenta por nivel: 3s -> 3.5s -> 4s -> 4.5s -> 5s.": "Grants temporary invisibility (camouflage) when reloading. Duration grows per level: 3s -> 3.5s -> 4s -> 4.5s -> 5s.",
-  "Otorga invisibilidad tras recibir daño. ¡La duración de la invisibilidad aumenta con cada subida de nivel!": "Grants invisibility after taking damage. Invisibility lasts longer with every level up!",
-  "Otorga objetos aleatorios en cada nivel y solo sube de nivel al consumir objetos. ¡La calidad de los objetos aumenta con cada subida de nivel!": "Grants random items at every level and only levels up by consuming items. Item quality increases with every level up!",
-  "Otorga sobreescudo protector a lo largo del tiempo, aumentando la capacidad según el nivel.": "Grants a protective overshield over time, with its capacity growing per level.",
-  "Otorga sobreescudo, aumentando según el nivel.": "Grants overshield, scaling with level.",
-  "Otorga un ataque de torbellino en el aire que inflige daño y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!": "Grants an airborne whirlwind attack that damages and knocks back nearby enemies. Damage increases and cooldown drops with every level up!",
-  "Otorga un objeto aleatorio en cada nivel, ¡explotando con botín legendario al alcanzar el nivel máximo!": "Grants a random item at every level, and bursts with legendary loot at max level!",
-  "Permite realizar un supersalto al acumular cargas a lo largo del tiempo, emitiendo una onda de choque al aterrizar. ¡La fuerza del salto aumenta y la recarga disminuye por nivel!": "Lets you perform a super jump by building charges over time, sending out a shockwave on landing. Jump force increases and cooldown drops per level!",
-  "Recarga automáticamente las armas no equipadas a lo largo del tiempo. Recarga el arma equipada al nivel máximo. ¡La recarga automática se vuelve más rápida con cada subida de nivel!": "Automatically reloads holstered weapons over time, and reloads the equipped weapon at max level. Auto-reload gets faster with every level up!",
-  "Recupera algo de salud o escudo tras recibir daño después de un breve período. ¡La cantidad curada aumenta con cada subida de nivel!": "Restores some health or shield after taking damage, following a short delay. The amount healed increases with every level up!",
-  "Revela el siguiente círculo de la tormenta en el mapa y alerta de cambios climáticos.": "Reveals the next storm circle on the map and warns about weather changes.",
-  "Se encuentra en Cofres de Reliquia": "Found in Relic Chests",
-  "Se encuentra merodeando por bosques y zonas arboladas": "Found roaming forests and wooded areas",
-  "Se encuentra por el mundo durante la noche": "Found across the world at night",
-  "Se obtiene al derrotar a un adversario poderoso": "Obtained by defeating a powerful opponent",
-  "Solo sube de nivel al ganar partidas. Sube de nivel más rápido con victorias con corona. ¡Nuevas variantes desbloqueadas tras dominarlo!": "Only levels up by winning matches, and levels up faster with crowned victories. New variants unlock once mastered!",
-  "Te otorga un arbusto tras cierta duración; obtén un arbusto al realizar una eliminación en el nivel máximo. ¡El tiempo de activación del arbusto disminuye con cada subida de nivel!": "Grants you a bush after a delay, and at max level you also get a bush on elimination. Bush cooldown decreases with every level up!",
-  "Ubicado cerca de zonas urbanas y ciudades": "Located near urban areas and cities",
-  "¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.": "Button mash! Every code you find in the world and enter is a valid one.",
-  "¡Hay que ir rápido! ¡Esprinta más rápido con cada subida de nivel!": "Gotta go fast! Sprint faster with every level up!",
-  "¡Mejora un objeto aleatorio en el inventario del jugador con cada subida de nivel!": "Upgrades a random item in the player's inventory with every level up!",
-  "¡Obtén una carga de Roca de Choque al infligir suficiente daño a enemigos!": "Get a Shock Rock charge when you deal enough damage to enemies!",
-  "¡Otorga la habilidad de flotar en el aire con la ayuda de Tails! ¡La velocidad al flotar aumenta con cada subida de nivel!": "Lets you float through the air with Tails' help! Floating speed increases with every level up!",
-  "¡Otorga la habilidad de impulsarte por el aire y desplegar la capa de Batman!": "Lets you launch yourself through the air and deploy Batman's cape!",
-  "¡Otorga la habilidad de realizar otro salto en el aire! ¡El tiempo de recarga entre saltos disminuye con cada subida de nivel!": "Lets you perform another jump in mid-air! The cooldown between jumps decreases with every level up!",
-  "(Activa - Salto en el aire) Spooky Dash te permite atravesar algunos objetos.": "(Active - Jump In Air) Spooky Dash lets you phase through some objects.",
-  "Aumenta las probabilidades de que aparezcan objetos de tus Hackeos de botín. (Activa - Salto en el aire) Spooky Dash te permite atravesar algunos objetos.": "Increases chances of spawning items from your Loot Hacks. (Active - Jump In Air) Spooky Dash lets you phase through some objects.",
-  "¡El porcentaje de salud recuperada aumenta con cada subida de nivel!": "Health recovered percent increases with each Level Up!",
-  "Gana el triple (3x) de PE de bonificación por eliminaciones": "Gain 3x bonus XP from eliminations",
-  "Aumenta las probabilidades de que aparezcan objetos de tus Hackeos de botín. ¡El porcentaje de salud recuperada aumenta con cada subida de nivel!": "Increases chances of spawning items from your Loot Hacks. Health recovered percent increases with each Level Up!",
-  "Te otorga camuflaje durante un tiempo al recibir daño.": "Grants cloak for a duration when you take damage.",
-  "(Activa - Salto en el aire) Activa un ataque torbellino que daña y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!": "(Active - Jump In Air) Triggers a whirlwind attack, damaging and knocking back nearby enemies. Damage increases and cooldown decreases with each Level Up!",
-  "(Activa) - Salta poco después de aterrizar para activar un Supersalto, si hay cargas disponibles.": "(Active) - Jump shortly after landing to trigger a Super Jump, if charges are present.",
-  "(Activa - Salto en el aire) ¡Flota con la ayuda de Tails!": "(Active - Jump In Air) Hover with the help of Tails!",
-  "¡Aumenta la duración de la sobremarcha con cada subida de nivel!": "Increases Overdrive duration with each Level Up!",
-  "Aumenta la efectividad de los objetos curativos.": "Increases the effectiveness of healing items.",
-  "Aumenta las probabilidades de que aparezcan objetos de tus Hackeos de botín.": "Increases chances of spawning items from your Loot Hacks.",
-  "¡Aporrea botones! Todas las pulsaciones son válidas al introducir códigos de trucos en la isla": "Button mash! All inputs are correct when entering cheat codes found in the world",
-  "Te envuelve en un arbusto tras cierto tiempo; al nivel máximo obtienes un arbusto tras cada eliminación.": "Wraps you in a bush after a while; at max level you get a bush after each elimination.",
-  "¡Esprinta más rápido con cada subida de nivel!": "Sprint faster with each Level Up!",
-  "Otorga objetos aleatorios en cada nivel; solo sube de nivel al consumir objetos del mundo.": "Grants random items at each level; only levels up when consuming items from the world."
+  "(Activa - Apuntar en el aire) Entra en tiempo de suspensión en el aire con precisión mejorada. ¡La precisión aumenta con cada subida de nivel!": {
+    "en": "(Active - Aim in mid-air) Hover in mid-air with improved accuracy. Accuracy increases with every level up!",
+    "pt-BR": "(Ativa - Mirar no ar) Flutua no ar com precisão aprimorada. A precisão aumenta a cada subida de nível!"
+  },
+  "(Activa - Salto en el aire) Salto doble. ¡El tiempo de recarga entre saltos disminuye con cada subida de nivel!": {
+    "en": "(Active - Jump In Air) Double Jump. Cooldown between jumps decreases with each Level Up!",
+    "pt-BR": "(Ativa - Pulo no ar) Pulo duplo. O tempo de recarga entre pulos diminui a cada subida de nível!"
+  },
+  "1,250 Polvo Estelar": {
+    "en": "1,250 Stardust",
+    "pt-BR": "1.250 Poeira Estelar"
+  },
+  "1,500 Polvo Estelar": {
+    "en": "1,500 Stardust",
+    "pt-BR": "1.500 Poeira Estelar"
+  },
+  "1,750 Polvo Estelar": {
+    "en": "1,750 Stardust",
+    "pt-BR": "1.750 Poeira Estelar"
+  },
+  "1,800 Polvo Estelar": {
+    "en": "1,800 Stardust",
+    "pt-BR": "1.800 Poeira Estelar"
+  },
+  "10,000 Polvo Estelar": {
+    "en": "10,000 Stardust",
+    "pt-BR": "10.000 Poeira Estelar"
+  },
+  "100 Polvo Estelar": {
+    "en": "100 Stardust",
+    "pt-BR": "100 Poeira Estelar"
+  },
+  "2,000 Polvo Estelar": {
+    "en": "2,000 Stardust",
+    "pt-BR": "2.000 Poeira Estelar"
+  },
+  "2,250 Polvo Estelar": {
+    "en": "2,250 Stardust",
+    "pt-BR": "2.250 Poeira Estelar"
+  },
+  "2,400 Polvo Estelar": {
+    "en": "2,400 Stardust",
+    "pt-BR": "2.400 Poeira Estelar"
+  },
+  "2,500 Polvo Estelar": {
+    "en": "2,500 Stardust",
+    "pt-BR": "2.500 Poeira Estelar"
+  },
+  "2,700 Polvo Estelar": {
+    "en": "2,700 Stardust",
+    "pt-BR": "2.700 Poeira Estelar"
+  },
+  "4,000 Polvo Estelar": {
+    "en": "4,000 Stardust",
+    "pt-BR": "4.000 Poeira Estelar"
+  },
+  "4,500 Polvo Estelar": {
+    "en": "4,500 Stardust",
+    "pt-BR": "4.500 Poeira Estelar"
+  },
+  "5,000 Polvo Estelar": {
+    "en": "5,000 Stardust",
+    "pt-BR": "5.000 Poeira Estelar"
+  },
+  "6,750 Polvo Estelar": {
+    "en": "6,750 Stardust",
+    "pt-BR": "6.750 Poeira Estelar"
+  },
+  "A veces se le encuentra durmiendo en cajas de almacenamiento": {
+    "en": "Sometimes found sleeping in storage boxes",
+    "pt-BR": "Às vezes é encontrado dormindo em caixas de armazenamento"
+  },
+  "Al abrir cofres o eliminar enemigos, existe la posibilidad de generar porciones de pastel que restauran salud y escudo.": {
+    "en": "Opening chests or eliminating enemies can spawn cake slices that restore health and shield.",
+    "pt-BR": "Ao abrir baús ou eliminar inimigos, há chance de surgirem fatias de bolo que restauram saúde e escudo."
+  },
+  "Aparición poco común en Cofres de Sprite": {
+    "en": "Uncommon spawn in Sprite Chests",
+    "pt-BR": "Aparição incomum em Baús de Sprite"
+  },
+  "Aplica Sobrecarga tras comer o beber un consumible. ¡La sobrecarga dura más tiempo con cada subida de nivel!": {
+    "en": "Applies Overdrive after eating or drinking a consumable. Overdrive lasts longer with every level up!",
+    "pt-BR": "Aplica Sobrecarga após comer ou beber um consumível. A Sobrecarga dura mais tempo a cada subida de nível!"
+  },
+  "Aplica Sobrecarga tras consumir objetos del mundo. ¡La sobrecarga dura más tiempo con cada subida de nivel!": {
+    "en": "Applies Overdrive after consuming world items. Overdrive lasts longer with every level up!",
+    "pt-BR": "Aplica Sobrecarga após consumir itens do mundo. A Sobrecarga dura mais tempo a cada subida de nível!"
+  },
+  "Aplica Sobrecarga tras recibir cierta cantidad de daño de la tormenta. Revela futuros círculos de la tormenta al nivel máximo. ¡Reduce el daño necesario para activar la sobrecarga con cada subida de nivel!": {
+    "en": "Applies Overdrive after taking a set amount of storm damage, and reveals future storm circles at max level. Reduces the damage needed to trigger Overdrive with every level up!",
+    "pt-BR": "Aplica Sobrecarga após receber certa quantidade de dano da tempestade. Revela os próximos círculos da tempestade no nível máximo. Reduz o dano necessário para ativar a Sobrecarga a cada subida de nível!"
+  },
+  "Aplica Sobrecarga tras recibir cierta cantidad de daño de la tormenta. ¡Aumenta la duración de la sobrecarga con cada subida de nivel!": {
+    "en": "Applies Overdrive after taking a set amount of storm damage. Overdrive lasts longer with every level up!",
+    "pt-BR": "Aplica Sobrecarga após receber certa quantidade de dano da tempestade. A duração da Sobrecarga aumenta a cada subida de nível!"
+  },
+  "Aumenta el daño en cada nivel: 30 -> 40 -> 60 -> 80 -> 120 de daño adicional.": {
+    "en": "Increases damage per level: 30 -> 40 -> 60 -> 80 -> 120 extra damage.",
+    "pt-BR": "Aumenta o dano a cada nível: 30 -> 40 -> 60 -> 80 -> 120 de dano adicional."
+  },
+  "Aumenta en cada nivel: +25% nado / +10% mov. -> +50%/+20% -> +100%/+30% -> +150%/+40% -> +200% velocidad de nado / +50% velocidad de movimiento.": {
+    "en": "Grows with every level: +25% swim / +10% move -> +50%/+20% -> +100%/+30% -> +150%/+40% -> +200% swim speed / +50% movement speed.",
+    "pt-BR": "Aumenta a cada nível: +25% natação / +10% mov. -> +50%/+20% -> +100%/+30% -> +150%/+40% -> +200% velocidade de natação / +50% velocidade de movimento."
+  },
+  "Aumenta la efectividad de los objetos de curación consumibles. ¡La efectividad de curación aumenta con cada subida de nivel!": {
+    "en": "Increases the effect of consumable healing items. Healing effectiveness increases with every level up!",
+    "pt-BR": "Aumenta a eficácia dos itens de cura consumíveis. A eficácia da cura aumenta a cada subida de nível!"
+  },
+  "Aumenta la velocidad de esprint y la altura de salto. ¡La altura de salto aumenta con cada subida de nivel!": {
+    "en": "Increases sprint speed and jump height. Jump height increases with every level up!",
+    "pt-BR": "Aumenta a velocidade de sprint e a altura do pulo. A altura do pulo aumenta a cada subida de nível!"
+  },
+  "Aumenta la velocidad y distancia del deslizamiento, otorgando un impulso al disparar deslizándote.": {
+    "en": "Increases slide speed and distance, and gives a boost when shooting while sliding.",
+    "pt-BR": "Aumenta a velocidade e a distância do deslize, concedendo um impulso ao atirar enquanto desliza."
+  },
+  "Aumenta su poder en cada nivel: 10 de curación -> 15 -> 20 -> 25 -> 30 de salud por eliminación.": {
+    "en": "Grows stronger with every level: 10 healing -> 15 -> 20 -> 25 -> 30 health per elimination.",
+    "pt-BR": "Aumenta o poder a cada nível: 10 de cura -> 15 -> 20 -> 25 -> 30 de saúde por eliminação."
+  },
+  "Aumenta su poder en cada subida de nivel: 2 de escudo -> 3 -> 4 -> 5 -> 6 de escudo por pulso.": {
+    "en": "Grows stronger with every level up: 2 shield -> 3 -> 4 -> 5 -> 6 shield per pulse.",
+    "pt-BR": "Aumenta o poder a cada subida de nível: 2 de escudo -> 3 -> 4 -> 5 -> 6 de escudo por pulso."
+  },
+  "Aumenta su poder en cada subida de nivel: 2 de escudo -> 3 -> 4 -> 6 -> 8 de escudo por pulso.": {
+    "en": "Grows stronger with every level up: 2 shield -> 3 -> 4 -> 6 -> 8 shield per pulse.",
+    "pt-BR": "Aumenta o poder a cada subida de nível: 2 de escudo -> 3 -> 4 -> 6 -> 8 de escudo por pulso."
+  },
+  "Aumenta tu salud máxima y escudo. Aumenta por nivel: +5 salud/escudo -> +10 -> +15 -> +20 -> +25 de salud y escudo máximos.": {
+    "en": "Increases your max health and shield. Grows per level: +5 health/shield -> +10 -> +15 -> +20 -> +25 max health and shield.",
+    "pt-BR": "Aumenta a saúde máxima e o escudo. Aumenta por nível: +5 saúde/escudo -> +10 -> +15 -> +20 -> +25 de saúde e escudo máximos."
+  },
+  "Avistado cerca de ríos y playas": {
+    "en": "Spotted near rivers and beaches",
+    "pt-BR": "Avistado perto de rios e praias"
+  },
+  "Avistado cerca de zonas altas y montañosas": {
+    "en": "Spotted near high, mountainous areas",
+    "pt-BR": "Avistado perto de regiões altas e montanhosas"
+  },
+  "Cazador de recompensas: rastrea y otorga bonificaciones adicionales al eliminar objetivos marcados.": {
+    "en": "Bounty hunter: tracks targets and grants extra bonuses for eliminating marked ones.",
+    "pt-BR": "Caçador de recompensas: rastreia alvos e concede bônus extras ao eliminar alvos marcados."
+  },
+  "Cofres de Sprite & Zonas de Extracción": {
+    "en": "Sprite Chests & Extraction Zones",
+    "pt-BR": "Baús de Sprite e Zonas de Extração"
+  },
+  "Concede bonificaciones pasivas de combate y exploración.": {
+    "en": "Grants passive combat and exploration bonuses.",
+    "pt-BR": "Concede bônus passivos de combate e exploração."
+  },
+  "Concede bonificaciones pasivas de combate, velocidad y recolección de botín.": {
+    "en": "Grants passive combat, speed and loot-collection bonuses.",
+    "pt-BR": "Concede bônus passivos de combate, velocidade e coleta de saque."
+  },
+  "Deslízate con fricción reducida al deslizarte. ¡Deslízate más lejos con cada subida de nivel!": {
+    "en": "Slide with reduced friction. Slide farther with every level up!",
+    "pt-BR": "Permite deslizar com atrito reduzido. Permite deslizar mais longe a cada subida de nível!"
+  },
+  "Distribuido por la isla de Fortnite": {
+    "en": "Distributed across the Fortnite island",
+    "pt-BR": "Distribuído pela ilha do Fortnite"
+  },
+  "El daño requerido para activarse disminuye por nivel: 150 de daño -> 125 -> 100 -> 75 -> 50 de daño.": {
+    "en": "The damage needed to activate it drops per level: 150 damage -> 125 -> 100 -> 75 -> 50 damage.",
+    "pt-BR": "O dano necessário para ativar diminui por nível: 150 de dano -> 125 -> 100 -> 75 -> 50 de dano."
+  },
+  "El daño requerido para activarse disminuye por nivel: 175 de daño -> 150 -> 125 -> 100 -> 75 de daño.": {
+    "en": "The damage needed to activate it drops per level: 175 damage -> 150 -> 125 -> 100 -> 75 damage.",
+    "pt-BR": "O dano necessário para ativar diminui por nível: 175 de dano -> 150 -> 125 -> 100 -> 75 de dano."
+  },
+  "El límite de salud regenerada aumenta por nivel: 60 de salud -> 70 -> 80 -> 90 -> 100 de salud.": {
+    "en": "The regenerated health cap grows per level: 60 health -> 70 -> 80 -> 90 -> 100 health.",
+    "pt-BR": "O limite de saúde regenerada aumenta por nível: 60 de saúde -> 70 -> 80 -> 90 -> 100 de saúde."
+  },
+  "Encontrado en la bóveda de cierto magnate de negocios": {
+    "en": "Found in a certain business tycoon's vault",
+    "pt-BR": "Encontrado no cofre de certo magnata dos negócios"
+  },
+  "Encuentra una escopeta de 8 bits en tu primer cofre y obtén un multiplicador de puntuación para ella.": {
+    "en": "Find an 8-bit shotgun in your first chest and get a score multiplier for it.",
+    "pt-BR": "Ao encontrar uma espingarda de 8 bits no primeiro baú, ganha-se um multiplicador de pontuação para ela."
+  },
+  "Entra en tiempo de suspensión en el aire con precisión mejorada al apuntar mientras saltas y caes. ¡La precisión aumenta con cada subida de nivel!": {
+    "en": "Hover in mid-air with improved accuracy when aiming while jumping and falling. Accuracy increases with every level up!",
+    "pt-BR": "Flutua no ar com precisão aprimorada ao mirar enquanto pula e cai. A precisão aumenta a cada subida de nível!"
+  },
+  "Esprintar brevemente vuelve tu deslizamiento destructivo. Aumenta por nivel: 40 daño / 10% cadencia -> 45/20% -> 50/30% -> 55/40% -> 60 daño / 50% cadencia.": {
+    "en": "Sprinting briefly turns your slide destructive. Grows per level: 40 damage / 10% fire rate -> 45/20% -> 50/30% -> 55/40% -> 60 damage / 50% fire rate.",
+    "pt-BR": "Usar sprint brevemente torna o deslize destrutivo. Aumenta por nível: 40 de dano / 10% de cadência -> 45/20% -> 50/30% -> 55/40% -> 60 de dano / 50% de cadência."
+  },
+  "Gana un 20% más de Polvo de Sprite al completar la extracción": {
+    "en": "Earn 20% more Sprite Dust when you complete the extraction",
+    "pt-BR": "Ganha 20% a mais de Poeira de Sprite ao concluir a extração"
+  },
+  "Genera una Burbuja de Escudo Jr. al usar un objeto de curación en ti mismo. La duración aumenta por nivel: 6s -> 7s -> 8s -> 9s -> 10s.": {
+    "en": "Spawns a Jr. Shield Bubble when you use a healing item on yourself. Duration grows per level: 6s -> 7s -> 8s -> 9s -> 10s.",
+    "pt-BR": "Gera uma Bolha de Escudo Jr. ao usar um item de cura em si mesmo. A duração aumenta por nível: 6s -> 7s -> 8s -> 9s -> 10s."
+  },
+  "Gana cargas con el tiempo.": {
+    "en": "Gains charges over time.",
+    "pt-BR": "Ganha cargas com o tempo."
+  },
+  "Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.": {
+    "en": "Loot hack: improves the quality of nearby chests and supply drops.",
+    "pt-BR": "Hack de saque: aumenta a qualidade dos baús e caixas de suprimentos próximos."
+  },
+  "La duración aumenta con cada subida de nivel: 3 segundos -> 3.5s -> 4s -> 4.5s -> 5 segundos.": {
+    "en": "Duration increases with every level up: 3 seconds -> 3.5s -> 4s -> 4.5s -> 5 seconds.",
+    "pt-BR": "A duração aumenta a cada subida de nível: 3 segundos -> 3,5s -> 4s -> 4,5s -> 5 segundos."
+  },
+  "Marca periódicamente a los enemigos en un área a tu alrededor. ¡Marca con más frecuencia y en un radio mayor con cada subida de nivel!": {
+    "en": "Periodically marks enemies in an area around you. Marks more often and over a wider radius with every level up!",
+    "pt-BR": "Marca periodicamente os inimigos numa área ao seu redor. Marca com mais frequência e em um raio maior a cada subida de nível!"
+  },
+  "Obtén PE de bonificación x3 con eliminaciones": {
+    "en": "Get x3 bonus XP from eliminations",
+    "pt-BR": "Obtém XP de bônus x3 com eliminações"
+  },
+  "Obtén PE de bonificación x3 con eliminaciones.": {
+    "en": "Get x3 bonus XP from eliminations.",
+    "pt-BR": "Obtém XP de bônus x3 com eliminações."
+  },
+  "Obtén el efecto Sobremarcha al trepar, saltar obstáculos o escalar muros": {
+    "en": "Get the Overdrive effect when climbing, vaulting obstacles or scaling walls",
+    "pt-BR": "Obtém o efeito Sobrecarga ao escalar, pular obstáculos ou subir muros"
+  },
+  "Obtén un 30% más de munición al recogerla en la isla": {
+    "en": "Get 30% more ammo when picking it up on the island",
+    "pt-BR": "Obtém 30% a mais de munição ao coletá-la na ilha"
+  },
+  "Otorga invisibilidad (camuflaje) temporal al recargar. La duración aumenta por nivel: 3s -> 3.5s -> 4s -> 4.5s -> 5s.": {
+    "en": "Grants temporary invisibility (camouflage) when reloading. Duration grows per level: 3s -> 3.5s -> 4s -> 4.5s -> 5s.",
+    "pt-BR": "Concede invisibilidade (camuflagem) temporária ao recarregar. A duração aumenta por nível: 3s -> 3,5s -> 4s -> 4,5s -> 5s."
+  },
+  "Otorga invisibilidad tras recibir daño. ¡La duración de la invisibilidad aumenta con cada subida de nivel!": {
+    "en": "Grants invisibility after taking damage. Invisibility lasts longer with every level up!",
+    "pt-BR": "Concede invisibilidade após receber dano. A duração da invisibilidade aumenta a cada subida de nível!"
+  },
+  "Otorga objetos aleatorios en cada nivel y solo sube de nivel al consumir objetos. ¡La calidad de los objetos aumenta con cada subida de nivel!": {
+    "en": "Grants random items at every level and only levels up by consuming items. Item quality increases with every level up!",
+    "pt-BR": "Concede itens aleatórios a cada nível e só sobe de nível ao consumir itens. A qualidade dos itens aumenta a cada subida de nível!"
+  },
+  "Otorga sobreescudo protector a lo largo del tiempo, aumentando la capacidad según el nivel.": {
+    "en": "Grants a protective overshield over time, with its capacity growing per level.",
+    "pt-BR": "Concede um sobrescudo protetor ao longo do tempo, com capacidade aumentando conforme o nível."
+  },
+  "Otorga sobreescudo, aumentando según el nivel.": {
+    "en": "Grants overshield, scaling with level.",
+    "pt-BR": "Concede sobrescudo, aumentando conforme o nível."
+  },
+  "Otorga un ataque de torbellino en el aire que inflige daño y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!": {
+    "en": "Grants an airborne whirlwind attack that damages and knocks back nearby enemies. Damage increases and cooldown drops with every level up!",
+    "pt-BR": "Concede um ataque de redemoinho no ar que causa dano e empurra os inimigos próximos. O dano aumenta e o tempo de recarga diminui a cada subida de nível!"
+  },
+  "Otorga un objeto aleatorio en cada nivel, ¡explotando con botín legendario al alcanzar el nivel máximo!": {
+    "en": "Grants a random item at every level, and bursts with legendary loot at max level!",
+    "pt-BR": "Concede um item aleatório a cada nível, explodindo em saque lendário ao atingir o nível máximo!"
+  },
+  "Permite realizar un supersalto al acumular cargas a lo largo del tiempo, emitiendo una onda de choque al aterrizar. ¡La fuerza del salto aumenta y la recarga disminuye por nivel!": {
+    "en": "Lets you perform a super jump by building charges over time, sending out a shockwave on landing. Jump force increases and cooldown drops per level!",
+    "pt-BR": "Permite dar um super pulo acumulando cargas ao longo do tempo, emitindo uma onda de choque ao pousar. A força do pulo aumenta e a recarga diminui por nível!"
+  },
+  "Recarga automáticamente las armas no equipadas a lo largo del tiempo. Recarga el arma equipada al nivel máximo. ¡La recarga automática se vuelve más rápida con cada subida de nivel!": {
+    "en": "Automatically reloads holstered weapons over time, and reloads the equipped weapon at max level. Auto-reload gets faster with every level up!",
+    "pt-BR": "Recarrega automaticamente as armas não equipadas ao longo do tempo. Recarrega a arma equipada no nível máximo. A recarga automática fica mais rápida a cada subida de nível!"
+  },
+  "Recupera algo de salud o escudo tras recibir daño después de un breve período. ¡La cantidad curada aumenta con cada subida de nivel!": {
+    "en": "Restores some health or shield after taking damage, following a short delay. The amount healed increases with every level up!",
+    "pt-BR": "Recupera um pouco de saúde ou escudo após receber dano, depois de um breve intervalo. A quantidade curada aumenta a cada subida de nível!"
+  },
+  "Revela el siguiente círculo de la tormenta en el mapa y alerta de cambios climáticos.": {
+    "en": "Reveals the next storm circle on the map and warns about weather changes.",
+    "pt-BR": "Revela o próximo círculo da tempestade no mapa e avisa sobre mudanças climáticas."
+  },
+  "Se encuentra en Cofres de Reliquia": {
+    "en": "Found in Relic Chests",
+    "pt-BR": "Encontrado em Baús de Relíquia"
+  },
+  "Se encuentra merodeando por bosques y zonas arboladas": {
+    "en": "Found roaming forests and wooded areas",
+    "pt-BR": "Encontrado vagando por florestas e áreas arborizadas"
+  },
+  "Se encuentra por el mundo durante la noche": {
+    "en": "Found across the world at night",
+    "pt-BR": "Encontrado pelo mundo durante a noite"
+  },
+  "Se obtiene al derrotar a un adversario poderoso": {
+    "en": "Obtained by defeating a powerful opponent",
+    "pt-BR": "Obtido ao derrotar um adversário poderoso"
+  },
+  "Solo sube de nivel al ganar partidas. Sube de nivel más rápido con victorias con corona. ¡Nuevas variantes desbloqueadas tras dominarlo!": {
+    "en": "Only levels up by winning matches, and levels up faster with crowned victories. New variants unlock once mastered!",
+    "pt-BR": "Só sobe de nível ao vencer partidas. Sobe de nível mais rápido com vitórias com coroa. Novas variantes são desbloqueadas ao dominá-lo!"
+  },
+  "Te otorga un arbusto tras cierta duración; obtén un arbusto al realizar una eliminación en el nivel máximo. ¡El tiempo de activación del arbusto disminuye con cada subida de nivel!": {
+    "en": "Grants you a bush after a delay, and at max level you also get a bush on elimination. Bush cooldown decreases with every level up!",
+    "pt-BR": "Concede um arbusto após certo tempo; obtém um arbusto ao realizar uma eliminação no nível máximo. O tempo de ativação do arbusto diminui a cada subida de nível!"
+  },
+  "Ubicado cerca de zonas urbanas y ciudades": {
+    "en": "Located near urban areas and cities",
+    "pt-BR": "Localizado perto de áreas urbanas e cidades"
+  },
+  "¡Aprieta los botones! Todos los códigos que encuentres en el mundo e ingreses son correctos.": {
+    "en": "Button mash! Every code you find in the world and enter is a valid one.",
+    "pt-BR": "Apertar botões sem parar! Todos os códigos que forem encontrados no mundo e inseridos estão corretos."
+  },
+  "¡Hay que ir rápido! ¡Esprinta más rápido con cada subida de nivel!": {
+    "en": "Gotta go fast! Sprint faster with every level up!",
+    "pt-BR": "Precisa ir rápido! Aumenta a velocidade de sprint a cada subida de nível!"
+  },
+  "¡Mejora un objeto aleatorio en el inventario del jugador con cada subida de nivel!": {
+    "en": "Upgrades a random item in the player's inventory with every level up!",
+    "pt-BR": "Melhora um item aleatório no inventário do jogador a cada subida de nível!"
+  },
+  "¡Obtén una carga de Roca de Choque al infligir suficiente daño a enemigos!": {
+    "en": "Get a Shock Rock charge when you deal enough damage to enemies!",
+    "pt-BR": "Obtém uma carga de Rocha de Choque ao causar dano suficiente aos inimigos!"
+  },
+  "¡Otorga la habilidad de flotar en el aire con la ayuda de Tails! ¡La velocidad al flotar aumenta con cada subida de nivel!": {
+    "en": "Lets you float through the air with Tails' help! Floating speed increases with every level up!",
+    "pt-BR": "Concede a habilidade de flutuar no ar com a ajuda do Tails! A velocidade de flutuação aumenta a cada subida de nível!"
+  },
+  "¡Otorga la habilidad de impulsarte por el aire y desplegar la capa de Batman!": {
+    "en": "Lets you launch yourself through the air and deploy Batman's cape!",
+    "pt-BR": "Concede a habilidade de impulsionar-se pelo ar e abrir a capa do Batman!"
+  },
+  "¡Otorga la habilidad de realizar otro salto en el aire! ¡El tiempo de recarga entre saltos disminuye con cada subida de nivel!": {
+    "en": "Lets you perform another jump in mid-air! The cooldown between jumps decreases with every level up!",
+    "pt-BR": "Concede a habilidade de dar outro pulo no ar! O tempo de recarga entre pulos diminui a cada subida de nível!"
+  },
+  "(Activa - Salto en el aire) Spooky Dash te permite atravesar algunos objetos.": {
+    "en": "(Active - Jump In Air) Spooky Dash lets you phase through some objects.",
+    "pt-BR": "(Ativa - Pulo no ar) Spooky Dash permite atravessar alguns objetos."
+  },
+  "Aumenta las probabilidades de que aparezcan objetos de tus Hackeos de botín. (Activa - Salto en el aire) Spooky Dash te permite atravesar algunos objetos.": {
+    "en": "Increases chances of spawning items from your Loot Hacks. (Active - Jump In Air) Spooky Dash lets you phase through some objects.",
+    "pt-BR": "Aumenta as chances de aparecerem itens dos seus Hacks de saque. (Ativa - Pulo no ar) Spooky Dash permite atravessar alguns objetos."
+  },
+  "¡El porcentaje de salud recuperada aumenta con cada subida de nivel!": {
+    "en": "Health recovered percent increases with each Level Up!",
+    "pt-BR": "A porcentagem de saúde recuperada aumenta a cada subida de nível!"
+  },
+  "Gana el triple (3x) de PE de bonificación por eliminaciones": {
+    "en": "Gain 3x bonus XP from eliminations",
+    "pt-BR": "Ganha o triplo (3x) de XP de bônus por eliminações"
+  },
+  "Aumenta las probabilidades de que aparezcan objetos de tus Hackeos de botín. ¡El porcentaje de salud recuperada aumenta con cada subida de nivel!": {
+    "en": "Increases chances of spawning items from your Loot Hacks. Health recovered percent increases with each Level Up!",
+    "pt-BR": "Aumenta as chances de aparecerem itens dos seus Hacks de saque. A porcentagem de saúde recuperada aumenta a cada subida de nível!"
+  },
+  "Te otorga camuflaje durante un tiempo al recibir daño.": {
+    "en": "Grants cloak for a duration when you take damage.",
+    "pt-BR": "Concede camuflagem por um tempo ao receber dano."
+  },
+  "(Activa - Salto en el aire) Activa un ataque torbellino que daña y empuja a los enemigos cercanos. ¡El daño aumenta y el tiempo de recarga disminuye con cada subida de nivel!": {
+    "en": "(Active - Jump In Air) Triggers a whirlwind attack, damaging and knocking back nearby enemies. Damage increases and cooldown decreases with each Level Up!",
+    "pt-BR": "(Ativa - Pulo no ar) Ativa um ataque de redemoinho que causa dano e empurra os inimigos próximos. O dano aumenta e o tempo de recarga diminui a cada subida de nível!"
+  },
+  "(Activa) - Salta poco después de aterrizar para activar un Supersalto, si hay cargas disponibles.": {
+    "en": "(Active) - Jump shortly after landing to trigger a Super Jump, if charges are present.",
+    "pt-BR": "(Ativa) - Pular logo após pousar ativa um super pulo, se houver cargas disponíveis."
+  },
+  "(Activa - Salto en el aire) ¡Flota con la ayuda de Tails!": {
+    "en": "(Active - Jump In Air) Hover with the help of Tails!",
+    "pt-BR": "(Ativa - Pulo no ar) Flutua com a ajuda do Tails!"
+  },
+  "¡Aumenta la duración de la sobremarcha con cada subida de nivel!": {
+    "en": "Increases Overdrive duration with each Level Up!",
+    "pt-BR": "A duração da Sobrecarga aumenta a cada subida de nível!"
+  },
+  "Aumenta la efectividad de los objetos curativos.": {
+    "en": "Increases the effectiveness of healing items.",
+    "pt-BR": "Aumenta a eficácia dos itens de cura."
+  },
+  "Aumenta las probabilidades de que aparezcan objetos de tus Hackeos de botín.": {
+    "en": "Increases chances of spawning items from your Loot Hacks.",
+    "pt-BR": "Aumenta as chances de aparecerem itens dos seus Hacks de saque."
+  },
+  "¡Aporrea botones! Todas las pulsaciones son válidas al introducir códigos de trucos en la isla": {
+    "en": "Button mash! All inputs are correct when entering cheat codes found in the world",
+    "pt-BR": "Apertar botões sem parar! Todos os toques são válidos ao digitar códigos de truque na ilha"
+  },
+  "Te envuelve en un arbusto tras cierto tiempo; al nivel máximo obtienes un arbusto tras cada eliminación.": {
+    "en": "Wraps you in a bush after a while; at max level you get a bush after each elimination.",
+    "pt-BR": "Envolve o jogador em um arbusto após certo tempo; no nível máximo, obtém um arbusto após cada eliminação."
+  },
+  "¡Esprinta más rápido con cada subida de nivel!": {
+    "en": "Sprint faster with each Level Up!",
+    "pt-BR": "Aumenta a velocidade de sprint a cada subida de nível!"
+  },
+  "Otorga objetos aleatorios en cada nivel; solo sube de nivel al consumir objetos del mundo.": {
+    "en": "Grants random items at each level; only levels up when consuming items from the world.",
+    "pt-BR": "Concede itens aleatórios a cada nível; só sobe de nível ao consumir itens do mundo."
+  }
 }

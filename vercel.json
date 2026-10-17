@@ -57,6 +57,10 @@
       ]
     }
   ],
+  "redirects": [
+    { "source": "/pt-pt", "destination": "/pt-br", "permanent": true },
+    { "source": "/pt-pt/:path*", "destination": "/pt-br/:path*", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/privacidad", "destination": "/privacidad.html" },
     { "source": "/(.*)", "destination": "/index.html" }

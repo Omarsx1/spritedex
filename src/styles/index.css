@@ -373,15 +373,16 @@ html::after {
   align-items: center;
 }
 
-/* --- Logo mark (F) --- */
+/* --- Logo mark --- */
 .app-navbar__logo-mark {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 0;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: transparent;
   font-family: var(--font-fortnite);
   font-size: 1.15rem;
   font-weight: 900;
@@ -389,9 +390,20 @@ html::after {
   letter-spacing: 0;
   line-height: 1;
   flex-shrink: 0;
+  /* Ahora es un <a> y no un <button>: el subrayado del navegador no pinta nada visible (solo
+     lleva una imagen dentro), pero se declara para que no dependa de eso. */
+  text-decoration: none;
   transition: all 0.2s ease;
   user-select: none;
   cursor: pointer;
+}
+
+.app-navbar__logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px rgba(0, 240, 232, 0.45)) drop-shadow(0 0 6px rgba(236, 72, 153, 0.35));
 }
 
 .app-navbar__logo-mark:hover {
@@ -970,19 +982,17 @@ a.app-navbar__menu-action-btn {
     box-shadow: none !important;
   }
   .app-navbar__logo-mark {
-    width: 34px;
-    height: 34px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(12, 14, 22, 0.65) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: transparent !important;
+    border: 0;
     border-radius: 9999px;
     font-size: 1.15rem;
     font-weight: 900;
     color: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     box-shadow: none !important;
     padding: 0;
     cursor: pointer;
@@ -1927,6 +1937,10 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   .hero__content {
     padding: 24px 14px 18px;
     gap: 18px;
+  }
+
+  .hero__title-block {
+    margin-top: 20px;
   }
 
   .hero__title-line {
@@ -7474,6 +7488,20 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   transform: scale(0.95);
 }
 
+@media (max-width: 600px) {
+  .ms-spotlight-card .ms-card__image {
+    top: 7px;
+  }
+
+  .ms-card__image img:not(.ms-card__crown) {
+    transform: scale(var(--sprite-scale, 1));
+  }
+
+  .ms-card__image img:not(.ms-card__crown):active {
+    transform: scale(calc(var(--sprite-scale, 1) * 0.95));
+  }
+}
+
 /* ── Card Footer Group (Gestalt Proximity: Name + Action) ── */
 .ms-card__footer {
   width: 100%;
@@ -8141,120 +8169,100 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .fpage__bloqueFicha .sdm-friends__fichaHead .sdm-friends__label { margin-top: 0; }
 .fpage__bloqueFicha .sdm-friends__fichaHead .sdm-friends__plate { margin-left: auto; }
 
-/* Selector de idioma de la barra superior */
+/* Selector de idioma: disparador compacto con icono y menu desplegable con cada idioma en su lengua */
 .lang-switch {
+  position: relative;
+  display: inline-flex;
+}
+
+.lang-switch__disparador {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  padding: 2px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-
-.lang-switch__btn {
-  min-width: 30px;
-  padding: 4px 6px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: #b9c2d0;
-  font-size: 0.68rem;
-  font-weight: 800;
+  gap: 6px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 9999px;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  background: rgba(12, 14, 22, 0.62);
+  color: rgba(226, 232, 240, 0.9);
+  font-size: 0.72rem;
+  font-weight: 700;
   letter-spacing: 0.06em;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 6px 16px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.15s ease, color 0.15s ease;
 }
 
-.lang-switch__btn:hover {
-  color: #e8edf5;
+.lang-switch__disparador:hover,
+.lang-switch.is-open .lang-switch__disparador {
+  border-color: rgba(34, 230, 220, 0.6);
+  color: #ffffff;
 }
 
-.lang-switch__btn.is-active {
-  background: #22e6dc;
-  color: #07131a;
-}
-
-.lang-switch__btn:focus-visible {
+.lang-switch__disparador:focus-visible,
+.lang-switch__opcion:focus-visible {
   outline: 2px solid #22e6dc;
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 
-@media (max-width: 420px) {
-  .lang-switch__btn { min-width: 26px; font-size: 0.62rem; }
+.lang-switch.is-open {
+  z-index: 1000;
 }
 
-.lang-switch__sep {
-  display: none;
+.lang-switch__disparador svg {
+  flex-shrink: 0;
 }
 
-/* Escritorio: capsula de cristal oscuro para que el texto inactivo se lea sobre cualquier fondo. */
-@media (min-width: 769px) {
-  .lang-switch {
-    padding: 3px;
-    border-radius: 9999px;
-    background: rgba(12, 14, 22, 0.62);
-    border: 1px solid rgba(167, 139, 250, 0.3);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 6px 16px rgba(0, 0, 0, 0.35);
-  }
-
-  .lang-switch__btn {
-    min-width: 36px;
-    padding: 5px 10px;
-    border-radius: 9999px;
-    color: rgba(226, 232, 240, 0.72);
-    font-size: 0.72rem;
-  }
-
-  .lang-switch__btn:hover {
-    color: #ffffff;
-  }
-
-  .lang-switch__btn.is-active {
-    background: linear-gradient(135deg, #22e6dc, #7dd3fc);
-    color: #06161c;
-    box-shadow: 0 0 12px rgba(34, 230, 220, 0.35);
-  }
+.lang-switch__flecha {
+  opacity: 0.7;
+  transition: transform 0.2s ease;
 }
 
-/* Movil: texto "ES / EN" dentro de un marco fino; el activo va en cian sin relleno. */
-@media (max-width: 768px) {
-  .lang-switch {
-    gap: 0;
-    padding: 5px 10px;
-    border-radius: 8px;
-    background: rgba(12, 14, 22, 0.45);
-    border-color: rgba(255, 255, 255, 0.22);
-  }
+.lang-switch.is-open .lang-switch__flecha {
+  transform: rotate(180deg);
+}
 
-  .lang-switch__btn {
-    min-width: 0;
-    padding: 0;
-    color: rgba(203, 213, 225, 0.55);
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-  }
+.lang-switch__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 1000;
+  min-width: 210px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border-radius: 12px;
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  background: #0c0e16;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+}
 
-  .lang-switch__btn:hover {
-    color: #e8edf5;
-  }
+.lang-switch__opcion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
 
-  .lang-switch__btn.is-active {
-    background: transparent;
-    color: #22e6dc;
-    text-shadow: 0 0 8px rgba(34, 230, 220, 0.45);
-  }
+.lang-switch__opcion:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
 
-  .lang-switch__sep {
-    display: inline;
-    margin: 0 6px;
-    color: rgba(203, 213, 225, 0.5);
-    font-size: 0.78rem;
-    font-weight: 500;
-  }
+.lang-switch__opcion[aria-current='true'] {
+  color: #22e6dc;
 }
 
 /* Refrescar e idioma van juntos a la derecha, con aire propio frente al titulo */
@@ -8264,10 +8272,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   gap: 8px;
   margin-left: auto;
   flex-shrink: 0;
-}
-
-.fpage__lang .lang-switch__btn {
-  min-width: 28px;
 }
 
 /* Aviso de lo que implica compartir el enlace: mismo sitio que el resto de la ficha */
@@ -9946,74 +9950,159 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
    El build sirve la misma guia como pagina estatica en dist/guia-espiritus; esto es la
    version dentro del armazon de la app. Todo sale de los tokens del tema: ni un color nuevo.
    Va al final del archivo para no pisar ninguna regla compartida. */
+
+/* La guia se lee sobre una superficie propia. Antes el texto caia directo sobre el arte de
+   temporada (la luna, las ramas) y la entradilla en --text-muted desaparecia: el contraste
+   dependia de que hubiera detras. El bosque sigue asomando por los bordes.
+   Sin backdrop-filter a proposito: .fnm-forest anima opacity en bucle de 9 s y desenfocar esa
+   capa en cada cuadro sale caro en movil. */
+
+/* El aire de arriba va en PADDING, nunca en margin. .guia es el primer hijo en flujo de
+   .app-container y el navbar es absoluto respecto a ese contenedor: un margin-top aqui se
+   colapsa hacia fuera, baja el contenedor entero y se lleva el navbar consigo, asi que el
+   contenido queda a la altura de la barra. El padding no colapsa. */
 .guia {
-  max-width: 760px;
-  margin: 0 auto;
-  /* La barra de navegacion es absoluta y termina a 64px del borde: el contenido arranca
-     debajo, con el mismo aire que la cabecera del catalogo. El inset del notch lo pone
-     .app-container. */
-  padding: 72px clamp(16px, 4vw, 32px) 80px;
+  padding: 76px clamp(16px, 4vw, 32px) 88px;
 }
 
+.guia__panel {
+  width: min(880px, 100%);
+  margin: 0 auto;
+  padding: clamp(24px, 4.6vw, 46px) clamp(18px, 4.6vw, 46px) clamp(34px, 5vw, 54px);
+  background: linear-gradient(180deg, rgba(22, 27, 34, 0.95) 0%, rgba(9, 12, 20, 0.96) 100%);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: 0 44px 90px -56px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* El titulo usa la fuente de la marca (la misma del hero y del logotipo): le da identidad a
+   una pagina de contenido sin tocar los encabezados del resto de la app. Es la misma regla
+   que aplica el armazon de las paginas estaticas, para que las dos caras coincidan. */
 .guia__titulo {
-  margin: 0 0 8px;
-  font-family: var(--font-heading);
-  font-size: clamp(1.65rem, 5.2vw, 2.35rem);
-  line-height: 1.15;
+  margin: 0 0 10px;
+  font-family: var(--font-fortnite);
+  font-size: clamp(2rem, 7vw, 3rem);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-wrap: balance;
   color: var(--text-bright);
   /* El encabezado recibe el foco al entrar (tabIndex=-1): que no quede bajo la barra. */
   scroll-margin-top: 78px;
 }
 
 .guia__lead {
-  margin: 0;
-  font-size: 0.92rem;
+  margin: 0 0 6px;
+  max-width: 62ch;
+  font-size: 1.02rem;
   line-height: 1.6;
   color: var(--text-muted);
 }
 
-.guia__seccion { margin-top: 26px; }
+.guia__seccion { margin-top: 38px; }
+
+/* Indice con anclas. Los encabezados llevan scroll-margin porque el navbar es absoluto: sin el,
+   al saltar a un ancla el titulo queda justo debajo de la barra. */
+.guia__indice {
+  margin: 0 0 34px;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.guia__indice ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+
+.guia__indice a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 13px;
+  font-size: 0.84rem;
+  text-decoration: none;
+  color: var(--text);
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.guia__indice a:hover {
+  background: rgba(0, 240, 232, 0.12);
+  border-color: var(--nav-accent, #00F0E8);
+  color: var(--nav-accent, #00F0E8);
+}
+
+.guia__seccion,
+.guia__h2 { scroll-margin-top: 78px; }
 
 .guia__h2 {
-  margin: 0 0 8px;
-  font-family: var(--font-heading);
-  font-size: 1.18rem;
-  line-height: 1.25;
+  margin: 0 0 10px;
+  font-family: var(--font-fortnite);
+  font-size: clamp(1.3rem, 4vw, 1.7rem);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-wrap: balance;
   color: var(--text-bright);
 }
 
 .guia__texto,
 .guia__lista {
-  margin: 0 0 10px;
-  font-size: 0.92rem;
-  line-height: 1.65;
+  margin: 0 0 12px;
+  max-width: 62ch;
+  font-size: 0.95rem;
+  line-height: 1.7;
   color: var(--text);
 }
 
 .guia__lista { padding-left: 20px; }
 
+.guia__lista li { margin-bottom: 6px; }
+
 /* La tabla de rarezas: la primera celda nombra la fila, asi que se lee como encabezado. */
 .guia__tabla-caja {
-  margin: 12px 0 0;
+  margin: 14px 0 0;
   overflow-x: auto;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
 }
 
 .guia__tabla {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.88rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9rem;
+}
+
+/* El titulo sale del modelo compartido (seo/guia.js), el mismo que usa la pagina estatica:
+   describe la tabla en vez de repetir el encabezado de la seccion. */
+.guia__tabla caption {
+  padding: 14px 18px 0;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .guia__tabla th,
-.guia__tabla td { padding: 9px 14px; text-align: left; }
+.guia__tabla td { padding: 11px 18px; text-align: left; }
 
 .guia__tabla thead th {
   font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.6px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -10022,37 +10111,88 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .guia__tabla tbody td { text-align: right; font-variant-numeric: tabular-nums; color: var(--text); }
 .guia__tabla tbody tr + tr th,
 .guia__tabla tbody tr + tr td { border-top: 1px solid var(--border); }
+.guia__tabla tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
 
-/* El FAQ mantiene <details>/<summary> nativos: el triangulo es el indicador de estado. */
+/* El badge de rareza de la tabla: misma forma y mismas medidas que .rarity-badge-sm de las
+   tarjetas. Aqui solo vive la geometria; el color va en linea desde el mapa compartido
+   (src/data/rarezaColores.js), porque reutilizar las clases de color de las tarjetas no vale: esas
+   llevan `!important` y una regla de mas especificidad de la tabla pisaba el `color` y el badge
+   salia con el texto en blanco. */
+.rareza-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* El FAQ mantiene <details>/<summary> nativos (sin JS, contenido en el DOM y con paridad con
+   el FAQPage). El triangulo del navegador se sustituye por un signo propio: mismo estado,
+   mas legible y con area de clic comoda. */
 .guia__faq { border-bottom: 1px solid var(--border); }
+.guia__faq:first-of-type { border-top: 1px solid var(--border); }
 
 .guia__resumen {
-  padding: 11px 0;
-  font-size: 0.95rem;
+  position: relative;
+  padding: 15px 36px 15px 0;
+  font-size: 1rem;
   font-weight: 700;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--text-bright);
   cursor: pointer;
+  list-style: none;
 }
+
+.guia__resumen::-webkit-details-marker { display: none; }
+
+.guia__resumen::after {
+  content: '+';
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--nav-accent, #00F0E8);
+  font-size: 1.3rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.guia__faq[open] .guia__resumen::after { content: '−'; }
+
+.guia__resumen:hover { color: var(--nav-accent, #00F0E8); }
 
 .guia__resumen:focus-visible {
   outline: 2px solid var(--nav-accent, #00F0E8);
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .guia__faq .guia__texto {
-  margin: 0 0 12px;
+  margin: 0 0 18px;
   color: var(--text-muted);
 }
 
 .guia__nota {
-  margin: 28px 0 0;
-  padding-left: 14px;
-  border-left: 2px solid var(--border);
-  font-size: 0.85rem;
-  line-height: 1.6;
+  margin: 34px 0 0;
+  padding-left: 16px;
+  max-width: 62ch;
+  border-left: 2px solid rgba(0, 240, 232, 0.35);
+  font-size: 0.88rem;
+  line-height: 1.65;
   color: var(--text-muted);
+}
+
+/* Con movimiento reducido el signo del FAQ cambia igual —es contenido, no adorno— pero sin
+   transiciones. */
+@media (prefers-reduced-motion: reduce) {
+  .guia__resumen::after,
+  .guia__tabla tbody tr { transition: none; }
 }
 
 /* Movil: el texto pequeno no baja de 0.75rem y la temporada no tiene animaciones de

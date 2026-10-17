@@ -39,7 +39,7 @@ test('la extraccion alcanza todas las cadenas de datos', () => {
 });
 
 test('toda cadena de datos del juego tiene su traduccion al ingles', () => {
-  const sinTraduccion = cadenasDeDatos().filter((texto) => !traducciones[texto]);
+  const sinTraduccion = cadenasDeDatos().filter((texto) => !traducciones[texto]?.en);
   assert.deepEqual(sinTraduccion, [], 'sin traducir:\n' + sinTraduccion.join('\n'));
 });
 
@@ -51,16 +51,16 @@ test('no sobran traducciones huerfanas', () => {
 
 test('ninguna traduccion queda vacia ni arrastra texto en español', () => {
   const malas = Object.entries(traducciones)
-    .filter(([, ingles]) => !ingles.trim() || /Polvo Estelar|espíritu|¡|ñ|Cofres de/i.test(ingles))
+    .filter(([, { en: ingles }]) => !ingles.trim() || /Polvo Estelar|espíritu|¡|ñ|Cofres de/i.test(ingles))
     .map(([clave]) => clave);
   assert.deepEqual(malas, []);
 });
 
 test('el texto del juego conserva su formato en ingles', () => {
   assert.equal(
-    traducciones['Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'],
+    traducciones['Hackeo de botín: aumenta la calidad de los cofres y cajas de suministros cercanas.'].en,
     'Loot hack: improves the quality of nearby chests and supply drops.'
   );
-  assert.equal(traducciones['2,000 Polvo Estelar'], '2,000 Stardust');
-  assert.equal(traducciones['Distribuido por la isla de Fortnite'], 'Distributed across the Fortnite island');
+  assert.equal(traducciones['2,000 Polvo Estelar'].en, '2,000 Stardust');
+  assert.equal(traducciones['Distribuido por la isla de Fortnite'].en, 'Distributed across the Fortnite island');
 });

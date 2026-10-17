@@ -17,6 +17,8 @@ import { slugDeEspiritu } from '../src/seo/espiritus.js';
 import { htmlGuia, htmlAcerca, htmlNovedades, etiquetasGuia, etiquetasAcerca, etiquetasNovedades } from '../src/seo/contenido.js';
 import { RUTAS_CONTENIDO } from '../src/seo/plantilla.js';
 import { datosGuia } from '../src/seo/guiaDatos.js';
+import { lineasOgLocale } from '../src/seo/idioma.js';
+import { IDIOMAS } from '../src/i18n/core.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DIST = path.join(ROOT, 'dist');
@@ -36,11 +38,10 @@ const escapar = (texto) => String(texto)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
 function bloqueHead(entrada) {
-  const { lang, titulo, descripcion, canonical, alternates } = etiquetasSeo(entrada);
+  const { lang, titulo, tituloDocumento, descripcion, canonical, alternates } = etiquetasSeo(entrada);
   const jsonLd = jsonLdDe(entrada);
-  const locale = lang === 'en' ? 'en_US' : 'es_MX';
   const lineas = [
-    '<title>' + escapar(titulo) + '</title>',
+    '<title>' + escapar(tituloDocumento || titulo) + '</title>',
     '<meta name="description" content="' + escapar(descripcion) + '" />',
     '<link rel="canonical" href="' + canonical + '" />',
     '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />',
@@ -53,8 +54,7 @@ function bloqueHead(entrada) {
     '<meta property="og:image" content="' + IMAGEN_REDES + '" />',
     '<meta property="og:image:width" content="1200" />',
     '<meta property="og:image:height" content="630" />',
-    '<meta property="og:locale" content="' + locale + '" />',
-    alternates.length ? '<meta property="og:locale:alternate" content="' + (lang === 'en' ? 'es_MX' : 'en_US') + '" />' : '',
+    ...lineasOgLocale(lang, alternates.length > 1),
     '<meta name="twitter:card" content="summary_large_image" />',
     '<meta name="twitter:title" content="' + escapar(titulo) + '" />',
     '<meta name="twitter:description" content="' + escapar(descripcion) + '" />',
@@ -93,6 +93,17 @@ function construirFichas(sprites, pickTexto) {
     // ve peor que un aviso.
     const candidato = s.thumb || s.image;
     const hayImagen = Boolean(candidato) && fs.existsSync(path.join(DIST, candidato));
+    // Los nombres en portugues salen del catalogo ingles (IDIOMAS_NOMBRE_EN): no hay fuente de
+    // nombres en portugues en el repo. Los textos del juego si se traducen con su propio idioma.
+    const bloqueEnIngles = (lang) => ({
+      nombre: s.fullNameEn,
+      familia: s.familyNameEn,
+      variante: s.variantDisplayEn,
+      habilidad: pickTexto(s.ability, lang),
+      perk: pickTexto(s.specialPerk, lang),
+      ubicacion: pickTexto(s.location, lang),
+      costo: pickTexto(s.summonCost, lang)
+    });
     return {
     id: s.id,
     rareza: s.rarity,
@@ -103,7 +114,8 @@ function construirFichas(sprites, pickTexto) {
     hermanas: (porFamilia.get(s.familyId) || []).map((h) => ({
       id: h.id,
       es: { nombre: h.fullName },
-      en: { nombre: h.fullNameEn }
+      en: { nombre: h.fullNameEn },
+      'pt-BR': { nombre: h.fullNameEn }
     })),
     es: {
       nombre: s.fullName,
@@ -114,15 +126,8 @@ function construirFichas(sprites, pickTexto) {
       ubicacion: s.location,
       costo: s.summonCost
     },
-    en: {
-      nombre: s.fullNameEn,
-      familia: s.familyNameEn,
-      variante: s.variantDisplayEn,
-      habilidad: pickTexto(s.ability, 'en'),
-      perk: pickTexto(s.specialPerk, 'en'),
-      ubicacion: pickTexto(s.location, 'en'),
-      costo: pickTexto(s.summonCost, 'en')
-    }
+    en: bloqueEnIngles('en'),
+    'pt-BR': bloqueEnIngles('pt-BR')
     };
   });
 }
@@ -199,7 +204,10 @@ async function main() {
       const conIdioma = canonicalDe(entrada.ruta, lang).slice(SITIO.length);
       const destino = conIdioma === '/' ? fuente : path.join(DIST, conIdioma.slice(1), 'index.html');
       fs.mkdirSync(path.dirname(destino), { recursive: true });
-      fs.writeFileSync(destino, base.replace('</head>', '    ' + bloqueHead({ ...entrada, lang }) + '\n  </head>'));
+      const html = base
+        .replace(/<html lang="[^"]*"/, '<html lang="' + lang + '"')
+        .replace('</head>', '    ' + bloqueHead({ ...entrada, lang }) + '\n  </head>');
+      fs.writeFileSync(destino, html);
       escritas.push(conIdioma);
     }
   }
@@ -211,7 +219,7 @@ async function main() {
   let paginas = 0;
   const hoy = new Date().toISOString().slice(0, 10);
   for (const ficha of fichas) {
-    for (const lang of ['es', 'en']) {
+    for (const lang of IDIOMAS) {
       const ruta = rutaConIdiomaEspiritu(rutaEspiritu(ficha.id), lang);
       const destino = path.join(DIST, ruta.slice(1), 'index.html');
       fs.mkdirSync(path.dirname(destino), { recursive: true });
@@ -227,7 +235,7 @@ async function main() {
       paginas++;
     }
   }
-  for (const lang of ['es', 'en']) {
+  for (const lang of IDIOMAS) {
     const ruta = rutaConIdiomaEspiritu(rutaHubEspiritus(), lang);
     const destino = path.join(DIST, ruta.slice(1), 'index.html');
     fs.mkdirSync(path.dirname(destino), { recursive: true });
@@ -241,17 +249,17 @@ async function main() {
   const guia = datosGuia(sprites);
   const novedades = { ultimos: ultimosEspiritus(fichas) };
   const contenido = [
-    ['guia', etiquetasGuia, () => htmlGuia(guia, 'es'), () => htmlGuia(guia, 'en')],
-    ['novedades', etiquetasNovedades, () => htmlNovedades(novedades, 'es'), () => htmlNovedades(novedades, 'en')],
-    ['acerca', etiquetasAcerca, () => htmlAcerca(guia, 'es'), () => htmlAcerca(guia, 'en')]
+    ['guia', etiquetasGuia, (lang) => htmlGuia(guia, lang)],
+    ['novedades', etiquetasNovedades, (lang) => htmlNovedades(novedades, lang)],
+    ['acerca', etiquetasAcerca, (lang) => htmlAcerca(guia, lang)]
   ];
-  for (const [clave, etiquetasDe, enEspanol, enIngles] of contenido) {
+  for (const [clave, etiquetasDe, htmlDe] of contenido) {
     const rutaBase = RUTAS_CONTENIDO[clave];
-    for (const lang of ['es', 'en']) {
+    for (const lang of IDIOMAS) {
       const ruta = rutaConIdiomaEspiritu(rutaBase, lang);
       const destino = path.join(DIST, ruta.slice(1), 'index.html');
       fs.mkdirSync(path.dirname(destino), { recursive: true });
-      fs.writeFileSync(destino, lang === 'es' ? enEspanol() : enIngles());
+      fs.writeFileSync(destino, htmlDe(lang));
       const etiquetas = etiquetasDe(lang);
       extras.push({ loc: etiquetas.canonical, alternates: etiquetas.alternates, frecuencia: 'monthly', prioridad: clave === 'guia' ? 0.9 : 0.6 });
       paginas++;
@@ -260,7 +268,7 @@ async function main() {
 
   fs.writeFileSync(path.join(DIST, 'sitemap.xml'), sitemap(extras));
   console.log('SEO: HTML por ruta -> ' + escritas.join(', '));
-  console.log('SEO: ' + paginas + ' paginas de espiritu (' + fichas.length + ' fichas x 2 idiomas + indice)');
+  console.log('SEO: ' + paginas + ' paginas (' + fichas.length + ' fichas x ' + IDIOMAS.length + ' idiomas + indice, guia, novedades y acerca)');
   console.log('SEO: sitemap con ' + (RUTAS.reduce((n, r) => n + r.idiomas.length, 0) + extras.length) + ' URLs');
 }
 

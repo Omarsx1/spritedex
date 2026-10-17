@@ -8,37 +8,43 @@
 // invalida el cluster entero).
 
 import { conIdioma, idiomaDeRuta, rutaSinIdioma } from '../i18n/core.js';
+import { hreflangsDe, porIdioma } from './idioma.js';
 
 export const SITIO = 'https://spritedex.gg';
+export const TITULO_SITIO = 'Spritedex';
 export const IMAGEN_REDES = SITIO + '/icon-512.png';
 
 export const RUTAS = [
   {
     ruta: '/',
-    idiomas: ['es', 'en'],
+    idiomas: ['es', 'en', 'pt-BR'],
     prioridad: 1.0,
     frecuencia: 'daily',
     titulos: {
       es: 'Spritedex — Espíritus de Fortnite: variantes y niveles',
-      en: 'Spritedex — Fortnite Sprites: variants and levels'
+      en: 'Spritedex — Fortnite Sprites: variants and levels',
+      'pt-BR': 'Spritedex — Espíritos do Fortnite: variantes e níveis'
     },
     descripciones: {
       es: 'Rastrea tu colección de espíritus de Fortnite: marca tus capturas, sube niveles del 1 al 5, compara con amigos y comparte tu Spritedex.',
-      en: 'Track your Fortnite sprite collection: mark your captures, level them from 1 to 5, compare with friends and share your Spritedex.'
+      en: 'Track your Fortnite sprite collection: mark your captures, level them from 1 to 5, compare with friends and share your Spritedex.',
+      'pt-BR': 'Acompanhe sua coleção de espíritos do Fortnite: marque o que você capturou, suba os níveis do 1 ao 5, compare com amigos e compartilhe seu Spritedex.'
     }
   },
   {
     ruta: '/amigos',
-    idiomas: ['es', 'en'],
+    idiomas: ['es', 'en', 'pt-BR'],
     prioridad: 0.6,
     frecuencia: 'weekly',
     titulos: {
       es: 'Comparar espíritus con amigos — Spritedex',
-      en: 'Compare Fortnite sprites with friends — Spritedex'
+      en: 'Compare Fortnite sprites with friends — Spritedex',
+      'pt-BR': 'Comparar espíritos com amigos — Spritedex'
     },
     descripciones: {
       es: 'Compara tu lista de espíritus de Fortnite con la de tus amigos: quién tiene más, cuáles te faltan y qué pueden intercambiar.',
-      en: 'Compare your Fortnite sprite list with your friends: who has more, what you are missing and what you can trade.'
+      en: 'Compare your Fortnite sprite list with your friends: who has more, what you are missing and what you can trade.',
+      'pt-BR': 'Compare sua lista de espíritos do Fortnite com a dos seus amigos: quem tem mais, quais faltam e o que podem trocar.'
     }
   },
   {
@@ -56,6 +62,29 @@ export const RUTAS = [
   }
 ];
 
+// Textos de los datos estructurados. Son los mismos que antes para es y en; los de portugues
+// siguen la misma estructura.
+const JSONLD = {
+  es: {
+    organizacion: 'Rastreador interactivo y catálogo de espíritus de Fortnite Capítulo 7.',
+    caracteristicas: ['Rastreador de colección de espíritus', 'Niveles del 1 al 5', 'Filtros por variante y familia', 'Comparación con amigos', 'Tarjetas para compartir'],
+    inicio: 'Inicio',
+    amigos: 'Amigos'
+  },
+  en: {
+    organizacion: 'Interactive tracker and database for Fortnite Chapter 7 Sprites.',
+    caracteristicas: ['Sprite collection tracker', 'Levels 1 to 5', 'Variant and family filters', 'Friend comparison', 'Shareable image cards'],
+    inicio: 'Home',
+    amigos: 'Friends'
+  },
+  'pt-BR': {
+    organizacion: 'Rastreador interativo e catálogo de espíritos do Fortnite Capítulo 7.',
+    caracteristicas: ['Rastreador de coleção de espíritos', 'Níveis do 1 ao 5', 'Filtros por variante e família', 'Comparação com amigos', 'Cartões para compartilhar'],
+    inicio: 'Início',
+    amigos: 'Amigos'
+  }
+};
+
 // '/amigos' + 'en' -> '/en/amigos'. Mismo esquema que usa la app al navegar (i18n/core.js),
 // para que la URL del canonical sea exactamente la que existe.
 export function rutaConIdioma(ruta, lang) {
@@ -67,15 +96,11 @@ export function canonicalDe(ruta, lang) {
 }
 
 // Juego hreflang completo, con autorreferencia y x-default: si falta cualquiera de los dos,
-// Google descarta el cluster.
+// Google descarta el cluster. Un link por idioma de la entrada.
 export function alternatesDe(ruta) {
   const entrada = RUTAS.find((r) => r.ruta === ruta);
   if (!entrada || entrada.idiomas.length < 2) return [];
-  return [
-    { hreflang: 'es', href: canonicalDe(ruta, 'es') },
-    { hreflang: 'en', href: canonicalDe(ruta, 'en') },
-    { hreflang: 'x-default', href: canonicalDe(ruta, 'es') }
-  ];
+  return hreflangsDe(SITIO, ruta, entrada.idiomas);
 }
 
 function sinBarraFinal(pathname) {
@@ -102,6 +127,7 @@ export function etiquetasSeo(entrada) {
   return {
     lang,
     titulo: entrada.titulos[lang],
+    tituloDocumento: TITULO_SITIO,
     descripcion: entrada.descripciones[lang],
     canonical: canonicalDe(entrada.ruta, entrada.idiomas.length > 1 ? lang : 'es'),
     alternates: entrada.noindex ? [] : alternatesDe(entrada.ruta)
@@ -113,7 +139,7 @@ export function etiquetasSeo(entrada) {
 export function jsonLdDe(entrada) {
   if (entrada.noindex) return null;
   const { lang, titulo, descripcion, canonical } = etiquetasSeo(entrada);
-  const enIngles = lang === 'en';
+  const t = porIdioma(lang, JSONLD);
   if (entrada.ruta === '/') {
     return {
       '@context': 'https://schema.org',
@@ -124,9 +150,7 @@ export function jsonLdDe(entrada) {
           name: 'Spritedex',
           url: SITIO + '/',
           logo: SITIO + '/icon-512.png',
-          description: enIngles
-            ? 'Interactive tracker and database for Fortnite Chapter 7 Sprites.'
-            : 'Rastreador interactivo y catálogo de espíritus de Fortnite Capítulo 7.'
+          description: t.organizacion
         },
         {
           '@type': 'WebSite',
@@ -140,7 +164,7 @@ export function jsonLdDe(entrada) {
             '@type': 'SearchAction',
             target: {
               '@type': 'EntryPoint',
-              urlTemplate: SITIO + (enIngles ? '/en?q={search_term_string}' : '/?q={search_term_string}')
+              urlTemplate: SITIO + conIdioma('/', lang) + '?q={search_term_string}'
             },
             'query-input': 'required name=search_term_string'
           }
@@ -156,9 +180,7 @@ export function jsonLdDe(entrada) {
           isAccessibleForFree: true,
           publisher: { '@id': SITIO + '/#organization' },
           offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-          featureList: enIngles
-            ? ['Sprite collection tracker', 'Levels 1 to 5', 'Variant and family filters', 'Friend comparison', 'Shareable image cards']
-            : ['Rastreador de colección de espíritus', 'Niveles del 1 al 5', 'Filtros por variante y familia', 'Comparación con amigos', 'Tarjetas para compartir'],
+          featureList: t.caracteristicas,
           description: descripcion
         },
         {
@@ -187,8 +209,8 @@ export function jsonLdDe(entrada) {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: enIngles ? 'Home' : 'Inicio', item: canonicalDe('/', lang) },
-          { '@type': 'ListItem', position: 2, name: enIngles ? 'Friends' : 'Amigos', item: canonical }
+          { '@type': 'ListItem', position: 1, name: t.inicio, item: canonicalDe('/', lang) },
+          { '@type': 'ListItem', position: 2, name: t.amigos, item: canonical }
         ]
       }
     ]

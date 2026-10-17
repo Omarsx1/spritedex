@@ -121,8 +121,32 @@ function drawModernDotQR(ctx, qrX, qrY, qrSize, url = dominioParaCompartir()) {
 // Caché global en memoria para acelerar la generación instantánea de imágenes
 const globalImageCache = new Map();
 
-// Caché global persistente de plantillas renderizadas para carga 0ms instantánea
-export const globalCanvasCache = new Map();
+// Cada captura es un lienzo de 1280x2515 (~13 MB en memoria): se guardan pocas y se olvidan
+// las mas viejas. Lo que sale de aqui se vuelve a dibujar o se lee del Cache Storage.
+export function crearCacheAcotada(maximo, alOlvidar = () => {}) {
+  const entradas = new Map();
+  return {
+    has: (clave) => entradas.has(clave),
+    get(clave) {
+      if (!entradas.has(clave)) return undefined;
+      const valor = entradas.get(clave);
+      entradas.delete(clave);
+      entradas.set(clave, valor);
+      return valor;
+    },
+    set(clave, valor) {
+      entradas.delete(clave);
+      entradas.set(clave, valor);
+      while (entradas.size > maximo) {
+        const [claveVieja, valorViejo] = entradas.entries().next().value;
+        entradas.delete(claveVieja);
+        alOlvidar(valorViejo);
+      }
+    }
+  };
+}
+
+export const globalCanvasCache = crearCacheAcotada(3);
 
 // Contrato del export por defecto. Lo comparten la modal y el precalculo en reposo de
 // App.jsx: si van como texto suelto en cada sitio, cambiar uno deja al otro sin acertar
@@ -298,6 +322,45 @@ export function loadImage(src, bajaPrioridad = false) {
   });
 }
 
+// Los sprites se guardan como ImageBitmap: createImageBitmap decodifica fuera del hilo
+// principal. Dibujar un HTMLImageElement obliga al navegador a decodificarlo ahi mismo la
+// primera vez, y eso es lo que traba la lona en gama media.
+const globalBitmapCache = new Map();
+const bitmapsEnCurso = new Map();
+const TIEMPO_MAX_BITMAP_MS = 1200;
+
+async function descargarBitmap(src, bajaPrioridad) {
+  const res = await fetch(src, { priority: bajaPrioridad ? 'low' : 'auto' });
+  if (!res.ok) throw new Error(`HTTP ${res.status} al cargar ${src}`);
+  const bitmap = await createImageBitmap(await res.blob());
+  globalBitmapCache.set(src, bitmap);
+  return bitmap;
+}
+
+function conTiempoMaximo(promesa, ms) {
+  let temporizador;
+  const limite = new Promise((resolve) => {
+    temporizador = setTimeout(() => resolve(null), ms);
+  });
+  return Promise.race([promesa, limite]).finally(() => clearTimeout(temporizador));
+}
+
+export function loadBitmap(src, bajaPrioridad = false) {
+  if (!src) return Promise.resolve(null);
+  if (globalBitmapCache.has(src)) return Promise.resolve(globalBitmapCache.get(src));
+  if (bitmapsEnCurso.has(src)) return bitmapsEnCurso.get(src);
+  if (typeof createImageBitmap !== 'function' || typeof fetch !== 'function') {
+    return loadImage(src, bajaPrioridad);
+  }
+
+  const pendiente = conTiempoMaximo(descargarBitmap(src, bajaPrioridad), TIEMPO_MAX_BITMAP_MS)
+    .catch(() => null)
+    .then((bitmap) => bitmap || loadImage(src, bajaPrioridad))
+    .finally(() => bitmapsEnCurso.delete(src));
+  bitmapsEnCurso.set(src, pendiente);
+  return pendiente;
+}
+
 // Precarga anticipada de recursos por lotes en reposo (idle) sin saturar la red ni bloquear el hilo.
 let turnoPrecarga = 0;
 // Pausa del calentamiento mientras el usuario scrollea: primero ve el arte de las tarjetas que
@@ -343,7 +406,7 @@ export function preloadCanvasAssets(spritesList = [], batchSize = 4) {
       slice.forEach(s => {
         // Las mismas imagenes que usa el export: la derivada del collage.
         const src = srcParaCollage(s);
-        if (src) loadImage(src, true);
+        if (src) loadBitmap(src, true);
       });
       if (index < spritesList.length) {
         // Con la modal de compartir abierta hay alguien esperando: se acelera para
@@ -577,6 +640,8 @@ function getSpiritHue(sprite) {
   return '#00F0E8';
 }
 
+const EXPORT_SCALE = 1;
+
 export async function generateSpritedexCardImage({
   spritesList,
   userState,
@@ -629,8 +694,8 @@ export async function generateSpritedexCardImage({
       const s = lista[siguiente++];
       // El collage dibuja el sprite a ~90-110 px: se usa la derivada de 256 px y, si
       // no existe, se cae a la miniatura de las tarjetas para no dejar el hueco.
-      let img = await loadImage(srcParaCollage(s));
-      if (!img && s.thumb) img = await loadImage(s.thumb);
+      let img = await loadBitmap(srcParaCollage(s));
+      if (!img && s.thumb) img = await loadBitmap(s.thumb);
       if (img) loadedImagesMap[s.id] = img;
     }
   };
@@ -860,7 +925,7 @@ const ESPIRITU_FALTANTE_TINTE = 'rgb(132, 138, 158)';
 // ~3 ms por espiritu: la lona de 64 fichas pasaba de 241 ms a 829 ms de dibujo.
 let lienzoApagado = null;
 function dibujarEspirituApagado(ctx, img, x, y, tamano) {
-  const lado = Math.max(1, Math.round(tamano));
+  const lado = Math.max(1, Math.round(tamano * EXPORT_SCALE));
   if (!lienzoApagado) lienzoApagado = document.createElement('canvas');
   if (lienzoApagado.width !== lado || lienzoApagado.height !== lado) {
     lienzoApagado.width = lado;
@@ -996,10 +1061,8 @@ async function renderGlitchOverrideTemplate({
     else if (totalSprites <= 63) cols = 8; // Caso ideal Imagen 2 (8x8 = 64)
     else cols = Math.max(8, Math.ceil(Math.sqrt(totalSlotsNeeded))); // 11x11 para 117
   } else {
-    // Formato Vertical: 9:16 fijo (1080x1920), que es lo que piden las redes (historias,
-    // reels, tiktok). Antes la altura se calculaba con la coleccion, asi que con pocos
-    // espiritus salia un lienzo 4:3 apaisado y con muchos uno de 1:2,2: ninguno servia
-    // tal cual en una red. Ahora el marco es fijo y lo que se adapta es la cuadricula.
+    // Formato Vertical: el ancho sigue a la cuadricula y el alto queda entre 1,25 veces el
+    // ancho y 1920 px, para que sirva en historias, reels y tiktok sin franjas vacias.
     width = 1080;
     height = 1920;
 
@@ -1098,9 +1161,10 @@ async function renderGlitchOverrideTemplate({
       // el relleno se pierde. Se usa como mascara y se pinta con un degradado claro, asi el
       // wordmark se lee igual que en la key art (que va sobre magenta).
       const capaLogo = document.createElement('canvas');
-      capaLogo.width = logoW;
-      capaLogo.height = logoH;
+      capaLogo.width = logoW * EXPORT_SCALE;
+      capaLogo.height = logoH * EXPORT_SCALE;
       const ctxLogo = capaLogo.getContext('2d');
+      ctxLogo.setTransform(EXPORT_SCALE, 0, 0, EXPORT_SCALE, 0, 0);
       ctxLogo.drawImage(fuenteLogo, 0, 0, logoW, logoH);
       ctxLogo.globalCompositeOperation = 'source-in';
       const gradLogo = ctxLogo.createLinearGradient(0, 0, 0, logoH);
@@ -1140,9 +1204,10 @@ async function renderGlitchOverrideTemplate({
 
   const availH = height - headerH - footerH;
 
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = width * EXPORT_SCALE;
+  canvas.height = height * EXPORT_SCALE;
   const ctx = canvas.getContext('2d');
+  ctx.setTransform(EXPORT_SCALE, 0, 0, EXPORT_SCALE, 0, 0);
 
   // Crear el lienzo de 1280x2515 ya se nota: respiro antes de empezar a pintar.
   await cederTurno();
@@ -1194,14 +1259,14 @@ async function renderGlitchOverrideTemplate({
     // nitido encima, asi que las letras no se lavan con la suma.
     ctx.save();
     ctx.shadowColor = 'rgba(192, 38, 211, 0.34)';
-    ctx.shadowBlur = Math.round(logoH * 0.42);
-    ctx.drawImage(logoMaresListo.capa, logoX, logoY);
+    ctx.shadowBlur = (Math.round(logoH * 0.42)) * EXPORT_SCALE;
+    ctx.drawImage(logoMaresListo.capa, logoX, logoY, logoMaresListo.w, logoMaresListo.h);
     ctx.shadowColor = 'rgba(232, 121, 249, 0.42)';
-    ctx.shadowBlur = Math.round(logoH * 0.2);
-    ctx.drawImage(logoMaresListo.capa, logoX, logoY);
+    ctx.shadowBlur = (Math.round(logoH * 0.2)) * EXPORT_SCALE;
+    ctx.drawImage(logoMaresListo.capa, logoX, logoY, logoMaresListo.w, logoMaresListo.h);
     ctx.shadowColor = 'rgba(232, 121, 249, 0.45)';
-    ctx.shadowBlur = 18;
-    ctx.drawImage(logoMaresListo.capa, logoX, logoY);
+    ctx.shadowBlur = 18 * EXPORT_SCALE;
+    ctx.drawImage(logoMaresListo.capa, logoX, logoY, logoMaresListo.w, logoMaresListo.h);
     ctx.shadowBlur = 0;
     ctx.restore();
     // La capsula se ancla al borde visible de las letras, no al lienzo del SVG.
@@ -1213,7 +1278,7 @@ async function renderGlitchOverrideTemplate({
     ctx.textAlign = 'center';
     ctx.letterSpacing = '3px';
     ctx.shadowColor = acentoCabeceraRgba;
-    ctx.shadowBlur = 8;
+    ctx.shadowBlur = 8 * EXPORT_SCALE;
     const topTextY = Math.round(34 * Math.min(1.15, scale));
     ctx.fillText(enTemporada ? t('lona.arribaMares') : t('lona.arriba'), width / 2, topTextY);
 
@@ -1234,7 +1299,7 @@ async function renderGlitchOverrideTemplate({
 
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
-    ctx.shadowBlur = 14;
+    ctx.shadowBlur = 14 * EXPORT_SCALE;
     ctx.fillText(titleText, width / 2, titleY);
     ctx.shadowBlur = 0;
   }
@@ -1256,7 +1321,7 @@ async function renderGlitchOverrideTemplate({
   capsuleGrad.addColorStop(1, '#d90429');
   ctx.save();
   ctx.shadowColor = 'rgba(255, 0, 85, 0.45)';
-  ctx.shadowBlur = 10;
+  ctx.shadowBlur = 10 * EXPORT_SCALE;
   ctx.fillStyle = capsuleGrad;
   ctx.fill();
   ctx.restore();
@@ -1353,7 +1418,7 @@ async function renderGlitchOverrideTemplate({
     grad.addColorStop(1, '#00F0E8');
     ctx.fillStyle = grad;
     ctx.shadowColor = 'rgba(255, 0, 85, 0.55)';
-    ctx.shadowBlur = 8;
+    ctx.shadowBlur = 8 * EXPORT_SCALE;
     ctx.fill();
     ctx.shadowBlur = 0;
 
@@ -1367,7 +1432,7 @@ async function renderGlitchOverrideTemplate({
     // Remate luminoso: el borde del avance queda encendido, como el cabezal del medidor.
     ctx.save();
     ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-    ctx.shadowBlur = 7;
+    ctx.shadowBlur = 7 * EXPORT_SCALE;
     ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
     ctx.fillRect(barX + fillW - 1.5, barY + 1, 2, barH - 2);
     ctx.restore();
@@ -1561,7 +1626,7 @@ async function renderGlitchOverrideTemplate({
         // Resplandor directo sobre la silueta del espíritu
         const imgShadowBlur = Math.max(8, Math.min(16, Math.round(cardW * 0.07)));
         ctx.shadowColor = hexToRgba(glowColor, isMastered ? 0.80 : 0.65);
-        ctx.shadowBlur = imgShadowBlur;
+        ctx.shadowBlur = (imgShadowBlur) * EXPORT_SCALE;
         ctx.drawImage(spriteImg, imgX, imgY, imgSize, imgSize);
         ctx.shadowBlur = 0;
       } else {
@@ -1602,8 +1667,8 @@ async function renderGlitchOverrideTemplate({
     // (la pertenencia ya la cuentan el borde, el badge y el propio espiritu apagado).
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
-    ctx.shadowBlur = 4;
-    ctx.shadowOffsetY = 1;
+    ctx.shadowBlur = 4 * EXPORT_SCALE;
+    ctx.shadowOffsetY = 1 * EXPORT_SCALE;
 
     const nameFit = getSpriteNameLines(
       ctx,
@@ -1706,8 +1771,8 @@ async function renderGlitchOverrideTemplate({
     if (isMastered && coronaImg && altoCorona >= PISO_ESTADO) {
       ctx.save();
       ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
-      ctx.shadowBlur = 5;
-      ctx.shadowOffsetY = 2;
+      ctx.shadowBlur = 5 * EXPORT_SCALE;
+      ctx.shadowOffsetY = 2 * EXPORT_SCALE;
       ctx.translate(derecha - anchoCorona / 2, estadoY);
       ctx.rotate(-CORONA_INCLINACION);
       ctx.drawImage(coronaImg, -anchoCorona / 2, -altoCorona / 2, anchoCorona, altoCorona);
@@ -1745,7 +1810,7 @@ async function renderGlitchOverrideTemplate({
     ctx.font = `800 ${tamanioPie}px "Outfit", "Inter", sans-serif`;
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(0, 240, 232, 0.45)';
-    ctx.shadowBlur = 10;
+    ctx.shadowBlur = 10 * EXPORT_SCALE;
     ctx.fillText(textoFirma, footerPadX, baseFilaY);
   }
   ctx.restore();
@@ -1764,27 +1829,15 @@ async function renderGlitchOverrideTemplate({
 export const EXPORT_IMAGE_TYPE = 'image/jpeg';
 export const EXPORT_IMAGE_QUALITY = 0.92;
 
+// Devuelve el blob sin crear su URL de objeto: quien la guarda es quien la libera.
 export function encodeCanvasToImage(canvas) {
   return new Promise((resolve) => {
     canvas.toBlob((blob) => {
-      const filename = `spritedex_${Date.now()}.jpg`;
       if (blob) {
-        const file = new File([blob], filename, { type: EXPORT_IMAGE_TYPE });
-        const blobUrl = URL.createObjectURL(blob);
-        resolve({
-          dataUrl: blobUrl,
-          blobUrl,
-          blob,
-          file
-        });
+        const file = new File([blob], `spritedex_${Date.now()}.jpg`, { type: EXPORT_IMAGE_TYPE });
+        resolve({ blob, file, dataUrl: '' });
       } else {
-        const dataUrl = canvas.toDataURL(EXPORT_IMAGE_TYPE, EXPORT_IMAGE_QUALITY);
-        resolve({
-          dataUrl,
-          blobUrl: dataUrl,
-          blob: null,
-          file: null
-        });
+        resolve({ blob: null, file: null, dataUrl: canvas.toDataURL(EXPORT_IMAGE_TYPE, EXPORT_IMAGE_QUALITY) });
       }
     }, EXPORT_IMAGE_TYPE, EXPORT_IMAGE_QUALITY);
   });
@@ -1824,8 +1877,7 @@ export async function readCachedCapture(key) {
     if (!blob || blob.size === 0) return null;
     return {
       blob,
-      file: new File([blob], `spritedex_${Date.now()}.jpg`, { type: EXPORT_IMAGE_TYPE }),
-      url: URL.createObjectURL(blob)
+      file: new File([blob], `spritedex_${Date.now()}.jpg`, { type: EXPORT_IMAGE_TYPE })
     };
   } catch {
     return null;

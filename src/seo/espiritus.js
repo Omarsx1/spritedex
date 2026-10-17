@@ -8,10 +8,19 @@
 // Por que existe: los 278 espiritus solo vivian dentro de la SPA (el detalle se abria en un
 // modal por estado, sin URL). Todo su contenido unico era invisible para un buscador.
 
-import { SITIO } from './rutas.js';
-import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, ZONA } from './plantilla.js';
+import { SITIO, TITULO_SITIO } from './rutas.js';
+import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, ZONA, ABRIR_MAIN } from './plantilla.js';
+import { porIdioma, hreflangsDe, nombreRareza, numeroEnIdioma } from './idioma.js';
 
 const RUTA_HUB = '/espiritus';
+
+// Rotulos de las propiedades del JSON-LD de la ficha. Se piden por idioma (porIdioma) y no con una
+// rama binaria: el portugues no debe caer al espanol.
+const ROTULOS_FICHA = {
+  es: { familia: 'Familia', variante: 'Variante', rareza: 'Rareza', generacion: 'Generación', probabilidad: 'Probabilidad', costo: 'Costo de invocación', ubicacion: 'Ubicación', categoria: 'Espíritu de Fortnite' },
+  en: { familia: 'Family', variante: 'Variant', rareza: 'Rarity', generacion: 'Generation', probabilidad: 'Drop chance', costo: 'Summon cost', ubicacion: 'Location', categoria: 'Fortnite sprite' },
+  'pt-BR': { familia: 'Família', variante: 'Variante', rareza: 'Raridade', generacion: 'Geração', probabilidad: 'Probabilidade', costo: 'Custo de invocação', ubicacion: 'Localização', categoria: 'Espírito de Fortnite' }
+};
 
 // El id del catalogo ya es unico y estable: solo hay que cambiar el guion bajo por guion, que
 // es lo que piden las URLs. No se usa el nombre visible a proposito: si algun dia se corrige
@@ -37,20 +46,19 @@ export function canonicalEspiritu(id, lang) {
 }
 
 export function alternatesDeEspiritu(id) {
-  return [
-    { hreflang: 'es', href: canonicalEspiritu(id, 'es') },
-    { hreflang: 'en', href: canonicalEspiritu(id, 'en') },
-    { hreflang: 'x-default', href: canonicalEspiritu(id, 'es') }
-  ];
+  return hreflangsDe(SITIO, rutaEspiritu(id));
 }
 
 export function etiquetasEspiritu(ficha, lang) {
   const datos = ficha[lang];
   const completo = datos.nombre + ' — ' + ZONA[lang] + ' | Spritedex';
   const titulo = completo.length <= 60 ? completo : recortar(datos.nombre + ' — ' + ZONA[lang], 60);
-  const descripcion = lang === 'en'
-    ? recortar('Fortnite sprite ' + datos.nombre + ': ' + datos.familia + ' family, ' + datos.variante + ' variant, ' + ficha.rareza + ' rarity, ' + ficha.drop + ' drop chance. Where to find it and what it does.', 160)
-    : recortar('Espíritu ' + datos.nombre + ' de Fortnite: familia ' + datos.familia + ', variante ' + datos.variante + ', rareza ' + ficha.rareza + ' y ' + ficha.drop + ' de probabilidad. Dónde aparece y qué hace.', 160);
+  const rareza = nombreRareza(ficha.rareza, lang);
+  const descripcion = porIdioma(lang, {
+    en: recortar('Fortnite sprite ' + datos.nombre + ': ' + datos.familia + ' family, ' + datos.variante + ' variant, ' + rareza + ' rarity, ' + numeroEnIdioma(ficha.drop, lang) + ' drop chance. Where to find it and what it does.', 160),
+    es: recortar('Espíritu ' + datos.nombre + ' de Fortnite: familia ' + datos.familia + ', variante ' + datos.variante + ', rareza ' + rareza + ' y ' + numeroEnIdioma(ficha.drop, lang) + ' de probabilidad. Dónde aparece y qué hace.', 160),
+    'pt-BR': recortar('Espírito ' + datos.nombre + ' de Fortnite: família ' + datos.familia + ', variante ' + datos.variante + ', raridade ' + rareza + ' e ' + numeroEnIdioma(ficha.drop, lang) + ' de probabilidade. Onde aparece e o que faz.', 160)
+  });
   return {
     lang,
     titulo,
@@ -61,22 +69,23 @@ export function etiquetasEspiritu(ficha, lang) {
 }
 
 export function etiquetasHubEspiritus(total, lang) {
-  const titulo = lang === 'en'
-    ? 'All Fortnite sprites — Spritedex'
-    : 'Todos los espíritus de Fortnite — Spritedex';
-  const descripcion = lang === 'en'
-    ? recortar('Full list of the ' + total + ' Fortnite sprites by family and variant, with rarity, drop chance and a page for each one.', 160)
-    : recortar('Lista completa de los ' + total + ' espíritus de Fortnite por familia y variante, con rareza, probabilidad de drop y su ficha.', 160);
+  const titulo = porIdioma(lang, {
+    en: 'All Fortnite sprites — Spritedex',
+    es: 'Todos los espíritus de Fortnite — Spritedex',
+    'pt-BR': 'Todos os espíritos de Fortnite — Spritedex'
+  });
+  const descripcion = porIdioma(lang, {
+    en: recortar('Full list of the ' + total + ' Fortnite sprites by family and variant, with rarity, drop chance and a page for each one.', 160),
+    es: recortar('Lista completa de los ' + total + ' espíritus de Fortnite por familia y variante, con rareza, probabilidad de drop y su ficha.', 160),
+    'pt-BR': recortar('Lista completa dos ' + total + ' espíritos de Fortnite por família e variante, com raridade, probabilidade de obtenção e uma ficha para cada um.', 160)
+  });
   return {
     lang,
     titulo,
+    tituloDocumento: TITULO_SITIO,
     descripcion,
     canonical: SITIO + rutaConIdiomaEspiritu(RUTA_HUB, lang),
-    alternates: [
-      { hreflang: 'es', href: SITIO + RUTA_HUB },
-      { hreflang: 'en', href: SITIO + '/en' + RUTA_HUB },
-      { hreflang: 'x-default', href: SITIO + RUTA_HUB }
-    ]
+    alternates: hreflangsDe(SITIO, RUTA_HUB)
   };
 }
 
@@ -87,16 +96,16 @@ function propiedad(nombre, valor) {
 export function jsonLdEspiritu(ficha, lang) {
   const etiquetas = etiquetasEspiritu(ficha, lang);
   const datos = ficha[lang];
-  const enIngles = lang === 'en';
+  const r = porIdioma(lang, ROTULOS_FICHA);
   const propiedades = [
-    propiedad(enIngles ? 'Family' : 'Familia', datos.familia),
-    propiedad(enIngles ? 'Variant' : 'Variante', datos.variante),
-    propiedad(enIngles ? 'Rarity' : 'Rareza', ficha.rareza),
-    propiedad(enIngles ? 'Generation' : 'Generación', String(ficha.generacion)),
-    propiedad(enIngles ? 'Drop chance' : 'Probabilidad', ficha.drop)
+    propiedad(r.familia, datos.familia),
+    propiedad(r.variante, datos.variante),
+    propiedad(r.rareza, nombreRareza(ficha.rareza, lang)),
+    propiedad(r.generacion, String(ficha.generacion)),
+    propiedad(r.probabilidad, numeroEnIdioma(ficha.drop, lang))
   ];
-  if (datos.costo) propiedades.push(propiedad(enIngles ? 'Summon cost' : 'Costo de invocación', datos.costo));
-  if (datos.ubicacion) propiedades.push(propiedad(enIngles ? 'Location' : 'Ubicación', datos.ubicacion));
+  if (datos.costo) propiedades.push(propiedad(r.costo, datos.costo));
+  if (datos.ubicacion) propiedades.push(propiedad(r.ubicacion, datos.ubicacion));
   return {
     '@context': 'https://schema.org',
     '@graph': [
@@ -113,15 +122,15 @@ export function jsonLdEspiritu(ficha, lang) {
           name: datos.nombre,
           ...(ficha.thumb ? { image: SITIO + ficha.thumb } : {}),
           description: datos.habilidad || etiquetas.descripcion,
-          category: enIngles ? 'Fortnite sprite' : 'Espíritu de Fortnite',
+          category: r.categoria,
           additionalProperty: propiedades
         }
       },
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: enIngles ? 'Home' : 'Inicio', item: SITIO + (enIngles ? '/en' : '/') },
-          { '@type': 'ListItem', position: 2, name: enIngles ? 'Sprites' : 'Espíritus', item: SITIO + rutaConIdiomaEspiritu(RUTA_HUB, lang) },
+          { '@type': 'ListItem', position: 1, name: TEXTO[lang].inicio, item: SITIO + rutaConIdiomaEspiritu('/', lang) },
+          { '@type': 'ListItem', position: 2, name: TEXTO[lang].espiritus, item: SITIO + rutaConIdiomaEspiritu(RUTA_HUB, lang) },
           { '@type': 'ListItem', position: 3, name: datos.nombre, item: etiquetas.canonical }
         ]
       }
@@ -131,7 +140,6 @@ export function jsonLdEspiritu(ficha, lang) {
 
 export function jsonLdHubEspiritus(fichas, lang) {
   const etiquetas = etiquetasHubEspiritus(fichas.length, lang);
-  const enIngles = lang === 'en';
   return {
     '@context': 'https://schema.org',
     '@graph': [
@@ -157,8 +165,8 @@ export function jsonLdHubEspiritus(fichas, lang) {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: enIngles ? 'Home' : 'Inicio', item: SITIO + (enIngles ? '/en' : '/') },
-          { '@type': 'ListItem', position: 2, name: enIngles ? 'Sprites' : 'Espíritus', item: etiquetas.canonical }
+          { '@type': 'ListItem', position: 1, name: TEXTO[lang].inicio, item: SITIO + rutaConIdiomaEspiritu('/', lang) },
+          { '@type': 'ListItem', position: 2, name: TEXTO[lang].espiritus, item: etiquetas.canonical }
         ]
       }
     ]
@@ -172,11 +180,11 @@ export function htmlPaginaEspiritu(ficha, lang) {
   const base = conIdiomaRuta('/', lang);
   const hub = conIdiomaRuta(RUTA_HUB, lang);
   const filas = [
-    [t.rareza, ficha.rareza],
+    [t.rareza, nombreRareza(ficha.rareza, lang)],
     [t.generacion, String(ficha.generacion)],
     [t.variante, d.variante],
     [t.familia, d.familia],
-    [t.drop, ficha.drop],
+    [t.drop, numeroEnIdioma(ficha.drop, lang)],
     [t.costo, d.costo],
     [t.ubicacion, d.ubicacion],
     [t.lanzamiento, ficha.lanzamiento]
@@ -187,8 +195,8 @@ export function htmlPaginaEspiritu(ficha, lang) {
       : '<li><a href="' + conIdiomaRuta(rutaEspiritu(h.id), lang) + '">' + escapar(h[lang].nombre) + '</a></li>'
   )).join('');
   const cuerpo = [
-    migas([{ nombre: t.inicio, href: base }, { nombre: t.espiritus, href: hub }, { nombre: d.nombre }]),
-    '<main>',
+    migas([{ nombre: t.inicio, href: base }, { nombre: t.espiritus, href: hub }, { nombre: d.nombre }], lang),
+    ABRIR_MAIN,
     '<h1>' + escapar(d.nombre) + '</h1>',
     '<p class="lead">' + escapar(ZONA[lang] + ' · ' + d.familia + ' · ' + d.variante) + '</p>',
     '<div class="ficha">',
@@ -225,8 +233,8 @@ export function htmlHubEspiritus(fichas, lang) {
     )).join('') + '</ul>'
   )).join('');
   const cuerpo = [
-    migas([{ nombre: t.inicio, href: base }, { nombre: t.espiritus }]),
-    '<main>',
+    migas([{ nombre: t.inicio, href: base }, { nombre: t.espiritus }], lang),
+    ABRIR_MAIN,
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
     bloques,
