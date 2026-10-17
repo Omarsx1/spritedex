@@ -390,6 +390,9 @@ html::after {
   letter-spacing: 0;
   line-height: 1;
   flex-shrink: 0;
+  /* Ahora es un <a> y no un <button>: el subrayado del navegador no pinta nada visible (solo
+     lleva una imagen dentro), pero se declara para que no dependa de eso. */
+  text-decoration: none;
   transition: all 0.2s ease;
   user-select: none;
   cursor: pointer;
