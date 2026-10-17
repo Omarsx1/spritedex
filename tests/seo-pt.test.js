@@ -91,5 +91,5 @@ test('la guia pt-BR lleva sus preguntas en portugues sin signos de apertura y co
   assert.doesNotMatch(textos, /[¡¿]/);
   assert.match(textos, /0,5% a 12,5%/);
   assert.equal(guia.secciones[2].tabla.cabeceras[0], 'Raridade');
-  assert.equal(guia.secciones[2].tabla.filas[0][0], 'Mítico');
+  assert.equal(guia.secciones[2].tabla.filas[0][0].texto, 'Mítico');
 });

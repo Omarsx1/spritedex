@@ -10002,6 +10002,47 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 .guia__seccion { margin-top: 38px; }
 
+/* Indice con anclas. Los encabezados llevan scroll-margin porque el navbar es absoluto: sin el,
+   al saltar a un ancla el titulo queda justo debajo de la barra. */
+.guia__indice {
+  margin: 0 0 34px;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.guia__indice ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+
+.guia__indice a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 13px;
+  font-size: 0.84rem;
+  text-decoration: none;
+  color: var(--text);
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.guia__indice a:hover {
+  background: rgba(0, 240, 232, 0.12);
+  border-color: var(--nav-accent, #00F0E8);
+  color: var(--nav-accent, #00F0E8);
+}
+
+.guia__seccion,
+.guia__h2 { scroll-margin-top: 78px; }
+
 .guia__h2 {
   margin: 0 0 10px;
   font-family: var(--font-fortnite);
@@ -10071,6 +10112,22 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .guia__tabla tbody tr + tr th,
 .guia__tabla tbody tr + tr td { border-top: 1px solid var(--border); }
 .guia__tabla tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+
+/* Special no es un color: en las tarjetas es la banda de arcoiris. La cadena es la MISMA que
+   .sprite-rarity-special y la del mapa compartido (src/data/rarezaColores.js); una prueba impide
+   que las dos se separen. Se pinta sobre el propio texto, y lleva respaldo porque sin el recorte
+   del fondo el texto quedaria transparente, que es peor que un color plano. */
+.rareza-arcoiris {
+  background: linear-gradient(15deg, #5dffe4 0, #8dff9a 8%, #fff36a 16%, #60dfff 24%, #7b7cff 32%, #ff77d8 40%, #ffc45f 48%, #5dffe4 56%, #8dff9a 64%, #fff36a 72%, #60dfff 80%, #7b7cff 88%, #ff77d8 96%, #ffc45f 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .rareza-arcoiris { background: none; color: #5dffe4; }
+}
 
 /* El FAQ mantiene <details>/<summary> nativos (sin JS, contenido en el DOM y con paridad con
    el FAQPage). El triangulo del navegador se sustituye por un signo propio: mismo estado,

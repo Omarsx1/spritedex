@@ -10,6 +10,7 @@
 // comprobacion de teclado se hace a mano.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { htmlGuia, htmlAcerca, htmlNovedades } from '../src/seo/contenido.js';
 import { htmlPaginaEspiritu, htmlHubEspiritus } from '../src/seo/espiritus.js';
 
@@ -138,7 +139,7 @@ test('1.3.1: las tablas marcan encabezados de columna y de fila, y llevan titulo
   const guia = htmlGuia(datosGuia, 'es');
   assert.ok(guia.includes('<th scope="col">'), 'guia: la cabecera de columna no lleva scope');
   // La primera celda de cada fila nombra la rareza: es encabezado de fila, como en la vista de la app.
-  assert.ok(guia.includes('<th scope="row">'), 'guia: la rareza deberia ser encabezado de fila');
+  assert.match(guia, /<th scope="row"[^>]*>/, 'guia: la rareza deberia ser encabezado de fila');
   assert.match(guia, /<caption[^>]*>[^<]+<\/caption>/, 'guia: la tabla no lleva titulo');
 
   const novedades = htmlNovedades({ ultimos: [{ ...ficha, slug: 'spookydash-gold' }] }, 'es');
@@ -164,4 +165,47 @@ test('2.5.8: los objetivos del conmutador de idioma llegan a 24x24 px', () => {
   // Comprobacion de presencia de la regla, no de medida real: el layout se verifica a mano.
   assert.match(html, /min-height:\s*24px/, 'falta la altura minima de los objetivos');
   assert.match(html, /\.saltar:focus/, 'el enlace de salto no se muestra al recibir foco');
+});
+
+test('2.4.1 / 4.1.2: cada ancla del indice tiene destino y cada region tiene su encabezado', () => {
+  for (const lang of IDIOMAS) {
+    const html = htmlGuia(datosGuia, lang);
+    const anclas = [...html.matchAll(/href="#([^"]+)"/g)].map((m) => m[1]);
+    assert.ok(anclas.length >= 8, lang + ': el indice deberia llevar las 8 secciones, lleva ' + anclas.length);
+    for (const ancla of anclas) {
+      assert.ok(html.includes('id="' + ancla + '"'), lang + ': ancla del indice sin destino: #' + ancla);
+    }
+    // Toda region con aria-labelledby debe apuntar a un encabezado que exista: si no, el lector
+    // de pantalla anuncia una region sin nombre.
+    const etiquetadas = [...html.matchAll(/aria-labelledby="([^"]+)"/g)].map((m) => m[1]);
+    assert.ok(etiquetadas.length >= 8, lang + ': faltan regiones etiquetadas');
+    for (const id of etiquetadas) {
+      assert.ok(html.includes('id="' + id + '"'), lang + ': aria-labelledby sin encabezado: ' + id);
+    }
+  }
+});
+
+test('el indice se anuncia en el idioma de la pagina', () => {
+  assert.ok(htmlGuia(datosGuia, 'es').includes('aria-label="Secciones"'));
+  assert.ok(htmlGuia(datosGuia, 'en').includes('aria-label="Sections"'));
+  assert.ok(htmlGuia(datosGuia, 'pt-BR').includes('aria-label="Seções"'));
+});
+
+test('las anclas son las mismas en los tres idiomas', () => {
+  // Un enlace compartido con ancla tiene que seguir sirviendo al cambiar de version.
+  const de = (lang) => [...htmlGuia(datosGuia, lang).matchAll(/id="(guia-[^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(de('en'), de('es'));
+  assert.deepEqual(de('pt-BR'), de('es'));
+});
+
+// La vista de la app no se puede montar en estas pruebas (Node no lee JSX y no hay jsdom), asi que
+// se comprueba la fuente. Cubre lo unico que la vista React podria perder por su cuenta: que siga
+// tomando del modelo compartido los ids del indice y el aria-labelledby de cada region.
+test('la vista de la app tambien lleva indice, anclas y regiones etiquetadas', () => {
+  const jsx = readFileSync(new URL('../src/components/GuiaPage.jsx', import.meta.url), 'utf8');
+  assert.match(jsx, /className="guia__indice"/, 'falta el indice en la vista de la app');
+  assert.match(jsx, /aria-label=\{modelo\.indice\}/, 'el indice no se anuncia con el texto del modelo');
+  assert.match(jsx, /id=\{seccion\.id\}/, 'las secciones no toman el id del modelo');
+  assert.match(jsx, /aria-labelledby=\{seccion\.id \+ '-titulo'\}/, 'falta el aria-labelledby de las secciones');
+  assert.match(jsx, /id=\{modelo\.faq\.id\}/, 'la seccion del FAQ no toma el id del modelo');
 });

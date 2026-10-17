@@ -93,3 +93,20 @@ test('un nombre con etiquetas en las novedades se escapa', () => {
   assert.ok(!html.includes('<script>alert(1)</script>'));
   assert.ok(html.includes('&lt;script&gt;'));
 });
+
+test('la tabla de rarezas pinta cada rareza con el color de las tarjetas', () => {
+  for (const lang of ['es', 'en', 'pt-BR']) {
+    const html = htmlGuia(guia, lang);
+    // Special no lleva color plano: lleva la banda de arcoiris, igual que en las tarjetas.
+    assert.ok(html.includes('class="rareza-arcoiris"'), lang + ': Special deberia salir con su degradado');
+    // Los mismos hexadecimales que usa la rejilla de la app (src/data/rarezaColores.js).
+    for (const [rareza, color] of [['Rare', '#00fffb'], ['Legendary', '#fbc363'], ['Epic', '#ec27ff'], ['Mythic', '#fff0a6']]) {
+      assert.ok(
+        html.includes('style="color: ' + color + '"'),
+        lang + ': la fila ' + rareza + ' deberia llevar ' + color
+      );
+    }
+    // El color no puede haber sustituido al nombre: la celda sigue siendo encabezado de fila.
+    assert.match(html, /<th scope="row" style="color: #[0-9a-f]{6}">[^<]+<\/th>/i);
+  }
+});

@@ -1,3 +1,4 @@
+import { COLORES_RAREZA, RAREZA_POR_DEFECTO } from './rarezaColores.js';
 import officialSpritesJson from './official_sprites.json';
 import { FAMILY_NAMES_MAP, THEME_NAMES_ES } from './nombresEspiritus.js';
 import { estadoLanzamiento } from '../utils/lanzamiento.js';
@@ -57,24 +58,24 @@ if (Array.isArray(fortniteGgJson)) {
 }
 
 export const RARITIES = {
-  Mythic: { name: 'MÍTICO', label: 'Mítico', color: '#fff0a6', bg: '#7c5d26', border: '#7c5d26', classKey: 'mythic', cardGradient: 'linear-gradient(180deg, #7c5d26 0%, #1b1c23 100%)' },
-  Legendary: { name: 'LEGENDARIO', label: 'Legendario', color: '#fbc363', bg: '#8a3c1e', border: '#8a3c1e', classKey: 'legendary', cardGradient: 'linear-gradient(180deg, #8a3c1e 0%, #1b1c23 100%)' },
-  Epic: { name: 'ÉPICO', label: 'Épico', color: '#ec27ff', bg: '#4c197b', border: '#4c197b', classKey: 'epic', cardGradient: 'linear-gradient(180deg, #4c197b 0%, #1b1c23 100%)' },
-  Rare: { name: 'RARO', label: 'Raro', color: '#00fffb', bg: '#00458a', border: '#00458a', classKey: 'rare', cardGradient: 'linear-gradient(180deg, #00458a 0%, #1b1c23 100%)' },
-  Uncommon: { name: 'POCO COMÚN', label: 'Poco Común', color: '#4ade80', bg: '#14532d', border: '#4ade80', classKey: 'uncommon', cardGradient: 'linear-gradient(180deg, #14532d 0%, #1b1c23 100%)' },
-  Common: { name: 'COMÚN', label: 'Común', color: '#94a3b8', bg: '#334155', border: '#94a3b8', classKey: 'common', cardGradient: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)' },
-  Special: { name: 'ESPECIAL', label: 'Especial', color: '#5dffe4', bg: '#134e4a', border: '#5dffe4', classKey: 'special', cardGradient: 'linear-gradient(180deg, #134e4a 0%, #1b1c23 100%)' },
+  Mythic: { name: 'MÍTICO', label: 'Mítico', ...COLORES_RAREZA.mythic },
+  Legendary: { name: 'LEGENDARIO', label: 'Legendario', ...COLORES_RAREZA.legendary },
+  Epic: { name: 'ÉPICO', label: 'Épico', ...COLORES_RAREZA.epic },
+  Rare: { name: 'RARO', label: 'Raro', ...COLORES_RAREZA.rare },
+  Uncommon: { name: 'POCO COMÚN', label: 'Poco Común', ...COLORES_RAREZA.uncommon },
+  Common: { name: 'COMÚN', label: 'Común', ...COLORES_RAREZA.common },
+  Special: { name: 'ESPECIAL', label: 'Especial', ...COLORES_RAREZA.special },
   // Series especiales oficiales de Fortnite
-  Exotic: { name: 'EXÓTICO', label: 'Exótico', color: '#5df0e4', bg: '#0e4a52', border: '#06b6d4', classKey: 'exotic', cardGradient: 'linear-gradient(180deg, #0e4a52 0%, #1b1c23 100%)' },
-  Dark: { name: 'OSCURO', label: 'Oscuro', color: '#f0abfc', bg: '#581c87', border: '#a21caf', classKey: 'dark', cardGradient: 'linear-gradient(180deg, #581c87 0%, #1b1c23 100%)' },
-  Gaming: { name: 'GAMING', label: 'Gaming', color: '#a5b4fc', bg: '#312e81', border: '#6366f1', classKey: 'gaming', cardGradient: 'linear-gradient(180deg, #312e81 0%, #1b1c23 100%)' },
-  Marvel: { name: 'MARVEL', label: 'Marvel', color: '#fca5a5', bg: '#7f1d1d', border: '#ef4444', classKey: 'marvel', cardGradient: 'linear-gradient(180deg, #7f1d1d 0%, #1b1c23 100%)' },
-  DC: { name: 'DC', label: 'DC', color: '#93c5fd', bg: '#1e3a8a', border: '#3b82f6', classKey: 'dc', cardGradient: 'linear-gradient(180deg, #1e3a8a 0%, #1b1c23 100%)' },
-  Icon: { name: 'ÍDOLO', label: 'Ídolo', color: '#5eead4', bg: '#115e59', border: '#14b8a6', classKey: 'icon', cardGradient: 'linear-gradient(180deg, #115e59 0%, #1b1c23 100%)' },
-  Frozen: { name: 'CONGELADO', label: 'Congelado', color: '#bae6fd', bg: '#0c4a6e', border: '#38bdf8', classKey: 'frozen', cardGradient: 'linear-gradient(180deg, #0c4a6e 0%, #1b1c23 100%)' },
-  Lava: { name: 'LAVA', label: 'Lava', color: '#fdba74', bg: '#7c2d12', border: '#ea580c', classKey: 'lava', cardGradient: 'linear-gradient(180deg, #7c2d12 0%, #1b1c23 100%)' },
-  Shadow: { name: 'SOMBRA', label: 'Sombra', color: '#f8fafc', bg: '#18181b', border: '#52525b', classKey: 'shadow', cardGradient: 'linear-gradient(180deg, #27272a 0%, #09090b 100%)' },
-  Slurp: { name: 'SORBETE', label: 'Sorbete', color: '#6ee7b7', bg: '#064e3b', border: '#10b981', classKey: 'slurp', cardGradient: 'linear-gradient(180deg, #064e3b 0%, #1b1c23 100%)' }
+  Exotic: { name: 'EXÓTICO', label: 'Exótico', ...COLORES_RAREZA.exotic },
+  Dark: { name: 'OSCURO', label: 'Oscuro', ...COLORES_RAREZA.dark },
+  Gaming: { name: 'GAMING', label: 'Gaming', ...COLORES_RAREZA.gaming },
+  Marvel: { name: 'MARVEL', label: 'Marvel', ...COLORES_RAREZA.marvel },
+  DC: { name: 'DC', label: 'DC', ...COLORES_RAREZA.dc },
+  Icon: { name: 'ÍDOLO', label: 'Ídolo', ...COLORES_RAREZA.icon },
+  Frozen: { name: 'CONGELADO', label: 'Congelado', ...COLORES_RAREZA.frozen },
+  Lava: { name: 'LAVA', label: 'Lava', ...COLORES_RAREZA.lava },
+  Shadow: { name: 'SOMBRA', label: 'Sombra', ...COLORES_RAREZA.shadow },
+  Slurp: { name: 'SORBETE', label: 'Sorbete', ...COLORES_RAREZA.slurp }
 };
 
 function resolverRareza(rarity) {
@@ -90,11 +91,8 @@ function resolverRareza(rarity) {
     sinTraducir: true,
     name: cleanName.toUpperCase(),
     label: cleanName.charAt(0).toUpperCase() + cleanName.slice(1).toLowerCase(),
-    color: '#5dffe4',
-    bg: '#134e4a',
-    border: '#14b8a6',
-    classKey: cleanName.toLowerCase().replace(/[^a-z0-9]/g, ''),
-    cardGradient: 'linear-gradient(180deg, #134e4a 0%, #1b1c23 100%)'
+    ...RAREZA_POR_DEFECTO,
+    classKey: cleanName.toLowerCase().replace(/[^a-z0-9]/g, '')
   };
 }
 

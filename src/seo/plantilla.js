@@ -6,6 +6,7 @@
 import { SITIO, IMAGEN_REDES } from './rutas.js';
 import { conIdioma, IDIOMAS } from '../i18n/core.js';
 import { NOMBRE_IDIOMA, lineasOgLocale, porIdioma } from './idioma.js';
+import { COLORES_RAREZA } from '../data/rarezaColores.js';
 
 export const ZONA = {
   es: 'Espíritu de Fortnite',
@@ -158,6 +159,12 @@ const CSS = [
   'table.tabla tbody tr:hover { background: rgba(255,255,255,.03); }',
   'table.tabla td:not(:first-child) { font-variant-numeric: tabular-nums; }',
 
+  // Special no es un color: en las tarjetas es la banda de arcoiris. Se pinta sobre el propio
+  // texto con background-clip, y lleva respaldo por si el navegador no recorta el fondo (sin el,
+  // el texto quedaria transparente, que es peor que un color plano).
+  '.rareza-arcoiris { background: ' + COLORES_RAREZA.special.degradadoTexto + '; background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }',
+  '@supports not ((-webkit-background-clip: text) or (background-clip: text)) { .rareza-arcoiris { background: none; color: ' + COLORES_RAREZA.special.color + '; } }',
+
   // FAQ: sigue siendo <details> nativo y sin JS. El triangulo del navegador se cambia por un
   // signo propio, que se lee mejor y no depende del motor.
   'details.faq { border-bottom: 1px solid var(--borde-suave); }',
@@ -183,6 +190,13 @@ const CSS = [
   'footer.pie nav { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 10px; }',
   'footer.pie a { color: var(--apagado); text-decoration: none; }',
   'footer.pie a:hover { color: var(--acento); text-decoration: underline; }',
+
+  // Indice de la guia: chips con las anclas. Sin JS y sin sticky (un sticky competiria con el
+  // scroll en movil por muy poco beneficio).
+  '.indice { margin: 0 0 34px; padding: 14px 18px; background: var(--panel); border: 1px solid var(--borde-suave); border-radius: var(--radio-m); }',
+  '.indice ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 10px; }',
+  '.indice a { display: inline-flex; align-items: center; min-height: 24px; border: 1px solid var(--borde-suave); border-radius: 999px; padding: 6px 13px; font-size: .84rem; text-decoration: none; color: var(--texto); transition: background-color .2s ease, border-color .2s ease, color .2s ease; }',
+  '.indice a:hover { background: var(--acento-tenue); border-color: var(--acento); color: var(--acento); }',
   // Accesibilidad. El foco se pinta con el acento sobre el fondo oscuro (contraste 13.96:1) y
   // con separacion del borde, para que se vea tanto en enlaces como en el summary del FAQ.
   ':focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; border-radius: 4px; }',

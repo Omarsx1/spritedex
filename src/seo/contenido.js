@@ -72,6 +72,21 @@ function migasContenido(lang, nombre) {
   ], lang);
 }
 
+// Una celda puede ser un texto suelto o un objeto { texto, color, degradado }: la rareza de la
+// guia lleva el color de su rareza, el mismo que muestran las tarjetas de la app.
+function celdaHtml(valor, esEncabezadoDeFila) {
+  const esObjeto = valor !== null && typeof valor === 'object';
+  const texto = escapar(esObjeto ? valor.texto : valor);
+  // Degradado y color plano son excluyentes: con la banda, el color va transparente y pintarlo
+  // ademas como color dejaria el texto o invisible o sin banda.
+  let atributos = '';
+  if (esObjeto && valor.degradado) atributos = ' class="rareza-arcoiris"';
+  else if (esObjeto && valor.color) atributos = ' style="color: ' + valor.color + '"';
+  return esEncabezadoDeFila
+    ? '<th scope="row"' + atributos + '>' + texto + '</th>'
+    : '<td>' + texto + '</td>';
+}
+
 // Una tabla de datos necesita titulo y encabezados con scope: sin ellos, el lector de pantalla
 // recorre una rejilla de numeros sin saber que es cada columna (criterio 1.3.1). La primera celda
 // de cada fila pasa a ser encabezado de fila cuando nombra la fila, igual que en la vista de la app.
@@ -80,9 +95,7 @@ function tabla(cabeceras, filas, { titulo, primeraEsEncabezado = false } = {}) {
     + (titulo ? '<caption>' + escapar(titulo) + '</caption>' : '')
     + '<thead><tr>' + cabeceras.map((c) => '<th scope="col">' + escapar(c) + '</th>').join('')
     + '</tr></thead><tbody>' + filas.map((f) => '<tr>' + f.map((c, i) => (
-      primeraEsEncabezado && i === 0
-        ? '<th scope="row">' + escapar(c) + '</th>'
-        : '<td>' + escapar(c) + '</td>'
+      celdaHtml(c, primeraEsEncabezado && i === 0)
     )).join('') + '</tr>').join('')
     + '</tbody></table>';
 }
@@ -95,16 +108,30 @@ function bloqueHtml(bloque) {
   return '<p>' + escapar(bloque.texto) + '</p>';
 }
 
-// Una seccion ocupa una linea (titulo y bloques seguidos) y su tabla, si la lleva, va en la
-// linea siguiente. Es la forma que ya tenia la pagina, que esta indexada.
+// Cada seccion es una region navegable: `aria-labelledby` apunta a su propio encabezado y el id
+// de ese encabezado es tambien el ancla del indice. El id viene del modelo —no se deriva del
+// titulo— para que sea el mismo en los tres idiomas y un enlace con ancla no se rompa al cambiar
+// de version.
 function seccionHtml(seccion) {
-  const linea = '<h2>' + escapar(seccion.titulo) + '</h2>' + seccion.bloques.map(bloqueHtml).join('');
-  return seccion.tabla
-    ? [linea, tabla(seccion.tabla.cabeceras, seccion.tabla.filas, {
-      titulo: seccion.tabla.titulo,
-      primeraEsEncabezado: true
-    })]
-    : [linea];
+  const idTitulo = seccion.id + '-titulo';
+  const contenido = '<h2 id="' + idTitulo + '">' + escapar(seccion.titulo) + '</h2>'
+    + seccion.bloques.map(bloqueHtml).join('')
+    + (seccion.tabla
+      ? tabla(seccion.tabla.cabeceras, seccion.tabla.filas, {
+        titulo: seccion.tabla.titulo,
+        primeraEsEncabezado: true
+      })
+      : '');
+  return '<section id="' + seccion.id + '" aria-labelledby="' + idTitulo + '">' + contenido + '</section>';
+}
+
+// Ocho secciones de lectura larga sin navegacion interna obligan a desplazarse a ciegas. El
+// indice sale de los mismos ids que usan las secciones, asi que no pueden desincronizarse.
+function indiceHtml(modelo) {
+  const enlaces = modelo.secciones.concat([modelo.faq]).map((s) => (
+    '<li><a href="#' + s.id + '">' + escapar(s.titulo) + '</a></li>'
+  )).join('');
+  return '<nav class="indice" aria-label="' + escapar(modelo.indice) + '"><ol>' + enlaces + '</ol></nav>';
 }
 
 // El FAQ visible sale de los mismos pares que el JSON-LD: si divergieran, el marcado diria algo
@@ -164,10 +191,13 @@ export function htmlGuia(datos, lang) {
     ABRIR_MAIN,
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
-    ...modelo.secciones.flatMap(seccionHtml),
+    indiceHtml(modelo),
+    ...modelo.secciones.map(seccionHtml),
     ctaHtml(lang),
-    '<h2>' + escapar(modelo.faq.titulo) + '</h2>',
+    '<section id="' + modelo.faq.id + '" aria-labelledby="' + modelo.faq.id + '-titulo">',
+    '<h2 id="' + modelo.faq.id + '-titulo">' + escapar(modelo.faq.titulo) + '</h2>',
     faqHtml(modelo.faq.entradas),
+    '</section>',
     '<p class="nota">' + escapar(modelo.nota) + '</p>',
     '</main>'
   ].join('\n');

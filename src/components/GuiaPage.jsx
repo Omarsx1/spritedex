@@ -24,6 +24,14 @@ function Bloque({ bloque }) {
   return <p className="guia__texto">{bloque.texto}</p>;
 }
 
+// La celda de la rareza llega del modelo como { texto, color } o { texto, degradado } —Special es
+// arcoiris, no un color—; las demas son valores sueltos.
+function CeldaRareza({ celda }) {
+  if (celda === null || typeof celda !== 'object') return <th scope="row">{celda}</th>;
+  if (celda.degradado) return <th scope="row" className="rareza-arcoiris">{celda.texto}</th>;
+  return <th scope="row" style={celda.color ? { color: celda.color } : undefined}>{celda.texto}</th>;
+}
+
 export function GuiaPage({ lang }) {
   // Se cuenta una vez por montaje sobre la lista completa del catalogo.
   const datos = useMemo(() => datosGuia(ALL_SPRITES), []);
@@ -46,9 +54,24 @@ export function GuiaPage({ lang }) {
         <h1 id="guia-titulo" className="guia__titulo" ref={tituloRef} tabIndex={-1}>{titulo}</h1>
         <p className="guia__lead">{etiquetas.descripcion}</p>
 
+        {/* Indice con anclas: los mismos ids que las secciones (ver el modelo compartido), asi
+            que indice y secciones no pueden desincronizarse. */}
+        <nav className="guia__indice" aria-label={modelo.indice}>
+          <ol>
+            {modelo.secciones.concat([modelo.faq]).map((s) => (
+              <li key={s.id}><a href={'#' + s.id}>{s.titulo}</a></li>
+            ))}
+          </ol>
+        </nav>
+
         {modelo.secciones.map((seccion) => (
-          <section className="guia__seccion" key={seccion.titulo}>
-            <h2 className="guia__h2">{seccion.titulo}</h2>
+          <section
+            id={seccion.id}
+            className="guia__seccion"
+            aria-labelledby={seccion.id + '-titulo'}
+            key={seccion.id}
+          >
+            <h2 id={seccion.id + '-titulo'} className="guia__h2">{seccion.titulo}</h2>
             {seccion.bloques.map((bloque, i) => <Bloque bloque={bloque} key={i} />)}
             {seccion.tabla && (
               <div className="guia__tabla-caja">
@@ -65,9 +88,9 @@ export function GuiaPage({ lang }) {
                   </thead>
                   <tbody>
                     {seccion.tabla.filas.map((fila) => (
-                      <tr key={fila[0]}>
+                      <tr key={fila[0].texto || fila[0]}>
                         {/* La primera celda nombra la fila (la rareza): encabezado, no dato. */}
-                        <th scope="row">{fila[0]}</th>
+                        <CeldaRareza celda={fila[0]} />
                         {fila.slice(1).map((celda, i) => <td key={i}>{celda}</td>)}
                       </tr>
                     ))}
@@ -78,8 +101,12 @@ export function GuiaPage({ lang }) {
           </section>
         ))}
 
-        <section className="guia__seccion" aria-labelledby="guia-faq">
-          <h2 id="guia-faq" className="guia__h2">{modelo.faq.titulo}</h2>
+        <section
+          id={modelo.faq.id}
+          className="guia__seccion"
+          aria-labelledby={modelo.faq.id + '-titulo'}
+        >
+          <h2 id={modelo.faq.id + '-titulo'} className="guia__h2">{modelo.faq.titulo}</h2>
           {modelo.faq.entradas.map(([pregunta, respuesta]) => (
             <details className="guia__faq" key={pregunta}>
               <summary className="guia__resumen">{pregunta}</summary>
