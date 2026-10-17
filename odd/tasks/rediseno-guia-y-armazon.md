@@ -70,7 +70,7 @@ rediseño; no debe viajar en ninguno de estos PR.
   `02b462f`)*
 - **T3** Sistema visual del armazón estático: Burbank para la marca y los títulos, escala
   tipográfica, superficies con profundidad real, ritmo vertical, tabla, FAQ y CTA con estados
-  hover/active/focus. *(S1, S4, S6, S7 — ruta: inline — pendiente)*
+  hover/active/focus. *(S1, S4, S6, S7 — ruta: inline — hecho)*
 - **T4** La guía: índice de secciones con anclas y estructura semántica (`section` +
   `aria-labelledby`). *(S1 — ruta: inline — pendiente)*
 - **T6** Verificación completa: `pnpm test`, `pnpm lint`, `pnpm build`,
@@ -166,3 +166,28 @@ correcta lo supera, se explica y se sigue. Si el conteo se acerca a 400, se apli
   navegador headless para una sola propiedad no se justifica.
 - **L15** Verificación tras el arreglo: `node --test` **308/308**, `pnpm lint` 0, `pnpm build`
   867 páginas. Falta la confirmación visual del usuario.
+- **L16** **T3 hecho**: el sistema visual de T5 se lleva al armazón estático. Las dos caras de la
+  guía comparten ahora las mismas decisiones: Burbank para el logotipo y los títulos (h1/h2), un
+  solo acento, un único resplandor arriba, radio variable (`--radio-l/-m/-s`), y tabla/FAQ/CTA con
+  el mismo tratamiento y los mismos estados.
+  - Se aplica la lección de L13: el aire de arriba va en `padding` (`.envoltura`), nunca en
+    `margin`. En las páginas estáticas no hay navbar absoluto, así que el colapso no muerde, pero
+    la regla queda escrita para que no vuelva a morder.
+  - `table.tabla` pasa a `border-collapse: separate` con `border-radius` y `overflow: hidden`, para
+    que la tabla se lea como una superficie y no como una rejilla de líneas.
+  - El FAQ cambia el triángulo del navegador por el signo `+`/`−` propio, igual que en la app.
+- **L17** S6 respetado: **cero peticiones externas**. La Burbank se sirve desde `public/` con
+  `@font-face` propio y se **precarga** (`rel="preload"`, 35 KB, mismo origen). Se descartó otra
+  vez cargar Google Fonts: bloquearía el render y regresaría los Core Web Vitals de la fase 3.
+  Añadidos `theme-color` y `viewport-fit=cover` para igualar la app en móvil.
+- **L18** Contraste de las superficies NUEVAS, medido y no supuesto: texto sobre panel 15.76:1,
+  apagado sobre panel 7.46:1, caption 7.46:1, hover del conmutador 12.82:1, hover del CTA 14.24:1,
+  acento sobre panel 12.97:1. Todas por encima de 4.5:1 → **ninguna regresión** de lo que ya
+  cumplía (S7).
+- **L19** Comprobado en el HTML generado (no solo en el código): el `preload` del woff2, el
+  `@font-face`, `h1` con `var(--display)`, `theme-color`, `viewport-fit`, y que **la accesibilidad
+  de T2 sigue intacta** (`.saltar`, `main#contenido`, `<caption>`, 2 `scope="col"` + 5
+  `scope="row"`). CSS balanceado 80/80. `node --test` 308/308, `pnpm lint` 0, `pnpm build` 867
+  páginas.
+- **L20** Verificación visual de T3 pendiente del usuario: `pnpm build && pnpm preview` y abrir
+  `localhost:4173/guia-espiritus` (esa es la página ESTÁTICA, la que no se ve en `pnpm dev`).
