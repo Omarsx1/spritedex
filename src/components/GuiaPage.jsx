@@ -52,6 +52,9 @@ export function GuiaPage({ lang }) {
           {seccion.tabla && (
             <div className="guia__tabla-caja">
               <table className="guia__tabla">
+                {/* El titulo viene del modelo compartido: es el mismo que pinta la pagina
+                    estatica, para que las dos caras digan lo mismo. */}
+                {seccion.tabla.titulo && <caption>{seccion.tabla.titulo}</caption>}
                 <thead>
                   <tr>
                     {seccion.tabla.cabeceras.map((cabecera) => (

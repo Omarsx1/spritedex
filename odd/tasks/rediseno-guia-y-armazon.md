@@ -45,20 +45,21 @@ adelante de `main` sin divergencia)
 
 ## Tareas
 
-- **T1** Documento de feature. *(ruta: inline)*
+- **T1** Documento de feature. *(ruta: inline — commit `6d151a4`)*
 - **T2** Accesibilidad estructural del armazón: salto al contenido, `main#contenido` enfocable,
   `:focus-visible` global, `scope` + `<caption>` en la tabla, `aria-label` de las migas por
-  idioma y objetivos de 24×24 px. *(S2, S3 — ruta: inline)*
-- **T3** Sistema visual del armazón: Burbank para la marca y los títulos, escala tipográfica,
-  superficies con profundidad real, ritmo vertical, tabla, FAQ y CTA con estados
-  hover/active/focus. *(S1, S4, S6, S7 — ruta: inline)*
+  idioma y objetivos de 24×24 px. *(S2, S3 — ruta: inline — commit `b07739e`)*
+- **T5** (ADELANTADA) La vista de la app: superficie legible sobre el arte de temporada,
+  tipografía de marca y `<caption>` en la tabla. *(S1, S2, S5 — ruta: inline — commit
+  `__COMMIT_T5__`)*
+- **T3** Sistema visual del armazón estático: Burbank para la marca y los títulos, escala
+  tipográfica, superficies con profundidad real, ritmo vertical, tabla, FAQ y CTA con estados
+  hover/active/focus. *(S1, S4, S6, S7 — ruta: inline — pendiente)*
 - **T4** La guía: índice de secciones con anclas y estructura semántica (`section` +
-  `aria-labelledby`). *(S1 — ruta: inline)*
-- **T5** `GuiaPage.jsx` y el bloque `.guia__*` de `src/styles/index.css` alineados con el armazón
-  nuevo, con las mismas correcciones de accesibilidad. *(S2, S5 — ruta: inline)*
+  `aria-labelledby`). *(S1 — ruta: inline — pendiente)*
 - **T6** Verificación completa: `pnpm test`, `pnpm lint`, `pnpm build`,
   `node scripts/verificar-seo.mjs --local` y comprobación de foco con teclado. *(S3, S6 — ruta:
-  inline)*
+  inline — pendiente)*
 
 Presupuesto de líneas (heurística orientativa, no criterio de aceptación): ~450 líneas
 autoradas entre CSS, plantilla, contenido y pruebas. Es un aviso, no un tope: si la solución
@@ -98,3 +99,35 @@ correcta lo supera, se explica y se sigue. Si el conteo se acerca a 400, se apli
   cambio de no romper el marcado ni el SEO, y porque en móvil reduce mucho el scroll. Convertirlo
   a una rejilla de dos columnas queda como alternativa si el usuario lo pide.
 - **L6** Tareas creadas: 6. T1 es el propio documento.
+- **L7** Corrección de un error mío de diagnóstico, con la evidencia. Afirmé que una visita
+  directa ve la página estática, y eso es cierto en producción —comprobado con
+  `curl -s https://spritedex.gg/guia-espiritus`: sirve el HTML prerenderizado y su único
+  `<script>` es el del JSON-LD, sin bundle—, pero **NO en `pnpm dev`**: Vite hace fallback al SPA
+  y `/guia-espiritus` lo pinta React (`GuiaPage`). El usuario reportó *"lo sigo viendo igual, no
+  sé qué está modificando"* mirando `localhost:5173`, y tenía razón: T2 vive en la página
+  estática y en el dev server no se ve. Debí advertirlo antes de empezar.
+  Para ver la estática en local: `pnpm build && pnpm preview`.
+- **L8** Reordenación: T5 pasa DELANTE de T3 y T4. Razón: el usuario valida con sus ojos en
+  `pnpm dev`, donde solo se ve la vista React; entregar primero T3 (estática) le habría dado otra
+  ronda de "no veo cambios". Además la app es el sistema de diseño de referencia —tiene los
+  tokens, los `@font-face` y temas por temporada—, así que conviene fijar ahí la identidad y
+  luego llevarla al armazón estático.
+- **L9** Diagnóstico visual de la captura del usuario, que resultó ser el defecto de fondo:
+  `.guia` no tenía superficie propia, así que el texto caía **directo sobre el arte de temporada**
+  (la luna, las ramas). El `.guia__lead` va en `--text-muted` (#8b949e): sobre un fondo oscuro
+  cumple, pero sobre la luna clara desaparece. El contraste dependía de qué hubiera detrás.
+  Arreglo: la guía pasa a ser una superficie con degradado casi opaco, borde y sombra.
+  **Sin `backdrop-filter`** a propósito: `.fnm-forest` anima `opacity` en bucle de 9 s
+  (`index.css:8342`) y desenfocar esa capa en cada cuadro es caro en móvil.
+- **L10** Identidad tipográfica de la guía: el título y los `h2` pasan a `--font-fortnite`
+  (Burbank, la misma del hero y del logotipo) en **las dos caras**. Así S5 se cumple de verdad:
+  antes la estática iba a usar Burbank para los títulos y la app usa Outfit, y las dos versiones
+  habrían quedado distintas. Se descarta cargar Outfit o Inter en las páginas estáticas:
+  rompería S6 (cero peticiones externas) y los Core Web Vitals de la fase 3.
+- **L11** También en la vista de la app: `<caption>` en la tabla de rarezas, alimentado por el
+  mismo `tabla.titulo` del modelo compartido que usa la estática. La app tenía `scope` en las
+  celdas pero le faltaba el título.
+- **L12** Verificación de lo observable: `node --test` 305/305, `pnpm lint` con salida 0 (los
+  warnings son previos y de otros archivos), `pnpm build` con 867 páginas y 874 URLs en el
+  sitemap. **La apariencia no la he visto**: la valida el usuario en `localhost:5173`. T5 queda
+  con los checks automáticos en verde pero pendiente de esa mirada.
