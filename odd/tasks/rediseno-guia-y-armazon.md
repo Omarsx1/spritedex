@@ -51,7 +51,7 @@ adelante de `main` sin divergencia)
   idioma y objetivos de 24×24 px. *(S2, S3 — ruta: inline — commit `b07739e`)*
 - **T5** (ADELANTADA) La vista de la app: superficie legible sobre el arte de temporada,
   tipografía de marca y `<caption>` en la tabla. *(S1, S2, S5 — ruta: inline — commit
-  `__COMMIT_T5__`)*
+  `02b462f`)*
 - **T3** Sistema visual del armazón estático: Burbank para la marca y los títulos, escala
   tipográfica, superficies con profundidad real, ritmo vertical, tabla, FAQ y CTA con estados
   hover/active/focus. *(S1, S4, S6, S7 — ruta: inline — pendiente)*
