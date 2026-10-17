@@ -9953,11 +9953,18 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
    dependia de que hubiera detras. El bosque sigue asomando por los bordes.
    Sin backdrop-filter a proposito: .fnm-forest anima opacity en bucle de 9 s y desenfocar esa
    capa en cada cuadro sale caro en movil. */
+
+/* El aire de arriba va en PADDING, nunca en margin. .guia es el primer hijo en flujo de
+   .app-container y el navbar es absoluto respecto a ese contenedor: un margin-top aqui se
+   colapsa hacia fuera, baja el contenedor entero y se lleva el navbar consigo, asi que el
+   contenido queda a la altura de la barra. El padding no colapsa. */
 .guia {
-  width: min(880px, 100% - 28px);
-  /* La barra de navegacion es absoluta y termina a 64 px del borde: la superficie arranca
-     debajo. El inset del notch lo pone .app-container. */
-  margin: 76px auto 88px;
+  padding: 76px clamp(16px, 4vw, 32px) 88px;
+}
+
+.guia__panel {
+  width: min(880px, 100%);
+  margin: 0 auto;
   padding: clamp(24px, 4.6vw, 46px) clamp(18px, 4.6vw, 46px) clamp(34px, 5vw, 54px);
   background: linear-gradient(180deg, rgba(22, 27, 34, 0.95) 0%, rgba(9, 12, 20, 0.96) 100%);
   border: 1px solid var(--border);

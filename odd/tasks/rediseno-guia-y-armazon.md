@@ -6,6 +6,22 @@ adelante de `main` sin divergencia)
 **Estrategia de entrega**: `ask-on-risk` (por defecto)
 **Runner de pruebas**: `node --test` (`pnpm test`), `pnpm lint` (oxlint), `pnpm build`
 
+## Entrega (estrategia elegida por el usuario: cadena a main)
+
+`ask-on-risk` → el usuario eligió **stacked PRs a main**. La cadena se construye desde los
+commits ya hechos (barrera al final, al abrir los PRs): cada corte es autocontenido y aterriza en
+`main` en orden. Cada PR lleva su propio diagrama de dependencias con `📍` en el suyo.
+
+| PR | Rama | Contenido | Depende de | Líneas |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | `feat/a11y-armazon-estatico` | `b07739e` — los 6 fallos WCAG del armazón + `tests/armazon-accesible.test.js` | — | ~262 |
+| 2 | `feat/guia-vista-en-la-app` | `02b462f` — superficie legible, fuente de marca y `<caption>` en la vista de la app | PR 1 (usa `tabla.titulo` del modelo) | ~195 |
+| 3 | `feat/guia-armazon-visual` | T3 — sistema visual del armazón estático | PR 1 | pendiente |
+| 4 | `feat/guia-indice-y-verificacion` | T4 + T6 — índice de secciones y verificación | PR 3 | pendiente |
+
+Fuera de la cadena: `b86f16a` (nota de la tarea del menú) es un pendiente sin relación con el
+rediseño; no debe viajar en ninguno de estos PR.
+
 ## Specs
 
 - **S1** — Petición literal: *"ahora quiero que
@@ -131,3 +147,22 @@ correcta lo supera, se explica y se sigue. Si el conteo se acerca a 400, se apli
   warnings son previos y de otros archivos), `pnpm build` con 867 páginas y 874 URLs en el
   sitemap. **La apariencia no la he visto**: la valida el usuario en `localhost:5173`. T5 queda
   con los checks automáticos en verde pero pendiente de esa mirada.
+- **L13** **Bug propio, encontrado con los ojos del usuario.** Reportó *"el contenido se ve a la
+  misma altura del navbar, mientras que en la página principal se ve bien ubicada"*. Causa: en
+  `App.jsx:1321-1328` el navbar es `position: absolute` **dentro** de `.app-container` (que es
+  `position: relative`), y `.guia` es el primer hijo *en flujo* de ese contenedor. El
+  `margin: 76px auto 88px` que puse en T5 **se colapsa hacia fuera** de `.app-container`: baja el
+  contenedor entero y se lleva el navbar consigo, así que el navbar acaba en y≈94 y el panel en
+  y=76 → el contenido queda *por encima* de la barra. En la home no pasa porque su contenido no
+  abre con un margen que se colapse.
+  Arreglo: `.guia` lleva el aire en `padding: 76px … 88px` (**el padding no colapsa**) y la
+  superficie se muda a `.guia__panel`, un envoltorio nuevo en `GuiaPage`. Antes de T5 no ocurría
+  porque `.guia` usaba `padding: 72px`.
+  Lección para T3: en el armazón estático también se prefiere padding para el aire de arriba.
+- **L14** Guarda de regresión `tests/guia-layout.test.js` (3 casos): fija que `.guia` no declare
+  `margin`, que la superficie viva en `.guia__panel` y que `GuiaPage` envuelva el contenido.
+  Comprobado que **la guarda falla con el código con bug y pasa con el arreglado**, así que
+  discrimina de verdad. Es un fallo de layout: ninguna prueba de contenido lo ve, y montar un
+  navegador headless para una sola propiedad no se justifica.
+- **L15** Verificación tras el arreglo: `node --test` **308/308**, `pnpm lint` 0, `pnpm build`
+  867 páginas. Falta la confirmación visual del usuario.

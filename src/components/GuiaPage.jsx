@@ -42,52 +42,54 @@ export function GuiaPage({ lang }) {
 
   return (
     <main className="guia" aria-labelledby="guia-titulo">
-      <h1 id="guia-titulo" className="guia__titulo" ref={tituloRef} tabIndex={-1}>{titulo}</h1>
-      <p className="guia__lead">{etiquetas.descripcion}</p>
+      <div className="guia__panel">
+        <h1 id="guia-titulo" className="guia__titulo" ref={tituloRef} tabIndex={-1}>{titulo}</h1>
+        <p className="guia__lead">{etiquetas.descripcion}</p>
 
-      {modelo.secciones.map((seccion) => (
-        <section className="guia__seccion" key={seccion.titulo}>
-          <h2 className="guia__h2">{seccion.titulo}</h2>
-          {seccion.bloques.map((bloque, i) => <Bloque bloque={bloque} key={i} />)}
-          {seccion.tabla && (
-            <div className="guia__tabla-caja">
-              <table className="guia__tabla">
-                {/* El titulo viene del modelo compartido: es el mismo que pinta la pagina
-                    estatica, para que las dos caras digan lo mismo. */}
-                {seccion.tabla.titulo && <caption>{seccion.tabla.titulo}</caption>}
-                <thead>
-                  <tr>
-                    {seccion.tabla.cabeceras.map((cabecera) => (
-                      <th scope="col" key={cabecera}>{cabecera}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {seccion.tabla.filas.map((fila) => (
-                    <tr key={fila[0]}>
-                      {/* La primera celda nombra la fila (la rareza): encabezado, no dato. */}
-                      <th scope="row">{fila[0]}</th>
-                      {fila.slice(1).map((celda, i) => <td key={i}>{celda}</td>)}
+        {modelo.secciones.map((seccion) => (
+          <section className="guia__seccion" key={seccion.titulo}>
+            <h2 className="guia__h2">{seccion.titulo}</h2>
+            {seccion.bloques.map((bloque, i) => <Bloque bloque={bloque} key={i} />)}
+            {seccion.tabla && (
+              <div className="guia__tabla-caja">
+                <table className="guia__tabla">
+                  {/* El titulo viene del modelo compartido: es el mismo que pinta la pagina
+                      estatica, para que las dos caras digan lo mismo. */}
+                  {seccion.tabla.titulo && <caption>{seccion.tabla.titulo}</caption>}
+                  <thead>
+                    <tr>
+                      {seccion.tabla.cabeceras.map((cabecera) => (
+                        <th scope="col" key={cabecera}>{cabecera}</th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-      ))}
-
-      <section className="guia__seccion" aria-labelledby="guia-faq">
-        <h2 id="guia-faq" className="guia__h2">{modelo.faq.titulo}</h2>
-        {modelo.faq.entradas.map(([pregunta, respuesta]) => (
-          <details className="guia__faq" key={pregunta}>
-            <summary className="guia__resumen">{pregunta}</summary>
-            <p className="guia__texto">{respuesta}</p>
-          </details>
+                  </thead>
+                  <tbody>
+                    {seccion.tabla.filas.map((fila) => (
+                      <tr key={fila[0]}>
+                        {/* La primera celda nombra la fila (la rareza): encabezado, no dato. */}
+                        <th scope="row">{fila[0]}</th>
+                        {fila.slice(1).map((celda, i) => <td key={i}>{celda}</td>)}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
         ))}
-      </section>
 
-      <p className="guia__nota">{modelo.nota}</p>
+        <section className="guia__seccion" aria-labelledby="guia-faq">
+          <h2 id="guia-faq" className="guia__h2">{modelo.faq.titulo}</h2>
+          {modelo.faq.entradas.map(([pregunta, respuesta]) => (
+            <details className="guia__faq" key={pregunta}>
+              <summary className="guia__resumen">{pregunta}</summary>
+              <p className="guia__texto">{respuesta}</p>
+            </details>
+          ))}
+        </section>
+
+        <p className="guia__nota">{modelo.nota}</p>
+      </div>
     </main>
   );
 }
