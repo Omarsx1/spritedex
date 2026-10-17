@@ -10,6 +10,7 @@ import { ALL_SPRITES } from '../data/spritesData';
 import { modeloGuia } from '../seo/guia.js';
 import { datosGuia } from '../seo/guiaDatos.js';
 import { etiquetasGuia } from '../seo/contenido.js';
+import { estiloBadgeRareza } from '../data/rarezaColores.js';
 
 // Un bloque del modelo: parrafo o lista. El modelo no trae marcado, asi que el renderer decide
 // (aqui, como en el generador estatico).
@@ -22,6 +23,19 @@ function Bloque({ bloque }) {
     );
   }
   return <p className="guia__texto">{bloque.texto}</p>;
+}
+
+// La celda de la rareza llega del modelo como { texto, clave }. Se pinta como el badge de las
+// tarjetas: la forma la pone .rareza-badge y el color el mapa compartido, el mismo que usan ellas.
+function CeldaRareza({ celda }) {
+  if (celda === null || typeof celda !== 'object') return <th scope="row">{celda}</th>;
+  const estilo = estiloBadgeRareza(celda.clave);
+  if (!estilo) return <th scope="row">{celda.texto}</th>;
+  return (
+    <th scope="row">
+      <span className="rareza-badge" style={estilo}>{celda.texto}</span>
+    </th>
+  );
 }
 
 export function GuiaPage({ lang }) {
@@ -42,49 +56,73 @@ export function GuiaPage({ lang }) {
 
   return (
     <main className="guia" aria-labelledby="guia-titulo">
-      <h1 id="guia-titulo" className="guia__titulo" ref={tituloRef} tabIndex={-1}>{titulo}</h1>
-      <p className="guia__lead">{etiquetas.descripcion}</p>
+      <div className="guia__panel">
+        <h1 id="guia-titulo" className="guia__titulo" ref={tituloRef} tabIndex={-1}>{titulo}</h1>
+        <p className="guia__lead">{etiquetas.descripcion}</p>
 
-      {modelo.secciones.map((seccion) => (
-        <section className="guia__seccion" key={seccion.titulo}>
-          <h2 className="guia__h2">{seccion.titulo}</h2>
-          {seccion.bloques.map((bloque, i) => <Bloque bloque={bloque} key={i} />)}
-          {seccion.tabla && (
-            <div className="guia__tabla-caja">
-              <table className="guia__tabla">
-                <thead>
-                  <tr>
-                    {seccion.tabla.cabeceras.map((cabecera) => (
-                      <th scope="col" key={cabecera}>{cabecera}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {seccion.tabla.filas.map((fila) => (
-                    <tr key={fila[0]}>
-                      {/* La primera celda nombra la fila (la rareza): encabezado, no dato. */}
-                      <th scope="row">{fila[0]}</th>
-                      {fila.slice(1).map((celda, i) => <td key={i}>{celda}</td>)}
+        {/* Indice con anclas: los mismos ids que las secciones (ver el modelo compartido), asi
+            que indice y secciones no pueden desincronizarse. */}
+        <nav className="guia__indice" aria-label={modelo.indice}>
+          <ol>
+            {modelo.secciones.concat([modelo.faq]).map((s) => (
+              <li key={s.id}><a href={'#' + s.id}>{s.titulo}</a></li>
+            ))}
+          </ol>
+        </nav>
+
+        {modelo.secciones.map((seccion) => (
+          <section
+            id={seccion.id}
+            className="guia__seccion"
+            aria-labelledby={seccion.id + '-titulo'}
+            key={seccion.id}
+          >
+            <h2 id={seccion.id + '-titulo'} className="guia__h2">{seccion.titulo}</h2>
+            {seccion.bloques.map((bloque, i) => <Bloque bloque={bloque} key={i} />)}
+            {seccion.tabla && (
+              <div className="guia__tabla-caja">
+                <table className="guia__tabla">
+                  {/* El titulo viene del modelo compartido: es el mismo que pinta la pagina
+                      estatica, para que las dos caras digan lo mismo. */}
+                  {seccion.tabla.titulo && <caption>{seccion.tabla.titulo}</caption>}
+                  <thead>
+                    <tr>
+                      {seccion.tabla.cabeceras.map((cabecera) => (
+                        <th scope="col" key={cabecera}>{cabecera}</th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-      ))}
-
-      <section className="guia__seccion" aria-labelledby="guia-faq">
-        <h2 id="guia-faq" className="guia__h2">{modelo.faq.titulo}</h2>
-        {modelo.faq.entradas.map(([pregunta, respuesta]) => (
-          <details className="guia__faq" key={pregunta}>
-            <summary className="guia__resumen">{pregunta}</summary>
-            <p className="guia__texto">{respuesta}</p>
-          </details>
+                  </thead>
+                  <tbody>
+                    {seccion.tabla.filas.map((fila) => (
+                      <tr key={fila[0].texto || fila[0]}>
+                        {/* La primera celda nombra la fila (la rareza): encabezado, no dato. */}
+                        <CeldaRareza celda={fila[0]} />
+                        {fila.slice(1).map((celda, i) => <td key={i}>{celda}</td>)}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
         ))}
-      </section>
 
-      <p className="guia__nota">{modelo.nota}</p>
+        <section
+          id={modelo.faq.id}
+          className="guia__seccion"
+          aria-labelledby={modelo.faq.id + '-titulo'}
+        >
+          <h2 id={modelo.faq.id + '-titulo'} className="guia__h2">{modelo.faq.titulo}</h2>
+          {modelo.faq.entradas.map(([pregunta, respuesta]) => (
+            <details className="guia__faq" key={pregunta}>
+              <summary className="guia__resumen">{pregunta}</summary>
+              <p className="guia__texto">{respuesta}</p>
+            </details>
+          ))}
+        </section>
+
+        <p className="guia__nota">{modelo.nota}</p>
+      </div>
     </main>
   );
 }

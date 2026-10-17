@@ -2,7 +2,7 @@
 // autorreferencia y x-default, locales de Open Graph y la tabla de rutas con portugues.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { porIdioma, ogLocale, ogLocalesAlternos, hreflangsDe, rarezaEnIdioma, numeroEnIdioma } from '../src/seo/idioma.js';
+import { porIdioma, ogLocale, ogLocalesAlternos, hreflangsDe, nombreRareza, numeroEnIdioma } from '../src/seo/idioma.js';
 import { RUTAS, SITIO, alternatesDe } from '../src/seo/rutas.js';
 import { idiomaDeRuta } from '../src/i18n/core.js';
 
@@ -44,9 +44,12 @@ test('la tabla de rutas declara pt-BR en la home y en amigos, y privacidad no ti
 });
 
 test('las raridades en portugues usan la etiqueta de la interfaz y el resto conserva el codigo', () => {
-  assert.equal(rarezaEnIdioma('Mythic', 'pt-BR'), 'Mítico');
-  assert.equal(rarezaEnIdioma('Mythic', 'es'), 'Mythic');
-  assert.equal(rarezaEnIdioma('Mythic', 'en'), 'Mythic');
+  assert.equal(nombreRareza('Mythic', 'pt-BR'), 'MÍTICO');
+  assert.equal(nombreRareza('Mythic', 'es'), 'MÍTICO');
+  assert.equal(nombreRareza('Mythic', 'en'), 'MYTHIC');
+  assert.equal(nombreRareza('Special', 'es'), 'ESPECIAL');
+  // Una rareza que el catalogo no conoce se muestra tal como venga en los datos.
+  assert.equal(nombreRareza('Loot Hacker', 'es'), 'Loot Hacker');
 });
 
 test('los decimales usan coma en portugues y punto en espanol e ingles', () => {

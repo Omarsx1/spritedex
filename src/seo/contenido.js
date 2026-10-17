@@ -6,7 +6,8 @@
 // devuelven HTML, asi que se prueban con node --test.
 
 import { SITIO, TITULO_SITIO } from './rutas.js';
-import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, RUTAS_CONTENIDO } from './plantilla.js';
+import { escapar, migas, documento, ctaHtml, recortar, conIdiomaRuta, TEXTO, RUTAS_CONTENIDO, ABRIR_MAIN, estiloACss } from './plantilla.js';
+import { estiloBadgeRareza } from '../data/rarezaColores.js';
 import { modeloGuia, formatearFecha } from './guia.js';
 import { hreflangsDe, porIdioma } from './idioma.js';
 
@@ -69,12 +70,32 @@ function migasContenido(lang, nombre) {
     { nombre: TEXTO[lang].inicio, href: conIdiomaRuta('/', lang) },
     { nombre: TEXTO[lang].espiritus, href: conIdiomaRuta('/espiritus', lang) },
     { nombre }
-  ]);
+  ], lang);
 }
 
-function tabla(cabeceras, filas) {
-  return '<table class="tabla"><thead><tr>' + cabeceras.map((c) => '<th>' + escapar(c) + '</th>').join('')
-    + '</tr></thead><tbody>' + filas.map((f) => '<tr>' + f.map((c) => '<td>' + escapar(c) + '</td>').join('') + '</tr>').join('')
+// Una celda puede ser un texto suelto o un objeto { texto, clave }: la rareza de la guia se pinta
+// como el badge de las tarjetas, con los colores del mapa compartido.
+function celdaHtml(valor, esEncabezadoDeFila) {
+  const esObjeto = valor !== null && typeof valor === 'object';
+  const texto = escapar(esObjeto ? valor.texto : valor);
+  if (!esEncabezadoDeFila) return '<td>' + texto + '</td>';
+  // El badge va DENTRO del <th scope="row">: la celda sigue siendo el encabezado de la fila (lo que
+  // lee el lector de pantalla) y el badge es solo la piel.
+  const estilo = esObjeto && valor.clave ? estiloBadgeRareza(valor.clave) : null;
+  if (!estilo) return '<th scope="row">' + texto + '</th>';
+  return '<th scope="row"><span class="rareza-badge" style="' + escapar(estiloACss(estilo)) + '">' + texto + '</span></th>';
+}
+
+// Una tabla de datos necesita titulo y encabezados con scope: sin ellos, el lector de pantalla
+// recorre una rejilla de numeros sin saber que es cada columna (criterio 1.3.1). La primera celda
+// de cada fila pasa a ser encabezado de fila cuando nombra la fila, igual que en la vista de la app.
+function tabla(cabeceras, filas, { titulo, primeraEsEncabezado = false } = {}) {
+  return '<table class="tabla">'
+    + (titulo ? '<caption>' + escapar(titulo) + '</caption>' : '')
+    + '<thead><tr>' + cabeceras.map((c) => '<th scope="col">' + escapar(c) + '</th>').join('')
+    + '</tr></thead><tbody>' + filas.map((f) => '<tr>' + f.map((c, i) => (
+      celdaHtml(c, primeraEsEncabezado && i === 0)
+    )).join('') + '</tr>').join('')
     + '</tbody></table>';
 }
 
@@ -86,11 +107,30 @@ function bloqueHtml(bloque) {
   return '<p>' + escapar(bloque.texto) + '</p>';
 }
 
-// Una seccion ocupa una linea (titulo y bloques seguidos) y su tabla, si la lleva, va en la
-// linea siguiente. Es la forma que ya tenia la pagina, que esta indexada.
+// Cada seccion es una region navegable: `aria-labelledby` apunta a su propio encabezado y el id
+// de ese encabezado es tambien el ancla del indice. El id viene del modelo —no se deriva del
+// titulo— para que sea el mismo en los tres idiomas y un enlace con ancla no se rompa al cambiar
+// de version.
 function seccionHtml(seccion) {
-  const linea = '<h2>' + escapar(seccion.titulo) + '</h2>' + seccion.bloques.map(bloqueHtml).join('');
-  return seccion.tabla ? [linea, tabla(seccion.tabla.cabeceras, seccion.tabla.filas)] : [linea];
+  const idTitulo = seccion.id + '-titulo';
+  const contenido = '<h2 id="' + idTitulo + '">' + escapar(seccion.titulo) + '</h2>'
+    + seccion.bloques.map(bloqueHtml).join('')
+    + (seccion.tabla
+      ? tabla(seccion.tabla.cabeceras, seccion.tabla.filas, {
+        titulo: seccion.tabla.titulo,
+        primeraEsEncabezado: true
+      })
+      : '');
+  return '<section id="' + seccion.id + '" aria-labelledby="' + idTitulo + '">' + contenido + '</section>';
+}
+
+// Ocho secciones de lectura larga sin navegacion interna obligan a desplazarse a ciegas. El
+// indice sale de los mismos ids que usan las secciones, asi que no pueden desincronizarse.
+function indiceHtml(modelo) {
+  const enlaces = modelo.secciones.concat([modelo.faq]).map((s) => (
+    '<li><a href="#' + s.id + '">' + escapar(s.titulo) + '</a></li>'
+  )).join('');
+  return '<nav class="indice" aria-label="' + escapar(modelo.indice) + '"><ol>' + enlaces + '</ol></nav>';
 }
 
 // El FAQ visible sale de los mismos pares que el JSON-LD: si divergieran, el marcado diria algo
@@ -147,13 +187,16 @@ export function htmlGuia(datos, lang) {
   jsonLd['@graph'].push(jsonLdFaq(modelo.faq));
   const cuerpo = [
     migasContenido(lang, porIdioma(lang, { es: 'Guía', en: 'Guide', 'pt-BR': 'Guia' })),
-    '<main>',
+    ABRIR_MAIN,
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
-    ...modelo.secciones.flatMap(seccionHtml),
+    indiceHtml(modelo),
+    ...modelo.secciones.map(seccionHtml),
     ctaHtml(lang),
-    '<h2>' + escapar(modelo.faq.titulo) + '</h2>',
+    '<section id="' + modelo.faq.id + '" aria-labelledby="' + modelo.faq.id + '-titulo">',
+    '<h2 id="' + modelo.faq.id + '-titulo">' + escapar(modelo.faq.titulo) + '</h2>',
     faqHtml(modelo.faq.entradas),
+    '</section>',
     '<p class="nota">' + escapar(modelo.nota) + '</p>',
     '</main>'
   ].join('\n');
@@ -164,6 +207,13 @@ const CABECERAS_NOVEDADES = {
   es: ['Lanzamiento', 'Espíritu', 'Familia', 'Variante', 'Probabilidad'],
   en: ['Release', 'Sprite', 'Family', 'Variant', 'Drop'],
   'pt-BR': ['Lançamento', 'Espírito', 'Família', 'Variante', 'Probabilidade']
+};
+
+// Titulo de la tabla de novedades. No repite el h1: describe que hay dentro (criterio 1.3.1).
+const CAPTIONS_NOVEDADES = {
+  es: 'Últimos espíritus añadidos, con su fecha de lanzamiento y su probabilidad',
+  en: 'Latest sprites added, with their release date and drop chance',
+  'pt-BR': 'Últimos espíritos adicionados, com data de lançamento e probabilidade'
 };
 
 export function htmlNovedades(datos, lang) {
@@ -188,12 +238,13 @@ export function htmlNovedades(datos, lang) {
   ]);
   const cuerpo = [
     migasContenido(lang, TEXTO[lang].novedades),
-    '<main>',
+    ABRIR_MAIN,
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
     tabla(
       CABECERAS_NOVEDADES[lang],
-      filas
+      filas,
+      { titulo: CAPTIONS_NOVEDADES[lang] }
     ),
     '<p class="nota">' + escapar(porIdioma(lang, {
       es: 'Las fechas son las registradas en los datos del juego. El detalle completo está en la ficha de cada espíritu.',
@@ -265,7 +316,7 @@ export function htmlAcerca(datos, lang) {
     });
   const cuerpo = [
     migasContenido(lang, TEXTO[lang].acerca),
-    '<main>',
+    ABRIR_MAIN,
     '<h1>' + escapar(etiquetas.titulo.replace(' — Spritedex', '')) + '</h1>',
     '<p class="lead">' + escapar(etiquetas.descripcion) + '</p>',
     '<h2>' + escapar(h.que) + '</h2><p>' + escapar(h.queTexto) + '</p>',

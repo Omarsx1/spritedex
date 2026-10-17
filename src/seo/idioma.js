@@ -5,6 +5,8 @@
 // portugues al espanol; aqui cada texto declara sus idiomas y solo cae a espanol si falta la clave.
 import { IDIOMAS, conIdioma } from '../i18n/core.js';
 import ptBR from '../i18n/locales/pt-BR.js';
+import es from '../i18n/locales/es.js';
+import en from '../i18n/locales/en.js';
 
 export const OG_LOCALE = { es: 'es_MX', en: 'en_US', 'pt-BR': 'pt_BR' };
 
@@ -54,12 +56,17 @@ export function numeroEnIdioma(texto, lang) {
   return lang === 'pt-BR' ? s.replace(/(\d)\.(\d)/g, '$1,$2') : s;
 }
 
-const DICCIONARIOS_PT = { 'pt-BR': ptBR };
+const DICCIONARIOS_RAREZA = { es, en, 'pt-BR': ptBR };
 
-// Las raridades llegan como codigo del juego ('Mythic', 'Special'). En portugues se usa la etiqueta
-// de la interfaz; en espanol e ingles se conserva el codigo, como ya hacia la pagina.
-export function rarezaEnIdioma(codigo, lang) {
-  const diccionario = DICCIONARIOS_PT[lang];
-  if (!diccionario || !codigo) return codigo;
-  return diccionario['rareza.' + String(codigo).toLowerCase() + '.etiqueta'] || codigo;
+// La etiqueta de rareza que VE el usuario, en mayusculas: la misma clave que ya usan los badges de
+// las tarjetas de la app (`rareza.<clase>.nombre`).
+//
+// Antes esta funcion conservaba el codigo del juego ('Special') en espanol e ingles, y solo
+// traducía en portugues. Eso hacia que la guia y las tarjetas dijeran cosas distintas de la misma
+// rareza en la misma pantalla: la tabla decia 'Special' y el badge de la tarjeta 'ESPECIAL'.
+export function nombreRareza(codigo, lang) {
+  if (!codigo) return codigo;
+  const clave = 'rareza.' + String(codigo).trim().toLowerCase() + '.nombre';
+  const diccionario = DICCIONARIOS_RAREZA[lang] || DICCIONARIOS_RAREZA.es;
+  return diccionario[clave] || codigo;
 }

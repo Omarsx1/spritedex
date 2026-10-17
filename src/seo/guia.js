@@ -4,7 +4,7 @@
 // (src/seo/contenido.js, que lo renderiza) y la vista dentro de la aplicacion. Aqui solo hay
 // datos: ni <h2>, ni class, ni escapado. Cada renderer decide como se pinta. Sin dependencias:
 // se prueba con node --test.
-import { porIdioma, rarezaEnIdioma, numeroEnIdioma } from './idioma.js';
+import { porIdioma, nombreRareza, numeroEnIdioma } from './idioma.js';
 
 // La fecha va en el texto y en el idioma de la pagina: "4 de octubre de 2026" / "October 4, 2026".
 export function formatearFecha(iso, lang) {
@@ -75,6 +75,7 @@ function copia(lang, datos, fraseDrop, fecha) {
       costoTexto: 'Summoning a sprite costs Stardust, and the amount depends on the sprite. This collection has ' + datos.costos + ' different costs.',
       coleccion: 'Tracking the collection',
       coleccionTexto: 'Spritedex keeps the whole list with family, variant, rarity and drop chance, marks what you own, levels from 1 to 5, compares with friends and exports a card to share. No account and no install: everything is stored in your browser.',
+      indice: 'Sections',
       faq: 'Frequent questions',
       datos: 'Data revised on ' + fecha + ' from the game and community sources. It can contain mistakes: if you see one, it is worth telling us.'
     };
@@ -95,6 +96,7 @@ function copia(lang, datos, fraseDrop, fecha) {
       costoTexto: 'Invocar um espírito custa Poeira Estelar, e a quantidade depende do espírito. Nesta coleção há ' + datos.costos + ' custos diferentes.',
       coleccion: 'Acompanhar a coleção',
       coleccionTexto: 'O Spritedex guarda a lista completa com família, variante, raridade e probabilidade, marca o que você tem, os níveis do 1 ao 5, compara com amigos e exporta um cartão para compartilhar. Sem conta e sem instalar: tudo fica guardado no seu navegador.',
+      indice: 'Seções',
       faq: 'Perguntas frequentes',
       datos: 'Dados revisados em ' + fecha + ' a partir do jogo e de fontes da comunidade. Podem ter erros: se você encontrar algum, vale avisar.'
     };
@@ -114,6 +116,7 @@ function copia(lang, datos, fraseDrop, fecha) {
     costoTexto: 'Invocar un espíritu cuesta Polvo Estelar, y la cantidad depende del espíritu. En esta colección hay ' + datos.costos + ' costos distintos.',
     coleccion: 'Seguir la colección',
     coleccionTexto: 'El Spritedex tiene la lista completa con familia, variante, rareza y probabilidad, marca lo que tienes, los niveles del 1 al 5, compara con amigos y exporta una tarjeta para compartir. Sin cuenta y sin instalar: todo se guarda en tu navegador.',
+    indice: 'Secciones',
     faq: 'Preguntas frecuentes',
     datos: 'Datos revisados el ' + fecha + ' a partir del juego y de fuentes de la comunidad. Pueden tener errores: si ves uno, merece la pena avisar.'
   };
@@ -121,6 +124,11 @@ function copia(lang, datos, fraseDrop, fecha) {
 
 // El cuerpo de la guia en un idioma: secciones con titulo y bloques (parrafos, listas, tablas),
 // el FAQ y la nota de revision. Los pares del FAQ son los mismos que marca el JSON-LD.
+//
+// Cada seccion lleva un `id` ESTABLE e independiente del idioma ('guia-rarezas' en es, en y
+// pt-BR). De ahi salen las anclas del indice y el `aria-labelledby` que convierte cada seccion en
+// una region navegable: si el id cambiara con el idioma, cualquier enlace compartido con ancla
+// dejaria de funcionar al cambiar de version.
 export function modeloGuia(lang, datos) {
   const fecha = formatearFecha(datos.fecha, lang);
   // Hay drops de una entre cien mil: decir "del 0.00001%" es cierto pero no se lee. Por debajo
@@ -136,27 +144,40 @@ export function modeloGuia(lang, datos) {
   const parrafo = (texto) => ({ tipo: 'parrafo', texto });
   return {
     lang,
+    indice: t.indice,
     secciones: [
-      { titulo: t.que, bloques: [parrafo(t.queTexto)] },
-      { titulo: t.familias, bloques: [parrafo(t.familiasTexto)] },
+      { id: 'guia-que', titulo: t.que, bloques: [parrafo(t.queTexto)] },
+      { id: 'guia-familias', titulo: t.familias, bloques: [parrafo(t.familiasTexto)] },
       {
+        id: 'guia-rarezas',
         titulo: t.rarezas,
         bloques: [parrafo(t.rarezasTexto)],
         tabla: {
+          titulo: porIdioma(lang, {
+            es: 'Espíritus por rareza en la colección actual',
+            en: 'Sprites per rarity in the current collection',
+            'pt-BR': 'Espíritos por raridade na coleção atual'
+          }),
           cabeceras: porIdioma(lang, {
             es: ['Rareza', 'Espíritus'],
             en: ['Rarity', 'Sprites'],
             'pt-BR': ['Raridade', 'Espíritos']
           }),
-          filas: datos.porRareza.map((r) => [rarezaEnIdioma(r.nombre, lang), r.n])
+          // La celda de la rareza viaja como { texto, clave }: el texto ya es la etiqueta localizada
+          // en mayusculas —la misma que muestran los badges de las tarjetas— y la clave es el codigo
+          // del juego, de donde cada renderer saca los colores del badge con el mapa compartido.
+          filas: datos.porRareza.map((r) => [
+            { texto: nombreRareza(r.nombre, lang), clave: r.nombre },
+            r.n
+          ])
         }
       },
-      { titulo: t.conseguir, bloques: [parrafo(t.conseguirTexto)] },
-      { titulo: t.niveles, bloques: [parrafo(t.nivelesTexto)] },
-      { titulo: t.costo, bloques: [parrafo(t.costoTexto)] },
-      { titulo: t.coleccion, bloques: [parrafo(t.coleccionTexto)] }
+      { id: 'guia-conseguir', titulo: t.conseguir, bloques: [parrafo(t.conseguirTexto)] },
+      { id: 'guia-niveles', titulo: t.niveles, bloques: [parrafo(t.nivelesTexto)] },
+      { id: 'guia-costo', titulo: t.costo, bloques: [parrafo(t.costoTexto)] },
+      { id: 'guia-coleccion', titulo: t.coleccion, bloques: [parrafo(t.coleccionTexto)] }
     ],
-    faq: { titulo: t.faq, entradas: preguntas(lang, datos) },
+    faq: { id: 'guia-faq', titulo: t.faq, entradas: preguntas(lang, datos) },
     nota: t.datos
   };
 }

@@ -93,3 +93,30 @@ test('un nombre con etiquetas en las novedades se escapa', () => {
   assert.ok(!html.includes('<script>alert(1)</script>'));
   assert.ok(html.includes('&lt;script&gt;'));
 });
+
+test('la tabla de rarezas pinta cada rareza como el badge de las tarjetas', () => {
+  for (const lang of ['es', 'en', 'pt-BR']) {
+    const html = htmlGuia(guia, lang);
+    // El badge lleva el fondo y el color de SU rareza, tomados del mapa compartido.
+    assert.ok(html.includes('class="rareza-badge"'), lang + ': falta el badge de rareza');
+    for (const [rareza, fondo, color] of [
+      ['Rare', '#00458a', '#00fffb'],
+      ['Legendary', '#8a3c1e', '#fbc363'],
+      ['Epic', '#4c197b', '#ff6bff'],
+      ['Mythic', '#7c5d26', '#fff0a6']
+    ]) {
+      assert.ok(
+        html.includes('background:#' + fondo.slice(1) + ';color:' + color),
+        lang + ': el badge de ' + rareza + ' deberia llevar su fondo y su color'
+      );
+    }
+    // Special no lleva fondo plano: lleva la banda de arcoiris de las tarjetas y el texto negro.
+    assert.ok(html.includes('background:linear-gradient(15deg'), lang + ': Special deberia llevar la banda de arcoiris');
+    assert.ok(
+      /rareza-badge" style="background:linear-gradient\(15deg[^"]*color:#000"/.test(html),
+      lang + ': la banda de Special deberia llevar el texto negro'
+    );
+    // El badge va dentro del encabezado de fila: el nombre no puede haber sustituido a la celda.
+    assert.match(html, /<th scope="row"><span class="rareza-badge"/);
+  }
+});
