@@ -6,11 +6,18 @@
 //   node scripts/verificar-seo.mjs https://spritedex.gg --todas   (las 569 URLs del sitemap)
 //
 // Comprueba: robots.txt, sitemap, y por cada pagina su estado, canonical autorreferente,
-// titulo, h1 y hreflang. Ademas sigue los enlaces de pagina y las imagenes para cazar rotos.
+// titulo, h1 y hreflang. Ademas sigue los enlaces de pagina y las imagenes para cazar rotos, y
+// verifica la accesibilidad basica del armazon (enlace de salto y destino enfocable).
 // En modo --local no abre puertos: lee dist/ directamente y compara contra el dominio real,
 // que es el que aparece en los canonical.
 import fs from 'node:fs';
 import path from 'node:path';
+import { IDIOMAS, conIdioma } from '../src/i18n/core.js';
+
+// Los idiomas con version propia mas x-default. Se DERIVA de IDIOMAS en vez de escribirlo a mano:
+// cuando se sumo pt-BR, el numero fijo se quedo en 3 y el verificador empezo a dar 22 fallos
+// falsos que tapaban cualquier regresion real.
+const HREFLANGS_ESPERADOS = IDIOMAS.length + 1;
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DIST = path.join(ROOT, 'dist');
@@ -33,8 +40,10 @@ const ESPECIALES = ['/', '/en', '/amigos', '/en/amigos', '/espiritus', '/en/espi
   '/acerca', '/en/acerca', '/privacidad'];
 
 // Rutas que sirve la SPA: su contenido (incluido el h1) lo pinta React en el navegador, asi que
-// no se les puede exigir h1 en el HTML. El resto de la fase 1 y 2 si lo lleva escrito.
-const RUTAS_APP = new Set(['/', '/en', '/amigos', '/en/amigos']);
+// no se les puede exigir h1 en el HTML, ni el salto al contenido, que es del armazon estatico.
+// Se DERIVAN de IDIOMAS por la misma razon que el numero de hreflang: la lista escrita a mano se
+// quedo sin pt-BR cuando se sumo el idioma.
+const RUTAS_APP = new Set(IDIOMAS.flatMap((lang) => [conIdioma('/', lang), conIdioma('/amigos', lang)]));
 
 const fallos = [];
 let revisadas = 0;
@@ -83,7 +92,16 @@ async function revisarPagina(ruta) {
   if (!RUTAS_APP.has(ruta) && h1 !== 1) fallos.push(ruta + ': ' + h1 + ' h1 (deberia ser 1)');
   if (!canon) fallos.push(ruta + ': sin canonical');
   else if (canon.replace(/\/$/, '') !== esperado.replace(/\/$/, '')) fallos.push(ruta + ': canonical ' + canon + ' (esperaba ' + esperado + ')');
-  if (ruta !== '/privacidad' && hreflang !== 3) fallos.push(ruta + ': ' + hreflang + ' hreflang (deberian ser 3)');
+  if (ruta !== '/privacidad' && hreflang !== HREFLANGS_ESPERADOS) {
+    fallos.push(ruta + ': ' + hreflang + ' hreflang (deberian ser ' + HREFLANGS_ESPERADOS + ')');
+  }
+  // Accesibilidad del armazon, criterio 2.4.1. Se comprueba aqui para que la pagina PUBLICADA
+  // tambien lo verifique y no solo las pruebas locales: el salto al contenido y su destino.
+  // Quedan fuera las rutas de la SPA (sin armazon) y /privacidad (archivo suelto).
+  if (!RUTAS_APP.has(ruta) && ruta !== '/privacidad') {
+    if (!html.includes('class="saltar" href="#contenido"')) fallos.push(ruta + ': sin enlace de salto al contenido');
+    if (!/<main id="contenido"[^>]*tabindex="-1"/.test(html)) fallos.push(ruta + ': el main no es destino enfocable del salto');
+  }
   const enlaces = [...new Set([...html.matchAll(/href="(\/[^"#]*?)"/g)].map((m) => m[1]))]
     .filter((h) => !path.extname(h) && !h.includes('?'));
   const imagenes = [...new Set([...html.matchAll(/src="(\/[^"]+)"/g)].map((m) => m[1]))];

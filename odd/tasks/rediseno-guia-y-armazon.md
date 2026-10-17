@@ -72,10 +72,18 @@ rediseño; no debe viajar en ninguno de estos PR.
   tipográfica, superficies con profundidad real, ritmo vertical, tabla, FAQ y CTA con estados
   hover/active/focus. *(S1, S4, S6, S7 — ruta: inline — hecho)*
 - **T4** La guía: índice de secciones con anclas y estructura semántica (`section` +
-  `aria-labelledby`). *(S1 — ruta: inline — pendiente)*
+  `aria-labelledby`). *(S1 — ruta: inline — hecho, commit `264ac9a`)*
 - **T6** Verificación completa: `pnpm test`, `pnpm lint`, `pnpm build`,
   `node scripts/verificar-seo.mjs --local` y comprobación de foco con teclado. *(S3, S6 — ruta:
-  inline — pendiente)*
+  inline — hecho)*
+
+### Fuera del plan original, pedido durante el trabajo
+
+- **Logo de la navbar**: el usuario preguntó si podía llevar también al inicio. Se arregló en
+  `501fa29` (era una violación de convención y su nombre accesible no describía ninguna
+  navegación). Es una feature distinta: va en su propio corte de la cadena.
+- **Colores de rareza en la tabla**: el usuario pidió que las rarezas tuvieran los colores de las
+  tarjetas, y señaló que Special es arcoíris. Se resolvió en `264ac9a`, junto con T4.
 
 Presupuesto de líneas (heurística orientativa, no criterio de aceptación): ~450 líneas
 autoradas entre CSS, plantilla, contenido y pruebas. Es un aviso, no un tope: si la solución
@@ -191,3 +199,22 @@ correcta lo supera, se explica y se sigue. Si el conteo se acerca a 400, se apli
   páginas.
 - **L20** Verificación visual de T3 pendiente del usuario: `pnpm build && pnpm preview` y abrir
   `localhost:4173/guia-espiritus` (esa es la página ESTÁTICA, la que no se ve en `pnpm dev`).
+- **L21** **El verificador estaba roto y tapaba todo.** `scripts/verificar-seo.mjs` exigía
+  `hreflang === 3`, un número escrito a mano que quedó obsoleto cuando se sumó pt-BR (ahora son
+  es, en, pt-BR y x-default = 4). Daba **22 fallos falsos** en cada pasada. Demostrado que era
+  previo a este trabajo: con `git stash` + rebuild, el build base daba exactamente los mismos 22.
+  Arreglo: `HREFLANGS_ESPERADOS` se **deriva de `IDIOMAS`**, así que sumar un idioma ya no puede
+  volver a dejar el número atrás. Esto importa porque sin un verificador fiable, T6 no verifica.
+- **L22** Segundo número obsoleto por la misma causa: `RUTAS_APP` listaba a mano `'/', '/en',
+  '/amigos', '/en/amigos'` y **se había quedado sin pt-BR**. También se deriva de `IDIOMAS` con
+  `conIdioma`. (Se detectó al escribir el chequeo de accesibilidad, que si no habría dado falsos
+  fallos en `/pt-br`.)
+- **L23** El verificador ahora comprueba también **accesibilidad en lo publicado** (criterio
+  2.4.1): que cada página prerenderizada traiga el enlace de salto y que su `main` sea destino
+  enfocable. Antes eso solo lo miraban las pruebas locales; ahora también la web servida. Quedan
+  fuera las rutas de la SPA (no tienen armazón) y `/privacidad` (archivo suelto).
+- **L24** **T6 cerrado.** `node --test` **318/318**, `pnpm lint` salida 0, `pnpm build` 867
+  páginas y 874 URLs en el sitemap, y el verificador **sin fallos en las 868 páginas del sitemap**
+  (871 enlaces y 286 imágenes seguidas, ninguna rota). La comprobación de foco con teclado que
+  pedía el plan no se puede automatizar aquí: queda como el punto que el usuario valida con sus
+  ojos en `localhost:5173` y en `pnpm preview`.
