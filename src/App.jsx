@@ -45,7 +45,7 @@ import {
   saveLastConnectedFriendCode,
   getLastConnectedFriendCode
 } from './utils/friendCode';
-import { buildShareUrl } from './utils/shareUrl';
+import { buildShareUrl, baseCompartir } from './utils/shareUrl';
 import { getLang, conIdioma, rutaSinIdioma, rutaDeArranque } from './i18n';
 import { aplicarSeoRuta } from './seo/head.js';
 import { etiquetasGuia } from './seo/contenido.js';
@@ -1260,7 +1260,7 @@ export function App() {
           /* El enlace se arma sobre /amigos a proposito: generateShareUrl usa la ruta actual y
              aqui estamos en /compartir, asi que el enlace mandaria a esta misma pantalla en vez
              de a la coleccion de quien lo recibe. */
-          enlaceColeccion={buildShareUrl(window.location.origin + conIdioma('/amigos', getLang()), myShareToken, myFriendCode || 'SDEX-0000')}
+          enlaceColeccion={buildShareUrl(baseCompartir(conIdioma('/amigos', getLang())), myShareToken, myFriendCode || 'SDEX-0000')}
           onBack={() => irA('/')}
         />
       </div>
