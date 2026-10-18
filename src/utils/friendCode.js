@@ -1,7 +1,7 @@
 import { getSupabase, isSupabaseConfigured } from './supabase';
 import { safeStorage } from './safeStorage';
 import { sinPerfil } from './mergeCollections';
-import { buildShareUrl, normalizeFriendCode } from './shareUrl.js';
+import { buildShareUrl, baseCompartir, normalizeFriendCode } from './shareUrl.js';
 
 // Se reexportan para no cambiar los sitios que ya las importaban desde aqui.
 export { buildShareUrl, normalizeFriendCode };
@@ -190,7 +190,7 @@ export function subscribeToFriendCollection(friendUserId, onUpdate) {
 
 
 export function generateShareUrl(token, friendCode) {
-  return buildShareUrl(window.location.origin + window.location.pathname, token, friendCode);
+  return buildShareUrl(baseCompartir(window.location.pathname), token, friendCode);
 }
 
 /**

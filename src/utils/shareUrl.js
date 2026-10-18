@@ -4,6 +4,17 @@
 // Con token, el enlace concede SOLO ver la coleccion y se puede revocar rotandolo.
 // Sin token (usuario que aun no tiene fila en la nube) cae al enlace por codigo.
 
+import { DOMINIO_PUBLICO } from './dominioPublico.js';
+
+/**
+ * Base de cualquier enlace que se comparte. Siempre el dominio nuevo: el origen donde
+ * este el usuario no manda, porque quien entra por el viejo dominio de Vercel tambien
+ * comparte spritedex.gg.
+ */
+export function baseCompartir(pathname = '/') {
+  return DOMINIO_PUBLICO + pathname;
+}
+
 /**
  * Normalizes friend code input:
  * - Extracts code from full URLs (?code=... or ?friend=...)

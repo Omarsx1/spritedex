@@ -2,50 +2,29 @@
 // Inspirado en el diseño 'CHAPTER 7 | SEASON 4: OVERRIDE' de Fortnite
 // Extension explicita: Vite resuelve igual, y asi el modulo tambien carga en Node
 // (el runner de pruebas nativo no completa extensiones).
-import { generateQRMatrix } from './qrGenerator.js';
 import { t } from '../i18n/texto.js';
 import { pickName } from './spriteName.js';
 import { rutaAssetEspiritu } from './spriteAssets.js';
 import { isFortnitemaresActive } from '../config/seasonalEvent.js';
+import { DOMINIO_PUBLICO, HOST_PUBLICO } from './dominioPublico.js';
 
-// Caché en memoria de matriz QR para evitar recalcular polinomios en cada exportación
-let cachedQRMatrix = null;
-function getCachedQR(url) {
-  if (!cachedQRMatrix) {
-    cachedQRMatrix = generateQRMatrix(url);
-  }
-  return cachedQRMatrix;
-}
-
-// Dominio del QR de la captura. Se usa el dominio donde esta el usuario para que el QR
-// apunte siempre a algo vivo (hoy el viejo, mañana spritedex.gg, sin romper nada durante
-// la migracion) y solo se cae al canonico cuando el origen no es publico: local, tunel de
-// desarrollo o preview de Vercel.
-const DOMINIO_CANONICO = 'https://spritedex.gg/';
-const ORIGENES_PUBLICOS = [
-  'https://spritedex.gg',
-  'https://www.spritedex.gg',
-  'https://spritedex-two.vercel.app'
-];
+// Dominio del pie de la captura. La migracion ya termino: la firma derecha apunta SIEMPRE
+// a spritedex.gg, entre por donde entre el usuario. Antes se seguia el origen publico, y
+// quien llegaba por el viejo dominio de Vercel compartia ese dominio viejo.
+const DOMINIO_CANONICO = DOMINIO_PUBLICO + '/';
 export function dominioParaCompartir() {
-  try {
-    const origen = window.location.origin;
-    if (ORIGENES_PUBLICOS.includes(origen)) return origen + '/';
-  } catch {}
   return DOMINIO_CANONICO;
 }
 
 /**
- * Texto que codifica el QR del pie: SOLO el dominio pelado ('spritedex.gg'), sin esquema,
- * sin barra final y sin 'www.'. La URL completa costaba 20 caracteres (version 2, 25
- * modulos); el dominio pelado son 12 (version 1, 21 modulos): 4 modulos menos de lado con el
- * mismo EC M. La leyenda del pie sigue mostrando el dominio con su esquema.
+ * Dominio pelado que se imprime en el pie ('spritedex.gg'), sin esquema, sin barra final
+ * y sin 'www.'. La lona ya no lleva QR: el enlace va como texto a la derecha del pie.
  */
 export function textoParaQR(url = dominioParaCompartir()) {
   try {
     return new URL(url).host.replace(/^www[.]/, '');
   } catch {
-    return DOMINIO_CANONICO.replace(/^https?:[/]{2}/, '').replace(/[/].*$/, '').replace(/^www[.]/, '');
+    return HOST_PUBLICO;
   }
 }
 
@@ -56,66 +35,6 @@ export function textoParaQR(url = dominioParaCompartir()) {
  */
 export function rutaFondoPlantilla() {
   return isFortnitemaresActive() ? '/bac_mares.webp' : '/background.webp';
-}
-
-// Renderiza un código QR moderno con estilo de puntos/círculos y acentos cibernéticos (100% escaneable)
-function drawModernDotQR(ctx, qrX, qrY, qrSize, url = dominioParaCompartir()) {
-  try {
-    const qr = getCachedQR(url);
-    const count = qr.getModuleCount();
-    const cellSize = qrSize / count;
-
-    // 1. Dibuja los 3 patrones de detección de posición con geometría ISO estándar para
-    // reconocimiento instantáneo de cámara, pero con las esquinas redondeadas: mismo
-    // ratio 1:1:3:1:1 (el que leen los escáneres), acabado moderno.
-    const drawFinderPattern = (startX, startY) => {
-      const lado = 7 * cellSize;
-      // Anillo exterior 7x7 en cian neón
-      ctx.fillStyle = '#00F0E8';
-      roundRect(ctx, startX, startY, lado, lado, cellSize * 1.6);
-      ctx.fill();
-      // Espacio intermedio 5x5 oscuro
-      ctx.fillStyle = '#060a14';
-      roundRect(ctx, startX + cellSize, startY + cellSize, 5 * cellSize, 5 * cellSize, cellSize * 1.1);
-      ctx.fill();
-      // Núcleo central 3x3 en cian neón
-      ctx.fillStyle = '#00F0E8';
-      roundRect(ctx, startX + 2 * cellSize, startY + 2 * cellSize, 3 * cellSize, 3 * cellSize, cellSize * 0.7);
-      ctx.fill();
-    };
-
-    drawFinderPattern(qrX, qrY); // Superior izquierdo
-    drawFinderPattern(qrX + (count - 7) * cellSize, qrY); // Superior derecho
-    drawFinderPattern(qrX, qrY + (count - 7) * cellSize); // Inferior izquierdo
-
-    // 2. Dibuja todos los módulos de datos como puntos circulares de alto contraste en un solo pase
-    const dotRadius = cellSize * 0.46;
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-
-    for (let r = 0; r < count; r++) {
-      for (let c = 0; c < count; c++) {
-        // Excluye las 3 áreas de los patrones de posición (7x7 en cada esquina)
-        const isFinder =
-          (r < 7 && c < 7) ||
-          (r < 7 && c >= count - 7) ||
-          (r >= count - 7 && c < 7);
-
-        if (isFinder) continue;
-
-        if (qr.isDark(r, c)) {
-          const centerX = qrX + c * cellSize + cellSize / 2;
-          const centerY = qrY + r * cellSize + cellSize / 2;
-
-          ctx.moveTo(centerX + dotRadius, centerY);
-          ctx.arc(centerX, centerY, dotRadius, 0, Math.PI * 2);
-        }
-      }
-    }
-    ctx.fill();
-  } catch (err) {
-    console.warn('Error rendering modern dot QR on canvas:', err);
-  }
 }
 
 // Caché global en memoria para acelerar la generación instantánea de imágenes
@@ -1120,26 +1039,12 @@ async function renderGlitchOverrideTemplate({
   const anchoDiseno = isSquare ? width : 1080;
 
   // El pie reserva sitio proporcional al formato: la firma (ID - nombre) a la izquierda y
-  // la marca a la derecha, en una sola linea y con el mismo tamano. La version con
-  // recuadro y esquinas cargaba la zona (el QR ya tiene esquinas y el pie su marca), asi
-  // que el pie es tipografia limpia con aire alrededor. Todo lo del pie
+  // el dominio a la derecha, en una sola linea y con el mismo tamano. Todo lo del pie
   // escala junto.
   const escFooter = anchoDiseno / 1200;
   const firmaAlto = Math.round(39 * escFooter);
   const baseFila = Math.round(60 * escFooter);
 
-  // El QR ya no vive en la grilla: baja al pie, a la esquina inferior derecha que ocupaba
-  // el hashtag. Su tamano manda en el alto de la banda, porque el pie tiene que dar sitio
-  // entero al codigo, a su hueco HUD y al dominio de debajo.
-  //
-  // El QR se mide con la MISMA vara que la ficha: su tamano se deriva del ANCHO DE FICHA
-  // (cellW), no del lienzo. Medido contra el ancho de diseno quedaba desproporcionado en
-  // los dos extremos: mas grande que una ficha en las cuadriculas densas y perdido en las
-  // lonas de 3 espiritus, donde la ficha es el triple de ancha.
-  //
-  // El ancho de celda no depende del pie, asi que se calcula aqui: es lo unico que el QR
-  // necesita para medirse, y la banda del pie se deriva despues de su bloque.
-  //
   // Con pocos espiritus la celda se inflaba (2 columnas de 504 px) y las fichas salian
   // gigantes al lado del titulo. En vertical el ancho de celda lleva techo: como mucho el
   // que usa una cuadricula tipica de 4 columnas, que es el tamano con el que se ve la
@@ -1148,29 +1053,9 @@ async function renderGlitchOverrideTemplate({
   let cellW = Math.floor((anchoDiseno - paddingX * 2) / cols);
   if (!isSquare) cellW = Math.min(cellW, CELDA_MAX_VERTICAL);
 
-  // Regla dura de escaneo: px por modulo >= 4. El objetivo acompana a la ficha (0,35 del
-  // ancho de celda: 56 px con fichas de 160, 94 con fichas de 270) y el techo evita que el
-  // codigo domine el pie. El PISO manda SIEMPRE: si la cuadricula es tan densa que el
-  // objetivo cae por debajo del minimo escaneable, el QR se queda en el piso (86 px con la
-  // matriz de 21 modulos) aunque quede mas ancho que una ficha. Eso es fisica del QR, no
-  // diseno.
-  const escalaPie = Math.min(1.15, escFooter);
-  const QR_MIN_PX_POR_MODULO = 4;
-  const QR_MAX_PX = 140;
-  const qrPieModulos = getCachedQR(textoParaQR()).getModuleCount();
-  const qrPiePiso = Math.ceil(qrPieModulos * QR_MIN_PX_POR_MODULO) + 2;
-  const qrPieTecho = Math.min(Math.round(cellW * 0.45), QR_MAX_PX);
-  const qrPieObjetivo = Math.round(cellW * 0.35);
-  const qrPieSize = Math.max(qrPiePiso, Math.min(qrPieTecho, qrPieObjetivo));
-  const qrPieCaptionAlto = Math.round(18 * escalaPie);
-  const qrPieHueco = Math.round(qrPieSize * 0.12);
-  const qrPieMargen = Math.round(16 * escFooter);
-  const qrPieCajaW = qrPieSize + qrPieHueco * 2;
-  const qrPieCajaH = qrPieSize + qrPieCaptionAlto + qrPieHueco * 2;
-  // La banda del pie se DERIVA del bloque del QR: codigo + linea del dominio + hueco de las
-  // esquinas HUD + margenes. El suelo proporcional al formato solo evita un pie raquitico
-  // cuando el bloque del QR es mas bajo que la tipografia del pie.
-  const footerH = Math.max(Math.round(148 * escFooter), qrPieCajaH + qrPieMargen * 2);
+  // La banda del pie es solo tipografia: firma a la izquierda y dominio a la derecha. Ya no
+  // hay bloque de QR que la infle, asi que el alto es proporcional al formato.
+  const footerH = Math.round(148 * escFooter);
 
   // En temporada el encabezado lleva el logo real y necesita su sitio. Se calcula con las
   // MISMAS proporciones con las que luego se dibuja, para que nunca tape la capsula ni la
@@ -1494,38 +1379,10 @@ async function renderGlitchOverrideTemplate({
   const startX = (width - gridW) / 2;
   const startY = headerH + Math.max(8, Math.floor((availH - gridH) / 2));
 
-  // 3.A. QR DEL PIE: esquina inferior derecha, el sitio del hashtag. Se dibuja ANTES de la
-  // cuadricula para que, si la ultima fila llega al borde derecho, la ficha quede por encima
-  // del codigo (que vive siempre por debajo de la banda del pie) y este quede intacto.
+  // 3.A. PIE: la firma a la izquierda y el dominio a la derecha. Todo el pie se dibuja al
+  // final, despues de la cuadricula; aqui solo se fija el margen lateral que comparte con
+  // las fichas.
   const footerPadX = Math.round(width * 0.05);
-  const qrCajaX = width - footerPadX - qrPieSize - qrPieHueco;
-  const qrCajaY = height - qrPieMargen - qrPieCajaH;
-  const qrInnerX = qrCajaX + qrPieHueco;
-  const qrInnerY = qrCajaY + qrPieHueco;
-  const qrSize = qrPieSize;
-  const qrCentroX = qrInnerX + qrSize / 2;
-  // El dominio de debajo entra siempre: el alto del pie se reserva con qrPieCajaH, que ya
-  // cuenta esa linea, asi que el codigo nunca se queda sin su texto de referencia.
-  const qrConTexto = qrPieCajaH + qrPieMargen * 2 <= footerH + 1;
-
-  // El codigo va desnudo sobre la plantilla: ni fundido de fondo ni esquinas HUD. Todo lo que
-  // se pinte aqui compite con la zona de escaneo, asi que solo baja el QR.
-  ctx.save();
-  const targetUrl = dominioParaCompartir();
-  // El codigo lleva el dominio pelado; la leyenda de abajo sigue mostrando el dominio entero
-  // (hostQr sale de targetUrl), asi que el ojo lee 'spritedex.gg' y el escaner lo completa.
-  drawModernDotQR(ctx, qrInnerX, qrInnerY, qrSize, textoParaQR(targetUrl));
-
-  if (qrConTexto) {
-    let hostQr = 'spritedex.gg';
-    try { hostQr = new URL(targetUrl).host.replace(/^www[.]/, ''); } catch {}
-    ctx.textAlign = 'center';
-    ctx.letterSpacing = '1.5px';
-    ctx.font = `900 ${Math.round(10 * escalaPie)}px "Outfit", "Inter", sans-serif`;
-    ctx.fillStyle = '#00F0E8';
-    ctx.fillText(hostQr, qrCentroX, qrInnerY + qrSize + Math.round(15 * escalaPie));
-  }
-  ctx.restore();
 
   // Talla unica de nombre para TODA la lona: la mayor con la que entra hasta el nombre mas
   // exigente (cada uno con su mejor reparto). Antes cada nombre estiraba hasta llenar SU
@@ -1841,27 +1698,31 @@ async function renderGlitchOverrideTemplate({
     ctx.restore();
   }
 
-  // 4. PIE: FIRMA A LA IZQUIERDA, EL QR A LA DERECHA
+  // 4. PIE: FIRMA A LA IZQUIERDA, EL DOMINIO A LA DERECHA
   // Una sola linea al pie: a la izquierda el ID de Fortnite (exactamente como estaba) y a
-  // la derecha el QR que bajo de la cuadricula. El texto de marca con el hashtag YA NO SE
-  // DIBUJA: sus claves de i18n (lona.marca / lona.marcaMares) se conservan porque el test
-  // de paridad entre locales las cuenta, pero quedan sin uso en la lona.
+  // la derecha el dominio como texto, en el sitio que antes ocupaba el QR. El texto de
+  // marca con el hashtag YA NO SE DIBUJA: sus claves de i18n (lona.marca / lona.marcaMares)
+  // se conservan porque el test de paridad entre locales las cuenta, pero quedan sin uso.
   ctx.save();
   ctx.textBaseline = 'alphabetic';
   const huecoMin = Math.round(24 * escFooter);
-  // La firma solo dispone del ancho que deja el bloque del QR.
-  const areaFirma = width - footerPadX * 2 - qrPieCajaW - huecoMin;
+  const hostPie = textoParaQR();
   const medirTexto = (texto, size, peso) => {
     ctx.font = `${peso} ${size}px "Outfit", "Inter", sans-serif`;
     return ctx.measureText(texto).width;
   };
   const textoFirma = usuario ? t('lona.usuario', { nombre: usuario }) : '';
-  // La firma conserva su talla: solo encoge si no entra a la izquierda del QR.
+  // Las dos piezas del pie comparten talla. Se mide la linea completa a la talla base y, si
+  // no entra, encogen LAS DOS por el mismo factor: la firma larga ya no deja al dominio
+  // grande fuera de su sitio ni lo pisa, y el pie se sigue leyendo como una sola linea.
+  ctx.letterSpacing = '0.5px';
+  const anchoBase = (usuario ? medirTexto(textoFirma, firmaAlto, 800) : 0)
+    + medirTexto(hostPie, firmaAlto, 900);
+  const disponible = width - footerPadX * 2 - huecoMin;
   let tamanioPie = firmaAlto;
-  const anchoFirma = usuario ? medirTexto(textoFirma, tamanioPie, 800) : 0;
-  if (usuario && anchoFirma > areaFirma) {
-    const factor = Math.max(0.55, areaFirma / anchoFirma);
-    tamanioPie = Math.max(Math.round(14 * escFooter), Math.floor(tamanioPie * factor));
+  if (anchoBase > disponible) {
+    const factor = Math.max(0.55, disponible / anchoBase);
+    tamanioPie = Math.max(Math.round(14 * escFooter), Math.floor(firmaAlto * factor));
   }
 
   const baseFilaY = height - baseFila;
@@ -1873,6 +1734,15 @@ async function renderGlitchOverrideTemplate({
     ctx.shadowBlur = 10 * EXPORT_SCALE;
     ctx.fillText(textoFirma, footerPadX, baseFilaY);
   }
+  // El dominio va en cyan y sin sombra: es el acento del pie y el unico texto que invita a
+  // visitar el sitio. Alineado a la derecha, misma base y misma talla adaptada que la firma.
+  ctx.textAlign = 'right';
+  ctx.font = `900 ${tamanioPie}px "Outfit", "Inter", sans-serif`;
+  ctx.letterSpacing = '0.5px';
+  ctx.fillStyle = '#00F0E8';
+  ctx.shadowColor = 'rgba(0, 240, 232, 0.45)';
+  ctx.shadowBlur = 10 * EXPORT_SCALE;
+  ctx.fillText(hostPie, width - footerPadX, baseFilaY);
   ctx.restore();
 
   // Codificar el PNG de 1280x2515 es la parte mas cara del export (2-6 s en movil),
@@ -1911,7 +1781,7 @@ export function encodeCanvasToImage(canvas) {
 // version del codigo que dibuja la lona, asi que sin bumpear esto cada cambio de diseno
 // se quedaba invisible para quien ya tenia una captura guardada: la modal servia el JPEG
 // viejo desde Cache Storage y parecia que el cambio no se habia aplicado.
-const EXPORT_CACHE_NAME = 'spritedex-export-v18';
+const EXPORT_CACHE_NAME = 'spritedex-export-v19';
 const EXPORT_CACHE_MAX = 8;
 
 // Generaciones en vuelo, por clave. La precarga en reposo y la modal piden la misma
