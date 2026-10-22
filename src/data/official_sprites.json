@@ -1108,7 +1108,7 @@
     "theme": "Quack",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Quack Jonesy",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -1177,7 +1177,7 @@
     "theme": "Quack",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Quack Adventure",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -1246,7 +1246,7 @@
     "theme": "Quack",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Quack Bush",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -1720,7 +1720,7 @@
     "theme": "Quack",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Quack Klombo",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -2356,7 +2356,7 @@
     "theme": "Quack",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Quack Spooky Dash",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -2489,7 +2489,7 @@
     "theme": "Basic",
     "rarity": "Mythic",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Honey",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -2500,7 +2500,7 @@
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Gold Honey",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -2511,7 +2511,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Cheat Master Honey",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -2522,7 +2522,7 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Loot Hacker Honey",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -2533,7 +2533,7 @@
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Bounty Hunter Honey",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -2544,7 +2544,7 @@
     "theme": "Trick or Treat",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Trick or Treat Honey",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -2555,7 +2555,7 @@
     "theme": "Basic",
     "rarity": "Rare",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "One Wish Willow Sprite",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -2566,7 +2566,7 @@
     "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Gold Obsession",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -2577,7 +2577,7 @@
     "theme": "Cheatmaster",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Cheat Master Obsession",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -2588,7 +2588,7 @@
     "theme": "Loot Hacker",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Loot Hacker Obsession",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -2599,7 +2599,7 @@
     "theme": "Bounty Hunter",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Bounty Hunter Obsession",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
@@ -2610,7 +2610,7 @@
     "theme": "Trick or Treat",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "nameEn": "Trick or Treat Obsession",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
