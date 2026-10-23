@@ -257,8 +257,8 @@ export const THEME_NAMES_EN = {
   Quack: 'Quack'
 };
 
-export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
-export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'Quack'];
+export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Quack', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem'];
+export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Quack', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem'];
 
 export { FAMILY_NAMES_MAP } from './nombresEspiritus.js';
 
