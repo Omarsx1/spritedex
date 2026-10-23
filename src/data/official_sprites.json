@@ -984,67 +984,6 @@
     "isNew": false
   },
   {
-    "id": "dumpsterdive_basic",
-    "name": "Mapache",
-    "theme": "Basic",
-    "rarity": "Epic",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 2,
-    "releaseDate": "2026-10-01"
-  },
-  {
-    "id": "dumpsterdive_gold",
-    "name": "Mapache Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 2,
-    "releaseDate": "2026-10-01"
-  },
-  {
-    "id": "dumpsterdive_cheatmaster",
-    "name": "Mapache Hacker",
-    "theme": "Cheatmaster",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 2,
-    "releaseDate": "2026-10-01"
-  },
-  {
-    "id": "dumpsterdive_loothacker",
-    "name": "Mapache Hacker de Botín",
-    "theme": "Loot Hacker",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 2,
-    "releaseDate": "2026-10-01"
-  },
-  {
-    "id": "dumpsterdive_bountyhunter",
-    "name": "Mapache Cazarrecompensas",
-    "theme": "Bounty Hunter",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 2,
-    "releaseDate": "2026-10-01"
-  },
-  {
-    "id": "dumpsterdive_tricktreat",
-    "name": "Mapache Dulce o Truco",
-    "theme": "Trick or Treat",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 2,
-    "releaseDate": "2026-10-08T05:00:00.000Z",
-    "lanzamientoManual": true
-  },
-  {
     "id": "jonesy_basic",
     "name": "Jonesy",
     "theme": "Basic",
@@ -2093,6 +2032,67 @@
   {
     "id": "blinky_tricktreat",
     "name": "Blinky Dulce o Truco",
+    "theme": "Trick or Treat",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 2,
+    "releaseDate": "2026-10-08T05:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "dumpsterdive_basic",
+    "name": "Mapache",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 2,
+    "releaseDate": "2026-10-01"
+  },
+  {
+    "id": "dumpsterdive_gold",
+    "name": "Mapache Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 2,
+    "releaseDate": "2026-10-01"
+  },
+  {
+    "id": "dumpsterdive_cheatmaster",
+    "name": "Mapache Hacker",
+    "theme": "Cheatmaster",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 2,
+    "releaseDate": "2026-10-01"
+  },
+  {
+    "id": "dumpsterdive_loothacker",
+    "name": "Mapache Hacker de Botín",
+    "theme": "Loot Hacker",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 2,
+    "releaseDate": "2026-10-01"
+  },
+  {
+    "id": "dumpsterdive_bountyhunter",
+    "name": "Mapache Cazarrecompensas",
+    "theme": "Bounty Hunter",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 2,
+    "releaseDate": "2026-10-01"
+  },
+  {
+    "id": "dumpsterdive_tricktreat",
+    "name": "Mapache Dulce o Truco",
     "theme": "Trick or Treat",
     "rarity": "Special",
     "unreleased": false,

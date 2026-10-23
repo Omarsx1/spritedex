@@ -26,10 +26,10 @@ test('cada familia ocupa un solo bloque contiguo', () => {
   }
 });
 
-test('la familia del Mapache va justo antes de Jonesy', () => {
+test('la familia del Mapache va justo despues de Blinky', () => {
   const i = familias.indexOf('dumpsterdive');
   assert.ok(i > -1, 'falta la familia dumpsterdive (Mapache)');
-  assert.equal(familias[i + 1], 'jonesy', 'el Mapache debe ir inmediatamente antes de Jonesy');
+  assert.equal(familias[i - 1], 'blinky', 'el Mapache debe ir inmediatamente despues de Blinky');
 });
 
 test('el Ciervo va antes que el Vampiro', () => {
