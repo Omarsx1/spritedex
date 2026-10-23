@@ -3,12 +3,9 @@ import { VARIANT_ORDER, FAMILY_NAMES_MAP, pickFamilyName } from './data/spritesD
 import { t } from './i18n';
 import { leerVista, urlConVista } from './utils/vistaUrl.js';
 
+const VARIANT_ALIASES = { Base: 'Basic', 'Cheat Master': 'Cheatmaster', LootHacker: 'Loot Hacker' };
 const getVariantPriority = (v) => {
-  if (v === 'Base' || v === 'Basic') return 0;
-  if (v === 'Gold') return 1;
-  if (v === 'Cheatmaster' || v === 'Cheat Master') return 2;
-  if (v === 'Loot Hacker' || v === 'LootHacker') return 3;
-  const idx = VARIANT_ORDER.indexOf(v);
+  const idx = VARIANT_ORDER.indexOf(VARIANT_ALIASES[v] || v);
   return idx === -1 ? 99 : idx;
 };
 import { Header } from './components/Header';

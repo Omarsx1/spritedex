@@ -1011,6 +1011,17 @@
     "isNew": false
   },
   {
+    "id": "jonesy_quack",
+    "name": "Jonesy Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "nameEn": "Quack Jonesy",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "gen": 2
+  },
+  {
     "id": "jonesy_loothacker",
     "name": "Jonesy Hacker de Botín",
     "theme": "Loot Hacker",
@@ -1042,17 +1053,6 @@
     "lanzamientoManual": true
   },
   {
-    "id": "jonesy_quack",
-    "name": "Jonesy Patito",
-    "theme": "Quack",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "nameEn": "Quack Jonesy",
-    "releaseDate": "2026-10-15T08:00:00.000Z",
-    "gen": 2
-  },
-  {
     "id": "adventure_basic",
     "name": "Aventurero",
     "theme": "Basic",
@@ -1078,6 +1078,17 @@
     "gen": 2,
     "unreleased": false,
     "isNew": false
+  },
+  {
+    "id": "adventure_quack",
+    "name": "Aventurero Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "nameEn": "Quack Adventure",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "gen": 2
   },
   {
     "id": "adventure_loothacker",
@@ -1111,17 +1122,6 @@
     "lanzamientoManual": true
   },
   {
-    "id": "adventure_quack",
-    "name": "Aventurero Patito",
-    "theme": "Quack",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "nameEn": "Quack Adventure",
-    "releaseDate": "2026-10-15T08:00:00.000Z",
-    "gen": 2
-  },
-  {
     "id": "bush_basic",
     "name": "Arbustín",
     "theme": "Basic",
@@ -1147,6 +1147,17 @@
     "gen": 2,
     "unreleased": false,
     "isNew": false
+  },
+  {
+    "id": "bush_quack",
+    "name": "Arbustín Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "nameEn": "Quack Bush",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "gen": 2
   },
   {
     "id": "bush_loothacker",
@@ -1178,17 +1189,6 @@
     "gen": 2,
     "releaseDate": "2026-10-08T05:00:00.000Z",
     "lanzamientoManual": true
-  },
-  {
-    "id": "bush_quack",
-    "name": "Arbustín Patito",
-    "theme": "Quack",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "nameEn": "Quack Bush",
-    "releaseDate": "2026-10-15T08:00:00.000Z",
-    "gen": 2
   },
   {
     "id": "sonic_basic",
@@ -1623,6 +1623,17 @@
     "isNew": false
   },
   {
+    "id": "klombo_quack",
+    "name": "Klombo Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "nameEn": "Quack Klombo",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "gen": 2
+  },
+  {
     "id": "klombo_loothacker",
     "name": "Klombo Hacker de Botín",
     "theme": "Loot Hacker",
@@ -1652,17 +1663,6 @@
     "gen": 2,
     "releaseDate": "2026-10-08T05:00:00.000Z",
     "lanzamientoManual": true
-  },
-  {
-    "id": "klombo_quack",
-    "name": "Klombo Patito",
-    "theme": "Quack",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "nameEn": "Quack Klombo",
-    "releaseDate": "2026-10-15T08:00:00.000Z",
-    "gen": 2
   },
   {
     "id": "megaman_basic",
@@ -2320,6 +2320,17 @@
     "releaseDate": "2026-10-01"
   },
   {
+    "id": "spookydash_quack",
+    "name": "Impulso aterrador Patito",
+    "theme": "Quack",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "nameEn": "Quack Spooky Dash",
+    "releaseDate": "2026-10-15T08:00:00.000Z",
+    "gen": 2
+  },
+  {
     "id": "spookydash_loothacker",
     "name": "Impulso aterrador Hacker de Botín",
     "theme": "Loot Hacker",
@@ -2349,17 +2360,6 @@
     "gen": 2,
     "releaseDate": "2026-10-08T05:00:00.000Z",
     "lanzamientoManual": true
-  },
-  {
-    "id": "spookydash_quack",
-    "name": "Impulso aterrador Patito",
-    "theme": "Quack",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "nameEn": "Quack Spooky Dash",
-    "releaseDate": "2026-10-15T08:00:00.000Z",
-    "gen": 2
   },
   {
     "id": "deer_basic",

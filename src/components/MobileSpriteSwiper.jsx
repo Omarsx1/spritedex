@@ -10,12 +10,9 @@ import spriteMobileScale from '../data/sprite_mobile_scale.json';
 import { safeStorage } from '../utils/safeStorage';
 import { trackEvent } from '../utils/telemetry';
 
+const VARIANT_ALIASES = { Base: 'Basic', 'Cheat Master': 'Cheatmaster', LootHacker: 'Loot Hacker' };
 const getVariantPriority = (v) => {
-  if (v === 'Base' || v === 'Basic') return 0;
-  if (v === 'Gold') return 1;
-  if (v === 'Cheatmaster' || v === 'Cheat Master') return 2;
-  if (v === 'Loot Hacker' || v === 'LootHacker') return 3;
-  const idx = VARIANT_ORDER.indexOf(v);
+  const idx = VARIANT_ORDER.indexOf(VARIANT_ALIASES[v] || v);
   return idx === -1 ? 99 : idx;
 };
 

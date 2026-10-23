@@ -97,6 +97,7 @@ export const VARIANT_ORDER = [
   'Basic',
   'Gold',
   'Cheatmaster',
+  'Quack',
   'Loot Hacker',
   'Bounty Hunter',
   'Trick or Treat',
@@ -104,8 +105,7 @@ export const VARIANT_ORDER = [
   'Galaxy',
   'Cube',
   'Holofoil',
-  'Gem',
-  'Quack'
+  'Gem'
 ];
 
 export function normalizeKey(str) {
