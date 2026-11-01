@@ -24,7 +24,7 @@ test('las familias de Buscatesoros ya traducidas conservan su nombre acordado', 
   assert.equal(FAMILY_NAMES_MAP.treasuremap, 'Buscarrutas');
   assert.equal(FAMILY_NAMES_MAP.feedjet, 'Caracol Transmisor');
   assert.equal(FAMILY_NAMES_MAP.unbotheredfish, 'Mar');
-  assert.equal(FAMILY_NAMES_MAP.coinpile, 'Buscacofres');
+  assert.equal(FAMILY_NAMES_MAP.coinpile, 'Saqueacofres');
   assert.equal(FAMILY_NAMES_MAP.parrot, 'Plumitas');
   assert.equal(FAMILY_NAMES_MAP.compass, 'Orientador');
   assert.equal(FAMILY_NAMES_MAP.treasurechest, 'Gatisoro');
