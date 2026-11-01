@@ -4450,6 +4450,38 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   fill: currentColor;
 }
 
+/* Cada nivel es una piedra distinta: rubi, esmeralda, zafiro, amatista y
+   diamante. Nada de ambar: la joya se lee por su color. */
+.star-btn.is-gema.gema-1.active,
+.star-btn-sm.is-gema.gema-1.active {
+  color: #e2485f;
+  filter: drop-shadow(0 0 4px rgba(226, 72, 95, 0.45));
+}
+
+.star-btn.is-gema.gema-2.active,
+.star-btn-sm.is-gema.gema-2.active {
+  color: #2fbf8f;
+  filter: drop-shadow(0 0 4px rgba(47, 191, 143, 0.45));
+}
+
+.star-btn.is-gema.gema-3.active,
+.star-btn-sm.is-gema.gema-3.active {
+  color: #4a86ff;
+  filter: drop-shadow(0 0 4px rgba(74, 134, 255, 0.45));
+}
+
+.star-btn.is-gema.gema-4.active,
+.star-btn-sm.is-gema.gema-4.active {
+  color: #b070f5;
+  filter: drop-shadow(0 0 4px rgba(176, 112, 245, 0.45));
+}
+
+.star-btn.is-gema.gema-5.active,
+.star-btn-sm.is-gema.gema-5.active {
+  color: #bfe6ff;
+  filter: drop-shadow(0 0 5px rgba(191, 230, 255, 0.6));
+}
+
 .owned-btn-sm {
   padding: 6px 14px;
   border-radius: 6px;

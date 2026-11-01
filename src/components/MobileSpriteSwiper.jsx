@@ -454,7 +454,7 @@ function FamilySpotlightRow({
                   {[1, 2, 3, 4, 5].map((num) => (
                     <button
                       key={num}
-                      className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''} ${sprite.gen === 2 ? 'is-sonic-ring-btn' : ''} ${sprite.gen === 3 ? 'is-gema' : ''}`}
+                      className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''} ${sprite.gen === 2 ? 'is-sonic-ring-btn' : ''} ${sprite.gen === 3 ? 'is-gema gema-' + num : ''}`}
                       onClick={(e) => handleLevelClick(e, num)}
                       style={isFriendView ? { pointerEvents: 'none' } : {}}
                       title={level === 1 && num === 1 ? t('swiper.tocaDesmarcar') : t('swiper.nivel', { n: num })}
