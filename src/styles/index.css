@@ -7170,7 +7170,9 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 296px;
+  /* Aire de sobra abajo: con 296 la sombra de la ficha se cortaba contra el
+     borde del escenario y quedaba una linea recta. */
+  height: 322px;
   position: relative;
 }
 
@@ -7178,7 +7180,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .ms-spotlight-stage {
   position: relative;
   width: 100%;
-  height: 296px;
+  height: 322px;
   display: flex;
   align-items: center;
   justify-content: center;
