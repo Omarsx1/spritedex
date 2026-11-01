@@ -1107,12 +1107,11 @@ a.app-navbar__menu-action-btn {
 
 .hero__title-line--accent {
   font-family: var(--font-heading);
-  font-size: calc(2.4rem - 1px);
+  font-size: calc(2.6rem - 1px);
   letter-spacing: 7px;
   line-height: 1;
-  /* El wordmark es una imagen recortada a las letras (sin padding inferior como
-     el texto): un tuck grande tapaba el oro. Solo un roce de 2 px. */
-  margin-top: 2px;
+  /* Un poco mas abajo del wordmark, sin volver al tuck que tapaba el oro. */
+  margin-top: 7px;
   padding: 0.05em 0.2em;
   /* Color plano de marca: se retiro el degradado violeta->magenta y su shimmer.
      Sobre el cielo de Cazatesoros va el azul marino; en los fondos oscuros de
@@ -1761,10 +1760,10 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   }
 
   .hero__title-line--accent {
-    font-size: 1.9rem;
+    font-size: 2.05rem;
     letter-spacing: 4px;
     /* Aire real entre el logo y el subtitulo. */
-    margin-top: 8px;
+    margin-top: 12px;
   }
 
   .hero__showcase {
@@ -1879,10 +1878,10 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   }
 
   .hero__title-line--accent {
-    font-size: 1.7rem;
+    font-size: 1.85rem;
     letter-spacing: 3px;
     /* Sin tuck y con separacion: el subtitulo ya no se pega al oro. */
-    margin-top: 8px;
+    margin-top: 12px;
   }
 
   .hero__bar {
