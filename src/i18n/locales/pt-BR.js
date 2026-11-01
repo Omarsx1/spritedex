@@ -350,6 +350,8 @@ export default {
   "ajustes.animaciones": "Animações",
   "ajustes.animacionesDetalle": "Movimento e transições",
   "ajustes.idioma": "Idioma",
+  "ajustes.aplicacion": "Aplicativo",
+  "ajustes.dados": "Dados",
   "ajustes.enlaces": "Links",
   "ajustes.privacidad": "Privacidade",
   "nav.inicioAyuda": "Ir para o início e trazer a versão mais recente",

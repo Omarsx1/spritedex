@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Download, User, UserPlus, LogOut, ShieldCheck, ChevronDown, Menu, X, Layers, Sparkles, Zap, ZapOff, Smartphone, AlertTriangle, Mail, BookOpen, Globe } from 'lucide-react';
+import { User, UserPlus, LogOut, ShieldCheck, Menu, X, Layers, Sparkles, Settings, AlertTriangle, Mail, BookOpen, Globe } from 'lucide-react';
 import { Google } from './ui/Google';
 import { getSupabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
-import { safeStorage } from '../utils/safeStorage';
 import { usuarioDeSesion, esCorreoSintetico } from '../utils/usuario';
 import { GENERATIONS } from '../data/spritesData';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -35,22 +34,11 @@ export function Navbar({
   onNavegar,
   onOpenAuthModal,
   onLinkGoogle,
-  onOpenBackupModal,
   onSignOut,
-  onOpenPrivacy
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
 
-  // La barra de navegacion movil abre este mismo menu (Ajustes).
-  useEffect(() => {
-    const abrirMenu = () => {
-      setIsNavMenuOpen(true);
-      setIsUserMenuOpen(false);
-    };
-    window.addEventListener('spritedex:abrir-menu', abrirMenu);
-    return () => window.removeEventListener('spritedex:abrir-menu', abrirMenu);
-  }, []);
   // Sesion anonima (acceso rapido 1-clic): su progreso solo vive en este dispositivo.
   // Debe verlo claro y tener a mano el camino para vincular su cuenta.
   const esAnonimo = Boolean(user?.is_anonymous);
@@ -68,41 +56,11 @@ export function Navbar({
     ];
   }, []);
   const myFriendCode = useMemo(() => getMyFriendCode(user?.id), [user]);
-  const [animationsEnabled, setAnimationsEnabled] = useState(() => {
-    if (typeof window === 'undefined') return true;
-
-    // 1. Si el usuario ya tiene una preferencia guardada, respetarla
-    const stored = safeStorage.getItem('spritedex_animations_enabled');
-    if (stored !== null) {
-      return stored === 'true';
-    }
-
-    // 2. Por defecto animaciones fluidas activas en todos los dispositivos
-    return true;
-  });
   const userDropdownRef = useRef(null);
   const navMenuRef = useRef(null);
   // Disparadores de cada desplegable: a donde vuelve el foco cuando Escape lo cierra.
   const userTriggerRef = useRef(null);
   const navTriggerRef = useRef(null);
-
-  // Sincroniza preferencia persistente de animaciones en DOM y localStorage
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-    if (animationsEnabled) {
-      document.documentElement.classList.remove('motion-disabled');
-      document.body.classList.remove('motion-disabled');
-      safeStorage.setItem('spritedex_animations_enabled', 'true');
-    } else {
-      document.documentElement.classList.add('motion-disabled');
-      document.body.classList.add('motion-disabled');
-      safeStorage.setItem('spritedex_animations_enabled', 'false');
-    }
-  }, [animationsEnabled]);
-
-  const handleToggleAnimations = () => {
-    setAnimationsEnabled((prev) => !prev);
-  };
 
   // Los dos enlaces de ayuda son enlaces de verdad; el clic normal ademas navega dentro de la
   // app. La ruta viaja sin el prefijo de idioma: conIdioma lo pone al armar el href.
@@ -405,53 +363,6 @@ export function Navbar({
 
               <div className="app-navbar__dropdown-divider" />
 
-              {/* Sección Herramientas */}
-              <div className="app-navbar__menu-section">
-                {/* Animaciones arriba y sola: es un interruptor, no una accion, y metida en
-                    la fila de tres se comia el ancho de las otras dos. No cierra el menu a
-                    proposito, para que se vea el cambio de estado en la propia fila. */}
-                <button
-                  className="app-navbar__menu-action-btn"
-                  onClick={handleToggleAnimations}
-                  aria-pressed={animationsEnabled}
-                >
-                  <div className="action-btn-left">
-                    {/* El acento del icono sale de una variable para que la temporada lo
-                        pueda virar sin duplicar el icono ni tocar el comportamiento. */}
-                    {animationsEnabled ? <Zap size={15} color="var(--nav-accent, #00F0E8)" /> : <ZapOff size={15} />}
-                    <span>{animationsEnabled ? t('nav.desactivarAnimaciones') : t('nav.activarAnimaciones')}</span>
-                  </div>
-                </button>
-
-                <div className="app-navbar__menu-actions-row">
-                <button
-                  className="app-navbar__menu-action-btn"
-                  onClick={() => {
-                    setIsNavMenuOpen(false);
-                    window.dispatchEvent(new CustomEvent('spritedex:open-install-prompt'));
-                  }}
-                >
-                  <div className="action-btn-left">
-                    <Smartphone size={15} color="var(--nav-accent, #00F0E8)" />
-                    <span>{t('nav.instalar')}</span>
-                  </div>
-                </button>
-
-                <button
-                  className="app-navbar__menu-action-btn"
-                  onClick={() => { onOpenBackupModal(); setIsNavMenuOpen(false); }}
-                >
-                  <div className="action-btn-left">
-                    <Download size={15} />
-                    <span>{t('nav.respaldo')}</span>
-                  </div>
-                </button>
-
-                </div>
-              </div>
-
-              <div className="app-navbar__dropdown-divider" />
-
               {/* Sección Ayuda y legal. Los tres enlaces ya no viven en un pie: los lleva
                   el menu, que existe en ambos breakpoints. El enlazado rastreable de las
                   paginas prerenderizadas lo sigue dando el pie estatico de seo/plantilla.js. */}
@@ -486,16 +397,18 @@ export function Navbar({
                   </div>
                 </a>
 
-                <button
-                  type="button"
+                {/* Ajustes es la casa de las preferencias y del respaldo; el menu solo
+                    navega. En escritorio es la unica entrada: la barra inferior no se ve. */}
+                <a
                   className="app-navbar__menu-action-btn"
-                  onClick={() => { setIsNavMenuOpen(false); onOpenPrivacy?.(); }}
+                  href={conIdioma('/ajustes', getLang())}
+                  onClick={(evento) => navegarEnApp(evento, '/ajustes')}
                 >
                   <div className="action-btn-left">
-                    <ShieldCheck size={15} />
-                    <span>{t('nav.cookiesPrivacidad')}</span>
+                    <Settings size={15} color="var(--nav-accent, #00F0E8)" />
+                    <span>{t('nav.tabAjustes')}</span>
                   </div>
-                </button>
+                </a>
 
                 <p className="app-navbar__menu-copy">© {new Date().getFullYear()} {t('nav.copyright')}</p>
                 <p className="app-navbar__menu-copy">{t('nav.disclaimer')}</p>

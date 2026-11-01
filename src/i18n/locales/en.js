@@ -351,6 +351,8 @@ export default {
   "ajustes.animaciones": "Animations",
   "ajustes.animacionesDetalle": "Motion and transitions",
   "ajustes.idioma": "Language",
+  "ajustes.aplicacion": "App",
+  "ajustes.datos": "Data",
   "ajustes.enlaces": "Links",
   "ajustes.privacidad": "Privacy",
   "nav.inicioAyuda": "Go to home and fetch the latest version",

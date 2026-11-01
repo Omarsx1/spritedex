@@ -155,7 +155,9 @@ html.theme-cazatesoros .main-content::after {
 
 html.theme-cazatesoros .main-content::before {
   top: -24px;
-  width: 118%;
+  /* Un poco mas ancho que el papel: si el rollo termina antes que el borde
+     rasgado se ven dos papeles distintos en las esquinas. */
+  width: 128%;
   aspect-ratio: 1200 / 105;
   background-image: url('/papiro-rollo-sup.webp');
   background-position: center top;
@@ -163,7 +165,7 @@ html.theme-cazatesoros .main-content::before {
 
 html.theme-cazatesoros .main-content::after {
   bottom: 0;
-  width: 118%;
+  width: 128%;
   aspect-ratio: 1200 / 190;
   background-image: url('/papiro-rollo-inf.webp');
   background-position: center bottom;
@@ -195,11 +197,11 @@ html.theme-cazatesoros .main-content::after {
   html.theme-cazatesoros .main-content::before {
     top: -8px;
     /* Los rollos sobresalen lo justo para verse las puntas, sin tocar el borde. */
-    width: 104%;
+    width: 116%;
   }
 
   html.theme-cazatesoros .main-content::after {
-    width: 104%;
+    width: 116%;
   }
 }
 
@@ -207,20 +209,17 @@ html.theme-cazatesoros .main-content::after {
    NAVBAR
    ========================================================================== */
 
-/* Solo los controles de la derecha se visten de madera; el logo conserva su
-   marca y su brillo. */
+/* Los controles de la derecha comparten la paleta de la barra inferior: navy con
+   filo de laton. Antes iban en madera y la cabecera y la barra parecian dos apps. */
 html.theme-cazatesoros .lang-switch__disparador,
 html.theme-cazatesoros .app-navbar__avatar,
 html.theme-cazatesoros .app-navbar__menu-btn {
-  background:
-    linear-gradient(180deg, rgba(255, 236, 196, 0.22), rgba(0, 0, 0, 0.16)),
-    linear-gradient(180deg, #9a6636, #74441f 60%, #55300f);
-  border: 1px solid #3d2410;
-  color: #fbeccb;
+  background: linear-gradient(180deg, #1b2b46 0%, #0e1728 100%);
+  border: 1px solid rgba(216, 178, 106, 0.75);
+  color: #f2e6c8;
   box-shadow:
-    inset 0 1px 0 rgba(255, 226, 170, 0.45),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.4),
-    0 4px 10px rgba(12, 6, 2, 0.45);
+    inset 0 1px 0 rgba(240, 226, 192, 0.16),
+    0 3px 8px rgba(4, 8, 16, 0.35);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -229,16 +228,14 @@ html.theme-cazatesoros .lang-switch__disparador:hover,
 html.theme-cazatesoros .app-navbar__avatar:hover,
 html.theme-cazatesoros .app-navbar__menu-btn:hover,
 html.theme-cazatesoros .app-navbar__menu-btn.is-active {
-  background:
-    linear-gradient(180deg, rgba(255, 240, 200, 0.28), rgba(0, 0, 0, 0.1)),
-    linear-gradient(180deg, #ab7340, #825026 60%, #5f3712);
-  border-color: #2e1a09;
-  color: #fff6e0;
+  background: linear-gradient(180deg, #22355a 0%, #142034 100%);
+  border-color: #e3c07a;
+  color: #fff3d0;
 }
 
 html.theme-cazatesoros .lang-switch__codigo,
 html.theme-cazatesoros .lang-switch__flecha {
-  color: #fbeccb;
+  color: #f2e6c8;
 }
 
 html.theme-cazatesoros .lang-switch__menu,
@@ -1314,6 +1311,14 @@ html.theme-cazatesoros .sdm-friends__plate {
   background: linear-gradient(180deg, #a9713c, #6f431c 58%, #54300f);
   border-color: #3f2410;
   color: #fff3d0;
+}
+
+/* Acciones de la pagina (instalar, respaldo): icono y texto alineados, como el
+   resto de filas de accion de la app. */
+.ajustes-enlace--accion {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .ajustes-fila {

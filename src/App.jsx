@@ -3,6 +3,7 @@ import { applyCazatesorosTheme, resolveCazatesorosState, CAZATESOROS_STORAGE_KEY
 import { VARIANT_ORDER, FAMILY_NAMES_MAP, pickFamilyName } from './data/spritesData';
 import { t } from './i18n';
 import { leerVista, urlConVista } from './utils/vistaUrl.js';
+import { leerAnimaciones, aplicarAnimaciones } from './utils/animaciones';
 
 const VARIANT_ALIASES = { Base: 'Basic', 'Cheat Master': 'Cheatmaster', LootHacker: 'Loot Hacker' };
 const getVariantPriority = (v) => {
@@ -142,6 +143,11 @@ export function App() {
   });
 
   const [isAdminAuth, setIsAdminAuth] = useState(() => isUserAdminAuthenticated());
+
+  // La preferencia de animaciones se aplica al arrancar, no solo al pasar por Ajustes.
+  useEffect(() => {
+    aplicarAnimaciones(leerAnimaciones());
+  }, []);
 
   // Registro de telemetría de visita al cargar la web (solo usuarios públicos reales)
   useEffect(() => {
@@ -1243,9 +1249,7 @@ export function App() {
       onNavegar={irA}
       onOpenAuthModal={() => setShowAuthModal(true)}
       onLinkGoogle={handleLinkGoogle}
-      onOpenBackupModal={() => setShowBackupModal(true)}
       onSignOut={handleSignOutCleanup}
-      onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
     />
   );
 
@@ -1366,9 +1370,8 @@ export function App() {
       <div className="app-container">
         {navbar}
         <AjustesPage
-          activeGen={activeGen}
-          onGenChange={(id) => setActiveGen(Number(id))}
           onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
+          onOpenBackup={() => setShowBackupModal(true)}
         />
         {modales}
         <MobileNavbar
