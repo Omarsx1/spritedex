@@ -11,7 +11,7 @@
 // Los parametros que NO son de la vista (friend, studio, perf, halloween...) se conservan
 // intactos: aqui solo se tocan las claves de VISTA_POR_DEFECTO.
 
-export const GENERACIONES_VALIDAS = ['0', '1', '2'];
+export const GENERACIONES_VALIDAS = ['0', '1', '2', '3'];
 export const VISTAS_VALIDAS = ['grid', 'list'];
 
 // Lo que se considera "vista sin tocar": nada de esto se escribe en la URL, asi que una vista

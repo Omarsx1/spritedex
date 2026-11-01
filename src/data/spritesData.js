@@ -127,7 +127,10 @@ export const THEME_STYLES = {
   Holofoil: { bg: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', border: '#ec88d8' },
   Cube: { bg: 'linear-gradient(180deg, #730974 0%, #1b1c23 100%)', border: '#8b008b' },
   Gem: { bg: 'linear-gradient(180deg, #334155 0%, #1b1c23 100%)', border: '#38bdf8' },
-  Quack: { bg: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', border: '#ec88d8' }
+  Quack: { bg: 'linear-gradient(180deg, #cb77be 0%, #1b1c23 100%)', border: '#ec88d8' },
+  // Temporada Buscatesoros.
+  cursed: { bg: 'linear-gradient(180deg, #2f1b47 0%, #120a1f 100%)', border: '#a855f7' },
+  jeweled: { bg: 'linear-gradient(180deg, #0f5132 0%, #08231a 100%)', border: '#34d399' }
 };
 
 export const ELEMENTAL_STYLES = {
@@ -254,11 +257,13 @@ export const THEME_NAMES_EN = {
   Holofoil: 'Holofoil',
   Cube: 'Cube',
   Gem: 'Gem',
-  Quack: 'Quack'
+  Quack: 'Quack',
+  cursed: 'Cursed',
+  jeweled: 'Fortune'
 };
 
-export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Quack', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem'];
-export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Quack', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem'];
+export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Quack', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'jeweled', 'cursed'];
+export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Quack', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'jeweled', 'cursed'];
 
 export { FAMILY_NAMES_MAP } from './nombresEspiritus.js';
 
@@ -986,5 +991,7 @@ export const SPRITE_FAMILIES = Object.values(
 
 export const GENERATIONS = [
   { id: 1, name: '1ª Generación', title: 'Runners', badgeColor: '#3b82f6' },
-  { id: 2, name: '2ª Generación', title: 'Override', badgeColor: '#ec4899' }
+  { id: 2, name: '2ª Generación', title: 'Override', badgeColor: '#ec4899' },
+  // Temporada Buscatesoros: los espiritus que llegan con ella forman la 3ª.
+  { id: 3, name: '3ª Generación', title: 'Buscatesoros', badgeColor: '#f59e0b' }
 ];

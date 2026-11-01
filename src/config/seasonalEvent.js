@@ -1,4 +1,5 @@
 import { safeStorage } from '../utils/safeStorage.js';
+import { isCazatesorosActive, resolveSeasonalTheme } from './cazatesoros.js';
 
 /**
  * Seasonal event configuration: Fortnitemares (Halloween).
@@ -75,19 +76,29 @@ export function isFortnitemaresActive(now = new Date()) {
     storedOverride = null;
   }
 
-  return resolveSeasonalState({ now, isDev: IS_DEV_BUILD, search, storedOverride });
+  return resolveSeasonalTheme({
+    cazatesorosActive: isCazatesorosActive(),
+    fortnitemaresActive: resolveSeasonalState({ now, isDev: IS_DEV_BUILD, search, storedOverride })
+  }).fortnitemares;
 }
 
 /**
  * Applies or removes the global 'theme-fortnitemares' class on <html> and <body>.
+ * Cazatesoros wins while it is active: the two themes share the hero and the
+ * page chrome, so both classes must never be on at once.
  */
 export function applySeasonalTheme(active = isFortnitemaresActive()) {
   if (typeof document === 'undefined') return;
 
+  const resolved = resolveSeasonalTheme({
+    cazatesorosActive: isCazatesorosActive(),
+    fortnitemaresActive: active
+  }).fortnitemares;
+
   const html = document.documentElement;
   const body = document.body;
 
-  if (active) {
+  if (resolved) {
     html.classList.add('theme-fortnitemares');
     body?.classList.add('theme-fortnitemares');
   } else {

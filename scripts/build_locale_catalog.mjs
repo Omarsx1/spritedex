@@ -39,7 +39,13 @@ const FAMILIAS = {
   overshield: 'Overshield', onigiri: 'WinnerC', xray: 'WinnerB', megaman: 'ImprovedSlide',
   crash: 'BodySlam', morgana: 'IncreaseHeals', blinky: 'GhostDamage', birthday: 'Birthday',
   pond: 'WinnerA', spookydash: 'PhaseDash', vampire: 'HealthSiphon', deer: 'IncreasedMelee',
-  dumpsterdive: 'WinnerD', honey: 'WinnerE', obsession: 'CargoLying'
+  dumpsterdive: 'WinnerD', honey: 'WinnerE', obsession: 'CargoLying',
+  // Temporada Buscatesoros (C7 S4).
+  peelybones: 'PeelyBones', parrot: 'Parrot', barreloffish: 'BarrelOfFish',
+  treasurechest: 'TreasureChest', treasuremap: 'TreasureMap', compass: 'Compass',
+  unbotheredfish: 'UnbotheredFish', starlight: 'StarLight', squibbly: 'Squibbly',
+  playmakerbrewery: 'PlaymakerBrewery', rookgecko: 'RookGecko', coinpile: 'CoinPile',
+  feedjet: 'FeedJet'
 };
 
 // tema de nuestro catalogo -> variante de la captura cruda, y su etiqueta en ingles
@@ -56,7 +62,10 @@ const VARIANTES = {
   Holofoil: { fuente: 'Holofoil', etiqueta: 'Holofoil' },
   Gem: { fuente: 'Gem', etiqueta: 'Gem' },
   Quack: { fuente: 'Quack', etiqueta: 'Quack' },
-  Cube: { fuente: 'Cube', etiqueta: 'Cube' }
+  Cube: { fuente: 'Cube', etiqueta: 'Cube' },
+  // Temporada Buscatesoros: la fuente las llama Cursed / Jeweled.
+  cursed: { fuente: 'Cursed', etiqueta: 'Cursed' },
+  jeweled: { fuente: 'Jeweled', etiqueta: 'Fortune' }
 };
 
 export function construirCatalogo() {

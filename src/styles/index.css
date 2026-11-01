@@ -1080,105 +1080,29 @@ a.app-navbar__menu-action-btn {
   letter-spacing: 3px;
   line-height: 1;
   padding: 0.12em 0.1em 0 0.1em;
-  background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 40%, #818cf8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  /* Sin degradado ni recorte a las letras: el subtitulo usa un color plano. */
   position: relative;
   display: inline-block;
 }
 
-/* ===== @designbycode/tailwindcss-text-glitch Authentic Plugin Implementation ===== */
-:root {
-  --tg-rgb-r: #ff0055;
-  --tg-rgb-g: #00f0ff;
-  /* Segunda copia del glitch del titulo: cian de la temporada, no violeta. */
-  --tg-rgb-b: #00FFFB;
-  --tg-rgb-blur: 2px;
-  --tg-rgb-duration: 2.8s;
-}
+/* ==========================================================================
+   LOGO: wordmark oficial en oro (public/fortnite-dorado.webp). En esta mini
+   temporada no hay efecto glitch ni copias RGB: la marca es la imagen.
+   ========================================================================== */
 
-.hero__title-line--glitch {
-  font-family: var(--font-fortnite);
-  font-weight: 900;
-  font-size: 6.2rem;
-  letter-spacing: 3px;
-  line-height: 1;
-  padding: 0.12em 0.1em 0 0.1em;
-  color: #ffffff;
-  -webkit-text-fill-color: #ffffff;
-  position: relative;
-  display: inline-block;
-  /* El parpadeo RGB ya no anima text-shadow ni filter: eso repintaba el texto
-     completo en cada frame (medido: 133 ms de CPU cada 5 s). Las franjas de color
-     las ponen dos copias de abajo, que saltan con transform por pasos. */
-}
-
-.hero__title-line--glitch::before,
-.hero__title-line--glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: inherit;
-  text-align: center;
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: -1;
-  /* El padre fija -webkit-text-fill-color en blanco y se hereda: sin esto las
-     copias salian blancas y no se veia ninguna franja de color. */
-  -webkit-text-fill-color: currentColor;
-}
-
-/* Las dos copias cromaticas: saltan de sitio por pasos, como el glitch original,
-   pero solo moviendo transform (lo hace el compositor). */
-.hero__title-line--glitch::before {
-  color: var(--tg-rgb-r, #ff0055);
-  /* La franja esta SIEMPRE puesta (como el text-shadow del original) y el glitch
-     es un evento: un hipo por ciclo y vuelta a la calma. Antes habia movimiento
-     todo el rato y eso cansa la vista: parece nervioso. El hipo es CORTO y SECO
-     (49 ms por salto, ver keyframes) y lo que se alargo fue el ciclo: el efecto
-     se ve poco, pero cuando cae es nitido y no arrastrado. */
-  animation: hero-glitch-r steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
-}
-
-.hero__title-line--glitch::after {
-  color: var(--tg-rgb-b, #00FFFB);
-  animation: hero-glitch-b steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
-  /* Un pelo desfasada de la roja: los hipos no caen clavados a la vez. */
-  animation-delay: 0.07s;
-}
-
-/* El hipo ocupa una porcion del ciclo mas grande para que el efecto se note.
-   ANTES: ciclo 2.8s*1.8 = 5.04s; calma 0%-88%, hipo 88%-94.5% (6.5% = ~328 ms,
-   cada golpe ~50-75 ms).
-   DESPUES: ciclo 2.8s*2.2 = 6.16s; calma 0%-70%, hipo 70%-90% (20% = ~1232 ms,
-   cada uno de los cuatro golpes sostenido 4% = ~246 ms).
-   Desplazamientos, colores y saltos duros (steps) son los MISMOS: solo cambia
-   cuanto tiempo queda el efecto en pantalla. */
-@keyframes hero-glitch-r {
-  /* Hipo corto y seco: los cinco estados del glitch caen en 3,5% del ciclo (245 ms con el
-     ciclo de 7 s), con saltos de 49 ms cada uno. El ciclo se alargo para que el hipo sea un
-     evento raro: nitido y breve en vez de largo y arrastrado. */
-  0%, 90%     { transform: translateX(-0.1rem); opacity: 0.85; }
-  90.7%       { transform: translateX(-0.65rem); opacity: 1; }
-  91.4%       { transform: translateX(0.2rem) translateY(-0.02rem); opacity: 1; }
-  92.1%       { transform: translateX(-0.15rem); opacity: 1; }
-  92.8%       { transform: translateX(-0.85rem); opacity: 1; }
-  93.5%, 100% { transform: translateX(-0.1rem); opacity: 0.85; }
-}
-
-@keyframes hero-glitch-b {
-  0%, 90%     { transform: translateX(0.1rem); opacity: 0.85; }
-  90.7%       { transform: translateX(0.65rem); opacity: 1; }
-  91.4%       { transform: translateX(-0.2rem) translateY(0.02rem); opacity: 1; }
-  92.1%       { transform: translateX(0.15rem); opacity: 1; }
-  92.8%       { transform: translateX(0.85rem); opacity: 1; }
-  93.5%, 100% { transform: translateX(0.1rem); opacity: 0.85; }
+.hero__title-logo {
+  display: block;
+  /* Mismo ancho que tenia el rotulo de texto a 6.2rem (558 px) para no mover
+     el encaje con SPRITEDEX ni el showcase. */
+  width: min(560px, 90vw);
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+  /* Resplandor blanco suave: drop-shadow usa el alfa de la imagen, asi que
+     dibuja el halo por detras de las letras y no ensucia el oro. */
+  filter:
+    drop-shadow(0 0 6px rgba(255, 255, 255, 0.18))
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.26));
 }
 
 .hero__title-line--accent {
@@ -1186,19 +1110,12 @@ a.app-navbar__menu-action-btn {
   font-size: calc(2.4rem - 1px);
   letter-spacing: 7px;
   line-height: 1;
-  margin-top: -24px;
+  /* El wordmark es una imagen recortada a las letras (sin padding inferior como
+     el texto): un tuck grande tapaba el oro. Solo un roce de 2 px. */
+  margin-top: 2px;
   padding: 0.05em 0.2em;
-  background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #f97316 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: titleShimmer 4s ease-in-out infinite;
-  background-size: 200% 100%;
-}
-
-@keyframes titleShimmer {
-  0%, 100% { background-position: 0% 50%; }
-  50%      { background-position: 100% 50%; }
+  /* Color plano de marca: se retiro el degradado violeta->magenta y su shimmer. */
+  color: #0f1d39;
 }
 
 /* --- Central Sprite Showcase --- */
@@ -1836,10 +1753,16 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
     letter-spacing: 2px;
   }
 
+  .hero__title-logo {
+    /* Un poco mas contenido que antes: en movil el wordmark se comia el ancho. */
+    width: min(380px, 78vw);
+  }
+
   .hero__title-line--accent {
-    font-size: 1.75rem;
+    font-size: 1.9rem;
     letter-spacing: 4px;
-    margin-top: -12px;
+    /* Aire real entre el logo y el subtitulo. */
+    margin-top: 8px;
   }
 
   .hero__showcase {
@@ -1949,11 +1872,15 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
     font-size: 3.8rem;
   }
 
+  .hero__title-logo {
+    width: min(300px, 76vw);
+  }
+
   .hero__title-line--accent {
-    font-size: 1.5rem;
+    font-size: 1.7rem;
     letter-spacing: 3px;
-    /* El encaje sobre FORTNITE crece con el mismo factor. */
-    margin-top: -10px;
+    /* Sin tuck y con separacion: el subtitulo ya no se pega al oro. */
+    margin-top: 8px;
   }
 
   .hero__bar {
@@ -8443,204 +8370,24 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
 }
 
 /* ==========================================================================
-   LOGO: FORTNITE -> FORTNITEMARES
-   Ambos conviven en el DOM; el tema decide cual se ve. Asi el
-   titulo real de la web se transforma donde ya vive, en vez de que un
-   overlay simule la transformacion encima.
+   LOGO: FORTNITE en el wordmark de oro (imagen) y SPRITEDEX en texto. Sin
+   glitch, sin copias RGB y sin tratamiento por temporada.
    ========================================================================== */
 
-/* El alto del bloque lo marca el wordmark, no el texto. El SVG es de 3:1
-   (viewBox 3000x1000), asi que se fija el alto y el ancho sale solo: asi el
-   logo manda en el titulo, igual que FORTNITE manda en la version normal.
-   Antes el alto venia de un max-height y la caja de 290px se recortaba, que
-   es justo lo que dejaba el logo pequeno. */
 .hero__title-line-wrap {
-  --fnm-logo-w: 520px;
   position: relative;
   display: grid;
   place-items: center;
   width: 100%;
-  height: calc(var(--fnm-logo-w) / 3);
-  transition: height 420ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Dimensionado por ANCHO, no por alto. El wordmark es de 3:1, asi que con
-   width + height:auto escala proporcionalmente y max-width solo puede
-   estrecharlo, nunca recortarlo. Al revés (height:100% + width:auto) el
-   max-width encogia la caja pero el alto se mantenia, y el logo se salia. */
-.hero__title-fnm-svg {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: var(--fnm-logo-w);
-  max-width: 100%;
-  height: auto;
-  transform: translate(-50%, -50%) scale(0.82);
-  opacity: 0;
-  filter: drop-shadow(0 0 14px rgba(192, 38, 211, 0.85))
-          drop-shadow(0 0 30px rgba(236, 72, 153, 0.6))
-          drop-shadow(0 0 54px rgba(168, 85, 247, 0.45));
-  transition: opacity 900ms ease, transform 1100ms cubic-bezier(0.34, 1.3, 0.5, 1), filter 900ms ease;
-  pointer-events: none;
-}
 
-@media (max-width: 768px) {
-  .hero__title-line-wrap { --fnm-logo-w: 480px; }
-}
-
-@media (max-width: 480px) {
-  .hero__title-line-wrap { --fnm-logo-w: 355px; }
-}
-
-@media (min-width: 769px) {
-  .hero__title-line-wrap { --fnm-logo-w: 600px; }
-  .hero__title-fnm-svg { margin-top: -14px; }
-  .filter-bar-container { margin-top: 44px; }
-}
-
-/* Estado normal: solo el texto, y el alto lo marca el propio texto. */
-.hero__title[data-fnm-logo='normal'] .hero__title-line-wrap {
-  height: auto;
-}
-
-.hero__title[data-fnm-logo='normal'] .hero__title-fnm-svg {
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.82);
-}
-
-/* Estado tematico: el wordmark define el alto y el texto sale del flujo, para
-   que la caja mida lo que mide el logo y no un max-height recortado. */
-.hero__title[data-fnm-logo='themed'] .hero__title-line-wrap {
-  height: calc(var(--fnm-logo-w) / 3);
-}
-
-.hero__title[data-fnm-logo='themed'] .hero__title-line--glitch {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  transform: translateY(-50%);
-}
-
-/* Estado tematico: el wordmark Fortnitemares toma el lugar del texto. La
-   salida del texto tambien es un momento: se hincha y se disuelve despacio,
-   mientras el SVG entra por debajo con su micro-rebote. */
-.hero__title[data-fnm-logo='themed'] .hero__title-line--glitch {
-  opacity: 0;
-  transform: translateY(-50%) scale(1.12);
-  filter: blur(10px);
-  transition: opacity 620ms ease, transform 760ms cubic-bezier(0.16, 1, 0.3, 1), filter 620ms ease;
-}
-
-.hero__title[data-fnm-logo='themed'] .hero__title-fnm-svg {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-  animation: fnm-logo-pulse 3.5s ease-in-out infinite alternate;
-}
-
-/* Fantasmas RGB del wordmark: dos siluetas de Fortnitemares recortadas con el
-   propio SVG como mascara, en el mismo rojo/cian del glitch de FORTNITE. El
-   contenedor apila y centra (grid 1x1); los fantasmas solo saltan con
-   transform en pasos: el mismo truco barato del titulo, sin animar filters. */
-.hero__title-fnm-ghosts {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-}
-
-.hero__title-fnm-ghost {
-  grid-area: 1 / 1;
-  width: var(--fnm-logo-w);
-  max-width: 100%;
-  aspect-ratio: 3 / 1;
-  opacity: 0;
-  pointer-events: none;
-  -webkit-mask-image: url('/fortnitemares.svg');
-  mask-image: url('/fortnitemares.svg');
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-}
-
-.hero__title-fnm-ghost--r { background: var(--tg-rgb-r, #ff0055); }
-.hero__title-fnm-ghost--b { background: var(--tg-rgb-b, #00FFFB); }
-
-.hero__title[data-fnm-logo='themed'] .hero__title-fnm-ghost--r {
-  opacity: 0.75;
-  /* Emergen cuando el wordmark ya esta asentandose: el split RGB aterriza
-     despues del bloom, no de golpe. */
-  transition: opacity 600ms ease 380ms;
-  animation: fnm-ghost-glitch-r steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
-}
-
-.hero__title[data-fnm-logo='themed'] .hero__title-fnm-ghost--b {
-  opacity: 0.75;
-  transition: opacity 600ms ease 460ms;
-  animation: fnm-ghost-glitch-b steps(1, end) infinite;
-  animation-duration: calc(var(--tg-rgb-duration, 2.8s) * 2.5);
-  animation-delay: 0.07s;
-}
-
-/* En reposo los fantasmas son invisibles: solo aparecen durante el hipo. */
-@keyframes fnm-ghost-glitch-r {
-  0%, 90%     { transform: translateX(calc(-0.1rem * var(--fnm-ghost-k, 1))); opacity: 0; }
-  90.7%       { transform: translateX(calc(-0.65rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
-  91.4%       { transform: translateX(calc(0.2rem * var(--fnm-ghost-k, 1))) translateY(-0.02rem); opacity: 0.8; }
-  92.1%       { transform: translateX(calc(-0.15rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
-  92.8%       { transform: translateX(calc(-0.85rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
-  93.5%, 100% { transform: translateX(calc(-0.1rem * var(--fnm-ghost-k, 1))); opacity: 0; }
-}
-
-@keyframes fnm-ghost-glitch-b {
-  0%, 90%     { transform: translateX(calc(0.1rem * var(--fnm-ghost-k, 1))); opacity: 0; }
-  90.7%       { transform: translateX(calc(0.65rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
-  91.4%       { transform: translateX(calc(-0.2rem * var(--fnm-ghost-k, 1))) translateY(0.02rem); opacity: 0.8; }
-  92.1%       { transform: translateX(calc(0.15rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
-  92.8%       { transform: translateX(calc(0.85rem * var(--fnm-ghost-k, 1))); opacity: 0.8; }
-  93.5%, 100% { transform: translateX(calc(0.1rem * var(--fnm-ghost-k, 1))); opacity: 0; }
-}
-
-/* En movil el logo es mas chico: el desplazamiento del split se reduce a la mitad
-   en vez de ocultarse. */
-@media (max-width: 768px) {
-  .hero__title-fnm-ghosts {
-    --fnm-ghost-k: 0.5;
-  }
-}
-
-@keyframes fnm-logo-pulse {
-  0% {
-    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.7))
-            drop-shadow(0 0 26px rgba(118, 28, 132, 0.8))
-            drop-shadow(0 0 50px rgba(118, 28, 132, 0.5));
-  }
-  100% {
-    filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.85))
-            drop-shadow(0 0 34px rgba(118, 28, 132, 0.9))
-            drop-shadow(0 0 60px rgba(118, 28, 132, 0.6));
-  }
-}
-
-/* Subtítulo SPRITEDEX: violeta -> magenta, el neon de la key art. */
+/* Subtítulo SPRITEDEX: mismo color plano de marca que el resto de temporadas. */
 .hero__title-line--accent-fnm {
-  background: linear-gradient(135deg, #f5d0fe 0%, #e879f9 45%, #f0abfc 75%, #d8b4fe 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  text-shadow: 0 0 18px rgba(217, 70, 239, 0.5) !important;
-  /* Sombra oscura por detras. Va en filter y no en text-shadow: con
-     background-clip el rotulo es un degradado recortado a las letras, y un
-     text-shadow se pinta encima del relleno, ensuciandolo. drop-shadow usa el
-     alfa ya recortado, asi que dibuja el borde por detras y deja la letra
-     limpia. */
+  color: #0f1d39 !important;
+  /* Sombra por detras para despegarlo de la key art. */
   filter: drop-shadow(0 3px 7px rgba(6, 2, 14, 0.8)) !important;
-  margin-top: -6px !important;
+  margin-top: 2px !important;
 }
 
 /* ==========================================================================
@@ -9483,11 +9230,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 /* Seasonal animations must respect the visitor's motion preference. */
 @media (prefers-reduced-motion: reduce) {
-  .hero__title-fnm-svg,
-.hero__title-fnm-ghost {
-    animation: none;
-  }
-
   /* El fuego de las calabazas y el pulso de luz se quedan fijos. */
   html.theme-fortnitemares::after {
     animation: none;
@@ -9510,11 +9252,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 /* The in-app "motion disabled" preference covers the seasonal layers too. */
-.motion-disabled .hero__title-fnm-svg,
-.motion-disabled .hero__title-fnm-ghost {
-  animation: none;
-}
-
 .motion-disabled .fnm-pumpkin-btn,
 .motion-disabled .fnm-pumpkin-svg,
 .motion-disabled .fnm-sat,
@@ -10218,4 +9955,97 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   html.theme-fortnitemares:not([data-fnm-phase])::after {
     animation: none;
   }
+}
+
+/* ==========================================================================
+   BARRA DE NAVEGACION MOVIL
+   Sustituye al dock flotante: cuatro accesos fijos abajo, siempre visibles.
+   ========================================================================== */
+
+.czs-navbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 70;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  gap: 2px;
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  background: rgba(8, 12, 24, 0.94);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.czs-navbar__item {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 2px;
+  border: 0;
+  background: none;
+  color: #cbd5e1;
+  font-family: var(--font-sans);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.czs-navbar__item:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.czs-navbar__icon-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Deja aire al final del documento para que la barra no tape contenido. */
+body.has-czs-navbar {
+  padding-bottom: calc(62px + env(safe-area-inset-bottom));
+}
+
+/* ==========================================================================
+   3ª GENERACION (Buscatesoros)
+   Cada carta lleva su tono en --g3-h/--g3-s/--g3-l desde SpriteCard.jsx: fondo
+   oscuro con un halo del color del espiritu, como la guia de colores.
+   ========================================================================== */
+
+html body .sprite-card.is-gen3 {
+  background:
+    radial-gradient(
+      ellipse at 50% 34%,
+      hsl(var(--g3-h) var(--g3-s) calc(var(--g3-l) + 20%)) 0%,
+      hsl(var(--g3-h) calc(var(--g3-s) - 12%) calc(var(--g3-l) + 6%)) 46%,
+      hsl(var(--g3-h) 42% calc(var(--g3-l) - 6%)) 100%
+    ) !important;
+  background-color: hsl(var(--g3-h) 42% calc(var(--g3-l) - 6%)) !important;
+  background-size: auto !important;
+  border-color: hsl(var(--g3-h) 45% calc(var(--g3-l) + 22%)) !important;
+}
+
+html body .sprite-card.is-gen3 .card-name {
+  color: #f7f1e4 !important;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+html body .sprite-card.is-gen3 .card-owned-btn,
+html body .sprite-card.is-gen3 .card-owned-btn.is-readonly {
+  background: rgba(12, 14, 20, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #ece6d8 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+html body .sprite-card.is-gen3 .card-owned-btn .btn-text {
+  color: #ece6d8 !important;
 }

@@ -1,0 +1,177 @@
+{
+  "barreloffish_basic": {
+    "h": 215,
+    "s": 51,
+    "l": 17
+  },
+  "barreloffish_cursed": {
+    "h": 140,
+    "s": 48,
+    "l": 18
+  },
+  "barreloffish_jeweled": {
+    "h": 354,
+    "s": 62,
+    "l": 20
+  },
+  "coinpile_basic": {
+    "h": 209,
+    "s": 53,
+    "l": 17
+  },
+  "coinpile_cursed": {
+    "h": 140,
+    "s": 48,
+    "l": 18
+  },
+  "coinpile_jeweled": {
+    "h": 354,
+    "s": 62,
+    "l": 20
+  },
+  "compass_basic": {
+    "h": 209,
+    "s": 56,
+    "l": 17
+  },
+  "compass_cursed": {
+    "h": 140,
+    "s": 48,
+    "l": 18
+  },
+  "compass_jeweled": {
+    "h": 354,
+    "s": 62,
+    "l": 20
+  },
+  "feedjet_basic": {
+    "h": 345,
+    "s": 49,
+    "l": 17
+  },
+  "parrot_basic": {
+    "h": 204,
+    "s": 57,
+    "l": 17
+  },
+  "parrot_cursed": {
+    "h": 140,
+    "s": 48,
+    "l": 18
+  },
+  "parrot_jeweled": {
+    "h": 354,
+    "s": 62,
+    "l": 20
+  },
+  "peelybones_basic": {
+    "h": 223,
+    "s": 60,
+    "l": 17
+  },
+  "peelybones_cursed": {
+    "h": 140,
+    "s": 48,
+    "l": 18
+  },
+  "peelybones_jeweled": {
+    "h": 354,
+    "s": 62,
+    "l": 20
+  },
+  "playmakerbrewery_basic": {
+    "h": 39,
+    "s": 64,
+    "l": 17
+  },
+  "playmakerbrewery_cursed": {
+    "h": 140,
+    "s": 48,
+    "l": 18
+  },
+  "playmakerbrewery_jeweled": {
+    "h": 354,
+    "s": 62,
+    "l": 20
+  },
+  "rookgecko_basic": {
+    "h": 202,
+    "s": 55,
+    "l": 17
+  },
+  "rookgecko_cursed": {
+    "h": 140,
+    "s": 48,
+    "l": 18
+  },
+  "rookgecko_jeweled": {
+    "h": 354,
+    "s": 62,
+    "l": 20
+  },
+  "squibbly_basic": {
+    "h": 96,
+    "s": 54,
+    "l": 17
+  },
+  "squibbly_cursed": {
+    "h": 140,
+    "s": 48,
+    "l": 18
+  },
+  "squibbly_jeweled": {
+    "h": 354,
+    "s": 62,
+    "l": 20
+  },
+  "starlight_basic": {
+    "h": 81,
+    "s": 59,
+    "l": 17
+  },
+  "treasurechest_basic": {
+    "h": 208,
+    "s": 56,
+    "l": 17
+  },
+  "treasurechest_cursed": {
+    "h": 140,
+    "s": 48,
+    "l": 18
+  },
+  "treasurechest_jeweled": {
+    "h": 354,
+    "s": 62,
+    "l": 20
+  },
+  "treasuremap_basic": {
+    "h": 215,
+    "s": 61,
+    "l": 17
+  },
+  "treasuremap_cursed": {
+    "h": 140,
+    "s": 48,
+    "l": 18
+  },
+  "treasuremap_jeweled": {
+    "h": 354,
+    "s": 62,
+    "l": 20
+  },
+  "unbotheredfish_basic": {
+    "h": 222,
+    "s": 57,
+    "l": 17
+  },
+  "unbotheredfish_cursed": {
+    "h": 140,
+    "s": 48,
+    "l": 18
+  },
+  "unbotheredfish_jeweled": {
+    "h": 354,
+    "s": 62,
+    "l": 20
+  }
+}
