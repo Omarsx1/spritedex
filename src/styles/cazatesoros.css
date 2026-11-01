@@ -1325,9 +1325,26 @@ html.theme-cazatesoros .sdm-friends__code {
 }
 
 html.theme-cazatesoros .sdm-friends__plate {
-  background: rgba(255, 250, 232, 0.85) !important;
-  border-color: rgba(74, 42, 16, 0.45) !important;
+  /* La placa del codigo no tenia relleno propio: el texto quedaba pegado al
+     filo. Ahora es una ficha con aire, prefijo tenue y codigo en tinta. */
+  padding: 6px 12px !important;
+  border-radius: 8px !important;
+  gap: 8px !important;
+  background: rgba(255, 250, 232, 0.92) !important;
+  border: 1px solid rgba(74, 42, 16, 0.45) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
   color: var(--czs-tinta) !important;
+}
+
+html.theme-cazatesoros .sdm-friends__prefix {
+  color: #7a5a34 !important;
+  letter-spacing: 1.1px;
+}
+
+html.theme-cazatesoros .sdm-friends__code {
+  color: #0e1728 !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 1.6px;
 }
 
 /* ==========================================================================
