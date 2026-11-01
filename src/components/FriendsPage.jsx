@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ALL_SPRITES, pickName } from '../data/spritesData';
-import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw, Trash2, CheckCircle2, Share2 } from 'lucide-react';
+import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw, Trash2, CheckCircle2 } from 'lucide-react';
 import { Modal } from './ui/Modal';
-import { safeStorage } from '../utils/safeStorage';
 import { useFriendRequests } from '../hooks/useFriendRequests';
 import { generateShareUrl } from '../utils/friendCode';
 import { fichaYaCargada } from '../utils/fichaAmigo';
@@ -55,8 +54,6 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
   // Espiritu de "te faltan" que tiene abierto el popover de registrar.
   const [registrarAbierto, setRegistrarAbierto] = useState(null);
   // Lo que ya le enviaste o compartiste a este amigo, por espiritu.
-  const [marcas, setMarcas] = useState({});
-  const [marcaAbierta, setMarcaAbierta] = useState(null);
 
   // Respaldo para los enlaces: con un enlace por token el codigo llega DESPUES del montaje,
   // asi que la pestaña se corrige sola en cuanto aparece; si no, el enlace abriria la
@@ -68,50 +65,20 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
 
   // Cerrar el popover al tocar fuera.
   useEffect(() => {
-    if (!registrarAbierto && !marcaAbierta) return undefined;
+    if (!registrarAbierto) return undefined;
     const cerrar = (evento) => {
       if (evento.target.closest('.fpage__mini')) return;
       setRegistrarAbierto(null);
-      setMarcaAbierta(null);
     };
     document.addEventListener('pointerdown', cerrar);
     return () => document.removeEventListener('pointerdown', cerrar);
-  }, [registrarAbierto, marcaAbierta]);
+  }, [registrarAbierto]);
 
   const registrarEspiritu = (id) => {
     if (onMarcarAtrapado) onMarcarAtrapado(id);
     setRegistrarAbierto(null);
   };
 
-  // Las marcas viven en este dispositivo, atadas al amigo que estas viendo.
-  useEffect(() => {
-    if (!codigoFicha) {
-      setMarcas({});
-      return;
-    }
-    try {
-      const guardado = safeStorage.getItem('spritedex_marcas_' + codigoFicha);
-      setMarcas(guardado ? JSON.parse(guardado) : {});
-    } catch {
-      setMarcas({});
-    }
-    setMarcaAbierta(null);
-  }, [codigoFicha]);
-
-  const marcarEspiritu = (id, valor) => {
-    setMarcas((previo) => {
-      const siguiente = { ...previo };
-      if (valor) siguiente[id] = valor;
-      else delete siguiente[id];
-      try {
-        safeStorage.setItem('spritedex_marcas_' + codigoFicha, JSON.stringify(siguiente));
-      } catch {
-        // Sin almacenamiento la marca dura la sesion.
-      }
-      return siguiente;
-    });
-    setMarcaAbierta(null);
-  };
 
   // Solo el refresco pedido por el usuario muestra confirmacion; la carga inicial no.
   const refrescoPedido = useRef(false);
@@ -352,34 +319,9 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
                 ) : (<>
                   <div className="fpage__minis">
                     {(verTodos.leFaltan ? listas.leFaltan : listas.leFaltan.slice(0, 12)).map((s) => (
-                      <div key={s.id} className={'fpage__mini fpage__mini--suyo' + (marcas[s.id] ? ' is-' + marcas[s.id] : '')}>
-                        <button
-                          type="button"
-                          className="fpage__miniBtn"
-                          aria-expanded={marcaAbierta === s.id}
-                          aria-label={t('amigos.marcarEnvio', { nombre: s.name })}
-                          onClick={() => setMarcaAbierta(marcaAbierta === s.id ? null : s.id)}
-                        >
-                          {s.img ? <img src={s.img} alt={s.name} loading="lazy" decoding="async" width={44} height={44} /> : <span className="fpage__miniNombre">?</span>}
-                          <span className="fpage__miniNombre">{s.name}</span>
-                        </button>
-                        {marcas[s.id] && (
-                          <span className="fpage__miniMarca fpage__miniMarca--compartido" aria-label={t('amigos.compartido')}>
-                            <Share2 size={10} />
-                          </span>
-                        )}
-                        {marcaAbierta === s.id && (
-                          <div className="fpage__miniPop" role="dialog" aria-label={t('amigos.marcarEnvio', { nombre: s.name })}>
-                            <button
-                              type="button"
-                              aria-pressed={Boolean(marcas[s.id])}
-                              onClick={() => marcarEspiritu(s.id, marcas[s.id] ? null : 'compartido')}
-                            >
-                              {marcas[s.id] ? <Check size={11} /> : null}
-                              {t('amigos.compartido')}
-                            </button>
-                          </div>
-                        )}
+                      <div key={s.id} className="fpage__mini fpage__mini--suyo">
+                        {s.img ? <img src={s.img} alt={s.name} loading="lazy" decoding="async" width={44} height={44} /> : <span className="fpage__miniNombre">?</span>}
+                        <span className="fpage__miniNombre">{s.name}</span>
                       </div>
                     ))}
                   </div>

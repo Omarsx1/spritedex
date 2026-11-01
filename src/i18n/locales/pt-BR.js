@@ -103,8 +103,6 @@ export default {
   "amigos.registrarEspiritu": "Registrar {nombre} na sua coleção",
   "amigos.registrarPregunta": "Registrar como capturado?",
   "amigos.registrar": "Registrar",
-  "amigos.marcarEnvio": "Marcar {nombre} como compartilhado",
-  "amigos.compartido": "Compartilhado",
   "amigos.rechazar": "Recusar",
   "amigos.sinAmigos": "Você ainda não tem amigos aceitos. Envie uma solicitação com o código de alguém: quando a pessoa aceitar, ela aparecerá aqui.",
   "amigos.sinFichaHint": "Toque em Ver coleção do amigo para carregar a comparação: você verá o que falta a você e o que falta a ele.",
