@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { fireConfetti } from '../utils/confetti';
-import { Lock } from 'lucide-react';
+import { Lock, Gem } from 'lucide-react';
 import { RARITIES, getSpriteCardStyle, getRarityInfo, pickName, tinteDeTemporada } from '../data/spritesData';
 import { t } from '../i18n';
 import { sounds } from '../utils/audio';
@@ -148,11 +148,13 @@ function SpriteCardBase({
                   {[1, 2, 3, 4, 5].map((num) => (
                     <button
                       key={num}
-                      className={`star-btn-sm ${level >= num ? 'active' : ''}`}
+                      className={`star-btn-sm ${level >= num ? 'active' : ''} ${sprite.gen === 3 ? 'is-gema' : ''}`}
                       onClick={(e) => handleLevelClick(e, num)}
                     >
                       {sprite.gen === 2 ? (
                         <SonicRing active={level >= num} mastered={isMastered && num === 5} size={14} />
+                      ) : sprite.gen === 3 ? (
+                        <Gem size={12} strokeWidth={2.4} aria-hidden="true" />
                       ) : (
                         '★'
                       )}
@@ -302,13 +304,15 @@ function SpriteCardBase({
           {[1, 2, 3, 4, 5].map((num) => (
             <button
               key={num}
-              className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''} ${sprite.gen === 2 ? 'is-sonic-ring-btn' : ''}`}
+              className={`star-btn ${level >= num ? 'active' : ''} ${isMastered && num === 5 ? 'mastered-star' : ''} ${sprite.gen === 2 ? 'is-sonic-ring-btn' : ''} ${sprite.gen === 3 ? 'is-gema' : ''}`}
               onClick={(e) => handleLevelClick(e, num)}
               style={isFriendView ? { pointerEvents: 'none' } : {}}
               title={level === 1 && num === 1 ? t('carta.tocaDesmarcar') : t('carta.nivel', { n: num })}
             >
               {sprite.gen === 2 ? (
                 <SonicRing active={level >= num} mastered={isMastered && num === 5} size={19} />
+              ) : sprite.gen === 3 ? (
+                <Gem size={15} strokeWidth={2.2} aria-hidden="true" />
               ) : (
                 '★'
               )}

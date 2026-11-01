@@ -4437,6 +4437,19 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   filter: drop-shadow(0 0 3px rgba(250, 204, 21, 0.35));
 }
 
+/* Tercera generacion: el nivel no son estrellas, son gemas de pirata. La piedra
+   se rellena al subir de nivel y queda en contorno mientras no se tiene. */
+.star-btn.is-gema svg,
+.star-btn-sm.is-gema svg {
+  display: block;
+  fill: none;
+}
+
+.star-btn.is-gema.active svg,
+.star-btn-sm.is-gema.active svg {
+  fill: currentColor;
+}
+
 .owned-btn-sm {
   padding: 6px 14px;
   border-radius: 6px;
