@@ -23,6 +23,7 @@ test('las familias de Buscatesoros ya traducidas conservan su nombre acordado', 
   assert.equal(FAMILY_NAMES_MAP.peelybones, 'Bananín Huesudo');
   assert.equal(FAMILY_NAMES_MAP.treasuremap, 'Buscarrutas');
   assert.equal(FAMILY_NAMES_MAP.feedjet, 'Caracol Transmisor');
+  assert.equal(FAMILY_NAMES_MAP.unbotheredfish, 'Mar');
 });
 
 test('la variante jeweled se llama Afortunado en español', () => {

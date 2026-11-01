@@ -1193,10 +1193,13 @@ html.theme-cazatesoros .sdm-share-pro__canvas-host {
     linear-gradient(rgba(255, 248, 226, 0.65), rgba(255, 248, 226, 0.65)),
     url('/papiro-papel.webp') center / 400px 400px,
     var(--czs-papel-claro) !important;
-  border: 2px solid rgba(74, 42, 16, 0.55) !important;
+  /* Filo fino de madera + hairline dorado por dentro: el marco de 2px pesaba
+     demasiado frente al chrome navy de la cabecera y la barra. */
+  border: 1px solid rgba(74, 42, 16, 0.45) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 246, 214, 0.6),
-    0 5px 14px rgba(40, 22, 6, 0.28) !important;
+    inset 0 0 0 1px rgba(216, 178, 106, 0.45),
+    0 5px 14px rgba(40, 22, 6, 0.24) !important;
   color: var(--czs-tinta) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -1220,16 +1223,38 @@ html.theme-cazatesoros .sdm-share-pro__input {
   color: var(--czs-tinta) !important;
 }
 
-/* Botones principales: madera en vez del cian */
-html.theme-cazatesoros .sdm-friends__btn,
-html.theme-cazatesoros .sdm-share-pro__btn,
+/* Pestana activa: navy con filo de laton, la misma familia que el filtro. */
 html.theme-cazatesoros .fpage__tab.is-active {
-  background: linear-gradient(180deg, #a9713c, #6f431c 58%, #54300f) !important;
-  border: 2px solid #3f2410 !important;
-  color: #fff3d0 !important;
+  background: linear-gradient(180deg, #1a2942 0%, #0e1728 100%) !important;
+  border: 1px solid #d8b26a !important;
+  color: #f2e6c8 !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 226, 170, 0.45),
-    0 3px 8px rgba(30, 15, 3, 0.35) !important;
+    inset 0 1px 0 rgba(240, 226, 192, 0.18),
+    0 2px 6px rgba(4, 8, 16, 0.3) !important;
+}
+
+/* Acciones secundarias: contorno navy sobre el papiro, sin bloque de madera. */
+html.theme-cazatesoros .sdm-friends__btn,
+html.theme-cazatesoros .sdm-share-pro__btn {
+  background: rgba(255, 250, 232, 0.9) !important;
+  border: 1px solid rgba(14, 23, 40, 0.55) !important;
+  color: #0e1728 !important;
+  box-shadow: none !important;
+}
+
+/* Accion primaria de la pagina: dorado con tinta oscura. */
+html.theme-cazatesoros .sdm-friends__send {
+  background: linear-gradient(180deg, #e8c98a 0%, #c9a45c 100%) !important;
+  border: 1px solid #a8843f !important;
+  color: #241a0c !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 2px 6px rgba(40, 22, 6, 0.3) !important;
+}
+
+/* Etiquetas de seccion en el navy del chrome. */
+html.theme-cazatesoros .sdm-friends__label {
+  color: #0e1728 !important;
 }
 
 html.theme-cazatesoros .sdm-friends__btn--ok {

@@ -61,7 +61,7 @@ export const FAMILY_NAMES_MAP = {
   treasurechest: 'Chester',
   treasuremap: 'Buscarrutas',
   compass: 'Wayfinder',
-  unbotheredfish: 'Kelper',
+  unbotheredfish: 'Mar',
   starlight: 'Sweet Dreams',
   squibbly: "Lil' Squibbly",
   playmakerbrewery: "Lil' Flacko",
