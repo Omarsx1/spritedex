@@ -13,14 +13,15 @@ html.theme-cazatesoros {
 }
 
 /* Fondo de papiro bajo el buscador, hasta el final de la pagina. */
+/* Textura de papiro (public/papiro-textura.webp, recorte del pergamino) con la
+   viñeta encima para que los bordes se oscurezcan. */
 html.theme-cazatesoros .main-content {
   background-color: var(--tc-papiro);
   background-image:
-    radial-gradient(ellipse at 30% 15%, rgba(255, 246, 215, 0.6), transparent 60%),
-    radial-gradient(ellipse at 85% 90%, rgba(120, 78, 30, 0.28), transparent 55%),
-    radial-gradient(rgba(120, 78, 30, 0.08) 1px, transparent 1.5px);
-  background-size: auto, auto, 6px 6px;
-  box-shadow: inset 0 0 70px rgba(90, 55, 20, 0.35);
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(90, 55, 20, 0.35) 100%),
+    url('/papiro-textura.webp');
+  background-size: auto, 780px 780px;
+  background-repeat: no-repeat, repeat;
 }
 
 /* Buscador: pastilla de papiro con marco de madera. La vista previa gana al tema
@@ -28,7 +29,7 @@ html.theme-cazatesoros .main-content {
    (fondo de cristal, anillo de neon y estado de foco), por eso van con !important. */
 html.theme-cazatesoros .mobile-glass-search-pill,
 html.theme-cazatesoros .mobile-glass-search-pill.is-focused {
-  background: radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.5), transparent 70%), var(--tc-papiro-claro) !important;
+  background: linear-gradient(rgba(255, 246, 215, 0.4), rgba(255, 246, 215, 0.4)), url('/papiro-textura.webp') center / 780px 780px, var(--tc-papiro-claro) !important;
   border: 6px solid transparent !important;
   border-image: linear-gradient(180deg, #9a6a35, var(--tc-madera-oscura) 50%, #8a5a2a) 1 !important;
   border-radius: 10px !important;
