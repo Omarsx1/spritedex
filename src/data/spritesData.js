@@ -313,10 +313,7 @@ export const SPANISH_NAME_OVERRIDES = {
   klombo_cheatmaster: 'Klombo Hacker',
   jonesy_basic: 'Jonesy',
   jonesy_gold: 'Jonesy Dorado',
-  jonesy_cheatmaster: 'Jonesy Hacker',
-  // "Fortuna" no se toca en el mapa de temas porque lo comparten todas las variantes
-  // jeweled; esta carta tiene su propio nombre en español.
-  playmakerbrewery_jeweled: "Lil' Flacko Afortunado"
+  jonesy_cheatmaster: 'Jonesy Hacker'
 };
 
 export const SPIRIT_DATA_OVERRIDES = {

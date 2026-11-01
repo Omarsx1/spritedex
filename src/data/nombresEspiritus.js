@@ -91,5 +91,5 @@ export const THEME_NAMES_ES = {
   Quack: 'Patito',
   // Temporada Buscatesoros (Chapter 7 Season 4).
   cursed: 'Maldito',
-  jeweled: 'Fortuna'
+  jeweled: 'Afortunado'
 };
