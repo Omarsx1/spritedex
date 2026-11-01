@@ -12,16 +12,23 @@ html.theme-cazatesoros {
   --tc-madera-oscura: #4a2a0f;
 }
 
-/* Fondo de papiro bajo el buscador, hasta el final de la pagina. */
-/* Textura de papiro (public/papiro-textura.webp, recorte del pergamino) con la
-   viñeta encima para que los bordes se oscurezcan. */
+/* Pergamino enrollado bajo el buscador, hasta el final de la pagina: rollo
+   superior e inferior, bordes envejecidos a los lados y textura de papel. Todo
+   son capas de fondo (sin pseudo-elementos) para no tapar el contenido. */
 html.theme-cazatesoros .main-content {
+  padding-left: 40px;
+  padding-right: 40px;
   background-color: var(--tc-papiro);
   background-image:
+    url('/papiro-rollo-sup.webp'),
+    url('/papiro-rollo-inf.webp'),
+    url('/papiro-borde-izq.webp'),
+    url('/papiro-borde-der.webp'),
     radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(90, 55, 20, 0.35) 100%),
     url('/papiro-textura.webp');
-  background-size: auto, 780px 780px;
-  background-repeat: no-repeat, repeat;
+  background-position: top center, bottom center, left top, right top, 0 0, 0 0;
+  background-size: min(100%, 1200px) auto, min(100%, 720px) auto, 44px auto, 44px auto, auto, 780px 780px;
+  background-repeat: no-repeat, no-repeat, repeat-y, repeat-y, no-repeat, repeat;
 }
 
 /* Buscador: pastilla de papiro con marco de madera. La vista previa gana al tema
