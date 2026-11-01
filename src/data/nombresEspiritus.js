@@ -63,7 +63,7 @@ export const FAMILY_NAMES_MAP = {
   compass: 'Orientador',
   unbotheredfish: 'Mar',
   starlight: 'Sweet Dreams',
-  squibbly: "Lil' Squibbly",
+  squibbly: 'Tintonio pequeño',
   playmakerbrewery: "Lil' Flacko",
   rookgecko: "Lil' Uzi Vert Jr.",
   coinpile: 'Saqueacofres',
