@@ -8136,6 +8136,105 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   overflow-wrap: anywhere;
 }
 
+/* Cada minicard es un boton: al tocarla se abre el popover de "Enviado" /
+   "Compartido" encima del espiritu. */
+.fpage__mini {
+  position: relative;
+  padding: 0;
+}
+
+.fpage__miniBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  width: 100%;
+  padding: 7px 5px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.fpage__miniBtn:focus-visible {
+  outline: 2px solid #d8b26a;
+  outline-offset: -2px;
+}
+
+/* Popover pequeño encima del espiritu. */
+.fpage__miniPop {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 118px;
+  padding: 5px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #1b2b46 0%, #0e1728 100%);
+  border: 1px solid rgba(216, 178, 106, 0.85);
+  box-shadow: 0 10px 24px rgba(4, 8, 16, 0.45);
+}
+
+.fpage__miniPop::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #0e1728;
+}
+
+.fpage__miniPop button {
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: #f2e6c8;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.fpage__miniPop button:hover,
+.fpage__miniPop button:focus-visible {
+  background: rgba(216, 178, 106, 0.16);
+  outline: none;
+}
+
+.fpage__miniPopText {
+  padding: 2px 4px 4px;
+  color: #c7b68c;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.fpage__miniPopOk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(180deg, #e8c98a 0%, #c9a45c 100%) !important;
+  color: #241a0c !important;
+  font-weight: 900 !important;
+  text-align: center !important;
+}
+
 /* Contraste de los botones del radar y de la ficha. El texto estaba bien, pero el cuerpo
    del boton era una superficie al 6% con borde al 12%: se confundia con el fondo y no se
    leia como control. Sube la superficie al 14% y el borde al 34%, y Quitar y Enviar pasan

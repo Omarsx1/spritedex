@@ -1356,6 +1356,11 @@ export function App() {
             if (limpio && conectado && limpio === conectado) handleDisconnectFriend();
           }}
           onBack={() => irA('/')}
+          onMarcarAtrapado={(id) => {
+            // Registrar desde la comparacion: sin salir de la pagina, el espiritu
+            // entra en la coleccion propia y desaparece de "te faltan".
+            if (!userState[id]?.owned) handleToggleOwned(id);
+          }}
           onVerColeccion={async (codigo) => {
             // Primero se abre la comparacion y despues se busca la coleccion: el
             // clic tiene que responder al instante, no cuando termina la peticion.

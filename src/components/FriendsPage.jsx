@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ALL_SPRITES, pickName } from '../data/spritesData';
-import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw, Trash2 } from 'lucide-react';
+import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw, Trash2, CheckCircle2 } from 'lucide-react';
 import { Modal } from './ui/Modal';
 import { useFriendRequests } from '../hooks/useFriendRequests';
 import { generateShareUrl } from '../utils/friendCode';
@@ -11,7 +11,7 @@ import { t } from '../i18n';
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
 // gestionan personas y en la ficha del amigo se compara la coleccion (fase 2).
 // Reutiliza los estilos .sdm-friends que ya estaban aprobados.
-export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, codigoCargado }) {
+export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, codigoCargado, onMarcarAtrapado }) {
   // Comparación rápida para la ficha: lo que él tiene y yo no, y al revés. Es la misma
   // idea que las listas de la modal, aquí resumida para tenerla en la página.
   const listas = useMemo(() => {
@@ -51,6 +51,8 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
   const [cargandoColeccion, setCargandoColeccion] = useState(false);
   // Quitar a un amigo pasa por una confirmacion: el toque accidental ya no borra.
   const [amigoAQuitar, setAmigoAQuitar] = useState(null);
+  // Espiritu de "te faltan" que tiene abierto el popover de registrar.
+  const [registrarAbierto, setRegistrarAbierto] = useState(null);
 
   // Respaldo para los enlaces: con un enlace por token el codigo llega DESPUES del montaje,
   // asi que la pestaña se corrige sola en cuanto aparece; si no, el enlace abriria la
@@ -59,6 +61,21 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
   useEffect(() => {
     if (codigoFicha) setVista('comparacion');
   }, [codigoFicha]);
+
+  // Cerrar el popover al tocar fuera.
+  useEffect(() => {
+    if (!registrarAbierto) return undefined;
+    const cerrar = (evento) => {
+      if (!evento.target.closest('.fpage__mini')) setRegistrarAbierto(null);
+    };
+    document.addEventListener('pointerdown', cerrar);
+    return () => document.removeEventListener('pointerdown', cerrar);
+  }, [registrarAbierto]);
+
+  const registrarEspiritu = (id) => {
+    if (onMarcarAtrapado) onMarcarAtrapado(id);
+    setRegistrarAbierto(null);
+  };
 
   // Solo el refresco pedido por el usuario muestra confirmacion; la carga inicial no.
   const refrescoPedido = useRef(false);
@@ -263,8 +280,25 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
                   <div className="fpage__minis">
                     {(verTodos.teFaltan ? listas.teFaltan : listas.teFaltan.slice(0, 12)).map((s) => (
                       <div key={s.id} className="fpage__mini">
-                        {s.img ? <img src={s.img} alt={s.name} loading="lazy" decoding="async" width={44} height={44} /> : <span className="fpage__miniNombre">?</span>}
-                        <span className="fpage__miniNombre">{s.name}</span>
+                        <button
+                          type="button"
+                          className="fpage__miniBtn"
+                          aria-expanded={registrarAbierto === s.id}
+                          aria-label={t('amigos.registrarEspiritu', { nombre: s.name })}
+                          onClick={() => setRegistrarAbierto(registrarAbierto === s.id ? null : s.id)}
+                        >
+                          {s.img ? <img src={s.img} alt={s.name} loading="lazy" decoding="async" width={44} height={44} /> : <span className="fpage__miniNombre">?</span>}
+                          <span className="fpage__miniNombre">{s.name}</span>
+                        </button>
+                        {registrarAbierto === s.id && (
+                          <div className="fpage__miniPop" role="dialog" aria-label={t('amigos.registrarEspiritu', { nombre: s.name })}>
+                            <span className="fpage__miniPopText">{t('amigos.registrarPregunta')}</span>
+                            <button type="button" className="fpage__miniPopOk" onClick={() => registrarEspiritu(s.id)}>
+                              <CheckCircle2 size={12} />
+                              {t('amigos.registrar')}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

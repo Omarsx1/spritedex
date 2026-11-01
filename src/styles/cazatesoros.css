@@ -1284,6 +1284,22 @@ html.theme-cazatesoros .sdm-friends__label {
   color: #0e1728 !important;
 }
 
+/* Minicards de la comparacion: el nombre iba en gris claro y sobre el papiro
+   no se leia. Fondo de papel claro, filo de madera y tinta. */
+html.theme-cazatesoros .fpage__mini {
+  background: rgba(255, 250, 232, 0.78);
+  border-color: rgba(74, 42, 16, 0.35);
+}
+
+html.theme-cazatesoros .fpage__mini--suyo {
+  border-color: rgba(31, 122, 99, 0.55);
+}
+
+html.theme-cazatesoros .fpage__miniNombre {
+  color: #3a2510;
+  font-size: 0.66rem;
+}
+
 /* ===== Compartir: misma escala de acciones que Amigos ===== */
 html.theme-cazatesoros .sdm-share-pro__seg-label {
   color: #0e1728 !important;
