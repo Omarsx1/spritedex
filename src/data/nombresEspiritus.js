@@ -60,7 +60,7 @@ export const FAMILY_NAMES_MAP = {
   barreloffish: "Barry O'Fish",
   treasurechest: 'Chester',
   treasuremap: 'Buscarrutas',
-  compass: 'Wayfinder',
+  compass: 'Orientador',
   unbotheredfish: 'Mar',
   starlight: 'Sweet Dreams',
   squibbly: "Lil' Squibbly",
