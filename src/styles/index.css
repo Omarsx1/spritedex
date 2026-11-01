@@ -7082,7 +7082,9 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   display: flex;
   flex-direction: column;
   gap: 6px;
-  contain: layout paint;
+  /* Sin paint: el paint containment recortaba la sombra de la ficha contra el
+     borde de la fila y dejaba esa franja recta debajo. */
+  contain: layout;
 }
 
 
