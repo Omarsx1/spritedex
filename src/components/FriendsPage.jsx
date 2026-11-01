@@ -5,7 +5,6 @@ import { useFriendRequests } from '../hooks/useFriendRequests';
 import { generateShareUrl } from '../utils/friendCode';
 import { fichaYaCargada } from '../utils/fichaAmigo';
 import { t } from '../i18n';
-import { LanguageSwitcher } from './LanguageSwitcher';
 
 // Pagina de amigos (fase 1): tu codigo, agregar, solicitudes y la lista de amigos.
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
@@ -133,7 +132,6 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
           <button className={'fpage__refresh' + (radar.cargando ? ' is-loading' : '')} onClick={actualizarRed} disabled={radar.cargando} aria-label={t('amigos.actualizar')}>
             <RefreshCw size={15} />
           </button>
-          <LanguageSwitcher className="fpage__lang" />
         </div>
       </div>
 

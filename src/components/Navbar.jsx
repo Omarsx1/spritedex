@@ -5,7 +5,6 @@ import { getSupabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
 import { usuarioDeSesion, esCorreoSintetico } from '../utils/usuario';
 import { GENERATIONS } from '../data/spritesData';
-import { LanguageSwitcher } from './LanguageSwitcher';
 import { t, conIdioma, getLang } from '../i18n';
 import { RUTA_GUIA } from '../utils/rutaGuia.js';
 
@@ -206,12 +205,9 @@ export function Navbar({
         </a>
       </div>
 
-      {/* Acciones derechas: Idioma + Avatar + Menú Hamburguesa. El interruptor de
-          animaciones vive DENTRO del menú: la barra tenia demasiados botones sueltos. */}
+      {/* Acciones derechas: Avatar + Menú Hamburguesa. El idioma vive en Ajustes:
+          un ajuste, una puerta. El interruptor de animaciones, igual. */}
       <div className="app-navbar__right">
-        {/* Selector de idioma: siempre visible, porque la deteccion del navegador es solo una apuesta */}
-        <LanguageSwitcher />
-
         {/* Avatar / Usuario (Solo Foto o Inicial Circular) */}
         <div ref={userDropdownRef} style={{ position: 'relative' }}>
           <button
