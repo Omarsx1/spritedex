@@ -8443,9 +8443,9 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
 }
 
 /* ==========================================================================
-   LOGO: FORTNITE en ambos temas. Fortnitemares no cambia el texto ni su
-   fuente (la original, Burbank Big Condensed): solo le pone el brillo violeta
-   pulsante al mismo FORTNITE del modo normal.
+   LOGO: FORTNITE en ambos temas, en la fuente original (Burbank Big
+   Condensed). En Fortnitemares el texto pasa a dorado con borde oscuro: sin
+   brillo, sin pulso y sin franjas RGB.
    ========================================================================== */
 
 .hero__title-line-wrap {
@@ -8456,20 +8456,16 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
 }
 
 .hero__title[data-fnm-logo='themed'] .hero__title-line--glitch {
-  animation: fnm-logo-pulse 3.5s ease-in-out infinite alternate;
+  background: linear-gradient(180deg, #fff6c2 0%, #ffd23f 45%, #e09512 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1.5px #3a1c05;
 }
 
-@keyframes fnm-logo-pulse {
-  0% {
-    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.7))
-            drop-shadow(0 0 26px rgba(118, 28, 132, 0.8))
-            drop-shadow(0 0 50px rgba(118, 28, 132, 0.5));
-  }
-  100% {
-    filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.85))
-            drop-shadow(0 0 34px rgba(118, 28, 132, 0.9))
-            drop-shadow(0 0 60px rgba(118, 28, 132, 0.6));
-  }
+.hero__title[data-fnm-logo='themed'] .hero__title-line--glitch::before,
+.hero__title[data-fnm-logo='themed'] .hero__title-line--glitch::after {
+  display: none;
 }
 
 
@@ -9329,10 +9325,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 /* Seasonal animations must respect the visitor's motion preference. */
 @media (prefers-reduced-motion: reduce) {
-  .hero__title[data-fnm-logo='themed'] .hero__title-line--glitch {
-    animation: none;
-  }
-
   /* El fuego de las calabazas y el pulso de luz se quedan fijos. */
   html.theme-fortnitemares::after {
     animation: none;
@@ -9355,10 +9347,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 /* The in-app "motion disabled" preference covers the seasonal layers too. */
-.motion-disabled .hero__title[data-fnm-logo='themed'] .hero__title-line--glitch {
-  animation: none;
-}
-
 .motion-disabled .fnm-pumpkin-btn,
 .motion-disabled .fnm-pumpkin-svg,
 .motion-disabled .fnm-sat,
