@@ -4500,6 +4500,12 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   justify-content: center;
   /* Despegado del borde inferior de la ficha. */
   padding: 4px 0 12px;
+  /* Es un boton: tocar el cofre baja el espiritu a nivel 4. */
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
 }
 
 /* Resplandor detras del cofre: solo un halo calido muy suave. Los rayos
@@ -10709,4 +10715,72 @@ body[data-gen='2']::after {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),
     0 2px 6px rgba(4, 8, 16, 0.35) !important;
+}
+
+/* ==========================================================================
+   MODAL DE ESPECIFICACIONES · PALETA DE LA CASA
+   Era la ultima superficie con el azul viejo y los degradados cian/purpura.
+   ========================================================================== */
+
+.sdm {
+  background: linear-gradient(180deg, #16233a 0%, #0c1524 100%);
+  border: 1px solid rgba(216, 178, 106, 0.55);
+  box-shadow:
+    0 24px 80px rgba(4, 8, 16, 0.7),
+    inset 0 1px 0 rgba(240, 226, 192, 0.12);
+}
+
+.sdm__name {
+  color: #f2e6c8;
+}
+
+.sdm__meta {
+  color: #c7b68c;
+}
+
+.sdm__card {
+  background: rgba(9, 17, 29, 0.62);
+  border: 1px solid rgba(216, 178, 106, 0.28);
+}
+
+.sdm__card-label,
+.sdm__progress-title {
+  color: #d8b26a;
+}
+
+.sdm__card-text {
+  color: #e8dcc2;
+}
+
+.sdm__progress-track {
+  background: rgba(240, 226, 192, 0.14);
+}
+
+.sdm__progress-fill {
+  background: linear-gradient(90deg, #9a6a2c 0%, #e8c98a 100%);
+  box-shadow: none;
+}
+
+.sdm__close {
+  color: #f2e6c8;
+}
+
+.sdm__variant {
+  border-color: rgba(240, 226, 192, 0.16);
+}
+
+.sdm__variant.sdm__variant--selected {
+  box-shadow:
+    0 0 0 1px #d8b26a,
+    0 8px 18px rgba(0, 0, 0, 0.45);
+}
+
+.sdm__vlvl--active {
+  background: #1f7a63;
+  color: #f2fff9;
+}
+
+.sdm__vlvl--gold {
+  background: linear-gradient(180deg, #e8c98a 0%, #c9a45c 100%);
+  color: #241a0c;
 }

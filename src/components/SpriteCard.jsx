@@ -147,9 +147,15 @@ function SpriteCardBase({
             <>
               {isOwned && !isFriendView && (
                 (isMastered && sprite.gen === 3) ? (
-                  <div className="list-level-cofre" onClick={(e) => e.stopPropagation()} title={t('carta.maxeado')}>
+                  <button
+                    type="button"
+                    className="list-level-cofre"
+                    onClick={(e) => handleLevelClick(e, 4)}
+                    title={t('carta.bajarANivel', { n: 4 })}
+                    aria-label={t('carta.bajarANivel', { n: 4 })}
+                  >
                     <img src={cofreMaxDe(sprite.id)} alt={t('carta.maxeado')} width={26} height={26} decoding="async" />
-                  </div>
+                  </button>
                 ) : (
                 <div className="list-level-stars" onClick={(e) => e.stopPropagation()}>
                   {[1, 2, 3, 4, 5].map((num) => (
@@ -308,9 +314,16 @@ function SpriteCardBase({
           <span>{t('carta.noLanzado')}</span>
         </div>
       ) : isOwned && isMastered && sprite.gen === 3 ? (
-        <div className="card-level-cofre" onClick={(e) => e.stopPropagation()} title={t('carta.maxeado')}>
+        <button
+          type="button"
+          className="card-level-cofre"
+          onClick={(e) => handleLevelClick(e, 4)}
+          title={t('carta.bajarANivel', { n: 4 })}
+          aria-label={t('carta.bajarANivel', { n: 4 })}
+          style={isFriendView ? { pointerEvents: 'none' } : {}}
+        >
           <img src={cofreMaxDe(sprite.id)} alt={t('carta.maxeado')} width={40} height={40} decoding="async" />
-        </div>
+        </button>
       ) : isOwned ? (
         <div className="card-level-stars" onClick={(e) => e.stopPropagation()}>
           {[1, 2, 3, 4, 5].map((num) => (

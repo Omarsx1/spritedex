@@ -201,6 +201,7 @@ export default {
   "carta.corona": "Corona",
   "carta.maxeado": "⭐ Maxeado",
   "carta.nivel": "Nivel {n}",
+  "carta.bajarANivel": "Bajar a nivel {n}",
   "carta.noLanzado": "No lanzado",
   "carta.noLoTiene": "No lo tiene",
   "carta.presta": "🎁 PRESTA",

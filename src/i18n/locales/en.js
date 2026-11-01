@@ -200,6 +200,7 @@ export default {
   "carta.corona": "Crown",
   "carta.maxeado": "⭐ Maxed",
   "carta.nivel": "Level {n}",
+  "carta.bajarANivel": "Lower to level {n}",
   "carta.noLanzado": "Unreleased",
   "carta.noLoTiene": "Doesn't own it",
   "carta.presta": "🎁 LENDS",

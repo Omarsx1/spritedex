@@ -199,6 +199,7 @@ export default {
   "carta.corona": "Coroa",
   "carta.maxeado": "⭐ Maximizado",
   "carta.nivel": "Nível {n}",
+  "carta.bajarANivel": "Baixar para o nível {n}",
   "carta.noLanzado": "Não lançado",
   "carta.noLoTiene": "Não tem",
   "carta.presta": "🎁 EMPRESTA",

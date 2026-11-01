@@ -449,9 +449,16 @@ function FamilySpotlightRow({
                   <span>{t('swiper.noLanzado')}</span>
                 </div>
               ) : isOwned && isMastered && sprite.gen === 3 ? (
-                <div className="card-level-cofre ms-cofre" onClick={(e) => e.stopPropagation()} title={t('carta.maxeado')}>
+                <button
+                  type="button"
+                  className="card-level-cofre ms-cofre"
+                  onClick={(e) => handleLevelClick(e, 4)}
+                  title={t('carta.bajarANivel', { n: 4 })}
+                  aria-label={t('carta.bajarANivel', { n: 4 })}
+                  style={isFriendView ? { pointerEvents: 'none' } : {}}
+                >
                   <img src={cofreMaxDe(sprite.id)} alt={t('carta.maxeado')} width={48} height={48} decoding="async" />
-                </div>
+                </button>
               ) : isOwned ? (
                 <div
                   className="card-level-stars ms-stars"
