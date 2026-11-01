@@ -44,11 +44,11 @@ export function SpiritCatalogTable({
     try {
       const urlParams = new URLSearchParams(window.location.search);
       const urlGen = urlParams.get('gen');
-      if (urlGen && ['1', '2', 'all'].includes(urlGen)) return urlGen;
+      if (urlGen && ['1', '2', '3', 'all'].includes(urlGen)) return urlGen;
       const savedGen = sessionStorage.getItem('spritedex_catalog_gen');
       if (savedGen) return savedGen;
     } catch {}
-    return '2';
+    return '3';
   });
 
   const [currentPage, setCurrentPage] = useState(() => {
@@ -84,6 +84,7 @@ export function SpiritCatalogTable({
 
       if (genFilter === '1' && s.gen !== 1) return false;
       if (genFilter === '2' && s.gen !== 2) return false;
+      if (genFilter === '3' && s.gen !== 3) return false;
 
       return true;
     });
@@ -242,9 +243,10 @@ export function SpiritCatalogTable({
             onChange={(e) => handleGenChange(e.target.value)}
             style={inputStyle}
           >
-            <option value="2">🎮 Temporada Actual (2ª Gen - 60 Espíritus)</option>
-            <option value="1">🌟 1ª Generación (109 Espíritus)</option>
-            <option value="all">📦 Todas las Generaciones (169 Espíritus)</option>
+            <option value="3">🎮 Temporada Actual (3ª Gen - 35 Espíritus)</option>
+            <option value="2">💠 2ª Generación (162 Espíritus)</option>
+            <option value="1">🌟 1ª Generación (117 Espíritus)</option>
+            <option value="all">📦 Todas las Generaciones (320 Espíritus)</option>
           </select>
 
           {/* Manage Families Button */}

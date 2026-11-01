@@ -186,13 +186,19 @@ export function App() {
 
   // Seasonal theme: apply on boot, then keep it in sync while the tab stays
   // open (boundary timer plus visibility/focus re-checks).
+  // La generacion elegida manda: Runners y Override no se visten de temporada,
+  // asi que un re-chequeo (foco, visibilidad o frontera) no puede cambiarlos.
   useEffect(() => {
-    applySeasonalTheme(isFortnitemaresActive());
+    const aplicarTemporada = () => {
+      applySeasonalTheme(activeGen === 3 ? isFortnitemaresActive() : false);
+    };
+    aplicarTemporada();
     const unsubscribe = subscribeSeasonalState((active) => {
+      aplicarTemporada();
       window.dispatchEvent(new CustomEvent('spritedex:season-change', { detail: { active } }));
     });
     return unsubscribe;
-  }, []);
+  }, [activeGen]);
 
 
   const [userState, setUserState] = useState(() => {

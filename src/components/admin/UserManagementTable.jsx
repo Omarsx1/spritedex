@@ -56,7 +56,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
       const saved = sessionStorage.getItem('spritedex_users_gen');
       if (saved !== null) return Number(saved);
     } catch {}
-    return 2;
+    return 3;
   });
 
   const [currentPage, setCurrentPage] = useState(() => {
@@ -104,6 +104,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
     });
   }, [sprites, selectedGen]);
 
+  const gen3Count = useMemo(() => sprites.filter(s => s.gen === 3 && !s.unreleased).length, [sprites]);
   const gen2Count = useMemo(() => sprites.filter(s => s.gen === 2 && !s.unreleased).length || 33, [sprites]);
   const gen1Count = useMemo(() => sprites.filter(s => s.gen === 1 && !s.unreleased).length || 109, [sprites]);
   const allCount = useMemo(() => sprites.filter(s => !s.unreleased).length || 142, [sprites]);
@@ -607,7 +608,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.textSecondary }}>Espíritus Atrapados</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: c.pillNeutralBg, border: `1px solid ${c.pillNeutralBorder}`, color: c.pillNeutralText, fontSize: '0.72rem', fontWeight: 700 }}>
               <Sparkles size={12} />
-              <span>{selectedGen === 2 ? '2ª Gen' : selectedGen === 1 ? '1ª Gen' : 'Globales'}</span>
+              <span>{selectedGen === 3 ? '3ª Gen' : selectedGen === 2 ? '2ª Gen' : selectedGen === 1 ? '1ª Gen' : 'Globales'}</span>
             </div>
           </div>
           <div style={{ fontSize: '1.85rem', fontWeight: 800, color: c.textPrimary, letterSpacing: '-0.03em' }}>
@@ -687,7 +688,7 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
           <div style={{ fontSize: '0.74rem', color: c.textSecondary, display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span>Filtro Activo:</span>
             <span style={{ fontWeight: 700, color: c.textPrimary }}>
-              {selectedGen === 2 ? 'Temporada Actual (2ª Gen)' : selectedGen === 1 ? '1ª Generación' : 'Todas las Generaciones'}
+              {selectedGen === 3 ? 'Temporada Actual (3ª Gen)' : selectedGen === 2 ? '2ª Generación' : selectedGen === 1 ? '1ª Generación' : 'Todas las Generaciones'}
             </span>
           </div>
         </div>
@@ -811,7 +812,8 @@ export function UserManagementTable({ sprites = [], darkMode = false }) {
                 outline: 'none'
               }}
             >
-              <option value={2}>🎮 Temporada Actual (2ª Gen - {gen2Count} Espíritus)</option>
+              <option value={3}>🎮 Temporada Actual (3ª Gen - {gen3Count} Espíritus)</option>
+              <option value={2}>💠 2ª Generación ({gen2Count} Espíritus)</option>
               <option value={1}>🌟 1ª Generación ({gen1Count} Espíritus)</option>
               <option value={0}>📦 Todas las Generaciones ({allCount} Espíritus)</option>
             </select>
