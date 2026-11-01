@@ -52,7 +52,22 @@ export const FAMILY_NAMES_MAP = {
   spookydash: 'Impulso aterrador',
   vampire: 'Vampiro',
   deer: 'El Ciervo',
-  dumpsterdive: 'Mapache'
+  dumpsterdive: 'Mapache',
+  // Familias de la temporada Buscatesoros: son nombres de personaje, se dejan
+  // igual en español.
+  peelybones: "Halfpeel'd",
+  parrot: 'Re-Pete',
+  barreloffish: "Barry O'Fish",
+  treasurechest: 'Chester',
+  treasuremap: 'Exmarks',
+  compass: 'Wayfinder',
+  unbotheredfish: 'Kelper',
+  starlight: 'Sweet Dreams',
+  squibbly: "Lil' Squibbly",
+  playmakerbrewery: "Lil' Flacko",
+  rookgecko: "Lil' Uzi Vert Jr.",
+  coinpile: 'Plundarrgh',
+  feedjet: 'Transponder Snail'
 };
 
 export const THEME_NAMES_ES = {
@@ -73,5 +88,8 @@ export const THEME_NAMES_ES = {
   Holofoil: 'Holográfico',
   Cube: 'Cúbico',
   Gem: 'Gema',
-  Quack: 'Patito'
+  Quack: 'Patito',
+  // Temporada Buscatesoros (Chapter 7 Season 4).
+  cursed: 'Maldito',
+  jeweled: 'Fortuna'
 };

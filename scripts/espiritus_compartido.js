@@ -8,6 +8,13 @@ export const GEN_1_FAMILIES = new Set([
   'batman', 'pollo', 'vini', 'wick', 'peely', 'llama', 'ironmouse'
 ]);
 
+// Familias que llegan con la temporada Buscatesoros: forman la 3ª generacion.
+export const GEN_3_FAMILIES = new Set([
+  'peelybones', 'parrot', 'barreloffish', 'treasurechest', 'treasuremap', 'compass',
+  'unbotheredfish', 'starlight', 'squibbly', 'playmakerbrewery', 'rookgecko',
+  'coinpile', 'feedjet'
+]);
+
 export const PARENT_TO_FAMILY = {
   water: 'water',
   earth: 'earth',
@@ -86,7 +93,9 @@ export const VARIANT_TO_THEME = {
   cube: 'Cube',
   holofoil: 'Holofoil',
   gem: 'Gem',
-  quack: 'Quack'
+  quack: 'Quack',
+  cursed: 'cursed',
+  jeweled: 'jeweled'
 };
 
 
@@ -105,7 +114,9 @@ export const VARIANT_ORDER = [
   'Galaxy',
   'Cube',
   'Holofoil',
-  'Gem'
+  'Gem',
+  'jeweled',
+  'cursed'
 ];
 
 export function normalizeKey(str) {

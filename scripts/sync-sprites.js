@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { archivoArteCanonico, ART_VECTORIAL } from '../src/data/spriteAssetMap.js';
 import {
   GEN_1_FAMILIES,
+  GEN_3_FAMILIES,
   PARENT_TO_FAMILY,
   VARIANT_TO_THEME,
   FAMILY_NAMES_ES,
@@ -653,7 +654,9 @@ async function syncSprites() {
           isNew: !isCardUnreleased
         };
 
-        if (!isGen1) {
+        if (GEN_3_FAMILIES.has(familyId)) {
+          newEntry.gen = 3;
+        } else if (!isGen1) {
           newEntry.gen = 2;
         }
 

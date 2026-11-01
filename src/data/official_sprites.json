@@ -2614,5 +2614,355 @@
     "nameEn": "Trick or Treat Obsession",
     "releaseDate": "2026-10-15T08:00:00.000Z",
     "gen": 2
+  },
+  {
+    "id": "peelybones_basic",
+    "name": "Peelybones",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "peelybones_jeweled",
+    "name": "Peelybones jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "peelybones_cursed",
+    "name": "Peelybones cursed",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "parrot_basic",
+    "name": "Parrot",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "parrot_cursed",
+    "name": "Parrot cursed",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "parrot_jeweled",
+    "name": "Parrot jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "barreloffish_basic",
+    "name": "Barreloffish",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "barreloffish_cursed",
+    "name": "Barreloffish cursed",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "barreloffish_jeweled",
+    "name": "Barreloffish jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "treasurechest_basic",
+    "name": "Treasurechest",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "treasurechest_cursed",
+    "name": "Treasurechest cursed",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "treasurechest_jeweled",
+    "name": "Treasurechest jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "treasuremap_basic",
+    "name": "Treasuremap",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "treasuremap_jeweled",
+    "name": "Treasuremap jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "treasuremap_cursed",
+    "name": "Treasuremap cursed",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "compass_basic",
+    "name": "Compass",
+    "theme": "Basic",
+    "rarity": "Rare",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "compass_cursed",
+    "name": "Compass cursed",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "compass_jeweled",
+    "name": "Compass jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "unbotheredfish_basic",
+    "name": "Unbotheredfish",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "unbotheredfish_jeweled",
+    "name": "Unbotheredfish jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "unbotheredfish_cursed",
+    "name": "Unbotheredfish cursed",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "starlight_basic",
+    "name": "Starlight",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "squibbly_basic",
+    "name": "Squibbly",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "squibbly_cursed",
+    "name": "Squibbly cursed",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "squibbly_jeweled",
+    "name": "Squibbly jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "playmakerbrewery_basic",
+    "name": "Playmakerbrewery",
+    "theme": "Basic",
+    "rarity": "Legendary",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "playmakerbrewery_jeweled",
+    "name": "Playmakerbrewery jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "playmakerbrewery_cursed",
+    "name": "Playmakerbrewery cursed",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "rookgecko_basic",
+    "name": "Rookgecko",
+    "theme": "Basic",
+    "rarity": "Legendary",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "rookgecko_cursed",
+    "name": "Rookgecko cursed",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "rookgecko_jeweled",
+    "name": "Rookgecko jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "coinpile_basic",
+    "name": "Coinpile",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "coinpile_cursed",
+    "name": "Coinpile cursed",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "coinpile_jeweled",
+    "name": "Coinpile jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "feedjet_basic",
+    "name": "Feedjet",
+    "theme": "Basic",
+    "rarity": "Legendary",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
   }
 ]
