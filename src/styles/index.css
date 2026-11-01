@@ -10082,8 +10082,17 @@ body[data-gen='1']::after {
   background-repeat: repeat, repeat, repeat, repeat, no-repeat, no-repeat;
 }
 
-/* Override conserva su fondo de siempre: rejilla + aire violeta, sin arte
-   encima. Solo Runners recibe un fondo propio. */
+/* Override: rejilla + aire violeta + el arte Glitch con sus barras neon. Fijo,
+   sin animacion ni temporizador que lo apague. */
+body[data-gen='2']::after {
+  background:
+    radial-gradient(130% 75% at 50% -20%, rgba(124, 58, 237, 0.5) 0%, rgba(88, 28, 235, 0.18) 38%, transparent 66%),
+    radial-gradient(70% 45% at 82% -8%, rgba(236, 72, 153, 0.2) 0%, transparent 70%),
+    radial-gradient(115% 55% at 50% -12%, rgba(6, 182, 212, 0.18) 0%, rgba(6, 182, 212, 0.05) 42%, transparent 74%),
+    radial-gradient(115% 60% at 50% 112%, rgba(76, 29, 149, 0.38) 0%, transparent 68%),
+    radial-gradient(120% 85% at 50% 45%, transparent 42%, rgba(3, 4, 14, 0.6) 100%),
+    url('/background.webp') center top / cover no-repeat;
+}
 
 /* Con una generacion elegida, su fondo manda: el bosque de temporada no debe
    teñir Runners ni Override, y la rejilla de Override no puede quedarse
