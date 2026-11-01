@@ -134,7 +134,7 @@ html.theme-cazatesoros .main-content {
     96px auto,
     96px auto,
     auto,
-    780px 780px;
+    1560px 1560px;
   background-repeat: no-repeat, no-repeat, repeat-y, repeat-y, no-repeat, repeat;
   /* El color y la textura del papel solo llenan la columna de contenido: asi el
      borde rasgado no queda sobre un rectangulo liso. Los rollos y bordes ocupan
@@ -155,7 +155,7 @@ html.theme-cazatesoros .main-content {
       40px auto,
       40px auto,
       auto,
-      520px 520px;
+      1040px 1040px;
   }
 }
 
