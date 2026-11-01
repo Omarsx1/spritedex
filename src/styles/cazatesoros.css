@@ -1,68 +1,845 @@
 /* ==========================================================================
-   Tema Cazatesoros (vista previa). Solo se aplica con la clase
-   html.theme-cazatesoros, que main.jsx pone en desarrollo con ?cazatesoros=1.
-   Papiro de fondo y buscador con marco de madera.
+   Tema Cazatesoros (Tesorodex) — capa visual de temporada.
+   Se activa con la clase html.theme-cazatesoros (ver src/config/cazatesoros.js).
+   No toca la marca: el logo fantasma, el wordmark SPRITEDEX y su tratamiento
+   se quedan exactamente como estan. Solo cambian superficies, marcos y luz.
    ========================================================================== */
 
 html.theme-cazatesoros {
-  --tc-papiro: #e6cf9a;
-  --tc-papiro-claro: #f4e6c0;
-  --tc-tinta: #3b2612;
-  --tc-madera: #7a4a1f;
-  --tc-madera-oscura: #4a2a0f;
+  --czs-papel: #e8d3a3;
+  --czs-papel-claro: #f6ead0;
+  --czs-papel-hondo: #d8bd85;
+  --czs-tinta: #3a2510;
+  --czs-tinta-suave: #6a4a26;
+  --czs-madera: #8b5a2b;
+  --czs-madera-clara: #b07a3f;
+  --czs-madera-oscura: #4a2a10;
+  --czs-oro: #f5c542;
+  --czs-oro-hondo: #c9902a;
+  --czs-mar: #17305c;
+
+  /* Fondo del lienzo: el mismo azul profundo del cielo de la escena, para el
+     rebote de iOS y para que no haya fogonazo antes de pintar el fondo. */
+  background-color: #10203f;
 }
 
-/* Pergamino enrollado bajo el buscador, hasta el final de la pagina: rollo
-   superior e inferior, bordes envejecidos a los lados y textura de papel. Todo
-   son capas de fondo (sin pseudo-elementos) para no tapar el contenido. */
+/* ==========================================================================
+   FONDO: isla / playa
+   ========================================================================== */
+
+/* La capa existe en index.html antes del primer pintado, asi que el fondo ya
+   esta puesto cuando React monta. */
+.czs-scene {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image: url('/cazatesoros-fondo-desktop.webp');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 600ms ease;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Velo superior: el cielo de la isla es muy luminoso y el wordmark blanco
+   necesita fondo. Es un degradado, no un filtro: no cuesta repintar. */
+.czs-scene::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(6, 20, 44, 0.52) 0%,
+    rgba(6, 20, 44, 0.30) 20%,
+    rgba(6, 20, 44, 0.06) 38%,
+    transparent 52%
+  );
+}
+
+html.theme-cazatesoros .czs-scene {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .czs-scene {
+    background-image: url('/cazatesoros-fondo-mobile.webp');
+    background-position: center top;
+  }
+
+  .czs-scene::after {
+    background: linear-gradient(
+      180deg,
+      rgba(6, 20, 44, 0.46) 0%,
+      rgba(6, 20, 44, 0.24) 18%,
+      rgba(6, 20, 44, 0.04) 34%,
+      transparent 46%
+    );
+  }
+}
+
+/* La rejilla cibernetica no pinta nada sobre una isla. */
+html.theme-cazatesoros body::before {
+  opacity: 0;
+}
+
+/* Vignette frio y profundo: la escena es luminosa, asi que los bordes se
+   hunden para que el papiro flote en vez de flotar sobre el mar. */
+html.theme-cazatesoros body::after {
+  background:
+    radial-gradient(130% 90% at 50% 42%, transparent 58%, rgba(3, 12, 26, 0.42) 100%),
+    linear-gradient(180deg, rgba(3, 12, 26, 0.14) 0%, transparent 26%);
+  animation: none;
+}
+
+/* El ruido de recortes de la temporada anterior no aplica. */
+html.theme-cazatesoros::after {
+  background-image: none;
+}
+
+/* Los dos temas nunca conviven, y si una clase vieja se queda pegada, la escena
+   de Cazatesoros manda: el bosque queda transparente tambien aqui. */
+html.theme-cazatesoros .fnm-forest {
+  opacity: 0 !important;
+  animation: none !important;
+}
+
+/* ==========================================================================
+   PERGAMINO: la pagina de contenido es un rollo de papiro
+   ========================================================================== */
+
 html.theme-cazatesoros .main-content {
-  padding-left: 40px;
-  padding-right: 40px;
-  background-color: var(--tc-papiro);
+  position: relative;
+  padding-left: 44px;
+  padding-right: 44px;
+  background-color: var(--czs-papel);
   background-image:
     url('/papiro-rollo-sup.webp'),
     url('/papiro-rollo-inf.webp'),
     url('/papiro-borde-izq.webp'),
     url('/papiro-borde-der.webp'),
-    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(90, 55, 20, 0.35) 100%),
+    radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(90, 55, 20, 0.32) 100%),
     url('/papiro-textura.webp');
   background-position: top center, bottom center, left top, right top, 0 0, 0 0;
-  background-size: min(100%, 1200px) auto, min(100%, 720px) auto, 44px auto, 44px auto, auto, 780px 780px;
+  background-size:
+    min(100%, 1200px) auto,
+    min(100%, 720px) auto,
+    44px auto,
+    44px auto,
+    auto,
+    780px 780px;
   background-repeat: no-repeat, no-repeat, repeat-y, repeat-y, no-repeat, repeat;
+  box-shadow:
+    0 18px 60px rgba(24, 12, 2, 0.45),
+    0 2px 0 rgba(255, 238, 196, 0.55) inset;
 }
 
-/* Buscador: pastilla de papiro con marco de madera. La vista previa gana al tema
-   de Fortnitemares, que sigue activo en desarrollo y tiene reglas mas especificas
-   (fondo de cristal, anillo de neon y estado de foco), por eso van con !important. */
+@media (max-width: 768px) {
+  html.theme-cazatesoros .main-content {
+    padding-left: 14px;
+    padding-right: 14px;
+    background-size:
+      min(100%, 720px) auto,
+      min(100%, 520px) auto,
+      18px auto,
+      18px auto,
+      auto,
+      520px 520px;
+  }
+}
+
+/* ==========================================================================
+   NAVBAR
+   ========================================================================== */
+
+/* Solo los controles de la derecha se visten de madera; el logo conserva su
+   marca y su brillo. */
+html.theme-cazatesoros .lang-switch__disparador,
+html.theme-cazatesoros .app-navbar__avatar,
+html.theme-cazatesoros .app-navbar__menu-btn {
+  background:
+    linear-gradient(180deg, rgba(255, 236, 196, 0.22), rgba(0, 0, 0, 0.16)),
+    linear-gradient(180deg, #9a6636, #74441f 60%, #55300f);
+  border: 1px solid #3d2410;
+  color: #fbeccb;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 226, 170, 0.45),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+    0 4px 10px rgba(12, 6, 2, 0.45);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html.theme-cazatesoros .lang-switch__disparador:hover,
+html.theme-cazatesoros .app-navbar__avatar:hover,
+html.theme-cazatesoros .app-navbar__menu-btn:hover,
+html.theme-cazatesoros .app-navbar__menu-btn.is-active {
+  background:
+    linear-gradient(180deg, rgba(255, 240, 200, 0.28), rgba(0, 0, 0, 0.1)),
+    linear-gradient(180deg, #ab7340, #825026 60%, #5f3712);
+  border-color: #2e1a09;
+  color: #fff6e0;
+}
+
+html.theme-cazatesoros .lang-switch__codigo,
+html.theme-cazatesoros .lang-switch__flecha {
+  color: #fbeccb;
+}
+
+html.theme-cazatesoros .lang-switch__menu,
+html.theme-cazatesoros .app-navbar__menu-dropdown,
+html.theme-cazatesoros .app-navbar__dropdown {
+  background: linear-gradient(180deg, #f6ead0, #e2c998);
+  border: 2px solid var(--czs-madera-oscura);
+  color: var(--czs-tinta);
+  box-shadow: 0 18px 40px rgba(20, 10, 2, 0.5);
+}
+
+html.theme-cazatesoros .lang-switch__opcion,
+html.theme-cazatesoros .app-navbar__menu-action-btn,
+html.theme-cazatesoros .app-navbar__dropdown-item {
+  color: var(--czs-tinta);
+}
+
+html.theme-cazatesoros .lang-switch__opcion:hover,
+html.theme-cazatesoros .app-navbar__menu-action-btn:hover,
+html.theme-cazatesoros .app-navbar__dropdown-item:hover {
+  background: rgba(139, 90, 43, 0.16);
+  color: var(--czs-tinta);
+}
+
+html.theme-cazatesoros .app-navbar__menu-section-label,
+html.theme-cazatesoros .app-navbar__gen-option,
+html.theme-cazatesoros .app-navbar__dropdown-name,
+html.theme-cazatesoros .app-navbar__dropdown-email,
+html.theme-cazatesoros .app-navbar__dropdown-code {
+  color: var(--czs-tinta);
+}
+
+html.theme-cazatesoros .app-navbar__gen-option:hover {
+  background: rgba(139, 90, 43, 0.14);
+}
+
+/* ==========================================================================
+   HERO: contadores y acciones
+   ========================================================================== */
+
+html.theme-cazatesoros .hero {
+  padding-top: 66px;
+}
+
+/* Un halo dorado calido detras del espiritu central, como el brillo de la
+   escena, sin promocionar capas compuestas por tarjeta. */
+html.theme-cazatesoros .hero__showcase::before {
+  content: '';
+  position: absolute;
+  inset: -18%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 55%, rgba(255, 214, 130, 0.32) 0%, rgba(255, 176, 72, 0.12) 42%, transparent 68%);
+}
+
+/* La barra se ensancha porque las placas de madera son mas anchas que los aros. */
+html.theme-cazatesoros .hero__bar {
+  max-width: 760px;
+  gap: 22px;
+}
+
+/* Contadores como placas de madera tallada. El aro SVG se retira: el numero
+   vive solo, como en un cartel de taberna. */
+html.theme-cazatesoros .hero__stat-ring {
+  position: relative;
+  padding: 10px 20px 9px;
+  min-width: 116px;
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(255, 236, 196, 0.2), rgba(0, 0, 0, 0.14)),
+    linear-gradient(180deg, #a9713c 0%, #7a4a1f 55%, #5d3512 100%);
+  border: 2px solid #3f2410;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 224, 168, 0.42),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.42),
+    0 6px 14px rgba(20, 10, 2, 0.5);
+  gap: 0;
+}
+
+/* Dos clavos en la cabecera de cada placa. */
+html.theme-cazatesoros .hero__stat-ring::before,
+html.theme-cazatesoros .hero__stat-ring::after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 32%, #ffe7b0, #9a6a2c 62%, #3a2410 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+html.theme-cazatesoros .hero__stat-ring::before { left: 8px; }
+html.theme-cazatesoros .hero__stat-ring::after { right: 8px; }
+
+html.theme-cazatesoros .hero__ring-svg {
+  display: none;
+}
+
+html.theme-cazatesoros .hero__ring-box {
+  width: auto;
+  height: auto;
+  min-width: 0;
+}
+
+html.theme-cazatesoros .hero__stat-inner {
+  position: static;
+  inset: auto;
+}
+
+html.theme-cazatesoros .hero__stat-of {
+  display: none;
+}
+
+html.theme-cazatesoros .hero__stat-value {
+  color: #fff3d0;
+  font-size: 1.9rem;
+  text-shadow: 0 1px 0 #3a2410, 0 0 12px rgba(255, 199, 96, 0.25);
+}
+
+html.theme-cazatesoros .hero__stat-label {
+  color: #ffe6ae;
+  font-size: 0.66rem;
+  letter-spacing: 1.7px;
+  text-shadow: 0 1px 0 #3a2410;
+}
+
+/* Acciones: dos maderas distintas para que Amigos y Compartir no se confundan. */
+html.theme-cazatesoros .hero__btn {
+  border: 2px solid #3d2410;
+  border-radius: 9px;
+  font-weight: 800;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 226, 170, 0.4),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.38),
+    0 5px 12px rgba(16, 8, 2, 0.42);
+}
+
+html.theme-cazatesoros .hero__btn--primary {
+  background:
+    linear-gradient(180deg, rgba(255, 236, 196, 0.14), rgba(0, 0, 0, 0.16)),
+    linear-gradient(180deg, #1d3b6e, #122a52 60%, #0c1d3a);
+  color: #ffe9b0;
+  border-color: #0a172f;
+}
+
+html.theme-cazatesoros .hero__btn--primary:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 240, 200, 0.2), rgba(0, 0, 0, 0.1)),
+    linear-gradient(180deg, #26497f, #173362 60%, #0e2345);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 226, 170, 0.45),
+    0 8px 18px rgba(8, 14, 30, 0.5);
+}
+
+html.theme-cazatesoros .hero__btn--accent {
+  background:
+    linear-gradient(180deg, rgba(255, 246, 214, 0.28), rgba(0, 0, 0, 0.12)),
+    linear-gradient(180deg, #d9a441, #b57a25 58%, #8f5a12);
+  color: #341f07;
+  border-color: #4a2a10;
+}
+
+html.theme-cazatesoros .hero__btn--accent:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 250, 224, 0.34), rgba(0, 0, 0, 0.08)),
+    linear-gradient(180deg, #e8b54e, #c2872c 58%, #9d651a);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 246, 214, 0.6),
+    0 8px 18px rgba(60, 32, 4, 0.45);
+}
+
+/* El dock movil acompana la paleta. */
+html.theme-cazatesoros .pm-btn {
+  background:
+    linear-gradient(180deg, rgba(255, 236, 196, 0.16), rgba(0, 0, 0, 0.18)),
+    linear-gradient(180deg, #8a5a2c, #5f3814);
+  border-color: #3d2410;
+  color: #ffe9b0;
+}
+
+/* La barra de progreso movil tambien es una fila de placas de papiro. */
+html.theme-cazatesoros .stats-bar__col {
+  border: 1px solid rgba(74, 42, 16, 0.55);
+  background:
+    linear-gradient(rgba(255, 250, 232, 0.6), rgba(255, 250, 232, 0.6)),
+    url('/papiro-textura.webp') center / 420px 420px,
+    var(--czs-papel-claro);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 205, 0.7),
+    0 3px 8px rgba(40, 22, 6, 0.28);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html.theme-cazatesoros .stats-bar__value {
+  color: var(--czs-tinta);
+}
+
+html.theme-cazatesoros .stats-bar__label {
+  color: var(--czs-tinta-suave);
+  font-weight: 700;
+}
+
+html.theme-cazatesoros .stats-bar__track {
+  background: rgba(74, 42, 16, 0.22);
+}
+
+html.theme-cazatesoros .stats-bar__fill--caught {
+  background: linear-gradient(90deg, #1f8f7f 0%, #4cc4ae 100%);
+  box-shadow: none;
+}
+
+html.theme-cazatesoros .stats-bar__fill--mastered {
+  background: linear-gradient(90deg, #b07a3f 0%, #f5c542 100%);
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   BUSCADOR Y FILTROS (escritorio)
+   ========================================================================== */
+
+html.theme-cazatesoros .search-input-field {
+  width: 176px;
+  padding: 9px 14px 9px 34px;
+  border-radius: 8px;
+  border: 2px solid var(--czs-madera-oscura);
+  background:
+    linear-gradient(rgba(255, 246, 215, 0.45), rgba(255, 246, 215, 0.45)),
+    url('/papiro-textura.webp') center / 420px 420px,
+    var(--czs-papel-claro);
+  color: var(--czs-tinta);
+  -webkit-text-fill-color: var(--czs-tinta);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 225, 170, 0.5),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.18),
+    0 3px 8px rgba(40, 22, 6, 0.35);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html.theme-cazatesoros .search-input-field::placeholder {
+  color: rgba(58, 37, 16, 0.62);
+}
+
+html.theme-cazatesoros .search-input-field:hover,
+html.theme-cazatesoros .search-input-field:focus {
+  background:
+    linear-gradient(rgba(255, 250, 230, 0.55), rgba(255, 250, 230, 0.55)),
+    url('/papiro-textura.webp') center / 420px 420px,
+    var(--czs-papel-claro);
+  border-color: #6b4423;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 232, 180, 0.6),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.18),
+    0 0 0 3px rgba(201, 144, 42, 0.28);
+}
+
+html.theme-cazatesoros .filter-search-box .search-icon {
+  color: var(--czs-madera);
+}
+
+html.theme-cazatesoros .status-pill-btn,
+html.theme-cazatesoros .filter-pill-trigger,
+html.theme-cazatesoros .filter-pill-checkbox,
+html.theme-cazatesoros .filter-view-toggle,
+html.theme-cazatesoros .gen-tab-btn {
+  border-radius: 8px;
+  border: 1px solid rgba(74, 42, 16, 0.55);
+  background:
+    linear-gradient(rgba(255, 246, 215, 0.5), rgba(255, 246, 215, 0.5)),
+    url('/papiro-textura.webp') center / 420px 420px,
+    var(--czs-papel);
+  color: var(--czs-tinta-suave);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 205, 0.65),
+    0 2px 6px rgba(40, 22, 6, 0.22);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  font-weight: 800;
+}
+
+html.theme-cazatesoros .status-pill-btn:hover:not(.is-active),
+html.theme-cazatesoros .filter-pill-trigger:hover,
+html.theme-cazatesoros .filter-pill-checkbox:hover,
+html.theme-cazatesoros .gen-tab-btn:hover:not(.is-active) {
+  background:
+    linear-gradient(rgba(255, 250, 228, 0.62), rgba(255, 250, 228, 0.62)),
+    url('/papiro-textura.webp') center / 420px 420px,
+    var(--czs-papel-claro);
+  border-color: var(--czs-madera);
+  color: var(--czs-tinta);
+}
+
+html.theme-cazatesoros .status-pill-btn.is-active,
+html.theme-cazatesoros .gen-tab-btn.is-active {
+  background:
+    linear-gradient(180deg, rgba(255, 236, 196, 0.22), rgba(0, 0, 0, 0.12)),
+    linear-gradient(180deg, #a9713c, #6f431c 58%, #54300f);
+  border-color: #3f2410;
+  color: #fff3d0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 226, 170, 0.45),
+    0 3px 8px rgba(30, 15, 3, 0.35);
+}
+
+html.theme-cazatesoros .status-pill-count-badge {
+  background: #f5c542;
+  color: #3a2410;
+  box-shadow: 0 0 8px rgba(245, 197, 66, 0.55);
+}
+
+html.theme-cazatesoros .status-pill-btn.is-active .status-pill-count-badge {
+  background: #fff3d0;
+  color: #3a2410;
+}
+
+html.theme-cazatesoros .filter-view-toggle {
+  padding: 3px;
+  gap: 2px;
+}
+
+html.theme-cazatesoros .view-toggle-btn {
+  color: var(--czs-tinta-suave);
+  border-radius: 6px;
+}
+
+html.theme-cazatesoros .view-toggle-btn.active {
+  background: linear-gradient(180deg, #a9713c, #6f431c);
+  color: #fff3d0;
+}
+
+html.theme-cazatesoros .filter-pill-checkbox input[type="checkbox"] {
+  accent-color: var(--czs-madera);
+}
+
+/* Desplegables */
+html.theme-cazatesoros .variant-grid-dropdown,
+html.theme-cazatesoros .sprite-grid-dropdown {
+  border-radius: 10px;
+  border: 2px solid var(--czs-madera-oscura);
+  background:
+    linear-gradient(rgba(255, 246, 215, 0.55), rgba(255, 246, 215, 0.55)),
+    url('/papiro-textura.webp') center / 420px 420px,
+    var(--czs-papel-claro);
+  box-shadow: 0 18px 40px rgba(24, 12, 2, 0.5);
+}
+
+html.theme-cazatesoros .variant-grid-chip,
+html.theme-cazatesoros .sprite-grid-chip {
+  border-radius: 6px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+html.theme-cazatesoros .variant-grid-chip:not(.is-active),
+html.theme-cazatesoros .sprite-grid-chip:not(.is-active) {
+  filter: saturate(0.82) brightness(0.96);
+}
+
+html.theme-cazatesoros .variant-grid-chip.is-active,
+html.theme-cazatesoros .sprite-grid-chip.is-active {
+  border-color: #3f2410;
+  box-shadow: 0 0 0 2px #f5c542, 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+html.theme-cazatesoros .sprite-chip-name {
+  color: var(--czs-tinta);
+  text-shadow: none;
+}
+
+html.theme-cazatesoros .sprite-grid-chip .sprite-chip-name {
+  color: var(--czs-tinta);
+}
+
+/* ==========================================================================
+   BUSCADOR MOVIL + HOJA DE FILTROS
+   ========================================================================== */
+
 html.theme-cazatesoros .mobile-glass-search-pill,
 html.theme-cazatesoros .mobile-glass-search-pill.is-focused {
-  background: linear-gradient(rgba(255, 246, 215, 0.4), rgba(255, 246, 215, 0.4)), url('/papiro-textura.webp') center / 780px 780px, var(--tc-papiro-claro) !important;
-  border: 6px solid transparent !important;
-  border-image: linear-gradient(180deg, #9a6a35, var(--tc-madera-oscura) 50%, #8a5a2a) 1 !important;
-  border-radius: 10px !important;
-  box-shadow: inset 0 2px 0 rgba(255, 225, 170, 0.35), inset 0 -3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px rgba(40, 22, 6, 0.45) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  background:
+    linear-gradient(rgba(255, 246, 215, 0.42), rgba(255, 246, 215, 0.42)),
+    url('/papiro-textura.webp') center / 780px 780px,
+    var(--czs-papel-claro);
+  border: 5px solid transparent;
+  border-image: linear-gradient(180deg, #9a6a35, var(--czs-madera-oscura) 50%, #8a5a2a) 1;
+  border-radius: 10px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 225, 170, 0.4),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(40, 22, 6, 0.45);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 html.theme-cazatesoros .mobile-glass-search-pill::before,
 html.theme-cazatesoros .mobile-glass-search-pill::after {
-  display: none !important;
+  display: none;
 }
 
-html.theme-cazatesoros .mobile-glass-search-pill .mobile-glass-search-input {
-  color: var(--tc-tinta) !important;
-  -webkit-text-fill-color: var(--tc-tinta) !important;
+html.theme-cazatesoros .mobile-glass-search-input {
+  color: var(--czs-tinta);
+  -webkit-text-fill-color: var(--czs-tinta);
 }
 
-html.theme-cazatesoros .mobile-glass-search-pill .mobile-glass-search-input::placeholder {
-  color: rgba(59, 38, 18, 0.6) !important;
+html.theme-cazatesoros .mobile-glass-search-input::placeholder {
+  color: rgba(58, 37, 16, 0.6);
 }
 
-html.theme-cazatesoros .mobile-glass-search-pill .mobile-glass-search-icon {
-  color: var(--tc-madera) !important;
+html.theme-cazatesoros .mobile-glass-search-icon,
+html.theme-cazatesoros .mobile-glass-filter-btn {
+  color: var(--czs-madera);
 }
 
-html.theme-cazatesoros .mobile-glass-search-pill .mobile-glass-divider {
-  background: var(--tc-madera) !important;
+html.theme-cazatesoros .mobile-glass-filter-btn:hover {
+  background: rgba(139, 90, 43, 0.16);
+  color: var(--czs-tinta);
+}
+
+html.theme-cazatesoros .mobile-glass-filter-btn.is-active {
+  color: #3a2410;
+  background: rgba(245, 197, 66, 0.35);
+  border-color: #6b4423;
+}
+
+html.theme-cazatesoros .mobile-glass-badge {
+  background: #f5c542;
+  color: #3a2410;
+}
+
+html.theme-cazatesoros .mobile-glass-divider {
+  background: rgba(74, 42, 16, 0.4);
+}
+
+html.theme-cazatesoros .mobile-glass-clear-btn {
+  background: rgba(74, 42, 16, 0.16);
+  color: var(--czs-tinta-suave);
+}
+
+/* La hoja de filtros: papel con cabecera de madera. */
+html.theme-cazatesoros .mobile-liquid-sheet {
+  background:
+    linear-gradient(rgba(255, 246, 215, 0.5), rgba(255, 246, 215, 0.5)),
+    url('/papiro-textura.webp') center / 620px 620px,
+    var(--czs-papel-claro);
+  border-color: var(--czs-madera-oscura);
+  color: var(--czs-tinta);
+}
+
+html.theme-cazatesoros .mobile-section-label,
+html.theme-cazatesoros .mobile-sheet-title {
+  color: var(--czs-madera-oscura);
+}
+
+html.theme-cazatesoros .mobile-status-pill,
+html.theme-cazatesoros .mobile-variant-chip,
+html.theme-cazatesoros .mobile-sheet-section select {
+  border-color: rgba(74, 42, 16, 0.45);
+  background: rgba(255, 250, 230, 0.7);
+  color: var(--czs-tinta);
+}
+
+html.theme-cazatesoros .mobile-status-pill.is-active {
+  background: linear-gradient(180deg, #a9713c, #6f431c);
+  border-color: #3f2410;
+  color: #fff3d0;
+}
+
+html.theme-cazatesoros .mobile-active-chip {
+  background: rgba(255, 250, 230, 0.75);
+  border-color: rgba(74, 42, 16, 0.45);
+  color: var(--czs-tinta);
+}
+
+/* ==========================================================================
+   FICHAS: pergamino con marco de madera
+   ========================================================================== */
+
+html.theme-cazatesoros .sprite-card {
+  border-radius: 10px;
+  /* El color de familia viaja en un style inline desde SpriteCard.jsx; sin
+     !important el marco de madera nunca ganaria. */
+  border: 2px solid #6b4423 !important;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 232, 0.55), rgba(236, 214, 168, 0.45)),
+    url('/papiro-textura.webp') !important;
+  background-size: auto, 420px 420px !important;
+  background-position: 0 0, center !important;
+  background-repeat: no-repeat, repeat !important;
+  background-color: var(--czs-papel-claro) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 240, 200, 0.5),
+    inset 0 -3px 0 rgba(120, 80, 34, 0.18),
+    0 5px 12px rgba(40, 22, 6, 0.32);
+}
+
+html.theme-cazatesoros .sprite-card:hover {
+  transform: translateY(-4px);
+  border-color: #4a2a10;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 240, 200, 0.55),
+    0 14px 26px rgba(30, 15, 3, 0.42);
+}
+
+/* El marco dorado de maestria se queda, pero sobre papel y sin pulso de neon. */
+html.theme-cazatesoros .sprite-card.is-mastered.is-classic-mastered,
+html.theme-cazatesoros .sprite-card.is-mastered.is-glitch-mastered {
+  background-color: var(--czs-papel-claro) !important;
+  border-color: var(--czs-oro-hondo) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 226, 140, 0.65),
+    0 6px 16px rgba(60, 34, 5, 0.4);
+}
+
+html.theme-cazatesoros .sprite-card.is-mastered.is-classic-mastered::before,
+html.theme-cazatesoros .sprite-card.is-mastered.is-classic-mastered::after,
+html.theme-cazatesoros .sprite-card.is-mastered.is-glitch-mastered::before,
+html.theme-cazatesoros .sprite-card.is-mastered.is-glitch-mastered::after {
+  display: none;
+}
+
+/* Nada de escaneo, lineas ni particulas ciberneticas sobre el papiro. */
+html.theme-cazatesoros .cyber-fx-overlay {
+  display: none;
+}
+
+html.theme-cazatesoros .card-name {
+  color: var(--czs-tinta);
+  text-shadow: 0 1px 0 rgba(255, 246, 214, 0.7);
+}
+
+html.theme-cazatesoros .ms-level-tag {
+  background: rgba(74, 42, 16, 0.9);
+  color: #fff3d0;
+}
+
+html.theme-cazatesoros .ms-level-tag--mastered {
+  background: linear-gradient(180deg, #f5c542, #c9902a);
+  color: #3a2410;
+}
+
+html.theme-cazatesoros .card-owned-btn {
+  border: 1px solid rgba(74, 42, 16, 0.35);
+  background: rgba(74, 42, 16, 0.12);
+  color: var(--czs-tinta-suave);
+}
+
+html.theme-cazatesoros .card-owned-btn:hover {
+  background: rgba(74, 42, 16, 0.2);
+  color: var(--czs-tinta);
+}
+
+html.theme-cazatesoros .card-owned-btn.owned {
+  background: linear-gradient(180deg, #b8892f, #8f5f14);
+  color: #fff6df;
+}
+
+html.theme-cazatesoros .card-owned-btn.mastered {
+  background: linear-gradient(180deg, #f7d465, #c9902a 60%, #a06a12);
+  animation: none;
+  color: #3a2410;
+  text-shadow: none;
+  box-shadow: inset 0 1px 0 rgba(255, 250, 224, 0.6);
+}
+
+html.theme-cazatesoros .card-image__crown,
+html.theme-cazatesoros .list-item-image__crown {
+  filter: drop-shadow(0 2px 3px rgba(60, 34, 5, 0.5));
+}
+
+html.theme-cazatesoros .card-unreleased-pill {
+  background: rgba(74, 42, 16, 0.9);
+  color: #ffe9b0;
+}
+
+html.theme-cazatesoros .star-btn {
+  color: rgba(74, 42, 16, 0.28);
+}
+
+html.theme-cazatesoros .star-btn:hover,
+html.theme-cazatesoros .star-btn.active,
+html.theme-cazatesoros .star-btn.mastered-star {
+  color: #c9902a;
+  filter: drop-shadow(0 0 3px rgba(201, 144, 42, 0.4));
+}
+
+/* ==========================================================================
+   VISTA LISTA
+   ========================================================================== */
+
+html.theme-cazatesoros .sprite-list-item {
+  background:
+    linear-gradient(rgba(255, 250, 232, 0.6), rgba(255, 250, 232, 0.6)),
+    url('/papiro-textura.webp') center / 420px 420px,
+    var(--czs-papel-claro);
+  border-color: rgba(74, 42, 16, 0.35);
+}
+
+html.theme-cazatesoros .list-item-name,
+html.theme-cazatesoros .list-item-meta {
+  color: var(--czs-tinta);
+}
+
+/* ==========================================================================
+   MODALES
+   ========================================================================== */
+
+html.theme-cazatesoros .sprite-detail-modal,
+html.theme-cazatesoros .modal-content {
+  background:
+    linear-gradient(rgba(255, 250, 232, 0.55), rgba(255, 250, 232, 0.55)),
+    url('/papiro-textura.webp') center / 620px 620px,
+    var(--czs-papel-claro);
+  border: 2px solid var(--czs-madera-oscura);
+  color: var(--czs-tinta);
+}
+
+/* ==========================================================================
+   MOVIL: ajustes de escala de las placas
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  html.theme-cazatesoros .hero__bar {
+    gap: 12px;
+  }
+
+  html.theme-cazatesoros .hero__stat-ring {
+    min-width: 92px;
+    padding: 8px 12px 7px;
+  }
+
+  html.theme-cazatesoros .hero__stat-value {
+    font-size: 1.36rem;
+  }
+
+  html.theme-cazatesoros .hero__stat-label {
+    font-size: 0.58rem;
+    letter-spacing: 1px;
+  }
+}
+
+@media (max-width: 480px) {
+  html.theme-cazatesoros .hero__stat-ring {
+    min-width: 88px;
+    padding: 7px 10px 6px;
+  }
+
+  html.theme-cazatesoros .hero__bar {
+    gap: 10px;
+  }
+
+  html.theme-cazatesoros .main-content {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 }
