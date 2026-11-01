@@ -58,7 +58,7 @@ export const FAMILY_NAMES_MAP = {
   peelybones: 'Bananín Huesudo',
   parrot: 'Plumitas',
   barreloffish: "Barry O'Fish",
-  treasurechest: 'Chester',
+  treasurechest: 'Gatisoro',
   treasuremap: 'Buscarrutas',
   compass: 'Orientador',
   unbotheredfish: 'Mar',

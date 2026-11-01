@@ -1190,6 +1190,7 @@ html.theme-cazatesoros .sdm-friends {
   border: 0 !important;
   box-shadow: none !important;
   padding: 0 !important;
+  gap: 16px !important;
 }
 
 html.theme-cazatesoros .sdm-friends__group,
@@ -1208,6 +1209,27 @@ html.theme-cazatesoros .sdm-share-pro__canvas-host {
   color: var(--czs-tinta) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+}
+
+/* Aire y jerarquia: las secciones iban con 10-11px de relleno y etiquetas de
+   0.62rem, que a 430px se leian apretadas. */
+html.theme-cazatesoros .sdm-friends__group {
+  padding: 14px !important;
+  border-radius: 12px !important;
+  gap: 9px;
+}
+
+html.theme-cazatesoros .sdm-friends__label {
+  font-size: 0.68rem !important;
+  letter-spacing: 1.2px;
+  color: #46301a !important;
+}
+
+html.theme-cazatesoros .sdm-friends__hint,
+html.theme-cazatesoros .sdm-friends__pendiente {
+  font-size: 0.74rem !important;
+  line-height: 1.55;
+  color: #5b4327 !important;
 }
 
 /* Textos sueltos sobre el papiro */
