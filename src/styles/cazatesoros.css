@@ -116,42 +116,49 @@ html.theme-cazatesoros .main-content {
   /* El cilindro del rollo ocupa ~86% del ancho de su asset: se escala a 116% para
      que cubra la caja completa, con los bordes rasgados debajo, como en el SVG. */
   padding-top: 98px;
+  /* Espacio para el rollo inferior (la captura mide ~280px a este ancho). */
+  padding-bottom: 210px;
   padding-left: 96px;
   padding-right: 96px;
   background-color: var(--czs-papel);
   background-image:
     url('/papiro-rollo-sup.webp'),
     url('/papiro-rollo-inf.webp'),
+    url('/papiro-textura.webp'),
     url('/papiro-borde-izq.webp'),
     url('/papiro-borde-der.webp'),
     radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(90, 55, 20, 0.32) 100%),
     url('/papiro-textura.webp');
   /* El rollo sube 24px para tapar el margen transparente de su asset: queda pegado al borde. */
-  background-position: center -24px, bottom center, left top, right top, 0 0, 0 0;
+  /* La banda (2a capa) es papel bajo el rollo inferior, solo en el ancho de la columna. */
+  background-position: center -24px, bottom center, center bottom, left top, right top, 0 0, 0 0;
   background-size:
     calc(100% * 1.16) auto,
     calc(100% * 1.16) auto,
+    calc(100% - 192px) 230px,
     96px auto,
     96px auto,
     auto,
     1560px 1560px;
-  background-repeat: no-repeat, no-repeat, repeat-y, repeat-y, no-repeat, repeat;
+  background-repeat: no-repeat, no-repeat, repeat-x, repeat-y, repeat-y, no-repeat, repeat;
   /* El color y la textura del papel solo llenan la columna de contenido: asi el
      borde rasgado no queda sobre un rectangulo liso. Los rollos y bordes ocupan
      la caja completa. */
-  background-clip: border-box, border-box, border-box, border-box, content-box, content-box;
+  background-clip: border-box, border-box, border-box, border-box, border-box, content-box, content-box;
   box-shadow: none;
 }
 
 @media (max-width: 768px) {
   html.theme-cazatesoros .main-content {
     padding-top: 40px;
+    padding-bottom: 76px;
     padding-left: 40px;
     padding-right: 40px;
-    background-position: center -8px, bottom center, left top, right top, 0 0, 0 0;
+    background-position: center -8px, bottom center, center bottom, left top, right top, 0 0, 0 0;
     background-size:
       calc(100% * 1.16) auto,
       calc(100% * 1.16) auto,
+      calc(100% - 80px) 90px,
       40px auto,
       40px auto,
       auto,
