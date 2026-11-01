@@ -113,8 +113,9 @@ html.theme-cazatesoros .fnm-forest {
 html.theme-cazatesoros .main-content {
   position: relative;
   /* El borde del papiro ocupa 96px a cada lado; el contenido queda dentro del pergamino. */
-  /* El rollo superior mide ~105px: el contenido empieza debajo de el. */
-  padding-top: 112px;
+  /* El cilindro del rollo ocupa ~86% del ancho de su asset: se escala a 116% para
+     que cubra la caja completa, con los bordes rasgados debajo, como en el SVG. */
+  padding-top: 98px;
   padding-left: 96px;
   padding-right: 96px;
   background-color: var(--czs-papel);
@@ -125,10 +126,11 @@ html.theme-cazatesoros .main-content {
     url('/papiro-borde-der.webp'),
     radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(90, 55, 20, 0.32) 100%),
     url('/papiro-textura.webp');
-  background-position: top center, bottom center, left top, right top, 0 0, 0 0;
+  /* El rollo sube 24px para tapar el margen transparente de su asset: queda pegado al borde. */
+  background-position: center -24px, bottom center, left top, right top, 0 0, 0 0;
   background-size:
-    min(100%, 1200px) auto,
-    min(100%, 1200px) auto,
+    calc(100% * 1.16) auto,
+    calc(100% * 1.16) auto,
     96px auto,
     96px auto,
     auto,
@@ -143,12 +145,13 @@ html.theme-cazatesoros .main-content {
 
 @media (max-width: 768px) {
   html.theme-cazatesoros .main-content {
-    padding-top: 52px;
+    padding-top: 40px;
     padding-left: 40px;
     padding-right: 40px;
+    background-position: center -8px, bottom center, left top, right top, 0 0, 0 0;
     background-size:
-      min(100%, 520px) auto,
-      min(100%, 520px) auto,
+      calc(100% * 1.16) auto,
+      calc(100% * 1.16) auto,
       40px auto,
       40px auto,
       auto,
