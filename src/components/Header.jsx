@@ -310,23 +310,11 @@ export function Header({
         <div className="hero__title-block" ref={titleRef} style={{ position: 'relative', zIndex: 10 }}>
           <h1 className="hero__title" data-fnm-logo={isFortnitemares ? 'themed' : 'normal'}>
             <span className="hero__title-line-wrap">
-              {/* Fantasmas RGB del wordmark: el mismo split rojo/cian del glitch
-                  de FORTNITE, pero enmascarando la silueta de Fortnitemares.
-                  El contenedor centra; los keyframes de glitch pueden entonces
-                  usar transform sin perder el centrado. */}
-              <span className="hero__title-fnm-ghosts" aria-hidden="true">
-                <span className="hero__title-fnm-ghost hero__title-fnm-ghost--r" />
-                <span className="hero__title-fnm-ghost hero__title-fnm-ghost--b" />
-              </span>
+              {/* FORTNITE en la fuente original en ambos temas. En Fortnitemares
+                  solo cambia el brillo violeta (data-fnm-logo), no el texto. */}
               <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">
                 FORTNITE
               </span>
-              <img
-                src="/fortnitemares.svg"
-                alt="FORTNITEMARES"
-                className="hero__title-fnm-svg"
-                aria-hidden={!isFortnitemares}
-              />
             </span>
             <span className={`hero__title-line hero__title-line--accent ${isFortnitemares ? 'hero__title-line--accent-fnm' : ''}`}>
               SPRITEDEX
