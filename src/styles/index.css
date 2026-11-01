@@ -10193,3 +10193,13 @@ body[data-gen='2'] .hero__title-line--accent {
   0%, 100% { background-position: 0% 50%; }
   50%      { background-position: 100% 50%; }
 }
+
+/* Los fondos por generacion son fijos: sin fundidos, sin deriva y sin
+   transiciones que los cambien a los pocos segundos. */
+body[data-gen='1']::before,
+body[data-gen='1']::after,
+body[data-gen='2']::before,
+body[data-gen='2']::after {
+  transition: none !important;
+  animation: none !important;
+}
