@@ -529,7 +529,7 @@ html::after {
 .app-navbar__menu-options {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .app-navbar__gen-option {
@@ -637,7 +637,8 @@ html::after {
   justify-content: center;
   gap: 7px;
   padding: 10px 8px;
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 1.1;
 }
 
 .app-navbar__menu-action-btn:hover {
@@ -2485,19 +2486,22 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   gap: 8px;
   padding: 6px 8px 6px 12px;
   border-radius: 9999px;
-  background: rgba(10, 15, 30, 0.95);
+  /* Paleta de marinero: casco azul marino, filo de laton y letra de pergamino. */
+  background: linear-gradient(180deg, #1a2942 0%, #0e1728 100%);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 240, 232, 0.5);
+  border: 1px solid rgba(216, 178, 106, 0.55);
   box-shadow:
-    0 0 16px rgba(0, 240, 232, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    0 8px 18px rgba(6, 10, 20, 0.45),
+    inset 0 1px 0 rgba(240, 226, 192, 0.18);
   transition: all 0.2s ease;
 }
 
 .mobile-new-coachmark:hover .mobile-new-coachmark__content {
-  border-color: #00F0E8;
-  box-shadow: 0 0 20px rgba(0, 240, 232, 0.5);
+  border-color: #e3c07a;
+  box-shadow:
+    0 10px 22px rgba(6, 10, 20, 0.55),
+    inset 0 1px 0 rgba(240, 226, 192, 0.26);
 }
 
 .mobile-new-coachmark__sparkle {
@@ -2508,7 +2512,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .mobile-new-coachmark__text {
   font-size: 0.74rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #f2e6c8;
   letter-spacing: -0.01em;
   white-space: nowrap;
 }
@@ -2518,17 +2522,19 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  background: #00F0E8;
-  color: #060714;
+  background: linear-gradient(180deg, #e8c98a 0%, #c9a45c 100%);
+  color: #241a0c;
   padding: 2px 8px;
   border-radius: 9999px;
-  box-shadow: 0 0 8px rgba(0, 240, 232, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 .mobile-new-coachmark__close {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(232, 213, 170, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2540,8 +2546,8 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 .mobile-new-coachmark__close:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.15);
+  color: #f2e6c8;
+  background: rgba(232, 213, 170, 0.15);
 }
 
 .mobile-new-coachmark__arrow {
@@ -2553,7 +2559,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   height: 0;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-top: 6px solid rgba(10, 15, 30, 0.95);
+  border-top: 6px solid #0e1728;
 }
 
 .mobile-new-coachmark__arrow::before {
@@ -2565,7 +2571,7 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   height: 0;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-top: 7px solid rgba(0, 240, 232, 0.5);
+  border-top: 7px solid rgba(216, 178, 106, 0.55);
   z-index: -1;
 }
 
@@ -2898,8 +2904,8 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #94a3b8;
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -2916,6 +2922,8 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .mobile-liquid-sheet-body {
   padding: 12px 18px;
   overflow-y: auto;
+  /* Al llegar al final de la lista el gesto no debe encadenar con la pagina. */
+  overscroll-behavior-y: contain;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -3000,11 +3008,26 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 /* Variants Grid in Sheet */
 .mobile-variants-chip-grid {
   display: flex;
-  flex-wrap: wrap;
+  /* Una sola linea que se desliza en horizontal: con muchas variantes la rejilla
+     crecia en alto y empujaba el resto del filtro fuera de la hoja. */
+  flex-wrap: nowrap;
   gap: 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  /* Se puede deslizar, pero la barra no se dibuja. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 2px 2px 4px;
+}
+
+.mobile-variants-chip-grid::-webkit-scrollbar {
+  display: none;
 }
 
 .mobile-variant-chip {
+  flex: 0 0 auto;
+  white-space: nowrap;
   padding: 6px 12px;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.07);
@@ -3047,6 +3070,13 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   max-height: 180px;
   overflow-y: auto;
   padding-right: 4px;
+  /* La lista sigue teniendo scroll tactil, sin barra visible. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-sprites-chip-grid::-webkit-scrollbar {
+  display: none;
 }
 
 .mobile-sprite-chip {
@@ -4998,8 +5028,8 @@ body:has(.modal-overlay) {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border: none;
   border-radius: 8px;
@@ -9987,15 +10017,15 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   padding: 6px 2px;
   border: 0;
   background: none;
   color: #cbd5e1;
   font-family: var(--font-sans);
-  font-size: 0.66rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   text-decoration: none;
   border-radius: 10px;
   cursor: pointer;
@@ -10008,11 +10038,37 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .czs-navbar__icon-wrap {
   position: relative;
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+}
+
+/* Cajon fijo del icono: alinea optica y verticalmente los cuatro elementos.
+   La calavera mide mas porque su SVG trae margen de mesa de trabajo. */
+.czs-navbar__icon-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+/* Calavera pirata del inicio. Viene del cinturon de la temporada con sus propios
+   colores (hueso y cuero), y sobre el papiro se perdia: va montada en un medallon
+   azul marino con filo de laton, como el resto de la paleta de marinero. */
+.czs-navbar__skull {
+  display: block;
+  /* El SVG trae ~30% de mesa de trabajo: se compensa con tamano para que el
+     dibujo visible quede a la altura de los iconos de 22 px. */
+  width: 33px;
+  height: 33px;
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 
 /* Deja aire al final del documento para que la barra no tape contenido. */
 body.has-czs-navbar {
-  padding-bottom: calc(62px + env(safe-area-inset-bottom));
+  padding-bottom: calc(76px + env(safe-area-inset-bottom));
 }
 
 /* La barra es solo para movil: en escritorio el menu vive en la cabecera. */
@@ -10235,7 +10291,7 @@ body[data-gen='2']::after {
     display: flex;
     justify-content: center;
     /* Aire entre el buscador y el rollo del papiro. */
-    padding: 14px 16px 24px;
+    padding: 14px 16px 44px;
     position: relative;
     z-index: 55;
   }
@@ -10250,7 +10306,9 @@ body[data-gen='2']::after {
    primera. Se dibuja fuera de la tarjeta, sin fondo. */
 .ms-loop-btn {
   position: absolute;
-  right: 2px;
+  /* Fuera de la tarjeta activa: el riel la centra, asi que su borde derecho cae justo
+     en 50% + 205/2. Los 10px de mas son el aire que pide el diseno. */
+  left: calc(50% + 112.5px);
   top: 50%;
   transform: translateY(-50%);
   z-index: 5;
@@ -10259,15 +10317,46 @@ body[data-gen='2']::after {
   justify-content: center;
   padding: 6px;
   border: 0;
-  background: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, currentColor 12%, transparent);
   color: #3a2510;
   cursor: pointer;
   opacity: 0.85;
-  transition: transform 160ms ease, opacity 160ms ease;
+  transition: transform 160ms ease, opacity 160ms ease, background-color 160ms ease;
 }
 
 .ms-loop-btn:hover,
 .ms-loop-btn:focus-visible {
   opacity: 1;
-  transform: translateY(-50%) translateX(-3px);
+  transform: translateY(-50%) translateX(-4px);
+  background: color-mix(in srgb, currentColor 20%, transparent);
+}
+
+/* Un empujon corto y repetido hacia la tarjeta: el icono se mueve, el boton no,
+   para que la posicion no baile y el gesto se lea como "toca aqui". */
+.ms-loop-btn svg {
+  animation: ms-loop-nudge 2.4s ease-in-out infinite;
+}
+
+.ms-loop-btn:hover svg,
+.ms-loop-btn:focus-visible svg {
+  animation-play-state: paused;
+}
+
+@keyframes ms-loop-nudge {
+  0%,
+  60%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-loop-btn svg {
+    animation: none;
+  }
 }

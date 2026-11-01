@@ -74,6 +74,7 @@ export function MobileLiquidFilterBar({
 
   const [canDismiss, setCanDismiss] = useState(false);
   const closeTimerRef = useRef(null);
+  const scrollAlAbrirRef = useRef(0);
 
   useEffect(() => {
     if (isOpen) {
@@ -100,6 +101,10 @@ export function MobileLiquidFilterBar({
       clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
     }
+    // Se guarda ANTES de abrir: al montar la hoja el navegador reajusta el scroll
+    // (el boton enfocado deja de estar en el mismo sitio) y para entonces ya no
+    // sirve leer window.scrollY.
+    scrollAlAbrirRef.current = typeof window === 'undefined' ? 0 : window.scrollY;
     setIsClosing(false);
     setIsOpen(true);
   };
@@ -223,15 +228,40 @@ export function MobileLiquidFilterBar({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, isClosing]);
 
-  // Lock body scroll when modal is open
+  // Bloquea el scroll de la pagina mientras la hoja esta abierta.
+  // overflow: hidden en body no alcanzaba: html lleva overflow-x: clip, y eso corta
+  // la propagacion del overflow del body al viewport. Se fija el body en la posicion
+  // guardada al abrir y se restaura al cerrar.
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    if (!isOpen) return undefined;
+    const raiz = document.documentElement;
+    const cuerpo = document.body;
+    const desplazamiento = scrollAlAbrirRef.current;
+    const anchoBarra = window.innerWidth - raiz.clientWidth;
+    const previo = {
+      position: cuerpo.style.position,
+      top: cuerpo.style.top,
+      left: cuerpo.style.left,
+      right: cuerpo.style.right,
+      width: cuerpo.style.width,
+      paddingRight: cuerpo.style.paddingRight
+    };
+
+    cuerpo.style.position = 'fixed';
+    cuerpo.style.top = '-' + desplazamiento + 'px';
+    cuerpo.style.left = '0';
+    cuerpo.style.right = '0';
+    cuerpo.style.width = '100%';
+    if (anchoBarra > 0) cuerpo.style.paddingRight = anchoBarra + 'px';
+
     return () => {
-      document.body.style.overflow = '';
+      cuerpo.style.position = previo.position;
+      cuerpo.style.top = previo.top;
+      cuerpo.style.left = previo.left;
+      cuerpo.style.right = previo.right;
+      cuerpo.style.width = previo.width;
+      cuerpo.style.paddingRight = previo.paddingRight;
+      window.scrollTo(0, desplazamiento);
     };
   }, [isOpen]);
 

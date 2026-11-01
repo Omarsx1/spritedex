@@ -1009,35 +1009,70 @@ html.theme-cazatesoros .modal-content {
    ========================================================================== */
 
 html.theme-cazatesoros .czs-navbar {
-  background:
-    url('/papiro-papel.webp') center / 400px 400px,
-    #d9b98c;
-  border-top: 3px solid #5f3b1e;
+  /* La barra toma la paleta del aviso de nuevos espiritus: casco navy, filo de
+     laton y tinta de pergamino. El papiro queda para el contenido; la barra
+     flota sobre el como el chrome de la referencia. */
+  background: linear-gradient(180deg, #1b2b46 0%, #0e1728 62%, #0b1220 100%);
+  border-top: 1px solid rgba(216, 178, 106, 0.75);
   box-shadow:
-    0 -8px 20px rgba(20, 10, 2, 0.5),
-    inset 0 2px 0 rgba(255, 235, 190, 0.4);
+    0 -12px 26px rgba(4, 8, 16, 0.45),
+    inset 0 1px 0 rgba(240, 226, 192, 0.16);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 
 html.theme-cazatesoros .czs-navbar__item {
-  color: #3a2510;
+  position: relative;
+  color: #d8c8a2;
+  transition: color 160ms ease;
 }
 
 html.theme-cazatesoros .czs-navbar__item:active {
-  background: rgba(95, 59, 30, 0.18);
+  background: rgba(216, 178, 106, 0.12);
+}
+
+html.theme-cazatesoros .czs-navbar__item.is-active {
+  color: #f0d79a;
+  font-weight: 700;
+}
+
+/* Pestana actual: capsula dorada tenue detras del icono (el indicador de las
+   barras inferiores de Material 3) en vez de subrayado bajo la etiqueta. */
+html.theme-cazatesoros .czs-navbar__item.is-active::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(216, 178, 106, 0.16);
+  transform: translateX(-50%);
+}
+
+/* La calavera no lleva capsula: su dibujo ya es una figura con volumen y el
+   fondo dorado se leia como una mancha. Se marca solo con la etiqueta dorada. */
+html.theme-cazatesoros .czs-navbar__item.is-active:first-child::before {
+  content: none;
+}
+
+html.theme-cazatesoros .czs-navbar__item:focus-visible {
+  outline: 2px solid #e3c07a;
+  outline-offset: -2px;
+  border-radius: 12px;
 }
 
 /* El subtitulo usa el azul marino de la marca sobre el cielo de la temporada.
    Sobre las hojas de palmera el marino se hundia: se le pone un filo claro y una
    sombra suave para que se lea igual sobre cielo que sobre follaje. */
 html.theme-cazatesoros .hero__title-line--accent {
-  color: #0154b1 !important;
-  /* Sin contorno: el trazo de texto comia el relleno y adelgazaba las letras.
-     El halo claro es un drop-shadow, que va por detras del glifo. */
-  filter:
-    drop-shadow(0 0 9px rgba(255, 255, 255, 0.55))
-    drop-shadow(0 2px 5px rgba(6, 20, 45, 0.5));
+  /* Azul de marca oscurecido: sobre el cielo claro, #0154b1 daba 1.9:1 y el
+     subtitulo se lavaba. Este navy da ~4:1 y sigue leyendose azul. */
+  color: #08203f !important;
+  /* Sin contorno ni halo claro: el resplandor blanco lavaba las letras y las
+     hacia ver borrosas. Solo queda una sombra oscura corta para despegarlas
+     del cielo cuando el fondo es muy luminoso. */
+  filter: drop-shadow(0 2px 4px rgba(6, 20, 45, 0.45));
 }
 
 /* En movil la barra de navegacion ya resuelve la vuelta al inicio: los botones
@@ -1065,6 +1100,20 @@ html.theme-cazatesoros .mobile-sprite-chip.is-active {
   background: linear-gradient(180deg, #a9713c, #6f431c) !important;
   border-color: #3f2410 !important;
   color: #fff3d0 !important;
+}
+
+/* Estado activo del filtro con la paleta del aviso de nuevos espiritus:
+   casco navy, filo de laton y letra pergamino. El marron madera se confundia
+   con el resto de chips del papiro y no marcaba la seleccion. */
+html.theme-cazatesoros .mobile-status-pill.is-active,
+html.theme-cazatesoros .mobile-variant-chip.is-active,
+html.theme-cazatesoros .mobile-sprite-chip.is-active {
+  background: linear-gradient(180deg, #1a2942 0%, #0e1728 100%) !important;
+  border-color: #d8b26a !important;
+  color: #f2e6c8 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(240, 226, 192, 0.18),
+    0 1px 2px rgba(6, 10, 20, 0.35) !important;
 }
 
 /* Interruptor de no lanzados: misma madera y titulo en tinta. */
