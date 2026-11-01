@@ -10161,3 +10161,24 @@ body[data-gen='2']::before {
   92.8%       { transform: translateX(0.85rem); opacity: 1; }
   93.5%, 100% { transform: translateX(0.1rem); opacity: 0.85; }
 }
+
+/* ==========================================================================
+   SUBTITULO SPRITEDEX POR GENERACION
+   Runners y Override conservan el degradado original del rediseño futurista
+   (#a78bfa -> #ec4899 -> #f97316) con su shimmer; Cazatesoros usa su azul.
+   ========================================================================== */
+
+body[data-gen='1'] .hero__title-line--accent,
+body[data-gen='2'] .hero__title-line--accent {
+  background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #f97316 100%) !important;
+  background-size: 200% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: titleShimmer 4s ease-in-out infinite;
+}
+
+@keyframes titleShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
