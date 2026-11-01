@@ -31,9 +31,9 @@ const FORMAS = {
   ),
   3: (
     <>
-      <path d="M12 3.8c3.6 3.4 3.6 13 0 16.4-3.6-3.4-3.6-13 0-16.4Z" />
-      <path d="M12 6.2v11.6" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
-      <circle cx="10.6" cy="7.4" r="0.8" fill="#ffffff" fillOpacity="0.9" stroke="none" />
+      <ellipse cx="12" cy="12" rx="6.2" ry="8.3" />
+      <path d="M6.2 9.2h11.6" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+      <circle cx="9.4" cy="7.4" r="0.85" fill="#ffffff" fillOpacity="0.9" stroke="none" />
     </>
   ),
   4: (
@@ -45,9 +45,10 @@ const FORMAS = {
   ),
   5: (
     <>
-      <path d="M12 4.4 19.8 19H4.2z" />
-      <path d="M12 9.4 16.2 17H7.8z" fill="#ffffff" fillOpacity="0.55" stroke="none" />
-      <circle cx="10.4" cy="8.6" r="0.8" fill="#ffffff" fillOpacity="0.95" stroke="none" />
+      <path d="M7 5.6h10l3.6 4.8L12 20.4 3.4 10.4z" />
+      <path d="M6 10.4h12" stroke="#ffffff" strokeOpacity="0.6" strokeWidth="1.1" fill="none" />
+      <path d="M9.2 5.6 12 20.4l2.8-14.8" stroke="#ffffff" strokeOpacity="0.3" strokeWidth="0.9" fill="none" />
+      <circle cx="9.4" cy="7.2" r="0.8" fill="#ffffff" fillOpacity="0.95" stroke="none" />
     </>
   )
 };
