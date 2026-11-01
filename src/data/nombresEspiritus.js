@@ -57,7 +57,7 @@ export const FAMILY_NAMES_MAP = {
   // salvo que tengan una version en español asentada.
   peelybones: 'Bananín Huesudo',
   parrot: 'Plumitas',
-  barreloffish: "Barry O'Fish",
+  barreloffish: 'Barry',
   treasurechest: 'Gatisoro',
   treasuremap: 'Buscarrutas',
   compass: 'Orientador',
