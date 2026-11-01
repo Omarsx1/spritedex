@@ -33,6 +33,9 @@ export function Header({
   onOpenCompareModal,
   onOpenAuthModal
 }) {
+  // Generacion activa normalizada: el menu puede entregar el id como texto.
+  const genActual = Number(activeGen);
+
   // Pool of sprites for hero rotation
   const spritePool = useMemo(() => {
     return spritesPool && spritesPool.length > 0 ? spritesPool : (defaultAllSprites || []);
@@ -288,7 +291,7 @@ export function Header({
             <span className="hero__title-line-wrap">
               {/* Cada generacion conserva su logo: Override con glitch,
                   Runners blanco liso y Cazatesoros el wordmark en oro. */}
-              {activeGen === 3 ? (
+              {genActual === 3 ? (
                 <img
                   className="hero__title-logo"
                   src="/fortnite-dorado.webp"
@@ -297,7 +300,7 @@ export function Header({
                   height="274"
                   draggable="false"
                 />
-              ) : activeGen === 2 ? (
+              ) : genActual === 2 ? (
                 <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">
                   FORTNITE
                 </span>
