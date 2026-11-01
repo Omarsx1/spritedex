@@ -10628,3 +10628,56 @@ body[data-gen='2']::after {
     animation: none;
   }
 }
+
+/* ==========================================================================
+   COMPARTIR · PALETA DE LA CASA EN CUALQUIER TEMA
+   En la temporada de papiro ya se veia asi; en el resto de temas quedaba el
+   diseno viejo en purpura y cian. Va al final y con !important porque las
+   reglas de temporada tienen mas especificidad.
+   ========================================================================== */
+
+.sdm-share-pro__seg-label {
+  color: #d8b26a !important;
+}
+
+.sdm-share-pro__seg-btn--active {
+  background: linear-gradient(180deg, #1a2942 0%, #0e1728 100%) !important;
+  border: 1px solid #d8b26a !important;
+  color: #f2e6c8 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(240, 226, 192, 0.18),
+    0 1px 2px rgba(4, 8, 16, 0.3) !important;
+}
+
+.sdm-share-pro__actions {
+  background: linear-gradient(180deg, #1b2b46 0%, #0e1728 100%) !important;
+  border: 1px solid rgba(216, 178, 106, 0.55) !important;
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(240, 226, 192, 0.14),
+    0 4px 12px rgba(4, 8, 16, 0.35) !important;
+}
+
+.sdm-share-pro__btn--copy {
+  background: rgba(240, 226, 192, 0.08) !important;
+  border: 1px solid rgba(240, 226, 192, 0.38) !important;
+  color: #f2e6c8 !important;
+  box-shadow: none !important;
+}
+
+.sdm-share-pro__btn--share {
+  background: rgba(216, 178, 106, 0.16) !important;
+  border: 1px solid rgba(216, 178, 106, 0.85) !important;
+  color: #f0d79a !important;
+  box-shadow: none !important;
+}
+
+.sdm-share-pro__btn--download {
+  background: linear-gradient(180deg, #e8c98a 0%, #c9a45c 100%) !important;
+  border: 1px solid #a8843f !important;
+  color: #241a0c !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 2px 6px rgba(4, 8, 16, 0.35) !important;
+}

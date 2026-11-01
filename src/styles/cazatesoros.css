@@ -1460,6 +1460,17 @@ html.theme-cazatesoros .sdm-friends__code {
   background: #fdf6e3;
 }
 
+.ajustes-copy {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: #6b4a2a;
+}
+
+.ajustes-copy + .ajustes-copy {
+  margin-top: 8px;
+}
+
 /* El aviso de "desliza para ver variantes" va en tinta: el azul claro no se lee
    sobre el papiro. */
 html.theme-cazatesoros .ms-family-hint {

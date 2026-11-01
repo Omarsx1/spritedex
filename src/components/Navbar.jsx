@@ -365,7 +365,7 @@ export function Navbar({
               <div className="app-navbar__menu-section">
                 <div className="app-navbar__menu-section-label">
                   <Sparkles size={13} />
-                  <span>{t('nav.ayudaLegal')}</span>
+                  <span>{t('nav.navegacion')}</span>
                 </div>
 
                 <a
@@ -406,8 +406,6 @@ export function Navbar({
                   </div>
                 </a>
 
-                <p className="app-navbar__menu-copy">© {new Date().getFullYear()} {t('nav.copyright')}</p>
-                <p className="app-navbar__menu-copy">{t('nav.disclaimer')}</p>
               </div>
             </div>
           )}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Languages, Moon, Download, Smartphone, ShieldCheck } from 'lucide-react';
+import { Languages, Moon, Download, Smartphone, ShieldCheck, Info } from 'lucide-react';
 import { t } from '../i18n';
 import { getLang } from '../i18n/texto';
 import { conIdioma } from '../i18n/core';
@@ -106,6 +106,12 @@ export function AjustesPage({ onOpenPrivacy, onOpenBackup, onNavegar }) {
             <span>{t('ajustes.privacidad')}</span>
           </button>
         </div>
+      </section>
+
+      <section className="ajustes-bloque">
+        <h2 className="ajustes-titulo"><Info size={16} /> {t('ajustes.acerca')}</h2>
+        <p className="ajustes-copy">© {new Date().getFullYear()} {t('nav.copyright')}</p>
+        <p className="ajustes-copy">{t('nav.disclaimer')}</p>
       </section>
     </div>
   );
