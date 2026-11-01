@@ -780,7 +780,7 @@ export function SharePage({ filteredSprites, allSprites, userState, activeFilter
           </button>
 
           <button
-            className="sdm-share-pro__btn sdm-share-pro__btn--download sdm-share__glitch-btn"
+            className="sdm-share-pro__btn sdm-share-pro__btn--download"
             onClick={handleDownload}
             disabled={!dataUrl}
             title={t('compartir.titleDescargar')}

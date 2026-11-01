@@ -562,7 +562,7 @@ export function MobileLiquidFilterBar({
               )}
               <button
                 type="button"
-                className="mobile-sheet-btn-apply sdm-share__glitch-btn"
+                className="mobile-sheet-btn-apply"
                 data-text={t('filtrosMovil.aplicarFiltrosMayus')}
                 onClick={handleClose}
               >

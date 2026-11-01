@@ -6100,114 +6100,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   box-shadow: 0 0 14px rgba(167, 139, 250, 0.5);
 }
 
-/* Descargar con Efecto Glitch Oficial Cyberpunk */
-.sdm-share__glitch-btn {
-  position: relative;
-  background: rgba(0, 240, 232, 0.12);
-  border: 1.5px solid #00F0E8;
-  color: #00F0E8;
-  box-shadow: 0 0 12px rgba(0, 240, 232, 0.25);
-  overflow: hidden;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.sdm-share__glitch-btn:hover:not(:disabled),
-.sdm-share__glitch-btn:focus:not(:disabled) {
-  background-color: #00F0E8;
-  color: #060714;
-  border-color: #00F0E8;
-  box-shadow: 0 0 25px rgba(0, 240, 232, 0.7);
-  outline: none;
-  transform: translateY(-1px);
-}
-
-.sdm-share__glitch-btn:active:not(:disabled) {
-  transform: scale(0.97);
-}
-
-.sdm-share__glitch-btn .sdm-share__btn-text,
-.sdm-share__glitch-btn .sdm-share__btn-icon {
-  position: relative;
-  z-index: 1;
-  transition: opacity 0.2s ease;
-}
-
-.sdm-share__glitch-btn:hover:not(:disabled) .sdm-share__btn-text,
-.sdm-share__glitch-btn:hover:not(:disabled) .sdm-share__btn-icon {
-  opacity: 0;
-}
-
-.sdm-share__glitch-btn::before,
-.sdm-share__glitch-btn::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  font-size: 0.75rem;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  background-color: #00F0E8;
-  transition: opacity 0.2s ease;
-  pointer-events: none;
-}
-
-.sdm-share__glitch-btn:hover:not(:disabled)::before,
-.sdm-share__glitch-btn:focus:not(:disabled)::before {
-  opacity: 1;
-  color: #ff0055;
-  animation: sdm-glitch-anim 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
-}
-
-.sdm-share__glitch-btn:hover:not(:disabled)::after,
-.sdm-share__glitch-btn:focus:not(:disabled)::after {
-  opacity: 1;
-  color: #060714;
-  animation: sdm-glitch-anim 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both infinite;
-}
-
-@keyframes sdm-glitch-anim {
-  0% {
-    transform: translate(0);
-    clip-path: inset(0 0 0 0);
-  }
-  20% {
-    transform: translate(-3px, 2px);
-    clip-path: inset(50% 0 20% 0);
-  }
-  40% {
-    transform: translate(2px, -2px);
-    clip-path: inset(20% 0 60% 0);
-  }
-  60% {
-    transform: translate(-3px, 1px);
-    clip-path: inset(80% 0 5% 0);
-  }
-  80% {
-    transform: translate(3px, -2px);
-    clip-path: inset(30% 0 45% 0);
-  }
-  100% {
-    transform: translate(0);
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sdm-share__glitch-btn:hover::before,
-  .sdm-share__glitch-btn:hover::after {
-    animation: none;
-    opacity: 0;
-  }
-  .sdm-share__glitch-btn:hover .sdm-share__btn-text,
-  .sdm-share__glitch-btn:hover .sdm-share__btn-icon {
-    opacity: 1;
-  }
-}
-
 .sdm-share-pro__btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -7841,7 +7733,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .motion-disabled .cyber-lines,
 .motion-disabled .card-particles,
 .motion-disabled .glowing-elements,
-.motion-disabled .sdm-share__glitch-btn,
 .motion-disabled .mobile-new-coachmark {
   animation: none !important;
 }
@@ -9112,9 +9003,8 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   color: #ffffff;
 }
 
-/* Aplicar Filtros: la accion principal, en cian. Va anclada a la hoja porque
-   comparte .sdm-share__glitch-btn con el boton de compartir, que tiene su
-   propia regla naranja mas adelante y gana por orden. */
+/* Aplicar Filtros: la accion principal de la hoja. Va anclada a la hoja para
+   no heredar el estilo de los botones de compartir. */
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .mobile-liquid-sheet .mobile-sheet-btn-apply {
   background: rgba(255, 146, 43, 0.12);
   border-color: #ff922b;
@@ -9476,36 +9366,6 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 
 html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share-pro__preview-wrap {
   border-color: rgba(168, 85, 247, 0.24);
-}
-
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn {
-  background: rgba(255, 146, 43, 0.12);
-  border-color: #ff922b;
-  color: #ff922b;
-  box-shadow: 0 0 12px rgba(255, 146, 43, 0.25);
-}
-
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn:hover:not(:disabled),
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn:focus:not(:disabled) {
-  background-color: #ff922b;
-  color: #1a0b02;
-  border-color: #ff922b;
-  box-shadow: 0 0 25px rgba(255, 146, 43, 0.55);
-}
-
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn::before,
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn::after {
-  background-color: #ff922b;
-}
-
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn:hover:not(:disabled)::before,
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn:focus:not(:disabled)::before {
-  color: #3b0764;
-}
-
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn:hover:not(:disabled)::after,
-html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:not([data-fnm-phase])) .sdm-share__glitch-btn:focus:not(:disabled)::after {
-  color: #1a0b02;
 }
 
 /* Seasonal animations must respect the visitor's motion preference. */
