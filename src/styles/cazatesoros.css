@@ -113,6 +113,8 @@ html.theme-cazatesoros .fnm-forest {
 html.theme-cazatesoros .main-content {
   position: relative;
   /* El borde del papiro ocupa 96px a cada lado; el contenido queda dentro del pergamino. */
+  /* El rollo superior mide ~105px: el contenido empieza debajo de el. */
+  padding-top: 112px;
   padding-left: 96px;
   padding-right: 96px;
   background-color: var(--czs-papel);
@@ -141,6 +143,7 @@ html.theme-cazatesoros .main-content {
 
 @media (max-width: 768px) {
   html.theme-cazatesoros .main-content {
+    padding-top: 52px;
     padding-left: 40px;
     padding-right: 40px;
     background-size:
