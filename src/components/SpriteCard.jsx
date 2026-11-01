@@ -196,7 +196,10 @@ function SpriteCardBase({
         ...(COLORES_GEN3[sprite.id] ? {
           '--g3-h': COLORES_GEN3[sprite.id].h,
           '--g3-s': `${COLORES_GEN3[sprite.id].s}%`,
-          '--g3-l': `${COLORES_GEN3[sprite.id].l}%`
+          '--g3-l': `${COLORES_GEN3[sprite.id].l}%`,
+          // La rareza manda en el aro y el resplandor: un legendario se lee
+          // legendario aunque el fondo sea el tinte de su temporada.
+          '--g3-ring': styleInfo.borderColor
         } : {})
       }}
       onClick={isFriendView ? undefined : handleToggleClick}

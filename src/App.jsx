@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useDeferredValue, useRef, lazy, Suspense } from 'react';
+import { applyCazatesorosTheme, resolveCazatesorosState, CAZATESOROS_STORAGE_KEY } from './config/cazatesoros';
 import { VARIANT_ORDER, FAMILY_NAMES_MAP, pickFamilyName } from './data/spritesData';
 import { t } from './i18n';
 import { leerVista, urlConVista } from './utils/vistaUrl.js';
@@ -274,6 +275,23 @@ export function App() {
     const temaNuevo = document.documentElement.classList.contains('theme-cazatesoros');
     return sinGenEnUrl && temaNuevo ? 3 : Number(vistaInicial.gen);
   });
+  // El diseno de temporada (papiro, nav bar, hero) solo viste la 3a generacion.
+  // Al cambiar de generacion se enciende o se apaga sin recargar.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    let storedOverride = null;
+    try { storedOverride = localStorage.getItem(CAZATESOROS_STORAGE_KEY); } catch { storedOverride = null; }
+    const habilitado = resolveCazatesorosState({
+      isDev: Boolean(import.meta.env?.DEV),
+      search: window.location.search,
+      storedOverride
+    });
+    applyCazatesorosTheme(habilitado && activeGen === 3);
+    // Cada generacion tiene su propio fondo: Runners (rejilla Blueprint),
+    // Override (arte Glitch) y Cazatesoros (escena tropical).
+    document.body.dataset.gen = String(activeGen);
+  }, [activeGen]);
+
   const [searchQuery, setSearchQuery] = useState(vistaInicial.q);
   // La busqueda se difiere: teclear no bloquea el pintado de la grilla.
   const deferredSearch = useDeferredValue(searchQuery);

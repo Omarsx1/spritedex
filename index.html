@@ -87,6 +87,11 @@
           else if (czsOverride === 'false') czsActive = false;
           else czsActive = true;
 
+          // El diseno nuevo pertenece a la 3a generacion: si la vista pide otra
+          // generacion, se respeta su estilo propio.
+          var genPedida = params.get('gen');
+          if (genPedida && genPedida !== '3') czsActive = false;
+
           if (czsActive) {
             document.documentElement.classList.add('theme-cazatesoros');
             document.body.classList.add('theme-cazatesoros');

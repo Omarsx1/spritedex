@@ -1114,8 +1114,10 @@ a.app-navbar__menu-action-btn {
      el texto): un tuck grande tapaba el oro. Solo un roce de 2 px. */
   margin-top: 2px;
   padding: 0.05em 0.2em;
-  /* Color plano de marca: se retiro el degradado violeta->magenta y su shimmer. */
-  color: #0f1d39;
+  /* Color plano de marca: se retiro el degradado violeta->magenta y su shimmer.
+     Sobre el cielo de Cazatesoros va el azul marino; en los fondos oscuros de
+     Runners y Override el subtitulo necesita luz. */
+  color: #dbe7ff;
 }
 
 /* --- Central Sprite Showcase --- */
@@ -8382,9 +8384,10 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
 }
 
 
-/* Subtítulo SPRITEDEX: mismo color plano de marca que el resto de temporadas. */
+/* Subtítulo SPRITEDEX sobre los fondos oscuros de Runners y Override: claro y
+   con sombra, porque el azul marino se hundía. */
 .hero__title-line--accent-fnm {
-  color: #0f1d39 !important;
+  color: #dbe7ff !important;
   /* Sombra por detras para despegarlo de la key art. */
   filter: drop-shadow(0 3px 7px rgba(6, 2, 14, 0.8)) !important;
   margin-top: 2px !important;
@@ -10030,7 +10033,13 @@ html body .sprite-card.is-gen3 {
     ) !important;
   background-color: hsl(var(--g3-h) 42% calc(var(--g3-l) - 6%)) !important;
   background-size: auto !important;
-  border-color: hsl(var(--g3-h) 45% calc(var(--g3-l) + 22%)) !important;
+  /* El aro y el resplandor llevan el color de la RAREZA (legendario naranja,
+     epico violeta...): el fondo sigue siendo el tinte de la temporada. */
+  border-color: var(--g3-ring, hsl(var(--g3-h) 45% calc(var(--g3-l) + 22%))) !important;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--g3-ring, #8b5cf6) 45%, transparent),
+    inset 0 -40px 60px -30px color-mix(in srgb, var(--g3-ring, #8b5cf6) 55%, transparent),
+    0 6px 16px color-mix(in srgb, var(--g3-ring, #8b5cf6) 35%, transparent) !important;
 }
 
 html body .sprite-card.is-gen3 .card-name {
@@ -10048,4 +10057,41 @@ html body .sprite-card.is-gen3 .card-owned-btn.is-readonly {
 
 html body .sprite-card.is-gen3 .card-owned-btn .btn-text {
   color: #ece6d8 !important;
+}
+
+/* ==========================================================================
+   FONDO POR GENERACION
+   Runners conserva la rejilla Blueprint; Override usa el arte Glitch que el
+   sitio llevaba antes (public/background.webp). Cazatesoros tiene su escena.
+   ========================================================================== */
+
+body[data-gen='1']::before {
+  opacity: 0;
+}
+
+/* Runners: rejilla Blueprint completa y opaca, para que no la tape ninguna capa
+   de temporada. */
+body[data-gen='1']::after {
+  background:
+    linear-gradient(rgba(14, 165, 233, 0.12) 1px, transparent 1px) 0 0 / 50px 50px,
+    linear-gradient(90deg, rgba(14, 165, 233, 0.12) 1px, transparent 1px) 0 0 / 50px 50px,
+    linear-gradient(rgba(14, 165, 233, 0.06) 1px, transparent 1px) 0 0 / 10px 10px,
+    linear-gradient(90deg, rgba(14, 165, 233, 0.06) 1px, transparent 1px) 0 0 / 10px 10px,
+    radial-gradient(circle at 60% 40%, rgba(6, 182, 212, 0.2) 0%, rgba(6, 182, 212, 0.05) 35%, transparent 70%),
+    #060714;
+  background-repeat: repeat, repeat, repeat, repeat, no-repeat, no-repeat;
+}
+
+body[data-gen='2']::before {
+  opacity: 0;
+}
+
+body[data-gen='2']::after {
+  background:
+    radial-gradient(130% 75% at 50% -20%, rgba(124, 58, 237, 0.5) 0%, rgba(88, 28, 235, 0.18) 38%, transparent 66%),
+    radial-gradient(70% 45% at 82% -8%, rgba(236, 72, 153, 0.2) 0%, transparent 70%),
+    radial-gradient(115% 55% at 50% -12%, rgba(6, 182, 212, 0.18) 0%, rgba(6, 182, 212, 0.05) 42%, transparent 74%),
+    radial-gradient(115% 60% at 50% 112%, rgba(76, 29, 149, 0.38) 0%, transparent 68%),
+    radial-gradient(120% 85% at 50% 45%, transparent 42%, rgba(3, 4, 14, 0.6) 100%),
+    url('/background.webp') center top / cover no-repeat;
 }

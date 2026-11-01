@@ -314,7 +314,8 @@ function FamilySpotlightRow({
           ...(COLORES_GEN3[sprite.id] ? {
             '--g3-h': COLORES_GEN3[sprite.id].h,
             '--g3-s': `${COLORES_GEN3[sprite.id].s}%`,
-            '--g3-l': `${COLORES_GEN3[sprite.id].l}%`
+            '--g3-l': `${COLORES_GEN3[sprite.id].l}%`,
+            '--g3-ring': styleInfo.borderColor
           } : {}),
           // El halo de color de fuera se retiro a proposito (se veia como un aro de luz
           // alrededor de la carta); la activa ya se distingue por tamaño, opacidad y z-index.

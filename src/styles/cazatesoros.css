@@ -1022,3 +1022,15 @@ html.theme-cazatesoros .czs-navbar__item {
 html.theme-cazatesoros .czs-navbar__item:active {
   background: rgba(95, 59, 30, 0.18);
 }
+
+/* El subtitulo usa el azul marino de la marca sobre el cielo de la temporada.
+   Sobre las hojas de palmera el marino se hundia: se le pone un filo claro y una
+   sombra suave para que se lea igual sobre cielo que sobre follaje. */
+html.theme-cazatesoros .hero__title-line--accent {
+  color: #1d4f91 !important;
+  /* Sin contorno: el trazo de texto comia el relleno y adelgazaba las letras.
+     El halo claro es un drop-shadow, que va por detras del glifo. */
+  filter:
+    drop-shadow(0 0 9px rgba(255, 255, 255, 0.55))
+    drop-shadow(0 2px 5px rgba(6, 20, 45, 0.5));
+}
