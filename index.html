@@ -76,6 +76,25 @@
           var params = new URLSearchParams(location.search);
 
           if (local) {
+            // Espejo de src/config/cazatesoros.js: flag > override > encendido.
+            // Cazatesoros gana sobre Fortnitemares, asi que si esta activo no se
+            // enciende el bosque de Halloween.
+            var czs = params.get('cazatesoros');
+            var czsOverride = null;
+            try { czsOverride = localStorage.getItem('spritedex_cazatesoros_override'); } catch (e) {}
+            var czsActive;
+            if (czs === '0' || czs === 'false') czsActive = false;
+            else if (czs === '1' || czs === 'true') czsActive = true;
+            else if (czsOverride === 'true') czsActive = true;
+            else if (czsOverride === 'false') czsActive = false;
+            else czsActive = true;
+
+            if (czsActive) {
+              document.documentElement.classList.add('theme-cazatesoros');
+              document.body.classList.add('theme-cazatesoros');
+              return;
+            }
+
             // Espejo del modo desarrollo de seasonalEvent.js: bandera > override > encendido.
             // Asi el parpadeo tampoco se ve en local y las banderas siguen mandando.
             var flag = params.get('halloween');
@@ -100,6 +119,9 @@
     <!-- El bosque de la temporada, montado en el armazon y no en React: asi existe ya en
          el primer fotograma. Su visibilidad la decide el CSS: sin la clase del tema no se ve. -->
     <div class="fnm-forest" aria-hidden="true"></div>
+    <!-- Escena de la temporada Cazatesoros. El CSS decide si se ve; existe antes del
+         primer pintado para que el hero no arranque sobre el fondo generico. -->
+    <div class="czs-scene" aria-hidden="true"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
