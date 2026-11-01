@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ALL_SPRITES, pickName } from '../data/spritesData';
-import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw, Trash2, CheckCircle2, Send, Share2 } from 'lucide-react';
+import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw, Trash2, CheckCircle2, Share2 } from 'lucide-react';
 import { Modal } from './ui/Modal';
 import { safeStorage } from '../utils/safeStorage';
 import { useFriendRequests } from '../hooks/useFriendRequests';
@@ -364,20 +364,20 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
                           <span className="fpage__miniNombre">{s.name}</span>
                         </button>
                         {marcas[s.id] && (
-                          <span
-                            className={'fpage__miniMarca fpage__miniMarca--' + marcas[s.id]}
-                            aria-label={t(marcas[s.id] === 'enviado' ? 'amigos.enviado' : 'amigos.compartido')}
-                          >
-                            {marcas[s.id] === 'enviado' ? <Send size={10} /> : <Share2 size={10} />}
+                          <span className="fpage__miniMarca fpage__miniMarca--compartido" aria-label={t('amigos.compartido')}>
+                            <Share2 size={10} />
                           </span>
                         )}
                         {marcaAbierta === s.id && (
                           <div className="fpage__miniPop" role="dialog" aria-label={t('amigos.marcarEnvio', { nombre: s.name })}>
-                            <button type="button" onClick={() => marcarEspiritu(s.id, 'enviado')}>{t('amigos.enviado')}</button>
-                            <button type="button" onClick={() => marcarEspiritu(s.id, 'compartido')}>{t('amigos.compartido')}</button>
-                            {marcas[s.id] && (
-                              <button type="button" onClick={() => marcarEspiritu(s.id, null)}>{t('amigos.quitarMarca')}</button>
-                            )}
+                            <button
+                              type="button"
+                              aria-pressed={Boolean(marcas[s.id])}
+                              onClick={() => marcarEspiritu(s.id, marcas[s.id] ? null : 'compartido')}
+                            >
+                              {marcas[s.id] ? <Check size={11} /> : null}
+                              {t('amigos.compartido')}
+                            </button>
                           </div>
                         )}
                       </div>

@@ -8220,6 +8220,9 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 .fpage__miniPop button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 6px 8px;
   border: 0;
   border-radius: 7px;
