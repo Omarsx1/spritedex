@@ -66,7 +66,7 @@ export const FAMILY_NAMES_MAP = {
   squibbly: "Lil' Squibbly",
   playmakerbrewery: "Lil' Flacko",
   rookgecko: "Lil' Uzi Vert Jr.",
-  coinpile: 'Plundarrgh',
+  coinpile: 'Buscacofres',
   feedjet: 'Caracol Transmisor'
 };
 
