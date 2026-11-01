@@ -184,22 +184,6 @@ export function App() {
     };
   }, [isAdminPortal, isAdminAuth]);
 
-  // Seasonal theme: apply on boot, then keep it in sync while the tab stays
-  // open (boundary timer plus visibility/focus re-checks).
-  // La generacion elegida manda: Runners y Override no se visten de temporada,
-  // asi que un re-chequeo (foco, visibilidad o frontera) no puede cambiarlos.
-  useEffect(() => {
-    const aplicarTemporada = () => {
-      applySeasonalTheme(activeGen === 3 ? isFortnitemaresActive() : false);
-    };
-    aplicarTemporada();
-    const unsubscribe = subscribeSeasonalState((active) => {
-      aplicarTemporada();
-      window.dispatchEvent(new CustomEvent('spritedex:season-change', { detail: { active } }));
-    });
-    return unsubscribe;
-  }, [activeGen]);
-
 
   const [userState, setUserState] = useState(() => {
     try {
@@ -297,6 +281,23 @@ export function App() {
     // Override (arte Glitch) y Cazatesoros (escena tropical).
     document.body.dataset.gen = String(activeGen);
   }, [activeGen]);
+
+  // Seasonal theme: apply on boot, then keep it in sync while the tab stays
+  // open (boundary timer plus visibility/focus re-checks).
+  // La generacion elegida manda: Runners y Override no se visten de temporada,
+  // asi que un re-chequeo (foco, visibilidad o frontera) no puede cambiarlos.
+  useEffect(() => {
+    const aplicarTemporada = () => {
+      applySeasonalTheme(activeGen === 3 ? isFortnitemaresActive() : false);
+    };
+    aplicarTemporada();
+    const unsubscribe = subscribeSeasonalState((active) => {
+      aplicarTemporada();
+      window.dispatchEvent(new CustomEvent('spritedex:season-change', { detail: { active } }));
+    });
+    return unsubscribe;
+  }, [activeGen]);
+
 
   const [searchQuery, setSearchQuery] = useState(vistaInicial.q);
   // La busqueda se difiere: teclear no bloquea el pintado de la grilla.
