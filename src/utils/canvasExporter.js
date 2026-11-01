@@ -29,12 +29,23 @@ export function textoParaQR(url = dominioParaCompartir()) {
 }
 
 /**
- * Fondo de la plantilla de compartir. En temporada la captura sale con el arte de
- * Fortnitemares; el resto del ano usa el de siempre. Si el de temporada no cargara, la
- * captura se hace igual con el de siempre: la plantilla nunca se queda sin fondo.
+ * Fondo de la plantilla de compartir: la 3a generacion tiene su propio arte por
+ * formato. Vertical usa vertical_3gen.webp y el cuadrado cuadrado_3gen.webp. Si
+ * esa imagen no cargara, se cae al otro formato y luego al fondo clasico: la
+ * plantilla nunca se queda sin fondo.
  */
-export function rutaFondoPlantilla() {
-  return isFortnitemaresActive() ? '/bac_mares.webp' : '/background.webp';
+// Tinta de la lona sobre el mapa claro de la 3a generacion.
+export const TINTA_LONA = '#0f2b63';
+
+export const FONDO_VERTICAL_3GEN = '/vertical_3gen.webp';
+export const FONDO_CUADRADO_3GEN = '/cuadrado_3gen.webp';
+
+export function rutaFondoPlantilla(format = 'checklist') {
+  return format === 'square' ? FONDO_CUADRADO_3GEN : FONDO_VERTICAL_3GEN;
+}
+
+export function rutaFondoRespaldo(format = 'checklist') {
+  return format === 'square' ? FONDO_VERTICAL_3GEN : FONDO_CUADRADO_3GEN;
 }
 
 // Caché global en memoria para acelerar la generación instantánea de imágenes
@@ -138,7 +149,10 @@ export function getCanvasCacheKey(format = DEFAULT_EXPORT_FORMAT, bgStyle = DEFA
   // sin corona no valen.
   // v68: la firma del pie sube a 42 px; las capturas v67 con la firma de 30 px no valen.
   // v69: la firma del pie baja a 39 px; las capturas v68 con la firma de 42 px no valen.
-  return `v69_${format}_${bgStyle}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
+  // v70: la plantilla estrena el arte de la 3a generacion por formato y el velo baja al
+  // 45%. La ruta del fondo entra en la clave: un cambio de fondo invalida lo cacheado.
+  // v71: cabecera estilo poster (FORTNITE en azul marino), velo al 22% y textos en tinta.
+  return `v85_${format}_${bgStyle}_${rutaFondoPlantilla(format)}_${count}_${ownedCount}_${alcance || 'all'}_${generalOwned ?? 'x'}/${generalTotal ?? 'x'}_${usuario || 'sin'}__${hash}`;
 }
 
 // Helper to pre-load image for canvas drawing with instantaneous in-memory caching
@@ -286,7 +300,8 @@ const PRECARGA_SCROLL_RETRY_MS = 250;
 // o sea ~1,8 MB de miniaturas saliendo de golpe mientras la app pintaba la primera pantalla.
 export function preloadCanvasAssets(spritesList = [], batchSize = 4) {
   if (typeof window === 'undefined') return;
-  loadImage(rutaFondoPlantilla(), true);
+  loadImage(FONDO_VERTICAL_3GEN, true);
+  loadImage(FONDO_CUADRADO_3GEN, true);
 
   if (Array.isArray(spritesList) && spritesList.length > 0) {
     // El efecto de App se dispara varias veces al arrancar (catalogo de cache y luego
@@ -361,9 +376,9 @@ export function preloadCanvasAssets(spritesList = [], batchSize = 4) {
 // Precarga de fondo al inicializar el módulo
 if (typeof window !== 'undefined') {
   if (window.requestIdleCallback) {
-    window.requestIdleCallback(() => loadImage(rutaFondoPlantilla()));
+    window.requestIdleCallback(() => { loadImage(FONDO_VERTICAL_3GEN); loadImage(FONDO_CUADRADO_3GEN); });
   } else {
-    setTimeout(() => loadImage(rutaFondoPlantilla()), 50);
+    setTimeout(() => { loadImage(FONDO_VERTICAL_3GEN); loadImage(FONDO_CUADRADO_3GEN); }, 50);
   }
 }
 
@@ -436,9 +451,12 @@ function drawCroppedBackground(ctx, img, canvasW, canvasH) {
 function drawCyberMatrixBackground(ctx, width, height, style = 'glitch_override', bgImg = null) {
   if (bgImg && style === 'glitch_override') {
     drawCroppedBackground(ctx, bgImg, width, height);
-    // Dark cyber tint overlay
-    ctx.fillStyle = 'rgba(6, 7, 20, 0.72)';
+    // Velo suave: el arte de la 3a generacion tiene que verse, pero el HUD
+    // necesita contraste para el texto claro.
+    ctx.fillStyle = 'rgba(6, 7, 20, 0.06)';
     ctx.fillRect(0, 0, width, height);
+    // El mapa no lleva scanlines ni bloques cromaticos: eran de Override.
+    return;
   } else if (style === 'blueprint') {
     // Blueprint dark blue
     ctx.fillStyle = '#060a17';
@@ -586,12 +604,12 @@ export async function generateSpritedexCardImage({
 
   const loadedImagesMap = {};
 
-  // Load official glitch wallpaper (en temporada, el arte de Fortnitemares)
-  const fondo = rutaFondoPlantilla();
+  // Fondo de la plantilla: arte de la 3a generacion segun el formato.
+  const fondo = rutaFondoPlantilla(format);
   const bgImgPromise = loadImage(fondo).then((img) => {
     if (img) return img;
-    // Sin el arte de temporada, la captura no se queda sin fondo.
-    return fondo === '/background.webp' ? null : loadImage('/background.webp');
+    // Si falta el del formato, se prueba el otro y por ultimo el clasico.
+    return loadImage(rutaFondoRespaldo(format)).then((otro) => otro || loadImage('/background.webp'));
   });
 
   // En temporada el encabezado usa el logo real de Fortnitemares (el mismo SVG del hero).
@@ -1197,39 +1215,44 @@ async function renderGlitchOverrideTemplate({
     // La capsula se ancla al borde visible de las letras, no al lienzo del SVG.
     titleY = logoY + logoMaresListo.borde;
   } else {
-    // Top Small Header: "FORTNITE , NUEVOS"
-    ctx.font = `900 ${Math.round(14 * Math.min(1.2, scale))}px "Outfit", "Inter", "Arial Black", sans-serif`;
-    ctx.fillStyle = acentoCabecera;
+    // Linea pequena: temporada y generacion.
+    ctx.font = `900 ${Math.round(15 * Math.min(1.2, scale))}px "Outfit", "Inter", "Arial Black", sans-serif`;
+    ctx.fillStyle = TINTA_LONA;
     ctx.textAlign = 'center';
     ctx.letterSpacing = '3px';
-    ctx.shadowColor = acentoCabeceraRgba;
-    ctx.shadowBlur = 8 * EXPORT_SCALE;
-    const topTextY = Math.round(34 * Math.min(1.15, scale));
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
+    ctx.shadowBlur = 0;
+    const topTextY = Math.round(36 * Math.min(1.15, scale));
     ctx.fillText(enTemporada ? t('lona.arribaMares') : t('lona.arriba'), width / 2, topTextY);
 
-    // Main Big Title: "SPRITEDEX OVERRIDE"
-    const titleText = enTemporada ? t('lona.tituloMares') : t('lona.titulo');
-    const baseTitleFontSize = isSquare ? (cols >= 8 ? 44 : 48) : 52;
-    const titleFontSize = Math.round(baseTitleFontSize * Math.min(1.22, Math.max(0.9, scale)));
+    // Lockup en una sola linea: FORTNITE CAZATESOROS, ajustado al ancho.
+    const titleText = enTemporada
+      ? t('lona.tituloMares')
+      : `${t('lona.titulo')} ${t('lona.temporada')}`;
+    const baseTitleFontSize = isSquare ? (cols >= 8 ? 62 : 70) : 78;
+    let titleFontSize = Math.round(baseTitleFontSize * Math.min(1.22, Math.max(0.9, scale)));
     ctx.font = `900 ${titleFontSize}px "Burbank Big Condensed", "Impact", "Arial Black", sans-serif`;
+    ctx.letterSpacing = '1px';
+    const anchoMaxTitulo = width * 0.9;
+    const anchoTitulo = ctx.measureText(titleText).width;
+    if (anchoTitulo > anchoMaxTitulo) {
+      titleFontSize = Math.floor(titleFontSize * (anchoMaxTitulo / anchoTitulo));
+      ctx.font = `900 ${titleFontSize}px "Burbank Big Condensed", "Impact", "Arial Black", sans-serif`;
+    }
 
-    titleY = topTextY + Math.round(50 * Math.min(1.15, scale));
+    titleY = topTextY + Math.round(titleFontSize * 0.92);
 
-    // Chromatic Aberration Shadows
-    ctx.fillStyle = acentoCabecera;
-    ctx.fillText(titleText, width / 2 + 3, titleY);
-
-    ctx.fillStyle = '#ff0055';
-    ctx.fillText(titleText, width / 2 - 3, titleY);
-
-    ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
-    ctx.shadowBlur = 14 * EXPORT_SCALE;
+    // Sombra corta y dura: el wordmark se despega del mapa sin brillos neon.
+    ctx.fillStyle = 'rgba(8, 20, 48, 0.28)';
+    ctx.fillText(titleText, width / 2 + 2, titleY + 3);
+    ctx.fillStyle = TINTA_LONA;
     ctx.fillText(titleText, width / 2, titleY);
     ctx.shadowBlur = 0;
   }
 
-  // Tagline Pill Capsule: "ROMPE LAS REGLAS • CAMBIA EL JUEGO"
+  // La capsula del lema era de Override: fuera salvo en Fortnitemares.
+  let capsuleBottom = titleY + Math.round(18 * Math.min(1.1, scale));
+  if (enTemporada) {
   const capsuleText = enTemporada ? t('lona.lemaMares') : t('lona.lema');
   const capsuleFontSize = Math.round(10.5 * Math.min(1.15, scale));
   ctx.font = `900 ${capsuleFontSize}px "Outfit", "Inter", "Arial Black", sans-serif`;
@@ -1258,6 +1281,8 @@ async function renderGlitchOverrideTemplate({
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'center';
   ctx.fillText(capsuleText, width / 2, capsuleY + Math.round(15 * Math.min(1.15, scale)));
+  capsuleBottom = capsuleY + capsuleH;
+  }
 
   // HUD Status Bar: la izquierda dice QUE lista es y la derecha el progreso de la
   // coleccion. Antes ambas hablaban de la lista exportada y con "Nuevos"/"Faltantes"
@@ -1268,30 +1293,62 @@ async function renderGlitchOverrideTemplate({
   const hudW = Math.min(width - paddingX * 2 - 30, Math.round(580 * Math.min(1.25, scale) * factorHud));
   const hudH = Math.round(36 * hudS);
   const hudX = (width - hudW) / 2;
-  const hudY = capsuleY + capsuleH + Math.round(16 * Math.min(1.1, scale) * (hudGrande ? 1.9 : 1));
+  const hudY = capsuleBottom + Math.round(16 * Math.min(1.1, scale) * (hudGrande ? 1.9 : 1));
   const hudPadX = Math.round(14 * factorHud);
 
-  // HUD Frame: una base oscura tenue garantiza que el texto se lea sobre cualquier fondo
-  // (el arte de temporada tiene zonas claras donde el gris del alcance se perdia).
-  roundRect(ctx, hudX, hudY, hudW, hudH, 4);
-  ctx.fillStyle = 'rgba(6, 8, 16, 0.42)';
+  // HUD de madera, como el buscador de la pagina: marco de madera, panel de
+  // papiro dentro y esquinas metalicas con su clavo.
+  roundRect(ctx, hudX, hudY, hudW, hudH, 6);
+  const maderaHud = ctx.createLinearGradient(hudX, hudY, hudX, hudY + hudH);
+  maderaHud.addColorStop(0, '#7c532d');
+  maderaHud.addColorStop(0.45, '#5f3b1e');
+  maderaHud.addColorStop(1, '#452814');
+  ctx.fillStyle = maderaHud;
   ctx.fill();
-  ctx.strokeStyle = 'rgba(0, 240, 232, 0.55)';
+  ctx.strokeStyle = 'rgba(30, 16, 6, 0.85)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  // Filo de luz arriba.
+  ctx.fillStyle = 'rgba(255, 226, 170, 0.28)';
+  ctx.fillRect(hudX + 3, hudY + 1, hudW - 6, 1);
+
+  // Panel de papiro.
+  const panelInset = Math.max(4, Math.round(5 * factorHud));
+  const panelX = hudX + panelInset;
+  const panelY = hudY + panelInset;
+  const panelW = hudW - panelInset * 2;
+  const panelH = hudH - panelInset * 2;
+  roundRect(ctx, panelX, panelY, panelW, panelH, 3);
+  const papelHud = ctx.createLinearGradient(panelX, panelY, panelX, panelY + panelH);
+  papelHud.addColorStop(0, '#f1dfb4');
+  papelHud.addColorStop(1, '#dcc08c');
+  ctx.fillStyle = papelHud;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(120, 82, 38, 0.55)';
   ctx.lineWidth = 1;
   ctx.stroke();
 
-  // Corner brackets on HUD
-  const brazoHud = Math.round(6 * factorHud);
-  const grosorHud = Math.max(2, Math.round(2 * factorHud));
-  ctx.fillStyle = '#00F0E8';
-  ctx.fillRect(hudX - 1, hudY - 1, brazoHud, grosorHud);
-  ctx.fillRect(hudX - 1, hudY - 1, grosorHud, brazoHud);
-  ctx.fillRect(hudX + hudW - brazoHud + 1, hudY - 1, brazoHud, grosorHud);
-  ctx.fillRect(hudX + hudW - 1, hudY - 1, grosorHud, brazoHud);
-  ctx.fillRect(hudX - 1, hudY + hudH - 1, brazoHud, grosorHud);
-  ctx.fillRect(hudX - 1, hudY + hudH - brazoHud + 1, grosorHud, brazoHud);
-  ctx.fillRect(hudX + hudW - brazoHud + 1, hudY + hudH - 1, brazoHud, grosorHud);
-  ctx.fillRect(hudX + hudW - 1, hudY + hudH - brazoHud + 1, grosorHud, brazoHud);
+  // Esquinas metalicas con clavo.
+  const placa = Math.max(7, Math.round(9 * factorHud));
+  const clavos = [
+    [hudX, hudY], [hudX + hudW - placa, hudY],
+    [hudX, hudY + hudH - placa], [hudX + hudW - placa, hudY + hudH - placa]
+  ];
+  for (const [px, py] of clavos) {
+    const metal = ctx.createLinearGradient(px, py, px + placa, py + placa);
+    metal.addColorStop(0, '#eddfb9');
+    metal.addColorStop(0.4, '#bda474');
+    metal.addColorStop(1, '#5d4823');
+    ctx.fillStyle = metal;
+    ctx.fillRect(px, py, placa, placa);
+    ctx.fillStyle = '#fff6e2';
+    ctx.beginPath();
+    ctx.arc(px + placa / 2, py + placa / 2, Math.max(1, placa * 0.16), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(70, 48, 18, 0.8)';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+  }
 
   // HUD Text: numero + etiqueta del alcance. En "Atrapados"/"Faltantes" el numero es el
   // tamano de la lista; el "owned" del alcance no aporta (seria 26/26 o 0/26).
@@ -1304,16 +1361,16 @@ async function renderGlitchOverrideTemplate({
   ctx.textAlign = 'left';
   // Numero en blanco y etiqueta clara: el alcance es informacion, no decoracion.
   ctx.font = `900 ${Math.round(13 * hudS)}px "Outfit", "Inter", sans-serif`;
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = '#33200d';
   const numeroHudW = ctx.measureText(numeroHud).width;
   ctx.fillText(numeroHud, hudX + hudPadX, hudTextY);
   ctx.font = `700 ${Math.round(11 * hudS)}px "Outfit", "Inter", sans-serif`;
-  ctx.fillStyle = '#cbd5e1';
+  ctx.fillStyle = '#6b4a2a';
   ctx.fillText(etiquetaHud, hudX + hudPadX + numeroHudW + Math.round(4 * factorHud), hudTextY);
 
   ctx.textAlign = 'right';
   ctx.font = `900 ${Math.round(11 * hudS)}px "Outfit", "Inter", sans-serif`;
-  ctx.fillStyle = '#00F0E8';
+  ctx.fillStyle = '#8a5316';
   ctx.fillText(usaGeneral ? t('lona.progresoGeneral', { pct: pctBarra }) : t('lona.progreso', { pct: pctBarra }), hudX + hudW - hudPadX, hudTextY);
 
   // Barra neon del HUD: riel con borde, marcas de cuarto y remate encendido en el avance.
@@ -1324,14 +1381,14 @@ async function renderGlitchOverrideTemplate({
   const barRadio = barH / 2;
 
   roundRect(ctx, barX, barY, barW, barH, barRadio);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+  ctx.fillStyle = 'rgba(74, 42, 16, 0.22)';
   ctx.fill();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+  ctx.strokeStyle = 'rgba(74, 42, 16, 0.35)';
   ctx.lineWidth = 1;
   ctx.stroke();
 
   // Marcas de 25/50/75: el riel se lee como medidor y no como una linea vacia.
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.fillStyle = 'rgba(74, 42, 16, 0.25)';
   for (const cuarto of [0.25, 0.5, 0.75]) {
     ctx.fillRect(Math.round(barX + barW * cuarto), Math.round(barY + barH * 0.3), 1, Math.round(barH * 0.4));
   }
@@ -1344,19 +1401,16 @@ async function renderGlitchOverrideTemplate({
     // no cuanto mide el relleno (antes, al 20%, el arcoiris entero cabia en ese 20% y la
     // barra parecia completa; ahora la punta solo llega al cian cerca del final).
     const grad = ctx.createLinearGradient(barX, barY, barX + barW, barY);
-    grad.addColorStop(0, '#ff0055');
-    grad.addColorStop(0.55, '#d946ef');
-    grad.addColorStop(1, '#00F0E8');
+    grad.addColorStop(0, '#a76a1f');
+    grad.addColorStop(0.6, '#e0a83c');
+    grad.addColorStop(1, '#f5c542');
     ctx.fillStyle = grad;
-    ctx.shadowColor = 'rgba(255, 0, 85, 0.55)';
-    ctx.shadowBlur = 8 * EXPORT_SCALE;
     ctx.fill();
-    ctx.shadowBlur = 0;
 
     // Brillo superior: le da volumen de cristal al relleno sin ensuciar el color.
     const brilloW = fillW - barH;
     if (brilloW > 2) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+      ctx.fillStyle = 'rgba(255, 246, 214, 0.35)';
       ctx.fillRect(barX + barRadio, barY + Math.max(1, Math.round(barH * 0.18)), brilloW, Math.max(1, Math.round(barH * 0.2)));
     }
 
@@ -1609,8 +1663,7 @@ async function renderGlitchOverrideTemplate({
     ctx.save();
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
-    // El nombre va SIEMPRE en blanco pleno: talla y brillo identicos en toda la cuadricula
-    // (la pertenencia ya la cuentan el borde, el badge y el propio espiritu apagado).
+    // El nombre se queda como siempre: blanco pleno con sombra oscura.
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
     ctx.shadowBlur = 4 * EXPORT_SCALE;
@@ -1654,7 +1707,9 @@ async function renderGlitchOverrideTemplate({
     //   marca.
     // - MAXEADO ya no cambia el color del texto: lo dice la CORONA sobre el espiritu, igual
     //   que en la rejilla de la app.
-    const estadoColor = isOwned ? '#00F0E8' : '#FF6B6B';
+    // Paleta de la temporada, oscurecida: sobre el papiro claro el oro y el oxido
+    // claros se perdian. Ambos tienen que leerse de un vistazo.
+    const estadoColor = isOwned ? '#6f4700' : '#6b1a10';
     const estadoTexto = isOwned ? t('lona.hackeado') : t('lona.faltante');
     // El texto va por debajo del centro de la banda: centrado quedaba a 5px de la linea
     // y se leia pegada a ella.
@@ -1673,7 +1728,8 @@ async function renderGlitchOverrideTemplate({
     // disponibles en la rejilla de 4 columnas) y se lee sin ampliar.
     const tamanoEstado = Math.max(11, Math.min(17, badgeH * 0.64));
 
-    ctx.font = `900 ${tamanoEstado}px "Outfit", "Inter", sans-serif`;
+    // Peso mas ligero: el estado es una etiqueta, no un titular.
+    ctx.font = `700 ${tamanoEstado}px "Outfit", "Inter", sans-serif`;
     const anchoTextoEstado = ctx.measureText(estadoTexto).width;
 
     // La linea del pie ya no cruza la ficha entera: mide el texto del estado mas un respiro
@@ -1683,15 +1739,15 @@ async function renderGlitchOverrideTemplate({
       cardW - 24,
       anchoTextoEstado + Math.max(18, badgeH * 1.1)
     );
-    ctx.fillStyle = isOwned ? 'rgba(0, 240, 232, 0.55)' : 'rgba(255, 107, 107, 0.55)';
+    ctx.fillStyle = isOwned ? 'rgba(111, 71, 0, 0.85)' : 'rgba(107, 26, 16, 0.8)';
     ctx.fillRect(centroFicha - anchoLinea / 2, badgeY, anchoLinea, 1);
 
-    // Contorno antes del relleno: sobre la luna y los destellos de la plantilla el texto
-    // suelto se perdia. El trazo no cambia el color del estado, solo le da un borde oscuro.
+    // Filo de crema antes del relleno: sobre el papiro claro el estado oscuro se
+    // separa del mapa, y sobre la franja azul tambien se lee.
     ctx.lineJoin = 'round';
     ctx.miterLimit = 2;
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.78)';
-    ctx.lineWidth = Math.max(2.4, tamanoEstado * 0.26);
+    ctx.strokeStyle = 'rgba(253, 246, 227, 0.45)';
+    ctx.lineWidth = Math.max(1.2, tamanoEstado * 0.12);
     ctx.strokeText(estadoTexto, centroFicha, estadoY);
     ctx.fillStyle = estadoColor;
     ctx.fillText(estadoTexto, centroFicha, estadoY);
@@ -1729,8 +1785,9 @@ async function renderGlitchOverrideTemplate({
   if (usuario) {
     ctx.textAlign = 'left';
     ctx.font = `800 ${tamanioPie}px "Outfit", "Inter", sans-serif`;
-    ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(0, 240, 232, 0.45)';
+    // La firma tambien va en tinta sobre el mapa claro; en Fortnitemares, blanca.
+    ctx.fillStyle = enTemporada ? '#ffffff' : '#0f2b63';
+    ctx.shadowColor = enTemporada ? 'rgba(0, 240, 232, 0.45)' : 'rgba(255, 255, 255, 0.4)';
     ctx.shadowBlur = 10 * EXPORT_SCALE;
     ctx.fillText(textoFirma, footerPadX, baseFilaY);
   }
@@ -1739,9 +1796,14 @@ async function renderGlitchOverrideTemplate({
   ctx.textAlign = 'right';
   ctx.font = `900 ${tamanioPie}px "Outfit", "Inter", sans-serif`;
   ctx.letterSpacing = '0.5px';
-  ctx.fillStyle = '#00F0E8';
-  ctx.shadowColor = 'rgba(0, 240, 232, 0.45)';
-  ctx.shadowBlur = 10 * EXPORT_SCALE;
+  // El dominio va en negro sobre el fondo claro; en Fortnitemares sigue en cyan.
+  // Sin filo ni resplandor: el texto se sostiene solo.
+  ctx.shadowBlur = 0;
+  if (enTemporada) {
+    ctx.shadowColor = 'rgba(0, 240, 232, 0.45)';
+    ctx.shadowBlur = 10 * EXPORT_SCALE;
+  }
+  ctx.fillStyle = enTemporada ? '#00F0E8' : '#000000';
   ctx.fillText(hostPie, width - footerPadX, baseFilaY);
   ctx.restore();
 

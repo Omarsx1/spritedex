@@ -171,7 +171,11 @@ html.theme-cazatesoros .main-content::after {
 
 @media (max-width: 768px) {
   html.theme-cazatesoros .main-content {
-    padding-top: 40px;
+    /* El papiro no toca los costados: se queda un margen de playa a cada lado. */
+    margin-left: 12px;
+    margin-right: 12px;
+    /* Aire entre el rollo y los marcadores. */
+    padding-top: 30px;
     padding-bottom: 108px;
     padding-left: 40px;
     padding-right: 40px;
@@ -190,11 +194,12 @@ html.theme-cazatesoros .main-content::after {
 
   html.theme-cazatesoros .main-content::before {
     top: -8px;
-    width: 124%;
+    /* Los rollos sobresalen lo justo para verse las puntas, sin tocar el borde. */
+    width: 104%;
   }
 
   html.theme-cazatesoros .main-content::after {
-    width: 124%;
+    width: 104%;
   }
 }
 
@@ -1027,10 +1032,265 @@ html.theme-cazatesoros .czs-navbar__item:active {
    Sobre las hojas de palmera el marino se hundia: se le pone un filo claro y una
    sombra suave para que se lea igual sobre cielo que sobre follaje. */
 html.theme-cazatesoros .hero__title-line--accent {
-  color: #162542 !important;
+  color: #0154b1 !important;
   /* Sin contorno: el trazo de texto comia el relleno y adelgazaba las letras.
      El halo claro es un drop-shadow, que va por detras del glifo. */
   filter:
     drop-shadow(0 0 9px rgba(255, 255, 255, 0.55))
     drop-shadow(0 2px 5px rgba(6, 20, 45, 0.5));
+}
+
+/* En movil la barra de navegacion ya resuelve la vuelta al inicio: los botones
+   de atras de las otras paginas sobran. */
+@media (max-width: 768px) {
+  body.has-czs-navbar .fpage__back {
+    display: none;
+  }
+}
+
+/* Familias del filtro movil: papiro con tinta legible (antes azul claro sobre
+   crema, que no se leia) y seleccion en madera. */
+html.theme-cazatesoros .mobile-sprite-chip {
+  background: rgba(255, 250, 232, 0.62) !important;
+  border-color: rgba(74, 42, 16, 0.35) !important;
+  color: var(--czs-tinta) !important;
+}
+
+html.theme-cazatesoros .mobile-sprite-chip:hover:not(.is-active) {
+  background: rgba(255, 250, 232, 0.9) !important;
+  color: var(--czs-tinta) !important;
+}
+
+html.theme-cazatesoros .mobile-sprite-chip.is-active {
+  background: linear-gradient(180deg, #a9713c, #6f431c) !important;
+  border-color: #3f2410 !important;
+  color: #fff3d0 !important;
+}
+
+/* Interruptor de no lanzados: misma madera y titulo en tinta. */
+html.theme-cazatesoros .mobile-compact-toggle-label-wrap {
+  background: rgba(255, 250, 232, 0.62) !important;
+  border-color: rgba(74, 42, 16, 0.35) !important;
+}
+
+html.theme-cazatesoros .mobile-compact-toggle-title {
+  color: var(--czs-tinta) !important;
+}
+
+html.theme-cazatesoros .mobile-toggle-switch {
+  background: rgba(74, 42, 16, 0.28) !important;
+}
+
+html.theme-cazatesoros .mobile-toggle-switch.is-on {
+  background: linear-gradient(180deg, #b07a3f, #8f5a12) !important;
+}
+
+html.theme-cazatesoros .mobile-toggle-thumb {
+  background: #fdf6e3 !important;
+}
+
+/* ==========================================================================
+   PAGINAS DE AMIGOS Y COMPARTIR CON EL TEMA DE LA TEMPORADA
+   Paneles de papiro, marcos de madera y texto en tinta.
+   ========================================================================== */
+
+html.theme-cazatesoros .fpage,
+html.theme-cazatesoros .spage {
+  background:
+    url('/papiro-papel.webp') center / 400px 400px,
+    #d9b98c;
+}
+
+html.theme-cazatesoros .fpage__title,
+html.theme-cazatesoros .sdm-share-pro__title,
+html.theme-cazatesoros .sdm-share-pro__subtitle,
+html.theme-cazatesoros .sdm-share-pro__seg-label,
+html.theme-cazatesoros .fpage__sub {
+  color: var(--czs-tinta) !important;
+}
+
+/* Paneles y grupos */
+html.theme-cazatesoros .sdm-friends,
+html.theme-cazatesoros .sdm-friends__group,
+html.theme-cazatesoros .sdm-friends__plate,
+html.theme-cazatesoros .sdm-share-pro__controls,
+html.theme-cazatesoros .sdm-share-pro__segmented,
+html.theme-cazatesoros .sdm-share-pro__canvas-host {
+  background:
+    linear-gradient(rgba(255, 248, 226, 0.65), rgba(255, 248, 226, 0.65)),
+    url('/papiro-papel.webp') center / 400px 400px,
+    var(--czs-papel-claro) !important;
+  border: 2px solid rgba(74, 42, 16, 0.55) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 246, 214, 0.6),
+    0 5px 14px rgba(40, 22, 6, 0.28) !important;
+  color: var(--czs-tinta) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Textos sueltos sobre el papiro */
+html.theme-cazatesoros .sdm-friends__label,
+html.theme-cazatesoros .sdm-friends__hint,
+html.theme-cazatesoros .sdm-friends__aviso,
+html.theme-cazatesoros .sdm-friends__pendiente,
+html.theme-cazatesoros .fpage__tab,
+html.theme-cazatesoros .sdm-share-pro__empty {
+  color: var(--czs-tinta) !important;
+}
+
+/* Campos de texto */
+html.theme-cazatesoros .sdm-friends__input,
+html.theme-cazatesoros .sdm-share-pro__input {
+  background: rgba(255, 250, 232, 0.85) !important;
+  border: 1px solid rgba(74, 42, 16, 0.45) !important;
+  color: var(--czs-tinta) !important;
+}
+
+/* Botones principales: madera en vez del cian */
+html.theme-cazatesoros .sdm-friends__btn,
+html.theme-cazatesoros .sdm-share-pro__btn,
+html.theme-cazatesoros .fpage__tab.is-active {
+  background: linear-gradient(180deg, #a9713c, #6f431c 58%, #54300f) !important;
+  border: 2px solid #3f2410 !important;
+  color: #fff3d0 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 226, 170, 0.45),
+    0 3px 8px rgba(30, 15, 3, 0.35) !important;
+}
+
+html.theme-cazatesoros .sdm-friends__btn--ok {
+  background: linear-gradient(180deg, #3f7a4a, #29562f 60%, #1d3f22) !important;
+  border-color: #16301a !important;
+  color: #eefbe9 !important;
+}
+
+html.theme-cazatesoros .sdm-friends__btn--danger {
+  background: linear-gradient(180deg, #9a3a2a, #6d2417 60%, #4a170e) !important;
+  border-color: #3a1109 !important;
+  color: #ffece5 !important;
+}
+
+/* Pestanas y pills */
+html.theme-cazatesoros .fpage__tab {
+  background: rgba(255, 250, 232, 0.7) !important;
+  border-color: rgba(74, 42, 16, 0.4) !important;
+}
+
+/* Boton de enviar solicitud y codigo de amigo en la paleta del tema. */
+html.theme-cazatesoros .sdm-friends__send {
+  background: linear-gradient(180deg, #a9713c, #6f431c 58%, #54300f) !important;
+  border: 2px solid #3f2410 !important;
+  color: #fff3d0 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 226, 170, 0.45),
+    0 3px 8px rgba(30, 15, 3, 0.35) !important;
+}
+
+html.theme-cazatesoros .sdm-friends__send:disabled {
+  opacity: 0.55;
+}
+
+html.theme-cazatesoros .sdm-friends__prefix {
+  color: #7a4a12 !important;
+}
+
+html.theme-cazatesoros .sdm-friends__code {
+  color: var(--czs-tinta) !important;
+}
+
+html.theme-cazatesoros .sdm-friends__plate {
+  background: rgba(255, 250, 232, 0.85) !important;
+  border-color: rgba(74, 42, 16, 0.45) !important;
+  color: var(--czs-tinta) !important;
+}
+
+/* ==========================================================================
+   PAGINA DE AJUSTES
+   ========================================================================== */
+
+.ajustes-page {
+  gap: 16px;
+}
+
+.ajustes-bloque {
+  background:
+    linear-gradient(rgba(255, 248, 226, 0.65), rgba(255, 248, 226, 0.65)),
+    url('/papiro-papel.webp') center / 400px 400px,
+    var(--czs-papel-claro, #f6ead0);
+  border: 2px solid rgba(74, 42, 16, 0.5);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 246, 214, 0.6), 0 4px 12px rgba(40, 22, 6, 0.22);
+}
+
+.ajustes-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b4a2a;
+}
+
+.ajustes-opciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ajustes-opciones--vertical {
+  flex-direction: column;
+}
+
+.ajustes-opcion,
+.ajustes-enlace {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(74, 42, 16, 0.45);
+  background: rgba(255, 250, 232, 0.8);
+  color: var(--czs-tinta, #3a2510);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ajustes-opcion.is-active {
+  background: linear-gradient(180deg, #a9713c, #6f431c 58%, #54300f);
+  border-color: #3f2410;
+  color: #fff3d0;
+}
+
+.ajustes-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--czs-tinta, #3a2510);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.ajustes-fila .mobile-toggle-switch {
+  background: rgba(74, 42, 16, 0.28);
+}
+
+.ajustes-fila .mobile-toggle-switch.is-on {
+  background: linear-gradient(180deg, #b07a3f, #8f5a12);
+}
+
+.ajustes-fila .mobile-toggle-thumb {
+  background: #fdf6e3;
+}
+
+/* El aviso de "desliza para ver variantes" va en tinta: el azul claro no se lee
+   sobre el papiro. */
+html.theme-cazatesoros .ms-family-hint {
+  color: #6b4a2a !important;
 }

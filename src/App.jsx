@@ -10,6 +10,8 @@ const getVariantPriority = (v) => {
   return idx === -1 ? 99 : idx;
 };
 import { Header } from './components/Header';
+import { MobileNavbar } from './components/MobileNavbar';
+import { AjustesPage } from './components/AjustesPage';
 import { Navbar } from './components/Navbar';
 import { FilterBar } from './components/FilterBar';
 import { SpriteCard } from './components/SpriteCard';
@@ -358,6 +360,7 @@ export function App() {
   // La guia vive en la misma ruta en los dos idiomas: la decision es sobre la ruta ya sin el
   // prefijo, la misma que alimenta al catalogo.
   const [enGuia, setEnGuia] = useState(() => esRutaGuia(rutaApp));
+  const [enAjustes, setEnAjustes] = useState(() => rutaApp.indexOf('/ajustes') === 0);
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [showFooterPrivacyModal, setShowFooterPrivacyModal] = useState(false);
 
@@ -1171,6 +1174,7 @@ export function App() {
     setEnAmigos(ruta.indexOf('/amigos') === 0);
     setEnCompartir(ruta.indexOf('/compartir') === 0);
     setEnGuia(esRutaGuia(ruta));
+    setEnAjustes(ruta.indexOf('/ajustes') === 0);
   }, []);
 
   // Codigo de amigo que venga en la ruta (/amigos/SDEX-XXXX) o en el enlace actual
@@ -1292,6 +1296,12 @@ export function App() {
           enlaceColeccion={buildShareUrl(baseCompartir(conIdioma('/amigos', getLang())), myShareToken, myFriendCode || 'SDEX-0000')}
           onBack={() => irA('/')}
         />
+        <MobileNavbar
+          solicitudesNuevas={solicitudesNuevas}
+          onOpenCompareModal={() => irA('/amigos')}
+          onOpenShareModal={() => irA('/compartir')}
+          onOpenAjustes={() => irA('/ajustes')}
+        />
       </div>
     );
   }
@@ -1340,6 +1350,33 @@ export function App() {
           }}
         />
         <Suspense fallback={null}>{modalAuth}</Suspense>
+        <MobileNavbar
+          solicitudesNuevas={solicitudesNuevas}
+          onOpenCompareModal={() => irA('/amigos')}
+          onOpenShareModal={() => irA('/compartir')}
+          onOpenAjustes={() => irA('/ajustes')}
+        />
+      </div>
+    );
+  }
+
+  // Ajustes: pagina propia con generacion, animaciones, idioma y enlaces.
+  if (enAjustes) {
+    return (
+      <div className="app-container">
+        {navbar}
+        <AjustesPage
+          activeGen={activeGen}
+          onGenChange={(id) => setActiveGen(Number(id))}
+          onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
+        />
+        {modales}
+        <MobileNavbar
+          solicitudesNuevas={solicitudesNuevas}
+          onOpenCompareModal={() => irA('/amigos')}
+          onOpenShareModal={() => irA('/compartir')}
+          onOpenAjustes={() => irA('/ajustes')}
+        />
       </div>
     );
   }
@@ -1353,6 +1390,12 @@ export function App() {
         {navbar}
         <GuiaPage lang={getLang()} />
         {modales}
+        <MobileNavbar
+          solicitudesNuevas={solicitudesNuevas}
+          onOpenCompareModal={() => irA('/amigos')}
+          onOpenShareModal={() => irA('/compartir')}
+          onOpenAjustes={() => irA('/ajustes')}
+        />
       </div>
     );
   }
@@ -1451,6 +1494,9 @@ export function App() {
       )}
 
       {/* Main Content with Fortnite.gg matching filters */}
+      {/* Hueco del buscador movil: vive fuera del papiro, sobre la playa. */}
+      <div id="buscador-movil-slot" className="buscador-movil-slot" />
+
       <main className="main-content">
         <FilterBar
           isMobile={isMobile}
@@ -1559,6 +1605,12 @@ export function App() {
       )}
 
       {modales}
+
+      <MobileNavbar
+        solicitudesNuevas={solicitudesNuevas}
+        onOpenCompareModal={() => irA('/amigos')}
+        onOpenShareModal={() => irA('/compartir')}
+      />
 
     </div>
   );

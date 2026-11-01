@@ -1,5 +1,6 @@
 import React, { useState, useRef, useMemo, useCallback, useEffect, memo } from 'react';
 import { fireConfetti } from '../utils/confetti';
+import { ChevronsLeft } from 'lucide-react';
 import { Lock } from 'lucide-react';
 import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER, pickName, tinteInterior } from '../data/spritesData';
 import { t } from '../i18n';
@@ -519,6 +520,20 @@ function FamilySpotlightRow({
           >
             {variants.map((v, i) => renderCard(v, i, i === safeActiveIdx))}
           </div>
+
+          {/* Al llegar al final, una flecha lleva de vuelta a la primera variante. */}
+          {safeActiveIdx >= count - 1 && (
+            <button
+              type="button"
+              className="ms-loop-btn"
+              onClick={(e) => { e.stopPropagation(); goTo(0); }}
+              onPointerDown={(e) => e.stopPropagation()}
+              aria-label={t('swiper.volverAlPrincipio')}
+              title={t('swiper.volverAlPrincipio')}
+            >
+              <ChevronsLeft size={30} strokeWidth={2.4} />
+            </button>
+          )}
         </div>
       )}
     </div>

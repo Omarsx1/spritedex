@@ -2419,15 +2419,14 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   max-width: 440px;
   /* 7px + los 58px que crece el hero al centrar el bloque de espiritus: la barra
      se queda exactamente donde estaba. */
-  margin: 7px auto 50px auto; /* Espacio amplio y comodo debajo de la barra de busqueda */
+  margin: 0 auto 14px auto; /* El buscador vive fuera; aqui solo quedan aviso y chips */
   padding: 0 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
   box-sizing: border-box;
-  /* Ajuste fino: baja la barra de búsqueda móvil 12px. */
-  transform: translateY(12px);
+  transform: none;
 }
 
 /* ═══ COACHMARK / TOOLTIP DE NUEVOS ESPÍRITUS (One-Time Discovery) ═══ */
@@ -10213,4 +10212,51 @@ body[data-gen='2']::before,
 body[data-gen='2']::after {
   transition: none !important;
   animation: none !important;
+}
+
+/* Hueco del buscador movil: fuera del papiro, sobre la escena. */
+.buscador-movil-slot {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .buscador-movil-slot {
+    display: flex;
+    justify-content: center;
+    /* Aire entre el buscador y el rollo del papiro. */
+    padding: 14px 16px 24px;
+    position: relative;
+    z-index: 55;
+  }
+
+  .buscador-movil-slot .mobile-glass-search-pill {
+    width: 100%;
+    max-width: 380px;
+  }
+}
+
+/* Flecha de bucle del carrusel de variantes: al llegar a la ultima, vuelve a la
+   primera. Se dibuja fuera de la tarjeta, sin fondo. */
+.ms-loop-btn {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: 0;
+  background: none;
+  color: #3a2510;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+
+.ms-loop-btn:hover,
+.ms-loop-btn:focus-visible {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-3px);
 }

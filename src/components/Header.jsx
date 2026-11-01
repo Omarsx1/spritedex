@@ -1,21 +1,13 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import { Home, Settings, Share2, Users } from 'lucide-react';
-import { createPortal } from 'react-dom';
+import { Share2, Users } from 'lucide-react';
 import gsap from 'gsap';
 import { allSprites as defaultAllSprites } from '../data/spritesData';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { rutaFallbackEspiritu } from '../utils/spriteAssets';
 import { t } from '../i18n';
+import { BadgeSolicitudes } from './BadgeSolicitudes';
 import { isFortnitemaresActive } from '../config/seasonalEvent';
-import { conIdioma } from '../i18n/core';
-import { getLang } from '../i18n/texto';
 
-// Indicador de solicitudes pendientes. Estatico a proposito: sin animacion, sin
-// transicion y sin will-change — la app prioriza fluidez y esto es solo un dato.
-function BadgeSolicitudes({ n, className = '' }) {
-  if (!n) return null;
-  return <span className={`solicitudes-badge ${className}`} aria-hidden="true">{n > 9 ? '9+' : n}</span>;
-}
 
 export function Header({
   activeGen = 3,
@@ -66,12 +58,6 @@ export function Header({
     ? ' · ' + t('header.solicitudesNuevas', { n: solicitudesNuevas })
     : '';
   const [isFortnitemares, setIsFortnitemares] = useState(() => isFortnitemaresActive());
-  // Reserva espacio al final del documento para que la barra movil no tape contenido.
-  useEffect(() => {
-    if (typeof document === 'undefined') return undefined;
-    document.body.classList.toggle('has-czs-navbar', Boolean(isMobile));
-    return () => document.body.classList.remove('has-czs-navbar');
-  }, [isMobile]);
   const seasonRef = useRef(isFortnitemares);
   // El intercambio de espiritus (swapSpirit) vive mas abajo y dispara la
   // aparicion magica tambien cuando la temporada cambie en vivo.
@@ -452,52 +438,7 @@ export function Header({
         </div>
       </div>
 
-      {isMobile && typeof document !== 'undefined' && createPortal(
-        <nav className="czs-navbar" aria-label={t('nav.menu')}>
-          <a
-            className="czs-navbar__item"
-            href={conIdioma('/', getLang())}
-            aria-label={t('nav.inicio')}
-          >
-            <Home size={20} strokeWidth={2.2} />
-            <span>{t('nav.tabInicio')}</span>
-          </a>
-          <button
-            type="button"
-            className="czs-navbar__item"
-            aria-label={t('header.radarAmigos') + etiquetaSolicitudes}
-            onClick={onOpenCompareModal}
-          >
-            <span className="czs-navbar__icon-wrap">
-              <Users size={20} strokeWidth={2.2} />
-              <BadgeSolicitudes n={solicitudesNuevas} className="solicitudes-badge--round" />
-            </span>
-            <span>{t('nav.tabAmigos')}</span>
-          </button>
-          <button
-            type="button"
-            className="czs-navbar__item"
-            aria-label={t('header.compartirImagen')}
-            onClick={onOpenShareModal}
-            onPointerDown={onPrecalentarCompartir}
-            onMouseEnter={() => { import('../components/SharePage'); }}
-            onTouchStart={() => { import('../components/SharePage'); }}
-          >
-            <Share2 size={20} strokeWidth={2.2} />
-            <span>{t('nav.tabCompartir')}</span>
-          </button>
-          <button
-            type="button"
-            className="czs-navbar__item"
-            aria-label={t('nav.menu')}
-            onClick={() => window.dispatchEvent(new CustomEvent('spritedex:abrir-menu'))}
-          >
-            <Settings size={20} strokeWidth={2.2} />
-            <span>{t('nav.tabAjustes')}</span>
-          </button>
-        </nav>,
-        document.body
-      )}
+
     </header>
 
   );

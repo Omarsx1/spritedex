@@ -266,7 +266,10 @@ export function MobileLiquidFilterBar({
           </div>
         )}
 
-        {/* ═══ UNIFIED GLASSMORPHIC SEARCH & FILTER PILL ═══ */}
+        {/* El buscador se monta fuera del papiro (slot sobre main). */}
+        {(() => {
+          const slot = typeof document !== 'undefined' ? document.getElementById('buscador-movil-slot') : null;
+          const pill = (
         <div className={`mobile-glass-search-pill ${isFocused ? 'is-focused' : ''} ${activeFiltersCount > 0 ? 'has-active-filters' : ''}`}>
           
           {/* Left: Search icon */}
@@ -318,6 +321,9 @@ export function MobileLiquidFilterBar({
             )}
           </button>
         </div>
+          );
+          return slot ? createPortal(pill, slot) : pill;
+        })()}
       </div>
 
       {/* ═══ ACTIVE FILTERS CHIPS (Quick dismiss tags) ═══ */}
