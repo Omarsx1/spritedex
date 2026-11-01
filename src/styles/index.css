@@ -4524,6 +4524,29 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   pointer-events: none;
 }
 
+/* Rayos finos y difusos: se intuyen como luz, no como una estrella de dibujos
+   animados. Sin animacion. */
+.card-level-cofre::after,
+.ms-cofre::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 104px;
+  height: 104px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 240, 205, 0.16) 0deg 2.6deg,
+    transparent 2.6deg 17deg
+  );
+  -webkit-mask-image: radial-gradient(circle, rgba(0, 0, 0, 0.9) 12%, rgba(0, 0, 0, 0.4) 46%, transparent 72%);
+  mask-image: radial-gradient(circle, rgba(0, 0, 0, 0.9) 12%, rgba(0, 0, 0, 0.4) 46%, transparent 72%);
+  filter: blur(1.1px);
+  pointer-events: none;
+}
+
 .card-level-cofre img,
 .list-level-cofre img {
   position: relative;
@@ -4555,6 +4578,11 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .ms-cofre::before {
   width: 96px;
   height: 96px;
+}
+
+.ms-cofre::after {
+  width: 126px;
+  height: 126px;
 }
 
 .owned-btn-sm {
