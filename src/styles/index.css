@@ -7184,7 +7184,10 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  /* Recorta el riel en horizontal, pero deja caer la sombra en vertical: con
+     overflow hidden la sombra se cortaba en recto contra el borde. */
+  overflow-x: clip;
+  overflow-y: visible;
   touch-action: pan-y;
   cursor: grab;
 }
