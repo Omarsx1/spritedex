@@ -8,7 +8,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 
 // Ajustes: preferencias y acciones de la app. La navegacion (generaciones, guia, catalogo)
 // vive en el menu de la cabecera; aqui solo lo que se configura o se ejecuta sobre la app.
-export function AjustesPage({ onOpenPrivacy, onOpenBackup }) {
+export function AjustesPage({ onOpenPrivacy, onOpenBackup, onNavegar }) {
   const [animations, setAnimations] = useState(leerAnimaciones);
 
   useEffect(() => {
@@ -79,8 +79,28 @@ export function AjustesPage({ onOpenPrivacy, onOpenBackup }) {
       <section className="ajustes-bloque">
         <h2 className="ajustes-titulo"><ShieldCheck size={16} /> {t('ajustes.enlaces')}</h2>
         <div className="ajustes-opciones ajustes-opciones--vertical">
-          <a className="ajustes-enlace" href={conIdioma('/amigos', getLang())}>{t('nav.tabAmigos')}</a>
-          <a className="ajustes-enlace" href={conIdioma('/compartir', getLang())}>{t('nav.tabCompartir')}</a>
+          <a
+            className="ajustes-enlace"
+            href={conIdioma('/amigos', getLang())}
+            onClick={(evento) => {
+              if (!onNavegar) return;
+              evento.preventDefault();
+              onNavegar('/amigos');
+            }}
+          >
+            {t('nav.tabAmigos')}
+          </a>
+          <a
+            className="ajustes-enlace"
+            href={conIdioma('/compartir', getLang())}
+            onClick={(evento) => {
+              if (!onNavegar) return;
+              evento.preventDefault();
+              onNavegar('/compartir');
+            }}
+          >
+            {t('nav.tabCompartir')}
+          </a>
           <button type="button" className="ajustes-enlace" onClick={onOpenPrivacy}>
             <ShieldCheck size={15} />
             <span>{t('ajustes.privacidad')}</span>

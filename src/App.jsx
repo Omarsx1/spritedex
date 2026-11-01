@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useDeferredValue, useRef, lazy, Suspense } from 'react';
+import { flushSync } from 'react-dom';
 import { applyCazatesorosTheme, resolveCazatesorosState, CAZATESOROS_STORAGE_KEY } from './config/cazatesoros';
 import { VARIANT_ORDER, FAMILY_NAMES_MAP, pickFamilyName } from './data/spritesData';
 import { t } from './i18n';
@@ -1176,11 +1177,25 @@ export function App() {
   // Toda navegacion interna conserva el idioma activo.
   const irA = useCallback((ruta) => {
     if (typeof window === 'undefined') return;
-    window.history.pushState({}, '', conIdioma(ruta, getLang()));
-    setEnAmigos(ruta.indexOf('/amigos') === 0);
-    setEnCompartir(ruta.indexOf('/compartir') === 0);
-    setEnGuia(esRutaGuia(ruta));
-    setEnAjustes(ruta.indexOf('/ajustes') === 0);
+    const aplicar = () => {
+      window.history.pushState({}, '', conIdioma(ruta, getLang()));
+      setEnAmigos(ruta.indexOf('/amigos') === 0);
+      setEnCompartir(ruta.indexOf('/compartir') === 0);
+      setEnGuia(esRutaGuia(ruta));
+      setEnAjustes(ruta.indexOf('/ajustes') === 0);
+      // Cada destino empieza arriba: sin esto, venir de una pagina corta a una
+      // larga (o al reves) daba un salto seco.
+      window.scrollTo(0, 0);
+    };
+
+    const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (typeof document.startViewTransition === 'function' && !sinMovimiento) {
+      // flushSync: React tiene que haber pintado el destino cuando la transicion
+      // toma la foto nueva, o captura la pantalla anterior.
+      document.startViewTransition(() => flushSync(aplicar));
+    } else {
+      aplicar();
+    }
   }, []);
 
   // Codigo de amigo que venga en la ruta (/amigos/SDEX-XXXX) o en el enlace actual
@@ -1372,6 +1387,7 @@ export function App() {
         <AjustesPage
           onOpenPrivacy={() => setShowFooterPrivacyModal(true)}
           onOpenBackup={() => setShowBackupModal(true)}
+          onNavegar={irA}
         />
         {modales}
         <MobileNavbar

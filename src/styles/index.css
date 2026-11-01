@@ -10403,3 +10403,45 @@ body[data-gen='2']::after {
     animation: none;
   }
 }
+
+/* ==========================================================================
+   TRANSICION ENTRE RUTAS (View Transitions API)
+   Un fundido corto entre la pantalla que sale y la que entra. El scroll lo
+   resetea App antes de la foto nueva, asi que el cambio no da el salto seco
+   de una pagina corta a una larga.
+   ========================================================================== */
+
+@keyframes vtRutaEntra {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vtRutaSale {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+::view-transition-old(root) {
+  animation: vtRutaSale 140ms ease both;
+}
+
+::view-transition-new(root) {
+  animation: vtRutaEntra 220ms ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
