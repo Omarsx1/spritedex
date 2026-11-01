@@ -110,6 +110,7 @@ export default {
   "amigos.compartirSinSesion": "Entre para compartilhar espíritos.",
   "amigos.teCompartieron": "COMPARTILHARAM COM VOCÊ ({n})",
   "amigos.teCompartieronHint": "Aceite e eles entram na sua coleção.",
+  "amigos.maxeadoPorEl": "Seu amigo tem ele no nível máximo",
   "amigos.rechazar": "Recusar",
   "amigos.sinAmigos": "Você ainda não tem amigos aceitos. Envie uma solicitação com o código de alguém: quando a pessoa aceitar, ela aparecerá aqui.",
   "amigos.sinFichaHint": "Toque em Ver coleção do amigo para carregar a comparação: você verá o que falta a você e o que falta a ele.",

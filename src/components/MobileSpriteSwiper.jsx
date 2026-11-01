@@ -2,6 +2,7 @@ import React, { useState, useRef, useMemo, useCallback, useEffect, memo } from '
 import { fireConfetti } from '../utils/confetti';
 import { ChevronsLeft } from 'lucide-react';
 import { GemaNivel } from './icons/GemaNivel';
+import { cofreMaxDe } from '../utils/cofreMax';
 import { Lock } from 'lucide-react';
 import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER, pickName, tinteInterior, tinteDeTemporada } from '../data/spritesData';
 import { t } from '../i18n';
@@ -447,6 +448,10 @@ function FamilySpotlightRow({
                   <Lock size={13} />
                   <span>{t('swiper.noLanzado')}</span>
                 </div>
+              ) : isOwned && isMastered && sprite.gen === 3 ? (
+                <div className="card-level-cofre ms-cofre" onClick={(e) => e.stopPropagation()} title={t('carta.maxeado')}>
+                  <img src={cofreMaxDe(sprite.id)} alt={t('carta.maxeado')} width={30} height={30} decoding="async" />
+                </div>
               ) : isOwned ? (
                 <div
                   className="card-level-stars ms-stars"
@@ -463,7 +468,7 @@ function FamilySpotlightRow({
                       {sprite.gen === 2 ? (
                         <SonicRing active={level >= num} mastered={isMastered && num === 5} size={20} />
                       ) : sprite.gen === 3 ? (
-                        <GemaNivel nivel={num} size={18} />
+                        <GemaNivel nivel={num} size={22} />
                       ) : (
                         '★'
                       )}

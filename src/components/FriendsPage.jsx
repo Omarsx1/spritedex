@@ -345,7 +345,11 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
                 ) : (<>
                   <div className="fpage__minis">
                     {(verTodos.teFaltan ? listas.teFaltan : listas.teFaltan.slice(0, 12)).map((s) => (
-                      <div key={s.id} className="fpage__mini">
+                      <div
+                        key={s.id}
+                        className={'fpage__mini' + (friendState?.[s.id]?.level === 5 ? ' fpage__mini--maxeado' : '')}
+                        title={friendState?.[s.id]?.level === 5 ? t('amigos.maxeadoPorEl') : undefined}
+                      >
                         <button
                           type="button"
                           className="fpage__miniBtn"
@@ -364,6 +368,9 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
                               {t('amigos.registrar')}
                             </button>
                           </div>
+                        )}
+                        {friendState?.[s.id]?.level === 5 && (
+                          <img className="fpage__miniMax" src="/img/x/sprites/crown.webp" alt="" width={13} height={13} decoding="async" />
                         )}
                       </div>
                     ))}

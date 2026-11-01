@@ -111,6 +111,7 @@ export default {
   "amigos.compartirSinSesion": "Sign in to share sprites.",
   "amigos.teCompartieron": "SHARED WITH YOU ({n})",
   "amigos.teCompartieronHint": "Accept them and they will enter your collection.",
+  "amigos.maxeadoPorEl": "Your friend has it maxed",
   "amigos.rechazar": "Decline",
   "amigos.sinAmigos": "You don't have any accepted friends yet. Send a request with someone's code: when they accept it, they'll show up here.",
   "amigos.sinFichaHint": "Tap View their collection to load the comparison: you'll see what you're missing and what they're missing.",

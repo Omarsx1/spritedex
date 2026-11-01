@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import { fireConfetti } from '../utils/confetti';
 import { Lock } from 'lucide-react';
 import { GemaNivel } from './icons/GemaNivel';
+import { cofreMaxDe } from '../utils/cofreMax';
 import { RARITIES, getSpriteCardStyle, getRarityInfo, pickName, tinteDeTemporada } from '../data/spritesData';
 import { t } from '../i18n';
 import { sounds } from '../utils/audio';
@@ -145,6 +146,11 @@ function SpriteCardBase({
           ) : (
             <>
               {isOwned && !isFriendView && (
+                (isMastered && sprite.gen === 3) ? (
+                  <div className="list-level-cofre" onClick={(e) => e.stopPropagation()} title={t('carta.maxeado')}>
+                    <img src={cofreMaxDe(sprite.id)} alt={t('carta.maxeado')} width={20} height={20} decoding="async" />
+                  </div>
+                ) : (
                 <div className="list-level-stars" onClick={(e) => e.stopPropagation()}>
                   {[1, 2, 3, 4, 5].map((num) => (
                     <button
@@ -155,13 +161,14 @@ function SpriteCardBase({
                       {sprite.gen === 2 ? (
                         <SonicRing active={level >= num} mastered={isMastered && num === 5} size={14} />
                       ) : sprite.gen === 3 ? (
-                        <GemaNivel nivel={num} size={14} />
+                        <GemaNivel nivel={num} size={17} />
                       ) : (
                         '★'
                       )}
                     </button>
                   ))}
                 </div>
+                )
               )}
               {isFriendView ? (
                 <span className={`owned-btn-sm is-readonly ${isOwned ? 'owned' : ''}`}>
@@ -300,6 +307,10 @@ function SpriteCardBase({
           <Lock size={13} />
           <span>{t('carta.noLanzado')}</span>
         </div>
+      ) : isOwned && isMastered && sprite.gen === 3 ? (
+        <div className="card-level-cofre" onClick={(e) => e.stopPropagation()} title={t('carta.maxeado')}>
+          <img src={cofreMaxDe(sprite.id)} alt={t('carta.maxeado')} width={26} height={26} decoding="async" />
+        </div>
       ) : isOwned ? (
         <div className="card-level-stars" onClick={(e) => e.stopPropagation()}>
           {[1, 2, 3, 4, 5].map((num) => (
@@ -313,7 +324,7 @@ function SpriteCardBase({
               {sprite.gen === 2 ? (
                 <SonicRing active={level >= num} mastered={isMastered && num === 5} size={19} />
               ) : sprite.gen === 3 ? (
-                <GemaNivel nivel={num} size={17} />
+                <GemaNivel nivel={num} size={21} />
               ) : (
                 '★'
               )}
