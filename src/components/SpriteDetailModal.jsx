@@ -153,14 +153,14 @@ export function SpriteDetailModal({ sprite, userState, onToggleOwned, onSetLevel
             <div className="sdm__card-footer">
               <div className="sdm__card-detail" title={t('detalle.costeInvocacion')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <img
-                  src="/img/stelar.webp"
-                  alt={t('detalle.polvoEstelar')}
+                  src="/img/gema.svg"
+                  alt={t('detalle.gema')}
                   className="sdm__stelar-img"
                   style={{
                     width: '26px',
                     height: '26px',
                     objectFit: 'contain',
-                    filter: 'drop-shadow(0 0 6px rgba(168, 85, 247, 0.55))'
+                    filter: 'drop-shadow(0 0 6px rgba(43, 184, 230, 0.55))'
                   }}
                 />
                 <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)' }}>

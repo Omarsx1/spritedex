@@ -261,6 +261,7 @@ export default {
   "detalle.nivelDe5": "Nivel {n}/5",
   "detalle.noLanzadoCandado": "🔒 No lanzado",
   "detalle.noLanzadoMayus": "NO LANZADO",
+  "detalle.gema": "Gema",
   "detalle.polvoEstelar": "Polvo Estelar",
   "detalle.variantes": "VARIANTES",
   "error.mensaje": "Ocurrió un error al sincronizar con el navegador. Toca el botón para recargar la aplicación sin perder tu progreso.",

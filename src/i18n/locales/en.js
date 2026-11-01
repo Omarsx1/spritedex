@@ -260,6 +260,7 @@ export default {
   "detalle.nivelDe5": "Level {n}/5",
   "detalle.noLanzadoCandado": "🔒 Unreleased",
   "detalle.noLanzadoMayus": "UNRELEASED",
+  "detalle.gema": "Gem",
   "detalle.polvoEstelar": "Stardust",
   "detalle.variantes": "VARIANTS",
   "error.mensaje": "Something went wrong while syncing with your browser. Tap the button to reload the app without losing your progress.",

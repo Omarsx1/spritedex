@@ -261,8 +261,8 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
       const cleanId = formData.id || `${formData.familyId}_${formData.variant.toLowerCase()}`;
       const costNumber = parseInt(formData.summonCostNum, 10);
       const formattedSummonCost = !isNaN(costNumber) && costNumber >= 0 
-        ? `${costNumber.toLocaleString('en-US')} Polvo Estelar`
-        : '2,000 Polvo Estelar';
+        ? `${costNumber.toLocaleString('en-US')} Gemas`
+        : '2,000 Gemas';
 
       const payload = {
         id: cleanId,
@@ -806,7 +806,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: c.textSecondary, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Costo Polvo Estelar
+                  Costo Gemas
                 </label>
                 <div style={{
                   display: 'flex',
@@ -850,11 +850,11 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
                     userSelect: 'none'
                   }}>
                     <img
-                      src="/img/stelar.webp"
+                      src="/img/gema.svg"
                       alt=""
                       style={{ width: '16px', height: '16px', objectFit: 'contain' }}
                     />
-                    <span>Polvo Estelar</span>
+                    <span>Gemas</span>
                   </div>
                 </div>
               </div>
@@ -1474,7 +1474,7 @@ export function SpiritEditorModal({ spirit, existingSprites = [], onSave, onClos
               <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 700, marginBottom: '10px' }}>
                 {(() => {
                   const n = parseInt(formData.summonCostNum, 10);
-                  return !isNaN(n) ? `${n.toLocaleString('en-US')} Polvo Estelar` : '0 Polvo Estelar';
+                  return !isNaN(n) ? `${n.toLocaleString('en-US')} Gemas` : '0 Gemas';
                 })()}
               </div>
 

@@ -14,7 +14,7 @@ import {
   subscribeSeasonalState
 } from '../src/config/seasonalEvent.js';
 import { HALLOWEEN_COLORS, isBatSwarmActive, batBurstFor } from '../src/utils/confetti.js';
-import { rutaFondoPlantilla } from '../src/utils/canvasExporter.js';
+import { rutaFondoPlantilla, rutaFondoRespaldo } from '../src/utils/canvasExporter.js';
 import { createBatSwarm, fireFlyingBats } from '../src/utils/batSwarm.js';
 
 const INSIDE = new Date('2026-10-15T12:00:00-05:00');
@@ -171,11 +171,12 @@ test('la plantilla de compartir usa el fondo de temporada', () => {
 
   globalThis.window = { location: { search: '' } };
   try {
-    globalThis.Date = conFecha('2026-10-15T12:00:00-05:00');
-    assert.equal(rutaFondoPlantilla(), '/bac_mares.webp', 'en temporada la captura sale con el arte de Fortnitemares');
-
-    globalThis.Date = conFecha('2026-06-01T12:00:00-05:00');
-    assert.equal(rutaFondoPlantilla(), '/background.webp', 'fuera de temporada queda el de siempre');
+    // La plantilla usa el arte de la 3a generacion, por formato.
+    assert.equal(rutaFondoPlantilla('square'), '/cuadrado_3gen.webp', 'el cuadrado usa su arte');
+    assert.equal(rutaFondoPlantilla('checklist'), '/vertical_3gen.webp', 'el vertical usa el suyo');
+    assert.equal(rutaFondoPlantilla(), '/vertical_3gen.webp', 'por defecto, vertical');
+    assert.equal(rutaFondoRespaldo('square'), '/vertical_3gen.webp', 'respaldo del cuadrado');
+    assert.equal(rutaFondoRespaldo('checklist'), '/cuadrado_3gen.webp', 'respaldo del vertical');
   } finally {
     globalThis.Date = RealDate;
     if (RealWindow === undefined) delete globalThis.window;
