@@ -4494,14 +4494,58 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 /* Cofre del espiritu maxeado (3ª generacion): sustituye la fila de gemas. */
 .card-level-cofre,
 .list-level-cofre {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 0;
+  /* Despegado del borde inferior de la ficha. */
+  padding: 4px 0 12px;
+}
+
+/* Resplandor detras del cofre: halo calido + rayos fijos (sin animacion). */
+.card-level-cofre::before,
+.ms-cofre::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 96px;
+  height: 96px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 226, 160, 0.5) 0%,
+    rgba(255, 197, 92, 0.22) 42%,
+    transparent 72%
+  );
+  pointer-events: none;
+}
+
+.card-level-cofre::after,
+.ms-cofre::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 108px;
+  height: 108px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 232, 186, 0.3) 0deg 5deg,
+    transparent 5deg 24deg
+  );
+  -webkit-mask-image: radial-gradient(circle, #000 18%, rgba(0, 0, 0, 0.55) 46%, transparent 70%);
+  mask-image: radial-gradient(circle, #000 18%, rgba(0, 0, 0, 0.55) 46%, transparent 70%);
+  pointer-events: none;
 }
 
 .card-level-cofre img,
 .list-level-cofre img {
+  position: relative;
+  z-index: 1;
   display: block;
   object-fit: contain;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
@@ -4520,6 +4564,20 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .ms-cofre img {
   width: 48px;
   height: 48px;
+}
+
+.ms-cofre {
+  padding: 4px 0 14px;
+}
+
+.ms-cofre::before {
+  width: 118px;
+  height: 118px;
+}
+
+.ms-cofre::after {
+  width: 132px;
+  height: 132px;
 }
 
 .owned-btn-sm {
@@ -10486,22 +10544,29 @@ body[data-gen='2']::after {
    primera. Se dibuja fuera de la tarjeta, sin fondo. */
 .ms-loop-btn {
   position: absolute;
-  /* Fuera de la tarjeta activa: el riel la centra, asi que su borde derecho cae justo
-     en 50% + 205/2. Los 10px de mas son el aire que pide el diseno. */
-  left: calc(50% + 112.5px);
+  /* Fuera de la tarjeta activa, pero el min() la mantiene dentro del escenario en
+     pantallas estrechas: antes su borde caia sobre el recorte y se veia a medias
+     (o desaparecia) en telefonos angostos. */
+  left: min(calc(50% + 112.5px), calc(100% - 44px));
   top: 50%;
   transform: translateY(-50%);
-  z-index: 5;
+  z-index: 12;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px;
-  border: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  /* Chip solido: se lee igual sobre la carta oscura que sobre el papiro. */
+  border: 1px solid #d8b26a;
   border-radius: 50%;
-  background: color-mix(in srgb, currentColor 12%, transparent);
+  background: #f2e6c8;
   color: #3a2510;
   cursor: pointer;
   opacity: 0.85;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
   transition: transform 160ms ease, opacity 160ms ease, background-color 160ms ease;
 }
 
@@ -10509,7 +10574,7 @@ body[data-gen='2']::after {
 .ms-loop-btn:focus-visible {
   opacity: 1;
   transform: translateY(-50%) translateX(-4px);
-  background: color-mix(in srgb, currentColor 20%, transparent);
+  background: #fff5dc;
 }
 
 /* Un empujon corto y repetido hacia la tarjeta: el icono se mueve, el boton no,
