@@ -10125,6 +10125,20 @@ body.has-czs-navbar {
   }
 }
 
+/* En las paginas de hoja completa (.fpage / .spage) el papiro llega hasta el
+   borde: el relleno del body para la barra dejaba una franja del fondo de
+   temporada entre el contenido y la barra al llegar al final del scroll. */
+@media (max-width: 768px) {
+  body.has-czs-navbar.has-hoja {
+    padding-bottom: 0;
+  }
+
+  body.has-czs-navbar.has-hoja .fpage,
+  body.has-czs-navbar.has-hoja .spage {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+}
+
 /* ==========================================================================
    3ª GENERACION (Buscatesoros)
    Cada carta lleva su tono en --g3-h/--g3-s/--g3-l desde SpriteCard.jsx: fondo

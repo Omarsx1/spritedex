@@ -368,6 +368,16 @@ export function App() {
   // prefijo, la misma que alimenta al catalogo.
   const [enGuia, setEnGuia] = useState(() => esRutaGuia(rutaApp));
   const [enAjustes, setEnAjustes] = useState(() => rutaApp.indexOf('/ajustes') === 0);
+
+  // Marca las rutas que son una hoja de papiro a pagina completa. La barra
+  // inferior reserva relleno en el body, y en esas hojas ese relleno dejaba ver
+  // el fondo de temporada entre el contenido y la barra.
+  useEffect(() => {
+    if (typeof document === 'undefined') return undefined;
+    const esHoja = enAmigos || enCompartir || enAjustes;
+    document.body.classList.toggle('has-hoja', esHoja);
+    return () => document.body.classList.remove('has-hoja');
+  }, [enAmigos, enCompartir, enAjustes]);
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [showFooterPrivacyModal, setShowFooterPrivacyModal] = useState(false);
 
