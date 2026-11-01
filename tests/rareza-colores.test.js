@@ -8,7 +8,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { COLORES_RAREZA, RAREZA_POR_DEFECTO, coloresDeRareza, colorDeRareza, estiloBadgeRareza } from '../src/data/rarezaColores.js';
+import { COLORES_RAREZA, RAREZA_POR_DEFECTO, coloresDeRareza, colorDeRareza, estiloBadgeRareza, usaColorDeRareza, matizDeRareza } from '../src/data/rarezaColores.js';
 import { htmlGuia } from '../src/seo/contenido.js';
 
 const spritesData = readFileSync(new URL('../src/data/spritesData.js', import.meta.url), 'utf8');
@@ -101,4 +101,35 @@ test('la tabla de la guia pinta cada rareza como badge, y Special con su banda',
   assert.match(html, /style="background:linear-gradient\(15deg[^"]*color:#000"/, 'Special deberia llevar la banda con texto negro');
   // Y el badge va dentro del encabezado de fila, no en lugar de el.
   assert.match(html, /<th scope="row"><span class="rareza-badge"/);
+});
+
+test('epicas y legendarias se identifican por el color de su rareza, no por familia ni temporada', () => {
+  for (const rareza of ['Epic', 'legendary', '  LEGENDARY  ']) {
+    assert.equal(usaColorDeRareza(rareza), true, rareza + ' deberia usar el color de su rareza');
+  }
+  for (const rareza of ['Rare', 'Mythic', 'Special', 'Loot Hacker', '', null, undefined]) {
+    assert.equal(usaColorDeRareza(rareza), false, String(rareza) + ' no entra en la regla');
+  }
+
+  // El catalogo real: ninguna epica ni legendaria puede escapar de la regla. Antes la familia
+  // elemental (peely, sonic, shadow...) y el tinte de temporada de gen 3 pintaban la carta de
+  // otro color, y dos cartas de la misma rareza no se reconocian como iguales.
+  const catalogo = JSON.parse(
+    readFileSync(new URL('../src/data/official_sprites.json', import.meta.url), 'utf8')
+  );
+  const epicas = catalogo.filter((s) => /^epic$/i.test(s.rarity)).length;
+  const legendarias = catalogo.filter((s) => /^legendary$/i.test(s.rarity)).length;
+  const dentro = catalogo.filter((s) => usaColorDeRareza(s.rarity)).length;
+  assert.ok(epicas > 0 && legendarias > 0, 'el catalogo deberia traer ambas rarezas');
+  assert.equal(dentro, epicas + legendarias, 'se colo una carta fuera de la regla');
+});
+
+test('el matiz de una rareza sale de su propio color de fondo', () => {
+  // Legendario #8a3c1e, epico #4c197b, raro #00458a: el matiz es lo unico que necesita la ficha
+  // de 3ª generacion para teñir el fondo sin cambiar la luminosidad de la temporada.
+  assert.equal(matizDeRareza('Legendary'), 17);
+  assert.equal(matizDeRareza('Epic'), 271);
+  assert.equal(matizDeRareza('Rare'), 210);
+  assert.equal(matizDeRareza(''), null);
+  assert.equal(matizDeRareza('Loot Hacker'), null);
 });

@@ -10015,6 +10015,17 @@ body.has-czs-navbar {
   padding-bottom: calc(62px + env(safe-area-inset-bottom));
 }
 
+/* La barra es solo para movil: en escritorio el menu vive en la cabecera. */
+@media (min-width: 769px) {
+  .czs-navbar {
+    display: none;
+  }
+
+  body.has-czs-navbar {
+    padding-bottom: 0;
+  }
+}
+
 /* ==========================================================================
    3ª GENERACION (Buscatesoros)
    Cada carta lleva su tono en --g3-h/--g3-s/--g3-l desde SpriteCard.jsx: fondo

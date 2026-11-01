@@ -53,13 +53,13 @@ export const FAMILY_NAMES_MAP = {
   vampire: 'Vampiro',
   deer: 'El Ciervo',
   dumpsterdive: 'Mapache',
-  // Familias de la temporada Buscatesoros: son nombres de personaje, se dejan
-  // igual en español.
-  peelybones: "Halfpeel'd",
+  // Familias de la temporada Buscatesoros. Los nombres de personaje se dejan igual
+  // salvo que tengan una version en español asentada.
+  peelybones: 'Bananín Huesudo',
   parrot: 'Re-Pete',
   barreloffish: "Barry O'Fish",
   treasurechest: 'Chester',
-  treasuremap: 'Exmarks',
+  treasuremap: 'Buscarrutas',
   compass: 'Wayfinder',
   unbotheredfish: 'Kelper',
   starlight: 'Sweet Dreams',
@@ -67,7 +67,7 @@ export const FAMILY_NAMES_MAP = {
   playmakerbrewery: "Lil' Flacko",
   rookgecko: "Lil' Uzi Vert Jr.",
   coinpile: 'Plundarrgh',
-  feedjet: 'Transponder Snail'
+  feedjet: 'Caracol Transmisor'
 };
 
 export const THEME_NAMES_ES = {

@@ -1,5 +1,6 @@
-import { COLORES_RAREZA, RAREZA_POR_DEFECTO } from './rarezaColores.js';
+import { COLORES_RAREZA, RAREZA_POR_DEFECTO, usaColorDeRareza, matizDeRareza } from './rarezaColores.js';
 import officialSpritesJson from './official_sprites.json';
+import COLORES_GEN3 from './coloresGen3.json';
 import { FAMILY_NAMES_MAP, THEME_NAMES_ES } from './nombresEspiritus.js';
 import { estadoLanzamiento } from '../utils/lanzamiento.js';
 import fortniteGgJson from './fortnite_gg_index.json';
@@ -208,6 +209,14 @@ export function getSpriteCardStyle(sprite) {
   const theme = sprite.variant || sprite.theme;
   const rarity = sprite.rarity;
   const familyId = (sprite.familyId || sprite.id?.split('_')[0] || '').toLowerCase();
+  const rarityObj = getRarityInfo(rarity);
+
+  // 0. Epicas y legendarias se leen por su rareza, por encima de familia y temporada: dos cartas
+  //    de la misma rareza tienen que compartir color para reconocerse como iguales. El tono solo
+  //    cambia si hace falta contraste, y eso ya vive en COLORES_RAREZA.
+  if (usaColorDeRareza(rarity) && rarityObj && rarityObj.cardGradient && rarityObj.border) {
+    return { background: rarityObj.cardGradient, borderColor: softenBorderColor(rarityObj.border) };
+  }
 
   // 1. Variantes con estilo temático específico (Gold, Cheatmaster, Galaxy, Cube, etc.)
   if (theme && theme !== 'Basic' && theme !== 'Base') {
@@ -229,12 +238,30 @@ export function getSpriteCardStyle(sprite) {
   }
 
   // 3. Estilo por Rareza (Mítico, Legendario, Épico, Raro, Poco Común, Especial, Exótico, etc.)
-  const rarityObj = getRarityInfo(rarity);
   if (rarityObj && rarityObj.cardGradient && rarityObj.border) {
     return { background: rarityObj.cardGradient, borderColor: softenBorderColor(rarityObj.border) };
   }
 
   return { background: 'linear-gradient(180deg, #104273 0%, #1b1c23 100%)', borderColor: softenBorderColor('#00afff') };
+}
+
+// La plantilla de la 3ª generacion es una ficha oscura: saturación y luminosidad fijas, y el
+// matiz es lo unico que varia. Asi una carta epica o legendaria se ve igual de oscura que sus
+// vecinas, pero con el tono de su rareza.
+const TINTE_G3_S = 52;
+const TINTE_G3_L = 17;
+
+/**
+ * El tinte de temporada de la 3ª generacion decora el fondo de una carta. Las rarezas que se
+ * identifican por su color no usan el matiz de su familia: usan el de su rareza, para que todas
+ * sus cartas compartan tono. Devuelve el tono a aplicar, o null si la carta no lleva tinte.
+ */
+export function tinteDeTemporada(sprite) {
+  if (!sprite || !COLORES_GEN3[sprite.id]) return null;
+  if (!usaColorDeRareza(sprite.rarity)) return COLORES_GEN3[sprite.id];
+  const matiz = matizDeRareza(sprite.rarity);
+  if (matiz === null) return COLORES_GEN3[sprite.id];
+  return { h: matiz, s: TINTE_G3_S, l: TINTE_G3_L };
 }
 
 export { THEME_NAMES_ES } from './nombresEspiritus.js';
@@ -286,7 +313,10 @@ export const SPANISH_NAME_OVERRIDES = {
   klombo_cheatmaster: 'Klombo Hacker',
   jonesy_basic: 'Jonesy',
   jonesy_gold: 'Jonesy Dorado',
-  jonesy_cheatmaster: 'Jonesy Hacker'
+  jonesy_cheatmaster: 'Jonesy Hacker',
+  // "Fortuna" no se toca en el mapa de temas porque lo comparten todas las variantes
+  // jeweled; esta carta tiene su propio nombre en español.
+  playmakerbrewery_jeweled: "Lil' Flacko Afortunado"
 };
 
 export const SPIRIT_DATA_OVERRIDES = {

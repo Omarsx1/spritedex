@@ -2,7 +2,7 @@ import React, { useState, useRef, useMemo, useCallback, useEffect, memo } from '
 import { fireConfetti } from '../utils/confetti';
 import { ChevronsLeft } from 'lucide-react';
 import { Lock } from 'lucide-react';
-import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER, pickName, tinteInterior } from '../data/spritesData';
+import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER, pickName, tinteInterior, tinteDeTemporada } from '../data/spritesData';
 import { t } from '../i18n';
 import { sounds } from '../utils/audio';
 import { rutaBasicoFamilia, rutaFallbackEspiritu } from '../utils/spriteAssets';
@@ -10,7 +10,6 @@ import { SonicRing } from './SonicRing';
 import spriteMobileScale from '../data/sprite_mobile_scale.json';
 import { safeStorage } from '../utils/safeStorage';
 import { trackEvent } from '../utils/telemetry';
-import COLORES_GEN3 from '../data/coloresGen3.json';
 
 const VARIANT_ALIASES = { Base: 'Basic', 'Cheat Master': 'Cheatmaster', LootHacker: 'Loot Hacker' };
 const getVariantPriority = (v) => {
@@ -259,6 +258,8 @@ function FamilySpotlightRow({
     const isMastered = isOwned && level === 5;
     const rarityInfo = getRarityInfo(sprite.rarity);
     const styleInfo = getCachedCardStyle(sprite);
+    // El tinte de temporada de gen 3 no pinta cartas cuya rareza se identifica por su color.
+    const tinte3 = tinteDeTemporada(sprite);
 
     const cardWidth = isActive ? W_ACTIVE : W_INACTIVE;
 
@@ -297,7 +298,7 @@ function FamilySpotlightRow({
     return (
       <div
         key={sprite.id}
-        className={`ms-spotlight-card ${isActive ? 'is-active' : 'is-inactive'} sprite-card ${isOwned ? 'is-owned' : ''} ${isMastered ? ('is-mastered ' + (sprite.gen === 2 ? 'is-glitch-mastered' : 'is-classic-mastered')) : ''} ${COLORES_GEN3[sprite.id] ? 'is-gen3' : ''}`}
+        className={`ms-spotlight-card ${isActive ? 'is-active' : 'is-inactive'} sprite-card ${isOwned ? 'is-owned' : ''} ${isMastered ? ('is-mastered ' + (sprite.gen === 2 ? 'is-glitch-mastered' : 'is-classic-mastered')) : ''} ${tinte3 ? 'is-gen3' : ''}`}
         data-familia={String(sprite?.id || '').split('_')[0]}
         style={{
           width: `${cardWidth}px`,
@@ -312,10 +313,10 @@ function FamilySpotlightRow({
           background: isMastered ? undefined : styleInfo.background,
           borderColor: styleInfo.borderColor,
           // Tinte de la 3ª generacion (mismas variables que la carta de escritorio).
-          ...(COLORES_GEN3[sprite.id] ? {
-            '--g3-h': COLORES_GEN3[sprite.id].h,
-            '--g3-s': `${COLORES_GEN3[sprite.id].s}%`,
-            '--g3-l': `${COLORES_GEN3[sprite.id].l}%`,
+          ...(tinte3 ? {
+            '--g3-h': tinte3.h,
+            '--g3-s': `${tinte3.s}%`,
+            '--g3-l': `${tinte3.l}%`,
             '--g3-ring': styleInfo.borderColor
           } : {}),
           // El halo de color de fuera se retiro a proposito (se veia como un aro de luz

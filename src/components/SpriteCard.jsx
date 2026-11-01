@@ -1,9 +1,8 @@
 import React, { memo } from 'react';
 import { fireConfetti } from '../utils/confetti';
 import { Lock } from 'lucide-react';
-import { RARITIES, getSpriteCardStyle, getRarityInfo, pickName } from '../data/spritesData';
+import { RARITIES, getSpriteCardStyle, getRarityInfo, pickName, tinteDeTemporada } from '../data/spritesData';
 import { t } from '../i18n';
-import COLORES_GEN3 from '../data/coloresGen3.json';
 import { sounds } from '../utils/audio';
 import { rutaBasicoFamilia, rutaFallbackEspiritu } from '../utils/spriteAssets';
 import { SonicRing } from './SonicRing';
@@ -32,6 +31,8 @@ function SpriteCardBase({
 
   const rarityInfo = getRarityInfo(sprite.rarity);
   const styleInfo = getSpriteCardStyle(sprite);
+  // El tinte de temporada de gen 3 no pinta cartas cuya rareza se identifica por su color.
+  const tinte3 = tinteDeTemporada(sprite);
 
   const handleToggleClick = (e) => {
     e.stopPropagation();
@@ -185,7 +186,7 @@ function SpriteCardBase({
   // Vista cuadrícula (estilo fortnite.gg)
   return (
     <div
-      className={`sprite-card ${isOwned ? 'is-owned' : ''} ${isMastered ? ('is-mastered ' + (sprite.gen === 2 ? 'is-glitch-mastered' : 'is-classic-mastered')) : ''} ${COLORES_GEN3[sprite.id] ? 'is-gen3' : ''}`}
+      className={`sprite-card ${isOwned ? 'is-owned' : ''} ${isMastered ? ('is-mastered ' + (sprite.gen === 2 ? 'is-glitch-mastered' : 'is-classic-mastered')) : ''} ${tinte3 ? 'is-gen3' : ''}`}
       data-familia={String(sprite?.id || '').split('_')[0]}
       style={{
         background: styleInfo.background,
@@ -193,10 +194,10 @@ function SpriteCardBase({
         position: 'relative',
         cursor: (sprite.unreleased || isFriendView) ? 'default' : 'pointer',
         // Tinte propio de la 3ª generacion: cada carta lleva su tono en variables.
-        ...(COLORES_GEN3[sprite.id] ? {
-          '--g3-h': COLORES_GEN3[sprite.id].h,
-          '--g3-s': `${COLORES_GEN3[sprite.id].s}%`,
-          '--g3-l': `${COLORES_GEN3[sprite.id].l}%`,
+        ...(tinte3 ? {
+          '--g3-h': tinte3.h,
+          '--g3-s': `${tinte3.s}%`,
+          '--g3-l': `${tinte3.l}%`,
           // La rareza manda en el aro y el resplandor: un legendario se lee
           // legendario aunque el fondo sea el tinte de su temporada.
           '--g3-ring': styleInfo.borderColor

@@ -63,6 +63,40 @@ export function coloresDeRareza(nombre) {
   return COLORES_RAREZA[sinSignos] || null;
 }
 
+// Rarezas que se identifican SOLO por su color: una epica se reconoce epica y una legendaria se
+// reconoce legendaria. Ni la familia elemental (peely verde, sonic azul...) ni el tinte de
+// temporada de la 3ª generacion pueden repintarlas; sin esto, dos cartas de la misma rareza
+// salian de colores distintos y dejaban de leerse como iguales.
+export const RAREZAS_DE_COLOR_UNICO = ['epic', 'legendary'];
+
+/** true si la carta debe pintarse con el color de su rareza y no con el de su familia o temporada. */
+export function usaColorDeRareza(nombre) {
+  const entrada = coloresDeRareza(nombre);
+  return Boolean(entrada && RAREZAS_DE_COLOR_UNICO.includes(entrada.classKey));
+}
+
+/**
+ * El matiz (0-359) del fondo de una rareza. La 3ª generacion tiñe cada ficha con el matiz de su
+ * espiritu; una rareza de color unico no puede hacer eso sin dejar de identificarse, asi que usa
+ * el matiz de su propia rareza: mismo tono para todas sus cartas, misma oscuridad de temporada.
+ * Devuelve null si la rareza no esta en el catalogo.
+ */
+export function matizDeRareza(nombre) {
+  const entrada = coloresDeRareza(nombre);
+  const hex = String(entrada && entrada.bg ? entrada.bg : '').replace('#', '');
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return null;
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const delta = max - min;
+  if (delta === 0) return 0;
+  let h;
+  if (max === r) h = ((g - b) / delta) % 6;
+  else if (max === g) h = (b - r) / delta + 2;
+  else h = (r - g) / delta + 4;
+  return Math.round((h * 60 + 360) % 360);
+}
+
 /**
  * El estilo inline del badge de una rareza, para que la pagina estatica y la app pinten EXACTAMENTE
  * lo mismo. Va inline y no por clase a proposito: las clases de color de las tarjetas llevan
