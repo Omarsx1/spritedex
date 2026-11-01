@@ -400,7 +400,7 @@ export function Navbar({
                 {/* Ajustes es la casa de las preferencias y del respaldo; el menu solo
                     navega. En escritorio es la unica entrada: la barra inferior no se ve. */}
                 <a
-                  className="app-navbar__menu-action-btn"
+                  className="app-navbar__menu-action-btn app-navbar__menu-ajustes"
                   href={conIdioma('/ajustes', getLang())}
                   onClick={(evento) => navegarEnApp(evento, '/ajustes')}
                 >

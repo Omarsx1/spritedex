@@ -1613,6 +1613,7 @@ export function App() {
         solicitudesNuevas={solicitudesNuevas}
         onOpenCompareModal={() => irA('/amigos')}
         onOpenShareModal={() => irA('/compartir')}
+        onOpenAjustes={() => irA('/ajustes')}
       />
 
     </div>

@@ -241,35 +241,60 @@ html.theme-cazatesoros .lang-switch__flecha {
 html.theme-cazatesoros .lang-switch__menu,
 html.theme-cazatesoros .app-navbar__menu-dropdown,
 html.theme-cazatesoros .app-navbar__dropdown {
-  background: linear-gradient(180deg, #f6ead0, #e2c998);
-  border: 2px solid var(--czs-madera-oscura);
-  color: var(--czs-tinta);
-  box-shadow: 0 18px 40px rgba(20, 10, 2, 0.5);
+  /* Los desplegables son chrome, igual que la barra y los botones que los abren:
+     navy con filo de laton y texto pergamino. En papiro parecian de otra app. */
+  background: linear-gradient(180deg, #1c2c48 0%, #101a2c 100%);
+  border: 1px solid rgba(216, 178, 106, 0.8);
+  color: #f2e6c8;
+  box-shadow:
+    0 18px 40px rgba(4, 8, 16, 0.55),
+    inset 0 1px 0 rgba(240, 226, 192, 0.12);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 html.theme-cazatesoros .lang-switch__opcion,
 html.theme-cazatesoros .app-navbar__menu-action-btn,
-html.theme-cazatesoros .app-navbar__dropdown-item {
-  color: var(--czs-tinta);
+html.theme-cazatesoros .app-navbar__dropdown-item,
+html.theme-cazatesoros .app-navbar__gen-option {
+  color: #f2e6c8;
 }
 
 html.theme-cazatesoros .lang-switch__opcion:hover,
 html.theme-cazatesoros .app-navbar__menu-action-btn:hover,
-html.theme-cazatesoros .app-navbar__dropdown-item:hover {
-  background: rgba(139, 90, 43, 0.16);
-  color: var(--czs-tinta);
-}
-
-html.theme-cazatesoros .app-navbar__menu-section-label,
-html.theme-cazatesoros .app-navbar__gen-option,
-html.theme-cazatesoros .app-navbar__dropdown-name,
-html.theme-cazatesoros .app-navbar__dropdown-email,
-html.theme-cazatesoros .app-navbar__dropdown-code {
-  color: var(--czs-tinta);
-}
-
+html.theme-cazatesoros .app-navbar__dropdown-item:hover,
 html.theme-cazatesoros .app-navbar__gen-option:hover {
-  background: rgba(139, 90, 43, 0.14);
+  background: rgba(216, 178, 106, 0.14);
+  color: #fff3d0;
+}
+
+/* Idioma activo: dorado y con fondo tenue, como la pestana actual de la barra. */
+html.theme-cazatesoros .lang-switch__opcion[aria-current='true'] {
+  background: rgba(216, 178, 106, 0.12);
+  color: #f0d79a;
+}
+
+html.theme-cazatesoros .app-navbar__menu-section-label {
+  color: #d8b26a;
+}
+
+html.theme-cazatesoros .app-navbar__dropdown-name {
+  color: #f2e6c8;
+}
+
+html.theme-cazatesoros .app-navbar__dropdown-email,
+html.theme-cazatesoros .app-navbar__dropdown-code,
+html.theme-cazatesoros .app-navbar__menu-copy {
+  color: #c7b68c;
+}
+
+html.theme-cazatesoros .app-navbar__dropdown-divider,
+html.theme-cazatesoros .app-navbar__menu-copy {
+  border-top-color: rgba(216, 178, 106, 0.22);
+}
+
+html.theme-cazatesoros .app-navbar__dropdown-divider {
+  background: rgba(216, 178, 106, 0.22);
 }
 
 /* ==========================================================================
@@ -426,13 +451,15 @@ html.theme-cazatesoros .stats-bar__col {
     var(--czs-papel-claro);
   box-shadow:
     inset 0 1px 0 rgba(255, 240, 205, 0.7),
+    inset 0 0 0 1px rgba(216, 178, 106, 0.45),
     0 3px 8px rgba(40, 22, 6, 0.28);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 
 html.theme-cazatesoros .stats-bar__value {
-  color: var(--czs-tinta);
+  /* Cifras en el navy del chrome: el papiro se queda para la placa. */
+  color: #0e1728;
 }
 
 html.theme-cazatesoros .stats-bar__label {
@@ -441,16 +468,16 @@ html.theme-cazatesoros .stats-bar__label {
 }
 
 html.theme-cazatesoros .stats-bar__track {
-  background: rgba(74, 42, 16, 0.22);
+  background: rgba(14, 23, 40, 0.18);
 }
 
 html.theme-cazatesoros .stats-bar__fill--caught {
-  background: linear-gradient(90deg, #1f8f7f 0%, #4cc4ae 100%);
+  background: linear-gradient(90deg, #1f7a63 0%, #3fa98c 100%);
   box-shadow: none;
 }
 
 html.theme-cazatesoros .stats-bar__fill--mastered {
-  background: linear-gradient(90deg, #b07a3f 0%, #f5c542 100%);
+  background: linear-gradient(90deg, #9a6a2c 0%, #d8b26a 100%);
   box-shadow: none;
 }
 

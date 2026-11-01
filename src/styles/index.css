@@ -360,7 +360,9 @@ html::after {
   border: none;
   border-radius: 0;
   box-shadow: none;
-  z-index: 50;
+  /* Por encima del hueco del buscador movil (z-index 55): con 50 el desplegable
+     quedaba detras de la pildora de busqueda. */
+  z-index: 60;
   position: absolute;
   top: calc(max(env(safe-area-inset-top, 0px), 14px) + 4px);
   left: 50%;
@@ -10079,6 +10081,15 @@ body.has-czs-navbar {
 
   body.has-czs-navbar {
     padding-bottom: 0;
+  }
+}
+
+/* Una sola entrada por destino: en movil Ajustes ya esta en la barra inferior,
+   asi que el menu no lo repite. En escritorio la barra no se ve y el menu es la
+   unica puerta. */
+@media (max-width: 768px) {
+  .app-navbar__menu-ajustes {
+    display: none;
   }
 }
 
