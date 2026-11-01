@@ -132,7 +132,7 @@ export function App() {
   // modal siguen con su propia instancia, asi que esto no altera su comportamiento.
   const { recibidas: solicitudesRecibidas } = useFriendRequests();
   const solicitudesNuevas = solicitudesRecibidas.length;
-  const { recibidos: compartidosRecibidos, resolver: resolverCompartido } = useSharedSprites();
+  const { recibidos: compartidosRecibidos, resolver: resolverCompartido, cargar: cargarCompartidos } = useSharedSprites();
   const avisosAmigos = solicitudesNuevas + compartidosRecibidos.length;
 
   // Detección de ruta secreta /portal-override /studio-override o ?studio=true
@@ -1389,6 +1389,7 @@ export function App() {
             }
           }}
           compartidos={compartidosRecibidos}
+          onRefrescarCompartidos={cargarCompartidos}
           onCompartirEspiritu={({ codigo, spriteId }) =>
             enviarEspiritu({ codigo, spriteId, fromCode: myFriendCode })
           }

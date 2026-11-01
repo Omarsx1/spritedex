@@ -31,6 +31,21 @@ export function useSharedSprites() {
     };
   }, []);
 
+  // Al volver a la app (cambio de pestaña o desbloquear el telefono) se vuelve a
+  // preguntar: sin esto, un envio que llega con la app abierta no se veia hasta
+  // recargar.
+  useEffect(() => {
+    const alVolver = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') cargar();
+    };
+    document.addEventListener('visibilitychange', alVolver);
+    window.addEventListener('focus', alVolver);
+    return () => {
+      document.removeEventListener('visibilitychange', alVolver);
+      window.removeEventListener('focus', alVolver);
+    };
+  }, [cargar]);
+
   const resolver = useCallback(async (fila, aceptar) => {
     setRecibidos((previo) => previo.filter((r) => r.id !== fila.id));
     const res = await resolverEnvio(fila.id, aceptar);

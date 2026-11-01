@@ -11,7 +11,7 @@ import { t } from '../i18n';
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
 // gestionan personas y en la ficha del amigo se compara la coleccion (fase 2).
 // Reutiliza los estilos .sdm-friends que ya estaban aprobados.
-export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, codigoCargado, onMarcarAtrapado, compartidos = [], onCompartirEspiritu, onAceptarCompartido, onRechazarCompartido }) {
+export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, codigoCargado, onMarcarAtrapado, compartidos = [], onRefrescarCompartidos, onCompartirEspiritu, onAceptarCompartido, onRechazarCompartido }) {
   // Comparación rápida para la ficha: lo que él tiene y yo no, y al revés. Es la misma
   // idea que las listas de la modal, aquí resumida para tenerla en la página.
   const listas = useMemo(() => {
@@ -127,6 +127,8 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
     refrescoPedido.current = true;
     setRefresco(null);
     radar.cargar();
+    // El boton tambien trae los envios nuevos: es el "recargar" de la pagina.
+    onRefrescarCompartidos?.();
   };
 
   const codigoCorto = (myFriendCode || '').replace(/^SDEX-/i, '');
