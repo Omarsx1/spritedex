@@ -450,7 +450,7 @@ function FamilySpotlightRow({
                 </div>
               ) : isOwned && isMastered && sprite.gen === 3 ? (
                 <div className="card-level-cofre ms-cofre" onClick={(e) => e.stopPropagation()} title={t('carta.maxeado')}>
-                  <img src={cofreMaxDe(sprite.id)} alt={t('carta.maxeado')} width={30} height={30} decoding="async" />
+                  <img src={cofreMaxDe(sprite.id)} alt={t('carta.maxeado')} width={48} height={48} decoding="async" />
                 </div>
               ) : isOwned ? (
                 <div

@@ -4507,9 +4507,19 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
+.card-level-cofre img {
+  width: 40px;
+  height: 40px;
+}
+
+.list-level-cofre img {
+  width: 26px;
+  height: 26px;
+}
+
 .ms-cofre img {
-  width: 30px;
-  height: 30px;
+  width: 48px;
+  height: 48px;
 }
 
 .owned-btn-sm {
