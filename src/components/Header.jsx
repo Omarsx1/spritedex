@@ -18,6 +18,7 @@ function BadgeSolicitudes({ n, className = '' }) {
 }
 
 export function Header({
+  activeGen = 3,
   spritesPool,
   totalCount,
   ownedCount,
@@ -285,16 +286,26 @@ export function Header({
         <div className="hero__title-block" ref={titleRef} style={{ position: 'relative', zIndex: 10 }}>
           <h1 className="hero__title">
             <span className="hero__title-line-wrap">
-              {/* Wordmark oficial en oro. En esta mini temporada ya no se usa el
-                  efecto glitch: la marca es la imagen, no texto con copias RGB. */}
-              <img
-                className="hero__title-logo"
-                src="/fortnite-dorado.webp"
-                alt="FORTNITE"
-                width="1120"
-                height="274"
-                draggable="false"
-              />
+              {/* Cada generacion conserva su logo: Override con glitch,
+                  Runners blanco liso y Cazatesoros el wordmark en oro. */}
+              {activeGen === 3 ? (
+                <img
+                  className="hero__title-logo"
+                  src="/fortnite-dorado.webp"
+                  alt="FORTNITE"
+                  width="1120"
+                  height="274"
+                  draggable="false"
+                />
+              ) : activeGen === 2 ? (
+                <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">
+                  FORTNITE
+                </span>
+              ) : (
+                <span className="hero__title-line hero__title-word--blanco">
+                  FORTNITE
+                </span>
+              )}
             </span>
             <span className={`hero__title-line hero__title-line--accent ${isFortnitemares ? 'hero__title-line--accent-fnm' : ''}`}>
               SPRITEDEX

@@ -1404,6 +1404,7 @@ export function App() {
       {navbar}
 
       <Header
+        activeGen={activeGen}
         spritesPool={scopedSprites}
         ownedCount={ownedCount}
         totalCount={totalCount}
