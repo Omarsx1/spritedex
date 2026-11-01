@@ -7970,6 +7970,38 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 .fpage__top { display: flex; align-items: center; gap: 12px; }
 .fpage__headText { flex: 1; min-width: 0; }
 .fpage__title { margin: 0; font-size: 1.45rem; font-weight: 900; color: #fff; }
+
+/* Ajustes en movil va sin la cabecera global: la barra inferior ya navega y el
+   logo se montaba encima del titulo de la pagina. En escritorio se queda, que es
+   la unica entrada al menu, y el contenido baja para no chocar con ella. */
+@media (max-width: 768px) {
+  .app-container:has(.ajustes-page) .app-navbar {
+    display: none;
+  }
+
+  .ajustes-page {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 769px) {
+  .ajustes-page {
+    padding-top: 78px;
+  }
+}
+
+/* Arriba de 1000px .fpage se vuelve una rejilla de dos columnas pensada para
+   Amigos. Ajustes es una sola columna de bloques: se queda en flex y con un
+   ancho de lectura comodo. */
+@media (min-width: 1000px) {
+  .fpage.ajustes-page {
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+}
 .fpage__sub { margin: 4px 0 0; font-size: 0.72rem; line-height: 1.4; color: rgba(226, 232, 240, 0.55); }
 .fpage__back, .fpage__refresh {
   display: inline-flex; align-items: center; justify-content: center;
