@@ -4438,16 +4438,25 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 
 /* Tercera generacion: el nivel no son estrellas, son gemas de pirata. La piedra
-   se rellena al subir de nivel y queda en contorno mientras no se tiene. */
+   trae su degradado y su destello; apagada se ve tenue, conseguida se enciende. */
 .star-btn.is-gema svg,
 .star-btn-sm.is-gema svg {
   display: block;
-  fill: none;
+  opacity: 0.26;
+  filter: grayscale(0.7) brightness(0.9);
+  transition: opacity 0.15s ease, filter 0.15s ease, transform 0.15s ease;
 }
 
 .star-btn.is-gema.active svg,
 .star-btn-sm.is-gema.active svg {
-  fill: currentColor;
+  opacity: 1;
+  filter: none;
+}
+
+.star-btn.is-gema:hover svg,
+.star-btn-sm.is-gema:hover svg {
+  opacity: 0.7;
+  filter: none;
 }
 
 /* Cada nivel es una piedra distinta: rubi, esmeralda, zafiro, amatista y

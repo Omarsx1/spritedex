@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { fireConfetti } from '../utils/confetti';
-import { Lock, Gem } from 'lucide-react';
+import { Lock } from 'lucide-react';
+import { GemaNivel } from './icons/GemaNivel';
 import { RARITIES, getSpriteCardStyle, getRarityInfo, pickName, tinteDeTemporada } from '../data/spritesData';
 import { t } from '../i18n';
 import { sounds } from '../utils/audio';
@@ -154,7 +155,7 @@ function SpriteCardBase({
                       {sprite.gen === 2 ? (
                         <SonicRing active={level >= num} mastered={isMastered && num === 5} size={14} />
                       ) : sprite.gen === 3 ? (
-                        <Gem size={12} strokeWidth={2.4} aria-hidden="true" />
+                        <GemaNivel nivel={num} size={14} />
                       ) : (
                         '★'
                       )}
@@ -312,7 +313,7 @@ function SpriteCardBase({
               {sprite.gen === 2 ? (
                 <SonicRing active={level >= num} mastered={isMastered && num === 5} size={19} />
               ) : sprite.gen === 3 ? (
-                <Gem size={15} strokeWidth={2.2} aria-hidden="true" />
+                <GemaNivel nivel={num} size={17} />
               ) : (
                 '★'
               )}

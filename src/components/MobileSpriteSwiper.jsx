@@ -1,6 +1,7 @@
 import React, { useState, useRef, useMemo, useCallback, useEffect, memo } from 'react';
 import { fireConfetti } from '../utils/confetti';
-import { ChevronsLeft, Gem } from 'lucide-react';
+import { ChevronsLeft } from 'lucide-react';
+import { GemaNivel } from './icons/GemaNivel';
 import { Lock } from 'lucide-react';
 import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER, pickName, tinteInterior, tinteDeTemporada } from '../data/spritesData';
 import { t } from '../i18n';
@@ -462,7 +463,7 @@ function FamilySpotlightRow({
                       {sprite.gen === 2 ? (
                         <SonicRing active={level >= num} mastered={isMastered && num === 5} size={20} />
                       ) : sprite.gen === 3 ? (
-                        <Gem size={16} strokeWidth={2.2} aria-hidden="true" />
+                        <GemaNivel nivel={num} size={18} />
                       ) : (
                         '★'
                       )}
