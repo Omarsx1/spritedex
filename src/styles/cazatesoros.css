@@ -1027,7 +1027,7 @@ html.theme-cazatesoros .czs-navbar__item:active {
    Sobre las hojas de palmera el marino se hundia: se le pone un filo claro y una
    sombra suave para que se lea igual sobre cielo que sobre follaje. */
 html.theme-cazatesoros .hero__title-line--accent {
-  color: #1d4f91 !important;
+  color: #162542 !important;
   /* Sin contorno: el trazo de texto comia el relleno y adelgazaba las letras.
      El halo claro es un drop-shadow, que va por detras del glifo. */
   filter:
