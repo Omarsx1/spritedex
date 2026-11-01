@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ALL_SPRITES, pickName } from '../data/spritesData';
-import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw, Trash2, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw, Trash2, CheckCircle2, Share2 } from 'lucide-react';
 import { Modal } from './ui/Modal';
 import { useFriendRequests } from '../hooks/useFriendRequests';
 import { generateShareUrl } from '../utils/friendCode';
@@ -11,7 +11,7 @@ import { t } from '../i18n';
 // Es la version con espacio de verdad de lo que vivia apretado en la modal: aqui se
 // gestionan personas y en la ficha del amigo se compara la coleccion (fase 2).
 // Reutiliza los estilos .sdm-friends que ya estaban aprobados.
-export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, codigoCargado, onMarcarAtrapado }) {
+export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFicha, userState, friendState, spritesScope, onAmigoQuitado, onBack, onVerColeccion, onVerEnApp, codigoCargado, onMarcarAtrapado, compartidos = [], onCompartirEspiritu, onAceptarCompartido, onRechazarCompartido }) {
   // Comparación rápida para la ficha: lo que él tiene y yo no, y al revés. Es la misma
   // idea que las listas de la modal, aquí resumida para tenerla en la página.
   const listas = useMemo(() => {
@@ -53,6 +53,11 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
   const [amigoAQuitar, setAmigoAQuitar] = useState(null);
   // Espiritu de "te faltan" que tiene abierto el popover de registrar.
   const [registrarAbierto, setRegistrarAbierto] = useState(null);
+  // Espiritu de "le faltan" que tiene abierto el popover de compartir.
+  const [compartirAbierto, setCompartirAbierto] = useState(null);
+  const [enviandoId, setEnviandoId] = useState(null);
+  const [enviados, setEnviados] = useState({});
+  const [avisoEnvio, setAvisoEnvio] = useState('');
   // Lo que ya le enviaste o compartiste a este amigo, por espiritu.
 
   // Respaldo para los enlaces: con un enlace por token el codigo llega DESPUES del montaje,
@@ -65,18 +70,42 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
 
   // Cerrar el popover al tocar fuera.
   useEffect(() => {
-    if (!registrarAbierto) return undefined;
+    if (!registrarAbierto && !compartirAbierto) return undefined;
     const cerrar = (evento) => {
       if (evento.target.closest('.fpage__mini')) return;
       setRegistrarAbierto(null);
+      setCompartirAbierto(null);
     };
     document.addEventListener('pointerdown', cerrar);
     return () => document.removeEventListener('pointerdown', cerrar);
-  }, [registrarAbierto]);
+  }, [registrarAbierto, compartirAbierto]);
 
   const registrarEspiritu = (id) => {
     if (onMarcarAtrapado) onMarcarAtrapado(id);
     setRegistrarAbierto(null);
+  };
+
+  // Compartir de verdad: crea el envio en la base. El amigo lo vera en su
+  // bloque "Te compartieron" y solo el decide si lo registra.
+  const compartirEspiritu = async (spriteId) => {
+    if (enviandoId) return;
+    setAvisoEnvio('');
+    setEnviandoId(spriteId);
+    try {
+      const res = await onCompartirEspiritu?.({ codigo: codigoFicha, spriteId });
+      if (res && res.ok) {
+        setEnviados((previo) => ({ ...previo, [spriteId]: true }));
+        setCompartirAbierto(null);
+      } else {
+        setAvisoEnvio(
+          res && res.motivo === 'sin-sesion'
+            ? t('amigos.compartirSinSesion')
+            : t('amigos.noSePudoCompartir')
+        );
+      }
+    } finally {
+      setEnviandoId(null);
+    }
   };
 
 
@@ -170,6 +199,38 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
           </button>
         </div>
       </div>
+
+      {compartidos.length > 0 && (
+        <div className="sdm-friends__group sdm-friends__group--regalos">
+          <span className="sdm-friends__label">{t('amigos.teCompartieron', { n: compartidos.length })}</span>
+          <p className="sdm-friends__hint">{t('amigos.teCompartieronHint')}</p>
+          {compartidos.map((envio) => {
+            const sprite = ALL_SPRITES.find((s) => s.id === envio.sprite_id);
+            return (
+              <div key={envio.id} className="sdm-friends__row">
+                <span className="fpage__mini fpage__mini--suyo fpage__mini--regalo">
+                  {sprite?.thumb || sprite?.image ? (
+                    <img src={sprite.thumb || sprite.image} alt="" width={28} height={28} decoding="async" />
+                  ) : null}
+                  <span className="fpage__miniNombre">{sprite ? pickName(sprite) : envio.sprite_id}</span>
+                </span>
+                <div className="sdm-friends__actions">
+                  <button
+                    type="button"
+                    className="sdm-friends__btn sdm-friends__btn--ok"
+                    onClick={() => onAceptarCompartido?.(envio)}
+                  >
+                    {t('amigos.aceptar')}
+                  </button>
+                  <button type="button" className="sdm-friends__btn" onClick={() => onRechazarCompartido?.(envio)}>
+                    {t('amigos.rechazar')}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Un bloque a la vez: la pagina deja de apilar siete secciones y de repetir la
           lista de amigos despues de la comparacion. */}
@@ -319,12 +380,39 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
                 ) : (<>
                   <div className="fpage__minis">
                     {(verTodos.leFaltan ? listas.leFaltan : listas.leFaltan.slice(0, 12)).map((s) => (
-                      <div key={s.id} className="fpage__mini fpage__mini--suyo">
-                        {s.img ? <img src={s.img} alt={s.name} loading="lazy" decoding="async" width={44} height={44} /> : <span className="fpage__miniNombre">?</span>}
-                        <span className="fpage__miniNombre">{s.name}</span>
+                      <div key={s.id} className={'fpage__mini fpage__mini--suyo' + (enviados[s.id] ? ' is-enviado' : '')}>
+                        <button
+                          type="button"
+                          className="fpage__miniBtn"
+                          aria-expanded={compartirAbierto === s.id}
+                          aria-label={t('amigos.compartirEspiritu', { nombre: s.name })}
+                          onClick={() => setCompartirAbierto(compartirAbierto === s.id ? null : s.id)}
+                        >
+                          {s.img ? <img src={s.img} alt={s.name} loading="lazy" decoding="async" width={44} height={44} /> : <span className="fpage__miniNombre">?</span>}
+                          <span className="fpage__miniNombre">{s.name}</span>
+                        </button>
+                        {enviados[s.id] && (
+                          <span className="fpage__miniMarca fpage__miniMarca--compartido" aria-label={t('amigos.compartido')}>
+                            <Share2 size={10} />
+                          </span>
+                        )}
+                        {compartirAbierto === s.id && (
+                          <div className="fpage__miniPop" role="dialog" aria-label={t('amigos.compartirEspiritu', { nombre: s.name })}>
+                            <button
+                              type="button"
+                              className="fpage__miniPopOk"
+                              disabled={enviandoId === s.id}
+                              onClick={() => compartirEspiritu(s.id)}
+                            >
+                              <Share2 size={12} />
+                              {enviandoId === s.id ? t('amigos.enviando') : t('amigos.compartir')}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
+                  {avisoEnvio && <p className="sdm-friends__aviso">{avisoEnvio}</p>}
                   {listas.leFaltan.length > 12 && (
                     <button type="button" className="sdm-friends__btn sdm-friends__btn--ver" onClick={() => setVerTodos((v) => ({ ...v, leFaltan: !v.leFaltan }))}>
                       {verTodos.leFaltan ? t('amigos.verMenos') : t('amigos.verLos', { n: listas.leFaltan.length })}

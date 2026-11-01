@@ -5,6 +5,8 @@ import { VARIANT_ORDER, FAMILY_NAMES_MAP, pickFamilyName } from './data/spritesD
 import { t } from './i18n';
 import { leerVista, urlConVista } from './utils/vistaUrl.js';
 import { leerAnimaciones, aplicarAnimaciones } from './utils/animaciones';
+import { enviarEspiritu } from './utils/sharedSprites';
+import { useSharedSprites } from './hooks/useSharedSprites';
 
 const VARIANT_ALIASES = { Base: 'Basic', 'Cheat Master': 'Cheatmaster', LootHacker: 'Loot Hacker' };
 const getVariantPriority = (v) => {
@@ -130,6 +132,8 @@ export function App() {
   // modal siguen con su propia instancia, asi que esto no altera su comportamiento.
   const { recibidas: solicitudesRecibidas } = useFriendRequests();
   const solicitudesNuevas = solicitudesRecibidas.length;
+  const { recibidos: compartidosRecibidos, resolver: resolverCompartido } = useSharedSprites();
+  const avisosAmigos = solicitudesNuevas + compartidosRecibidos.length;
 
   // Detección de ruta secreta /portal-override /studio-override o ?studio=true
   const [isAdminPortal, setIsAdminPortal] = useState(() => {
@@ -1326,7 +1330,7 @@ export function App() {
           onBack={() => irA('/')}
         />
         <MobileNavbar
-          solicitudesNuevas={solicitudesNuevas}
+          solicitudesNuevas={avisosAmigos}
           onOpenCompareModal={() => irA('/amigos')}
           onOpenShareModal={() => irA('/compartir')}
           onOpenAjustes={() => irA('/ajustes')}
@@ -1384,10 +1388,20 @@ export function App() {
               irA('/');
             }
           }}
+          compartidos={compartidosRecibidos}
+          onCompartirEspiritu={({ codigo, spriteId }) =>
+            enviarEspiritu({ codigo, spriteId, fromCode: myFriendCode })
+          }
+          onAceptarCompartido={async (fila) => {
+            // Aceptar es escribir en MI coleccion: la fila del amigo sigue siendo suya.
+            if (!userState[fila.sprite_id]?.owned) handleToggleOwned(fila.sprite_id);
+            await resolverCompartido(fila, true);
+          }}
+          onRechazarCompartido={(fila) => resolverCompartido(fila, false)}
         />
         <Suspense fallback={null}>{modalAuth}</Suspense>
         <MobileNavbar
-          solicitudesNuevas={solicitudesNuevas}
+          solicitudesNuevas={avisosAmigos}
           onOpenCompareModal={() => irA('/amigos')}
           onOpenShareModal={() => irA('/compartir')}
           onOpenAjustes={() => irA('/ajustes')}
@@ -1408,7 +1422,7 @@ export function App() {
         />
         {modales}
         <MobileNavbar
-          solicitudesNuevas={solicitudesNuevas}
+          solicitudesNuevas={avisosAmigos}
           onOpenCompareModal={() => irA('/amigos')}
           onOpenShareModal={() => irA('/compartir')}
           onOpenAjustes={() => irA('/ajustes')}
@@ -1427,7 +1441,7 @@ export function App() {
         <GuiaPage lang={getLang()} />
         {modales}
         <MobileNavbar
-          solicitudesNuevas={solicitudesNuevas}
+          solicitudesNuevas={avisosAmigos}
           onOpenCompareModal={() => irA('/amigos')}
           onOpenShareModal={() => irA('/compartir')}
           onOpenAjustes={() => irA('/ajustes')}
@@ -1498,7 +1512,7 @@ export function App() {
         user={user}
         isLiveConnected={isLiveConnected}
         connectedFriendCode={connectedFriendCode}
-        solicitudesNuevas={solicitudesNuevas}
+        solicitudesNuevas={avisosAmigos}
         onOpenShareModal={() => irA('/compartir')}
         onPrecalentarCompartir={precalentarCompartir}
         onOpenBackupModal={() => setShowBackupModal(true)}
@@ -1643,7 +1657,7 @@ export function App() {
       {modales}
 
       <MobileNavbar
-        solicitudesNuevas={solicitudesNuevas}
+        solicitudesNuevas={avisosAmigos}
         onOpenCompareModal={() => irA('/amigos')}
         onOpenShareModal={() => irA('/compartir')}
         onOpenAjustes={() => irA('/ajustes')}
