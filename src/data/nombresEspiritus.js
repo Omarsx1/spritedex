@@ -56,7 +56,7 @@ export const FAMILY_NAMES_MAP = {
   // Familias de la temporada Buscatesoros. Los nombres de personaje se dejan igual
   // salvo que tengan una version en español asentada.
   peelybones: 'Bananín Huesudo',
-  parrot: 'Re-Pete',
+  parrot: 'Plumitas',
   barreloffish: "Barry O'Fish",
   treasurechest: 'Chester',
   treasuremap: 'Buscarrutas',
