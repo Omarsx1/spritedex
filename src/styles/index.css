@@ -7931,6 +7931,49 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
 }
 .sdm-friends__btn--ok { color: #04121a; background: linear-gradient(135deg, #34d399, #10b981); border-color: transparent; }
 .sdm-friends__btn--danger { color: #fca5a5; border-color: rgba(248, 113, 113, 0.35); }
+
+/* Quitar es un icono de papelera: menos ruido en la fila y menos toques
+   accidentales que con una etiqueta. */
+.sdm-friends__btn--icono {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Confirmacion de quitar amigo */
+.confirmar-quitar {
+  max-width: 360px;
+}
+
+.confirmar-quitar__titulo {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.confirmar-quitar__texto {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.confirmar-quitar__codigo {
+  margin: 0 0 16px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
+.confirmar-quitar__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
 .sdm-friends__pendiente { font-size: 0.66rem; color: rgba(226, 232, 240, 0.5); }
 .sdm-friends__hint { margin: 0; font-size: 0.7rem; color: rgba(226, 232, 240, 0.5); line-height: 1.45; }
 

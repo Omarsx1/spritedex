@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ALL_SPRITES, pickName } from '../data/spritesData';
-import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Users, UserPlus, Copy, Check, Zap, RefreshCw, Trash2 } from 'lucide-react';
+import { Modal } from './ui/Modal';
 import { useFriendRequests } from '../hooks/useFriendRequests';
 import { generateShareUrl } from '../utils/friendCode';
 import { fichaYaCargada } from '../utils/fichaAmigo';
@@ -47,6 +48,9 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
   // Amigos por defecto. Si se entra por un enlace con codigo (/amigos/SDEX-XXXX) abre en
   // Comparación, porque ese enlace existe justo para ver la comparación con esa persona.
   const [vista, setVista] = useState(codigoFicha ? 'comparacion' : 'amigos');
+  const [cargandoColeccion, setCargandoColeccion] = useState(false);
+  // Quitar a un amigo pasa por una confirmacion: el toque accidental ya no borra.
+  const [amigoAQuitar, setAmigoAQuitar] = useState(null);
 
   // Respaldo para los enlaces: con un enlace por token el codigo llega DESPUES del montaje,
   // asi que la pestaña se corrige sola en cuanto aparece; si no, el enlace abriria la
@@ -88,13 +92,25 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
   // enlace (/amigos/SDEX-XXXX), donde no hay clic que valga.
   // Sin amistad aceptada la colección ya no se puede leer: se avisa en vez de no hacer nada.
   const verColeccion = async (codigo) => {
-    const ok = await onVerColeccion(codigo);
-    if (ok === false) { setAviso(t('amigos.noSePudoVer')); return false; }
-    // El aviso se limpia al exito: si no, "no pudimos ver esa colección" sobrevivia a la
-    // carga siguiente.
-    setAviso('');
+    // Respuesta inmediata: la pestaña de comparación se abre ya y muestra su estado
+    // de carga. Antes esperaba a la petición y el clic parecía muerto.
+    if (cargandoColeccion) return false;
+    setCargandoColeccion(true);
     setVista('comparacion');
-    return ok;
+    try {
+      const ok = await onVerColeccion(codigo);
+      if (ok === false) {
+        setAviso(t('amigos.noSePudoVer'));
+        setVista('amigos');
+        return false;
+      }
+      // El aviso se limpia al exito: si no, "no pudimos ver esa colección" sobrevivia a la
+      // carga siguiente.
+      setAviso('');
+      return ok;
+    } finally {
+      setCargandoColeccion(false);
+    }
   };
 
   const copiar = async (texto, cual) => {
@@ -207,6 +223,11 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
         </div>
         <div className="fpage__principal">
             <div className="fpage__bloqueFicha">
+            {cargandoColeccion && !friendState && (
+              <div className="sdm-friends__group">
+                <p className="sdm-friends__hint">{t('amigos.cargandoColeccion')}</p>
+              </div>
+            )}
             {codigoFicha && (
               <div className="sdm-friends__group">
                 <div className="sdm-friends__fichaHead">
@@ -330,16 +351,12 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
                     <button type="button" className="sdm-friends__btn sdm-friends__btn--ok" onClick={() => verColeccion(suyo)}>{t('amigos.verColeccion')}</button>
                     <button
                       type="button"
-                      className="sdm-friends__btn sdm-friends__btn--danger"
-                      onClick={() => {
-                        radar.borrar(a.id);
-                        // Si estabas viendo SU coleccion, hay que salir de esa vista: si no,
-                        // al volver a la app queda el cartel de MODO AMIGO con datos de
-                        // alguien que ya no es tu amigo.
-                        if (onAmigoQuitado) onAmigoQuitado(suyo);
-                      }}
+                      className="sdm-friends__btn sdm-friends__btn--danger sdm-friends__btn--icono"
+                      aria-label={t('amigos.quitarAmigo')}
+                      title={t('amigos.quitarAmigo')}
+                      onClick={() => setAmigoAQuitar({ id: a.id, codigo: suyo })}
                     >
-                      {t('amigos.quitar')}
+                      <Trash2 size={15} strokeWidth={2.2} aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -366,6 +383,38 @@ export function FriendsPage({ myFriendCode, myShareToken, avisoExterno, codigoFi
           )}
         </div>
       </div>
+
+      {amigoAQuitar && (
+        <Modal
+          onClose={() => setAmigoAQuitar(null)}
+          className="modal-content confirmar-quitar"
+        >
+          <h3 className="confirmar-quitar__titulo">{t('amigos.confirmarQuitarTitulo')}</h3>
+          <p className="confirmar-quitar__texto">{t('amigos.confirmarQuitarTexto')}</p>
+          <p className="confirmar-quitar__codigo">
+            SDEX {String(amigoAQuitar.codigo || '').replace(/^SDEX-/i, '')}
+          </p>
+          <div className="confirmar-quitar__acciones">
+            <button type="button" className="sdm-friends__btn" onClick={() => setAmigoAQuitar(null)}>
+              {t('amigos.cancelar')}
+            </button>
+            <button
+              type="button"
+              className="sdm-friends__btn sdm-friends__btn--danger"
+              onClick={() => {
+                radar.borrar(amigoAQuitar.id);
+                // Si estabas viendo SU coleccion hay que salir de esa vista: si no, al
+                // volver a la app queda el cartel de MODO AMIGO con datos de alguien que
+                // ya no es tu amigo.
+                if (onAmigoQuitado) onAmigoQuitado(amigoAQuitar.codigo);
+                setAmigoAQuitar(null);
+              }}
+            >
+              {t('amigos.quitar')}
+            </button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

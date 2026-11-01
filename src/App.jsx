@@ -1357,13 +1357,15 @@ export function App() {
           }}
           onBack={() => irA('/')}
           onVerColeccion={async (codigo) => {
+            // Primero se abre la comparacion y despues se busca la coleccion: el
+            // clic tiene que responder al instante, no cuando termina la peticion.
+            irA('/amigos/' + encodeURIComponent(codigo));
             const ok = await handleConnectFriendCode(codigo);
             if (ok !== false) {
               // Se carga su coleccion para comparar en la FICHA, pero sin cambiar tu vista:
               // si dejaramos el perfil en modo amigo, al volver atras aparecia el cartel de
               // MODO AMIGO sin que nadie lo pidiera. Para eso esta el boton Vista de amigo.
               setActiveProfile('mine');
-              irA('/amigos/' + encodeURIComponent(codigo));
             }
             // El resultado tiene que volver a la pagina: sin este return, FriendsPage recibe
             // undefined, el aviso de "no pudimos ver esa colección" nunca se dibuja y el clic
