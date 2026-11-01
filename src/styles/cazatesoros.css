@@ -113,40 +113,60 @@ html.theme-cazatesoros .fnm-forest {
 html.theme-cazatesoros .main-content {
   position: relative;
   /* El borde del papiro ocupa 96px a cada lado; el contenido queda dentro del pergamino. */
-  /* El cilindro del rollo ocupa ~86% del ancho de su asset: se escala a 116% para
-     que cubra la caja completa, con los bordes rasgados debajo, como en el SVG. */
   padding-top: 98px;
-  /* Espacio para el rollo inferior (la captura mide ~280px a este ancho). */
+  /* Espacio para el rollo inferior. */
   padding-bottom: 260px;
   padding-left: 96px;
   padding-right: 96px;
-  background-color: var(--czs-papel);
+  /* Superficie continua: el papel es un degradado lateral que empalma con el
+     tono de cada tira rasgada. Las tiras ya traen grabado su desvanecido hacia
+     dentro, asi que no hay corte recto ni teselas visibles. */
+  background-color: transparent;
   background-image:
-    url('/papiro-rollo-sup.webp'),
-    url('/papiro-rollo-inf.webp'),
-    url('/papiro-textura.webp'),
     url('/papiro-borde-izq.webp'),
     url('/papiro-borde-der.webp'),
-    radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(90, 55, 20, 0.32) 100%),
-    url('/papiro-textura.webp');
-  /* El rollo sube 24px para tapar el margen transparente de su asset: queda pegado al borde. */
-  /* La banda (3a capa) es el papel entre las tarjetas y el rollo: solo en el ancho de la
-     columna, para que sus costados queden tapados por el borde rasgado. */
-  background-position: center -24px, bottom center, center bottom, left top, right top, 0 0, 0 0;
-  background-size:
-    calc(100% * 1.16) auto,
-    calc(100% * 1.16) auto,
-    calc(100% - 192px) 260px,
-    96px auto,
-    96px auto,
-    auto,
-    1560px 1560px;
-  background-repeat: no-repeat, no-repeat, no-repeat, repeat-y, repeat-y, no-repeat, repeat;
-  /* El color y la textura del papel solo llenan la columna de contenido: asi el
-     borde rasgado no queda sobre un rectangulo liso. Los rollos y bordes ocupan
-     la caja completa. */
-  background-clip: border-box, border-box, border-box, border-box, border-box, content-box, content-box;
+    /* El papel es opaco desde los 38px: la tira empieza a desvanecerse a los
+       43px, asi que por debajo siempre hay papel y no se cuela el fondo. */
+    linear-gradient(90deg,
+      rgba(217, 185, 140, 0) 0 26px,
+      #d9b98c 38px,
+      #cfa778 40%,
+      #c9a06f 70%,
+      #c39a68 calc(100% - 38px),
+      rgba(195, 154, 104, 0) calc(100% - 26px) 100%);
+  background-position: left top, right top, 0 0;
+  background-size: 96px auto, 96px auto, auto;
+  background-repeat: repeat-y, repeat-y, no-repeat;
   box-shadow: none;
+}
+
+/* Los rollos van como piezas aparte para poder sobresalir del lienzo: sus
+   puntas rasgadas deben verse, no quedar cortadas por la caja. */
+html.theme-cazatesoros .main-content::before,
+html.theme-cazatesoros .main-content::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+}
+
+html.theme-cazatesoros .main-content::before {
+  top: -24px;
+  width: 118%;
+  aspect-ratio: 1200 / 105;
+  background-image: url('/papiro-rollo-sup.webp');
+  background-position: center top;
+}
+
+html.theme-cazatesoros .main-content::after {
+  bottom: 0;
+  width: 118%;
+  aspect-ratio: 1200 / 190;
+  background-image: url('/papiro-rollo-inf.webp');
+  background-position: center bottom;
 }
 
 @media (max-width: 768px) {
@@ -155,15 +175,26 @@ html.theme-cazatesoros .main-content {
     padding-bottom: 108px;
     padding-left: 40px;
     padding-right: 40px;
-    background-position: center -8px, bottom center, center bottom, left top, right top, 0 0, 0 0;
-    background-size:
-      calc(100% * 1.16) auto,
-      calc(100% * 1.16) auto,
-      calc(100% - 80px) 108px,
-      40px auto,
-      40px auto,
-      auto,
-      1040px 1040px;
+    background-size: 40px auto, 40px auto, auto;
+    background-image:
+      url('/papiro-borde-izq.webp'),
+      url('/papiro-borde-der.webp'),
+      linear-gradient(90deg,
+        rgba(217, 185, 140, 0) 0 9px,
+        #d9b98c 13px,
+        #cfa778 40%,
+        #c9a06f 70%,
+        #c39a68 calc(100% - 13px),
+        rgba(195, 154, 104, 0) calc(100% - 9px) 100%);
+  }
+
+  html.theme-cazatesoros .main-content::before {
+    top: -8px;
+    width: 124%;
+  }
+
+  html.theme-cazatesoros .main-content::after {
+    width: 124%;
   }
 }
 
@@ -389,7 +420,7 @@ html.theme-cazatesoros .stats-bar__col {
   border: 1px solid rgba(74, 42, 16, 0.55);
   background:
     linear-gradient(rgba(255, 250, 232, 0.6), rgba(255, 250, 232, 0.6)),
-    url('/papiro-textura.webp') center / 420px 420px,
+    url('/papiro-papel.webp') center / 400px 400px,
     var(--czs-papel-claro);
   box-shadow:
     inset 0 1px 0 rgba(255, 240, 205, 0.7),
@@ -425,21 +456,65 @@ html.theme-cazatesoros .stats-bar__fill--mastered {
    BUSCADOR Y FILTROS (escritorio)
    ========================================================================== */
 
+/* Marco de madera con esquinas metalicas y clavo, como la referencia: el
+   buscador deja de ser una caja plana y pasa a ser una pieza del cofre. */
+html.theme-cazatesoros .filter-search-box {
+  position: relative;
+  padding: 12px;
+  border-radius: 7px;
+  border: 1px solid #33200d;
+  background-color: #5f3b1e;
+  background-image:
+    /* clavos en las cuatro esquinas */
+    radial-gradient(circle at 50% 50%, #fff6e2 0 1.4px, #c7a76c 2px, #6b4f22 3.2px, rgba(0, 0, 0, 0) 4px),
+    radial-gradient(circle at 50% 50%, #fff6e2 0 1.4px, #c7a76c 2px, #6b4f22 3.2px, rgba(0, 0, 0, 0) 4px),
+    radial-gradient(circle at 50% 50%, #fff6e2 0 1.4px, #c7a76c 2px, #6b4f22 3.2px, rgba(0, 0, 0, 0) 4px),
+    radial-gradient(circle at 50% 50%, #fff6e2 0 1.4px, #c7a76c 2px, #6b4f22 3.2px, rgba(0, 0, 0, 0) 4px),
+    /* placas metalicas de esquina */
+    linear-gradient(140deg, #eddfb9 0%, #bda474 36%, #7d6438 68%, #42311a 100%),
+    linear-gradient(220deg, #eddfb9 0%, #bda474 36%, #7d6438 68%, #42311a 100%),
+    linear-gradient(40deg, #eddfb9 0%, #bda474 36%, #7d6438 68%, #42311a 100%),
+    linear-gradient(320deg, #eddfb9 0%, #bda474 36%, #7d6438 68%, #42311a 100%),
+    /* madera del marco: veta suave, no tablones */
+    repeating-linear-gradient(90deg, #6d4724 0 11px, #653f1f 11px 22px, #5c381b 22px 33px),
+    linear-gradient(180deg, #74502c 0%, #5f3b1e 45%, #4a2c14 100%);
+  background-size:
+    7px 7px, 7px 7px, 7px 7px, 7px 7px,
+    12px 12px, 12px 12px, 12px 12px, 12px 12px,
+    100% 100%, 100% 100%;
+  background-position:
+    3px 3px, calc(100% - 3px) 3px, 3px calc(100% - 3px), calc(100% - 3px) calc(100% - 3px),
+    0 0, 100% 0, 0 100%, 100% 100%,
+    0 0, 0 0;
+  background-repeat: no-repeat;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 220, 160, 0.3),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.45),
+    inset 3px 0 0 rgba(0, 0, 0, 0.16),
+    inset -3px 0 0 rgba(0, 0, 0, 0.16),
+    0 6px 14px rgba(20, 10, 2, 0.45);
+}
+
+html.theme-cazatesoros .filter-search-box .search-icon {
+  left: 22px;
+  color: var(--czs-tinta);
+  z-index: 2;
+}
+
 html.theme-cazatesoros .search-input-field {
   width: 176px;
   padding: 9px 14px 9px 34px;
-  border-radius: 8px;
-  border: 2px solid var(--czs-madera-oscura);
+  border-radius: 4px;
+  border: 1px solid rgba(96, 63, 28, 0.55);
   background:
     linear-gradient(rgba(255, 246, 215, 0.45), rgba(255, 246, 215, 0.45)),
-    url('/papiro-textura.webp') center / 420px 420px,
+    url('/papiro-papel.webp') center / 400px 400px,
     var(--czs-papel-claro);
   color: var(--czs-tinta);
   -webkit-text-fill-color: var(--czs-tinta);
   box-shadow:
-    inset 0 2px 0 rgba(255, 225, 170, 0.5),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.18),
-    0 3px 8px rgba(40, 22, 6, 0.35);
+    inset 0 3px 7px rgba(74, 45, 15, 0.38),
+    inset 0 -1px 0 rgba(255, 240, 205, 0.35);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -452,7 +527,7 @@ html.theme-cazatesoros .search-input-field:hover,
 html.theme-cazatesoros .search-input-field:focus {
   background:
     linear-gradient(rgba(255, 250, 230, 0.55), rgba(255, 250, 230, 0.55)),
-    url('/papiro-textura.webp') center / 420px 420px,
+    url('/papiro-papel.webp') center / 400px 400px,
     var(--czs-papel-claro);
   border-color: #6b4423;
   box-shadow:
@@ -474,7 +549,7 @@ html.theme-cazatesoros .gen-tab-btn {
   border: 1px solid rgba(74, 42, 16, 0.55);
   background:
     linear-gradient(rgba(255, 246, 215, 0.5), rgba(255, 246, 215, 0.5)),
-    url('/papiro-textura.webp') center / 420px 420px,
+    url('/papiro-papel.webp') center / 400px 400px,
     var(--czs-papel);
   color: var(--czs-tinta-suave);
   box-shadow:
@@ -491,7 +566,7 @@ html.theme-cazatesoros .filter-pill-checkbox:hover,
 html.theme-cazatesoros .gen-tab-btn:hover:not(.is-active) {
   background:
     linear-gradient(rgba(255, 250, 228, 0.62), rgba(255, 250, 228, 0.62)),
-    url('/papiro-textura.webp') center / 420px 420px,
+    url('/papiro-papel.webp') center / 400px 400px,
     var(--czs-papel-claro);
   border-color: var(--czs-madera);
   color: var(--czs-tinta);
@@ -546,7 +621,7 @@ html.theme-cazatesoros .sprite-grid-dropdown {
   border: 2px solid var(--czs-madera-oscura);
   background:
     linear-gradient(rgba(255, 246, 215, 0.55), rgba(255, 246, 215, 0.55)),
-    url('/papiro-textura.webp') center / 420px 420px,
+    url('/papiro-papel.webp') center / 400px 400px,
     var(--czs-papel-claro);
   box-shadow: 0 18px 40px rgba(24, 12, 2, 0.5);
 }
@@ -582,31 +657,54 @@ html.theme-cazatesoros .sprite-grid-chip .sprite-chip-name {
    BUSCADOR MOVIL + HOJA DE FILTROS
    ========================================================================== */
 
+/* Mismo marco que el buscador de escritorio: madera fina, esquinas metalicas
+   con clavo, y el papiro como superficie interior (los iconos van encima del
+   papiro, no sobre la madera). */
 html.theme-cazatesoros .mobile-glass-search-pill,
 html.theme-cazatesoros .mobile-glass-search-pill.is-focused {
-  background:
-    linear-gradient(rgba(255, 246, 215, 0.42), rgba(255, 246, 215, 0.42)),
-    url('/papiro-textura.webp') center / 780px 780px,
-    var(--czs-papel-claro);
-  border: 5px solid transparent;
-  border-image: linear-gradient(180deg, #9a6a35, var(--czs-madera-oscura) 50%, #8a5a2a) 1;
-  border-radius: 10px;
+  padding: 9px;
+  height: 54px;
+  border-radius: 8px;
+  border: 1px solid #33200d;
+  border-image: none;
+  background-color: #5f3b1e;
+  background-image:
+    radial-gradient(circle at 50% 50%, #fff6e2 0 1.1px, #c7a76c 1.7px, #6b4f22 2.7px, rgba(0, 0, 0, 0) 3.4px),
+    radial-gradient(circle at 50% 50%, #fff6e2 0 1.1px, #c7a76c 1.7px, #6b4f22 2.7px, rgba(0, 0, 0, 0) 3.4px),
+    radial-gradient(circle at 50% 50%, #fff6e2 0 1.1px, #c7a76c 1.7px, #6b4f22 2.7px, rgba(0, 0, 0, 0) 3.4px),
+    radial-gradient(circle at 50% 50%, #fff6e2 0 1.1px, #c7a76c 1.7px, #6b4f22 2.7px, rgba(0, 0, 0, 0) 3.4px),
+    linear-gradient(140deg, #eddfb9 0%, #bda474 36%, #7d6438 68%, #42311a 100%),
+    linear-gradient(220deg, #eddfb9 0%, #bda474 36%, #7d6438 68%, #42311a 100%),
+    linear-gradient(40deg, #eddfb9 0%, #bda474 36%, #7d6438 68%, #42311a 100%),
+    linear-gradient(320deg, #eddfb9 0%, #bda474 36%, #7d6438 68%, #42311a 100%),
+    url('/papiro-papel.webp'),
+    repeating-linear-gradient(90deg, #79502a 0 11px, #71482a 11px 22px, #684026 22px 33px),
+    linear-gradient(180deg, #7e5330 0%, #6b4423 45%, #55351b 100%);
+  background-size:
+    5px 5px, 5px 5px, 5px 5px, 5px 5px,
+    9px 9px, 9px 9px, 9px 9px, 9px 9px,
+    calc(100% - 18px) calc(100% - 18px),
+    100% 100%, 100% 100%;
+  background-position:
+    2px 2px, calc(100% - 2px) 2px, 2px calc(100% - 2px), calc(100% - 2px) calc(100% - 2px),
+    0 0, 100% 0, 0 100%, 100% 100%,
+    9px 9px,
+    0 0, 0 0;
+  background-repeat: no-repeat;
   box-shadow:
-    inset 0 2px 0 rgba(255, 225, 170, 0.4),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.28),
-    0 4px 10px rgba(40, 22, 6, 0.45);
+    inset 0 2px 0 rgba(255, 220, 160, 0.28),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.42),
+    0 5px 12px rgba(20, 10, 2, 0.45);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-}
-
-html.theme-cazatesoros .mobile-glass-search-pill::before,
-html.theme-cazatesoros .mobile-glass-search-pill::after {
-  display: none;
 }
 
 html.theme-cazatesoros .mobile-glass-search-input {
   color: var(--czs-tinta);
   -webkit-text-fill-color: var(--czs-tinta);
+  background: transparent;
+  box-shadow: none;
+  height: 100%;
 }
 
 html.theme-cazatesoros .mobile-glass-search-input::placeholder {
@@ -616,6 +714,12 @@ html.theme-cazatesoros .mobile-glass-search-input::placeholder {
 html.theme-cazatesoros .mobile-glass-search-icon,
 html.theme-cazatesoros .mobile-glass-filter-btn {
   color: var(--czs-madera);
+}
+
+/* Aire a la izquierda de la lupa: con el marco nuevo quedaba pegada al papiro. */
+html.theme-cazatesoros .mobile-glass-search-icon {
+  margin-left: 8px;
+  flex-shrink: 0;
 }
 
 html.theme-cazatesoros .mobile-glass-filter-btn:hover {
@@ -647,7 +751,7 @@ html.theme-cazatesoros .mobile-glass-clear-btn {
 html.theme-cazatesoros .mobile-liquid-sheet {
   background:
     linear-gradient(rgba(255, 246, 215, 0.5), rgba(255, 246, 215, 0.5)),
-    url('/papiro-textura.webp') center / 620px 620px,
+    url('/papiro-papel.webp') center / 400px 400px,
     var(--czs-papel-claro);
   border-color: var(--czs-madera-oscura);
   color: var(--czs-tinta);
@@ -727,8 +831,8 @@ html.theme-cazatesoros .sprite-card {
   border: 2px solid #6b4423 !important;
   background:
     linear-gradient(180deg, rgba(255, 250, 232, 0.55), rgba(236, 214, 168, 0.45)),
-    url('/papiro-textura.webp') !important;
-  background-size: auto, 420px 420px !important;
+    url('/papiro-papel.webp') !important;
+  background-size: auto, 400px 400px !important;
   background-position: 0 0, center !important;
   background-repeat: no-repeat, repeat !important;
   background-color: var(--czs-papel-claro) !important;
@@ -835,7 +939,7 @@ html.theme-cazatesoros .star-btn.mastered-star {
 html.theme-cazatesoros .sprite-list-item {
   background:
     linear-gradient(rgba(255, 250, 232, 0.6), rgba(255, 250, 232, 0.6)),
-    url('/papiro-textura.webp') center / 420px 420px,
+    url('/papiro-papel.webp') center / 400px 400px,
     var(--czs-papel-claro);
   border-color: rgba(74, 42, 16, 0.35);
 }
@@ -853,7 +957,7 @@ html.theme-cazatesoros .sprite-detail-modal,
 html.theme-cazatesoros .modal-content {
   background:
     linear-gradient(rgba(255, 250, 232, 0.55), rgba(255, 250, 232, 0.55)),
-    url('/papiro-textura.webp') center / 620px 620px,
+    url('/papiro-papel.webp') center / 400px 400px,
     var(--czs-papel-claro);
   border: 2px solid var(--czs-madera-oscura);
   color: var(--czs-tinta);
@@ -893,4 +997,28 @@ html.theme-cazatesoros .modal-content {
     gap: 10px;
   }
 
+}
+
+/* ==========================================================================
+   BARRA DE NAVEGACION MOVIL (tema Cazatesoros)
+   ========================================================================== */
+
+html.theme-cazatesoros .czs-navbar {
+  background:
+    url('/papiro-papel.webp') center / 400px 400px,
+    #d9b98c;
+  border-top: 3px solid #5f3b1e;
+  box-shadow:
+    0 -8px 20px rgba(20, 10, 2, 0.5),
+    inset 0 2px 0 rgba(255, 235, 190, 0.4);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html.theme-cazatesoros .czs-navbar__item {
+  color: #3a2510;
+}
+
+html.theme-cazatesoros .czs-navbar__item:active {
+  background: rgba(95, 59, 30, 0.18);
 }

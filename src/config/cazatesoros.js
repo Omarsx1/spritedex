@@ -10,17 +10,22 @@
  * the source of the `!important` fights in the first preview.
  */
 
+// La temporada ya se lanzo: el tema deja de ser solo una vista previa local y
+// pasa a ser el tema por defecto tambien en produccion. `?cazatesoros=0` sigue
+// siendo la salida de emergencia.
+export const CAZATESOROS_LAUNCHED = true;
+
 export const CAZATESOROS_CLASS = 'theme-cazatesoros';
 export const CAZATESOROS_STORAGE_KEY = 'spritedex_cazatesoros_override';
 
 /**
  * Pure resolver: no globals, so it can be unit tested directly.
  *
- * Order: explicit query flag, then the stored override, then the development
- * default (on). Production ignores every preview input.
+ * Order: explicit query flag, then the stored override, then the default (on).
+ * Production only reaches this point once CAZATESOROS_LAUNCHED is true.
  */
 export function resolveCazatesorosState({ isDev = false, search = '', storedOverride = null } = {}) {
-  if (!isDev) return false;
+  if (!isDev && !CAZATESOROS_LAUNCHED) return false;
 
   const flag = new URLSearchParams(search || '').get('cazatesoros');
   if (flag === '0' || flag === 'false') return false;

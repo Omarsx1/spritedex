@@ -75,26 +75,25 @@
           var local = host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host === '' || /\.(local|localhost)$/.test(host);
           var params = new URLSearchParams(location.search);
 
+          // Espejo de src/config/cazatesoros.js: flag > override > encendido.
+          // La temporada ya esta lanzada, asi que tambien manda en produccion.
+          var czs = params.get('cazatesoros');
+          var czsOverride = null;
+          try { czsOverride = localStorage.getItem('spritedex_cazatesoros_override'); } catch (e) {}
+          var czsActive;
+          if (czs === '0' || czs === 'false') czsActive = false;
+          else if (czs === '1' || czs === 'true') czsActive = true;
+          else if (czsOverride === 'true') czsActive = true;
+          else if (czsOverride === 'false') czsActive = false;
+          else czsActive = true;
+
+          if (czsActive) {
+            document.documentElement.classList.add('theme-cazatesoros');
+            document.body.classList.add('theme-cazatesoros');
+            return;
+          }
+
           if (local) {
-            // Espejo de src/config/cazatesoros.js: flag > override > encendido.
-            // Cazatesoros gana sobre Fortnitemares, asi que si esta activo no se
-            // enciende el bosque de Halloween.
-            var czs = params.get('cazatesoros');
-            var czsOverride = null;
-            try { czsOverride = localStorage.getItem('spritedex_cazatesoros_override'); } catch (e) {}
-            var czsActive;
-            if (czs === '0' || czs === 'false') czsActive = false;
-            else if (czs === '1' || czs === 'true') czsActive = true;
-            else if (czsOverride === 'true') czsActive = true;
-            else if (czsOverride === 'false') czsActive = false;
-            else czsActive = true;
-
-            if (czsActive) {
-              document.documentElement.classList.add('theme-cazatesoros');
-              document.body.classList.add('theme-cazatesoros');
-              return;
-            }
-
             // Espejo del modo desarrollo de seasonalEvent.js: bandera > override > encendido.
             // Asi el parpadeo tampoco se ve en local y las banderas siguen mandando.
             var flag = params.get('halloween');

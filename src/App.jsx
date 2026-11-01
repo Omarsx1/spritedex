@@ -266,7 +266,14 @@ export function App() {
     () => leerVista(typeof window !== 'undefined' ? window.location.search : ''),
     []
   );
-  const [activeGen, setActiveGen] = useState(Number(vistaInicial.gen)); // 2 = 2ª Generación (GLITCH) by default!
+  const [activeGen, setActiveGen] = useState(() => {
+    // Con el tema de la temporada nueva y sin generacion en la URL, se abre en la
+    // 3ª generacion (Buscatesoros). Fuera de la temporada sigue mandando la 2ª.
+    if (typeof window === 'undefined' || typeof document === 'undefined') return Number(vistaInicial.gen);
+    const sinGenEnUrl = !/[?&]gen=/.test(window.location.search);
+    const temaNuevo = document.documentElement.classList.contains('theme-cazatesoros');
+    return sinGenEnUrl && temaNuevo ? 3 : Number(vistaInicial.gen);
+  });
   const [searchQuery, setSearchQuery] = useState(vistaInicial.q);
   // La busqueda se difiere: teclear no bloquea el pintado de la grilla.
   const deferredSearch = useDeferredValue(searchQuery);

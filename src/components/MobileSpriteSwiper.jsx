@@ -9,6 +9,7 @@ import { SonicRing } from './SonicRing';
 import spriteMobileScale from '../data/sprite_mobile_scale.json';
 import { safeStorage } from '../utils/safeStorage';
 import { trackEvent } from '../utils/telemetry';
+import COLORES_GEN3 from '../data/coloresGen3.json';
 
 const VARIANT_ALIASES = { Base: 'Basic', 'Cheat Master': 'Cheatmaster', LootHacker: 'Loot Hacker' };
 const getVariantPriority = (v) => {
@@ -295,7 +296,7 @@ function FamilySpotlightRow({
     return (
       <div
         key={sprite.id}
-        className={`ms-spotlight-card ${isActive ? 'is-active' : 'is-inactive'} sprite-card ${isOwned ? 'is-owned' : ''} ${isMastered ? ('is-mastered ' + (sprite.gen === 2 ? 'is-glitch-mastered' : 'is-classic-mastered')) : ''}`}
+        className={`ms-spotlight-card ${isActive ? 'is-active' : 'is-inactive'} sprite-card ${isOwned ? 'is-owned' : ''} ${isMastered ? ('is-mastered ' + (sprite.gen === 2 ? 'is-glitch-mastered' : 'is-classic-mastered')) : ''} ${COLORES_GEN3[sprite.id] ? 'is-gen3' : ''}`}
         data-familia={String(sprite?.id || '').split('_')[0]}
         style={{
           width: `${cardWidth}px`,
@@ -309,6 +310,12 @@ function FamilySpotlightRow({
           // puedan recortar.
           background: isMastered ? undefined : styleInfo.background,
           borderColor: styleInfo.borderColor,
+          // Tinte de la 3ª generacion (mismas variables que la carta de escritorio).
+          ...(COLORES_GEN3[sprite.id] ? {
+            '--g3-h': COLORES_GEN3[sprite.id].h,
+            '--g3-s': `${COLORES_GEN3[sprite.id].s}%`,
+            '--g3-l': `${COLORES_GEN3[sprite.id].l}%`
+          } : {}),
           // El halo de color de fuera se retiro a proposito (se veia como un aro de luz
           // alrededor de la carta); la activa ya se distingue por tamaño, opacidad y z-index.
           // Aqui solo queda: una sombra de apoyo PEQUENA para la normal, y el tinte del tema

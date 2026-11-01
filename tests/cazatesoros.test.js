@@ -11,9 +11,13 @@ import {
   CAZATESOROS_STORAGE_KEY
 } from '../src/config/cazatesoros.js';
 
-test('production never activates the Cazatesoros preview', () => {
-  assert.equal(resolveCazatesorosState({ isDev: false }), false);
-  assert.equal(resolveCazatesorosState({ isDev: false, search: '?cazatesoros=1', storedOverride: 'true' }), false);
+test('production activates the launched season and keeps the escape hatch', () => {
+  // Lanzada la temporada, produccion enciende el tema por defecto.
+  assert.equal(resolveCazatesorosState({ isDev: false }), true);
+  assert.equal(resolveCazatesorosState({ isDev: false, search: '?cazatesoros=1' }), true);
+  // La bandera y el override siguen apagandolo.
+  assert.equal(resolveCazatesorosState({ isDev: false, search: '?cazatesoros=0' }), false);
+  assert.equal(resolveCazatesorosState({ isDev: false, storedOverride: 'false' }), false);
 });
 
 test('development honours the query flag before the stored override', () => {

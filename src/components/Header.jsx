@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import { Gamepad2, Share2, Users, X } from 'lucide-react';
+import { Home, Settings, Share2, Users } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import gsap from 'gsap';
-import { Liquid } from 'liquid-gooey';
 import { allSprites as defaultAllSprites } from '../data/spritesData';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { rutaFallbackEspiritu } from '../utils/spriteAssets';
 import { t } from '../i18n';
 import { isFortnitemaresActive } from '../config/seasonalEvent';
-import { PumpkinIcon } from './icons/PumpkinIcon';
+import { conIdioma } from '../i18n/core';
+import { getLang } from '../i18n/texto';
 
 // Indicador de solicitudes pendientes. Estatico a proposito: sin animacion, sin
 // transicion y sin will-change — la app prioriza fluidez y esto es solo un dato.
@@ -54,7 +54,6 @@ export function Header({
   const titleRef = useRef(null);
   const statsRef = useRef(null);
   const actionsRef = useRef(null);
-  const dockRef = useRef(null);
 
   // Menú gooey de acciones (solo móvil): réplica 1:1 de libraries.dev/gooey
   const isMobile = useIsMobile(768);
@@ -62,8 +61,13 @@ export function Header({
   const etiquetaSolicitudes = solicitudesNuevas > 0
     ? ' · ' + t('header.solicitudesNuevas', { n: solicitudesNuevas })
     : '';
-  const [actionsOpen, setActionsOpen] = useState(false);
   const [isFortnitemares, setIsFortnitemares] = useState(() => isFortnitemaresActive());
+  // Reserva espacio al final del documento para que la barra movil no tape contenido.
+  useEffect(() => {
+    if (typeof document === 'undefined') return undefined;
+    document.body.classList.toggle('has-czs-navbar', Boolean(isMobile));
+    return () => document.body.classList.remove('has-czs-navbar');
+  }, [isMobile]);
   const seasonRef = useRef(isFortnitemares);
   // El intercambio de espiritus (swapSpirit) vive mas abajo y dispara la
   // aparicion magica tambien cuando la temporada cambie en vivo.
@@ -111,35 +115,6 @@ export function Header({
     };
   }, []);
 
-  const toggleActions = useCallback(() => {
-    setActionsOpen((prev) => !prev);
-  }, []);
-
-  // Al volver a escritorio el menú no debe quedar abierto.
-  useEffect(() => {
-    if (!isMobile) setActionsOpen(false);
-  }, [isMobile]);
-
-  // Escape y toque fuera cierran el menú.
-  useEffect(() => {
-    if (!actionsOpen) return undefined;
-    const onKeyDown = (event) => {
-      if (event.key === 'Escape') toggleActions();
-    };
-    const onPointerDown = (event) => {
-      if (dockRef.current && !dockRef.current.contains(event.target)) {
-        toggleActions();
-      }
-    };
-    document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('pointerdown', onPointerDown);
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-      document.removeEventListener('pointerdown', onPointerDown);
-    };
-  }, [actionsOpen, toggleActions]);
-
-  const gooeyTransition = 'bouncy';
   const currentSprite = spritePool[spriteIndex] || spritePool[0];
 
   // Progress percentages
@@ -308,13 +283,18 @@ export function Header({
       <div className="hero__content">
         {/* Title */}
         <div className="hero__title-block" ref={titleRef} style={{ position: 'relative', zIndex: 10 }}>
-          <h1 className="hero__title" data-fnm-logo={isFortnitemares ? 'themed' : 'normal'}>
+          <h1 className="hero__title">
             <span className="hero__title-line-wrap">
-              {/* FORTNITE en la fuente original en ambos temas. En Fortnitemares
-                  solo cambia el brillo violeta (data-fnm-logo), no el texto. */}
-              <span className="hero__title-line hero__title-line--glitch" data-text="FORTNITE">
-                FORTNITE
-              </span>
+              {/* Wordmark oficial en oro. En esta mini temporada ya no se usa el
+                  efecto glitch: la marca es la imagen, no texto con copias RGB. */}
+              <img
+                className="hero__title-logo"
+                src="/fortnite-dorado.webp"
+                alt="FORTNITE"
+                width="1120"
+                height="274"
+                draggable="false"
+              />
             </span>
             <span className={`hero__title-line hero__title-line--accent ${isFortnitemares ? 'hero__title-line--accent-fnm' : ''}`}>
               SPRITEDEX
@@ -459,171 +439,49 @@ export function Header({
       </div>
 
       {isMobile && typeof document !== 'undefined' && createPortal(
-        <div className="hero__dock" ref={dockRef}>
-          {isFortnitemares ? (
-            <div className={`fnm-dock ${actionsOpen ? 'is-open' : ''}`}>
-              {/* Satélite Amigos */}
-              <div
-                className={`fnm-sat fnm-sat--friends ${actionsOpen ? 'is-visible' : ''}`}
-                style={{
-                  transform: actionsOpen ? 'translate(-56px, -34px) scale(1)' : 'translate(0, 0) scale(0.3)',
-                  opacity: actionsOpen ? 1 : 0,
-                  pointerEvents: actionsOpen ? 'auto' : 'none',
-                  transition: 'transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 200ms ease'
-                }}
-              >
-                <button
-                  type="button"
-                  className="fnm-sat-btn"
-                  aria-label={t('header.radarAmigos') + etiquetaSolicitudes}
-                  tabIndex={actionsOpen ? 0 : -1}
-                  onClick={() => {
-                    toggleActions();
-                    onOpenCompareModal();
-                  }}
-                >
-                  <Users size={19} strokeWidth={2.2} />
-                  <BadgeSolicitudes n={solicitudesNuevas} className="solicitudes-badge--round" />
-                </button>
-              </div>
-
-              {/* Satélite Compartir */}
-              <div
-                className={`fnm-sat fnm-sat--share ${actionsOpen ? 'is-visible' : ''}`}
-                style={{
-                  transform: actionsOpen ? 'translate(0px, -66px) scale(1)' : 'translate(0, 0) scale(0.3)',
-                  opacity: actionsOpen ? 1 : 0,
-                  pointerEvents: actionsOpen ? 'auto' : 'none',
-                  transition: 'transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1) 30ms, opacity 200ms ease'
-                }}
-              >
-                <button
-                  type="button"
-                  className="fnm-sat-btn"
-                  aria-label={t('header.compartirImagen')}
-                  tabIndex={actionsOpen ? 0 : -1}
-                  onClick={() => {
-                    toggleActions();
-                    onOpenShareModal();
-                  }}
-                  onPointerDown={onPrecalentarCompartir}
-                  onMouseEnter={() => {
-                    import('../components/SharePage');
-                  }}
-                  onTouchStart={() => {
-                    import('../components/SharePage');
-                  }}
-                >
-                  <Share2 size={19} strokeWidth={2.2} />
-                </button>
-              </div>
-
-              {/* Botón Principal: Solo la calabaza, SIN fondo alguno */}
-              <button
-                type="button"
-                className="fnm-pumpkin-btn"
-                aria-expanded={actionsOpen}
-                aria-label={(actionsOpen ? t('header.cerrarAcciones') : t('header.abrirAcciones')) + etiquetaSolicitudes}
-                onClick={toggleActions}
-              >
-                <PumpkinIcon
-                  size={50}
-                  className={`fnm-pumpkin-svg ${actionsOpen ? 'is-open' : ''}`}
-                />
-                <BadgeSolicitudes n={solicitudesNuevas} className="solicitudes-badge--fab" />
-              </button>
-            </div>
-          ) : (
-            <Liquid
-              blur={7}
-              contrast={19}
-              fill="#0c152d"
-              filterPadding={80}
-              shadow="0 4px 18px rgba(0, 0, 0, 0.55), 0 0 12px rgba(0, 240, 232, 0.18)"
-              className={`pm ${actionsOpen ? 'pm-open' : ''}`}
-            >
-              <Liquid.Item
-                className="pm-slot"
-                x={actionsOpen ? -56 : 0}
-                y={actionsOpen ? -34 : 0}
-                transition={gooeyTransition}
-                delay={0}
-              >
-                <button
-                  type="button"
-                  className="pm-btn pm-sat"
-                  aria-label={t('header.radarAmigos') + etiquetaSolicitudes}
-                  tabIndex={actionsOpen ? 0 : -1}
-                  onClick={() => {
-                    toggleActions();
-                    onOpenCompareModal();
-                  }}
-                >
-                  <span
-                    className="pm-sat-icon"
-                    style={{
-                      transitionDelay: actionsOpen ? '110ms' : '0ms'
-                    }}
-                  >
-                    <Users size={19} strokeWidth={2.2} />
-                  </span>
-                  <BadgeSolicitudes n={solicitudesNuevas} className="solicitudes-badge--round" />
-                </button>
-              </Liquid.Item>
-
-              <Liquid.Item
-                className="pm-slot"
-                x={0}
-                y={actionsOpen ? -66 : 0}
-                transition={gooeyTransition}
-                delay={actionsOpen ? 35 : 0}
-              >
-                <button
-                  type="button"
-                  className="pm-btn pm-sat"
-                  aria-label={t('header.compartirImagen')}
-                  tabIndex={actionsOpen ? 0 : -1}
-                  onClick={() => {
-                    toggleActions();
-                    onOpenShareModal();
-                  }}
-                  onPointerDown={onPrecalentarCompartir}
-                  onMouseEnter={() => {
-                    import('../components/SharePage');
-                  }}
-                  onTouchStart={() => {
-                    import('../components/SharePage');
-                  }}
-                >
-                  <span
-                    className="pm-sat-icon"
-                    style={{
-                      transitionDelay: actionsOpen ? '150ms' : '0ms'
-                    }}
-                  >
-                    <Share2 size={19} strokeWidth={2.2} />
-                  </span>
-                </button>
-              </Liquid.Item>
-
-              <Liquid.Item className="pm-slot">
-                <button
-                  type="button"
-                  className="pm-btn pm-main"
-                  aria-expanded={actionsOpen}
-                  aria-label={(actionsOpen ? t('header.cerrarAcciones') : t('header.abrirAcciones')) + etiquetaSolicitudes}
-                  onClick={toggleActions}
-                >
-                  <span className="pm-main-icon-wrap">
-                    <Gamepad2 size={22} strokeWidth={2.2} className={`pm-icon-pad ${actionsOpen ? 'is-hidden' : ''}`} />
-                    <X size={20} strokeWidth={2.4} className={`pm-icon-close ${actionsOpen ? 'is-visible' : ''}`} />
-                  </span>
-                  <BadgeSolicitudes n={solicitudesNuevas} className="solicitudes-badge--round" />
-                </button>
-              </Liquid.Item>
-            </Liquid>
-          )}
-        </div>,
+        <nav className="czs-navbar" aria-label={t('nav.menu')}>
+          <a
+            className="czs-navbar__item"
+            href={conIdioma('/', getLang())}
+            aria-label={t('nav.inicio')}
+          >
+            <Home size={20} strokeWidth={2.2} />
+            <span>{t('nav.tabInicio')}</span>
+          </a>
+          <button
+            type="button"
+            className="czs-navbar__item"
+            aria-label={t('header.radarAmigos') + etiquetaSolicitudes}
+            onClick={onOpenCompareModal}
+          >
+            <span className="czs-navbar__icon-wrap">
+              <Users size={20} strokeWidth={2.2} />
+              <BadgeSolicitudes n={solicitudesNuevas} className="solicitudes-badge--round" />
+            </span>
+            <span>{t('nav.tabAmigos')}</span>
+          </button>
+          <button
+            type="button"
+            className="czs-navbar__item"
+            aria-label={t('header.compartirImagen')}
+            onClick={onOpenShareModal}
+            onPointerDown={onPrecalentarCompartir}
+            onMouseEnter={() => { import('../components/SharePage'); }}
+            onTouchStart={() => { import('../components/SharePage'); }}
+          >
+            <Share2 size={20} strokeWidth={2.2} />
+            <span>{t('nav.tabCompartir')}</span>
+          </button>
+          <button
+            type="button"
+            className="czs-navbar__item"
+            aria-label={t('nav.menu')}
+            onClick={() => window.dispatchEvent(new CustomEvent('spritedex:abrir-menu'))}
+          >
+            <Settings size={20} strokeWidth={2.2} />
+            <span>{t('nav.tabAjustes')}</span>
+          </button>
+        </nav>,
         document.body
       )}
     </header>

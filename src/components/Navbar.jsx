@@ -41,6 +41,16 @@ export function Navbar({
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
+
+  // La barra de navegacion movil abre este mismo menu (Ajustes).
+  useEffect(() => {
+    const abrirMenu = () => {
+      setIsNavMenuOpen(true);
+      setIsUserMenuOpen(false);
+    };
+    window.addEventListener('spritedex:abrir-menu', abrirMenu);
+    return () => window.removeEventListener('spritedex:abrir-menu', abrirMenu);
+  }, []);
   // Sesion anonima (acceso rapido 1-clic): su progreso solo vive en este dispositivo.
   // Debe verlo claro y tener a mano el camino para vincular su cuenta.
   const esAnonimo = Boolean(user?.is_anonymous);
@@ -49,7 +59,9 @@ export function Navbar({
   const opcionesGen = useMemo(() => {
     const gen1 = GENERATIONS.find((g) => g.id === 1);
     const gen2 = GENERATIONS.find((g) => g.id === 2);
+    const gen3 = GENERATIONS.find((g) => g.id === 3);
     return [
+      { id: 3, badge: '3', nombre: gen3?.title || 'Buscatesoros', detalle: '3ª Generación', color: gen3?.badgeColor || '#f59e0b' },
       { id: 2, badge: '2', nombre: gen2?.title || 'Override', detalle: '2ª Generación', color: gen2?.badgeColor || '#ec4899' },
       { id: 1, badge: '1', nombre: gen1?.title || 'Runners', detalle: '1ª Generación', color: gen1?.badgeColor || '#3b82f6' },
       { id: 0, badge: <Globe size={16} strokeWidth={2.4} aria-hidden="true" />, nombre: t('nav.todas'), detalle: 'Catálogo completo', color: '#00f0e8' }
