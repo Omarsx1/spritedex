@@ -8455,12 +8455,20 @@ html.theme-fortnitemares:not([data-fnm-phase])::after {
   width: 100%;
 }
 
+/* Oro de lamina: base dorada con bandas de brillo diagonales, motas claras y
+   sombras oscuras para la textura metalica. Solo color y relieve; sin resplandor. */
 .hero__title[data-fnm-logo='themed'] .hero__title-line--glitch {
-  background: linear-gradient(180deg, #fff6c2 0%, #ffd23f 45%, #e09512 100%);
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0) 28%, rgba(255, 250, 210, 0.7) 40%, rgba(255, 255, 255, 0) 50%, rgba(255, 238, 170, 0.45) 66%, rgba(255, 255, 255, 0) 78%),
+    radial-gradient(circle at 18% 22%, rgba(255, 248, 210, 0.95) 0, rgba(255, 248, 210, 0) 9%),
+    radial-gradient(circle at 78% 68%, rgba(255, 222, 110, 0.6) 0, rgba(255, 222, 110, 0) 16%),
+    radial-gradient(circle at 46% 80%, rgba(110, 60, 8, 0.45) 0, rgba(110, 60, 8, 0) 14%),
+    linear-gradient(180deg, #ffec9a 0%, #f5c134 38%, #d8931c 70%, #9a6010 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: 1.5px #3a1c05;
+  -webkit-text-stroke: 1px #3d2104;
+  filter: drop-shadow(0 3px 0 #5a3206) drop-shadow(0 0 1px rgba(0, 0, 0, 0.7));
 }
 
 .hero__title[data-fnm-logo='themed'] .hero__title-line--glitch::before,
