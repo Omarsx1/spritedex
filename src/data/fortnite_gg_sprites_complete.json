@@ -3591,7 +3591,7 @@
     "rarity": "Special",
     "variant": "Cursed",
     "season": "C7 S4",
-    "unreleased": false,
+    "unreleased": true,
     "image": "https://fortnite.gg/img/x/sprites/icons/T_Icon_BR_Creature_Sprite_UnbotheredFish_Cursed_L.webp",
     "ability": "Restaura salud con el tiempo cuando está en el agua.",
     "specialPerk": "",

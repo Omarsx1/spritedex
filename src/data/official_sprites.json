@@ -2621,7 +2621,7 @@
     "theme": "Basic",
     "rarity": "Rare",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2631,7 +2631,7 @@
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2641,7 +2641,7 @@
     "theme": "cursed",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2651,7 +2651,7 @@
     "theme": "Basic",
     "rarity": "Rare",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2661,7 +2661,7 @@
     "theme": "cursed",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2671,7 +2671,7 @@
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2681,7 +2681,7 @@
     "theme": "Basic",
     "rarity": "Rare",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2691,7 +2691,7 @@
     "theme": "cursed",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2701,7 +2701,7 @@
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2711,7 +2711,7 @@
     "theme": "Basic",
     "rarity": "Rare",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2721,7 +2721,7 @@
     "theme": "cursed",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2731,7 +2731,7 @@
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2741,7 +2741,7 @@
     "theme": "Basic",
     "rarity": "Epic",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2751,7 +2751,7 @@
     "theme": "cursed",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2761,7 +2761,7 @@
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2771,7 +2771,7 @@
     "theme": "Basic",
     "rarity": "Epic",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2781,7 +2781,7 @@
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2790,8 +2790,8 @@
     "name": "Unbotheredfish cursed",
     "theme": "cursed",
     "rarity": "Special",
-    "unreleased": false,
-    "isNew": true,
+    "unreleased": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2801,7 +2801,7 @@
     "theme": "Basic",
     "rarity": "Epic",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2811,7 +2811,7 @@
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2821,7 +2821,7 @@
     "theme": "cursed",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2831,7 +2831,7 @@
     "theme": "Basic",
     "rarity": "Epic",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2841,7 +2841,7 @@
     "theme": "cursed",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2851,7 +2851,7 @@
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2861,7 +2861,7 @@
     "theme": "Basic",
     "rarity": "Legendary",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2871,7 +2871,7 @@
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2881,7 +2881,7 @@
     "theme": "cursed",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2891,7 +2891,7 @@
     "theme": "Basic",
     "rarity": "Legendary",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2901,7 +2901,7 @@
     "theme": "cursed",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2911,7 +2911,7 @@
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2921,7 +2921,7 @@
     "theme": "Basic",
     "rarity": "Mythic",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2931,7 +2931,7 @@
     "theme": "cursed",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2941,7 +2941,7 @@
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2951,7 +2951,7 @@
     "theme": "Basic",
     "rarity": "Legendary",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
@@ -2961,7 +2961,7 @@
     "theme": "Basic",
     "rarity": "Mythic",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   }
