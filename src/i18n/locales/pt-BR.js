@@ -304,7 +304,7 @@ export default {
   "filtrosMovil.aplicarFiltrosMayus": "APLICAR FILTROS",
   "filtrosMovil.atrapados": "Capturados",
   "filtrosMovil.borrarBusqueda": "Apagar busca",
-  "filtrosMovil.buscarEspiritu": "Buscar espírito...",
+  "filtrosMovil.buscarEspiritu": "Buscar elemental...",
   "filtrosMovil.cerrarAviso": "Fechar aviso",
   "filtrosMovil.cerrarFiltros": "Fechar filtros",
   "filtrosMovil.estado": "Estado",
