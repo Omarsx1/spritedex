@@ -116,6 +116,9 @@ html.theme-cazatesoros .main-content {
   padding-top: 98px;
   /* Espacio para el rollo inferior. */
   padding-bottom: 260px;
+  /* El rollo inferior cierra la hoja, pero el papiro flota sobre el mar: debajo
+     de ese rollo tiene que verse la escena, no terminar pegado al documento. */
+  margin-bottom: 56px;
   padding-left: 96px;
   padding-right: 96px;
   /* Superficie continua: el papel es un degradado lateral que empalma con el
@@ -154,7 +157,10 @@ html.theme-cazatesoros .main-content::after {
 }
 
 html.theme-cazatesoros .main-content::before {
-  top: -24px;
+  /* El webp trae 17 de sus 105 filas transparentes arriba: con top -24px ese hueco
+     dejaba ver el hero como una franja plana sobre el rollo. Subirlo esos ~22px
+     (16% de su alto) hace que el cuerpo del rollo tape la franja. */
+  top: -48px;
   /* Un poco mas ancho que el papel: si el rollo termina antes que el borde
      rasgado se ven dos papeles distintos en las esquinas. */
   width: 128%;
@@ -166,7 +172,9 @@ html.theme-cazatesoros .main-content::before {
 html.theme-cazatesoros .main-content::after {
   bottom: 0;
   width: 128%;
-  aspect-ratio: 1200 / 190;
+  /* El webp es solo el cilindro: la fila 178 hacia abajo era el borde de papel que
+     se veia como un reborde recto debajo del rollo. */
+  aspect-ratio: 1200 / 178;
   background-image: url('/papiro-rollo-inf.webp');
   background-position: center bottom;
 }

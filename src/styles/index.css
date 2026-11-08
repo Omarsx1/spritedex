@@ -2032,6 +2032,15 @@ html.theme-fortnitemares:is([data-fnm-phase='glow'],[data-fnm-phase='settle'],:n
   gap: 8px;
 }
 
+/* Escritorio: la fila de estado (Todos / Nuevos / Capturados / Faltantes) quedaba
+   pegada al borde superior del papiro. La fila de busqueda ya baja 12px con su
+   translateY, asi que aqui se le da el mismo aire arriba a la de estado. */
+@media (min-width: 769px) {
+  .status-pill-group {
+    padding-top: 10px;
+  }
+}
+
 .status-pill-btn {
   padding: 6px 18px;
   border-radius: 9999px;
