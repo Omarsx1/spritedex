@@ -128,10 +128,23 @@ const TRANSLATIONS = {
     'Increases sprinting speed and jump height. Jump height increased with each Level Up!':
       'Aumenta la velocidad de esprint y la altura de salto. ¡La altura de salto aumenta con cada subida de nivel!',
     'Health regenerated to increases at each Level Up: 60 Health -> 70 Health -> 80 Health -> 90 Health -> 100 Health':
-      'El límite de salud regenerada aumenta por nivel: 60 de salud -> 70 -> 80 -> 90 -> 100 de salud.'
+      'El límite de salud regenerada aumenta por nivel: 60 de salud -> 70 -> 80 -> 90 -> 100 de salud.',
+    'Increases reload speed, with a chance that reloading refunds ammo.':
+      'Aumenta la velocidad de recarga, con una probabilidad de que al recargar devuelva munición.',
+    'Grants a chance to spawn extra loot from Treasure Chests and nullifies fall damage.':
+      'Otorga una probabilidad de generar botín extra en los cofres del tesoro y anula el daño por caída.',
+    'Restores health over time when in water.':
+      'Restaura salud con el tiempo cuando está en el agua.',
+    'Grants a random item at each level, exploding with Mythic loot at Max Level.':
+      'Otorga un objeto aleatorio en cada nivel, ¡explotando con botín mítico al nivel máximo!',
+    'Jumping into a fishing hole fishes it and gives some bonus loot.':
+      'Saltar a un agujero de pesca lo pesca y otorga algo de botín extra.',
+    'Grants extra resources on pickup, with Teammates who also have this Sprite equipped receiving some extra resources as well!':
+      'Otorga recursos extra al recogerlos, y los compañeros que también lleven este espíritu equipado reciben recursos extra.'
   },
   perks: {
     'Gain charges over time.': 'Gana cargas con el tiempo.',
+    'Gain Slap at max level!': '¡Obtén el efecto Bofetada al nivel máximo!',
     'Gain 3x bonus XP from eliminations':
       'Gana el triple (3x) de PE de bonificación por eliminaciones',
     'Button mash! All inputs are correct when entering cheat codes found in the world':

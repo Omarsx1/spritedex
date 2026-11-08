@@ -78,16 +78,11 @@ jobs:
       - name: Validar compilación con Vite
         run: pnpm run build
 
-      # La prueba de humo caza lo que ni el linter ni el build ven (por ejemplo, usar
-      # una constante antes de declararla). Corre sobre el dist recien construido.
-      - name: Pruebas del contrato del export
-        run: pnpm test
-
-      - name: Prueba de humo de la app
-        env:
-          PUPPETEER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
-        run: pnpm smoke
-
+      # El commit del catálogo va ANTES de las pruebas de contrato a propósito: este
+      # workflow no toca código, solo datos generados. Si una prueba falla por una
+      # traducción nueva que aún no existe, el job se pone rojo y avisa, pero el
+      # catálogo ya quedó publicado en vez de congelarse durante días. Lint y build
+      # siguen siendo la barrera previa: datos rotos no llegan a commitearse.
       - name: Guardar y pushear cambios si hay novedades
         run: |
           if [ -n "$(git status --porcelain src/data/ public/sprites/)" ]; then
@@ -132,3 +127,13 @@ jobs:
             fi
             echo "ℹ️ No hay cambios en el catálogo. Última actualización hace $DIAS días (límite: $LIMITE)."
           fi
+
+      # La prueba de humo caza lo que ni el linter ni el build ven (por ejemplo, usar
+      # una constante antes de declararla). Corre sobre el dist recien construido.
+      - name: Pruebas del contrato del export
+        run: pnpm test
+
+      - name: Prueba de humo de la app
+        env:
+          PUPPETEER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: pnpm smoke

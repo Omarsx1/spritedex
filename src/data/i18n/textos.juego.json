@@ -394,5 +394,33 @@
   "Otorga objetos aleatorios en cada nivel; solo sube de nivel al consumir objetos del mundo.": {
     "en": "Grants random items at each level; only levels up when consuming items from the world.",
     "pt-BR": "Concede itens aleatórios a cada nível; só sobe de nível ao consumir itens do mundo."
+  },
+  "Aumenta la velocidad de recarga, con una probabilidad de que al recargar devuelva munición.": {
+    "en": "Increases reload speed, with a chance that reloading refunds ammo.",
+    "pt-BR": "Aumenta a velocidade de recarga, com chance de que a recarga devolva munição."
+  },
+  "¡Obtén el efecto Bofetada al nivel máximo!": {
+    "en": "Gain Slap at max level!",
+    "pt-BR": "Ganhe o efeito Tapa no nível máximo!"
+  },
+  "Otorga una probabilidad de generar botín extra en los cofres del tesoro y anula el daño por caída.": {
+    "en": "Grants a chance to spawn extra loot from Treasure Chests and nullifies fall damage.",
+    "pt-BR": "Concede chance de gerar saque extra em baús do tesouro e anula o dano de queda."
+  },
+  "Restaura salud con el tiempo cuando está en el agua.": {
+    "en": "Restores health over time when in water.",
+    "pt-BR": "Restaura saúde ao longo do tempo quando está na água."
+  },
+  "Otorga un objeto aleatorio en cada nivel, ¡explotando con botín mítico al nivel máximo!": {
+    "en": "Grants a random item at each level, exploding with Mythic loot at Max Level.",
+    "pt-BR": "Concede um item aleatório a cada nível, explodindo em saque mítico no nível máximo!"
+  },
+  "Saltar a un agujero de pesca lo pesca y otorga algo de botín extra.": {
+    "en": "Jumping into a fishing hole fishes it and gives some bonus loot.",
+    "pt-BR": "Pular em um buraco de pesca o pesca e concede um pouco de saque extra."
+  },
+  "Otorga recursos extra al recogerlos, y los compañeros que también lleven este espíritu equipado reciben recursos extra.": {
+    "en": "Grants extra resources on pickup, with Teammates who also have this Sprite equipped receiving some extra resources as well!",
+    "pt-BR": "Concede recursos extras ao coletá-los, e os companheiros que também estiverem com este espírito equipado recebem recursos extras também!"
   }
 }
