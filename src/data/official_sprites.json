@@ -2706,66 +2706,6 @@
     "releaseDate": "2026-11-01"
   },
   {
-    "id": "treasurechest_basic",
-    "name": "Treasurechest",
-    "theme": "Basic",
-    "rarity": "Epic",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
-    "id": "treasurechest_cursed",
-    "name": "Treasurechest cursed",
-    "theme": "cursed",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
-    "id": "treasurechest_jeweled",
-    "name": "Treasurechest jeweled",
-    "theme": "jeweled",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
-    "id": "treasuremap_basic",
-    "name": "Treasuremap",
-    "theme": "Basic",
-    "rarity": "Epic",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
-    "id": "treasuremap_jeweled",
-    "name": "Treasuremap jeweled",
-    "theme": "jeweled",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
-    "id": "treasuremap_cursed",
-    "name": "Treasuremap cursed",
-    "theme": "cursed",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
     "id": "compass_basic",
     "name": "Compass",
     "theme": "Basic",
@@ -2788,6 +2728,36 @@
   {
     "id": "compass_jeweled",
     "name": "Compass jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "treasurechest_basic",
+    "name": "Treasurechest",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "treasurechest_cursed",
+    "name": "Treasurechest cursed",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "treasurechest_jeweled",
+    "name": "Treasurechest jeweled",
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
@@ -2826,10 +2796,30 @@
     "releaseDate": "2026-11-01"
   },
   {
-    "id": "starlight_basic",
-    "name": "Starlight",
+    "id": "treasuremap_basic",
+    "name": "Treasuremap",
     "theme": "Basic",
-    "rarity": "Mythic",
+    "rarity": "Epic",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "treasuremap_jeweled",
+    "name": "Treasuremap jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "treasuremap_cursed",
+    "name": "Treasuremap cursed",
+    "theme": "cursed",
+    "rarity": "Special",
     "unreleased": false,
     "isNew": true,
     "gen": 3,
@@ -2896,36 +2886,6 @@
     "releaseDate": "2026-11-01"
   },
   {
-    "id": "rookgecko_basic",
-    "name": "Rookgecko",
-    "theme": "Basic",
-    "rarity": "Legendary",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
-    "id": "rookgecko_cursed",
-    "name": "Rookgecko cursed",
-    "theme": "cursed",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
-    "id": "rookgecko_jeweled",
-    "name": "Rookgecko jeweled",
-    "theme": "jeweled",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": true,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
     "id": "coinpile_basic",
     "name": "Coinpile",
     "theme": "Basic",
@@ -2960,6 +2920,46 @@
     "name": "Feedjet",
     "theme": "Basic",
     "rarity": "Legendary",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "starlight_basic",
+    "name": "Starlight",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "rookgecko_basic",
+    "name": "Rookgecko",
+    "theme": "Basic",
+    "rarity": "Legendary",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "rookgecko_cursed",
+    "name": "Rookgecko cursed",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "rookgecko_jeweled",
+    "name": "Rookgecko jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
     "unreleased": false,
     "isNew": true,
     "gen": 3,
