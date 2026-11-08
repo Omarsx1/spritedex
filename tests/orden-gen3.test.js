@@ -20,6 +20,7 @@ const ORDEN_GEN3 = [
   'treasuremap', // Buscarrutas
   'squibbly', // Tintonio pequeño
   'playmakerbrewery', // Lil' Flacko
+  'rookgecko', // Lil' Uzi Vert Jr.
   'coinpile', // Saqueacofres
   'feedjet' // Caracol Transmisor
 ];
