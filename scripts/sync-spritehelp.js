@@ -6,7 +6,7 @@ import {
   GEN_1_FAMILIES,
   FAMILY_NAMES_ES,
   THEME_NAMES_ES,
-  VARIANT_ORDER,
+  ordenDeVariantes,
   normalizeKey,
   capitalize
 } from './espiritus_compartido.js';
@@ -126,9 +126,10 @@ function insertarEnFamilia(catalogo, espiritu) {
     catalogo.push(espiritu);
     return;
   }
-  const ordenNuevo = VARIANT_ORDER.indexOf(espiritu.theme);
+  const orden = ordenDeVariantes(familia);
+  const ordenNuevo = orden.indexOf(espiritu.theme);
   const antes = indices.find((i) => {
-    const ordenActual = VARIANT_ORDER.indexOf(catalogo[i].theme);
+    const ordenActual = orden.indexOf(catalogo[i].theme);
     return ordenNuevo !== -1 && (ordenActual === -1 || ordenNuevo < ordenActual);
   });
   catalogo.splice(antes ?? indices[indices.length - 1] + 1, 0, espiritu);

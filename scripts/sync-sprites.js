@@ -10,8 +10,7 @@ import {
   VARIANT_TO_THEME,
   FAMILY_NAMES_ES,
   THEME_NAMES_ES,
-  VARIANT_ORDER,
-  normalizeKey,
+  ordenDeVariantes,  normalizeKey,
   capitalize
 } from './espiritus_compartido.js';
 
@@ -683,7 +682,7 @@ async function syncSprites() {
           newEntry.releaseDate = today;
         }
 
-        // Insertar contiguo a los miembros de su familia respetando VARIANT_ORDER
+        // Insertar contiguo a los miembros de su familia respetando el orden de su generación
         const familyIndices = [];
         officialSprites.forEach((s, idx) => {
           const sFamily = s.id.split('_')[0].toLowerCase();
@@ -693,11 +692,12 @@ async function syncSprites() {
         });
 
         if (familyIndices.length > 0) {
-          const targetOrderIdx = VARIANT_ORDER.indexOf(theme);
+          const orden = ordenDeVariantes(familyId);
+          const targetOrderIdx = orden.indexOf(theme);
           let inserted = false;
           for (const fIdx of familyIndices) {
             const itemTheme = officialSprites[fIdx].theme;
-            const itemOrderIdx = VARIANT_ORDER.indexOf(itemTheme);
+            const itemOrderIdx = orden.indexOf(itemTheme);
             if (targetOrderIdx !== -1 && (itemOrderIdx === -1 || targetOrderIdx < itemOrderIdx)) {
               officialSprites.splice(fIdx, 0, newEntry);
               inserted = true;

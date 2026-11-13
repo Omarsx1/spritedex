@@ -1,18 +1,14 @@
 import React, { useState, useEffect, useMemo, useCallback, useDeferredValue, useRef, lazy, Suspense } from 'react';
 import { flushSync } from 'react-dom';
 import { applyCazatesorosTheme, resolveCazatesorosState, CAZATESOROS_STORAGE_KEY } from './config/cazatesoros';
-import { VARIANT_ORDER, FAMILY_NAMES_MAP, pickFamilyName } from './data/spritesData';
+import { FAMILY_NAMES_MAP, pickFamilyName } from './data/spritesData';
 import { t } from './i18n';
 import { leerVista, urlConVista } from './utils/vistaUrl.js';
 import { leerAnimaciones, aplicarAnimaciones } from './utils/animaciones';
+import { prioridadVariante } from './utils/ordenVariantes';
 import { enviarEspiritu } from './utils/sharedSprites';
 import { useSharedSprites } from './hooks/useSharedSprites';
 
-const VARIANT_ALIASES = { Base: 'Basic', 'Cheat Master': 'Cheatmaster', LootHacker: 'Loot Hacker' };
-const getVariantPriority = (v) => {
-  const idx = VARIANT_ORDER.indexOf(VARIANT_ALIASES[v] || v);
-  return idx === -1 ? 99 : idx;
-};
 import { Header } from './components/Header';
 import { MobileNavbar } from './components/MobileNavbar';
 import { AjustesPage } from './components/AjustesPage';
@@ -1051,7 +1047,7 @@ export function App() {
             if (famA !== famB) {
               return 0;
             }
-            return getVariantPriority(a.variant) - getVariantPriority(b.variant);
+            return prioridadVariante(a.variant, a.gen) - prioridadVariante(b.variant, b.gen);
           });
         }
         break;

@@ -4,15 +4,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { VARIANT_ORDER } from '../src/utils/ordenVariantes.js';
 
 const sprites = JSON.parse(readFileSync(new URL('../src/data/official_sprites.json', import.meta.url), 'utf8'));
-const spritesData = readFileSync(new URL('../src/data/spritesData.js', import.meta.url), 'utf8');
 
-const variantes = () => {
-  const coincidencia = spritesData.match(/export const VARIANT_ORDER = \[([^\]]+)\]/);
-  assert.ok(coincidencia, 'no se encontro VARIANT_ORDER en spritesData.js');
-  return coincidencia[1].split(',').map((v) => v.trim().replace(/^'|'$/g, ''));
-};
+const variantes = () => VARIANT_ORDER;
 
 test('VARIANT_ORDER pone Patito justo despues de Hacker y antes de Hacker de Botin', () => {
   const orden = variantes();

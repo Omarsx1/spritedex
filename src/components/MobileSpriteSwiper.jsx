@@ -4,7 +4,8 @@ import { ChevronsLeft } from 'lucide-react';
 import { GemaNivel } from './icons/GemaNivel';
 import { cofreMaxDe } from '../utils/cofreMax';
 import { Lock } from 'lucide-react';
-import { getSpriteCardStyle, getRarityInfo, VARIANT_ORDER, pickName, tinteInterior, tinteDeTemporada } from '../data/spritesData';
+import { getSpriteCardStyle, getRarityInfo, pickName, tinteInterior, tinteDeTemporada } from '../data/spritesData';
+import { prioridadVariante } from '../utils/ordenVariantes';
 import { t } from '../i18n';
 import { sounds } from '../utils/audio';
 import { rutaBasicoFamilia, rutaFallbackEspiritu } from '../utils/spriteAssets';
@@ -13,11 +14,6 @@ import spriteMobileScale from '../data/sprite_mobile_scale.json';
 import { safeStorage } from '../utils/safeStorage';
 import { trackEvent } from '../utils/telemetry';
 
-const VARIANT_ALIASES = { Base: 'Basic', 'Cheat Master': 'Cheatmaster', LootHacker: 'Loot Hacker' };
-const getVariantPriority = (v) => {
-  const idx = VARIANT_ORDER.indexOf(VARIANT_ALIASES[v] || v);
-  return idx === -1 ? 99 : idx;
-};
 
 // Dimensiones fijas coleccionables exactas
 const W_ACTIVE = 205;
@@ -591,7 +587,7 @@ export function MobileSpriteSwiper({
     // Ordenar variantes canónicamente dentro de cada familia
     return Array.from(familyMap.values()).map((family) => ({
       ...family,
-      variants: [...family.variants].sort((a, b) => getVariantPriority(a.variant) - getVariantPriority(b.variant))
+      variants: [...family.variants].sort((a, b) => prioridadVariante(a.variant, a.gen) - prioridadVariante(b.variant, b.gen))
     }));
   }, [sprites]);
 

@@ -126,6 +126,13 @@ export const VARIANT_ORDER = [
   'cursed'
 ];
 
+// La 3ª generación sigue el orden de Fortnite: Dorado al final.
+export const VARIANT_ORDER_GEN_3 = ['Basic', 'jeweled', 'cursed', 'Gold'];
+
+export function ordenDeVariantes(familiaId) {
+  return GEN_3_FAMILIES.has(familiaId) ? VARIANT_ORDER_GEN_3 : VARIANT_ORDER;
+}
+
 export function normalizeKey(str) {
   return (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }

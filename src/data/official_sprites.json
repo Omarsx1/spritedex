@@ -2626,17 +2626,6 @@
     "releaseDate": "2026-11-01"
   },
   {
-    "id": "peelybones_gold",
-    "name": "Bananín Huesudo Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 3,
-    "releaseDate": "2026-11-13T11:00:00.000Z",
-    "lanzamientoManual": true
-  },
-  {
     "id": "peelybones_jeweled",
     "name": "Peelybones jeweled",
     "theme": "jeweled",
@@ -2657,10 +2646,41 @@
     "releaseDate": "2026-11-01"
   },
   {
+    "id": "peelybones_gold",
+    "name": "Bananín Huesudo Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
     "id": "parrot_basic",
     "name": "Parrot",
     "theme": "Basic",
     "rarity": "Rare",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "parrot_jeweled",
+    "name": "Parrot jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "parrot_cursed",
+    "name": "Parrot cursed",
+    "theme": "cursed",
+    "rarity": "Special",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
@@ -2678,18 +2698,18 @@
     "lanzamientoManual": true
   },
   {
-    "id": "parrot_cursed",
-    "name": "Parrot cursed",
-    "theme": "cursed",
-    "rarity": "Special",
+    "id": "barreloffish_basic",
+    "name": "Barreloffish",
+    "theme": "Basic",
+    "rarity": "Rare",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
   {
-    "id": "parrot_jeweled",
-    "name": "Parrot jeweled",
+    "id": "barreloffish_jeweled",
+    "name": "Barreloffish jeweled",
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
@@ -2698,10 +2718,10 @@
     "releaseDate": "2026-11-01"
   },
   {
-    "id": "barreloffish_basic",
-    "name": "Barreloffish",
-    "theme": "Basic",
-    "rarity": "Rare",
+    "id": "barreloffish_cursed",
+    "name": "Barreloffish cursed",
+    "theme": "cursed",
+    "rarity": "Special",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
@@ -2719,18 +2739,18 @@
     "lanzamientoManual": true
   },
   {
-    "id": "barreloffish_cursed",
-    "name": "Barreloffish cursed",
-    "theme": "cursed",
-    "rarity": "Special",
+    "id": "compass_basic",
+    "name": "Compass",
+    "theme": "Basic",
+    "rarity": "Rare",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
   {
-    "id": "barreloffish_jeweled",
-    "name": "Barreloffish jeweled",
+    "id": "compass_jeweled",
+    "name": "Compass jeweled",
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
@@ -2739,10 +2759,10 @@
     "releaseDate": "2026-11-01"
   },
   {
-    "id": "compass_basic",
-    "name": "Compass",
-    "theme": "Basic",
-    "rarity": "Rare",
+    "id": "compass_cursed",
+    "name": "Compass cursed",
+    "theme": "cursed",
+    "rarity": "Special",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
@@ -2760,18 +2780,18 @@
     "lanzamientoManual": true
   },
   {
-    "id": "compass_cursed",
-    "name": "Compass cursed",
-    "theme": "cursed",
-    "rarity": "Special",
+    "id": "treasurechest_basic",
+    "name": "Treasurechest",
+    "theme": "Basic",
+    "rarity": "Epic",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
   {
-    "id": "compass_jeweled",
-    "name": "Compass jeweled",
+    "id": "treasurechest_jeweled",
+    "name": "Treasurechest jeweled",
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
@@ -2780,10 +2800,10 @@
     "releaseDate": "2026-11-01"
   },
   {
-    "id": "treasurechest_basic",
-    "name": "Treasurechest",
-    "theme": "Basic",
-    "rarity": "Epic",
+    "id": "treasurechest_cursed",
+    "name": "Treasurechest cursed",
+    "theme": "cursed",
+    "rarity": "Special",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
@@ -2801,26 +2821,6 @@
     "lanzamientoManual": true
   },
   {
-    "id": "treasurechest_cursed",
-    "name": "Treasurechest cursed",
-    "theme": "cursed",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
-    "id": "treasurechest_jeweled",
-    "name": "Treasurechest jeweled",
-    "theme": "jeweled",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
     "id": "unbotheredfish_basic",
     "name": "Unbotheredfish",
     "theme": "Basic",
@@ -2829,17 +2829,6 @@
     "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
-  },
-  {
-    "id": "unbotheredfish_gold",
-    "name": "Mar Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 3,
-    "releaseDate": "2026-11-13T11:00:00.000Z",
-    "lanzamientoManual": true
   },
   {
     "id": "unbotheredfish_jeweled",
@@ -2862,6 +2851,17 @@
     "releaseDate": "2026-11-13"
   },
   {
+    "id": "unbotheredfish_gold",
+    "name": "Mar Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
     "id": "treasuremap_basic",
     "name": "Treasuremap",
     "theme": "Basic",
@@ -2870,17 +2870,6 @@
     "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
-  },
-  {
-    "id": "treasuremap_gold",
-    "name": "Buscarrutas Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 3,
-    "releaseDate": "2026-11-13T11:00:00.000Z",
-    "lanzamientoManual": true
   },
   {
     "id": "treasuremap_jeweled",
@@ -2903,10 +2892,41 @@
     "releaseDate": "2026-11-01"
   },
   {
+    "id": "treasuremap_gold",
+    "name": "Buscarrutas Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
     "id": "squibbly_basic",
     "name": "Squibbly",
     "theme": "Basic",
     "rarity": "Epic",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "squibbly_jeweled",
+    "name": "Squibbly jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "squibbly_cursed",
+    "name": "Squibbly cursed",
+    "theme": "cursed",
+    "rarity": "Special",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
@@ -2924,26 +2944,6 @@
     "lanzamientoManual": true
   },
   {
-    "id": "squibbly_cursed",
-    "name": "Squibbly cursed",
-    "theme": "cursed",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
-    "id": "squibbly_jeweled",
-    "name": "Squibbly jeweled",
-    "theme": "jeweled",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
     "id": "playmakerbrewery_basic",
     "name": "Playmakerbrewery",
     "theme": "Basic",
@@ -2952,17 +2952,6 @@
     "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
-  },
-  {
-    "id": "playmakerbrewery_gold",
-    "name": "Lil' Flacko Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 3,
-    "releaseDate": "2026-11-13T11:00:00.000Z",
-    "lanzamientoManual": true
   },
   {
     "id": "playmakerbrewery_jeweled",
@@ -2985,10 +2974,41 @@
     "releaseDate": "2026-11-01"
   },
   {
+    "id": "playmakerbrewery_gold",
+    "name": "Lil' Flacko Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
     "id": "rookgecko_basic",
     "name": "Rookgecko",
     "theme": "Basic",
     "rarity": "Legendary",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "rookgecko_jeweled",
+    "name": "Rookgecko jeweled",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "rookgecko_cursed",
+    "name": "Rookgecko cursed",
+    "theme": "cursed",
+    "rarity": "Special",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
@@ -3006,18 +3026,18 @@
     "lanzamientoManual": true
   },
   {
-    "id": "rookgecko_cursed",
-    "name": "Rookgecko cursed",
-    "theme": "cursed",
-    "rarity": "Special",
+    "id": "coinpile_basic",
+    "name": "Coinpile",
+    "theme": "Basic",
+    "rarity": "Mythic",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
   },
   {
-    "id": "rookgecko_jeweled",
-    "name": "Rookgecko jeweled",
+    "id": "coinpile_jeweled",
+    "name": "Coinpile jeweled",
     "theme": "jeweled",
     "rarity": "Special",
     "unreleased": false,
@@ -3026,10 +3046,10 @@
     "releaseDate": "2026-11-01"
   },
   {
-    "id": "coinpile_basic",
-    "name": "Coinpile",
-    "theme": "Basic",
-    "rarity": "Mythic",
+    "id": "coinpile_cursed",
+    "name": "Coinpile cursed",
+    "theme": "cursed",
+    "rarity": "Special",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
@@ -3045,26 +3065,6 @@
     "gen": 3,
     "releaseDate": "2026-11-13T11:00:00.000Z",
     "lanzamientoManual": true
-  },
-  {
-    "id": "coinpile_cursed",
-    "name": "Coinpile cursed",
-    "theme": "cursed",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
-  },
-  {
-    "id": "coinpile_jeweled",
-    "name": "Coinpile jeweled",
-    "theme": "jeweled",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 3,
-    "releaseDate": "2026-11-01"
   },
   {
     "id": "feedjet_basic",
@@ -3098,17 +3098,6 @@
     "lanzamientoManual": true
   },
   {
-    "id": "piratecalamari_gold",
-    "name": "Squiplash Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
-    "unreleased": false,
-    "isNew": false,
-    "gen": 3,
-    "releaseDate": "2026-11-13T11:00:00.000Z",
-    "lanzamientoManual": true
-  },
-  {
     "id": "piratecalamari_jeweled",
     "name": "Squiplash Afortunado",
     "theme": "jeweled",
@@ -3131,10 +3120,10 @@
     "lanzamientoManual": true
   },
   {
-    "id": "whitetiger_basic",
-    "name": "Sir Óscar el Segundo",
-    "theme": "Basic",
-    "rarity": "Legendary",
+    "id": "piratecalamari_gold",
+    "name": "Squiplash Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
@@ -3142,10 +3131,10 @@
     "lanzamientoManual": true
   },
   {
-    "id": "whitetiger_gold",
-    "name": "Sir Óscar el Segundo Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
+    "id": "whitetiger_basic",
+    "name": "Sir Óscar el Segundo",
+    "theme": "Basic",
+    "rarity": "Legendary",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
@@ -3175,10 +3164,10 @@
     "lanzamientoManual": true
   },
   {
-    "id": "daffodilchurn_basic",
-    "name": "Mini Miku",
-    "theme": "Basic",
-    "rarity": "Mythic",
+    "id": "whitetiger_gold",
+    "name": "Sir Óscar el Segundo Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
@@ -3186,10 +3175,10 @@
     "lanzamientoManual": true
   },
   {
-    "id": "daffodilchurn_gold",
-    "name": "Mini Miku Dorado",
-    "theme": "Gold",
-    "rarity": "Special",
+    "id": "daffodilchurn_basic",
+    "name": "Mini Miku",
+    "theme": "Basic",
+    "rarity": "Mythic",
     "unreleased": false,
     "isNew": false,
     "gen": 3,
@@ -3211,6 +3200,17 @@
     "id": "daffodilchurn_cursed",
     "name": "Mini Miku Maldito",
     "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "daffodilchurn_gold",
+    "name": "Mini Miku Dorado",
+    "theme": "Gold",
     "rarity": "Special",
     "unreleased": false,
     "isNew": false,

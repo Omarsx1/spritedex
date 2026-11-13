@@ -3,6 +3,7 @@ import officialSpritesJson from './official_sprites.json';
 import COLORES_GEN3 from './coloresGen3.json';
 import { FAMILY_NAMES_MAP, THEME_NAMES_ES } from './nombresEspiritus.js';
 import { estadoLanzamiento } from '../utils/lanzamiento.js';
+import { prioridadVariante } from '../utils/ordenVariantes.js';
 import fortniteGgJson from './fortnite_gg_index.json';
 
 // Miniaturas WebP para tarjetas, generadas por scripts/generate_sprite_thumbs.js.
@@ -289,7 +290,7 @@ export const THEME_NAMES_EN = {
   jeweled: 'Fortune'
 };
 
-export const VARIANT_ORDER = ['Basic', 'Gold', 'Cheatmaster', 'Quack', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'jeweled', 'cursed'];
+export { VARIANT_ORDER } from '../utils/ordenVariantes.js';
 export const THEMES_LIST = ['Basic', 'Gold', 'Cheatmaster', 'Quack', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Candy', 'Galaxy', 'Cube', 'Holofoil', 'Gem', 'jeweled', 'cursed'];
 
 export { FAMILY_NAMES_MAP } from './nombresEspiritus.js';
@@ -1010,9 +1011,7 @@ export const SPRITE_FAMILIES = Object.values(
 ).map((family) => ({
   ...family,
   sprites: [...family.sprites].sort((a, b) => {
-    const aIdx = VARIANT_ORDER.indexOf(a.variant);
-    const bIdx = VARIANT_ORDER.indexOf(b.variant);
-    return (aIdx === -1 ? 99 : aIdx) - (bIdx === -1 ? 99 : bIdx);
+    return prioridadVariante(a.variant, family.gen) - prioridadVariante(b.variant, family.gen);
   })
 }));
 
