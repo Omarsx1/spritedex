@@ -455,10 +455,10 @@
 }
 
 /* El botón del menú: el cofre crece al pasar el ratón. */
-.app-navbar__chestcounter { transition: transform 0.16s ease, background 0.16s ease; }
-.app-navbar__chestcounter:hover { transform: translateY(-1px); }
+.app-navbar__cofres { transition: transform 0.16s ease, background 0.16s ease; }
+.app-navbar__cofres:hover { transform: translateY(-1px); }
 .cc-nav-icon { width: 20px; height: 18px; object-fit: contain; transition: transform 0.18s ease; }
-.app-navbar__chestcounter:hover .cc-nav-icon { transform: scale(1.22); }
+.app-navbar__cofres:hover .cc-nav-icon { transform: scale(1.22); }
 
 @media (max-width: 640px) {
   .cc-page { padding: calc(84px + env(safe-area-inset-top, 0px)) 12px 110px; }

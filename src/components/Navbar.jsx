@@ -214,8 +214,8 @@ export function Navbar({
           className="app-navbar__cofres"
           href={conIdioma(RUTA_COFRES, getLang())}
           onClick={(evento) => navegarEnApp(evento, RUTA_COFRES)}
-          title={t('nav.chestCounterAviso')}
-          aria-label={t('nav.chestCounter')}
+          title={t('nav.cofresAviso')}
+          aria-label={t('nav.cofres')}
         >
           <img src="/cofre-max-oro.webp" alt="" width="30" height="27" draggable="false" />
         </a>
@@ -394,14 +394,14 @@ export function Navbar({
                 {/* Herramienta propia: pagina Beta interna, no una ruta externa. El icono
                     crece al pasar el raton (hover). */}
                 <a
-                  className="app-navbar__menu-action-btn app-navbar__chestcounter"
+                  className="app-navbar__menu-action-btn app-navbar__cofres"
                   href={conIdioma(RUTA_COFRES, getLang())}
-                  title={t('nav.chestCounterAviso')}
+                  title={t('nav.cofresAviso')}
                   onClick={(evento) => navegarEnApp(evento, RUTA_COFRES)}
                 >
                   <div className="action-btn-left">
                     <img className="cc-nav-icon" src="/cofre-max-oro.webp" alt="" width="18" height="18" />
-                    <span>{t('nav.chestCounter')}</span>
+                    <span>{t('nav.cofres')}</span>
                   </div>
                 </a>
 

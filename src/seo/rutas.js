@@ -48,7 +48,7 @@ export const RUTAS = [
     }
   },
   {
-    // Página Beta del contador de cofres (ChestCounter). El cuerpo lo pinta la SPA; aquí van
+    // Página Beta del contador de cofres. El cuerpo lo pinta la SPA; aquí van
     // el título, la descripción, el canonical y el hreflang que sí lee el buscador.
     ruta: '/cofres',
     idiomas: ['es', 'en', 'pt-BR'],
