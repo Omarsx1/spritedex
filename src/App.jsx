@@ -21,6 +21,7 @@ import { ClaimAccountBanner } from './components/ClaimAccountBanner';
 import { InstallPrompt } from './components/InstallPrompt';
 import { FriendsPage } from './components/FriendsPage';
 import { GuiaPage } from './components/GuiaPage';
+import { CofresPage } from './components/CofresPage';
 import { MobileSpriteSwiper } from './components/MobileSpriteSwiper';
 import { applySeasonalTheme, isFortnitemaresActive, subscribeSeasonalState } from './config/seasonalEvent';
 import { useIsMobile } from './hooks/useIsMobile';
@@ -53,6 +54,7 @@ import { etiquetasGuia } from './seo/contenido.js';
 import { espirituDeEnlace } from './utils/enlaceEspiritu.js';
 import { codigoFichaEnRuta } from './utils/visitaEnlace';
 import { esRutaGuia } from './utils/rutaGuia.js';
+import { esRutaCofres } from './utils/rutaCofres.js';
 import { codigoNormalizado } from './utils/fichaAmigo';
 import { firmaGuardada } from './utils/firmaUsuario';
 import { isDeadSessionError } from './utils/deadSession';
@@ -368,6 +370,7 @@ export function App() {
   // La guia vive en la misma ruta en los dos idiomas: la decision es sobre la ruta ya sin el
   // prefijo, la misma que alimenta al catalogo.
   const [enGuia, setEnGuia] = useState(() => esRutaGuia(rutaApp));
+  const [enCofres, setEnCofres] = useState(() => esRutaCofres(rutaApp));
   const [enAjustes, setEnAjustes] = useState(() => rutaApp.indexOf('/ajustes') === 0);
 
   // Marca las rutas que son una hoja de papiro a pagina completa. La barra
@@ -375,10 +378,10 @@ export function App() {
   // el fondo de temporada entre el contenido y la barra.
   useEffect(() => {
     if (typeof document === 'undefined') return undefined;
-    const esHoja = enAmigos || enCompartir || enAjustes;
+    const esHoja = enAmigos || enCompartir || enAjustes || enCofres;
     document.body.classList.toggle('has-hoja', esHoja);
     return () => document.body.classList.remove('has-hoja');
-  }, [enAmigos, enCompartir, enAjustes]);
+  }, [enAmigos, enCompartir, enAjustes, enCofres]);
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [showFooterPrivacyModal, setShowFooterPrivacyModal] = useState(false);
 
@@ -1167,6 +1170,7 @@ export function App() {
       setEnAmigos(ruta.indexOf('/amigos') === 0);
       setEnCompartir(ruta.indexOf('/compartir') === 0);
       setEnGuia(esRutaGuia(ruta));
+      setEnCofres(esRutaCofres(ruta));
     };
     window.addEventListener('popstate', alVolver);
     return () => window.removeEventListener('popstate', alVolver);
@@ -1201,6 +1205,7 @@ export function App() {
       setEnAmigos(ruta.indexOf('/amigos') === 0);
       setEnCompartir(ruta.indexOf('/compartir') === 0);
       setEnGuia(esRutaGuia(ruta));
+      setEnCofres(esRutaCofres(ruta));
       setEnAjustes(ruta.indexOf('/ajustes') === 0);
       // Cada destino empieza arriba: sin esto, venir de una pagina corta a una
       // larga (o al reves) daba un salto seco.
@@ -1426,6 +1431,23 @@ export function App() {
           onOpenBackup={() => setShowBackupModal(true)}
           onNavegar={irA}
         />
+        {modales}
+        <MobileNavbar
+          solicitudesNuevas={avisosAmigos}
+          onOpenCompareModal={() => irA('/amigos')}
+          onOpenShareModal={() => irA('/compartir')}
+          onOpenAjustes={() => irA('/ajustes')}
+        />
+      </div>
+    );
+  }
+
+  // El contador de cofres: pagina Beta con modo manual y lector del data.json real.
+  if (enCofres) {
+    return (
+      <div className="app-container">
+        {navbar}
+        <CofresPage />
         {modales}
         <MobileNavbar
           solicitudesNuevas={avisosAmigos}

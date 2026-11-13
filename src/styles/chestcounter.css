@@ -1,0 +1,273 @@
+/* Contador de cofres (Beta). La paleta copia el menú hamburguesa del tema Cazatesoros:
+   azul marino, filo de latón, texto pergamino y acentos cian/dorado. Así la página no
+   parece de otra app cuando se abre desde el menú. */
+
+.cc-page {
+  --cc-gold: #e8b04b;
+  --cc-gold-2: #ffe6ae;
+  --cc-cyan: #00f0e8;
+  --cc-card: #1b2434;
+  --cc-card-2: #141c2b;
+  --cc-line: #2a3346;
+  --cc-border: #b8863f;
+  --cc-muted: #8b97ad;
+  --cc-text: #f2e6c8;
+  --cc-text-2: #c7b68c;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 26px 18px 96px;
+  color: var(--cc-text);
+}
+
+.cc-hero {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 18px;
+  align-items: center;
+  padding: 22px;
+  border-radius: 20px;
+  border: 1.5px solid var(--cc-border);
+  background:
+    radial-gradient(120% 150% at 0% 0%, rgba(0, 240, 232, 0.08), transparent 46%),
+    linear-gradient(180deg, #1b2b46 0%, #0e1728 100%);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
+}
+.cc-hero__icon { width: 112px; height: 100px; object-fit: contain; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5)); }
+.cc-hero__text { min-width: 0; }
+.cc-hero__top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cc-kicker {
+  color: var(--cc-gold);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.cc-beta {
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(216, 178, 106, 0.7);
+  background: rgba(216, 178, 106, 0.16);
+  color: var(--cc-gold-2);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.cc-title {
+  margin: 4px 0 6px;
+  font-family: var(--font-fortnite, 'Burbank Big Condensed', sans-serif);
+  font-size: clamp(2.1rem, 5vw, 3.1rem);
+  line-height: 0.95;
+  letter-spacing: 0.015em;
+  color: #fff3d0;
+  outline: none;
+}
+.cc-lead { color: var(--cc-text-2); font-size: 1rem; max-width: 70ch; }
+.cc-privacy { margin-top: 6px; color: var(--cc-muted); font-size: 0.82rem; }
+
+.cc-token {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+  margin-top: 14px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px solid var(--cc-line);
+  background: linear-gradient(180deg, #1c2c48 0%, #101a2c 100%);
+}
+.cc-token.is-found {
+  border-color: var(--cc-border);
+  background:
+    radial-gradient(90% 140% at 0% 0%, rgba(232, 176, 75, 0.24), transparent 55%),
+    linear-gradient(180deg, #1c2c48 0%, #101a2c 100%);
+}
+.cc-token__mark { width: 58px; height: 58px; object-fit: contain; filter: drop-shadow(0 0 14px rgba(232, 176, 75, 0.4)); }
+.cc-token h2 {
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cc-muted);
+}
+.cc-token strong { display: block; font-size: 1.45rem; margin: 2px 0 4px; color: var(--cc-text); }
+.cc-token.is-found strong { color: var(--cc-gold-2); }
+.cc-token p { color: var(--cc-text-2); font-size: 0.9rem; max-width: 70ch; }
+.cc-token__meta {
+  grid-column: 1 / -1;
+  color: var(--cc-muted);
+  font-size: 0.78rem;
+  border-top: 1px solid var(--cc-line);
+  padding-top: 10px;
+}
+
+.cc-manual {
+  margin-top: 14px;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid var(--cc-line);
+  background: linear-gradient(180deg, #1c2c48 0%, #101a2c 100%);
+}
+.cc-manual__count span {
+  display: block;
+  color: var(--cc-muted);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.cc-manual__count strong {
+  display: block;
+  margin: 4px 0 2px;
+  font-size: clamp(2.8rem, 9vw, 4.4rem);
+  line-height: 1;
+  color: var(--cc-gold-2);
+}
+.cc-manual__count small { color: var(--cc-text-2); font-size: 0.85rem; }
+.cc-manual__buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.cc-manual__note { margin-top: 12px; color: var(--cc-muted); font-size: 0.8rem; }
+
+.cc-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.cc-kpi {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--cc-line);
+  background: var(--cc-card);
+}
+.cc-kpi span {
+  display: block;
+  color: var(--cc-muted);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.cc-kpi strong { display: block; margin-top: 6px; font-size: 1.7rem; line-height: 1; color: var(--cc-text); }
+.cc-kpi--hero {
+  background: linear-gradient(180deg, #1c2c48 0%, #101a2c 100%);
+  border-color: var(--cc-border);
+}
+.cc-kpi--hero strong { color: var(--cc-gold-2); font-size: 2.2rem; }
+.cc-kpi small { display: block; margin-top: 6px; color: var(--cc-muted); font-size: 0.72rem; }
+
+.cc-card {
+  margin-top: 14px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid var(--cc-line);
+  background: var(--cc-card);
+}
+.cc-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.cc-card__head h2 { font-size: 1.02rem; color: var(--cc-text); }
+.cc-card__head span { color: var(--cc-muted); font-size: 0.8rem; }
+
+.cc-chart { display: flex; align-items: flex-end; gap: 4px; height: 180px; padding-top: 8px; }
+.cc-chart__col {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.cc-chart__col em {
+  color: var(--cc-muted);
+  font-size: 0.58rem;
+  font-style: normal;
+  white-space: nowrap;
+  transform: rotate(-38deg);
+  transform-origin: center;
+}
+.cc-bar {
+  width: 100%;
+  max-width: 22px;
+  border-radius: 4px 4px 2px 2px;
+  background: linear-gradient(180deg, var(--cc-gold-2) 0%, var(--cc-border) 100%);
+  transition: height 0.25s ease;
+}
+.cc-bar.is-empty { background: #232b3a; }
+
+.cc-table-wrap { overflow-x: auto; }
+.cc-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+.cc-table th {
+  text-align: left;
+  color: var(--cc-muted);
+  font-weight: 600;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--cc-line);
+  white-space: nowrap;
+}
+.cc-table td { padding: 9px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); color: var(--cc-text); }
+.cc-table .r { text-align: right; }
+.cc-table tbody tr:last-child td { border-bottom: 0; }
+
+.cc-note { color: var(--cc-muted); font-size: 0.78rem; margin-top: 10px; }
+
+.cc-source {
+  margin-top: 22px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px dashed rgba(216, 178, 106, 0.4);
+  background: rgba(255, 255, 255, 0.02);
+}
+.cc-source h2 { font-size: 0.95rem; margin-bottom: 10px; color: var(--cc-text); }
+.cc-source ol { margin: 0 0 12px 18px; color: var(--cc-text-2); display: grid; gap: 4px; font-size: 0.88rem; }
+
+.cc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid var(--cc-line);
+  background: linear-gradient(180deg, #1c2c48 0%, #101a2c 100%);
+  color: var(--cc-text);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+}
+.cc-btn:hover { transform: translateY(-1px); border-color: #e3c07a; color: #fff3d0; }
+.cc-btn--primary { border-color: var(--cc-border); color: var(--cc-gold-2); }
+.cc-btn--gold {
+  background: linear-gradient(180deg, var(--cc-gold-2) 0%, var(--cc-gold) 100%);
+  border-color: #b8862f;
+  color: #241a0c;
+}
+.cc-btn--ghost { background: rgba(255, 255, 255, 0.05); }
+.cc-btn--danger { color: #ffb4b4; border-color: rgba(255, 96, 96, 0.4); }
+
+/* El botón del menú: el cofre crece al pasar el ratón. */
+.app-navbar__chestcounter { transition: transform 0.16s ease, background 0.16s ease; }
+.app-navbar__chestcounter:hover { transform: translateY(-1px); }
+.cc-nav-icon { width: 20px; height: 18px; object-fit: contain; transition: transform 0.18s ease; }
+.app-navbar__chestcounter:hover .cc-nav-icon { transform: scale(1.22); }
+
+@media (max-width: 640px) {
+  .cc-page { padding: 18px 12px 110px; }
+  .cc-hero { grid-template-columns: 1fr; padding: 18px; }
+  .cc-hero__icon { width: 88px; height: 78px; }
+  .cc-chart { height: 140px; }
+  .cc-chart__col em { font-size: 0.5rem; }
+  .cc-kpi strong { font-size: 1.4rem; }
+  .cc-kpi--hero strong { font-size: 1.8rem; }
+  .cc-token { grid-template-columns: auto 1fr; padding: 16px; }
+  .cc-token__mark { width: 46px; height: 46px; }
+}

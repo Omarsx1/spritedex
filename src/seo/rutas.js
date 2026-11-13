@@ -48,6 +48,24 @@ export const RUTAS = [
     }
   },
   {
+    // Página Beta del contador de cofres (ChestCounter). El cuerpo lo pinta la SPA; aquí van
+    // el título, la descripción, el canonical y el hreflang que sí lee el buscador.
+    ruta: '/cofres',
+    idiomas: ['es', 'en', 'pt-BR'],
+    prioridad: 0.5,
+    frecuencia: 'weekly',
+    titulos: {
+      es: 'Contador de cofres y Token Pirata — Spritedex',
+      en: 'Fortnite chest counter and Pirate Token — Spritedex',
+      'pt-BR': 'Contador de baús e Token Pirata — Spritedex'
+    },
+    descripciones: {
+      es: 'Cuenta tus cofres de Fortnite en el navegador y sigue tu Token Pirata. Funciona en móvil, PC y consola: sin instalar nada.',
+      en: 'Count your Fortnite chests in the browser and track your Pirate Token. Works on mobile, PC and console: no install needed.',
+      'pt-BR': 'Conte seus baús do Fortnite no navegador e acompanhe seu Token Pirata. Funciona no celular, PC e console: sem instalar nada.'
+    }
+  },
+  {
     // Pagina estatica (public/privacidad.html): el prerender no la reescribe, pero entra en
     // el sitemap, que es de donde se estaba quedando fuera.
     ruta: '/privacidad',

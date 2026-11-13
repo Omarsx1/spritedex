@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { User, UserPlus, LogOut, ShieldCheck, Menu, X, Layers, Sparkles, Settings, AlertTriangle, Mail, BookOpen, Globe, Boxes } from 'lucide-react';
+import { User, UserPlus, LogOut, ShieldCheck, Menu, X, Layers, Sparkles, Settings, AlertTriangle, Mail, BookOpen, Globe } from 'lucide-react';
 import { Google } from './ui/Google';
 import { getSupabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
@@ -7,6 +7,7 @@ import { usuarioDeSesion, esCorreoSintetico } from '../utils/usuario';
 import { GENERATIONS } from '../data/spritesData';
 import { t, conIdioma, getLang } from '../i18n';
 import { RUTA_GUIA } from '../utils/rutaGuia.js';
+import { RUTA_COFRES } from '../utils/rutaCofres.js';
 
 // Un clic normal: boton izquierdo, sin modificadores y sin target. Cualquier otra cosa
 // (cmd/ctrl-clic, clic central, "abrir en pestaña nueva") deja que el navegador siga el href
@@ -379,18 +380,16 @@ export function Navbar({
                   </div>
                 </a>
 
-                {/* Herramienta externa: es una app de Windows, no una ruta de la app.
-                    El enlace real se abre en otra pestaña para no perder el catálogo. */}
+                {/* Herramienta propia: pagina Beta interna, no una ruta externa. El icono
+                    crece al pasar el raton (hover). */}
                 <a
-                  className="app-navbar__menu-action-btn"
-                  href="https://github.com/xdoofy92/ChestCounter"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  className="app-navbar__menu-action-btn app-navbar__chestcounter"
+                  href={conIdioma(RUTA_COFRES, getLang())}
                   title={t('nav.chestCounterAviso')}
-                  onClick={() => setIsNavMenuOpen(false)}
+                  onClick={(evento) => navegarEnApp(evento, RUTA_COFRES)}
                 >
                   <div className="action-btn-left">
-                    <Boxes size={15} color="var(--nav-accent, #00F0E8)" />
+                    <img className="cc-nav-icon" src="/cofre-max-oro.webp" alt="" width="18" height="18" />
                     <span>{t('nav.chestCounter')}</span>
                   </div>
                 </a>
