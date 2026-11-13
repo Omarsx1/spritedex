@@ -138,6 +138,7 @@ export function EquipoCompartido({ user }) {
             maxLength={24}
             value={nombreJugador}
             onChange={(e) => setNombreJugador(e.target.value)}
+            onFocus={(e) => e.target.select()}
           />
         </label>
 
@@ -151,6 +152,7 @@ export function EquipoCompartido({ user }) {
                 maxLength={30}
                 value={nombreEquipo}
                 onChange={(e) => setNombreEquipo(e.target.value)}
+                onFocus={(e) => e.target.select()}
               />
             </label>
             <button type="submit" className="cc-btn cc-btn--gold" disabled={accion || !nombreJugador.trim()}>
@@ -170,6 +172,7 @@ export function EquipoCompartido({ user }) {
                 placeholder="AB12CD34"
                 value={codigo}
                 onChange={(e) => setCodigo(e.target.value.toUpperCase().replace(/\s/g, ''))}
+                onFocus={(e) => e.target.select()}
               />
             </label>
             <button type="submit" className="cc-btn cc-btn--primary" disabled={accion || !codigo.trim() || !nombreJugador.trim()}>
