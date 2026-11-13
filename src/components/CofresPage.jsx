@@ -362,6 +362,37 @@ export function CofresPage({ user, onOpenAuth }) {
       </section>
       )}
 
+      {(!esEquipo || !user) && (
+        <section className="cc-card">
+          <div className="cc-card__head">
+            <h2>{t('chest.historyTitle')}</h2>
+            <span>{entradas.length} {t('chest.daysPlayed').toLowerCase()}</span>
+          </div>
+          {entradas.length === 0 ? (
+            <p className="cc-note">{t('chest.historyEmpty')}</p>
+          ) : (
+            <div className="cc-table-wrap">
+              <table className="cc-table">
+                <thead>
+                  <tr>
+                    <th>{t('chest.date')}</th>
+                    <th className="r">{t('chest.chests')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...entradas].sort((a, b) => b[0].localeCompare(a[0])).map(([dia, cantidad]) => (
+                    <tr key={dia}>
+                      <td>{dia}</td>
+                      <td className="r">{numero(cantidad, lang)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      )}
+
       <section className="cc-source">
         <h2>{t('chest.howTitle')}</h2>
         <ol className="cc-steps">

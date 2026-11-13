@@ -560,4 +560,6 @@ export default {
   "team.rejoin": "Rejoin",
   "team.archived": "Archived",
   "team.historyNote": "Chests from players who left are recorded here but do not count toward the active total.",
+  "chest.historyTitle": "History by day",
+  "chest.historyEmpty": "No days recorded yet. Add your first chest to start.",
 };

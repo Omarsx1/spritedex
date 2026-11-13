@@ -559,4 +559,6 @@ export default {
   "team.rejoin": "Entrar novamente",
   "team.archived": "Arquivada",
   "team.historyNote": "Os baús de quem saiu ficam registrados aqui, mas não somam ao total ativo.",
+  "chest.historyTitle": "Histórico por dia",
+  "chest.historyEmpty": "Ainda não há dias registrados. Some seu primeiro baú para começar.",
 };

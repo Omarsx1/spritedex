@@ -561,4 +561,6 @@ export default {
   "team.rejoin": "Volver a unirme",
   "team.archived": "Archivado",
   "team.historyNote": "Los cofres de quienes salieron quedan registrados aquí, pero no suman al total activo.",
+  "chest.historyTitle": "Historial por día",
+  "chest.historyEmpty": "Aún no hay días registrados. Suma tu primer cofre para empezar.",
 };
