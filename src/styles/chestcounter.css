@@ -16,7 +16,8 @@
   width: 100%;
   max-width: 1080px;
   margin: 0 auto;
-  padding: 26px 18px 96px;
+  /* El navbar es absoluto: sin este hueco el hero arranca debajo de la barra. */
+  padding: calc(76px + env(safe-area-inset-top, 0px)) 18px 96px;
   color: var(--cc-text);
 }
 
@@ -308,7 +309,7 @@
 .app-navbar__chestcounter:hover .cc-nav-icon { transform: scale(1.22); }
 
 @media (max-width: 640px) {
-  .cc-page { padding: 18px 12px 110px; }
+  .cc-page { padding: calc(84px + env(safe-area-inset-top, 0px)) 12px 110px; }
   .cc-hero { grid-template-columns: 1fr; padding: 18px; }
   .cc-hero__icon { width: 88px; height: 78px; }
   .cc-chart { height: 140px; }
