@@ -35,6 +35,7 @@ export function Navbar({
   onOpenAuthModal,
   onLinkGoogle,
   onSignOut,
+  logoSrc = '/logoSF.webp',
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
@@ -202,7 +203,12 @@ export function Navbar({
           title={t('nav.inicioAyuda')}
           aria-label={t('nav.inicio')}
         >
-          <img className="app-navbar__logo-img" src="/logoSF.webp" alt="" draggable="false" />
+          <img
+            className={`app-navbar__logo-img ${logoSrc.includes('cofre') ? 'is-cofre' : ''}`}
+            src={logoSrc}
+            alt=""
+            draggable="false"
+          />
         </a>
       </div>
 

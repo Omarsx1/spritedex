@@ -1289,6 +1289,7 @@ export function App() {
       onOpenAuthModal={() => setShowAuthModal(true)}
       onLinkGoogle={handleLinkGoogle}
       onSignOut={handleSignOutCleanup}
+      logoSrc={enCofres ? '/cofre-max-oro.webp' : '/logoSF.webp'}
     />
   );
 
