@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { ALL_SPRITES, SPANISH_NAME_OVERRIDES, SPIRIT_DATA_OVERRIDES, SUMMON_COST_OVERRIDES, WEBP_MAP, getSpriteThumb } from '../data/spritesData';
 import catalogEn from '../data/i18n/catalog.en.json';
 import { getSupabase } from '../utils/supabase';
-import { estadoLanzamiento, fechaDeLanzamiento, sinEstadoDeLanzamiento, DIAS_NOVEDAD } from '../utils/lanzamiento.js';
+import { estadoLanzamiento, fechaDeLanzamiento, sinEstadoDeLanzamiento } from '../utils/lanzamiento.js';
 import { filtrarCopiaConfirmada } from '../utils/copiaLocal.js';
+import { applyBatchNoveltyRules } from '../utils/novedadLote.js';
 
 export const DYNAMIC_SPRITES_CACHE_KEY = 'spritedex_dynamic_sprites_cache_v2';
 
@@ -74,85 +75,7 @@ export function evaluateReleaseStatus(sprite, ahora = Date.now()) {
   };
 }
 
-// Industry-Standard Novelty Rule (Fortnite / Steam standard):
-// 1. If spirits exist within 7-day window -> highlight them.
-// 2. If NO spirits exist within 7 days (content drought) -> fallback to the latest drop batch so "Nuevos" is never empty!
-export function applyBatchNoveltyRules(spritesList) {
-  if (!Array.isArray(spritesList) || spritesList.length === 0) return spritesList;
-
-  const now = Date.now();
-
-  // 1. Estado de cada espiritu (la regla vive en utils/lanzamiento.js)
-  const withTiming = spritesList.map((sprite) => {
-    const estado = estadoLanzamiento(sprite, now);
-    return {
-      ...sprite,
-      unreleased: estado.unreleased,
-      isAutoScheduled: estado.programado,
-      timeUntilRelease: estado.programado ? estado.releaseTime - now : 0,
-      daysSince: estado.diasDesde,
-      releaseTime: estado.releaseTime
-    };
-  });
-
-  // 2. Identify active Gen 2 released spirits with valid dates
-  const releasedGen2 = withTiming.filter(s => !s.unreleased && s.releaseTime > 0 && s.gen === 2);
-  const activeRecent = releasedGen2.filter(s => s.daysSince >= 0 && s.daysSince < DIAS_NOVEDAD);
-
-  // 3. Fallback: If no spirits released in the last 7 days, find the latest drop batch date
-  let latestBatchTime = 0;
-  if (activeRecent.length === 0 && releasedGen2.length > 0) {
-    latestBatchTime = Math.max(...releasedGen2.map(s => s.releaseTime));
-  }
-
-  // 4. Map novelty status
-  return withTiming.map(s => {
-    if (s.unreleased) {
-      return {
-        ...s,
-        isNew: false,
-        noveltyReason: 'unreleased'
-      };
-    }
-
-    /* Salida manual de la ventana de novedad. Sin esto, un evento que ya
-       termino sigue contando como nuevo solo porque su fecha cae dentro de
-       los 7 dias: el cumpleanos se apago y su cartel seguia encendido. */
-    if (s.notNew) {
-      return {
-        ...s,
-        isNew: false,
-        noveltyReason: 'excluded'
-      };
-    }
-
-    // Normal case: We have spirits released in the last 7 days
-    if (activeRecent.length > 0) {
-      const isWithin7 = s.daysSince >= 0 && s.daysSince < DIAS_NOVEDAD;
-      return {
-        ...s,
-        isNew: isWithin7,
-        noveltyReason: isWithin7 ? 'recent' : 'expired'
-      };
-    }
-
-    // Drought case: Fallback to the latest drop batch (within 36h of the latest drop)
-    if (latestBatchTime > 0) {
-      const isLatestDrop = Math.abs(s.releaseTime - latestBatchTime) <= (36 * 60 * 60 * 1000);
-      return {
-        ...s,
-        isNew: isLatestDrop,
-        noveltyReason: isLatestDrop ? 'latest_drop' : 'older_drop'
-      };
-    }
-
-    return {
-      ...s,
-      isNew: Boolean(s.is_new ?? s.isNew ?? false),
-      noveltyReason: 'manual'
-    };
-  });
-}
+export { applyBatchNoveltyRules };
 
 export function useDynamicSprites() {
   const [sprites, setSprites] = useState(() => {

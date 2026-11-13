@@ -5,7 +5,6 @@ import { t } from '../i18n';
 import { MobileLiquidFilterBar } from './MobileLiquidFilterBar';
 import { safeStorage } from '../utils/safeStorage';
 import { rutaBasicoFamilia } from '../utils/spriteAssets';
-import { contarNovedades, claveAvisoNovedades } from '../utils/novedadesAviso';
 
 // El color de cada variante sale de la MISMA paleta que las fichas (THEME_STYLES), no de una
 // tabla aparte: la de aqui era mas corta y 'Bounty Hunter', 'Loot Hacker' y 'Trick or Treat'
@@ -26,6 +25,8 @@ const STATUS_OPTIONS = [
 export function FilterBar({
   isMobile,
   activeGen,
+  newSpiritsCount = 0,
+  newSpiritsKey = '',
   setActiveGen,
   searchQuery,
   setSearchQuery,
@@ -45,14 +46,9 @@ export function FilterBar({
   const [variantOpen, setVariantOpen] = useState(false);
   const [spriteOpen, setSpriteOpen] = useState(false);
 
-  // Compute number of active new spirits
-  const newSpiritsCount = useMemo(() => {
-    return contarNovedades(ALL_SPRITES);
-  }, []);
-
-  /* La clave del aviso sale del drop mas reciente: cada tanda de espiritus
-     nuevos vuelve a avisar una vez por navegador. */
-  const claveNovedades = useMemo(() => claveAvisoNovedades(ALL_SPRITES), []);
+  /* El conteo y la clave llegan de App: salen de la misma lista dinamica y del mismo
+     alcance (generacion visible) que pinta la vista "Nuevos". */
+  const claveNovedades = newSpiritsKey;
 
   const [showNewTooltip, setShowNewTooltip] = useState(() => {
     if (safeStorage.getItem(claveNovedades)) return false;
@@ -65,7 +61,7 @@ export function FilterBar({
       setShowNewTooltip(false);
       safeStorage.setItem(claveNovedades, 'true');
     }
-  }, [statusFilter]);
+  }, [statusFilter, claveNovedades]);
 
   const handleExploreNew = () => {
     setStatusFilter('new');
@@ -157,6 +153,8 @@ export function FilterBar({
     return (
       <MobileLiquidFilterBar
         activeGen={activeGen}
+        newSpiritsCount={newSpiritsCount}
+        newSpiritsKey={newSpiritsKey}
         setActiveGen={setActiveGen}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}

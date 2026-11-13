@@ -5,7 +5,6 @@ import { THEMES_LIST, ALL_SPRITES, pickFamilyName, pickThemeName } from '../data
 import { t } from '../i18n';
 import { safeStorage } from '../utils/safeStorage';
 import { rutaBasicoFamilia } from '../utils/spriteAssets';
-import { contarNovedades, claveAvisoNovedades } from '../utils/novedadesAviso';
 
 const STATUS_OPTIONS = [
   { value: 'all', labelKey: 'filtrosMovil.todos' },
@@ -16,6 +15,8 @@ const STATUS_OPTIONS = [
 
 export function MobileLiquidFilterBar({
   activeGen,
+  newSpiritsCount = 0,
+  newSpiritsKey = '',
   searchQuery,
   setSearchQuery,
   baseFilter,
@@ -33,13 +34,7 @@ export function MobileLiquidFilterBar({
   const inputRef = useRef(null);
 
   // ═══ SMART ONE-TIME DISCOVERY COACHMARK (NUEVO DROP CUMPLEAÑOS - 2026-09-26) ═══
-  const newSpiritsCount = useMemo(() => {
-    return contarNovedades(ALL_SPRITES);
-  }, []);
-
-  /* La clave del aviso sale del drop mas reciente: cada tanda de espiritus
-     nuevos vuelve a avisar una vez por navegador. */
-  const claveNovedades = useMemo(() => claveAvisoNovedades(ALL_SPRITES), []);
+  const claveNovedades = newSpiritsKey;
 
   const [showNewTooltip, setShowNewTooltip] = useState(() => {
     if (safeStorage.getItem(claveNovedades)) return false;
@@ -52,7 +47,7 @@ export function MobileLiquidFilterBar({
       setShowNewTooltip(false);
       safeStorage.setItem(claveNovedades, 'true');
     }
-  }, [statusFilter]);
+  }, [statusFilter, claveNovedades]);
 
   const handleExploreNew = () => {
     setStatusFilter('new');

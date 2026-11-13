@@ -42,6 +42,7 @@ import { setSyncSession, queueCloudSync, clearCloudSync, flushCloudSync } from '
 import { safeStorage } from './utils/safeStorage';
 import { iniciarCalentador } from './utils/spritePrefetch';
 import { pausarAnimacionesFueraDePantalla } from './utils/pausaAnimaciones';
+import { claveAvisoNovedades } from './utils/novedadesAviso';
 import {
   getMyFriendCode,
   fetchCollectionByFriendCode,
@@ -1082,6 +1083,14 @@ export function App() {
     });
  }, [dynamicSpritesVista, activeGen, showUnreleased]);
 
+  /* El aviso de novedades y la vista "Nuevos" salen de la MISMA lista dinámica y del
+     mismo alcance (generación visible). Antes el contador miraba el catálogo estático
+     de todas las generaciones: podía decir "1" y la lista quedar vacía. */
+  const novedadesVista = useMemo(() => {
+    return scopedSprites.filter((s) => s.isNew && !s.unreleased);
+  }, [scopedSprites]);
+  const newSpiritsKey = useMemo(() => claveAvisoNovedades(novedadesVista), [novedadesVista]);
+
   // Calentador de miniaturas del grid. OJO: va despues de scopedSprites a proposito, porque
   // filteredSprites (su dependencia) es un useMemo declarado mas arriba; antes seria un TDZ.
   useEffect(() => {
@@ -1552,6 +1561,8 @@ export function App() {
         <FilterBar
           isMobile={isMobile}
           activeGen={activeGen}
+          newSpiritsCount={novedadesVista.length}
+          newSpiritsKey={newSpiritsKey}
           setActiveGen={setActiveGen}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
