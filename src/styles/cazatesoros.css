@@ -1005,6 +1005,15 @@ html.theme-cazatesoros .modal-content {
   color: var(--czs-tinta);
 }
 
+/* El login está diseñado para fondo oscuro (texto blanco y campos translúcidos). El
+   pergamino del tema lo dejaba ilegible: se le devuelve su superficie propia. */
+html.theme-cazatesoros .modal-content.auth-modal__content,
+html.theme-cazatesoros .modal-content.auth-modal__content--unconfigured {
+  background: rgba(12, 14, 22, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e9eef7;
+}
+
 /* ==========================================================================
    MOVIL: ajustes de escala de las placas
    ========================================================================== */
