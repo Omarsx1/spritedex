@@ -214,17 +214,18 @@
 .cc-table .r { text-align: right; }
 .cc-table tbody tr:last-child td { border-bottom: 0; }
 
-.cc-note { color: var(--cc-muted); font-size: 0.78rem; margin-top: 10px; }
+.cc-note { color: #b8c4d6; font-size: 0.82rem; line-height: 1.5; margin-top: 10px; }
 
 .cc-source {
   margin-top: 22px;
-  padding: 18px;
+  padding: 20px;
   border-radius: 18px;
-  border: 1px dashed rgba(216, 178, 106, 0.4);
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--cc-border);
+  background: linear-gradient(180deg, #1c2c48 0%, #101a2c 100%);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
 }
-.cc-source h2 { font-size: 0.95rem; margin-bottom: 10px; color: var(--cc-text); }
-.cc-source ol { margin: 0 0 12px 18px; color: var(--cc-text-2); display: grid; gap: 4px; font-size: 0.88rem; }
+.cc-source h2 { font-size: 1rem; margin-bottom: 10px; color: #fff3d0; }
+.cc-source ol { margin: 0 0 12px 18px; color: var(--cc-text); display: grid; gap: 6px; font-size: 0.9rem; line-height: 1.5; }
 
 .cc-btn {
   display: inline-flex;
