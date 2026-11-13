@@ -13,6 +13,7 @@ function hoyClave() {
 export function useEquipoCompartido(user) {
   const [equipo, setEquipo] = useState(null);
   const [miembros, setMiembros] = useState([]);
+  const [pasados, setPasados] = useState([]);
   const [cargando, setCargando] = useState(Boolean(user));
   const [error, setError] = useState('');
   const [enVivo, setEnVivo] = useState(false);
@@ -39,6 +40,7 @@ export function useEquipoCompartido(user) {
         .from('team_members')
         .select('team_id')
         .eq('user_id', userId)
+        .is('left_at', null)
         .maybeSingle();
       if (errorMine) {
         setError(errorMine.message);
@@ -47,6 +49,21 @@ export function useEquipoCompartido(user) {
       if (!mine) {
         setEquipo(null);
         setMiembros([]);
+        const { data: historicos } = await supabase
+          .from('team_members')
+          .select('team_id, total, dias, left_at, teams(name, code, archived_at)')
+          .eq('user_id', userId)
+          .not('left_at', 'is', null)
+          .order('left_at', { ascending: false });
+        setPasados((historicos || []).map((p) => ({
+          teamId: p.team_id,
+          nombre: p.teams?.name || 'Equipo',
+          codigo: p.teams?.code || '',
+          total: Number(p.total) || 0,
+          dias: p.dias && typeof p.dias === 'object' ? p.dias : {},
+          leftAt: p.left_at,
+          archivado: Boolean(p.teams?.archived_at)
+        })));
         return;
       }
       const { data: team, error: errorTeam } = await supabase
@@ -60,7 +77,7 @@ export function useEquipoCompartido(user) {
       }
       const { data: members, error: errorMembers } = await supabase
         .from('team_members')
-        .select('user_id, display_name, total, dias, updated_at')
+        .select('user_id, display_name, total, dias, left_at, joined_at, updated_at')
         .eq('team_id', mine.team_id)
         .order('total', { ascending: false });
       if (errorMembers) {
@@ -73,8 +90,11 @@ export function useEquipoCompartido(user) {
         nombre: m.display_name,
         total: Number(m.total) || 0,
         dias: m.dias && typeof m.dias === 'object' ? m.dias : {},
+        leftAt: m.left_at || null,
+        joinedAt: m.joined_at || null,
         actualizado: m.updated_at
       })));
+      setPasados([]);
     } catch (err) {
       setError(err?.message || 'error');
     } finally {
@@ -154,8 +174,7 @@ export function useEquipoCompartido(user) {
     }
     ultimoDelta.current = 0;
     setPuedeDeshacer(false);
-    setEquipo(null);
-    setMiembros([]);
+    await cargar();
   }
 
   async function sumar(delta) {
@@ -212,11 +231,12 @@ export function useEquipoCompartido(user) {
   return {
     equipo,
     miembros,
+    pasados,
     cargando,
     error,
     enVivo,
     puedeDeshacer,
-    miembro: miembros.find((m) => m.userId === userId) || null,
+    miembro: miembros.find((m) => m.userId === userId && !m.leftAt) || null,
     crear,
     unir,
     salir,

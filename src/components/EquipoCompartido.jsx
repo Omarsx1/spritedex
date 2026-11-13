@@ -26,7 +26,7 @@ function nombrePorDefecto(user) {
 export function EquipoCompartido({ user }) {
   const lang = getLang();
   const {
-    equipo, miembros, cargando, error, enVivo, miembro,
+    equipo, miembros, pasados, cargando, error, enVivo, miembro,
     crear, unir, salir, sumar, deshacer, puedeDeshacer
   } = useEquipoCompartido(user);
   const [nombreEquipo, setNombreEquipo] = useState('Mi equipo');
@@ -37,16 +37,18 @@ export function EquipoCompartido({ user }) {
   const [accion, setAccion] = useState(false);
 
   const hoy = hoyClave();
-  const total = miembros.reduce((n, m) => n + m.total, 0);
-  const hoyTotal = miembros.reduce((n, m) => n + (Number(m.dias[hoy]) || 0), 0);
-  const top = miembros.reduce((mejor, m) => (!mejor || m.total > mejor.total ? m : mejor), null);
+  const activos = miembros.filter((m) => !m.leftAt);
+  const historial = miembros.filter((m) => m.leftAt);
+  const total = activos.reduce((n, m) => n + m.total, 0);
+  const hoyTotal = activos.reduce((n, m) => n + (Number(m.dias[hoy]) || 0), 0);
+  const top = activos.reduce((mejor, m) => (!mejor || m.total > mejor.total ? m : mejor), null);
   const dias = useMemo(() => {
     const mapa = {};
-    for (const m of miembros) {
+    for (const m of activos) {
       for (const [dia, n] of Object.entries(m.dias || {})) mapa[dia] = (Number(mapa[dia]) || 0) + (Number(n) || 0);
     }
     return mapa;
-  }, [miembros]);
+  }, [activos]);
   const serie = useMemo(() => {
     const salida = [];
     const base = new Date();
@@ -80,6 +82,13 @@ export function EquipoCompartido({ user }) {
     if (typeof window !== 'undefined' && !window.confirm(t('team.leaveConfirm'))) return;
     setAccion(true);
     await salir();
+    setAccion(false);
+  }
+
+  async function volverAEquipo(pasado) {
+    if (!pasado.codigo) return;
+    setAccion(true);
+    await unir(pasado.codigo, nombreJugador.trim());
     setAccion(false);
   }
 
@@ -181,6 +190,30 @@ export function EquipoCompartido({ user }) {
           </form>
         </div>
 
+        {pasados.length > 0 && (
+          <div className="cc-shared__past">
+            <h3>{t('team.pastTitle')}</h3>
+            <ul className="cc-shared__past-list">
+              {pasados.map((p) => (
+                <li key={`${p.teamId}-${p.leftAt}`} className="cc-shared__past-row">
+                  <div>
+                    <b>{p.nombre}</b>
+                    <span>{p.codigo}{p.archivado ? ` · ${t('team.archived')}` : ''}</span>
+                    <small>{t('team.total')}: {numero(p.total, lang)} · {t('team.leftAt')} {new Intl.DateTimeFormat(lang, { day: '2-digit', month: 'short' }).format(new Date(p.leftAt))}</small>
+                  </div>
+                  <button
+                    type="button"
+                    className="cc-btn cc-btn--ghost"
+                    onClick={() => volverAEquipo(p)}
+                    disabled={accion || !p.codigo}
+                  >{t('team.rejoin')}</button>
+                </li>
+              ))}
+            </ul>
+            <p className="cc-note">{t('team.historyNote')}</p>
+          </div>
+        )}
+
         <p className="cc-note">{t('team.sharedNote')}</p>
       </div>
     );
@@ -210,7 +243,7 @@ export function EquipoCompartido({ user }) {
       <div className="cc-manual__count">
         <span>{t('team.total')}</span>
         <strong>{numero(total, lang)}</strong>
-        <small>{t('team.today')}: {numero(hoyTotal, lang)} · {miembros.length} {t('team.members').toLowerCase()}</small>
+        <small>{t('team.today')}: {numero(hoyTotal, lang)} · {activos.length} {t('team.members').toLowerCase()}</small>
       </div>
 
       <div className="cc-manual__buttons">
@@ -238,7 +271,7 @@ export function EquipoCompartido({ user }) {
       </form>
 
       <ul className="cc-team-list cc-shared__members">
-        {miembros.map((m) => (
+        {activos.map((m) => (
           <li key={m.userId} className={`cc-team-player ${m.userId === user.id ? 'is-active' : ''}`}>
             <div className="cc-team-player__select cc-team-player__select--static">
               <span className="cc-team-player__name">
@@ -253,6 +286,22 @@ export function EquipoCompartido({ user }) {
       </ul>
 
       {top && <p className="cc-shared__top">{t('team.top')}: <b>{top.nombre}</b> · {numero(top.total, lang)}</p>}
+
+      {historial.length > 0 && (
+        <div className="cc-shared__history">
+          <h3>{t('team.historyTitle')}</h3>
+          <ul className="cc-shared__history-list">
+            {historial.map((m) => (
+              <li key={m.userId}>
+                <span>{m.nombre}</span>
+                <b>{numero(m.total, lang)}</b>
+                <small>{t('team.leftAt')} {new Intl.DateTimeFormat(lang, { day: '2-digit', month: 'short' }).format(new Date(m.leftAt))}</small>
+              </li>
+            ))}
+          </ul>
+          <p className="cc-note">{t('team.historyNote')}</p>
+        </div>
+      )}
 
       <div className="cc-card cc-shared__chart">
         <div className="cc-card__head">

@@ -20,7 +20,8 @@ Rama: `main` · Entrega: commits por unidad de trabajo · Runner: `npm test` (no
 - **S10** — La ruta `/cofres` entra al sitemap y al `<head>` del build.
 - **S11** — Con sesión de Spritedex, el contador se sincroniza entre dispositivos en la tabla aislada `chest_counters`; sin sesión o sin tabla, sigue funcionando en local. La fusión conserva el mayor total, el mayor de cada día y el token si aparece en cualquiera de los lados. El historial de Deshacer no se sube.
 - **S12** — Modo Equipo manual: plantilla de jugadores, jugador activo, +1/+5/cantidad por jugador, total del equipo, día del equipo, top y deshacer. La fusión en la nube conserva el mayor total y día de cada jugador. No usa replays: es exacto si cada uno cuenta o si una persona lleva la cuenta.
-- **S13** — Equipo compartido en tiempo real: código de invitación, cada jugador entra con su cuenta, solo puede sumar/restar su propia fila, totales en vivo por Supabase Realtime y permisos por equipo. Un usuario pertenece a un solo equipo; el dueño que sale lo disuelve. Sin relación ni colaboración con ChestCounter.
+- **S13** — Equipo compartido en tiempo real: código de invitación, cada jugador entra con su cuenta, solo puede sumar/restar su propia fila, totales en vivo por Supabase Realtime y permisos por equipo. Un usuario pertenece a un solo equipo activo. Sin relación ni colaboración con ChestCounter.
+- **S14** — Historial y transferencia: al salir se marca `left_at` (no se borra la fila); los cofres quedan en el historial del equipo pero no suman al total activo. Si sale el dueño, la propiedad pasa al miembro activo con más cofres. Si no quedan activos, el equipo se archiva y el historial se conserva. Volver a unirse al mismo equipo reactiva la fila con sus cofres.
 
 ## Assumptions
 
@@ -37,6 +38,7 @@ Rama: `main` · Entrega: commits por unidad de trabajo · Runner: `npm test` (no
 - **T5** Sincronización con la cuenta (`chest_counters`, migración SQL, fusión y estado local/cloud). `S11`
 - **T6** Modo Equipo manual (roster, jugador activo, totales por jugador, top y sync). `S12`
 - **T7** Equipo compartido real (`teams`, `team_members`, RPCs, RLS y Realtime) + UI de crear/unirse. `S13`
+- **T8** Historial, transferencia de dueño y reingreso sin perder registros. `S14`
 
 ## Log
 
@@ -50,3 +52,4 @@ Rama: `main` · Entrega: commits por unidad de trabajo · Runner: `npm test` (no
 - **L8** (2026-11-13) Usuario elige el modo equipo manual. Se implementa plantilla, jugador activo, totales por jugador, total del equipo, top, deshacer y sincronización. La automatización por replays queda descartada para esta versión.
 - **L9** (2026-11-13) Usuario elige equipo compartido en tiempo real. Se añaden `teams` y `team_members` con RLS, RPCs atómicas y Realtime; cada jugador cuenta lo suyo. Se retira cualquier referencia a ChestCounter: no es nuestro servicio ni hay colaboración.
 - **L10** (2026-11-13) Migración aplicada en el proyecto de la app. E2E en producción con dos cuentas anónimas: crear equipo, unirse por código, ambos ven 2 jugadores, A suma 1 y B lo ve, B suma 5 y ambos ven 6. Estado "En vivo" en las dos. El dueño sale y disuelve el equipo.
+- **L11** (2026-11-13) Usuario pide conservar los contadores al salir. Se añade historial con `left_at`, transferencia de propiedad al miembro con más cofres, archivo solo cuando no quedan activos y reingreso que reactiva la fila. No se borran registros; el contador individual queda intacto. Pendiente ejecutar `2026-11-13_equipo_historial.sql`.
