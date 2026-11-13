@@ -4,10 +4,12 @@
 // Cada acción guarda una foto del estado anterior. Deshacer restaura esa foto y la quita del
 // historial. Así, tras un +5, deshacer quita 5; tras marcar el token, lo desmarca.
 
+import { equipoInicial, normalizarEquipo } from './cofresEquipo.js';
+
 export const HISTORIAL_MAX = 30;
 
 export function estadoInicial() {
-  return { total: 0, sesion: 0, token: false, tokenFecha: null, dias: {}, historial: [] };
+  return { total: 0, sesion: 0, token: false, tokenFecha: null, dias: {}, equipo: equipoInicial(), historial: [] };
 }
 
 export function normalizar(guardado) {
@@ -24,6 +26,7 @@ export function normalizar(guardado) {
     token: guardado.token === true,
     tokenFecha: typeof guardado.tokenFecha === 'string' ? guardado.tokenFecha : null,
     dias,
+    equipo: normalizarEquipo(guardado.equipo),
     historial: Array.isArray(guardado.historial) ? guardado.historial.slice(-HISTORIAL_MAX) : []
   };
 }
@@ -34,7 +37,11 @@ function foto(estado) {
     sesion: estado.sesion,
     token: estado.token,
     tokenFecha: estado.tokenFecha,
-    dias: { ...estado.dias }
+    dias: { ...estado.dias },
+    equipo: {
+      ...(estado.equipo || equipoInicial()),
+      jugadores: (estado.equipo?.jugadores || []).map((j) => ({ ...j, dias: { ...j.dias } }))
+    }
   };
 }
 

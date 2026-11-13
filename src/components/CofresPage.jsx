@@ -1,8 +1,10 @@
 // Contador de cofres de Spritedex (Beta).
 //
 // Servicio propio, sin apps externas: el usuario toca +1 por cada cofre que abre y todo se
-// guarda en este navegador. La meta de la temporada es el Token Pirata, así que la página
-// muestra el total, el día, la sesión y el estado del token.
+// guarda en este navegador. Tiene dos vistas:
+//   Individual: total, hoy, sesión y Token Pirata.
+//   Equipo: plantilla de jugadores, contador por jugador y total del equipo.
+// Con sesión se sincroniza en la nube; sin sesión funciona igual en local.
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { t, getLang } from '../i18n';
 import { safeStorage } from '../utils/safeStorage';
@@ -10,14 +12,27 @@ import { useCofresCloud } from '../hooks/useCofresCloud';
 import {
   estadoInicial,
   normalizar,
+  aplicar,
   sumarCofres,
   alternarToken,
   reiniciarSesion,
-  reiniciarTodo,
   deshacerUltimo
 } from '../utils/cofresManual.js';
+import {
+  equipoInicial,
+  agregarJugador,
+  quitarJugador,
+  seleccionarJugador,
+  sumarJugador,
+  jugadorActivo,
+  totalEquipo,
+  hoyEquipo,
+  diasEquipo,
+  topEquipo
+} from '../utils/cofresEquipo.js';
 
 const CLAVE = 'spritedex_cofres_v1';
+const CLAVE_VISTA = 'spritedex_cofres_vista';
 const DIA_MS = 24 * 60 * 60 * 1000;
 
 const numero = (valor, lang) => new Intl.NumberFormat(lang, { maximumFractionDigits: 1 }).format(valor || 0);
@@ -42,9 +57,11 @@ function Barra({ valor, maximo, etiqueta }) {
 export function CofresPage({ user, onOpenAuth }) {
   const lang = getLang();
   const [cofres, setCofres] = useState(leerGuardado);
-  const sync = useCofresCloud({ user, cofres, setCofres });
+  const [vista, setVista] = useState(() => (safeStorage.getItem(CLAVE_VISTA) === 'equipo' ? 'equipo' : 'individual'));
   const [entrada, setEntrada] = useState('');
+  const [nuevoJugador, setNuevoJugador] = useState('');
   const tituloRef = useRef(null);
+  const sync = useCofresCloud({ user, cofres, setCofres });
 
   useEffect(() => {
     if (tituloRef.current) tituloRef.current.focus();
@@ -55,7 +72,18 @@ export function CofresPage({ user, onOpenAuth }) {
     safeStorage.setItem(CLAVE, JSON.stringify(siguiente));
   }
 
+  function cambiarVista(siguiente) {
+    setVista(siguiente);
+    safeStorage.setItem(CLAVE_VISTA, siguiente);
+  }
+
   function sumar(cantidad) {
+    if (vista === 'equipo') {
+      const activo = jugadorActivo(cofres.equipo);
+      if (!activo) return;
+      guardar(aplicar(cofres, { equipo: sumarJugador(cofres.equipo, activo.id, cantidad, claveDia()) }));
+      return;
+    }
     guardar(sumarCofres(cofres, cantidad, claveDia()));
   }
 
@@ -67,16 +95,11 @@ export function CofresPage({ user, onOpenAuth }) {
     guardar(reiniciarSesion(cofres));
   }
 
-  function reiniciar() {
-    if (typeof window !== 'undefined' && !window.confirm(t('chest.resetConfirm'))) return;
-    guardar(reiniciarTodo());
-  }
-
   function marcarToken() {
     guardar(alternarToken(cofres, claveDia()));
   }
 
-  function sumarManual(evento) {
+  function sumaManual(evento) {
     evento.preventDefault();
     const cantidad = Math.floor(Number(entrada));
     if (!Number.isFinite(cantidad) || cantidad <= 0) return;
@@ -84,13 +107,48 @@ export function CofresPage({ user, onOpenAuth }) {
     setEntrada('');
   }
 
+  function reiniciar() {
+    const mensaje = vista === 'equipo' ? t('chest.teamResetConfirm') : t('chest.resetConfirm');
+    if (typeof window !== 'undefined' && !window.confirm(mensaje)) return;
+    if (vista === 'equipo') {
+      guardar(aplicar(cofres, { equipo: equipoInicial() }));
+    } else {
+      guardar(aplicar(cofres, { total: 0, sesion: 0, token: false, tokenFecha: null, dias: {} }));
+    }
+  }
+
+  function agregarMiembro(evento) {
+    evento.preventDefault();
+    const nombre = nuevoJugador.trim();
+    if (!nombre) return;
+    guardar(aplicar(cofres, { equipo: agregarJugador(cofres.equipo, nombre) }));
+    setNuevoJugador('');
+  }
+
+  function quitarMiembro(id) {
+    guardar(aplicar(cofres, { equipo: quitarJugador(cofres.equipo, id) }));
+  }
+
+  function seleccionarMiembro(id) {
+    guardar({ ...cofres, equipo: seleccionarJugador(cofres.equipo, id) });
+  }
+
   const hoy = claveDia();
-  const hoyCofres = Number(cofres.dias[hoy]) || 0;
-  const entradas = Object.entries(cofres.dias).filter(([, n]) => Number(n) > 0);
+  const esEquipo = vista === 'equipo';
+  const equipo = cofres.equipo || equipoInicial();
+  const activo = jugadorActivo(equipo);
+  const equipoTotal = totalEquipo(equipo);
+  const equipoHoy = hoyEquipo(equipo, hoy);
+  const equipoDias = diasEquipo(equipo);
+  const equipoTop = topEquipo(equipo);
+  const diasBase = esEquipo ? equipoDias : cofres.dias;
+  const totalBase = esEquipo ? equipoTotal : cofres.total;
+  const hoyBase = esEquipo ? equipoHoy : (Number(cofres.dias[hoy]) || 0);
+  const entradas = Object.entries(diasBase).filter(([, n]) => Number(n) > 0);
   const mejorDia = entradas.map(([dia, n]) => ({ dia, cofres: Number(n) }))
     .sort((a, b) => b.cofres - a.cofres)[0] || null;
   const diasJugados = entradas.length;
-  const mediaDia = diasJugados ? cofres.total / diasJugados : 0;
+  const mediaDia = diasJugados ? totalBase / diasJugados : 0;
 
   const serie = useMemo(() => {
     const salida = [];
@@ -99,10 +157,10 @@ export function CofresPage({ user, onOpenAuth }) {
     for (let i = 13; i >= 0; i--) {
       const fecha = new Date(base.getTime() - i * DIA_MS);
       const clave = claveDia(fecha);
-      salida.push({ clave, fecha, cofres: Number(cofres.dias[clave]) || 0 });
+      salida.push({ clave, fecha, cofres: Number(diasBase[clave]) || 0 });
     }
     return salida;
-  }, [cofres.dias]);
+  }, [diasBase]);
   const maxSerie = Math.max(1, ...serie.map((d) => d.cofres));
   const fmtDia = (fecha) => new Intl.DateTimeFormat(lang, { day: '2-digit', month: '2-digit' }).format(fecha);
 
@@ -120,27 +178,92 @@ export function CofresPage({ user, onOpenAuth }) {
         </div>
       </section>
 
-      <section className={`cc-token ${cofres.token ? 'is-found' : ''}`}>
-        <img className="cc-token__mark" src="/token-pirata.svg" alt="" width="52" height="52" />
-        <div>
-          <h2>{t('chest.token')}</h2>
-          <strong>{cofres.token ? t('chest.tokenYes') : t('chest.tokenNo')}</strong>
-          <p>{cofres.token
-            ? t('chest.tokenYesManualNote')
-            : t('chest.tokenNoManualNote', { n: numero(cofres.total, lang) })}</p>
-        </div>
-        <span className="cc-token__meta">{t('chest.tokenHint')}</span>
-      </section>
+      {!esEquipo && (
+        <section className={`cc-token ${cofres.token ? 'is-found' : ''}`}>
+          <img className="cc-token__mark" src="/token-pirata.svg" alt="" width="52" height="52" />
+          <div>
+            <h2>{t('chest.token')}</h2>
+            <strong>{cofres.token ? t('chest.tokenYes') : t('chest.tokenNo')}</strong>
+            <p>{cofres.token
+              ? t('chest.tokenYesManualNote')
+              : t('chest.tokenNoManualNote', { n: numero(cofres.total, lang) })}</p>
+          </div>
+          <span className="cc-token__meta">{t('chest.tokenHint')}</span>
+        </section>
+      )}
 
       <section className="cc-manual">
-        <div className="cc-manual__count">
-          <span>{t('chest.total')}</span>
-          <strong>{numero(cofres.total, lang)}</strong>
-          <small>{t('chest.today')}: {numero(hoyCofres, lang)} · {t('chest.session')}: {numero(cofres.sesion, lang)}</small>
+        <div className="cc-vista" role="tablist" aria-label={t('chest.modesAria')}>
+          <button type="button" role="tab" aria-selected={!esEquipo}
+            className={!esEquipo ? 'is-active' : ''} onClick={() => cambiarVista('individual')}>
+            {t('chest.modeIndividual')}
+          </button>
+          <button type="button" role="tab" aria-selected={esEquipo}
+            className={esEquipo ? 'is-active' : ''} onClick={() => cambiarVista('equipo')}>
+            {t('chest.modeTeam')}
+          </button>
         </div>
+
+        {esEquipo && (
+          <div className="cc-team">
+            <form className="cc-team-add" onSubmit={agregarMiembro}>
+              <label htmlFor="cc-team-name">{t('chest.teamAddLabel')}</label>
+              <div className="cc-team-add__row">
+                <input
+                  id="cc-team-name"
+                  type="text"
+                  maxLength={24}
+                  value={nuevoJugador}
+                  onChange={(e) => setNuevoJugador(e.target.value)}
+                  placeholder={t('chest.teamAddPlaceholder')}
+                />
+                <button type="submit" className="cc-btn cc-btn--primary">{t('chest.teamAdd')}</button>
+              </div>
+            </form>
+
+            {equipo.jugadores.length === 0 ? (
+              <p className="cc-note">{t('chest.teamEmpty')}</p>
+            ) : (
+              <ul className="cc-team-list">
+                {equipo.jugadores.map((j) => (
+                  <li key={j.id} className={`cc-team-player ${j.id === equipo.activoId ? 'is-active' : ''}`}>
+                    <button
+                      type="button"
+                      className="cc-team-player__select"
+                      onClick={() => seleccionarMiembro(j.id)}
+                      aria-pressed={j.id === equipo.activoId}
+                    >
+                      <span className="cc-team-player__name">{j.nombre}</span>
+                      <span className="cc-team-player__count">{numero(j.total, lang)}</span>
+                      <span className="cc-team-player__today">{t('chest.today')}: {numero(Number(j.dias[hoy]) || 0, lang)}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="cc-team-player__remove"
+                      onClick={() => quitarMiembro(j.id)}
+                      aria-label={`${t('chest.teamRemove')} ${j.nombre}`}
+                    >×</button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {activo && <p className="cc-team__active">{t('chest.teamActive', { nombre: activo.nombre })}</p>}
+          </div>
+        )}
+
+        <div className="cc-manual__count">
+          <span>{esEquipo ? t('chest.teamTotal') : t('chest.total')}</span>
+          <strong>{numero(esEquipo ? equipoTotal : cofres.total, lang)}</strong>
+          <small>
+            {esEquipo
+              ? `${t('chest.teamToday')}: ${numero(equipoHoy, lang)} · ${equipo.jugadores.length} ${t('chest.teamPlayers').toLowerCase()}`
+              : `${t('chest.today')}: ${numero(hoyBase, lang)} · ${t('chest.session')}: ${numero(cofres.sesion, lang)}`}
+          </small>
+        </div>
+
         <div className="cc-manual__buttons">
-          <button type="button" className="cc-btn cc-btn--gold" onClick={() => sumar(1)}>{t('chest.add1')}</button>
-          <button type="button" className="cc-btn cc-btn--primary" onClick={() => sumar(5)}>{t('chest.add5')}</button>
+          <button type="button" className="cc-btn cc-btn--gold" onClick={() => sumar(1)} disabled={esEquipo && !activo}>{t('chest.add1')}</button>
+          <button type="button" className="cc-btn cc-btn--primary" onClick={() => sumar(5)} disabled={esEquipo && !activo}>{t('chest.add5')}</button>
           <button
             type="button"
             className="cc-btn cc-btn--ghost"
@@ -148,11 +271,14 @@ export function CofresPage({ user, onOpenAuth }) {
             disabled={!cofres.historial?.length}
             title={t('chest.undoHint')}
           >{t('chest.undo')}</button>
-          <button type="button" className="cc-btn cc-btn--ghost" onClick={marcarToken}>{t('chest.manualToken')}</button>
-          <button type="button" className="cc-btn cc-btn--ghost" onClick={nuevaSesion}>{t('chest.newSession')}</button>
-          <button type="button" className="cc-btn cc-btn--ghost cc-btn--danger" onClick={reiniciar}>{t('chest.reset')}</button>
+          {!esEquipo && <button type="button" className="cc-btn cc-btn--ghost" onClick={marcarToken}>{t('chest.manualToken')}</button>}
+          {!esEquipo && <button type="button" className="cc-btn cc-btn--ghost" onClick={nuevaSesion}>{t('chest.newSession')}</button>}
+          <button type="button" className="cc-btn cc-btn--ghost cc-btn--danger" onClick={reiniciar}>
+            {esEquipo ? t('chest.teamReset') : t('chest.reset')}
+          </button>
         </div>
-        <form className="cc-manual__form" onSubmit={sumarManual}>
+
+        <form className="cc-manual__form" onSubmit={sumaManual}>
           <label htmlFor="cc-manual-amount">{t('chest.manualAmountLabel')}</label>
           <div className="cc-manual__form-row">
             <input
@@ -165,13 +291,15 @@ export function CofresPage({ user, onOpenAuth }) {
               value={entrada}
               onChange={(e) => setEntrada(e.target.value)}
             />
-            <button type="submit" className="cc-btn cc-btn--primary">{t('chest.manualAmountAdd')}</button>
+            <button type="submit" className="cc-btn cc-btn--primary" disabled={esEquipo && !activo}>{t('chest.manualAmountAdd')}</button>
           </div>
           <p className="cc-note">{t('chest.manualAmountHint')}</p>
         </form>
+
         <p className="cc-manual__note">{t('chest.manualBody')}</p>
-        <p className="cc-manual__note">{t('chest.sessionHelp')}</p>
-        <p className="cc-note">{t('chest.manualTokenNote')}</p>
+        {!esEquipo && <p className="cc-manual__note">{t('chest.sessionHelp')}</p>}
+        <p className="cc-note">{esEquipo ? t('chest.teamTokenNote') : t('chest.manualTokenNote')}</p>
+
         <div className="cc-sync" aria-live="polite">
           {!user ? (
             <>
@@ -198,6 +326,13 @@ export function CofresPage({ user, onOpenAuth }) {
         <div className="cc-kpi"><span>{t('chest.daysPlayed')}</span><strong>{numero(diasJugados, lang)}</strong></div>
         <div className="cc-kpi"><span>{t('chest.averageDay')}</span><strong>{numero(mediaDia, lang)}</strong></div>
         <div className="cc-kpi"><span>{t('chest.bestDay')}</span><strong>{mejorDia ? numero(mejorDia.cofres, lang) : '—'}</strong>{mejorDia && <small>{mejorDia.dia}</small>}</div>
+        {esEquipo && (
+          <div className="cc-kpi">
+            <span>{t('chest.teamTop')}</span>
+            <strong>{equipoTop ? numero(equipoTop.total, lang) : '—'}</strong>
+            {equipoTop && <small>{equipoTop.nombre}</small>}
+          </div>
+        )}
       </section>
 
       <section className="cc-card">

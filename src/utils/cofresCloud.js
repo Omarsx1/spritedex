@@ -7,6 +7,8 @@
 // La fusión es conservadora: por día gana el número mayor y el token se mantiene si aparece
 // en cualquiera de los dos lados. El historial de "Deshacer" es local y no se sube.
 
+import { fusionarEquipo } from './cofresEquipo.js';
+
 export function sinHistorial(estado) {
   if (!estado) return {};
   const { historial, ...resto } = estado;
@@ -28,6 +30,7 @@ export function fusionarCofres(local, remoto) {
     token,
     tokenFecha: token ? (fechas[0] || null) : null,
     dias,
+    equipo: fusionarEquipo(local?.equipo, remoto.equipo),
     historial: local?.historial || []
   };
 }
