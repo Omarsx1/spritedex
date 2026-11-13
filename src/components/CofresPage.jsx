@@ -30,6 +30,7 @@ import {
   diasEquipo,
   topEquipo
 } from '../utils/cofresEquipo.js';
+import { EquipoCompartido } from './EquipoCompartido';
 
 const CLAVE = 'spritedex_cofres_v1';
 const CLAVE_VISTA = 'spritedex_cofres_vista';
@@ -204,6 +205,11 @@ export function CofresPage({ user, onOpenAuth }) {
           </button>
         </div>
 
+        {esEquipo && user ? (
+          <EquipoCompartido user={user} />
+        ) : (
+          <>
+
         {esEquipo && (
           <div className="cc-team">
             <form className="cc-team-add" onSubmit={agregarMiembro}>
@@ -320,8 +326,11 @@ export function CofresPage({ user, onOpenAuth }) {
             </>
           )}
         </div>
+          </>
+        )}
       </section>
 
+      {(!esEquipo || !user) && (
       <section className="cc-kpis">
         <div className="cc-kpi"><span>{t('chest.daysPlayed')}</span><strong>{numero(diasJugados, lang)}</strong></div>
         <div className="cc-kpi"><span>{t('chest.averageDay')}</span><strong>{numero(mediaDia, lang)}</strong></div>
@@ -334,7 +343,9 @@ export function CofresPage({ user, onOpenAuth }) {
           </div>
         )}
       </section>
+      )}
 
+      {(!esEquipo || !user) && (
       <section className="cc-card">
         <div className="cc-card__head">
           <h2>{t('chest.chart')}</h2>
@@ -349,6 +360,7 @@ export function CofresPage({ user, onOpenAuth }) {
           ))}
         </div>
       </section>
+      )}
 
       <section className="cc-source">
         <h2>{t('chest.howTitle')}</h2>

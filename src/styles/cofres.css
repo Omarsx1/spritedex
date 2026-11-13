@@ -454,6 +454,70 @@
   .app-navbar__cofres::before { animation: none; opacity: 0.6; }
 }
 
+.cc-shared { display: grid; gap: 14px; }
+.cc-shared__intro h2,
+.cc-shared__head h2 { font-size: 1.25rem; color: var(--cc-text); }
+.cc-shared__intro p { color: var(--cc-text-2); font-size: 0.9rem; }
+.cc-shared__name,
+.cc-shared__card label { display: grid; gap: 6px; color: var(--cc-text-2); font-size: 0.8rem; }
+.cc-shared__name input,
+.cc-shared__card input {
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--cc-line);
+  background: var(--cc-card-2);
+  color: var(--cc-text);
+  font: inherit;
+  font-size: 0.9rem;
+}
+.cc-shared__name input:focus,
+.cc-shared__card input:focus { outline: 2px solid var(--cc-gold); outline-offset: 1px; }
+.cc-shared__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.cc-shared__card {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--cc-line);
+  border-radius: 14px;
+  background: var(--cc-card-2);
+}
+.cc-shared__card h3 { font-size: 0.95rem; color: var(--cc-text); }
+.cc-shared__head { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; align-items: flex-start; }
+.cc-shared__kicker {
+  color: var(--cc-gold);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.cc-shared__code {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+  padding: 6px 10px;
+  border: 1px dashed var(--cc-border);
+  border-radius: 8px;
+  background: var(--cc-card-2);
+  color: var(--cc-gold-2);
+  font-family: monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+.cc-shared__code span { color: var(--cc-muted); font-family: var(--font-sans); font-size: 0.7rem; letter-spacing: 0; }
+.cc-shared__head-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.cc-shared__status { display: inline-flex; gap: 6px; align-items: center; color: var(--cc-muted); font-size: 0.75rem; }
+.cc-shared__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cc-muted); }
+.cc-shared__status.is-live .cc-shared__dot { background: #3ddc97; box-shadow: 0 0 8px rgba(61, 220, 151, 0.55); }
+.cc-shared__loading { color: var(--cc-muted); }
+.cc-shared__members { margin-top: 14px; }
+.cc-team-player__select--static { cursor: default; }
+.cc-shared__you { color: var(--cc-gold-2); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.cc-shared__top { color: var(--cc-text-2); font-size: 0.85rem; }
+.cc-shared__chart { margin-top: 4px; }
+
 /* El botón del menú: el cofre crece al pasar el ratón. */
 .app-navbar__cofres { transition: transform 0.16s ease, background 0.16s ease; }
 .app-navbar__cofres:hover { transform: translateY(-1px); }
