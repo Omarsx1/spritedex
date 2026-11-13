@@ -1447,7 +1447,7 @@ export function App() {
     return (
       <div className="app-container">
         {navbar}
-        <CofresPage />
+        <CofresPage user={user} onOpenAuth={() => setShowAuthModal(true)} />
         {modales}
         <MobileNavbar
           solicitudesNuevas={avisosAmigos}

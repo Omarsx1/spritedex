@@ -18,6 +18,7 @@ Rama: `main` · Entrega: commits por unidad de trabajo · Runner: `npm test` (no
 - **S8** — La paleta de la página copia el menú hamburguesa: azul marino, filo de latón, texto pergamino y acentos cian/dorado. Texto: "los colores de los elementos de esta página deben ser como los del menú hamburguesa".
 - **S9** — El login bajo el tema Cazatesoros conserva su superficie oscura y su texto se lee. Texto: "corrige los colores del loguin que no se ve nada".
 - **S10** — La ruta `/cofres` entra al sitemap y al `<head>` del build.
+- **S11** — Con sesión de Spritedex, el contador se sincroniza entre dispositivos en la tabla aislada `chest_counters`; sin sesión o sin tabla, sigue funcionando en local. La fusión conserva el mayor total, el mayor de cada día y el token si aparece en cualquiera de los lados. El historial de Deshacer no se sube.
 
 ## Assumptions
 
@@ -31,6 +32,7 @@ Rama: `main` · Entrega: commits por unidad de trabajo · Runner: `npm test` (no
 - **T2** Contador manual persistente, token y estadísticas. `S3-S6`
 - **T3** Traducciones, paleta del menú, login legible y SEO. `S7-S10`
 - **T4** Verificación: `npm test`, lint, build y captura de la página. `S1-S10`
+- **T5** Sincronización con la cuenta (`chest_counters`, migración SQL, fusión y estado local/cloud). `S11`
 
 ## Log
 
@@ -40,3 +42,4 @@ Rama: `main` · Entrega: commits por unidad de trabajo · Runner: `npm test` (no
 - **L4** (2026-11-13) Usuario: "¿cómo ofrecemos el servicio a más usuarios? como PS5? no solo a windows". Se prioriza el modo manual web.
 - **L5** (2026-11-13) Usuario: "en lugar de una estrella coloca [emblema dorado]" y "los colores de los elementos de esta página deben ser como los del menú hamburguesa".
 - **L6** (2026-11-13) Usuario: "corrige los colores del loguin que no se ve nada". Causa: el tema Cazatesoros pintaba el modal con pergamino claro y el login mantiene texto blanco.
+- **L7** (2026-11-13) Usuario aprueba la sincronización con la cuenta. Se añade `chest_counters` con RLS, fusión conservadora y estado "Solo en este dispositivo / Sincronizando / Sincronizado". La migración debe ejecutarse en el proyecto Supabase de la app; el MCP disponible apunta a otro proyecto.

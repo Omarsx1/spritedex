@@ -562,4 +562,10 @@ export default {
   "chest.manualAmountPlaceholder": "e.g. 25",
   "chest.manualAmountAdd": "Add",
   "chest.manualAmountHint": "They are added to the total, today and the session. They can also be undone.",
+  "chest.syncLocal": "Only on this device.",
+  "chest.syncLogin": "Sign in to sync",
+  "chest.syncSyncing": "Syncing…",
+  "chest.syncDone": "Synced with your account",
+  "chest.syncGuest": "Saved in your guest account. Link your account to use it on other devices.",
+  "chest.syncLink": "Link account",
 };

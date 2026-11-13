@@ -563,4 +563,10 @@ export default {
   "chest.manualAmountPlaceholder": "Ej. 25",
   "chest.manualAmountAdd": "Sumar",
   "chest.manualAmountHint": "Se suman al total, a hoy y a la sesión. También se pueden deshacer.",
+  "chest.syncLocal": "Solo en este dispositivo.",
+  "chest.syncLogin": "Inicia sesión para sincronizar",
+  "chest.syncSyncing": "Sincronizando…",
+  "chest.syncDone": "Sincronizado con tu cuenta",
+  "chest.syncGuest": "Guardado en tu cuenta de invitado. Vincula tu cuenta para llevarlo a otros dispositivos.",
+  "chest.syncLink": "Vincular cuenta",
 };

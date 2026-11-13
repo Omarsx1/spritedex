@@ -6,6 +6,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { t, getLang } from '../i18n';
 import { safeStorage } from '../utils/safeStorage';
+import { useCofresCloud } from '../hooks/useCofresCloud';
 import {
   estadoInicial,
   normalizar,
@@ -38,9 +39,10 @@ function Barra({ valor, maximo, etiqueta }) {
   return <span className={`cc-bar ${valor > 0 ? '' : 'is-empty'}`} style={{ height: alto + '%' }} title={etiqueta} />;
 }
 
-export function CofresPage() {
+export function CofresPage({ user, onOpenAuth }) {
   const lang = getLang();
   const [cofres, setCofres] = useState(leerGuardado);
+  const sync = useCofresCloud({ user, cofres, setCofres });
   const [entrada, setEntrada] = useState('');
   const tituloRef = useRef(null);
 
@@ -170,6 +172,26 @@ export function CofresPage() {
         <p className="cc-manual__note">{t('chest.manualBody')}</p>
         <p className="cc-manual__note">{t('chest.sessionHelp')}</p>
         <p className="cc-note">{t('chest.manualTokenNote')}</p>
+        <div className="cc-sync" aria-live="polite">
+          {!user ? (
+            <>
+              <span className="cc-sync__dot" />
+              <span>{t('chest.syncLocal')}</span>
+              <button type="button" className="cc-sync__link" onClick={onOpenAuth}>{t('chest.syncLogin')}</button>
+            </>
+          ) : user.is_anonymous ? (
+            <>
+              <span className={`cc-sync__dot ${sync === 'synced' ? 'is-ok' : ''}`} />
+              <span>{sync === 'syncing' ? t('chest.syncSyncing') : sync === 'synced' ? t('chest.syncGuest') : t('chest.syncLocal')}</span>
+              <button type="button" className="cc-sync__link" onClick={onOpenAuth}>{t('chest.syncLink')}</button>
+            </>
+          ) : (
+            <>
+              <span className={`cc-sync__dot ${sync === 'synced' ? 'is-ok' : ''}`} />
+              <span>{sync === 'syncing' ? t('chest.syncSyncing') : sync === 'synced' ? t('chest.syncDone') : t('chest.syncLocal')}</span>
+            </>
+          )}
+        </div>
       </section>
 
       <section className="cc-kpis">
