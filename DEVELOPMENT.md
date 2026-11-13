@@ -31,6 +31,24 @@ Para registrar un Sprite en estado "Anunciado" sin alterar la experiencia princi
 3. **Promoción a Estado Oficial (Lanzado en Juego)**:
    * Cuando el sprite se lanza oficialmente en el juego, cambiar el valor a `"unreleased": false`.
 
+### Programación de un lote (auto-publicación)
+
+Un lote se publica solo, sin desplegar nada esa madrugada, con dos campos por ficha:
+
+```json
+{
+  "id": "whitetiger_basic",
+  "unreleased": false,
+  "releaseDate": "2026-11-13T11:00:00.000Z",
+  "lanzamientoManual": true
+}
+```
+
+* `releaseDate` va con **hora y zona** (instante global). Un día suelto se lee como medianoche UTC y adelanta la salida la noche anterior en América. Las 6:00 a. m. en Perú (UTC-5) son `T11:00:00.000Z`.
+* `unreleased` debe quedar en `false`: es la fecha futura la que oculta la ficha. Si se deja `true`, la ficha **no** se publica al llegar la fecha.
+* `lanzamientoManual: true` evita que el sync la vuelva a ocultar cuando fortnite.gg todavía la lista como no lanzada (su protección por fecha futura desaparece justo al publicarse). Se retira cuando la fuente confirme el lanzamiento.
+* No programar placeholders sin arte real (gem/holofoil viejos): la fuente no los da por lanzados.
+
 ---
 
 ## ➕ 2. Flujo Paso a Paso para Agregar Nuevos Sprites

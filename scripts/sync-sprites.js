@@ -63,6 +63,12 @@ const TRANSLATIONS = {
   abilities: {
     '(Active - Jump In Air) Spooky Dash lets you phase through some objects.':
       '(Activa - Salto en el aire) Spooky Dash te permite atravesar algunos objetos.',
+    'Grants increased Pickaxe damage, also gives a temporary speed boost when your Shield breaks.':
+      'Aumenta el daño del pico y otorga un impulso de velocidad temporal cuando tu escudo se rompe.',
+    'Grants a Friendship Bubble when emoting with other players.':
+      'Otorga una Burbuja de Amistad al hacer emotes con otros jugadores.',
+    'Grants regenerating Zero Point dash charges.':
+      'Otorga cargas de impulso de Punto Cero que se regeneran.',
     'Increases chances of spawning items from your Loot Hacks. (Active - Jump In Air) Spooky Dash lets you phase through some objects.':
       'Aumenta las probabilidades de que aparezcan objetos de tus Hackeos de botín. (Activa - Salto en el aire) Spooky Dash te permite atravesar algunos objetos.',
     '(Active - Jump In Air) Double Jump. Cooldown between jumps decreases with each Level Up!':

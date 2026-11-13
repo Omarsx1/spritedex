@@ -284,7 +284,20 @@
   "obsession_cheat": "One Wish Willow Mestre da Trapaça",
   "obsession_hacker": "One Wish Willow Hacker de Saques",
   "obsession_bounty": "One Wish Willow Caçador de Recompensas",
-  "obsession_treat": "One Wish Willow Gostosuras ou Travessuras"
+  "obsession_treat": "One Wish Willow Gostosuras ou Travessuras",
+  "piratecalamari_basic": "Squiplash",
+  "piratecalamari_gold": "Squiplash Dourado",
+  "piratecalamari_jeweled": "Squiplash Afortunado",
+  "piratecalamari_cursed": "Squiplash Amaldiçoado",
+  "whitetiger_basic": "Sir Oscar, o Segundo",
+  "whitetiger_gold": "Sir Oscar, o Segundo Dourado",
+  "whitetiger_jeweled": "Sir Oscar, o Segundo Afortunado",
+  "whitetiger_cursed": "Sir Oscar, o Segundo Amaldiçoado",
+  "daffodilchurn_basic": "Mini Miku",
+  "daffodilchurn_gold": "Mini Miku Dourado",
+  "daffodilchurn_jeweled": "Mini Miku Afortunado",
+  "daffodilchurn_cursed": "Mini Miku Amaldiçoado",
+  "yortmelee_basic": "Zee"
  },
  "familia": {
   "water": "Água",
@@ -338,7 +351,11 @@
   "deer": "O Cervo",
   "vampire": "Vampiro",
   "honey": "Mel",
-  "obsession": "One Wish Willow"
+  "obsession": "One Wish Willow",
+  "piratecalamari": "Squiplash",
+  "whitetiger": "Sir Oscar, o Segundo",
+  "daffodilchurn": "Mini Miku",
+  "yortmelee": "Zee"
  },
  "tema": {
   "Basic": "Normal",
@@ -352,6 +369,8 @@
   "Gem": "Gema",
   "Holofoil": "Metalizado",
   "Quack": "Quack",
-  "Cube": "Cubo"
+  "Cube": "Cubo",
+  "cursed": "Amaldiçoado",
+  "jeweled": "Afortunado"
  }
 }

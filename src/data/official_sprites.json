@@ -2626,6 +2626,17 @@
     "releaseDate": "2026-11-01"
   },
   {
+    "id": "peelybones_gold",
+    "name": "Bananín Huesudo Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
     "id": "peelybones_jeweled",
     "name": "Peelybones jeweled",
     "theme": "jeweled",
@@ -2654,6 +2665,17 @@
     "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "parrot_gold",
+    "name": "Plumitas Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "parrot_cursed",
@@ -2686,6 +2708,17 @@
     "releaseDate": "2026-11-01"
   },
   {
+    "id": "barreloffish_gold",
+    "name": "Barry Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
     "id": "barreloffish_cursed",
     "name": "Barreloffish cursed",
     "theme": "cursed",
@@ -2714,6 +2747,17 @@
     "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "compass_gold",
+    "name": "Orientador Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "compass_cursed",
@@ -2746,6 +2790,17 @@
     "releaseDate": "2026-11-01"
   },
   {
+    "id": "treasurechest_gold",
+    "name": "Gatisoro Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
     "id": "treasurechest_cursed",
     "name": "Treasurechest cursed",
     "theme": "cursed",
@@ -2776,6 +2831,17 @@
     "releaseDate": "2026-11-01"
   },
   {
+    "id": "unbotheredfish_gold",
+    "name": "Mar Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
     "id": "unbotheredfish_jeweled",
     "name": "Unbotheredfish jeweled",
     "theme": "jeweled",
@@ -2790,10 +2856,10 @@
     "name": "Unbotheredfish cursed",
     "theme": "cursed",
     "rarity": "Special",
-    "unreleased": true,
-    "isNew": false,
+    "unreleased": false,
+    "isNew": true,
     "gen": 3,
-    "releaseDate": "2026-11-01"
+    "releaseDate": "2026-11-13"
   },
   {
     "id": "treasuremap_basic",
@@ -2804,6 +2870,17 @@
     "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "treasuremap_gold",
+    "name": "Buscarrutas Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "treasuremap_jeweled",
@@ -2836,6 +2913,17 @@
     "releaseDate": "2026-11-01"
   },
   {
+    "id": "squibbly_gold",
+    "name": "Tintonio pequeño Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
     "id": "squibbly_cursed",
     "name": "Squibbly cursed",
     "theme": "cursed",
@@ -2864,6 +2952,17 @@
     "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "playmakerbrewery_gold",
+    "name": "Lil' Flacko Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "playmakerbrewery_jeweled",
@@ -2896,6 +2995,17 @@
     "releaseDate": "2026-11-01"
   },
   {
+    "id": "rookgecko_gold",
+    "name": "Lil' Uzi Vert Jr. Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
     "id": "rookgecko_cursed",
     "name": "Rookgecko cursed",
     "theme": "cursed",
@@ -2924,6 +3034,17 @@
     "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "coinpile_gold",
+    "name": "Saqueacofres Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
   },
   {
     "id": "coinpile_cursed",
@@ -2964,5 +3085,148 @@
     "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-01"
+  },
+  {
+    "id": "piratecalamari_basic",
+    "name": "Squiplash",
+    "theme": "Basic",
+    "rarity": "Epic",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "piratecalamari_gold",
+    "name": "Squiplash Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "piratecalamari_jeweled",
+    "name": "Squiplash Afortunado",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "piratecalamari_cursed",
+    "name": "Squiplash Maldito",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "whitetiger_basic",
+    "name": "Sir Óscar el Segundo",
+    "theme": "Basic",
+    "rarity": "Legendary",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "whitetiger_gold",
+    "name": "Sir Óscar el Segundo Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "whitetiger_jeweled",
+    "name": "Sir Óscar el Segundo Afortunado",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "whitetiger_cursed",
+    "name": "Sir Óscar el Segundo Maldito",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "daffodilchurn_basic",
+    "name": "Mini Miku",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "daffodilchurn_gold",
+    "name": "Mini Miku Dorado",
+    "theme": "Gold",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "daffodilchurn_jeweled",
+    "name": "Mini Miku Afortunado",
+    "theme": "jeweled",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "daffodilchurn_cursed",
+    "name": "Mini Miku Maldito",
+    "theme": "cursed",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
+  },
+  {
+    "id": "yortmelee_basic",
+    "name": "Zee",
+    "theme": "Basic",
+    "rarity": "Mythic",
+    "unreleased": false,
+    "isNew": false,
+    "gen": 3,
+    "releaseDate": "2026-11-13T11:00:00.000Z",
+    "lanzamientoManual": true
   }
 ]

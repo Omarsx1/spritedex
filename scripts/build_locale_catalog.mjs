@@ -45,7 +45,10 @@ const FAMILIAS = {
   treasurechest: 'TreasureChest', treasuremap: 'TreasureMap', compass: 'Compass',
   unbotheredfish: 'UnbotheredFish', starlight: 'StarLight', squibbly: 'Squibbly',
   playmakerbrewery: 'PlaymakerBrewery', rookgecko: 'RookGecko', coinpile: 'CoinPile',
-  feedjet: 'FeedJet'
+  feedjet: 'FeedJet',
+  // Anunciadas el 13 de noviembre de 2026.
+  piratecalamari: 'PirateCalamari', whitetiger: 'WhiteTiger',
+  daffodilchurn: 'DaffodilChurn', yortmelee: 'YortMelee'
 };
 
 // tema de nuestro catalogo -> variante de la captura cruda, y su etiqueta en ingles

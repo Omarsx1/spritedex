@@ -67,7 +67,13 @@ export const FAMILY_NAMES_MAP = {
   playmakerbrewery: "Lil' Flacko",
   rookgecko: "Lil' Uzi Vert Jr.",
   coinpile: 'Saqueacofres',
-  feedjet: 'Caracol Transmisor'
+  feedjet: 'Caracol Transmisor',
+  // Familias anunciadas en la temporada Buscatesoros. Los nombres propios se conservan;
+  // solo Sir Oscar tiene una forma natural en español.
+  piratecalamari: 'Squiplash',
+  whitetiger: 'Sir Óscar el Segundo',
+  daffodilchurn: 'Mini Miku',
+  yortmelee: 'Zee'
 };
 
 export const THEME_NAMES_ES = {

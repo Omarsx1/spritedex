@@ -12,7 +12,9 @@ export const GEN_1_FAMILIES = new Set([
 export const GEN_3_FAMILIES = new Set([
   'peelybones', 'parrot', 'barreloffish', 'treasurechest', 'treasuremap', 'compass',
   'unbotheredfish', 'starlight', 'squibbly', 'playmakerbrewery', 'rookgecko',
-  'coinpile', 'feedjet'
+  'coinpile', 'feedjet',
+  // Anunciadas en fortnite.gg el 13 de noviembre de 2026.
+  'piratecalamari', 'whitetiger', 'daffodilchurn', 'yortmelee'
 ]);
 
 export const PARENT_TO_FAMILY = {
@@ -69,7 +71,12 @@ export const PARENT_TO_FAMILY = {
   winnerd: 'dumpsterdive',
   // fortnite.gg los publica con estos codenames; ya existen como honey_* y obsession_* (spritehelp).
   winnere: 'honey',
-  cargolying: 'obsession'
+  cargolying: 'obsession',
+  // Familias de la temporada Buscatesoros anunciadas el 13 de noviembre de 2026.
+  piratecalamari: 'piratecalamari',
+  whitetiger: 'whitetiger',
+  daffodilchurn: 'daffodilchurn',
+  yortmelee: 'yortmelee'
 };
 
 export const VARIANT_TO_THEME = {

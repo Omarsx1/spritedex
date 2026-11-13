@@ -422,5 +422,17 @@
   "Otorga recursos extra al recogerlos, y los compañeros que también lleven este espíritu equipado reciben recursos extra.": {
     "en": "Grants extra resources on pickup, with Teammates who also have this Sprite equipped receiving some extra resources as well!",
     "pt-BR": "Concede recursos extras ao coletá-los, e os companheiros que também estiverem com este espírito equipado recebem recursos extras também!"
+  },
+  "Aumenta el daño del pico y otorga un impulso de velocidad temporal cuando tu escudo se rompe.": {
+    "en": "Grants increased Pickaxe damage, also gives a temporary speed boost when your Shield breaks.",
+    "pt-BR": "Aumenta o dano da picareta e concede um impulso de velocidade temporário quando o seu escudo quebra."
+  },
+  "Otorga una Burbuja de Amistad al hacer emotes con otros jugadores.": {
+    "en": "Grants a Friendship Bubble when emoting with other players.",
+    "pt-BR": "Concede uma Bolha da Amizade ao fazer emotes com outros jogadores."
+  },
+  "Otorga cargas de impulso de Punto Cero que se regeneran.": {
+    "en": "Grants regenerating Zero Point dash charges.",
+    "pt-BR": "Concede cargas de avanço do Ponto Zero que se regeneram."
   }
 }
