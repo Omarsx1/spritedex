@@ -6,6 +6,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { t, getLang } from '../i18n';
 import { safeStorage } from '../utils/safeStorage';
+import {
+  estadoInicial,
+  normalizar,
+  sumarCofres,
+  alternarToken,
+  reiniciarSesion,
+  reiniciarTodo,
+  deshacerUltimo
+} from '../utils/cofresManual.js';
 
 const CLAVE = 'spritedex_cofres_v1';
 const DIA_MS = 24 * 60 * 60 * 1000;
@@ -16,21 +25,11 @@ function claveDia(fecha = new Date()) {
   return `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
 }
 
-function leerCofres() {
-  const base = { total: 0, sesion: 0, token: false, tokenFecha: null, dias: {} };
+function leerGuardado() {
   try {
-    const guardado = JSON.parse(safeStorage.getItem(CLAVE) || 'null');
-    if (!guardado || typeof guardado !== 'object') return base;
-    const dias = guardado.dias && typeof guardado.dias === 'object' ? guardado.dias : {};
-    return {
-      total: Math.max(0, Number(guardado.total) || 0),
-      sesion: Math.max(0, Number(guardado.sesion) || 0),
-      token: guardado.token === true,
-      tokenFecha: typeof guardado.tokenFecha === 'string' ? guardado.tokenFecha : null,
-      dias
-    };
+    return normalizar(JSON.parse(safeStorage.getItem(CLAVE) || 'null'));
   } catch {
-    return base;
+    return estadoInicial();
   }
 }
 
@@ -41,7 +40,8 @@ function Barra({ valor, maximo, etiqueta }) {
 
 export function CofresPage() {
   const lang = getLang();
-  const [cofres, setCofres] = useState(leerCofres);
+  const [cofres, setCofres] = useState(leerGuardado);
+  const [entrada, setEntrada] = useState('');
   const tituloRef = useRef(null);
 
   useEffect(() => {
@@ -54,29 +54,32 @@ export function CofresPage() {
   }
 
   function sumar(cantidad) {
-    const hoy = claveDia();
-    const dias = { ...cofres.dias };
-    dias[hoy] = Math.max(0, (Number(dias[hoy]) || 0) + cantidad);
-    guardar({
-      ...cofres,
-      total: Math.max(0, cofres.total + cantidad),
-      sesion: Math.max(0, cofres.sesion + cantidad),
-      dias
-    });
+    guardar(sumarCofres(cofres, cantidad, claveDia()));
+  }
+
+  function deshacer() {
+    guardar(deshacerUltimo(cofres));
   }
 
   function nuevaSesion() {
-    guardar({ ...cofres, sesion: 0 });
+    guardar(reiniciarSesion(cofres));
   }
 
   function reiniciar() {
     if (typeof window !== 'undefined' && !window.confirm(t('chest.resetConfirm'))) return;
-    guardar({ total: 0, sesion: 0, token: false, tokenFecha: null, dias: {} });
+    guardar(reiniciarTodo());
   }
 
   function marcarToken() {
-    const token = !cofres.token;
-    guardar({ ...cofres, token, tokenFecha: token ? claveDia() : null });
+    guardar(alternarToken(cofres, claveDia()));
+  }
+
+  function sumarManual(evento) {
+    evento.preventDefault();
+    const cantidad = Math.floor(Number(entrada));
+    if (!Number.isFinite(cantidad) || cantidad <= 0) return;
+    sumar(cantidad);
+    setEntrada('');
   }
 
   const hoy = claveDia();
@@ -112,7 +115,6 @@ export function CofresPage() {
           </div>
           <h1 id="cc-titulo" className="cc-title" ref={tituloRef} tabIndex={-1}>{t('chest.pageTitle')}</h1>
           <p className="cc-lead">{t('chest.lead')}</p>
-          <p className="cc-privacy">{t('chest.privacy')}</p>
         </div>
       </section>
 
@@ -137,12 +139,36 @@ export function CofresPage() {
         <div className="cc-manual__buttons">
           <button type="button" className="cc-btn cc-btn--gold" onClick={() => sumar(1)}>{t('chest.add1')}</button>
           <button type="button" className="cc-btn cc-btn--primary" onClick={() => sumar(5)}>{t('chest.add5')}</button>
-          <button type="button" className="cc-btn cc-btn--ghost" onClick={() => sumar(-1)}>{t('chest.undo')}</button>
+          <button
+            type="button"
+            className="cc-btn cc-btn--ghost"
+            onClick={deshacer}
+            disabled={!cofres.historial?.length}
+            title={t('chest.undoHint')}
+          >{t('chest.undo')}</button>
           <button type="button" className="cc-btn cc-btn--ghost" onClick={marcarToken}>{t('chest.manualToken')}</button>
           <button type="button" className="cc-btn cc-btn--ghost" onClick={nuevaSesion}>{t('chest.newSession')}</button>
           <button type="button" className="cc-btn cc-btn--ghost cc-btn--danger" onClick={reiniciar}>{t('chest.reset')}</button>
         </div>
+        <form className="cc-manual__form" onSubmit={sumarManual}>
+          <label htmlFor="cc-manual-amount">{t('chest.manualAmountLabel')}</label>
+          <div className="cc-manual__form-row">
+            <input
+              id="cc-manual-amount"
+              type="number"
+              inputMode="numeric"
+              min="1"
+              step="1"
+              placeholder={t('chest.manualAmountPlaceholder')}
+              value={entrada}
+              onChange={(e) => setEntrada(e.target.value)}
+            />
+            <button type="submit" className="cc-btn cc-btn--primary">{t('chest.manualAmountAdd')}</button>
+          </div>
+          <p className="cc-note">{t('chest.manualAmountHint')}</p>
+        </form>
         <p className="cc-manual__note">{t('chest.manualBody')}</p>
+        <p className="cc-manual__note">{t('chest.sessionHelp')}</p>
         <p className="cc-note">{t('chest.manualTokenNote')}</p>
       </section>
 
