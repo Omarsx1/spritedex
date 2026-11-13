@@ -310,19 +310,19 @@ export function CofresPage({ user, onOpenAuth }) {
           {!user ? (
             <>
               <span className="cc-sync__dot" />
-              <span>{t('chest.syncLocal')}</span>
+              <span className="cc-sync__message">{t('chest.syncLocal')}</span>
               <button type="button" className="cc-sync__link" onClick={onOpenAuth}>{t('chest.syncLogin')}</button>
             </>
           ) : user.is_anonymous ? (
             <>
               <span className={`cc-sync__dot ${sync === 'synced' ? 'is-ok' : ''}`} />
-              <span>{sync === 'syncing' ? t('chest.syncSyncing') : sync === 'synced' ? t('chest.syncGuest') : t('chest.syncLocal')}</span>
+              <span className="cc-sync__message">{sync === 'syncing' ? t('chest.syncSyncing') : sync === 'synced' ? t('chest.syncGuest') : t('chest.syncLocal')}</span>
               <button type="button" className="cc-sync__link" onClick={onOpenAuth}>{t('chest.syncLink')}</button>
             </>
           ) : (
             <>
               <span className={`cc-sync__dot ${sync === 'synced' ? 'is-ok' : ''}`} />
-              <span>{sync === 'syncing' ? t('chest.syncSyncing') : sync === 'synced' ? t('chest.syncDone') : t('chest.syncLocal')}</span>
+              <span className="cc-sync__message">{sync === 'syncing' ? t('chest.syncSyncing') : sync === 'synced' ? t('chest.syncDone') : t('chest.syncLocal')}</span>
             </>
           )}
         </div>

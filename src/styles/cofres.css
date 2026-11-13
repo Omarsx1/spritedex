@@ -251,7 +251,7 @@
 .cc-manual__note { margin-top: 12px; color: var(--cc-muted); font-size: 0.8rem; }
 .cc-sync {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 14px;
@@ -263,12 +263,15 @@
 .cc-sync__dot {
   width: 8px;
   height: 8px;
+  margin-top: 5px;
   border-radius: 50%;
   background: var(--cc-muted);
   flex: 0 0 auto;
 }
+.cc-sync__message { flex: 1 1 220px; min-width: 0; }
 .cc-sync__dot.is-ok { background: #3ddc97; box-shadow: 0 0 8px rgba(61, 220, 151, 0.55); }
 .cc-sync__link {
+  flex: 0 0 auto;
   padding: 0;
   border: 0;
   background: none;
@@ -530,7 +533,7 @@
     grid-template-columns: 68px 1fr;
     gap: 12px;
     padding: 16px;
-    align-items: start;
+    align-items: center;
   }
   .cc-hero__icon { width: 68px; height: 61px; filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.45)); }
   .cc-hero__top { gap: 6px; }
