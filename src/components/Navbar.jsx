@@ -35,7 +35,6 @@ export function Navbar({
   onOpenAuthModal,
   onLinkGoogle,
   onSignOut,
-  logoSrc = '/logoSF.webp',
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
@@ -203,18 +202,24 @@ export function Navbar({
           title={t('nav.inicioAyuda')}
           aria-label={t('nav.inicio')}
         >
-          <img
-            className={`app-navbar__logo-img ${logoSrc.includes('cofre') ? 'is-cofre' : ''}`}
-            src={logoSrc}
-            alt=""
-            draggable="false"
-          />
+          <img className="app-navbar__logo-img" src="/logoSF.webp" alt="" draggable="false" />
         </a>
       </div>
 
       {/* Acciones derechas: Avatar + Menú Hamburguesa. El idioma vive en Ajustes:
           un ajuste, una puerta. El interruptor de animaciones, igual. */}
       <div className="app-navbar__right">
+        {/* Atajo al contador de cofres: pegado al avatar, como una acción más de la barra. */}
+        <a
+          className="app-navbar__cofres"
+          href={conIdioma(RUTA_COFRES, getLang())}
+          onClick={(evento) => navegarEnApp(evento, RUTA_COFRES)}
+          title={t('nav.chestCounterAviso')}
+          aria-label={t('nav.chestCounter')}
+        >
+          <img src="/cofre-max-oro.webp" alt="" width="30" height="27" draggable="false" />
+        </a>
+
         {/* Avatar / Usuario (Solo Foto o Inicial Circular) */}
         <div ref={userDropdownRef} style={{ position: 'relative' }}>
           <button

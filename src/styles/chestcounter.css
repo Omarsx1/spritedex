@@ -255,8 +255,51 @@
 .cc-btn--ghost { background: rgba(255, 255, 255, 0.05); }
 .cc-btn--danger { color: #ffb4b4; border-color: rgba(255, 96, 96, 0.4); }
 
-/* En /cofres el logo superior es el cofre real, un poco más grande para que se lea. */
-.app-navbar__logo-img.is-cofre { width: 38px; height: 34px; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45)); }
+/* Atajo al contador junto al avatar: solo el cofre, con un halo dorado sutil. */
+.app-navbar__cofres {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  transition: transform 0.16s ease;
+}
+.app-navbar__cofres::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 213, 128, 0.42) 0%, rgba(255, 168, 48, 0.16) 46%, transparent 72%);
+  animation: ccCofreGlow 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+.app-navbar__cofres:hover { transform: scale(1.12); }
+.app-navbar__cofres:hover::before { animation: none; opacity: 1; transform: scale(1.14); }
+.app-navbar__cofres img {
+  position: relative;
+  z-index: 1;
+  width: 34px;
+  height: 31px;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 5px rgba(255, 210, 120, 0.6))
+    drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+  transition: transform 0.18s ease;
+}
+.app-navbar__cofres:hover img { transform: scale(1.06); }
+
+@keyframes ccCofreGlow {
+  0%, 100% { opacity: 0.45; transform: scale(0.9); }
+  50% { opacity: 0.95; transform: scale(1.12); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-navbar__cofres::before { animation: none; opacity: 0.6; }
+}
 
 /* El botón del menú: el cofre crece al pasar el ratón. */
 .app-navbar__chestcounter { transition: transform 0.16s ease, background 0.16s ease; }
