@@ -14,6 +14,8 @@ export function useEquipoCompartido(user) {
   const [equipo, setEquipo] = useState(null);
   const [miembros, setMiembros] = useState([]);
   const [pasados, setPasados] = useState([]);
+  const [aporteEquipos, setAporteEquipos] = useState(0);
+  const [equiposCount, setEquiposCount] = useState(0);
   const [cargando, setCargando] = useState(Boolean(user));
   const [error, setError] = useState('');
   const [enVivo, setEnVivo] = useState(false);
@@ -36,26 +38,23 @@ export function useEquipoCompartido(user) {
         setError('sin-supabase');
         return;
       }
-      const { data: mine, error: errorMine } = await supabase
+      // Todas las pertenencias (activa e históricas): así el total general no pierde
+      // lo que el usuario sumó en equipos de los que ya salió.
+      const { data: todos, error: errorTodos } = await supabase
         .from('team_members')
-        .select('team_id')
-        .eq('user_id', userId)
-        .is('left_at', null)
-        .maybeSingle();
-      if (errorMine) {
-        setError(errorMine.message);
+        .select('team_id, total, dias, left_at, teams(name, code, archived_at)')
+        .eq('user_id', userId);
+      if (errorTodos) {
+        setError(errorTodos.message);
         return;
       }
-      if (!mine) {
-        setEquipo(null);
-        setMiembros([]);
-        const { data: historicos } = await supabase
-          .from('team_members')
-          .select('team_id, total, dias, left_at, teams(name, code, archived_at)')
-          .eq('user_id', userId)
-          .not('left_at', 'is', null)
-          .order('left_at', { ascending: false });
-        setPasados((historicos || []).map((p) => ({
+      const lista = todos || [];
+      setAporteEquipos(lista.reduce((n, p) => n + (Number(p.total) || 0), 0));
+      setEquiposCount(new Set(lista.map((p) => p.team_id)).size);
+      setPasados(lista
+        .filter((p) => p.left_at)
+        .sort((a, b) => String(b.left_at).localeCompare(String(a.left_at)))
+        .map((p) => ({
           teamId: p.team_id,
           nombre: p.teams?.name || 'Equipo',
           codigo: p.teams?.code || '',
@@ -64,6 +63,10 @@ export function useEquipoCompartido(user) {
           leftAt: p.left_at,
           archivado: Boolean(p.teams?.archived_at)
         })));
+      const mine = lista.find((p) => !p.left_at);
+      if (!mine) {
+        setEquipo(null);
+        setMiembros([]);
         return;
       }
       const { data: team, error: errorTeam } = await supabase
@@ -94,7 +97,6 @@ export function useEquipoCompartido(user) {
         joinedAt: m.joined_at || null,
         actualizado: m.updated_at
       })));
-      setPasados([]);
     } catch (err) {
       setError(err?.message || 'error');
     } finally {
@@ -189,6 +191,7 @@ export function useEquipoCompartido(user) {
       dias[dia] = Math.max(0, (Number(dias[dia]) || 0) + delta);
       return { ...m, total: Math.max(0, m.total + delta), dias };
     }));
+    setAporteEquipos((n) => Math.max(0, n + delta));
     const { error: err } = await supabase.rpc('sumar_cofre_equipo', {
       p_team_id: equipo.id,
       p_delta: delta,
@@ -217,6 +220,7 @@ export function useEquipoCompartido(user) {
       dias[dia] = Math.max(0, (Number(dias[dia]) || 0) + delta);
       return { ...m, total: Math.max(0, m.total + delta), dias };
     }));
+    setAporteEquipos((n) => Math.max(0, n + delta));
     const { error: err } = await supabase.rpc('sumar_cofre_equipo', {
       p_team_id: equipo.id,
       p_delta: delta,
@@ -232,6 +236,8 @@ export function useEquipoCompartido(user) {
     equipo,
     miembros,
     pasados,
+    aporteEquipos,
+    equiposCount,
     cargando,
     error,
     enVivo,

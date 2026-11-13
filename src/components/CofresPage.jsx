@@ -31,6 +31,7 @@ import {
   topEquipo
 } from '../utils/cofresEquipo.js';
 import { EquipoCompartido } from './EquipoCompartido';
+import { useEquipoCompartido } from '../hooks/useEquipoCompartido';
 
 const CLAVE = 'spritedex_cofres_v1';
 const CLAVE_VISTA = 'spritedex_cofres_vista';
@@ -63,6 +64,7 @@ export function CofresPage({ user, onOpenAuth }) {
   const [nuevoJugador, setNuevoJugador] = useState('');
   const tituloRef = useRef(null);
   const sync = useCofresCloud({ user, cofres, setCofres });
+  const equipoShared = useEquipoCompartido(user);
 
   useEffect(() => {
     if (tituloRef.current) tituloRef.current.focus();
@@ -179,6 +181,25 @@ export function CofresPage({ user, onOpenAuth }) {
         </div>
       </section>
 
+      <section className="cc-general">
+        <div>
+          <span className="cc-general__label">{t('chest.generalTitle')}</span>
+          <strong>{numero(cofres.total + (user ? equipoShared.aporteEquipos : 0), lang)}</strong>
+          <small>{t('chest.generalNote')}</small>
+          {user && equipoShared.error && <small>{t('chest.generalTeamsError')}</small>}
+        </div>
+        <div className="cc-general__split">
+          <div><b>{numero(cofres.total, lang)}</b><span>{t('chest.generalIndividual')}</span></div>
+          <div><b>{numero(user ? equipoShared.aporteEquipos : 0, lang)}</b><span>{t('chest.generalTeams')}</span></div>
+          {user && equipoShared.equiposCount > 0 && (
+            <div><b>{equipoShared.equiposCount}</b><span>{t('chest.generalTeamCount')}</span></div>
+          )}
+        </div>
+        {!user && (
+          <button type="button" className="cc-sync__link" onClick={onOpenAuth}>{t('chest.generalLogin')}</button>
+        )}
+      </section>
+
       {!esEquipo && (
         <section className={`cc-token ${cofres.token ? 'is-found' : ''}`}>
           <img className="cc-token__mark" src="/token-pirata.svg" alt="" width="52" height="52" />
@@ -206,7 +227,7 @@ export function CofresPage({ user, onOpenAuth }) {
         </div>
 
         {esEquipo && user ? (
-          <EquipoCompartido user={user} />
+          <EquipoCompartido user={user} estado={equipoShared} />
         ) : (
           <>
 

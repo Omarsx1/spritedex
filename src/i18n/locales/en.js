@@ -562,4 +562,11 @@ export default {
   "team.historyNote": "Chests from players who left are recorded here but do not count toward the active total.",
   "chest.historyTitle": "History by day",
   "chest.historyEmpty": "No days recorded yet. Add your first chest to start.",
+  "chest.generalTitle": "Overall total",
+  "chest.generalNote": "Only your chests: individual plus what you added in your teams.",
+  "chest.generalIndividual": "Individual",
+  "chest.generalTeams": "In teams",
+  "chest.generalTeamCount": "Teams",
+  "chest.generalLogin": "Sign in to include your teams",
+  "chest.generalTeamsError": "Could not load your team contribution.",
 };

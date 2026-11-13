@@ -2,7 +2,6 @@
 // sumar/restar su propia fila y Realtime refresca los totales del equipo.
 import React, { useMemo, useState } from 'react';
 import { t, getLang } from '../i18n';
-import { useEquipoCompartido } from '../hooks/useEquipoCompartido';
 
 const DIA_MS = 24 * 60 * 60 * 1000;
 const numero = (valor, lang) => new Intl.NumberFormat(lang, { maximumFractionDigits: 1 }).format(valor || 0);
@@ -23,12 +22,12 @@ function nombrePorDefecto(user) {
     || 'Jugador';
 }
 
-export function EquipoCompartido({ user }) {
+export function EquipoCompartido({ user, estado }) {
   const lang = getLang();
   const {
     equipo, miembros, pasados, cargando, error, enVivo, miembro,
     crear, unir, salir, sumar, deshacer, puedeDeshacer
-  } = useEquipoCompartido(user);
+  } = estado;
   const [nombreEquipo, setNombreEquipo] = useState('Mi equipo');
   const [nombreJugador, setNombreJugador] = useState(() => nombrePorDefecto(user));
   const [codigo, setCodigo] = useState('');

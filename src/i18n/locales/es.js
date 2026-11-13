@@ -563,4 +563,11 @@ export default {
   "team.historyNote": "Los cofres de quienes salieron quedan registrados aquí, pero no suman al total activo.",
   "chest.historyTitle": "Historial por día",
   "chest.historyEmpty": "Aún no hay días registrados. Suma tu primer cofre para empezar.",
+  "chest.generalTitle": "Total general",
+  "chest.generalNote": "Solo tus cofres: lo individual más lo que sumaste en tus equipos.",
+  "chest.generalIndividual": "Individual",
+  "chest.generalTeams": "En equipos",
+  "chest.generalTeamCount": "Equipos",
+  "chest.generalLogin": "Inicia sesión para incluir tus equipos",
+  "chest.generalTeamsError": "No se pudo cargar tu aporte de equipos.",
 };

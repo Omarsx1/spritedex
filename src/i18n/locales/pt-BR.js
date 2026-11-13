@@ -561,4 +561,11 @@ export default {
   "team.historyNote": "Os baús de quem saiu ficam registrados aqui, mas não somam ao total ativo.",
   "chest.historyTitle": "Histórico por dia",
   "chest.historyEmpty": "Ainda não há dias registrados. Some seu primeiro baú para começar.",
+  "chest.generalTitle": "Total geral",
+  "chest.generalNote": "Apenas seus baús: o individual mais o que você somou nas suas equipes.",
+  "chest.generalIndividual": "Individual",
+  "chest.generalTeams": "Nas equipes",
+  "chest.generalTeamCount": "Equipes",
+  "chest.generalLogin": "Entre para incluir suas equipes",
+  "chest.generalTeamsError": "Não foi possível carregar sua contribuição nas equipes.",
 };

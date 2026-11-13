@@ -66,6 +66,37 @@
 }
 .cc-lead { color: var(--cc-text-2); font-size: 0.95rem; line-height: 1.5; max-width: 62ch; }
 
+.cc-general {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+  margin-top: 14px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1.5px solid var(--cc-border);
+  background: linear-gradient(180deg, #1b2b46 0%, #0e1728 100%);
+}
+.cc-general__label {
+  color: var(--cc-gold);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.cc-general strong {
+  display: block;
+  font-size: clamp(2.2rem, 7vw, 3rem);
+  line-height: 1;
+  color: var(--cc-gold-2);
+}
+.cc-general small { display: block; margin-top: 4px; color: var(--cc-muted); font-size: 0.78rem; }
+.cc-general__split { display: flex; flex-wrap: wrap; gap: 18px; }
+.cc-general__split div { display: grid; gap: 2px; }
+.cc-general__split b { color: var(--cc-text); font-size: 1.25rem; }
+.cc-general__split span { color: var(--cc-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.cc-general > .cc-sync__link { grid-column: 1 / -1; justify-self: start; }
+
 .cc-token {
   position: relative;
   display: grid;
@@ -575,6 +606,8 @@
   .cc-chart__col em { font-size: 0.5rem; }
   .cc-kpi strong { font-size: 1.4rem; }
   .cc-kpi--hero strong { font-size: 1.8rem; }
+  .cc-general { grid-template-columns: 1fr; gap: 10px; padding: 16px; }
+  .cc-general__split { gap: 14px; }
   .cc-token { grid-template-columns: auto 1fr; padding: 16px; }
   .cc-token__mark { width: 46px; height: 46px; }
 }
