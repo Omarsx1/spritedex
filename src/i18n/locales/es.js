@@ -387,6 +387,8 @@ export default {
   "nav.entrarOCrearUsuario": "Entrar o crear usuario",
   "nav.generaciones": "Generaciones",
   "nav.guiaEspiritus": "Guía de espíritus",
+  "nav.chestCounter": "Contador de cofres",
+  "nav.chestCounterAviso": "Herramienta externa para Windows (se abre en GitHub)",
   "nav.iniciarSesion": "Iniciar sesión",
   "nav.iniciarSesionTitulo": "Iniciar Sesión",
   "nav.instalar": "Instalar",

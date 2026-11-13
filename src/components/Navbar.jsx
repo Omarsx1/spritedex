@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { User, UserPlus, LogOut, ShieldCheck, Menu, X, Layers, Sparkles, Settings, AlertTriangle, Mail, BookOpen, Globe } from 'lucide-react';
+import { User, UserPlus, LogOut, ShieldCheck, Menu, X, Layers, Sparkles, Settings, AlertTriangle, Mail, BookOpen, Globe, Boxes } from 'lucide-react';
 import { Google } from './ui/Google';
 import { getSupabase } from '../utils/supabase';
 import { getMyFriendCode } from '../utils/friendCode';
@@ -376,6 +376,22 @@ export function Navbar({
                   <div className="action-btn-left">
                     <BookOpen size={15} color="var(--nav-accent, #00F0E8)" />
                     <span>{t('nav.guiaEspiritus')}</span>
+                  </div>
+                </a>
+
+                {/* Herramienta externa: es una app de Windows, no una ruta de la app.
+                    El enlace real se abre en otra pestaña para no perder el catálogo. */}
+                <a
+                  className="app-navbar__menu-action-btn"
+                  href="https://github.com/xdoofy92/ChestCounter"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={t('nav.chestCounterAviso')}
+                  onClick={() => setIsNavMenuOpen(false)}
+                >
+                  <div className="action-btn-left">
+                    <Boxes size={15} color="var(--nav-accent, #00F0E8)" />
+                    <span>{t('nav.chestCounter')}</span>
                   </div>
                 </a>
 

@@ -386,6 +386,8 @@ export default {
   "nav.entrarOCrearUsuario": "Sign in or create account",
   "nav.generaciones": "Generations",
   "nav.guiaEspiritus": "Sprite guide",
+  "nav.chestCounter": "Chest counter",
+  "nav.chestCounterAviso": "External Windows tool (opens on GitHub)",
   "nav.iniciarSesion": "Sign in",
   "nav.iniciarSesionTitulo": "Sign in",
   "nav.instalar": "Install",
