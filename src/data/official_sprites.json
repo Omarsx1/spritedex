@@ -3219,6 +3219,18 @@
     "lanzamientoManual": true
   },
   {
+    "id": "daffodilchurn_fortune",
+    "name": "Mini Miku Fortune",
+    "theme": "Fortune",
+    "rarity": "Special",
+    "unreleased": false,
+    "isNew": true,
+    "nameEn": "Fortune Mini Miku",
+    "releaseDate": "2026-11-15T08:00:00.000Z",
+    "artSource": "spritehelp",
+    "gen": 2
+  },
+  {
     "id": "yortmelee_basic",
     "name": "Zee",
     "theme": "Basic",
