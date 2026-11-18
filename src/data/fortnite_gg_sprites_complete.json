@@ -4065,8 +4065,8 @@
   },
   {
     "id": "328",
-    "name": "Fortune Sir Oscar the Second",
-    "fullName": "Fortune Sir Oscar the Second Sprite",
+    "name": "jeweled Sir Oscar the Second",
+    "fullName": "jeweled Sir Oscar the Second Sprite",
     "parent": "WhiteTiger",
     "rarity": "Special",
     "variant": "Jeweled",
@@ -4081,8 +4081,8 @@
   },
   {
     "id": "329",
-    "name": "Cursed Sir Oscar the Second",
-    "fullName": "Cursed Sir Oscar the Second Sprite",
+    "name": "cursed Sir Oscar the Second",
+    "fullName": "cursed Sir Oscar the Second Sprite",
     "parent": "WhiteTiger",
     "rarity": "Special",
     "variant": "Cursed",
@@ -4177,8 +4177,8 @@
   },
   {
     "id": "334",
-    "name": "cursed Mini Miku",
-    "fullName": "cursed Mini Miku Sprite",
+    "name": "Cursed Mini Miku",
+    "fullName": "Cursed Mini Miku Sprite",
     "parent": "DaffodilChurn",
     "rarity": "Special",
     "variant": "Cursed",
@@ -4193,8 +4193,8 @@
   },
   {
     "id": "335",
-    "name": "jeweled Mini Miku",
-    "fullName": "jeweled Mini Miku Sprite",
+    "name": "Fortune Mini Miku",
+    "fullName": "Fortune Mini Miku Sprite",
     "parent": "DaffodilChurn",
     "rarity": "Special",
     "variant": "Jeweled",
