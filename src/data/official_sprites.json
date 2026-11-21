@@ -2846,7 +2846,7 @@
     "theme": "cursed",
     "rarity": "Special",
     "unreleased": false,
-    "isNew": true,
+    "isNew": false,
     "gen": 3,
     "releaseDate": "2026-11-13"
   },
